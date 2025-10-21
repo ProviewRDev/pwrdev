@@ -122,4 +122,62 @@ std::string formatHeaderCompat(char severity_char, CoLogFacility facility, const
   return formatHeader(level, facility, app_name, structured_data);
 }
 
+int findMessageStartIndex(const std::string& log_entry)
+{
+  // RFC5424 format: <PRI>VERSION TIMESTAMP HOSTNAME APP-NAME PROCID MSGID STRUCTURED-DATA MSG
+  // Example: <134>1 2024-10-21T10:30:45.123456+02:00 hostname app_name 1234 - - This is the message
+
+  if (log_entry.empty() || log_entry[0] != '<')
+  {
+    return -1; // Not RFC5424 format
+  }
+
+  size_t pos = 1; // Skip initial '<'
+  size_t len = log_entry.length();
+  int field_count = 0;
+
+  // Skip PRI field - find closing '>'
+  while (pos < len && log_entry[pos] != '>')
+  {
+    pos++;
+  }
+  if (pos >= len)
+  {
+    return -1; // Malformed - no closing '>'
+  }
+  pos++; // Skip '>'
+
+  // Now skip 6 more space-separated fields:
+  // VERSION TIMESTAMP HOSTNAME APP-NAME PROCID MSGID STRUCTURED-DATA
+  while (pos < len && field_count < 7)
+  {
+    // Skip whitespace
+    while (pos < len && (log_entry[pos] == ' ' || log_entry[pos] == '\t'))
+    {
+      pos++;
+    }
+    if (pos >= len)
+    {
+      return -1; // Ran out of content
+    }
+
+    // Skip current field
+    while (pos < len && log_entry[pos] != ' ' && log_entry[pos] != '\t')
+    {
+      pos++;
+    }
+
+    field_count++;
+  }
+
+  // Skip any remaining whitespace before message
+  while (pos < len && (log_entry[pos] == ' ' || log_entry[pos] == '\t'))
+  {
+    pos++;
+  }
+
+  // pos should now point to the start of the message
+  return (pos < len) ? static_cast<int>(pos) : -1;
+}
+
 } // namespace RFC5424

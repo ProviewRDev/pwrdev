@@ -35,3 +35,21 @@ extern "C" int co_rfc5424_format_header_c(char severity_char, const char* app_na
     return -1; // Error occurred
   }
 }
+
+// C-compatible wrapper for finding message start index
+extern "C" int co_rfc5424_find_message_start_c(const char* log_entry)
+{
+  if (!log_entry)
+  {
+    return -1;
+  }
+
+  try
+  {
+    return RFC5424::findMessageStartIndex(std::string(log_entry));
+  }
+  catch (...)
+  {
+    return -1; // Error occurred
+  }
+}

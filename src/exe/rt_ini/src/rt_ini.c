@@ -46,6 +46,7 @@
 #endif
 
 #include "co_dcli.h"
+#include "co_rfc5424_c.h"
 #include "co_string.h"
 #include "co_time.h"
 #include "co_ver.h"
@@ -1795,7 +1796,21 @@ static void ini_errl_cb(void* ctx, char* str, char severity, pwr_tStatus sts, er
       }
     }
     cp->np->ProcMsgSeverity[anix - 1] = sts;
-    strncpy(cp->np->ProcMessage[anix - 1], &str[49], sizeof(cp->np->ProcMessage[0]));
+
+    // Extract message content using RFC5424 parser
+    char* message_start = str;
+    int message_index = co_rfc5424_find_message_start_c(str);
+
+    if (message_index >= 0)
+    {
+      // RFC5424 format detected and parsed successfully
+      message_start = &str[message_index];
+    }
+
+    // If RFC5424 parsing fails, use the original string as fallback
+    // This should not happen in normal operation since all logs are now RFC5424
+
+    strncpy(cp->np->ProcMessage[anix - 1], message_start, sizeof(cp->np->ProcMessage[0]));
     cp->np->ProcMessage[anix - 1][sizeof(cp->np->ProcMessage[0]) - 1] = 0;
     break;
   case errh_eMsgType_Status:

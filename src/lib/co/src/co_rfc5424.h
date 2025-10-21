@@ -117,6 +117,17 @@ std::string formatTimezone(const std::string& tz_string);
  */
 CoLogLevel mapSeverityChar(char severity_char);
 
+/**
+ * @brief Find the start index of the message in an RFC5424 formatted log entry.
+ *
+ * Parses an RFC5424 syslog formatted string to find where the actual message content begins.
+ * The RFC5424 format is: <PRI>VERSION TIMESTAMP HOSTNAME APP-NAME PROCID MSGID STRUCTURED-DATA MSG
+ *
+ * @param log_entry The complete RFC5424 formatted log entry
+ * @return Index where the message starts, or -1 if not valid RFC5424 format
+ */
+int findMessageStartIndex(const std::string& log_entry);
+
 } // namespace RFC5424
 
 #endif // CO_RFC5424_H

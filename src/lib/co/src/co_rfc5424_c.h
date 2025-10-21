@@ -58,6 +58,17 @@ extern "C"
    */
   int co_rfc5424_format_header_c(char severity_char, const char* app_name, char* buffer, size_t buffer_size);
 
+  /**
+   * @brief Find the start index of the message in an RFC5424 formatted log entry (C interface).
+   *
+   * Parses an RFC5424 syslog formatted string to find where the actual message content begins.
+   * The RFC5424 format is: <PRI>VERSION TIMESTAMP HOSTNAME APP-NAME PROCID MSGID STRUCTURED-DATA MSG
+   *
+   * @param log_entry The complete RFC5424 formatted log entry (null-terminated string)
+   * @return Index where the message starts, or -1 if not valid RFC5424 format
+   */
+  int co_rfc5424_find_message_start_c(const char* log_entry);
+
 #ifdef __cplusplus
 }
 #endif
