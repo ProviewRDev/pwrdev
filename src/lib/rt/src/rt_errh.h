@@ -39,7 +39,6 @@
 
 #include "rt_errh_types.h"
 #include "co_log_severity.h"
-#include "co_logger.h"
 
 #if defined __cplusplus
 extern "C"
@@ -113,7 +112,7 @@ extern "C"
   char* errh_GetMsg(const pwr_tStatus sts, char* buf, int bufSize);
   char* errh_GetError(const pwr_tStatus sts, char* buf, int bufSize);
   char* errh_GetText(const pwr_tStatus sts, char* buf, int bufSize);
-  char* errh_Log(char* buff, char severity, const char* msg, ...);
+  // char* errh_Log(char* buff, char severity, const char* msg, ...);
 
   // Standard log functions
   void errh_Fatal(const char* msg, ...);

@@ -64,6 +64,7 @@
 #include "rt_gdh.h"
 #include "rt_errh_msg.h"
 #include "rt_pwr_msg.h"
+#include "co_rfc5424_c.h"
 
 #define UNKNOWN_PROGRAM_NAME "Unknown name   "
 #define ERRH_MAX_ANIX 40
@@ -276,25 +277,6 @@ char* errh_GetError(const int sts, char* buf, int bufSize) { return get_message(
  * @return Pointer to the buffer containing the message text.
  */
 char* errh_GetText(const int sts, char* buf, int bufSize) { return get_message(sts, 1, buf, bufSize); }
-
-/* Log a message.  */
-char* errh_Log(char* buff, char severity, const char* msg, ...)
-{
-  char* s;
-  va_list ap;
-
-  s = get_header(severity, buff);
-  va_start(ap, msg);
-  msg_vsprintf(s, msg, NULL, ap);
-  va_end(ap);
-
-  if (g_interactive)
-    printf("%s\n", buff);
-  else
-    errh_send(buff, severity, 0, errh_eMsgType_Log);
-
-  return buff;
-}
 
 /**
  * @brief Log a success message.
@@ -575,7 +557,6 @@ void errh_CErrLog(pwr_tStatus sts, ...)
  * (including severity, program name, PID, timestamp), followed by the formatted message using the
  * supplied format string and arguments. The resulting string is suitable for logging or display.
  *
- * Unlike errh_Log, this function does not send or print the message; it only formats it.
  *
  * @param string   Buffer where the formatted message will be written.
  * @param severity Severity character ('E' for error, 'W' for warning, etc.).
@@ -719,44 +700,9 @@ static char* get_name(char* name, int size)
 
   return name;
 }
-/**
- * @brief Internal: Get the current process ID.
- *
- * Stores the current process ID in the provided pointer.
- *
- * @param pid Pointer to store the process ID.
- * @return Pointer to the pid argument.
- */
-static sPid* get_pid(sPid* pid)
-{
-  *pid = getpid();
 
-  return pid;
-}
-
-/**
- * @brief Formats the log message header for error logging.
- *
- * This function writes a formatted header string into the provided buffer.
- * The header includes severity, program name, process ID, and timestamp.
- * If running in interactive mode, only the severity character is written.
- *
- * @param severity The severity character (e.g., 'E' for error, 'W' for warning).
- * @param s Pointer to the buffer where the header will be written.
- * @return Pointer to the end of the written header string (for appending the log message).
- *
- * Example header format (non-interactive):
- *   E programName   12345678 25-09-23 14:32:01.00
- *
- * Example header format (interactive):
- *   E
- */
 static char* get_header(char severity, char* s)
 {
-  sPid pid;
-  pwr_tTime time;
-  struct tm tp, *t;
-
   if (!g_init_done)
     errh_Init(NULL, 0);
 
@@ -766,65 +712,39 @@ static char* get_header(char severity, char* s)
     return s;
   }
 
-  time_GetTime(&time);
+  // Use RFC5424 formatting for proper syslog compliance
+  char rfc5424_header[512];
+  int header_len =
+      co_rfc5424_format_header_c(severity, g_program_name, rfc5424_header, sizeof(rfc5424_header));
 
-  get_pid(&pid);
-
-  s += sprintf(s, "%c %-*.*s", severity, (int)sizeof(g_program_name), (int)sizeof(g_program_name),
-               g_program_name);
-
-  time_t sec = time.tv_sec;
-  localtime_r(&sec, &tp);
-  t = &tp;
-  s += sprintf(s, " %8d ", pid);
-
-  s += sprintf(s, "%02d-%02d-%02d %02d:%02d:%02d.%02d ", t->tm_year % 100, t->tm_mon + 1, t->tm_mday,
-               t->tm_hour, t->tm_min, t->tm_sec, (int)(time.tv_nsec / 10000000));
-
-  return s;
-}
-
-static char* get_header_rfc5424(char severity, char* s)
-{
-  sPid pid;
-  pwr_tTime time;
-  struct tm tp, *t;
-
-  if (!g_init_done)
-    errh_Init(NULL, 0);
-
-  if (g_interactive)
+  if (header_len > 0)
   {
-    s += sprintf(s, "%c ", severity);
+    // Copy the RFC5424 header and add a space for the message
+    strcpy(s, rfc5424_header);
+    s += header_len;
+    *s++ = ' '; // Add space separator before message content
+    *s = '\0';  // Null terminate
     return s;
   }
-
-  time_GetTime(&time);
-
-  get_pid(&pid);
-
-  s += sprintf(s, "%c %-*.*s", severity, (int)sizeof(g_program_name), (int)sizeof(g_program_name),
-               g_program_name);
-
-  time_t sec = time.tv_sec;
-  localtime_r(&sec, &tp);
-  t = &tp;
-  s += sprintf(s, " %8d ", pid);
-
-  s += sprintf(s, "%02d-%02d-%02d %02d:%02d:%02d.%02d ", t->tm_year % 100, t->tm_mon + 1, t->tm_mday,
-               t->tm_hour, t->tm_min, t->tm_sec, (int)(time.tv_nsec / 10000000));
-
-  return s;
+  else
+  {
+    // Fallback to simple format if RFC5424 formatting fails
+    s += sprintf(s, "%c %-*.*s ", severity, (int)sizeof(g_program_name), (int)sizeof(g_program_name),
+                 g_program_name);
+    return s;
+  }
 }
 
 /**
- * @brief Formats and logs a message with severity, optional log structure, and variable arguments.
+ * @brief Formats and logs an RFC5424 compliant message with severity and variable arguments.
  *
- * This function builds a log message header (including severity, program name, PID, timestamp),
- * formats the message using the provided format string and arguments, and sends it to the error log system.
+ * This function builds an RFC5424 syslog compliant log message header using CoLogger's formatting,
+ * then appends the formatted message content. The result is sent to the error log system.
  * If interactive mode is enabled, the message is printed to stdout instead of being sent to the log queue.
  * If a log structure pointer (lp) is provided and lp->send is true, the message is also sent to a custom log
  * queue.
+ *
+ * RFC5424 format: <PRI>VERSION TIMESTAMP HOSTNAME APP-NAME PROCID MSGID STRUCTURED-DATA MSG
  *
  * @param lp       Optional pointer to a log structure (errh_sLog) for custom logging. Can be NULL.
  * @param severity Severity character ('E' for error, 'W' for warning, etc.).
@@ -832,47 +752,9 @@ static char* get_header_rfc5424(char severity, char* s)
  * @param ap       Variable argument list for formatting the message.
  *
  * Example usage:
- *   log_message(NULL, 'E', "Error: %s", args);
+ *   log_message_rfc5424(NULL, 'E', "Error: %s", args);
  */
 static void log_message(errh_sLog* lp, char severity, const char* msg, va_list ap)
-{
-  char* s;
-  char string[1000];
-
-  s = get_header(severity, string);
-  msg_vsprintf(s, msg, NULL, ap);
-  if (g_interactive)
-    printf("%s\n", string);
-  else
-    errh_send(string, severity, 0, errh_eMsgType_Log);
-
-  if (lp != NULL && lp->send)
-  {
-    lp->put.data = string;
-    lp->put.size = strlen(string) + 1;
-    lp->put.allocate = 1;
-    qcom_Put(NULL, &lp->logQ, &lp->put);
-  }
-}
-
-/**
- * @brief Formats and logs a message with severity, optional log structure, and variable arguments.
- *
- * This function builds a log message header (including severity, program name, PID, timestamp),
- * formats the message using the provided format string and arguments, and sends it to the error log system.
- * If interactive mode is enabled, the message is printed to stdout instead of being sent to the log queue.
- * If a log structure pointer (lp) is provided and lp->send is true, the message is also sent to a custom log
- * queue.
- *
- * @param lp       Optional pointer to a log structure (errh_sLog) for custom logging. Can be NULL.
- * @param severity Severity character ('E' for error, 'W' for warning, etc.).
- * @param msg      Format string for the log message (like printf).
- * @param ap       Variable argument list for formatting the message.
- *
- * Example usage:
- *   log_message(NULL, 'E', "Error: %s", args);
- */
-static void log_message_rfc5424(errh_sLog* lp, char severity, const char* msg, va_list ap)
 {
   char* s;
   char string[LOG_MAX_MSG_SIZE];

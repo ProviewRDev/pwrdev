@@ -59,11 +59,13 @@
 
 static pthread_mutex_t g_file_mutex;
 static pthread_mutex_t g_term_mutex;
+
 #if defined(OS_MACOS) || defined(OS_FREEBSD) || defined(OS_OPENBSD)
 static int g_mqid = -1;
 #else
 static mqd_t g_mqid = (mqd_t)-1;
 #endif
+
 static int g_log_file = -1;
 static int g_new_log_file = 1;
 static int g_term = -1;
@@ -197,6 +199,7 @@ void errl_Init(const char* termName,
 
   return;
 }
+
 void errl_Unlink(void)
 {
 #if !defined(OS_MACOS) && !defined(OS_FREEBSD) && !defined(OS_OPENBSD)
@@ -215,6 +218,7 @@ void errl_Unlink(void)
   mq_unlink(name);
 #endif
 }
+
 void errl_SetFile(const char* logFileName)
 {
   pwr_tStatus sts = 1;
