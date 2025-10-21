@@ -49,10 +49,8 @@ static void loadCSS()
 
   // Try to load from file first
   GError* error = nullptr;
-  char css_path[256] = "";
-  char css_filename[] = "$pwr_exe/pn_dcp_tool_style.css";
-
-  dcli_translate_filename(css_filename, css_path);
+  char css_path[256];
+  dcli_translate_filename(css_path, "$pwr_exe/pn_dcp_tool_style.css");
   if (!gtk_css_provider_load_from_path(provider, css_path, &error))
   {
     if (error)
@@ -66,7 +64,6 @@ static void loadCSS()
   {
     gtk_style_context_add_provider_for_screen(screen, GTK_STYLE_PROVIDER(provider),
                                               GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
-    std::cout << "Loaded custom CSS styling" << std::endl;
   }
 
   g_object_unref(provider);
