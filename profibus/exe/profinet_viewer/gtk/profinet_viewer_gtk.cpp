@@ -38,6 +38,7 @@
 
 #include "pn_dcp_tool_gtk.h"
 #include <iostream>
+#include "co_dcli.h"
 
 // Load CSS styling for modern UI
 static void loadCSS()
@@ -48,8 +49,11 @@ static void loadCSS()
 
   // Try to load from file first
   GError* error = nullptr;
-  if (!gtk_css_provider_load_from_path(
-          provider, "/data0/pwr/profibus/exe/profinet_viewer2/gtk/pn_dcp_tool_style.css", &error))
+  char css_path[256] = "";
+  char css_filename[] = "$pwr_exe/pn_dcp_tool_style.css";
+
+  dcli_translate_filename(css_filename, css_path);
+  if (!gtk_css_provider_load_from_path(provider, css_path, &error))
   {
     if (error)
     {

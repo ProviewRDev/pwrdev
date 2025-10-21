@@ -1,8 +1,8 @@
 ifndef link_rule_mk
 link_rule_mk := 1
 
-link = $(ldxx) -L$(pwr_elib) $(elinkflags) $(domap) -o $(pwr_exe)/profinet_viewer2_gtk \
-	$(bld_dir)/profinet_viewer2_gtk.o \
+link = $(ldxx) -L$(pwr_elib) $(elinkflags) $(domap) -o $(pwr_exe)/profinet_viewer_gtk \
+	$(bld_dir)/profinet_viewer_gtk.o \
 	$(bld_dir)/pn_dcp_tool_gtk.o \
 	$(bld_dir)/network_topology_window.o \
 	$(bld_dir)/pn_dcp_tool.o \
