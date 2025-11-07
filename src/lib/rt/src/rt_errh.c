@@ -66,7 +66,7 @@
 #include "rt_pwr_msg.h"
 #include "co_rfc5424_c.h"
 
-#define UNKNOWN_PROGRAM_NAME "unknown   "
+#define UNKNOWN_PROGRAM_NAME "unknown"
 #define ERRH_MAX_ANIX 40
 #define ERRH_MAX_ANIX_NAME_LEN 32
 
