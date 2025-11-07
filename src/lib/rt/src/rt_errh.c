@@ -66,12 +66,12 @@
 #include "rt_pwr_msg.h"
 #include "co_rfc5424_c.h"
 
-#define UNKNOWN_PROGRAM_NAME "Unknown name   "
+#define UNKNOWN_PROGRAM_NAME "unknown   "
 #define ERRH_MAX_ANIX 40
 #define ERRH_MAX_ANIX_NAME_LEN 32
 
 typedef void* aa_list[];
-#define aa_arg(ap, vap, type) (ap ? ((type) * ap++) : va_arg(vap, type))
+#define aa_arg(ap, vap, type) (ap ? ((type)*ap++) : va_arg(vap, type))
 
 typedef enum
 {
