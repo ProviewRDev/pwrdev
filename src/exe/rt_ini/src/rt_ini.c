@@ -1002,9 +1002,11 @@ static pwr_tStatus events(ini_sContext* cp)
 
     if (lst_Succ(NULL, &cp->proc_lh, &pl) == NULL)
       break;
+
     pid = waitpid(-1, &status, WNOHANG | WUNTRACED);
     if (pid == 0)
       continue;
+
     if (pid == last_pid)
       break;
 
