@@ -484,6 +484,9 @@ wb_orep* wb_vrepdb::createObject(pwr_tStatus* sts, wb_cdef cdef,
 
     o.ohTime(time);
     o.flags(cdef.flags());
+    // Set object body sizes from class definition at creation time.
+    // These sizes are stored in database and must match class definition.
+    // If class definition changes, "Update Classes" must update these values!
     o.rbSize(cdef.size(pwr_eBix_rt));
     o.dbSize(cdef.size(pwr_eBix_dev));
 
@@ -2216,15 +2219,13 @@ int wb_vrepdb::checkClass(pwr_tCid cid)
 
   n_time = n_crep->ohTime();
 
-  // Check if timestamps differ OR if body sizes changed
+   // Check if timestamps differ OR if body sizes changed
   if (time_Acomp(&o_time, &n_time) != 0) {
     n = 1;
   } else if (o_crep->size(pwr_eBix_rt) != n_crep->size(pwr_eBix_rt) ||
              o_crep->size(pwr_eBix_dev) != n_crep->size(pwr_eBix_dev)) {
     // Body size changed even though timestamp didn't - needs update!
-    // printf("DEBUG checkClass: Class %s body size changed! Old RT=%zu New RT=%zu, Old Dev=%zu New Dev=%zu\n",
-    //        o_crep->name(), o_crep->size(pwr_eBix_rt), n_crep->size(pwr_eBix_rt),
-    //        o_crep->size(pwr_eBix_dev), n_crep->size(pwr_eBix_dev));
+    // This prevents segfaults from buffer overflows during database reads.
     n = 1;
   } else {
     pwr_tCid* cidlist;
