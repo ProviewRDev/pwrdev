@@ -1975,9 +1975,12 @@ pwr_tStatus wb_vrepdb::updateMeta()
   m_attribute_th = tree_CreateTable(&sts, sizeof(sAttributeKey),
       offsetof(sAttribute, key), sizeof(sAttribute), 1000, comp_attribute);
 
+  // printf("DEBUG updateMeta: Starting update process...\n");
+  
   try {
     wb_db_class_iterator ip(m_db);
 
+    // printf("DEBUG updateMeta: Phase 1 - Checking classes\n");
     for (ip.first(); !ip.atEnd(); ip.succClass()) {
       try {
         nClass += checkClass(ip.cid());
@@ -1986,21 +1989,70 @@ pwr_tStatus wb_vrepdb::updateMeta()
         printf("vrepdb::updateMeta: %s\n", e.what().c_str());
       }
     }
+    
+    // printf("DEBUG updateMeta: Phase 2 - Checking objects\n");
     for (ip.first(); !ip.atEnd(); ip.succObject()) {
       pwr_tCid cid = ip.cid();
       sClass* cp = (sClass*)tree_Find(&sts, m_class_th, &cid);
 
       nAref += updateArefs(ip.oid(), ip.cid());
 
-      if (!cp)
-        continue;
+      if (!cp) {
+        // printf("DEBUG updateMeta: Object %u:%u class 0x%x not in modified table, checking anyway...\n",
+        //        ip.oid().oix, ip.oid().vid, cid);
+        // Don't skip! Check if object size is wrong even if class not marked modified
+        // Create temporary class entry for size checking
+        sClass temp_cp;
+        temp_cp.cid = cid;
+        temp_cp.n_time.tv_sec = 0;
+        temp_cp.n_time.tv_nsec = 0;
+        cp = &temp_cp;
+      }
 
       cp->count++;
 
-      if (time_IsNull(&cp->n_time))
-        continue;
+      // Check if object body size matches class definition
+      // printf("DEBUG updateMeta: Checking object %u:%u of class 0x%x\n", 
+      //        ip.oid().oix, ip.oid().vid, cid);
+      
+      bool needs_update = false;
+      if (!time_IsNull(&cp->n_time)) {
+        // printf("  -> Class changed (timestamp differs), needs update\n");
+        needs_update = true;  // Class changed
+      } else {
+        // Class didn't change, but check if object size is wrong
+        // printf("  -> Class timestamp same, checking body sizes...\n");
+        m_ohead.get(m_db->m_txn, ip.oid());
+        wb_cdrep* crep = m_erep->merep()->cdrep(&sts, cid);
+        if (crep) {
+          size_t obj_rt = m_ohead.rbSize();
+          size_t obj_dev = m_ohead.dbSize();
+          size_t class_rt = crep->size(pwr_eBix_rt);
+          size_t class_dev = crep->size(pwr_eBix_dev);
+          
+          // printf("  -> Object RT=%zu, Class RT=%zu\n", obj_rt, class_rt);
+          // printf("  -> Object Dev=%zu, Class Dev=%zu\n", obj_dev, class_dev);
+          
+          if (obj_rt != class_rt || obj_dev != class_dev) {
+            // printf("  -> SIZE MISMATCH! Object needs update!\n");
+            needs_update = true;
+          } else {
+            // printf("  -> Sizes match, no update needed\n");
+          }
+        } else {
+          // Don't care about this case for now
+          // printf("  -> WARNING: Could not get class definition!\n");
+        }
+      }
 
-      nObject += updateObject(ip.oid(), ip.cid());
+      if (needs_update) {
+        // printf("  -> UPDATING object %u:%u\n", ip.oid().oix, ip.oid().vid);
+        nObject += updateObject(ip.oid(), ip.cid());
+      } else {
+        // Don't care about this case for now
+        // printf("  -> Skipping object %u:%u (no update needed)\n", 
+        //        ip.oid().oix, ip.oid().vid);
+      }
     }
   } catch (DbException& e) {
     printf("vrepdb::updateMeta: %s\n", e.what());
@@ -2164,7 +2216,15 @@ int wb_vrepdb::checkClass(pwr_tCid cid)
 
   n_time = n_crep->ohTime();
 
+  // Check if timestamps differ OR if body sizes changed
   if (time_Acomp(&o_time, &n_time) != 0) {
+    n = 1;
+  } else if (o_crep->size(pwr_eBix_rt) != n_crep->size(pwr_eBix_rt) ||
+             o_crep->size(pwr_eBix_dev) != n_crep->size(pwr_eBix_dev)) {
+    // Body size changed even though timestamp didn't - needs update!
+    // printf("DEBUG checkClass: Class %s body size changed! Old RT=%zu New RT=%zu, Old Dev=%zu New Dev=%zu\n",
+    //        o_crep->name(), o_crep->size(pwr_eBix_rt), n_crep->size(pwr_eBix_rt),
+    //        o_crep->size(pwr_eBix_dev), n_crep->size(pwr_eBix_dev));
     n = 1;
   } else {
     pwr_tCid* cidlist;
