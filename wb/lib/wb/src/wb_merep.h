@@ -47,77 +47,277 @@ class wb_tdrep;
 class wb_adrep;
 class wb_vrepdb;
 
-typedef struct {
-  pwr_tCid subCid; /**< Class Id for class attribute */
-  pwr_tCid hostCid; /**< Class Id for owner class */
-  pwr_tUInt32 idx; /**< Index of offset data */
+/**
+ * @struct merep_sClassAttrKey
+ * @brief Key for class attribute offset lookup table
+ *
+ * Used to cache attribute offset information for class attributes - attributes
+ * whose type is itself a class (e.g., an attribute of type "$Node" contains
+ * a complete class instance within the parent object's body).
+ */
+typedef struct
+{
+  pwr_tCid subCid;  /**< Class ID of the attribute's type (the embedded class) */
+  pwr_tCid hostCid; /**< Class ID of the owning class (parent containing this attribute) */
+  pwr_tUInt32 idx;  /**< Index for multiple instances/array elements */
 } merep_sClassAttrKey;
 
 #define merep_cCattOffsetSize 20
 
-typedef struct {
-  tree_sNode n;
-  merep_sClassAttrKey key;
-  int numOffset;
-  int numIdx;
-  pwr_tUInt32 offset[merep_cCattOffsetSize];
-  pwr_tUInt32 flags[merep_cCattOffsetSize];
+/**
+ * @struct merep_sClassAttr
+ * @brief Cached offset information for class attributes
+ *
+ * Stores pre-calculated offset and flag information for accessing attributes
+ * within embedded class instances. This avoids repeated recursive calculations
+ * when navigating through nested class structures.
+ */
+typedef struct
+{
+  tree_sNode n;                              /**< Tree node for search table */
+  merep_sClassAttrKey key;                   /**< Lookup key */
+  int numOffset;                             /**< Number of valid offsets */
+  int numIdx;                                /**< Number of valid indices */
+  pwr_tUInt32 offset[merep_cCattOffsetSize]; /**< Byte offsets within body */
+  pwr_tUInt32 flags[merep_cCattOffsetSize];  /**< Attribute flags */
 } merep_sClassAttr;
 
-class wb_merep {
+/**
+ * @class wb_merep
+ * @brief Meta Representation - manages class definitions from .dbs files
+ *
+ * Central repository for class metadata (types, attributes, inheritance).
+ * Loads and caches class definitions from compiled .dbs files to provide
+ * fast lookup of class information during workbench operations.
+ *
+ * @section dbs_files .dbs File Loading
+ *
+ * .dbs files are compiled class definition databases generated from .wb_load source:
+ *
+ * @code
+ * # 1. Edit source file
+ * $pwr_elib/wbl/pwrb.wb_load:
+ *   Volume pwrb
+ *     Object $PlantHier class
+ *       Object Template $Node
+ *         Body RtBody
+ *           Attr Description String
+ *           Attr DefGraph String
+ *         EndBody
+ *       EndObject
+ *     EndObject
+ *   EndVolume
+ *
+ * # 2. Compile to .dbs
+ * $ wb_cmd build pwrb
+ * → Generates $pwr_exe/pwrb.dbs (Berkeley DB format)
+ *
+ * # 3. wb_merep loads pwrb.dbs:
+ * - Creates wb_mvrep for pwrb volume
+ * - Creates wb_vrepdbs backend for Berkeley DB access
+ * - Caches class definitions (wb_cdrep) and type definitions (wb_tdrep)
+ * - Builds class attribute offset table (m_catt_tt) for fast access
+ * @endcode
+ *
+ * @section class_lookup Class Information Lookup
+ *
+ * Methods for retrieving class and type metadata:
+ * - cdrep(cid): Get class definition by CID
+ * - cdrep(name): Get class definition by name (e.g., "$Node")
+ * - tdrep(tid): Get type definition by TID
+ * - tdrep(name): Get type definition by name (e.g., "String")
+ *
+ * @section merep_in_session wb_merep in Session Context
+ *
+ * Each wb_erep (environment/session) has one wb_merep that loads ALL .dbs
+ * files from $pwr_exe directory:
+ * @code
+ * wb_erep session;
+ * session.merep() → wb_merep containing:
+ *   - pwrs.dbs (base system classes)
+ *   - pwrb.dbs (base configuration classes)
+ *   - rt.dbs (runtime classes)
+ *   - nmps.dbs (network classes)
+ *   - ... (all installed class volumes)
+ * @endcode
+ *
+ * @section class_attributes Class Attributes
+ *
+ * When an attribute's type is a class (not a primitive like Int32 or String),
+ * the attribute contains an embedded instance of that class:
+ * @code
+ * Object MyPlant $PlantHier
+ *   Object N1 $Node        // N1 is an instance of $Node class
+ *     Attr Description = "Node 1"  // Access: MyPlant.N1.Description
+ *   EndObject
+ * EndObject
+ * @endcode
+ *
+ * The m_catt_tt table caches offset calculations for these nested accesses.
+ */
+class wb_merep
+{
+  /** @brief Map of volume ID → wb_mvrep (one per loaded .dbs file) */
   std::map<pwr_tVid, wb_mvrep*> m_mvrepdbs;
 
+  /** @brief Environment representation (wb session) */
   wb_erep* m_erep;
+
+  /** @brief Optional associated volume (for scoped operations) */
   wb_vrep* m_vrep;
+
+  /** @brief Class attribute offset cache (tree of merep_sClassAttr) */
   tree_sTable* m_catt_tt;
 
   typedef std::map<pwr_tVid, wb_mvrep*>::iterator mvrep_iterator;
 
 public:
-  wb_merep(wb_erep* erep, wb_vrep* vrep = 0)
-      : m_erep(erep), m_vrep(vrep), m_catt_tt(0)
-  {
-  }
+  wb_merep(wb_erep* erep, wb_vrep* vrep = 0) : m_erep(erep), m_vrep(vrep), m_catt_tt(0) {}
   ~wb_merep();
+
+  /**
+   * @brief Construct by loading all .dbs files from directory
+   * @param dirname Directory containing .dbs files (typically $pwr_exe)
+   * @param erep Environment representation (wb session)
+   * @param vrep Optional volume for scoped operations
+   */
   wb_merep(const char* dirname, wb_erep* erep, wb_vrep* vrep = 0);
+
+  /** @brief Copy constructor with different volume context */
   wb_merep(const wb_merep& x, wb_vrep* vrep);
+
+  /** @brief Get default meta volume (first loaded .dbs) */
   wb_mvrep* volume(pwr_tStatus* sts);
+
+  /** @brief Get meta volume by volume ID */
   wb_mvrep* volume(pwr_tStatus* sts, pwr_tVid vid);
+
+  /** @brief Get meta volume by name (e.g., "pwrb", "rt") */
   wb_mvrep* volume(pwr_tStatus* sts, const char* name);
 
+  /**
+   * @brief Compare metadata with another merep
+   * @param dirname Directory to compare against
+   * @param merep Other merep to compare
+   * @return true if metadata matches
+   */
   bool compareMeta(const char* dirname, wb_merep* merep);
+
+  /** @brief Copy all .dbs files to directory */
   void copyFiles(const char* dirname);
+
+  /** @brief Copy .dbs files differing from another merep */
   void copyFiles(const char* dirname, wb_merep* merep);
+
+  /**
+   * @brief Check if runtime volume's cached classes match .dbs files
+   * @param db Runtime volume (wb_vrepdb) to check
+   * @param dirname Directory containing current .dbs files
+   *
+   * Updates chead table in .db file if class definitions have changed.
+   * Critical for detecting when "Update Classes" is needed.
+   */
   void checkFiles(wb_vrepdb* db, const char* dirname);
 
+  /** @brief Get object representation from any loaded .dbs volume */
   wb_orep* object(pwr_tStatus* sts, pwr_tOid oid);
+
+  /** @brief Register a new .dbs volume */
   void addDbs(pwr_tStatus* sts, wb_mvrep* mvrep);
+
+  /** @brief Unregister a .dbs volume */
   void removeDbs(pwr_tStatus* sts, wb_mvrep* mvrep);
 
+  // Class and Type Definition Lookup
+
+  /** @brief Get class definition for an object */
   wb_cdrep* cdrep(pwr_tStatus* sts, const wb_orep& o);
+
+  /** @brief Get class definition by class ID */
   wb_cdrep* cdrep(pwr_tStatus* sts, pwr_tCid cid);
+
+  /** @brief Get class definition by name (e.g., "$Node") */
   wb_cdrep* cdrep(pwr_tStatus* sts, wb_name name);
+
+  /** @brief Get type definition for an attribute */
   wb_tdrep* tdrep(pwr_tStatus* sts, const wb_adrep& a);
+
+  /** @brief Get type definition by type ID */
   wb_tdrep* tdrep(pwr_tStatus* sts, pwr_tTid tid);
+
+  /** @brief Get type definition by name (e.g., "String", "Int32") */
   wb_tdrep* tdrep(pwr_tStatus* sts, wb_name name);
 
-  int getAttrInfoRec(wb_attrname* attr, pwr_eBix bix, pwr_tCid cid,
-      size_t* size, size_t* offset, pwr_tTid* tid, int* elements,
-      pwr_eType* type, int* flags, int level);
+  /**
+   * @brief Recursively get attribute information
+   * @param attr Attribute name (may be nested: "N1.Description")
+   * @param bix Body index (0=RtBody, 1=DevBody)
+   * @param cid Starting class ID
+   * @param size Output: attribute size in bytes
+   * @param offset Output: byte offset within body
+   * @param tid Output: type ID
+   * @param elements Output: array element count (1 if not array)
+   * @param type Output: base type (pwr_eType_Int32, etc.)
+   * @param flags Output: attribute flags
+   * @param level Recursion depth (internal use)
+   * @return 1 on success, 0 on failure
+   */
+  int getAttrInfoRec(wb_attrname* attr, pwr_eBix bix, pwr_tCid cid, size_t* size, size_t* offset,
+                     pwr_tTid* tid, int* elements, pwr_eType* type, int* flags, int level);
 
-  void classDependency(pwr_tStatus* sts, pwr_tCid cid, pwr_tCid** lst,
-      pwr_sAttrRef** arlst, int* cnt);
+  /**
+   * @brief Get list of classes this class depends on
+   * @param cid Class to analyze
+   * @param lst Output: array of dependent class IDs (caller must free)
+   * @param arlst Output: array of attribute refs (caller must free)
+   * @param cnt Output: number of dependencies
+   *
+   * Used for determining update order when classes change.
+   */
+  void classDependency(pwr_tStatus* sts, pwr_tCid cid, pwr_tCid** lst, pwr_sAttrRef** arlst, int* cnt);
+
+  /**
+   * @brief Get class modification timestamp
+   * @param cid Class ID
+   * @param time Output: timestamp from .dbs file
+   */
   void classVersion(pwr_tStatus* sts, pwr_tCid cid, pwr_tTime* time);
+
+  /**
+   * @brief Build class attribute offset cache
+   * @return Tree table (merep_sClassAttr entries)
+   *
+   * Pre-calculates offsets for all class attributes to speed up
+   * nested attribute access (e.g., "MyPlant.N1.Description").
+   */
   tree_sTable* buildCatt(pwr_tStatus* sts);
-  void insertCattObject(
-      pwr_tStatus* sts, pwr_tCid cid, wb_adrep* adp, int offset, 
-      int disableattr);
-  tree_sTable* catt_tt()
-  {
-    return m_catt_tt;
-  }
-  void subClass(pwr_tCid supercid, pwr_tCid subcid, pwr_tCid* nextsubcid,
-      pwr_tStatus* sts);
+
+  /**
+   * @brief Add class attribute offset entry to cache
+   * @param cid Host class containing the class attribute
+   * @param adp Attribute definition (must be a class type)
+   * @param offset Base offset of attribute in host class body
+   * @param disableattr Flag to disable attribute (internal use)
+   */
+  void insertCattObject(pwr_tStatus* sts, pwr_tCid cid, wb_adrep* adp, int offset, int disableattr);
+
+  /** @brief Get class attribute offset cache */
+  tree_sTable* catt_tt() { return m_catt_tt; }
+
+  /**
+   * @brief Get next subclass in inheritance hierarchy
+   * @param supercid Superclass (parent class)
+   * @param subcid Current subclass (or pwr_cNCid to start)
+   * @param nextsubcid Output: next subclass ID
+   * @param sts Status
+   */
+  void subClass(pwr_tCid supercid, pwr_tCid subcid, pwr_tCid* nextsubcid, pwr_tStatus* sts);
+
+  /**
+   * @brief Get next meta volume after specified VID
+   * @param vid Starting volume ID (or 0 to get first)
+   * @return Next wb_mvrep, or NULL if no more
+   */
   wb_mvrep* nextVolume(pwr_tStatus* sts, pwr_tVid vid);
 };
 
