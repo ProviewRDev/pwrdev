@@ -14,9 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added some ABB classes to the workbench palette for quick access.
 - Added the cJSON library to the project.
 - Added this changelog.
-- Add a new help error window that can display up to 20 error messages.
-- Add contextual error messages within the help window (e.g., via XTT, WTT), providing relevant user feedback.
-- Provide error details, including the file and line number where the issue occurred.
+- Add an error section to the bottom of the help window that displays up to 20 error messages.
+  - Improve contextual feedback in the help window (e.g., via XTT, WTT) with clearer, more actionable error messages.
+  - Include detailed error information, such as the filename and line number where each issue occurs.
 - Added BitField8/16/32/64 data representation. These represent bitfields that are not byte-swapped, in accordance with their definition.
 - New pin for DSup, ActiveNotAcked for when the DSup is active but has not yet been ackknowledged.
 
