@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Include detailed error information, such as the filename and line number where each issue occurs.
 - Added BitField8/16/32/64 data representation. These represent bitfields that are not byte-swapped, in accordance with their definition.
 - New pin for DSup, ActiveNotAcked for when the DSup is active but has not yet been ackknowledged.
+- bcomp: Added MinOut to compposit
 
 ### Fixed
 
