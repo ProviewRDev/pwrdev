@@ -1264,7 +1264,7 @@ int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local
           pwr_tOName dev_name; // The name/path of the device that generated
                                // the alarm
           char data_str[250];  // If we have a data payload available we store it in hex format as a string
-          std::ostringstream event_text_str, event_more_text_str;
+          std::ostringstream event_text_stream, event_more_text_stream, log_text_stream;
 
           gdh_ObjidToName(dev_objid, dev_name, sizeof(dev_name), cdh_mName_pathStrict);
 
@@ -1272,29 +1272,32 @@ int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local
           for (int dlength = 0; dlength < data_length; dlength++)
             sprintf(&data_str[dlength * 2], "%02X", *(data.raw_data + dlength));
 
-          event_text_str << "PROFINET: ";
+          event_text_stream << "PROFINET: ";
           // Diagnostics
           if (alarm->Type & PROFINET_ALARM_DIAGNOSIS_APPEARS)
           {
-            event_text_str << "[++Diagnostics]";
+            event_text_stream << "DIAG APPEAR ";
+            log_text_stream << "DIAGNOSIS APPEARS ";
           }
           else if (alarm->Type & PROFINET_ALARM_DIAGNOSIS_DISAPPEARS)
           {
-            event_text_str << "[--Diagnostics]";
+            event_text_stream << "DIAG CLEARED ";
+            log_text_stream << "DIAGNOSIS DISAPPEARS ";
           }
           // Treat everything else as an "alarm"?
           else
           {
-            event_text_str << "[Alarm]";
+            event_text_stream << "ALARM ";
+            log_text_stream << "ALARM ";
           }
 
           // Add prio if available...
-          if (alarm->Prio == pwr_ePnAlarmPrioEnum_High)
-            event_text_str << "(H)";
-          else if (alarm->Prio == pwr_ePnAlarmPrioEnum_Low)
-            event_text_str << "(L)";
+          // if (alarm->Prio == pwr_ePnAlarmPrioEnum_High)
+          //   event_text_str << "(H)";
+          // else if (alarm->Prio == pwr_ePnAlarmPrioEnum_Low)
+          //   event_text_str << "(L)";
 
-          event_text_str << "{M" << alarm->SlotNumber << ":SM" << alarm->SubslotNumber << "} ";
+          event_text_stream << "M" << alarm->SlotNumber << ":SM" << alarm->SubslotNumber << " ";
 
           // If we have data we can try to generate a more detailed message
           if (data_length > 0)
@@ -1307,8 +1310,8 @@ int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local
             // Do we have any errors of this type saved in our device?
             if (device_channel_diag_map->count(error_type))
             {
-              event_text_str << device_channel_diag_map->at(error_type).m_name;
-              event_more_text_str << device_channel_diag_map->at(error_type).m_help;
+              event_text_stream << device_channel_diag_map->at(error_type).m_name;
+              event_more_text_stream << device_channel_diag_map->at(error_type).m_help;
 
 #if (pwr_dHost_byteOrder == pwr_dLittleEndian)
               ushort ext_error_type = bswap_16(data.pn_data->ExtChannelErrorType);
@@ -1319,25 +1322,26 @@ int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local
               // Maybe we have extended diagnostics/error strings aswell?
               if (device_channel_diag_map->at(error_type).m_ext_channel_diag_map.count(ext_error_type))
               {
-                event_text_str << " - "
-                               << device_channel_diag_map->at(error_type)
-                                      .m_ext_channel_diag_map.at(ext_error_type)
-                                      .m_name;
-                event_more_text_str << " - "
-                                    << device_channel_diag_map->at(error_type)
-                                           .m_ext_channel_diag_map.at(ext_error_type)
-                                           .m_help;
+                event_text_stream << " - "
+                                  << device_channel_diag_map->at(error_type)
+                                         .m_ext_channel_diag_map.at(ext_error_type)
+                                         .m_name;
+                event_more_text_stream << " - "
+                                       << device_channel_diag_map->at(error_type)
+                                              .m_ext_channel_diag_map.at(ext_error_type)
+                                              .m_help;
               }
             }
             else // No detailed descriptions of this error/diagnostics available. Just print out the data as
                  // is...
             {
-              event_more_text_str << "Data: " << data_str;
+              event_more_text_stream << "Data: " << data_str;
             }
           }
 
-          std::string event_text = event_text_str.str();
-          std::string event_more_text = event_more_text_str.str();
+          std::string event_text = event_text_stream.str();
+          std::string event_more_text = event_more_text_stream.str();
+          local->logger->log(event_text + event_more_text, CoLogLevel::INFO, CoLogFacility::Local0);
           event_text.resize(sizeof(pwr_tString80) - 1);
           event_more_text.resize(sizeof(pwr_tString256) - 1);
 
@@ -2010,12 +2014,6 @@ void* handle_events(void* ptr)
   T_PNAK_WAIT_OBJECT wait_object;
   int sts;
 
-  // Connect to alarm handling
-  sts = connect_alarm();
-  if EVEN (sts)
-    errh_Warning("PROFINET: Unable to initialize alarm queue. Alarms from this "
-                 "service won't work...");
-
   pwr_sClass_PnControllerSoftingPNAK* op;
   io_sPnRackLocal* r_local;
 
@@ -2034,6 +2032,18 @@ void* handle_events(void* ptr)
   args = (agent_args*)ptr;
   local = (io_sAgentLocal*)args->local;
   ap = args->ap;
+
+  local->logger->log("Started supervision thread");
+
+  // Connect to alarm handling
+  sts = connect_alarm();
+  if EVEN (sts)
+  {
+    errh_Warning("PROFINET: Unable to initialize alarm queue. Alarms from this "
+                 "service won't work...");
+    local->logger->log("Unable to initialize alarm queue. Alarms from this service won't work...",
+                       CoLogLevel::WARNING);
+  }
 
   pthread_mutex_lock(&local->mutex);
 

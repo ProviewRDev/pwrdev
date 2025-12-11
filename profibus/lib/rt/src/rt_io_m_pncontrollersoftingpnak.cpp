@@ -54,6 +54,7 @@
 
 #include "co_cdh.h"
 #include "co_dcli.h"
+#include "co_logger.h"
 #include "pwr_profibusclasses.h"
 
 #include "rt_io_base.h"
@@ -81,6 +82,7 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
 
   /* Allocate area for local data structure */
   ap->Local = (io_sAgentLocal*)new io_sAgentLocal;
+
   if (!ap->Local)
   {
     //    errh_Error( "ERROR config Profibus DP Master %s - %s", ap->Name,
@@ -90,6 +92,9 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
 
   local = (io_sAgentLocal*)ap->Local;
   op = (pwr_sClass_PnControllerSoftingPNAK*)ap->op;
+
+  local->logger->log("Profinet Softing PNAK agent init (co_logger)", CoLogLevel::INFO);
+  errh_Info("Profinet Softing PNAK agent init");
 
   pnak_init();
 
@@ -129,6 +134,7 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
   io_sAgentLocal* local;
   // PnIOCRData* pn_iocr_data;
   pwr_tUInt16 sts;
+  PN_U8 temp_status = 0;
   unsigned char* io_datap;
   unsigned char* clean_io_datap;
   unsigned char status_data = 0;
@@ -191,7 +197,8 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
         // give them some time.
         // TODO Investigate further...
         io_sPnRackLocal* local_device = (io_sPnRackLocal*)device_list->Local;
-        if ((pwr_device->IOCS = ioxs) == 0x40 && local_device->start_cnt >= local_device->start_time)
+        if ((pwr_device->IOCS = ioxs) == PNAK_IOXS_STATUS_DETECTED_BY_DEVICE &&
+            local_device->start_cnt >= local_device->start_time)
         {
           pwr_device->Status = PB__DISABLED;
         } // 0x40 == Bad, 0x80 == Good...
@@ -202,9 +209,14 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
           {
             if (subslot.second.m_rt_io_submodule_type & PROFINET_IO_SUBMODULE_TYPE_INPUT)
             {
+              // char test =
+              //     iocr.m_rt_io_data[subslot.second.m_rt_offset_io_in + subslot.second.m_io_input_length];
               io_datap = iocr.m_rt_io_data + subslot.second.m_rt_offset_io_in;
               clean_io_datap = iocr.m_rt_clean_io_data + subslot.second.m_rt_offset_clean_io_in;
               memcpy(clean_io_datap, io_datap, subslot.second.m_io_input_length);
+
+              // printf("Input IOCS data...: %02x\n", (unsigned char)test);
+              // printf("Input IOXS data...: %02x\n", (unsigned char)ioxs);
             }
           }
         }
