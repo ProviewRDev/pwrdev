@@ -110,7 +110,7 @@ public:
   // Stack Runtime specifics
   unsigned short m_rt_identifier;
   unsigned short m_rt_io_data_length;
-  unsigned char* m_rt_io_data;
+  PN_U8 m_rt_io_data[PROFINET_IO_DATA_MAX_LENGTH];
   unsigned short m_rt_clean_io_data_length;
   unsigned char* m_rt_clean_io_data;
   uint m_rt_properties = 0;

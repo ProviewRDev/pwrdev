@@ -1649,8 +1649,9 @@ int unpack_download_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local)
           _HIGH_LOW_BYTES_TO_PN_U16(pIOCRInfo->IOCRIdentifierHighByte, pIOCRInfo->IOCRIdentifierLowByte);
       pn_device->m_IOCR_map.at(type).m_rt_io_data_length =
           _HIGH_LOW_BYTES_TO_PN_U16(pIOCRInfo->IODataLengthHighByte, pIOCRInfo->IODataLengthLowByte);
-      pn_device->m_IOCR_map.at(type).m_rt_io_data =
-          (unsigned char*)calloc(1, pn_device->m_IOCR_map.at(type).m_rt_io_data_length);
+      // pn_device->m_IOCR_map.at(type).m_rt_io_data =
+      //     (unsigned char*)calloc(1, pn_device->m_IOCR_map.at(type).m_rt_io_data_length);
+      // pn_device->m_IOCR_map.at(type).m_rt_io_data = (PN_U8*)calloc(1, PROFINET_IO_DATA_MAX_LENGTH);
 
       NumberAPIs = _HIGH_LOW_BYTES_TO_PN_U16(pIOCRInfo->NumberOfAPIsHighByte, pIOCRInfo->NumberOfAPIsLowByte);
 
