@@ -186,25 +186,33 @@ static bool is_signal_class(pwr_tCid cid)
   }
 }
 
+/* Check if a type is a primitive type that can be exported */
+static bool is_primitive_type(pwr_eType type)
+{
+  switch (type)
+  {
+  case pwr_eType_Boolean:
+  case pwr_eType_Float32:
+  case pwr_eType_Float64:
+  case pwr_eType_Int8:
+  case pwr_eType_Int16:
+  case pwr_eType_Int32:
+  case pwr_eType_Int64:
+  case pwr_eType_UInt8:
+  case pwr_eType_UInt16:
+  case pwr_eType_UInt32:
+  case pwr_eType_UInt64:
+  case pwr_eType_String:
+  case pwr_eType_Char:
+    return true;
+  default:
+    return false;
+  }
+}
+
 static bool should_skip_object(pwr_tCid cid)
 {
   return (cid == pwr_cClass_Security || cid == pwr_cClass_DynamicVolume);
-}
-
-static bool has_actual_value(pwr_tCid cid, pwr_tOid oid)
-{
-  gdh_sAttrDef* bd;
-  int rows;
-  pwr_tStatus sts = gdh_GetObjectBodyDef(cid, &bd, &rows, oid);
-  if (EVEN(sts))
-    return false;
-
-  for (int i = 0; i < rows; i++)
-  {
-    if (streq(bd[i].attrName, "ActualValue"))
-      return true;
-  }
-  return false;
 }
 
 static void get_description(pwr_tOid oid, char* desc, size_t size)
@@ -289,6 +297,167 @@ static void rebuild_selected_list(AppData* app);
 
 /*_Tree population_______________________________________________________*/
 
+/* Add primitive attributes of an object as child nodes in the tree */
+static void add_attributes_to_tree(AppData* app, pwr_tOid oid, pwr_tCid cid, const char* fullname,
+                                   GtkTreeIter* parent, bool is_signal)
+{
+  gdh_sAttrDef* bd;
+  int rows;
+  pwr_tStatus sts = gdh_GetObjectBodyDef(cid, &bd, &rows, oid);
+  if (EVEN(sts))
+    return;
+
+  for (int i = 0; i < rows; i++)
+  {
+    pwr_sParInfo* info = &bd[i].attr->Param.Info;
+
+    /* Skip class attributes (nested objects), virtual, private pointers, void */
+    if (info->Flags & PWR_MASK_RTVIRTUAL)
+      continue;
+    if ((info->Flags & PWR_MASK_PRIVATE) && (info->Flags & PWR_MASK_POINTER))
+      continue;
+    if (info->Type == pwr_eType_Void)
+      continue;
+
+    /* Check if it's a primitive type we can export */
+    if (!is_primitive_type(info->Type) && !(info->Flags & PWR_MASK_CLASS))
+      continue;
+
+    /* Build attribute path and display name */
+    char attr_path[512];
+    char display_name[256];
+    char type_display[64];
+
+    snprintf(attr_path, sizeof(attr_path), "%s.%s", fullname, bd[i].attrName);
+    strncpy(display_name, bd[i].attrName, sizeof(display_name) - 1);
+    display_name[sizeof(display_name) - 1] = '\0';
+
+    /* If it's a non-array class attribute, recurse into it */
+    if ((info->Flags & PWR_MASK_CLASS) && !(info->Flags & PWR_MASK_ARRAY))
+    {
+      /* Get the class type for nested object */
+      pwr_tAttrRef nested_aref;
+      sts = gdh_NameToAttrref(pwr_cNOid, attr_path, &nested_aref);
+      if (ODD(sts))
+      {
+        pwr_tTid nested_tid;
+        sts = gdh_GetAttrRefTid(&nested_aref, &nested_tid);
+        if (ODD(sts))
+        {
+          /* Create a container node for the nested class */
+          gchar* name_utf8 = latin1_to_utf8(display_name);
+          gchar* class_utf8 = latin1_to_utf8(get_class_name(nested_tid));
+
+          GtkTreeIter attr_iter;
+          gtk_tree_store_append(app->source_store, &attr_iter, parent);
+          gtk_tree_store_set(app->source_store, &attr_iter, COL_NAME, name_utf8, COL_TYPE, "", COL_CLASS,
+                             class_utf8, COL_CLASS_ID, (guint)cid, COL_DESCRIPTION, "", COL_ENABLED, FALSE,
+                             COL_IS_SIGNAL, FALSE, COL_SELECTABLE, FALSE, COL_AREF_STR, "", COL_OID_OIX,
+                             oid.oix, COL_OID_VID, oid.vid, COL_VISIBLE, TRUE, -1);
+
+          /* Recursively add attributes of the nested class */
+          add_attributes_to_tree(app, oid, nested_tid, attr_path, &attr_iter, false);
+
+          g_free(name_utf8);
+          g_free(class_utf8);
+        }
+      }
+      continue;
+    }
+
+    /* If it's a class array, create a selectable parent with expandable children */
+    if ((info->Flags & PWR_MASK_CLASS) && (info->Flags & PWR_MASK_ARRAY))
+    {
+      pwr_tAttrRef arr_aref;
+      sts = gdh_NameToAttrref(pwr_cNOid, attr_path, &arr_aref);
+      if (ODD(sts))
+      {
+        pwr_tTid arr_tid;
+        sts = gdh_GetAttrRefTid(&arr_aref, &arr_tid);
+        if (ODD(sts))
+        {
+          snprintf(type_display, sizeof(type_display), "%s[%d]", get_class_name(arr_tid), info->Elements);
+
+          gchar* name_utf8 = latin1_to_utf8(display_name);
+          gchar* aref_utf8 = latin1_to_utf8(attr_path);
+
+          bool enabled = (app->selected_names.find(std::string(aref_utf8)) != app->selected_names.end());
+
+          /* Create selectable parent node for the array */
+          GtkTreeIter arr_iter;
+          gtk_tree_store_append(app->source_store, &arr_iter, parent);
+          gtk_tree_store_set(app->source_store, &arr_iter, COL_NAME, name_utf8, COL_TYPE, type_display,
+                             COL_CLASS, "", COL_CLASS_ID, (guint)0, COL_DESCRIPTION, "", COL_ENABLED, enabled,
+                             COL_IS_SIGNAL, FALSE, COL_SELECTABLE, TRUE, COL_AREF_STR, aref_utf8, COL_OID_OIX,
+                             oid.oix, COL_OID_VID, oid.vid, COL_VISIBLE, TRUE, -1);
+
+          /* Add each array element as an expandable child */
+          for (int j = 0; j < (int)info->Elements; j++)
+          {
+            char elem_path[512];
+            char elem_name[256];
+            snprintf(elem_path, sizeof(elem_path), "%s.%s[%d]", fullname, bd[i].attrName, j);
+            snprintf(elem_name, sizeof(elem_name), "%s[%d]", bd[i].attrName, j);
+
+            gchar* elem_name_utf8 = latin1_to_utf8(elem_name);
+            gchar* elem_class_utf8 = latin1_to_utf8(get_class_name(arr_tid));
+
+            GtkTreeIter elem_iter;
+            gtk_tree_store_append(app->source_store, &elem_iter, &arr_iter);
+            gtk_tree_store_set(app->source_store, &elem_iter, COL_NAME, elem_name_utf8, COL_TYPE, "",
+                               COL_CLASS, elem_class_utf8, COL_CLASS_ID, (guint)cid, COL_DESCRIPTION, "",
+                               COL_ENABLED, FALSE, COL_IS_SIGNAL, FALSE, COL_SELECTABLE, FALSE, COL_AREF_STR,
+                               "", COL_OID_OIX, oid.oix, COL_OID_VID, oid.vid, COL_VISIBLE, TRUE, -1);
+
+            /* Recursively add attributes of this array element */
+            add_attributes_to_tree(app, oid, arr_tid, elem_path, &elem_iter, false);
+
+            g_free(elem_name_utf8);
+            g_free(elem_class_utf8);
+          }
+
+          g_free(name_utf8);
+          g_free(aref_utf8);
+        }
+      }
+      continue;
+    }
+
+    /* Get the type for this attribute - show array size in type if it's an array */
+    if (info->Flags & PWR_MASK_ARRAY)
+      snprintf(type_display, sizeof(type_display), "%s[%d]", get_type_name(info->Type), info->Elements);
+    else
+      strncpy(type_display, get_type_name(info->Type), sizeof(type_display) - 1);
+    type_display[sizeof(type_display) - 1] = '\0';
+
+    /* Get the type for this attribute */
+    pwr_tAttrRef attr_aref;
+    sts = gdh_NameToAttrref(pwr_cNOid, attr_path, &attr_aref);
+    if (EVEN(sts))
+      continue;
+
+    gchar* name_utf8 = latin1_to_utf8(display_name);
+    gchar* aref_utf8 = latin1_to_utf8(attr_path);
+
+    /* For signals, ActualValue is enabled by default and marked as signal */
+    bool is_actual_value = streq(bd[i].attrName, "ActualValue");
+    bool is_signal_attr = is_signal && is_actual_value;
+    bool enabled =
+        (app->selected_names.find(std::string(aref_utf8)) != app->selected_names.end()) || is_signal_attr;
+
+    GtkTreeIter attr_iter;
+    gtk_tree_store_append(app->source_store, &attr_iter, parent);
+    gtk_tree_store_set(app->source_store, &attr_iter, COL_NAME, name_utf8, COL_TYPE, type_display, COL_CLASS,
+                       "", COL_CLASS_ID, (guint)0, COL_DESCRIPTION, "", COL_ENABLED, enabled, COL_IS_SIGNAL,
+                       is_signal_attr, COL_SELECTABLE, TRUE, COL_AREF_STR, aref_utf8, COL_OID_OIX, oid.oix,
+                       COL_OID_VID, oid.vid, COL_VISIBLE, TRUE, -1);
+
+    g_free(name_utf8);
+    g_free(aref_utf8);
+  }
+  free(bd);
+}
+
 static void add_object_to_tree(AppData* app, pwr_tOid oid, GtkTreeIter* parent)
 {
   pwr_tStatus sts;
@@ -315,7 +484,6 @@ static void add_object_to_tree(AppData* app, pwr_tOid oid, GtkTreeIter* parent)
   get_description(oid, description, sizeof(description));
 
   bool is_sig = is_signal_class(cid);
-  bool has_av = has_actual_value(cid, oid);
 
   /* Convert strings to UTF-8 for GTK */
   gchar* name_utf8 = latin1_to_utf8(name);
@@ -325,44 +493,20 @@ static void add_object_to_tree(AppData* app, pwr_tOid oid, GtkTreeIter* parent)
   GtkTreeIter iter;
   gtk_tree_store_append(app->source_store, &iter, parent);
 
-  if (has_av)
-  {
-    char av_name[512];
-    snprintf(av_name, sizeof(av_name), "%s.ActualValue", fullname);
+  /* All objects are container nodes with attributes as children */
+  gtk_tree_store_set(app->source_store, &iter, COL_NAME, name_utf8, COL_TYPE, "", COL_CLASS, class_utf8,
+                     COL_CLASS_ID, (guint)cid, COL_DESCRIPTION, desc_utf8, COL_ENABLED, FALSE, COL_IS_SIGNAL,
+                     is_sig, COL_SELECTABLE, FALSE, COL_AREF_STR, "", COL_OID_OIX, oid.oix, COL_OID_VID,
+                     oid.vid, COL_VISIBLE, TRUE, -1);
 
-    /* Convert av_name to UTF-8 for display */
-    gchar* aref_utf8 = latin1_to_utf8(av_name);
-
-    pwr_tAttrRef av_aref;
-    sts = gdh_NameToAttrref(pwr_cNOid, av_name, &av_aref);
-    if (ODD(sts))
-    {
-      pwr_tTid av_tid;
-      sts = gdh_GetAttrRefTid(&av_aref, &av_tid);
-      const char* type_str = ODD(sts) ? get_type_name((pwr_eType)av_tid) : "Unknown";
-
-      bool enabled =
-          is_sig || (app->selected_names.find(std::string(aref_utf8)) != app->selected_names.end());
-
-      gtk_tree_store_set(app->source_store, &iter, COL_NAME, name_utf8, COL_TYPE, type_str, COL_CLASS,
-                         class_utf8, COL_CLASS_ID, (guint)cid, COL_DESCRIPTION, desc_utf8, COL_ENABLED,
-                         enabled, COL_IS_SIGNAL, is_sig, COL_SELECTABLE, TRUE, COL_AREF_STR, aref_utf8,
-                         COL_OID_OIX, oid.oix, COL_OID_VID, oid.vid, COL_VISIBLE, TRUE, -1);
-    }
-    g_free(aref_utf8);
-  }
-  else
-  {
-    gtk_tree_store_set(app->source_store, &iter, COL_NAME, name_utf8, COL_TYPE, "", COL_CLASS, class_utf8,
-                       COL_CLASS_ID, (guint)cid, COL_DESCRIPTION, desc_utf8, COL_ENABLED, FALSE,
-                       COL_IS_SIGNAL, FALSE, COL_SELECTABLE, FALSE, COL_AREF_STR, "", COL_OID_OIX, oid.oix,
-                       COL_OID_VID, oid.vid, COL_VISIBLE, TRUE, -1);
-  }
+  /* Add all primitive attributes as child nodes */
+  add_attributes_to_tree(app, oid, cid, fullname, &iter, is_sig);
 
   g_free(name_utf8);
   g_free(desc_utf8);
   g_free(class_utf8);
 
+  /* Add child objects */
   pwr_tOid coid;
   sts = gdh_GetChild(oid, &coid);
   while (ODD(sts))
@@ -605,7 +749,7 @@ static gboolean on_query_tooltip(GtkWidget* widget, gint x, gint y, gboolean key
 
   if (!selectable)
   {
-    gtk_tooltip_set_text(tooltip, "No ActualValue attribute - not exportable");
+    gtk_tooltip_set_text(tooltip, "Container node - expand to see exportable attributes");
     return TRUE;
   }
   return FALSE;
