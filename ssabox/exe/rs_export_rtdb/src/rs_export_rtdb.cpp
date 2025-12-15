@@ -121,6 +121,7 @@ struct asdf
   pwr_tStatus sts;
   pwr_tRefId dlid;
   void* valp;
+  std::string description;
 };
 typedef struct asdf asdfs;
 std::map<std::string, asdfs> arefs;
@@ -259,6 +260,14 @@ int rs_export_rtdb::gen_schema_main()
     cJSON_AddStringToObject(signal_field, "name", utf8_name.c_str());
     cJSON_AddItemToObject(signal_field, "type", pwr_eType_to_json(it->second.type, &it->second.aref));
     cJSON_AddNullToObject(signal_field, "default");
+
+    /* Add doc attribute if description is available */
+    if (!it->second.description.empty())
+    {
+      std::string utf8_desc = to_utf8(it->second.description);
+      cJSON_AddStringToObject(signal_field, "doc", utf8_desc.c_str());
+    }
+
     cJSON_AddItemToArray(event_fields, signal_field);
   }
 
@@ -291,7 +300,20 @@ int rs_export_rtdb::gen_schema_main()
     schema_root = event_record;
   }
 
-  // Create schema wrapper
+  // Save pretty-printed schema for debugging before wrapping
+  if (exp_debug)
+  {
+    pwr_tFileName fname;
+    dcli_translate_filename(fname, "$pwrp_log/avro_schema.json");
+    FILE* fp = fopen(fname, "w");
+    char* pretty_schema = cJSON_Print(schema_root);
+    fprintf(fp, "%s", pretty_schema);
+    free(pretty_schema);
+    fclose(fp);
+    printf("Schema saved to: %s\n", fname);
+  }
+
+  // Create schema wrapper for Confluent Schema Registry
   cJSON* schema_wrapper = cJSON_CreateObject();
   char* schema_str = cJSON_PrintUnformatted(schema_root);
   cJSON_AddStringToObject(schema_wrapper, "schema", schema_str);
@@ -303,13 +325,12 @@ int rs_export_rtdb::gen_schema_main()
   free(request_body);
   cJSON_Delete(schema_wrapper);
 
-  if (exp_debug)
+  // Skip HTTP request if no schema URL is configured (schema-only mode)
+  if (streq(m_schema_url, ""))
   {
-    pwr_tFileName fname;
-    dcli_translate_filename(fname, "$pwrp_log/avro_schema.json");
-    FILE* fp = fopen(fname, "w");
-    fprintf(fp, "%s", tmp.c_str());
-    fclose(fp);
+    if (exp_debug)
+      printf("Schema-only mode: skipping schema registry upload\n");
+    return res;
   }
 
   try
@@ -594,6 +615,13 @@ int rs_export_rtdb::load_signals()
     a.flags = cJSON_GetObjectItemCaseSensitive(item, "flags")->valueint;
     a.type = (pwr_eType)cJSON_GetObjectItemCaseSensitive(item, "type")->valueint;
 
+    /* Load description if present */
+    const cJSON* desc_json = cJSON_GetObjectItemCaseSensitive(item, "description");
+    if (desc_json && cJSON_IsString(desc_json) && desc_json->valuestring)
+      a.description = desc_json->valuestring;
+    else
+      a.description = "";
+
     const cJSON* aref_json = cJSON_GetObjectItemCaseSensitive(item, "aref");
     a.aref.Flags.m = cJSON_GetObjectItemCaseSensitive(aref_json, "Flags")->valueint;
     a.aref.Size = cJSON_GetObjectItemCaseSensitive(aref_json, "Size")->valueint;
@@ -749,6 +777,7 @@ static void usage()
             << "    -c Config file\n"
             << "    -s Schema registry URL\n"
             << "    -d Debug\n"
+            << "    -S Schema only - generate and print schema, then exit\n"
             << "    -a Anix\n"
             << "    -h Help\n\n"
             << "  Configuration files\n"
@@ -767,6 +796,7 @@ int main(int argc, char** argv)
   pwr_tFileName config_file = "";
   pwr_tStatus sts;
   rs_export_rtdb* exp = new rs_export_rtdb();
+  int schema_only = 0;
 
   for (int i = 1; i < argc; i++)
   {
@@ -779,6 +809,10 @@ int main(int argc, char** argv)
         {
         case 'd':
           exp_debug = 1;
+          break;
+        case 'S':
+          schema_only = 1;
+          exp_debug = 1; // Enable debug to also save to file
           break;
         case 'a':
         {
@@ -839,6 +873,11 @@ int main(int argc, char** argv)
             usage();
             exit(0);
           }
+          else if (streq(argv[i], "--schema-only"))
+          {
+            schema_only = 1;
+            exp_debug = 1;
+          }
           break;
         default:
           usage();
@@ -859,6 +898,24 @@ int main(int argc, char** argv)
     errh_Fatal("gdh_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(1);
+  }
+
+  // Schema-only mode: just generate and print schema, then exit
+  if (schema_only)
+  {
+    if (!exp->load_signals())
+    {
+      std::cerr << "Failed to load signals from select.json" << std::endl;
+      exit(1);
+    }
+    if (!exp->gen_schema_main())
+    {
+      std::cerr << "Failed to generate schema" << std::endl;
+      exit(1);
+    }
+    std::cout << "\nSchema generation complete." << std::endl;
+    std::cout << "Schema saved to: $pwrp_log/avro_schema.json" << std::endl;
+    exit(0);
   }
 
   exp->get_confobj();
