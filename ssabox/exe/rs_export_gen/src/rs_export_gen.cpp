@@ -40,13 +40,7 @@
 
 #if defined PWRE_CONF_RDKAFKA
 
-#include <cstdint>
-#include <algorithm>
 #include <unistd.h>
-#include <sstream>
-#include <vector>
-
-#include <glib.h>
 
 #include "pwr.h"
 #include "pwr_systemclasses.h"
@@ -55,6 +49,7 @@
 #include "rt_gdh_msg.h"
 #include "rt_errh.h"
 #include "co_cdh.h"
+#include "co_cJSON.h"
 #include "co_dcli.h"
 #include "co_error.h"
 #include "co_string.h"
@@ -73,7 +68,7 @@ typedef enum
 
 static char json_filename[] = "$pwrp_load/select.json";
 static gen_eFilter filter = gen_eFilter_Signals;
-static std::vector<std::string> tmp_array;
+static cJSON* signals_array = NULL;
 
 /*_Filter functions______________________________________________________*/
 
@@ -143,19 +138,32 @@ static bool should_include_attribute(const pwr_sParInfo& pari)
 
 /*_JSON serialization____________________________________________________*/
 
-static std::string aref_to_json(pwr_tAttrRef& aref)
+static cJSON* aref_to_json(pwr_tAttrRef& aref)
 {
-  return "{\"Objid\":{\"oix\":" + std::to_string(aref.Objid.oix) +
-         ",\"vid\":" + std::to_string(aref.Objid.vid) + "},\"Body\":" + std::to_string(aref.Body) +
-         ",\"Offset\":" + std::to_string(aref.Offset) + ",\"Size\":" + std::to_string(aref.Size) +
-         ",\"Flags\":" + std::to_string(aref.Flags.m) + "}";
+  cJSON* aref_obj = cJSON_CreateObject();
+
+  cJSON* objid = cJSON_CreateObject();
+  cJSON_AddNumberToObject(objid, "oix", aref.Objid.oix);
+  cJSON_AddNumberToObject(objid, "vid", aref.Objid.vid);
+  cJSON_AddItemToObject(aref_obj, "Objid", objid);
+
+  cJSON_AddNumberToObject(aref_obj, "Body", aref.Body);
+  cJSON_AddNumberToObject(aref_obj, "Offset", aref.Offset);
+  cJSON_AddNumberToObject(aref_obj, "Size", aref.Size);
+  cJSON_AddNumberToObject(aref_obj, "Flags", aref.Flags.m);
+
+  return aref_obj;
 }
 
-static std::string attribute_to_json(const char* name, pwr_tAttrRef& aref, const pwr_sParInfo& pari)
+static cJSON* attribute_to_json(const char* name, pwr_tAttrRef& aref, const pwr_sParInfo& pari)
 {
-  return "{\"name\":\"" + std::string(name) + "\",\"aref\":" + aref_to_json(aref) +
-         ",\"type\":" + std::to_string(pari.Type) + ",\"flags\":" + std::to_string(pari.Flags) +
-         ",\"enable\":1}";
+  cJSON* attr = cJSON_CreateObject();
+  cJSON_AddStringToObject(attr, "name", name);
+  cJSON_AddItemToObject(attr, "aref", aref_to_json(aref));
+  cJSON_AddNumberToObject(attr, "type", pari.Type);
+  cJSON_AddNumberToObject(attr, "flags", pari.Flags);
+  cJSON_AddNumberToObject(attr, "enable", 1);
+  return attr;
 }
 
 /*_Object traversal______________________________________________________*/
@@ -211,7 +219,7 @@ static void process_attributes(char* ap, char* aname, pwr_tAttrRef* arp, pwr_tCi
       }
       else
       {
-        tmp_array.push_back(attribute_to_json(name, aref, pari));
+        cJSON_AddItemToArray(signals_array, attribute_to_json(name, aref, pari));
       }
     }
   }
@@ -338,6 +346,12 @@ int main(int argc, char** argv)
     return sts;
   }
 
+  // Create root JSON object and signals array
+  cJSON* root = cJSON_CreateObject();
+  cJSON_AddNumberToObject(root, "frequency", 1);
+  cJSON_AddNumberToObject(root, "batches", 1);
+  signals_array = cJSON_AddArrayToObject(root, "signals");
+
   // Traverse object tree and collect attributes
   pwr_tOid oid;
   sts = gdh_GetRootList(&oid);
@@ -348,34 +362,24 @@ int main(int argc, char** argv)
     sts = gdh_GetNextSibling(oid, &oid);
   }
 
-  // Sort and generate JSON output
-  std::sort(std::begin(tmp_array), std::end(tmp_array));
+  int signal_count = cJSON_GetArraySize(signals_array);
 
-  std::ostringstream json_string;
-  json_string << "{\n";
-  json_string << "  \"frequency\": 1,\n";
-  json_string << "  \"batches\": 1,\n";
-  json_string << "  \"signals\": [\n";
-
-  for (size_t i = 0; i < tmp_array.size(); i++)
-  {
-    json_string << "    " << tmp_array[i];
-    if (i < tmp_array.size() - 1)
-      json_string << ",";
-    json_string << "\n";
-  }
-
-  json_string << "  ]\n";
-  json_string << "}";
-
-  // Write to file
+  // Write formatted JSON to file
+  char* json_str = cJSON_Print(root);
   FILE* fp = fopen(fname, "w");
   if (!fp)
+  {
+    free(json_str);
+    cJSON_Delete(root);
     return 1;
-  fputs(json_string.str().c_str(), fp);
+  }
+  fputs(json_str, fp);
   fclose(fp);
 
-  printf("%s generated with %d columns\n", fname, (int)tmp_array.size());
+  printf("%s generated with %d columns\n", fname, signal_count);
+
+  free(json_str);
+  cJSON_Delete(root);
 
   return 0;
 }
