@@ -34,13 +34,18 @@
  * General Public License plus this exception.
  */
 
-/* rs_export_gen Generate export table in JSON format */
+/* rs_export_gen - Interactive export signal selector */
 
 /*_Include files_________________________________________________________*/
 
 #if defined PWRE_CONF_RDKAFKA
 
-#include <unistd.h>
+#include <gtk/gtk.h>
+#include <string.h>
+#include <map>
+#include <set>
+#include <string>
+#include <functional>
 
 #include "pwr.h"
 #include "pwr_systemclasses.h"
@@ -51,30 +56,101 @@
 #include "co_cdh.h"
 #include "co_cJSON.h"
 #include "co_dcli.h"
-#include "co_error.h"
 #include "co_string.h"
+
+/*_Encoding conversion___________________________________________________*/
+
+/* Convert ISO-8859-1 string to UTF-8 for GTK/Pango.
+ * ProviewR uses ISO-8859-1 internally, but GTK3 requires UTF-8.
+ * Returns a newly allocated string that must be freed with g_free(). */
+static gchar* latin1_to_utf8(const char* str)
+{
+  if (!str || !str[0])
+    return g_strdup("");
+
+  /* Try to interpret as UTF-8 first - if valid, just duplicate */
+  if (g_utf8_validate(str, -1, NULL))
+    return g_strdup(str);
+
+  /* Convert from ISO-8859-1 (Latin-1) to UTF-8 */
+  gsize bytes_read, bytes_written;
+  GError* error = NULL;
+  gchar* utf8 = g_convert(str, -1, "UTF-8", "ISO-8859-1", &bytes_read, &bytes_written, &error);
+  if (error)
+  {
+    g_error_free(error);
+    /* Fallback: replace invalid chars */
+    return g_strdup("?");
+  }
+  return utf8;
+}
 
 /*_Types_________________________________________________________________*/
 
-typedef enum
+enum
 {
-  gen_eFilter_All,
-  gen_eFilter_Signals,
-  gen_eFilter_Redu,
-  gen_eFilter_SevHist
-} gen_eFilter;
+  COL_NAME = 0,
+  COL_TYPE,
+  COL_CLASS,
+  COL_CLASS_ID,
+  COL_DESCRIPTION,
+  COL_ENABLED,
+  COL_IS_SIGNAL,
+  COL_SELECTABLE,
+  COL_AREF_STR,
+  COL_OID_OIX,
+  COL_OID_VID,
+  COL_VISIBLE,
+  NUM_COLS
+};
 
-/*_Global variables______________________________________________________*/
+enum
+{
+  SEL_COL_NAME = 0,
+  SEL_COL_TYPE,
+  SEL_COL_DESCRIPTION,
+  SEL_NUM_COLS
+};
+
+struct AppData
+{
+  GtkWidget* window;
+  GtkWidget* source_tree;
+  GtkWidget* selected_tree;
+  GtkTreeStore* source_store;
+  GtkTreeModelFilter* filter_model;
+  GtkListStore* selected_store;
+  GtkWidget* stats_label;
+  GtkWidget* statusbar;
+  GtkWidget* search_entry;
+  guint status_ctx;
+
+  int signal_count;
+  int variable_count;
+  int total_selected;
+
+  std::set<std::string> selected_names;
+
+  /* Filter state */
+  bool filter_di;
+  bool filter_do;
+  bool filter_dv;
+  bool filter_ai;
+  bool filter_ao;
+  bool filter_av;
+  bool filter_ii;
+  bool filter_io;
+  bool filter_iv;
+  bool filter_co;
+  bool filter_po;
+  bool filter_other;
+  std::string search_text;
+};
 
 static char json_filename[] = "$pwrp_load/select.json";
-static gen_eFilter filter = gen_eFilter_Signals;
-static cJSON* signals_array = NULL;
 
-/*_Filter functions______________________________________________________*/
+/*_Helper functions______________________________________________________*/
 
-/**
- * Check if a class is a signal class (I/O signals with SigChanCon attribute)
- */
 static bool is_signal_class(pwr_tCid cid)
 {
   switch (cid)
@@ -93,293 +169,832 @@ static bool is_signal_class(pwr_tCid cid)
   }
 }
 
-/**
- * Check if an object should be skipped entirely (not processed, no recursion)
- */
 static bool should_skip_object(pwr_tCid cid)
 {
   return (cid == pwr_cClass_Security || cid == pwr_cClass_DynamicVolume);
 }
 
-/**
- * Check if an object should be processed based on current filter
- */
-static bool should_process_object(pwr_tCid cid)
+static bool has_actual_value(pwr_tCid cid, pwr_tOid oid)
 {
-  switch (filter)
+  gdh_sAttrDef* bd;
+  int rows;
+  pwr_tStatus sts = gdh_GetObjectBodyDef(cid, &bd, &rows, oid);
+  if (EVEN(sts))
+    return false;
+
+  for (int i = 0; i < rows; i++)
   {
-  case gen_eFilter_Signals:
-    return is_signal_class(cid);
-  case gen_eFilter_All:
-  case gen_eFilter_Redu:
-  case gen_eFilter_SevHist:
-    return true;
+    if (streq(bd[i].attrName, "ActualValue"))
+      return true;
+  }
+  return false;
+}
+
+static void get_description(pwr_tOid oid, char* desc, size_t size)
+{
+  pwr_tStatus sts;
+  pwr_tOName attrname;
+
+  desc[0] = '\0';
+  sts = gdh_ObjidToName(oid, attrname, sizeof(attrname), cdh_mName_volumeStrict);
+  if (EVEN(sts))
+    return;
+
+  strcat(attrname, ".Description");
+  sts = gdh_GetObjectInfo(attrname, desc, size);
+}
+
+static const char* get_class_name(pwr_tCid cid)
+{
+  static pwr_tOName classname;
+  pwr_tStatus sts;
+
+  sts = gdh_ObjidToName(cdh_ClassIdToObjid(cid), classname, sizeof(classname), cdh_mName_object);
+  if (EVEN(sts))
+    return "Unknown";
+  return classname;
+}
+
+static const char* get_type_name(pwr_eType type)
+{
+  switch (type)
+  {
+  case pwr_eType_Boolean:
+    return "Boolean";
+  case pwr_eType_Float32:
+    return "Float32";
+  case pwr_eType_Float64:
+    return "Float64";
+  case pwr_eType_Int8:
+    return "Int8";
+  case pwr_eType_Int16:
+    return "Int16";
+  case pwr_eType_Int32:
+    return "Int32";
+  case pwr_eType_Int64:
+    return "Int64";
+  case pwr_eType_UInt8:
+    return "UInt8";
+  case pwr_eType_UInt16:
+    return "UInt16";
+  case pwr_eType_UInt32:
+    return "UInt32";
+  case pwr_eType_UInt64:
+    return "UInt64";
+  case pwr_eType_String:
+    return "String";
+  case pwr_eType_Time:
+    return "Time";
+  case pwr_eType_DeltaTime:
+    return "DeltaTime";
   default:
-    return true;
+    return "Other";
   }
 }
 
-/**
- * Check if an attribute should be included based on current filter
- */
-static bool should_include_attribute(const pwr_sParInfo& pari)
+/*_Statistics update_____________________________________________________*/
+
+static void update_stats(AppData* app)
 {
-  // Skip virtual, private pointers, and void types
-  if (pari.Flags & PWR_MASK_RTVIRTUAL || (pari.Flags & PWR_MASK_PRIVATE && pari.Flags & PWR_MASK_POINTER) ||
-      pari.Type == pwr_eType_Void)
+  char stats[256];
+  snprintf(stats, sizeof(stats), "Selected: %d total (%d signals, %d variables)", app->total_selected,
+           app->signal_count, app->variable_count);
+  gtk_label_set_text(GTK_LABEL(app->stats_label), stats);
+}
+
+/*_Forward declarations__________________________________________________*/
+
+static void rebuild_selected_list(AppData* app);
+
+/*_Tree population_______________________________________________________*/
+
+static void add_object_to_tree(AppData* app, pwr_tOid oid, GtkTreeIter* parent)
+{
+  pwr_tStatus sts;
+  pwr_tCid cid;
+  pwr_tOName name;
+  char description[256];
+
+  sts = gdh_GetObjectClass(oid, &cid);
+  if (EVEN(sts))
+    return;
+
+  if (should_skip_object(cid))
+    return;
+
+  sts = gdh_ObjidToName(oid, name, sizeof(name), cdh_mName_object);
+  if (EVEN(sts))
+    return;
+
+  pwr_tOName fullname;
+  sts = gdh_ObjidToName(oid, fullname, sizeof(fullname), cdh_mName_volumeStrict);
+  if (EVEN(sts))
+    return;
+
+  get_description(oid, description, sizeof(description));
+
+  bool is_sig = is_signal_class(cid);
+  bool has_av = has_actual_value(cid, oid);
+
+  /* Convert strings to UTF-8 for GTK */
+  gchar* name_utf8 = latin1_to_utf8(name);
+  gchar* desc_utf8 = latin1_to_utf8(description);
+  gchar* class_utf8 = latin1_to_utf8(get_class_name(cid));
+
+  GtkTreeIter iter;
+  gtk_tree_store_append(app->source_store, &iter, parent);
+
+  if (has_av)
+  {
+    char av_name[512];
+    snprintf(av_name, sizeof(av_name), "%s.ActualValue", fullname);
+
+    pwr_tAttrRef av_aref;
+    sts = gdh_NameToAttrref(pwr_cNOid, av_name, &av_aref);
+    if (ODD(sts))
+    {
+      pwr_tTid av_tid;
+      sts = gdh_GetAttrRefTid(&av_aref, &av_tid);
+      const char* type_str = ODD(sts) ? get_type_name((pwr_eType)av_tid) : "Unknown";
+
+      bool enabled = is_sig || (app->selected_names.find(av_name) != app->selected_names.end());
+
+      gtk_tree_store_set(app->source_store, &iter, COL_NAME, name_utf8, COL_TYPE, type_str, COL_CLASS,
+                         class_utf8, COL_CLASS_ID, (guint)cid, COL_DESCRIPTION, desc_utf8, COL_ENABLED,
+                         enabled, COL_IS_SIGNAL, is_sig, COL_SELECTABLE, TRUE, COL_AREF_STR, av_name,
+                         COL_OID_OIX, oid.oix, COL_OID_VID, oid.vid, COL_VISIBLE, TRUE, -1);
+    }
+  }
+  else
+  {
+    gtk_tree_store_set(app->source_store, &iter, COL_NAME, name_utf8, COL_TYPE, "", COL_CLASS, class_utf8,
+                       COL_CLASS_ID, (guint)cid, COL_DESCRIPTION, desc_utf8, COL_ENABLED, FALSE,
+                       COL_IS_SIGNAL, FALSE, COL_SELECTABLE, FALSE, COL_AREF_STR, "", COL_OID_OIX, oid.oix,
+                       COL_OID_VID, oid.vid, COL_VISIBLE, TRUE, -1);
+  }
+
+  g_free(name_utf8);
+  g_free(desc_utf8);
+  g_free(class_utf8);
+
+  pwr_tOid coid;
+  sts = gdh_GetChild(oid, &coid);
+  while (ODD(sts))
+  {
+    add_object_to_tree(app, coid, &iter);
+    sts = gdh_GetNextSibling(coid, &coid);
+  }
+}
+
+static void populate_source_tree(AppData* app)
+{
+  gtk_tree_store_clear(app->source_store);
+
+  pwr_tOid oid;
+  pwr_tStatus sts = gdh_GetRootList(&oid);
+  while (ODD(sts))
+  {
+    if (oid.oix != 0x80000001)
+      add_object_to_tree(app, oid, NULL);
+    sts = gdh_GetNextSibling(oid, &oid);
+  }
+}
+
+/* Check if a row matches the current filter criteria */
+static bool row_matches_filter(AppData* app, guint class_id, const char* name, const char* desc)
+{
+  /* Check class filter */
+  bool class_match = false;
+
+  switch (class_id)
+  {
+  case pwr_cClass_Di:
+    class_match = app->filter_di;
+    break;
+  case pwr_cClass_Do:
+    class_match = app->filter_do;
+    break;
+  case pwr_cClass_Dv:
+    class_match = app->filter_dv;
+    break;
+  case pwr_cClass_Ai:
+    class_match = app->filter_ai;
+    break;
+  case pwr_cClass_Ao:
+    class_match = app->filter_ao;
+    break;
+  case pwr_cClass_Av:
+    class_match = app->filter_av;
+    break;
+  case pwr_cClass_Ii:
+    class_match = app->filter_ii;
+    break;
+  case pwr_cClass_Io:
+    class_match = app->filter_io;
+    break;
+  case pwr_cClass_Iv:
+    class_match = app->filter_iv;
+    break;
+  case pwr_cClass_Co:
+    class_match = app->filter_co;
+    break;
+  case pwr_cClass_Po:
+    class_match = app->filter_po;
+    break;
+  default:
+    class_match = app->filter_other;
+    break;
+  }
+
+  if (!class_match)
     return false;
 
-  // Filter-specific checks
-  if (filter == gen_eFilter_Redu && !(pari.Flags & PWR_MASK_REDUTRANSFER))
-    return false;
+  /* Check search text */
+  if (!app->search_text.empty())
+  {
+    std::string name_lower = name ? name : "";
+    std::string desc_lower = desc ? desc : "";
+    std::string search_lower = app->search_text;
+
+    /* Convert to lowercase for case-insensitive search */
+    for (auto& c : name_lower)
+      c = tolower(c);
+    for (auto& c : desc_lower)
+      c = tolower(c);
+    for (auto& c : search_lower)
+      c = tolower(c);
+
+    if (name_lower.find(search_lower) == std::string::npos &&
+        desc_lower.find(search_lower) == std::string::npos)
+      return false;
+  }
 
   return true;
 }
 
-/*_JSON serialization____________________________________________________*/
-
-static cJSON* aref_to_json(pwr_tAttrRef& aref)
+/* Apply filter to tree - set COL_VISIBLE for each row */
+static void apply_filter_recursive(AppData* app, GtkTreeIter* parent, bool* any_child_visible)
 {
-  cJSON* aref_obj = cJSON_CreateObject();
+  GtkTreeIter iter;
+  gboolean valid;
 
-  cJSON* objid = cJSON_CreateObject();
-  cJSON_AddNumberToObject(objid, "oix", aref.Objid.oix);
-  cJSON_AddNumberToObject(objid, "vid", aref.Objid.vid);
-  cJSON_AddItemToObject(aref_obj, "Objid", objid);
+  if (parent)
+    valid = gtk_tree_model_iter_children(GTK_TREE_MODEL(app->source_store), &iter, parent);
+  else
+    valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(app->source_store), &iter);
 
-  cJSON_AddNumberToObject(aref_obj, "Body", aref.Body);
-  cJSON_AddNumberToObject(aref_obj, "Offset", aref.Offset);
-  cJSON_AddNumberToObject(aref_obj, "Size", aref.Size);
-  cJSON_AddNumberToObject(aref_obj, "Flags", aref.Flags.m);
-
-  return aref_obj;
-}
-
-static cJSON* attribute_to_json(const char* name, pwr_tAttrRef& aref, const pwr_sParInfo& pari)
-{
-  cJSON* attr = cJSON_CreateObject();
-  cJSON_AddStringToObject(attr, "name", name);
-  cJSON_AddItemToObject(attr, "aref", aref_to_json(aref));
-  cJSON_AddNumberToObject(attr, "type", pari.Type);
-  cJSON_AddNumberToObject(attr, "flags", pari.Flags);
-  cJSON_AddNumberToObject(attr, "enable", 1);
-  return attr;
-}
-
-/*_Object traversal______________________________________________________*/
-
-static void process_attributes(char* ap, char* aname, pwr_tAttrRef* arp, pwr_tCid cid)
-{
-  gdh_sAttrDef* bd;
-  int rows;
-  pwr_tStatus sts = gdh_GetObjectBodyDef(cid, &bd, &rows, arp->Objid);
-  if (EVEN(sts))
-    throw co_error(sts);
-
-  for (int i = 0; i < rows; i++)
+  while (valid)
   {
-    pwr_sParInfo pari = bd[i].attr->Param.Info;
+    guint class_id;
+    gchar* name;
+    gchar* desc;
+    gboolean selectable;
 
-    if (!should_include_attribute(pari))
-      continue;
+    gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), &iter, COL_CLASS_ID, &class_id, COL_NAME, &name,
+                       COL_DESCRIPTION, &desc, COL_SELECTABLE, &selectable, -1);
 
-    pwr_tOName name, attrName;
-    strcpy(name, aname);
-    strcat(name, ".");
-    strcat(name, bd[i].attrName);
-    strcpy(attrName, bd[i].attrName);
+    /* Check if any children are visible */
+    bool child_visible = false;
+    if (gtk_tree_model_iter_has_child(GTK_TREE_MODEL(app->source_store), &iter))
+      apply_filter_recursive(app, &iter, &child_visible);
 
-    int elements = 1;
-    if (pari.Flags & PWR_MASK_ARRAY)
-      elements = pari.Elements;
+    /* Row is visible if it matches filter OR if any child is visible */
+    bool row_visible = false;
+    if (selectable)
+      row_visible = row_matches_filter(app, class_id, name, desc);
 
-    for (int j = 0; j < elements; j++)
+    /* Always show parent if child is visible */
+    if (child_visible)
+      row_visible = true;
+
+    gtk_tree_store_set(app->source_store, &iter, COL_VISIBLE, row_visible, -1);
+
+    if (row_visible && any_child_visible)
+      *any_child_visible = true;
+
+    g_free(name);
+    g_free(desc);
+
+    valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(app->source_store), &iter);
+  }
+}
+
+static void apply_filter(AppData* app)
+{
+  bool dummy = false;
+  apply_filter_recursive(app, NULL, &dummy);
+  gtk_tree_model_filter_refilter(app->filter_model);
+}
+
+static void traverse_tree(AppData* app, GtkTreeIter* it, std::function<void(GtkTreeIter*)> callback)
+{
+  callback(it);
+
+  GtkTreeIter child;
+  if (gtk_tree_model_iter_children(GTK_TREE_MODEL(app->source_store), &child, it))
+  {
+    do
     {
-      if (pari.Flags & PWR_MASK_ARRAY)
-      {
-        char idx[20];
-        sprintf(idx, "[%d]", j);
-        strcpy(name, aname);
-        strcat(name, ".");
-        strcat(name, bd[i].attrName);
-        strcat(name, idx);
-        strcpy(attrName, bd[i].attrName);
-        strcat(attrName, idx);
-      }
+      traverse_tree(app, &child, callback);
+    } while (gtk_tree_model_iter_next(GTK_TREE_MODEL(app->source_store), &child));
+  }
+}
 
-      pwr_tAttrRef aref;
-      sts = gdh_ArefANameToAref(arp, attrName, &aref);
-      if (EVEN(sts))
-        throw co_error(sts);
+static void rebuild_selected_list(AppData* app)
+{
+  gtk_list_store_clear(app->selected_store);
+  app->signal_count = 0;
+  app->variable_count = 0;
+  app->total_selected = 0;
 
-      if (bd[i].attr->Param.Info.Flags & PWR_MASK_CLASS)
-      {
-        // Recurse into nested class attributes
-        process_attributes(ap + pari.Offset + j * pari.Size / elements, name, &aref, pari.Type);
-      }
+  auto add_if_enabled = [&](GtkTreeIter* it)
+  {
+    gboolean enabled;
+    gboolean is_signal;
+    gchar* name;
+    gchar* type;
+    gchar* desc;
+    gchar* aref_str;
+
+    gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), it, COL_ENABLED, &enabled, COL_IS_SIGNAL,
+                       &is_signal, COL_NAME, &name, COL_TYPE, &type, COL_DESCRIPTION, &desc, COL_AREF_STR,
+                       &aref_str, -1);
+
+    if (enabled && aref_str && aref_str[0] != '\0')
+    {
+      GtkTreeIter sel_iter;
+      gtk_list_store_append(app->selected_store, &sel_iter);
+      gtk_list_store_set(app->selected_store, &sel_iter, SEL_COL_NAME, aref_str, SEL_COL_TYPE, type,
+                         SEL_COL_DESCRIPTION, desc, -1);
+
+      if (is_signal)
+        app->signal_count++;
       else
-      {
-        cJSON_AddItemToArray(signals_array, attribute_to_json(name, aref, pari));
-      }
+        app->variable_count++;
+      app->total_selected++;
     }
+
+    g_free(name);
+    g_free(type);
+    g_free(desc);
+    g_free(aref_str);
+  };
+
+  GtkTreeIter iter;
+  gboolean valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(app->source_store), &iter);
+  while (valid)
+  {
+    traverse_tree(app, &iter, add_if_enabled);
+    valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(app->source_store), &iter);
   }
+
+  update_stats(app);
 }
 
-static void process_object(pwr_tAttrRef* arp, char* aname)
+/*_Callbacks_____________________________________________________________*/
+
+static gboolean on_query_tooltip(GtkWidget* widget, gint x, gint y, gboolean keyboard_mode,
+                                 GtkTooltip* tooltip, gpointer user_data)
 {
-  pwr_tTid tid;
-  pwr_tStatus sts = gdh_GetAttrRefTid(arp, &tid);
-  if (EVEN(sts))
-    throw co_error(sts);
+  GtkTreeView* tree = GTK_TREE_VIEW(widget);
+  GtkTreeModel* model;
+  GtkTreePath* path;
+  GtkTreeIter iter;
+  gint bx, by;
 
-  if (arp->Flags.b.Object && arp->Size == 0)
+  gtk_tree_view_convert_widget_to_bin_window_coords(tree, x, y, &bx, &by);
+  if (!gtk_tree_view_get_path_at_pos(tree, bx, by, &path, NULL, NULL, NULL))
+    return FALSE;
+
+  model = gtk_tree_view_get_model(tree);
+  if (!gtk_tree_model_get_iter(model, &iter, path))
   {
-    sts = gdh_GetObjectSize(arp->Objid, &arp->Size);
-    if (EVEN(sts))
-      throw co_error(sts);
+    gtk_tree_path_free(path);
+    return FALSE;
   }
-  else if (arp->Size == 0)
+  gtk_tree_path_free(path);
+
+  gboolean selectable;
+  gtk_tree_model_get(model, &iter, COL_SELECTABLE, &selectable, -1);
+
+  if (!selectable)
   {
-    throw co_error(GDH__BADARG);
+    gtk_tooltip_set_text(tooltip, "No ActualValue attribute - not exportable");
+    return TRUE;
   }
-
-  char* ap = (char*)calloc(1, arp->Size);
-  memset(ap, 0, arp->Size);
-
-  sts = gdh_GetObjectInfoAttrref(arp, ap, arp->Size);
-  if (EVEN(sts))
-  {
-    fprintf(stderr, "Couldn't get object info attr ref for object %s\n", aname);
-    throw co_error(sts);
-  }
-
-  process_attributes(ap, aname, arp, tid);
-
-  free(ap);
+  return FALSE;
 }
 
-static void traverse_object_tree(pwr_tOid oid)
+static void on_toggle_enabled(GtkCellRendererToggle* renderer, gchar* path_str, gpointer user_data)
 {
-  pwr_tOName name;
-  pwr_tCid cid;
-  pwr_tStatus sts;
-  pwr_tBoolean local;
+  AppData* app = (AppData*)user_data;
+  GtkTreePath* filter_path = gtk_tree_path_new_from_string(path_str);
+  GtkTreeIter filter_iter;
 
-  // Skip mounted remote objects
-  sts = gdh_GetObjectLocation(oid, &local);
-  if (EVEN(sts))
-    throw co_error(sts);
-
-  if (!local)
-    return;
-
-  sts = gdh_GetObjectClass(oid, &cid);
-  if (EVEN(sts))
-    throw co_error(sts);
-
-  // Skip security and dynamic volume objects entirely
-  if (should_skip_object(cid))
-    return;
-
-  // Process object if it matches the filter
-  if (should_process_object(cid))
+  /* Get iterator in filter model first */
+  if (gtk_tree_model_get_iter(GTK_TREE_MODEL(app->filter_model), &filter_iter, filter_path))
   {
-    sts = gdh_ObjidToName(oid, name, sizeof(name), cdh_mName_volumeStrict);
-    if (EVEN(sts))
-      throw co_error(sts);
+    /* Convert to underlying store iterator */
+    GtkTreeIter store_iter;
+    gtk_tree_model_filter_convert_iter_to_child_iter(app->filter_model, &store_iter, &filter_iter);
 
-    pwr_tAttrRef aref = cdh_ObjidToAref(oid);
-    process_object(&aref, name);
-  }
+    gboolean enabled;
+    gchar* aref_str;
+    gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), &store_iter, COL_ENABLED, &enabled, COL_AREF_STR,
+                       &aref_str, -1);
 
-  // Always recurse into children
-  pwr_tOid coid;
-  pwr_tStatus sts2 = gdh_GetChild(oid, &coid);
-  while (ODD(sts2))
-  {
-    traverse_object_tree(coid);
-    sts2 = gdh_GetNextSibling(coid, &coid);
-  }
-}
-
-/*_Main program__________________________________________________________*/
-
-static void usage()
-{
-  printf("rs_export_gen [-f 'filter']\n\n"
-         "-f Filter, 'all', 'signals' or 'redu'. Default 'signals'\n\n");
-}
-
-int main(int argc, char** argv)
-{
-  if (argc > 1 && streq(argv[1], "-h"))
-  {
-    usage();
-    exit(0);
-  }
-
-  if (argc > 2 && streq(argv[1], "-f"))
-  {
-    if (streq(argv[2], "all"))
-      filter = gen_eFilter_All;
-    else if (streq(argv[2], "signals"))
-      filter = gen_eFilter_Signals;
-    else if (streq(argv[2], "redu"))
-      filter = gen_eFilter_Redu;
-    else if (streq(argv[2], "sevhist"))
-      filter = gen_eFilter_SevHist;
-    else
+    if (aref_str && aref_str[0] != '\0')
     {
-      usage();
-      exit(0);
+      enabled = !enabled;
+      gtk_tree_store_set(app->source_store, &store_iter, COL_ENABLED, enabled, -1);
+
+      if (enabled)
+        app->selected_names.insert(aref_str);
+      else
+        app->selected_names.erase(aref_str);
     }
+    g_free(aref_str);
+  }
+
+  gtk_tree_path_free(filter_path);
+  rebuild_selected_list(app);
+}
+
+static void on_save_clicked(GtkButton* button, gpointer user_data)
+{
+  AppData* app = (AppData*)user_data;
+
+  cJSON* root = cJSON_CreateObject();
+  cJSON_AddNumberToObject(root, "frequency", 1);
+  cJSON_AddNumberToObject(root, "batches", 1);
+  cJSON* signals = cJSON_AddArrayToObject(root, "signals");
+
+  GtkTreeIter iter;
+  gboolean valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(app->selected_store), &iter);
+
+  while (valid)
+  {
+    gchar* name;
+    gchar* type;
+    gchar* desc;
+
+    gtk_tree_model_get(GTK_TREE_MODEL(app->selected_store), &iter, SEL_COL_NAME, &name, SEL_COL_TYPE, &type,
+                       SEL_COL_DESCRIPTION, &desc, -1);
+
+    cJSON* signal = cJSON_CreateObject();
+    cJSON_AddStringToObject(signal, "name", name);
+    cJSON_AddStringToObject(signal, "type", type);
+    cJSON_AddNumberToObject(signal, "enable", 1);
+    if (desc && desc[0] != '\0')
+      cJSON_AddStringToObject(signal, "description", desc);
+
+    cJSON_AddItemToArray(signals, signal);
+
+    g_free(name);
+    g_free(type);
+    g_free(desc);
+
+    valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(app->selected_store), &iter);
   }
 
   pwr_tFileName fname;
   dcli_translate_filename(fname, json_filename);
-  errh_Interactive();
 
-  pwr_tStatus sts = gdh_Init("java_native");
-  if (EVEN(sts))
-  {
-    fprintf(stderr, "gdh_Init failed\n");
-    return sts;
-  }
-
-  // Create root JSON object and signals array
-  cJSON* root = cJSON_CreateObject();
-  cJSON_AddNumberToObject(root, "frequency", 1);
-  cJSON_AddNumberToObject(root, "batches", 1);
-  signals_array = cJSON_AddArrayToObject(root, "signals");
-
-  // Traverse object tree and collect attributes
-  pwr_tOid oid;
-  sts = gdh_GetRootList(&oid);
-  while (ODD(sts))
-  {
-    if (oid.oix != 0x80000001)
-      traverse_object_tree(oid);
-    sts = gdh_GetNextSibling(oid, &oid);
-  }
-
-  int signal_count = cJSON_GetArraySize(signals_array);
-
-  // Write formatted JSON to file
   char* json_str = cJSON_Print(root);
   FILE* fp = fopen(fname, "w");
-  if (!fp)
+  if (fp)
   {
-    free(json_str);
-    cJSON_Delete(root);
-    return 1;
-  }
-  fputs(json_str, fp);
-  fclose(fp);
+    fputs(json_str, fp);
+    fclose(fp);
 
-  printf("%s generated with %d columns\n", fname, signal_count);
+    char msg[512];
+    snprintf(msg, sizeof(msg), "Saved %d signals to %s", app->total_selected, fname);
+    gtk_statusbar_push(GTK_STATUSBAR(app->statusbar), app->status_ctx, msg);
+  }
+  else
+  {
+    gtk_statusbar_push(GTK_STATUSBAR(app->statusbar), app->status_ctx, "Error: Could not save file");
+  }
 
   free(json_str);
   cJSON_Delete(root);
+}
+
+static void on_select_all_signals(GtkButton* button, gpointer user_data)
+{
+  AppData* app = (AppData*)user_data;
+
+  auto select_signal = [&](GtkTreeIter* it)
+  {
+    gboolean is_signal;
+    gchar* aref_str;
+
+    gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), it, COL_IS_SIGNAL, &is_signal, COL_AREF_STR,
+                       &aref_str, -1);
+
+    if (is_signal && aref_str && aref_str[0] != '\0')
+    {
+      gtk_tree_store_set(app->source_store, it, COL_ENABLED, TRUE, -1);
+      app->selected_names.insert(aref_str);
+    }
+
+    g_free(aref_str);
+  };
+
+  GtkTreeIter iter;
+  gboolean valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(app->source_store), &iter);
+  while (valid)
+  {
+    traverse_tree(app, &iter, select_signal);
+    valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(app->source_store), &iter);
+  }
+
+  rebuild_selected_list(app);
+}
+
+static void on_filter_toggled(GtkToggleButton* button, gpointer user_data)
+{
+  AppData* app = (AppData*)user_data;
+  const gchar* name = gtk_widget_get_name(GTK_WIDGET(button));
+  gboolean active = gtk_toggle_button_get_active(button);
+
+  if (strcmp(name, "Di") == 0)
+    app->filter_di = active;
+  else if (strcmp(name, "Do") == 0)
+    app->filter_do = active;
+  else if (strcmp(name, "Dv") == 0)
+    app->filter_dv = active;
+  else if (strcmp(name, "Ai") == 0)
+    app->filter_ai = active;
+  else if (strcmp(name, "Ao") == 0)
+    app->filter_ao = active;
+  else if (strcmp(name, "Av") == 0)
+    app->filter_av = active;
+  else if (strcmp(name, "Ii") == 0)
+    app->filter_ii = active;
+  else if (strcmp(name, "Io") == 0)
+    app->filter_io = active;
+  else if (strcmp(name, "Iv") == 0)
+    app->filter_iv = active;
+  else if (strcmp(name, "Co") == 0)
+    app->filter_co = active;
+  else if (strcmp(name, "Po") == 0)
+    app->filter_po = active;
+  else if (strcmp(name, "Other") == 0)
+    app->filter_other = active;
+
+  apply_filter(app);
+}
+
+static void on_search_changed(GtkSearchEntry* entry, gpointer user_data)
+{
+  AppData* app = (AppData*)user_data;
+  const gchar* text = gtk_entry_get_text(GTK_ENTRY(entry));
+  app->search_text = text ? text : "";
+  apply_filter(app);
+}
+
+static void on_clear_all(GtkButton* button, gpointer user_data)
+{
+  AppData* app = (AppData*)user_data;
+
+  auto clear_enabled = [&](GtkTreeIter* it)
+  { gtk_tree_store_set(app->source_store, it, COL_ENABLED, FALSE, -1); };
+
+  GtkTreeIter iter;
+  gboolean valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(app->source_store), &iter);
+  while (valid)
+  {
+    traverse_tree(app, &iter, clear_enabled);
+    valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(app->source_store), &iter);
+  }
+
+  app->selected_names.clear();
+  rebuild_selected_list(app);
+}
+
+/*_Window creation_______________________________________________________*/
+
+static void create_window(AppData* app)
+{
+  app->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_title(GTK_WINDOW(app->window), "ProviewR Export Signal Selector");
+  gtk_window_set_default_size(GTK_WINDOW(app->window), 1400, 800);
+  g_signal_connect(app->window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+
+  GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+  gtk_container_add(GTK_CONTAINER(app->window), vbox);
+
+  // Toolbar
+  GtkWidget* toolbar = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
+  gtk_widget_set_margin_start(toolbar, 10);
+  gtk_widget_set_margin_end(toolbar, 10);
+  gtk_widget_set_margin_top(toolbar, 5);
+  gtk_widget_set_margin_bottom(toolbar, 5);
+  gtk_box_pack_start(GTK_BOX(vbox), toolbar, FALSE, FALSE, 0);
+
+  GtkWidget* select_signals_btn = gtk_button_new_with_label("Select All Signals");
+  g_signal_connect(select_signals_btn, "clicked", G_CALLBACK(on_select_all_signals), app);
+  gtk_box_pack_start(GTK_BOX(toolbar), select_signals_btn, FALSE, FALSE, 0);
+
+  GtkWidget* clear_btn = gtk_button_new_with_label("Clear All");
+  g_signal_connect(clear_btn, "clicked", G_CALLBACK(on_clear_all), app);
+  gtk_box_pack_start(GTK_BOX(toolbar), clear_btn, FALSE, FALSE, 0);
+
+  GtkWidget* save_btn = gtk_button_new_with_label("Save");
+  g_signal_connect(save_btn, "clicked", G_CALLBACK(on_save_clicked), app);
+  gtk_box_pack_start(GTK_BOX(toolbar), save_btn, FALSE, FALSE, 0);
+
+  app->stats_label = gtk_label_new("Selected: 0 total (0 signals, 0 variables)");
+  gtk_widget_set_halign(app->stats_label, GTK_ALIGN_END);
+  gtk_box_pack_end(GTK_BOX(toolbar), app->stats_label, FALSE, FALSE, 0);
+
+  /* Filter row */
+  GtkWidget* filter_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
+  gtk_widget_set_margin_start(filter_box, 10);
+  gtk_widget_set_margin_end(filter_box, 10);
+  gtk_widget_set_margin_bottom(filter_box, 5);
+  gtk_box_pack_start(GTK_BOX(vbox), filter_box, FALSE, FALSE, 0);
+
+  GtkWidget* filter_label = gtk_label_new("Filter:");
+  gtk_box_pack_start(GTK_BOX(filter_box), filter_label, FALSE, FALSE, 0);
+
+  /* Create filter toggle buttons */
+  const char* filter_names[] = {"Di", "Do", "Dv", "Ai", "Ao", "Av", "Ii", "Io", "Iv", "Co", "Po", "Other"};
+  for (int i = 0; i < 12; i++)
+  {
+    GtkWidget* btn = gtk_toggle_button_new_with_label(filter_names[i]);
+    gtk_widget_set_name(btn, filter_names[i]);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(btn), TRUE);
+    g_signal_connect(btn, "toggled", G_CALLBACK(on_filter_toggled), app);
+    gtk_box_pack_start(GTK_BOX(filter_box), btn, FALSE, FALSE, 0);
+  }
+
+  /* Search entry */
+  GtkWidget* search_label = gtk_label_new("   Search:");
+  gtk_box_pack_start(GTK_BOX(filter_box), search_label, FALSE, FALSE, 0);
+
+  app->search_entry = gtk_search_entry_new();
+  gtk_widget_set_size_request(app->search_entry, 200, -1);
+  g_signal_connect(app->search_entry, "search-changed", G_CALLBACK(on_search_changed), app);
+  gtk_box_pack_start(GTK_BOX(filter_box), app->search_entry, FALSE, FALSE, 0);
+
+  // Paned view
+  GtkWidget* paned = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
+  gtk_box_pack_start(GTK_BOX(vbox), paned, TRUE, TRUE, 0);
+
+  // Left: Source tree
+  GtkWidget* left_frame = gtk_frame_new("Available Objects");
+  gtk_paned_pack1(GTK_PANED(paned), left_frame, TRUE, TRUE);
+
+  GtkWidget* scrolled_source = gtk_scrolled_window_new(NULL, NULL);
+  gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_source), GTK_POLICY_AUTOMATIC,
+                                 GTK_POLICY_AUTOMATIC);
+  gtk_container_add(GTK_CONTAINER(left_frame), scrolled_source);
+
+  app->source_store = gtk_tree_store_new(NUM_COLS, G_TYPE_STRING, /* COL_NAME */
+                                         G_TYPE_STRING,           /* COL_TYPE */
+                                         G_TYPE_STRING,           /* COL_CLASS */
+                                         G_TYPE_UINT,             /* COL_CLASS_ID */
+                                         G_TYPE_STRING,           /* COL_DESCRIPTION */
+                                         G_TYPE_BOOLEAN,          /* COL_ENABLED */
+                                         G_TYPE_BOOLEAN,          /* COL_IS_SIGNAL */
+                                         G_TYPE_BOOLEAN,          /* COL_SELECTABLE */
+                                         G_TYPE_STRING,           /* COL_AREF_STR */
+                                         G_TYPE_UINT,             /* COL_OID_OIX */
+                                         G_TYPE_UINT,             /* COL_OID_VID */
+                                         G_TYPE_BOOLEAN);         /* COL_VISIBLE */
+
+  /* Create filter model */
+  app->filter_model =
+      GTK_TREE_MODEL_FILTER(gtk_tree_model_filter_new(GTK_TREE_MODEL(app->source_store), NULL));
+  gtk_tree_model_filter_set_visible_column(app->filter_model, COL_VISIBLE);
+
+  app->source_tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(app->filter_model));
+  gtk_tree_view_set_tooltip_column(GTK_TREE_VIEW(app->source_tree), -1); /* We'll handle tooltips manually */
+  gtk_container_add(GTK_CONTAINER(scrolled_source), app->source_tree);
+
+  /* Toggle checkbox - sensitive only for selectable items */
+  GtkCellRenderer* toggle_renderer = gtk_cell_renderer_toggle_new();
+  g_signal_connect(toggle_renderer, "toggled", G_CALLBACK(on_toggle_enabled), app);
+  GtkTreeViewColumn* col_enabled =
+      gtk_tree_view_column_new_with_attributes("Export", toggle_renderer, "active", COL_ENABLED, "sensitive",
+                                               COL_SELECTABLE, "visible", COL_SELECTABLE, NULL);
+  gtk_tree_view_append_column(GTK_TREE_VIEW(app->source_tree), col_enabled);
+
+  /* Text renderers with greyed out styling for non-selectable rows */
+  GtkCellRenderer* text_renderer = gtk_cell_renderer_text_new();
+
+  GtkCellRenderer* name_renderer = gtk_cell_renderer_text_new();
+  GtkTreeViewColumn* col_name = gtk_tree_view_column_new();
+  gtk_tree_view_column_set_title(col_name, "Name");
+  gtk_tree_view_column_pack_start(col_name, name_renderer, TRUE);
+  gtk_tree_view_column_add_attribute(col_name, name_renderer, "text", COL_NAME);
+  gtk_tree_view_column_add_attribute(col_name, name_renderer, "sensitive", COL_SELECTABLE);
+  gtk_tree_view_column_set_expand(col_name, TRUE);
+  gtk_tree_view_append_column(GTK_TREE_VIEW(app->source_tree), col_name);
+
+  GtkCellRenderer* class_renderer = gtk_cell_renderer_text_new();
+  GtkTreeViewColumn* col_class = gtk_tree_view_column_new();
+  gtk_tree_view_column_set_title(col_class, "Class");
+  gtk_tree_view_column_pack_start(col_class, class_renderer, TRUE);
+  gtk_tree_view_column_add_attribute(col_class, class_renderer, "text", COL_CLASS);
+  gtk_tree_view_column_add_attribute(col_class, class_renderer, "sensitive", COL_SELECTABLE);
+  gtk_tree_view_append_column(GTK_TREE_VIEW(app->source_tree), col_class);
+
+  GtkCellRenderer* type_renderer = gtk_cell_renderer_text_new();
+  GtkTreeViewColumn* col_type = gtk_tree_view_column_new();
+  gtk_tree_view_column_set_title(col_type, "Type");
+  gtk_tree_view_column_pack_start(col_type, type_renderer, TRUE);
+  gtk_tree_view_column_add_attribute(col_type, type_renderer, "text", COL_TYPE);
+  gtk_tree_view_column_add_attribute(col_type, type_renderer, "sensitive", COL_SELECTABLE);
+  gtk_tree_view_append_column(GTK_TREE_VIEW(app->source_tree), col_type);
+
+  GtkCellRenderer* desc_renderer = gtk_cell_renderer_text_new();
+  GtkTreeViewColumn* col_desc = gtk_tree_view_column_new();
+  gtk_tree_view_column_set_title(col_desc, "Description");
+  gtk_tree_view_column_pack_start(col_desc, desc_renderer, TRUE);
+  gtk_tree_view_column_add_attribute(col_desc, desc_renderer, "text", COL_DESCRIPTION);
+  gtk_tree_view_column_add_attribute(col_desc, desc_renderer, "sensitive", COL_SELECTABLE);
+  gtk_tree_view_append_column(GTK_TREE_VIEW(app->source_tree), col_desc);
+
+  // Right: Selected list
+  GtkWidget* right_frame = gtk_frame_new("Selected for Export");
+  gtk_paned_pack2(GTK_PANED(paned), right_frame, FALSE, TRUE);
+
+  GtkWidget* scrolled_selected = gtk_scrolled_window_new(NULL, NULL);
+  gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_selected), GTK_POLICY_AUTOMATIC,
+                                 GTK_POLICY_AUTOMATIC);
+  gtk_container_add(GTK_CONTAINER(right_frame), scrolled_selected);
+
+  app->selected_store = gtk_list_store_new(SEL_NUM_COLS, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
+
+  app->selected_tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(app->selected_store));
+  gtk_container_add(GTK_CONTAINER(scrolled_selected), app->selected_tree);
+
+  GtkTreeViewColumn* sel_col_name =
+      gtk_tree_view_column_new_with_attributes("Attribute", text_renderer, "text", SEL_COL_NAME, NULL);
+  gtk_tree_view_column_set_expand(sel_col_name, TRUE);
+  gtk_tree_view_append_column(GTK_TREE_VIEW(app->selected_tree), sel_col_name);
+
+  GtkTreeViewColumn* sel_col_type =
+      gtk_tree_view_column_new_with_attributes("Type", text_renderer, "text", SEL_COL_TYPE, NULL);
+  gtk_tree_view_append_column(GTK_TREE_VIEW(app->selected_tree), sel_col_type);
+
+  GtkTreeViewColumn* sel_col_desc = gtk_tree_view_column_new_with_attributes(
+      "Description", text_renderer, "text", SEL_COL_DESCRIPTION, NULL);
+  gtk_tree_view_append_column(GTK_TREE_VIEW(app->selected_tree), sel_col_desc);
+
+  gtk_paned_set_position(GTK_PANED(paned), 800);
+
+  /* Enable tooltips for non-selectable items */
+  gtk_widget_set_has_tooltip(app->source_tree, TRUE);
+  g_signal_connect(app->source_tree, "query-tooltip", G_CALLBACK(on_query_tooltip), NULL);
+
+  // Statusbar
+  app->statusbar = gtk_statusbar_new();
+  gtk_box_pack_start(GTK_BOX(vbox), app->statusbar, FALSE, FALSE, 0);
+  app->status_ctx = gtk_statusbar_get_context_id(GTK_STATUSBAR(app->statusbar), "main");
+  gtk_statusbar_push(GTK_STATUSBAR(app->statusbar), app->status_ctx, "Ready");
+}
+
+/*_Main program__________________________________________________________*/
+
+int main(int argc, char** argv)
+{
+  gtk_init(&argc, &argv);
+  errh_Interactive();
+
+  pwr_tStatus sts = gdh_Init("rs_export_gen");
+  if (EVEN(sts))
+  {
+    fprintf(stderr, "gdh_Init failed - is the runtime running?\n");
+    return 1;
+  }
+
+  AppData app = {};
+
+  /* Initialize all filters to enabled */
+  app.filter_di = true;
+  app.filter_do = true;
+  app.filter_dv = true;
+  app.filter_ai = true;
+  app.filter_ao = true;
+  app.filter_av = true;
+  app.filter_ii = true;
+  app.filter_io = true;
+  app.filter_iv = true;
+  app.filter_co = true;
+  app.filter_po = true;
+  app.filter_other = true;
+
+  create_window(&app);
+  populate_source_tree(&app);
+  apply_filter(&app);
+  on_select_all_signals(NULL, &app);
+
+  gtk_widget_show_all(app.window);
+  gtk_main();
 
   return 0;
 }
