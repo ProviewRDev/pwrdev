@@ -46,6 +46,7 @@
 #include <map>
 #include <set>
 #include <string>
+#include <vector>
 #include <functional>
 
 #include "pwr.h"
@@ -213,6 +214,98 @@ static bool is_primitive_type(pwr_eType type)
 static bool should_skip_object(pwr_tCid cid)
 {
   return (cid == pwr_cClass_Security || cid == pwr_cClass_DynamicVolume);
+}
+
+/* Structure to hold primitive attribute info for saving */
+struct PrimitiveAttr
+{
+  std::string name;
+  pwr_tAttrRef aref;
+  pwr_eType type;
+  std::string description;
+};
+
+/*
+ * Recursively collect all primitive attributes from a class.
+ * If the attribute is a nested class, recurse into it.
+ * If it's a class array, iterate through all elements.
+ */
+static void collect_primitive_attrs(const char* base_path, pwr_tCid cid, pwr_tOid oid,
+                                    std::vector<PrimitiveAttr>& attrs, const char* base_desc)
+{
+  pwr_tStatus sts;
+  gdh_sAttrDef* bd;
+  int rows;
+
+  sts = gdh_GetObjectBodyDef(cid, &bd, &rows, pwr_cNOid);
+  if (EVEN(sts))
+    return;
+
+  for (int i = 0; i < rows; i++)
+  {
+    pwr_sParInfo* info = &bd[i].attr->Param.Info;
+
+    /* Skip virtual, private pointers, void */
+    if (info->Flags & PWR_MASK_RTVIRTUAL)
+      continue;
+    if ((info->Flags & PWR_MASK_PRIVATE) && (info->Flags & PWR_MASK_POINTER))
+      continue;
+    if (info->Type == pwr_eType_Void)
+      continue;
+
+    char attr_path[512];
+    snprintf(attr_path, sizeof(attr_path), "%s.%s", base_path, bd[i].attrName);
+
+    /* Check if this is a primitive type */
+    if (is_primitive_type(info->Type))
+    {
+      PrimitiveAttr pa;
+      pa.name = attr_path;
+      pa.description = base_desc ? base_desc : "";
+
+      sts = gdh_NameToAttrref(pwr_cNOid, attr_path, &pa.aref);
+      if (ODD(sts))
+      {
+        pa.type = info->Type;
+        attrs.push_back(pa);
+      }
+    }
+    /* Check if it's a non-array class - recurse into it */
+    else if ((info->Flags & PWR_MASK_CLASS) && !(info->Flags & PWR_MASK_ARRAY))
+    {
+      pwr_tAttrRef nested_aref;
+      sts = gdh_NameToAttrref(pwr_cNOid, attr_path, &nested_aref);
+      if (ODD(sts))
+      {
+        pwr_tTid nested_tid;
+        sts = gdh_GetAttrRefTid(&nested_aref, &nested_tid);
+        if (ODD(sts))
+          collect_primitive_attrs(attr_path, nested_tid, oid, attrs, base_desc);
+      }
+    }
+    /* Check if it's a class array - iterate through elements */
+    else if ((info->Flags & PWR_MASK_CLASS) && (info->Flags & PWR_MASK_ARRAY))
+    {
+      pwr_tAttrRef arr_aref;
+      sts = gdh_NameToAttrref(pwr_cNOid, attr_path, &arr_aref);
+      if (ODD(sts))
+      {
+        pwr_tTid arr_tid;
+        sts = gdh_GetAttrRefTid(&arr_aref, &arr_tid);
+        if (ODD(sts))
+        {
+          for (int j = 0; j < (int)info->Elements; j++)
+          {
+            char elem_path[512];
+            snprintf(elem_path, sizeof(elem_path), "%s[%d]", attr_path, j);
+            collect_primitive_attrs(elem_path, arr_tid, oid, attrs, base_desc);
+          }
+        }
+      }
+    }
+  }
+
+  free(bd);
 }
 
 static void get_description(pwr_tOid oid, char* desc, size_t size)
@@ -887,29 +980,139 @@ static void on_save_clicked(GtkButton* button, gpointer user_data)
   cJSON_AddNumberToObject(root, "batches", 1);
   cJSON* signals = cJSON_AddArrayToObject(root, "signals");
 
+  int saved_count = 0;
   GtkTreeIter iter;
   gboolean valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(app->selected_store), &iter);
 
   while (valid)
   {
     gchar* name;
-    gchar* type;
+    gchar* type_str;
     gchar* desc;
 
-    gtk_tree_model_get(GTK_TREE_MODEL(app->selected_store), &iter, SEL_COL_NAME, &name, SEL_COL_TYPE, &type,
-                       SEL_COL_DESCRIPTION, &desc, -1);
+    gtk_tree_model_get(GTK_TREE_MODEL(app->selected_store), &iter, SEL_COL_NAME, &name, SEL_COL_TYPE,
+                       &type_str, SEL_COL_DESCRIPTION, &desc, -1);
 
-    cJSON* signal = cJSON_CreateObject();
-    cJSON_AddStringToObject(signal, "name", name);
-    cJSON_AddStringToObject(signal, "type", type);
-    cJSON_AddNumberToObject(signal, "enable", 1);
-    if (desc && desc[0] != '\0')
-      cJSON_AddStringToObject(signal, "description", desc);
+    /* Get full aref info from GDH */
+    pwr_tAttrRef aref;
+    pwr_tStatus sts = gdh_NameToAttrref(pwr_cNOid, name, &aref);
+    if (ODD(sts))
+    {
+      /* Get type ID */
+      pwr_tTid tid;
+      sts = gdh_GetAttrRefTid(&aref, &tid);
+      if (ODD(sts))
+      {
+        /* Check if this is a class (not a primitive type) */
+        pwr_tOid class_oid = cdh_ClassIdToObjid(tid);
+        pwr_tStatus class_sts;
+        pwr_tCid class_cid;
+        class_sts = gdh_GetObjectClass(class_oid, &class_cid);
 
-    cJSON_AddItemToArray(signals, signal);
+        /* If tid refers to a class, expand to primitive attributes */
+        if (ODD(class_sts))
+        {
+          std::vector<PrimitiveAttr> prim_attrs;
+
+          /* Handle class array */
+          if (aref.Flags.b.Array)
+          {
+            /* For class arrays, we need to iterate through each element */
+            /* Find parent object and get attribute info */
+            pwr_tOName attrname;
+            sts = gdh_AttrrefToName(&aref, attrname, sizeof(attrname), cdh_mName_volumeStrict);
+            if (ODD(sts))
+            {
+              /* Extract just the array base name (without index) */
+              char* bracket = strchr(attrname, '[');
+              if (bracket)
+                *bracket = '\0';
+
+              /* Get the aref for the base array to find element count */
+              pwr_tAttrRef base_aref;
+              sts = gdh_NameToAttrref(pwr_cNOid, attrname, &base_aref);
+              if (ODD(sts))
+              {
+                /* Calculate element count from array size */
+                pwr_tAttrRef elem_aref;
+                char elem_path[512];
+                snprintf(elem_path, sizeof(elem_path), "%s[0]", attrname);
+                sts = gdh_NameToAttrref(pwr_cNOid, elem_path, &elem_aref);
+                if (ODD(sts))
+                {
+                  int elem_count = base_aref.Size / elem_aref.Size;
+                  for (int i = 0; i < elem_count; i++)
+                  {
+                    snprintf(elem_path, sizeof(elem_path), "%s[%d]", attrname, i);
+                    collect_primitive_attrs(elem_path, tid, aref.Objid, prim_attrs,
+                                            desc && desc[0] != '\0' ? desc : NULL);
+                  }
+                }
+              }
+            }
+          }
+          else
+          {
+            /* Single class instance */
+            collect_primitive_attrs(name, tid, aref.Objid, prim_attrs, desc && desc[0] != '\0' ? desc : NULL);
+          }
+
+          /* Add all collected primitive attributes */
+          for (const auto& pa : prim_attrs)
+          {
+            cJSON* signal = cJSON_CreateObject();
+            cJSON_AddStringToObject(signal, "name", pa.name.c_str());
+            cJSON_AddNumberToObject(signal, "type", (int)pa.type);
+            cJSON_AddNumberToObject(signal, "flags", (int)pa.aref.Flags.m);
+            cJSON_AddNumberToObject(signal, "enable", 1);
+            if (!pa.description.empty())
+              cJSON_AddStringToObject(signal, "description", pa.description.c_str());
+
+            cJSON* aref_json = cJSON_CreateObject();
+            cJSON* oid_json = cJSON_CreateObject();
+            cJSON_AddNumberToObject(oid_json, "oix", (int)pa.aref.Objid.oix);
+            cJSON_AddNumberToObject(oid_json, "vid", (int)pa.aref.Objid.vid);
+            cJSON_AddItemToObject(aref_json, "Objid", oid_json);
+            cJSON_AddNumberToObject(aref_json, "Body", (int)pa.aref.Body);
+            cJSON_AddNumberToObject(aref_json, "Offset", (int)pa.aref.Offset);
+            cJSON_AddNumberToObject(aref_json, "Size", (int)pa.aref.Size);
+            cJSON_AddNumberToObject(aref_json, "Flags", (int)pa.aref.Flags.m);
+            cJSON_AddItemToObject(signal, "aref", aref_json);
+
+            cJSON_AddItemToArray(signals, signal);
+            saved_count++;
+          }
+        }
+        else
+        {
+          /* It's a primitive type - save directly */
+          cJSON* signal = cJSON_CreateObject();
+          cJSON_AddStringToObject(signal, "name", name);
+          cJSON_AddNumberToObject(signal, "type", (int)tid);
+          cJSON_AddNumberToObject(signal, "flags", (int)aref.Flags.m);
+          cJSON_AddNumberToObject(signal, "enable", 1);
+          if (desc && desc[0] != '\0')
+            cJSON_AddStringToObject(signal, "description", desc);
+
+          cJSON* aref_json = cJSON_CreateObject();
+          cJSON* oid_json = cJSON_CreateObject();
+          cJSON_AddNumberToObject(oid_json, "oix", (int)aref.Objid.oix);
+          cJSON_AddNumberToObject(oid_json, "vid", (int)aref.Objid.vid);
+          cJSON_AddItemToObject(aref_json, "Objid", oid_json);
+          cJSON_AddNumberToObject(aref_json, "Body", (int)aref.Body);
+          cJSON_AddNumberToObject(aref_json, "Offset", (int)aref.Offset);
+          cJSON_AddNumberToObject(aref_json, "Size", (int)aref.Size);
+          cJSON_AddNumberToObject(aref_json, "Flags", (int)aref.Flags.m);
+          cJSON_AddItemToObject(signal, "aref", aref_json);
+
+          cJSON_AddItemToArray(signals, signal);
+          saved_count++;
+        }
+      }
+    }
 
     g_free(name);
-    g_free(type);
+    g_free(type_str);
     g_free(desc);
 
     valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(app->selected_store), &iter);
@@ -926,7 +1129,7 @@ static void on_save_clicked(GtkButton* button, gpointer user_data)
     fclose(fp);
 
     char msg[512];
-    snprintf(msg, sizeof(msg), "Saved %d signals to %s", app->total_selected, fname);
+    snprintf(msg, sizeof(msg), "Saved %d signals to %s", saved_count, fname);
     gtk_statusbar_push(GTK_STATUSBAR(app->statusbar), app->status_ctx, msg);
   }
   else
