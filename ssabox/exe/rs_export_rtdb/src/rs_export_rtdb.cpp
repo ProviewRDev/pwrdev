@@ -41,7 +41,6 @@
 #if defined PWRE_CONF_RDKAFKA
 
 #include <cstdint>
-#include <sstream>
 #include <ctime>
 #include <unistd.h>
 #include <algorithm>
@@ -83,24 +82,28 @@ public:
         m_schema_id(0), m_anix(errh_eAnix_appl20), m_last_msg_err(0)
   {
     strcpy(m_schema_url, "");
+    m_last_json_time.tv_sec = 0;
+    m_last_json_time.tv_nsec = 0;
   }
 
   pwr_tURL m_schema_url;
   pwr_sClass_Ssab_ExportRtdbServer* m_confobj;
   pwr_tDlid m_confdlid;
   float m_scantime;
-  std::ostringstream m_json_string;
   int m_msg_idx;
   int m_frequency;
   int m_batches;
   uint32_t m_schema_id;
   errh_eAnix m_anix;
   int m_last_msg_err;
+  pwr_tTime m_last_json_time; // Track select.json modification time
 
   void get_confobj();
   std::string to_utf8(std::string& str);
   std::string fix_name(std::string key);
   int gen_schema_main();
+  int load_signals();             // New function to load signals from JSON
+  int check_and_reload_signals(); // New function to check for file changes
   int scan();
   char* read_file(const char* filename);
   cJSON* parse_file(const char* filename);
@@ -217,48 +220,88 @@ std::string rs_export_rtdb::fix_name(std::string key)
 }
 
 /*
- * This function generates the kafka scheam JSON and sends it to kafka.
+ * This function generates the Avro schema JSON using cJSON and sends it to kafka.
  */
 int rs_export_rtdb::gen_schema_main()
 {
   int res = 1;
-  m_json_string.str("");
-  if (m_batches > 1)
-  {
-    m_json_string << "{";
-    m_json_string << "\\\"type\\\":\\\"record\\\",";
-    m_json_string << "\\\"name\\\":\\\"Parent\\\",";
-    m_json_string << "\\\"fields\\\":[";
-    m_json_string << "{";
-    m_json_string << "\\\"name\\\":\\\"events\\\",";
-    m_json_string << "\\\"type\\\": {";
-    m_json_string << "\\\"type\\\":\\\"array\\\",";
-    m_json_string << "\\\"items\\\":";
-  }
-  m_json_string << "{";
-  m_json_string << "\\\"type\\\":\\\"record\\\",";
-  m_json_string << "\\\"name\\\":\\\"Event\\\",";
-  m_json_string << "\\\"fields\\\":[";
-  m_json_string << "{\\\"name\\\":\\\"timestamp\\\",\\\"type\\\":{\\\"type\\\":\\\"long\\\","
-                   "\\\"logicalType\\\":\\\"timestamp-millis\\\"}},";
-  m_json_string << "{\\\"name\\\":\\\"index\\\",\\\"type\\\":\\\"int\\\",\\\"default\\\":0},";
 
+  // Build Event record schema
+  cJSON* event_record = cJSON_CreateObject();
+  cJSON_AddStringToObject(event_record, "type", "record");
+  cJSON_AddStringToObject(event_record, "name", "Event");
+
+  cJSON* event_fields = cJSON_CreateArray();
+
+  // Add timestamp field
+  cJSON* timestamp_field = cJSON_CreateObject();
+  cJSON_AddStringToObject(timestamp_field, "name", "timestamp");
+  cJSON* timestamp_type = cJSON_CreateObject();
+  cJSON_AddStringToObject(timestamp_type, "type", "long");
+  cJSON_AddStringToObject(timestamp_type, "logicalType", "timestamp-millis");
+  cJSON_AddItemToObject(timestamp_field, "type", timestamp_type);
+  cJSON_AddItemToArray(event_fields, timestamp_field);
+
+  // Add index field
+  cJSON* index_field = cJSON_CreateObject();
+  cJSON_AddStringToObject(index_field, "name", "index");
+  cJSON_AddStringToObject(index_field, "type", "int");
+  cJSON_AddNumberToObject(index_field, "default", 0);
+  cJSON_AddItemToArray(event_fields, index_field);
+
+  // Add all signal fields
   for (std::map<std::string, asdfs>::iterator it = arefs.begin(); it != arefs.end(); it++)
   {
     std::string fixed = fix_name(it->first);
-    m_json_string << "{\\\"name\\\":\\\"" << to_utf8(fixed)
-                  << "\\\",\\\"type\\\":" << pwr_eType_to_str(it->second.type) << ",\\\"default\\\": null},";
+    std::string utf8_name = to_utf8(fixed);
+
+    cJSON* signal_field = cJSON_CreateObject();
+    cJSON_AddStringToObject(signal_field, "name", utf8_name.c_str());
+    cJSON_AddItemToObject(signal_field, "type", pwr_eType_to_json(it->second.type, &it->second.aref));
+    cJSON_AddNullToObject(signal_field, "default");
+    cJSON_AddItemToArray(event_fields, signal_field);
   }
 
-  std::string tmp = m_json_string.str();
-  tmp.erase(tmp.rfind(','));
-  tmp += "]}";
+  cJSON_AddItemToObject(event_record, "fields", event_fields);
+
+  // Wrap in Parent record if batching
+  cJSON* schema_root;
   if (m_batches > 1)
   {
-    tmp += "}}]}";
+    cJSON* parent_record = cJSON_CreateObject();
+    cJSON_AddStringToObject(parent_record, "type", "record");
+    cJSON_AddStringToObject(parent_record, "name", "Parent");
+
+    cJSON* parent_fields = cJSON_CreateArray();
+    cJSON* events_field = cJSON_CreateObject();
+    cJSON_AddStringToObject(events_field, "name", "events");
+
+    cJSON* array_type = cJSON_CreateObject();
+    cJSON_AddStringToObject(array_type, "type", "array");
+    cJSON_AddItemToObject(array_type, "items", event_record);
+
+    cJSON_AddItemToObject(events_field, "type", array_type);
+    cJSON_AddItemToArray(parent_fields, events_field);
+    cJSON_AddItemToObject(parent_record, "fields", parent_fields);
+
+    schema_root = parent_record;
+  }
+  else
+  {
+    schema_root = event_record;
   }
 
-  tmp = "{\"schema\":\"" + tmp + "\"}";
+  // Create schema wrapper
+  cJSON* schema_wrapper = cJSON_CreateObject();
+  char* schema_str = cJSON_PrintUnformatted(schema_root);
+  cJSON_AddStringToObject(schema_wrapper, "schema", schema_str);
+  free(schema_str);
+  cJSON_Delete(schema_root);
+
+  char* request_body = cJSON_PrintUnformatted(schema_wrapper);
+  std::string tmp(request_body);
+  free(request_body);
+  cJSON_Delete(schema_wrapper);
 
   if (exp_debug)
   {
@@ -277,15 +320,23 @@ int rs_export_rtdb::gen_schema_main()
     std::string path = "/subjects/";
     path += kafka_get_topic();
     path += "-value/versions";
+
+    // Exponential backoff: 1s, 2s, 4s, 8s, 16s
+    int backoff_seconds = 1;
     for (int i = 0; i < 5; i++)
     {
       res2 = http_request(url.c_str(), path.c_str(), tmp);
       if (res2 > 0)
         break;
-      errh_Info("Did not receive a valid schema id from kafka registry, retrying.");
+
+      errh_Info("Did not receive a valid schema id from kafka registry, retrying in %d seconds.",
+                backoff_seconds);
       if (exp_debug)
-        printf("Did not receive a valid schema id from kafka registry, retrying.\n");
-      sleep(3);
+        printf("Did not receive a valid schema id from kafka registry, retrying in %d seconds.\n",
+               backoff_seconds);
+
+      sleep(backoff_seconds);
+      backoff_seconds *= 2; // Exponential backoff
     }
     if (res2 <= 0)
     {
@@ -311,12 +362,20 @@ int rs_export_rtdb::gen_schema_main()
 int freqCounter = 0;
 int batch = 0;
 int izero[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+int reload_check_counter = 0; // Check for file changes every N scans
 
 AvroEncoder avro_encoder = AvroEncoder();
 
 int rs_export_rtdb::scan()
 {
   aproc_TimeStamp(m_scantime, m_scantime * 5);
+
+  // Check for select.json changes every 60 scans (e.g., once per minute if scan is 1 Hz)
+  if (++reload_check_counter >= 60)
+  {
+    reload_check_counter = 0;
+    check_and_reload_signals();
+  }
 
   if (freqCounter % m_frequency != 0)
   {
@@ -482,6 +541,124 @@ cJSON* rs_export_rtdb::parse_file(const char* filename)
   return parsed;
 }
 
+/*
+ * Load signals from select.json file
+ */
+int rs_export_rtdb::load_signals()
+{
+  pwr_tFileName fname;
+  pwr_tStatus sts;
+
+  dcli_translate_filename(fname, json_filename);
+  sts = dcli_file_time(fname, &m_last_json_time);
+  if (EVEN(sts))
+  {
+    // Generate file
+    pwr_tCmd cmd = "rs_export_gen -f signals";
+    system(cmd);
+    sts = dcli_file_time(fname, &m_last_json_time);
+  }
+
+  cJSON* parsed = parse_file(fname);
+  if (parsed == NULL)
+  {
+    const char* error_ptr = cJSON_GetErrorPtr();
+    if (error_ptr != NULL)
+      errh_Error("JSON parse error before: %s", error_ptr);
+    else
+      errh_Error("JSON parse error");
+    cJSON_Delete(parsed);
+    return 0;
+  }
+
+  m_frequency = cJSON_GetObjectItemCaseSensitive(parsed, "frequency")->valueint;
+  m_batches = cJSON_GetObjectItemCaseSensitive(parsed, "batches")->valueint;
+  if (exp_debug)
+    fprintf(stderr, "freq %d batches %d\n", m_frequency, m_batches);
+
+  // Clear existing signals first (for reload case)
+  for (std::map<std::string, asdfs>::iterator it = arefs.begin(); it != arefs.end(); it++)
+  {
+    if (ODD(it->second.sts))
+      gdh_DLUnrefObjectInfo(it->second.dlid);
+  }
+  arefs.clear();
+
+  const cJSON* item = NULL;
+  cJSON_ArrayForEach(item, cJSON_GetObjectItemCaseSensitive(parsed, "signals"))
+  {
+    std::string name(cJSON_GetObjectItemCaseSensitive(item, "name")->valuestring);
+
+    asdfs a;
+    a.to_send = cJSON_GetObjectItemCaseSensitive(item, "enable")->valueint;
+    a.flags = cJSON_GetObjectItemCaseSensitive(item, "flags")->valueint;
+    a.type = (pwr_eType)cJSON_GetObjectItemCaseSensitive(item, "type")->valueint;
+
+    const cJSON* aref_json = cJSON_GetObjectItemCaseSensitive(item, "aref");
+    a.aref.Flags.m = cJSON_GetObjectItemCaseSensitive(aref_json, "Flags")->valueint;
+    a.aref.Size = cJSON_GetObjectItemCaseSensitive(aref_json, "Size")->valueint;
+    a.aref.Offset = cJSON_GetObjectItemCaseSensitive(aref_json, "Offset")->valueint;
+    a.aref.Body = cJSON_GetObjectItemCaseSensitive(aref_json, "Body")->valueint;
+
+    const cJSON* oid_json = cJSON_GetObjectItemCaseSensitive(aref_json, "Objid");
+    a.aref.Objid.oix = cJSON_GetObjectItemCaseSensitive(oid_json, "oix")->valueint;
+    a.aref.Objid.vid = cJSON_GetObjectItemCaseSensitive(oid_json, "vid")->valueint;
+
+    a.sts = gdh_NameToAttrref(pwr_cNOid, name.c_str(), &a.aref);
+    if (ODD(a.sts))
+      a.sts = gdh_DLRefObjectInfoAttrref(&a.aref, &a.valp, &a.dlid);
+    if (EVEN(a.sts))
+    {
+      a.valp = 0;
+      errh_Error("Attribute link error, %m, %s", sts, name.c_str());
+    }
+    arefs[name] = a;
+  }
+
+  cJSON_Delete(parsed);
+  return 1;
+}
+
+/*
+ * Check if select.json has been modified and reload if necessary
+ */
+int rs_export_rtdb::check_and_reload_signals()
+{
+  pwr_tFileName fname;
+  pwr_tTime current_time;
+  pwr_tStatus sts;
+
+  dcli_translate_filename(fname, json_filename);
+  sts = dcli_file_time(fname, &current_time);
+  if (EVEN(sts))
+    return 0;
+
+  // Check if file has been modified
+  if (current_time.tv_sec != m_last_json_time.tv_sec || current_time.tv_nsec != m_last_json_time.tv_nsec)
+  {
+    errh_Info("Detected change in select.json, reloading signals and regenerating schema...");
+    if (exp_debug)
+      printf("Detected change in select.json, reloading signals and regenerating schema...\n");
+
+    if (!load_signals())
+    {
+      errh_Error("Failed to reload signals from select.json");
+      return 0;
+    }
+
+    if (!gen_schema_main())
+    {
+      errh_Error("Failed to regenerate schema after signal reload");
+      return 0;
+    }
+
+    errh_Info("Successfully reloaded signals and regenerated schema");
+    return 1;
+  }
+
+  return 0;
+}
+
 int rs_export_rtdb::init(qcom_sQid* qid)
 {
   setbuf(stdout, NULL); // Disable stdout buffering
@@ -518,69 +695,12 @@ int rs_export_rtdb::init(qcom_sQid* qid)
   }
   // End of copy-paste
 
-  // The code below parses the select.json file which tells which signals to sample and send to kafka
-  pwr_tFileName fname;
-  pwr_tTime t;
-
-  dcli_translate_filename(fname, json_filename);
-  sts = dcli_file_time(fname, &t);
-  if (EVEN(sts))
+  // Load signals from select.json
+  if (!load_signals())
   {
-    // Generate file
-    pwr_tCmd cmd = "rs_export_gen -f signals";
-    system(cmd);
-  }
-
-  cJSON* parsed = parse_file(fname);
-  if (parsed == NULL)
-  {
-    const char* error_ptr = cJSON_GetErrorPtr();
-    if (error_ptr != NULL)
-      errh_Fatal("JSON parse error before: %s", error_ptr);
-    else
-      errh_Fatal("JSON parse error");
-    cJSON_Delete(parsed);
     errh_SetStatus(PWR__SRVTERM);
-    exit(1);
+    return 0;
   }
-
-  m_frequency = cJSON_GetObjectItemCaseSensitive(parsed, "frequency")->valueint;
-  m_batches = cJSON_GetObjectItemCaseSensitive(parsed, "batches")->valueint;
-  if (exp_debug)
-    fprintf(stderr, "freq %d batches %d\n", m_frequency, m_batches);
-
-  const cJSON* item = NULL;
-  cJSON_ArrayForEach(item, cJSON_GetObjectItemCaseSensitive(parsed, "signals"))
-  {
-    std::string name(cJSON_GetObjectItemCaseSensitive(item, "name")->valuestring);
-
-    asdfs a;
-    a.to_send = cJSON_GetObjectItemCaseSensitive(item, "enable")->valueint;
-    a.flags = cJSON_GetObjectItemCaseSensitive(item, "flags")->valueint;
-    a.type = (pwr_eType)cJSON_GetObjectItemCaseSensitive(item, "type")->valueint;
-
-    const cJSON* aref_json = cJSON_GetObjectItemCaseSensitive(item, "aref");
-    a.aref.Flags.m = cJSON_GetObjectItemCaseSensitive(aref_json, "Flags")->valueint;
-    a.aref.Size = cJSON_GetObjectItemCaseSensitive(aref_json, "Size")->valueint;
-    a.aref.Offset = cJSON_GetObjectItemCaseSensitive(aref_json, "Offset")->valueint;
-    a.aref.Body = cJSON_GetObjectItemCaseSensitive(aref_json, "Body")->valueint;
-
-    const cJSON* oid_json = cJSON_GetObjectItemCaseSensitive(aref_json, "Objid");
-    a.aref.Objid.oix = cJSON_GetObjectItemCaseSensitive(oid_json, "oix")->valueint;
-    a.aref.Objid.vid = cJSON_GetObjectItemCaseSensitive(oid_json, "vid")->valueint;
-
-    a.sts = gdh_NameToAttrref(pwr_cNOid, name.c_str(), &a.aref);
-    if (ODD(a.sts))
-      a.sts = gdh_DLRefObjectInfoAttrref(&a.aref, &a.valp, &a.dlid);
-    if (EVEN(a.sts))
-    {
-      a.valp = 0;
-      errh_Error("Attribute link error, %m, %s", sts, name.c_str());
-    }
-    arefs[name] = a;
-  }
-
-  cJSON_Delete(parsed);
 
   if (exp_debug)
   {

@@ -37,7 +37,10 @@
 #ifndef export_rtdb_gdh_h
 #define export_rtdb_gdh_h
 
+#include "co_cJSON.h"
+
 int encode_val(AvroEncoder& enc, pwr_eType type_id, bool is_ptr, pwr_sAttrRef* aref, void* val);
-std::string pwr_eType_to_str(pwr_eType tid);
+cJSON* pwr_eType_to_json(pwr_eType tid, pwr_sAttrRef* aref);
+int get_array_element_count(pwr_sAttrRef* aref, pwr_eType element_type);
 
 #endif
