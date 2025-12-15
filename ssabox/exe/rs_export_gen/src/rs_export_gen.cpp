@@ -1570,6 +1570,9 @@ static void on_select_all_signals(GtkButton* button, gpointer user_data)
     valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(app->source_store), &iter);
   }
 
+  /* Update parent states to show inconsistent where applicable */
+  recalculate_all_parent_states(app);
+
   rebuild_selected_list(app);
 }
 
