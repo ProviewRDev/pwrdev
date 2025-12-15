@@ -351,9 +351,9 @@ static void add_attributes_to_tree(AppData* app, pwr_tOid oid, pwr_tCid cid, con
           GtkTreeIter attr_iter;
           gtk_tree_store_append(app->source_store, &attr_iter, parent);
           gtk_tree_store_set(app->source_store, &attr_iter, COL_NAME, name_utf8, COL_TYPE, "", COL_CLASS,
-                             class_utf8, COL_CLASS_ID, (guint)parent_class_id, COL_DESCRIPTION, "", COL_ENABLED, FALSE,
-                             COL_IS_SIGNAL, FALSE, COL_SELECTABLE, FALSE, COL_AREF_STR, "", COL_OID_OIX,
-                             oid.oix, COL_OID_VID, oid.vid, COL_VISIBLE, TRUE, -1);
+                             class_utf8, COL_CLASS_ID, (guint)parent_class_id, COL_DESCRIPTION, "",
+                             COL_ENABLED, FALSE, COL_IS_SIGNAL, FALSE, COL_SELECTABLE, FALSE, COL_AREF_STR,
+                             "", COL_OID_OIX, oid.oix, COL_OID_VID, oid.vid, COL_VISIBLE, TRUE, -1);
 
           /* Recursively add attributes of the nested class */
           add_attributes_to_tree(app, oid, nested_tid, attr_path, &attr_iter, false, parent_class_id);
@@ -387,9 +387,9 @@ static void add_attributes_to_tree(AppData* app, pwr_tOid oid, pwr_tCid cid, con
           GtkTreeIter arr_iter;
           gtk_tree_store_append(app->source_store, &arr_iter, parent);
           gtk_tree_store_set(app->source_store, &arr_iter, COL_NAME, name_utf8, COL_TYPE, type_display,
-                             COL_CLASS, "", COL_CLASS_ID, (guint)parent_class_id, COL_DESCRIPTION, "", COL_ENABLED, enabled,
-                             COL_IS_SIGNAL, FALSE, COL_SELECTABLE, TRUE, COL_AREF_STR, aref_utf8, COL_OID_OIX,
-                             oid.oix, COL_OID_VID, oid.vid, COL_VISIBLE, TRUE, -1);
+                             COL_CLASS, "", COL_CLASS_ID, (guint)parent_class_id, COL_DESCRIPTION, "",
+                             COL_ENABLED, enabled, COL_IS_SIGNAL, FALSE, COL_SELECTABLE, TRUE, COL_AREF_STR,
+                             aref_utf8, COL_OID_OIX, oid.oix, COL_OID_VID, oid.vid, COL_VISIBLE, TRUE, -1);
 
           /* Add each array element as an expandable child */
           for (int j = 0; j < (int)info->Elements; j++)
@@ -405,9 +405,10 @@ static void add_attributes_to_tree(AppData* app, pwr_tOid oid, pwr_tCid cid, con
             GtkTreeIter elem_iter;
             gtk_tree_store_append(app->source_store, &elem_iter, &arr_iter);
             gtk_tree_store_set(app->source_store, &elem_iter, COL_NAME, elem_name_utf8, COL_TYPE, "",
-                               COL_CLASS, elem_class_utf8, COL_CLASS_ID, (guint)parent_class_id, COL_DESCRIPTION, "",
-                               COL_ENABLED, FALSE, COL_IS_SIGNAL, FALSE, COL_SELECTABLE, FALSE, COL_AREF_STR,
-                               "", COL_OID_OIX, oid.oix, COL_OID_VID, oid.vid, COL_VISIBLE, TRUE, -1);
+                               COL_CLASS, elem_class_utf8, COL_CLASS_ID, (guint)parent_class_id,
+                               COL_DESCRIPTION, "", COL_ENABLED, FALSE, COL_IS_SIGNAL, FALSE, COL_SELECTABLE,
+                               FALSE, COL_AREF_STR, "", COL_OID_OIX, oid.oix, COL_OID_VID, oid.vid,
+                               COL_VISIBLE, TRUE, -1);
 
             /* Recursively add attributes of this array element */
             add_attributes_to_tree(app, oid, arr_tid, elem_path, &elem_iter, false, parent_class_id);
@@ -448,9 +449,9 @@ static void add_attributes_to_tree(AppData* app, pwr_tOid oid, pwr_tCid cid, con
     GtkTreeIter attr_iter;
     gtk_tree_store_append(app->source_store, &attr_iter, parent);
     gtk_tree_store_set(app->source_store, &attr_iter, COL_NAME, name_utf8, COL_TYPE, type_display, COL_CLASS,
-                       "", COL_CLASS_ID, (guint)parent_class_id, COL_DESCRIPTION, "", COL_ENABLED, enabled, COL_IS_SIGNAL,
-                       is_signal_attr, COL_SELECTABLE, TRUE, COL_AREF_STR, aref_utf8, COL_OID_OIX, oid.oix,
-                       COL_OID_VID, oid.vid, COL_VISIBLE, TRUE, -1);
+                       "", COL_CLASS_ID, (guint)parent_class_id, COL_DESCRIPTION, "", COL_ENABLED, enabled,
+                       COL_IS_SIGNAL, is_signal_attr, COL_SELECTABLE, TRUE, COL_AREF_STR, aref_utf8,
+                       COL_OID_OIX, oid.oix, COL_OID_VID, oid.vid, COL_VISIBLE, TRUE, -1);
 
     g_free(name_utf8);
     g_free(aref_utf8);
