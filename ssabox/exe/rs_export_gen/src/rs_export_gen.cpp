@@ -59,6 +59,8 @@
 #include "co_error.h"
 #include "co_string.h"
 
+/*_Types_________________________________________________________________*/
+
 typedef enum
 {
   gen_eFilter_All,
@@ -67,12 +69,81 @@ typedef enum
   gen_eFilter_SevHist
 } gen_eFilter;
 
+/*_Global variables______________________________________________________*/
+
 static char json_filename[] = "$pwrp_load/select.json";
 static gen_eFilter filter = gen_eFilter_Signals;
+static std::vector<std::string> tmp_array;
 
-std::vector<std::string> tmp_array;
+/*_Filter functions______________________________________________________*/
 
-std::string aref_to_str(pwr_tAttrRef& aref)
+/**
+ * Check if a class is a signal class (I/O signals with SigChanCon attribute)
+ */
+static bool is_signal_class(pwr_tCid cid)
+{
+  switch (cid)
+  {
+  case pwr_cClass_Di:
+  case pwr_cClass_Do:
+  case pwr_cClass_Ai:
+  case pwr_cClass_Ao:
+  case pwr_cClass_Ii:
+  case pwr_cClass_Io:
+  case pwr_cClass_Co:
+  case pwr_cClass_Po:
+    return true;
+  default:
+    return false;
+  }
+}
+
+/**
+ * Check if an object should be skipped entirely (not processed, no recursion)
+ */
+static bool should_skip_object(pwr_tCid cid)
+{
+  return (cid == pwr_cClass_Security || cid == pwr_cClass_DynamicVolume);
+}
+
+/**
+ * Check if an object should be processed based on current filter
+ */
+static bool should_process_object(pwr_tCid cid)
+{
+  switch (filter)
+  {
+  case gen_eFilter_Signals:
+    return is_signal_class(cid);
+  case gen_eFilter_All:
+  case gen_eFilter_Redu:
+  case gen_eFilter_SevHist:
+    return true;
+  default:
+    return true;
+  }
+}
+
+/**
+ * Check if an attribute should be included based on current filter
+ */
+static bool should_include_attribute(const pwr_sParInfo& pari)
+{
+  // Skip virtual, private pointers, and void types
+  if (pari.Flags & PWR_MASK_RTVIRTUAL || (pari.Flags & PWR_MASK_PRIVATE && pari.Flags & PWR_MASK_POINTER) ||
+      pari.Type == pwr_eType_Void)
+    return false;
+
+  // Filter-specific checks
+  if (filter == gen_eFilter_Redu && !(pari.Flags & PWR_MASK_REDUTRANSFER))
+    return false;
+
+  return true;
+}
+
+/*_JSON serialization____________________________________________________*/
+
+static std::string aref_to_json(pwr_tAttrRef& aref)
 {
   return "{\"Objid\":{\"oix\":" + std::to_string(aref.Objid.oix) +
          ",\"vid\":" + std::to_string(aref.Objid.vid) + "},\"Body\":" + std::to_string(aref.Body) +
@@ -80,7 +151,16 @@ std::string aref_to_str(pwr_tAttrRef& aref)
          ",\"Flags\":" + std::to_string(aref.Flags.m) + "}";
 }
 
-void printObjectR(char* ap, char* aname, pwr_tAttrRef* arp, pwr_tCid cid)
+static std::string attribute_to_json(const char* name, pwr_tAttrRef& aref, const pwr_sParInfo& pari)
+{
+  return "{\"name\":\"" + std::string(name) + "\",\"aref\":" + aref_to_json(aref) +
+         ",\"type\":" + std::to_string(pari.Type) + ",\"flags\":" + std::to_string(pari.Flags) +
+         ",\"enable\":1}";
+}
+
+/*_Object traversal______________________________________________________*/
+
+static void process_attributes(char* ap, char* aname, pwr_tAttrRef* arp, pwr_tCid cid)
 {
   gdh_sAttrDef* bd;
   int rows;
@@ -92,15 +172,7 @@ void printObjectR(char* ap, char* aname, pwr_tAttrRef* arp, pwr_tCid cid)
   {
     pwr_sParInfo pari = bd[i].attr->Param.Info;
 
-    if (filter == gen_eFilter_Signals && !(pari.Flags & PWR_MASK_CLASS) &&
-        strcmp(bd[i].attrName, "ActualValue") != 0)
-      continue;
-
-    if (filter == gen_eFilter_Redu && !(pari.Flags & PWR_MASK_REDUTRANSFER))
-      continue;
-
-    if (pari.Flags & PWR_MASK_RTVIRTUAL || (pari.Flags & PWR_MASK_PRIVATE && pari.Flags & PWR_MASK_POINTER) ||
-        pari.Type == pwr_eType_Void)
+    if (!should_include_attribute(pari))
       continue;
 
     pwr_tOName name, attrName;
@@ -126,6 +198,7 @@ void printObjectR(char* ap, char* aname, pwr_tAttrRef* arp, pwr_tCid cid)
         strcpy(attrName, bd[i].attrName);
         strcat(attrName, idx);
       }
+
       pwr_tAttrRef aref;
       sts = gdh_ArefANameToAref(arp, attrName, &aref);
       if (EVEN(sts))
@@ -133,20 +206,18 @@ void printObjectR(char* ap, char* aname, pwr_tAttrRef* arp, pwr_tCid cid)
 
       if (bd[i].attr->Param.Info.Flags & PWR_MASK_CLASS)
       {
-        printObjectR(ap + pari.Offset + j * pari.Size / elements, name, &aref, pari.Type);
+        // Recurse into nested class attributes
+        process_attributes(ap + pari.Offset + j * pari.Size / elements, name, &aref, pari.Type);
       }
       else
       {
-        std::string tmp = "{\"name\":\"" + std::string(name) + "\",\"aref\":" + aref_to_str(aref) +
-                          ",\"type\":" + std::to_string(pari.Type) +
-                          ",\"flags\":" + std::to_string(pari.Flags) + ",\"enable\":1}";
-        tmp_array.push_back(tmp);
+        tmp_array.push_back(attribute_to_json(name, aref, pari));
       }
     }
   }
 }
 
-void printObject(pwr_tAttrRef* arp, char* aname)
+static void process_object(pwr_tAttrRef* arp, char* aname)
 {
   pwr_tTid tid;
   pwr_tStatus sts = gdh_GetAttrRefTid(arp, &tid);
@@ -174,19 +245,19 @@ void printObject(pwr_tAttrRef* arp, char* aname)
     throw co_error(sts);
   }
 
-  printObjectR(ap, aname, arp, tid);
+  process_attributes(ap, aname, arp, tid);
 
   free(ap);
 }
 
-void dfs_helper(pwr_tOid oid)
+static void traverse_object_tree(pwr_tOid oid)
 {
   pwr_tOName name;
   pwr_tCid cid;
   pwr_tStatus sts;
   pwr_tBoolean local;
 
-  // Dismiss the security object, dynamic volumes and mounted remote objects
+  // Skip mounted remote objects
   sts = gdh_GetObjectLocation(oid, &local);
   if (EVEN(sts))
     throw co_error(sts);
@@ -198,27 +269,34 @@ void dfs_helper(pwr_tOid oid)
   if (EVEN(sts))
     throw co_error(sts);
 
-  if (cid == pwr_cClass_Security || cid == pwr_cClass_DynamicVolume)
+  // Skip security and dynamic volume objects entirely
+  if (should_skip_object(cid))
     return;
 
-  sts = gdh_ObjidToName(oid, name, sizeof(name), cdh_mName_volumeStrict);
-  if (EVEN(sts))
-    throw co_error(sts);
+  // Process object if it matches the filter
+  if (should_process_object(cid))
+  {
+    sts = gdh_ObjidToName(oid, name, sizeof(name), cdh_mName_volumeStrict);
+    if (EVEN(sts))
+      throw co_error(sts);
 
-  pwr_tAttrRef aref = cdh_ObjidToAref(oid);
+    pwr_tAttrRef aref = cdh_ObjidToAref(oid);
+    process_object(&aref, name);
+  }
 
-  printObject(&aref, name);
-
+  // Always recurse into children
   pwr_tOid coid;
   pwr_tStatus sts2 = gdh_GetChild(oid, &coid);
   while (ODD(sts2))
   {
-    dfs_helper(coid);
+    traverse_object_tree(coid);
     sts2 = gdh_GetNextSibling(coid, &coid);
   }
 }
 
-void usage()
+/*_Main program__________________________________________________________*/
+
+static void usage()
 {
   printf("rs_export_gen [-f 'filter']\n\n"
          "-f Filter, 'all', 'signals' or 'redu'. Default 'signals'\n\n");
@@ -226,7 +304,6 @@ void usage()
 
 int main(int argc, char** argv)
 {
-
   if (argc > 1 && streq(argv[1], "-h"))
   {
     usage();
@@ -260,7 +337,19 @@ int main(int argc, char** argv)
     fprintf(stderr, "gdh_Init failed\n");
     return sts;
   }
+
+  // Traverse object tree and collect attributes
   pwr_tOid oid;
+  sts = gdh_GetRootList(&oid);
+  while (ODD(sts))
+  {
+    if (oid.oix != 0x80000001)
+      traverse_object_tree(oid);
+    sts = gdh_GetNextSibling(oid, &oid);
+  }
+
+  // Sort and generate JSON output
+  std::sort(std::begin(tmp_array), std::end(tmp_array));
 
   std::ostringstream json_string;
   json_string << "{\n";
@@ -268,26 +357,18 @@ int main(int argc, char** argv)
   json_string << "  \"batches\": 1,\n";
   json_string << "  \"signals\": [\n";
 
-  sts = gdh_GetRootList(&oid);
-  while (ODD(sts))
-  {
-    if (oid.oix != 0x80000001)
-      dfs_helper(oid);
-    sts = gdh_GetNextSibling(oid, &oid);
-  }
-  std::sort(std::begin(tmp_array), std::end(tmp_array));
-  for (int i = 0; i < tmp_array.size(); i++)
+  for (size_t i = 0; i < tmp_array.size(); i++)
   {
     json_string << "    " << tmp_array[i];
     if (i < tmp_array.size() - 1)
-    {
       json_string << ",";
-    }
     json_string << "\n";
   }
+
   json_string << "  ]\n";
   json_string << "}";
 
+  // Write to file
   FILE* fp = fopen(fname, "w");
   if (!fp)
     return 1;
