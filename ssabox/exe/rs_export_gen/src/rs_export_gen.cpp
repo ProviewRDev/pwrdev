@@ -103,6 +103,67 @@ static gchar* latin1_to_utf8(const char* str)
   return utf8;
 }
 
+/* Convert UTF-8 string back to ISO-8859-1 for ProviewR/GDH functions.
+ * GTK uses UTF-8, but ProviewR/GDH expects ISO-8859-1.
+ * Returns a newly allocated string that must be freed with g_free(). */
+static gchar* utf8_to_latin1(const char* str)
+{
+  if (!str || !str[0])
+    return g_strdup("");
+
+  /* Try using g_convert first */
+  gsize bytes_read, bytes_written;
+  GError* error = NULL;
+  gchar* latin1 = g_convert(str, -1, "ISO-8859-1", "UTF-8", &bytes_read, &bytes_written, &error);
+  if (error)
+  {
+    g_error_free(error);
+    /* Fallback: manual conversion - decode UTF-8 to ISO-8859-1 */
+    gsize len = strlen(str);
+    gchar* result = (gchar*)g_malloc(len + 1);
+    gchar* p = result;
+    const unsigned char* s = (const unsigned char*)str;
+    while (*s)
+    {
+      if (*s < 0x80)
+      {
+        /* ASCII character */
+        *p++ = *s++;
+      }
+      else if ((*s & 0xE0) == 0xC0 && (s[1] & 0xC0) == 0x80)
+      {
+        /* 2-byte UTF-8 sequence: 110xxxxx 10xxxxxx -> single Latin-1 byte */
+        unsigned int code = ((*s & 0x1F) << 6) | (s[1] & 0x3F);
+        if (code <= 0xFF)
+          *p++ = (gchar)code;
+        else
+          *p++ = '?'; /* Character outside Latin-1 range */
+        s += 2;
+      }
+      else if ((*s & 0xF0) == 0xE0)
+      {
+        /* 3-byte UTF-8 sequence - outside Latin-1, replace with ? */
+        *p++ = '?';
+        s += 3;
+      }
+      else if ((*s & 0xF8) == 0xF0)
+      {
+        /* 4-byte UTF-8 sequence - outside Latin-1, replace with ? */
+        *p++ = '?';
+        s += 4;
+      }
+      else
+      {
+        /* Invalid UTF-8, copy as-is */
+        *p++ = *s++;
+      }
+    }
+    *p = '\0';
+    return result;
+  }
+  return latin1;
+}
+
 /*_Types_________________________________________________________________*/
 
 enum
@@ -613,11 +674,12 @@ static void add_attributes_to_tree(AppData* app, pwr_tOid oid, pwr_tCid cid, con
     gchar* name_utf8 = latin1_to_utf8(display_name);
     gchar* aref_utf8 = latin1_to_utf8(attr_path);
 
-    /* For signals, ActualValue is enabled by default and marked as signal */
+    /* For signals, ActualValue is enabled by default only if no saved selections exist */
     bool is_actual_value = streq(bd[i].attrName, "ActualValue");
     bool is_signal_attr = is_signal && is_actual_value;
-    bool enabled =
-        (app->selected_names.find(std::string(aref_utf8)) != app->selected_names.end()) || is_signal_attr;
+    bool in_selection = (app->selected_names.find(std::string(aref_utf8)) != app->selected_names.end());
+    /* If we have saved selections, use them; otherwise default signals to enabled */
+    bool enabled = app->selected_names.empty() ? is_signal_attr : in_selection;
 
     GtkTreeIter attr_iter;
     gtk_tree_store_append(app->source_store, &attr_iter, parent);
@@ -693,6 +755,60 @@ static void add_object_to_tree(AppData* app, pwr_tOid oid, GtkTreeIter* parent)
   }
 }
 
+/* Forward declaration */
+static int get_children_state(AppData* app, GtkTreeIter* parent);
+
+/*
+ * Recursively recalculate parent states after loading selections.
+ * Goes bottom-up: first processes children, then updates parent state.
+ */
+static void recalculate_states_recursive(AppData* app, GtkTreeIter* iter)
+{
+  /* First recurse to all children */
+  GtkTreeIter child;
+  if (gtk_tree_model_iter_children(GTK_TREE_MODEL(app->source_store), &child, iter))
+  {
+    do
+    {
+      recalculate_states_recursive(app, &child);
+    } while (gtk_tree_model_iter_next(GTK_TREE_MODEL(app->source_store), &child));
+  }
+
+  /* Then update this node's state based on children */
+  if (gtk_tree_model_iter_has_child(GTK_TREE_MODEL(app->source_store), iter))
+  {
+    gboolean selectable;
+    gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), iter, COL_SELECTABLE, &selectable, -1);
+
+    if (selectable)
+    {
+      int state = get_children_state(app, iter);
+
+      if (state == 0)
+        gtk_tree_store_set(app->source_store, iter, COL_ENABLED, FALSE, COL_INCONSISTENT, FALSE, -1);
+      else if (state == 1)
+        gtk_tree_store_set(app->source_store, iter, COL_ENABLED, FALSE, COL_INCONSISTENT, TRUE, -1);
+      else
+        gtk_tree_store_set(app->source_store, iter, COL_ENABLED, TRUE, COL_INCONSISTENT, FALSE, -1);
+    }
+  }
+}
+
+/*
+ * Recalculate all parent states after tree is populated.
+ * This ensures parents show correct state based on which children are selected.
+ */
+static void recalculate_all_parent_states(AppData* app)
+{
+  GtkTreeIter iter;
+  gboolean valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(app->source_store), &iter);
+  while (valid)
+  {
+    recalculate_states_recursive(app, &iter);
+    valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(app->source_store), &iter);
+  }
+}
+
 static void populate_source_tree(AppData* app)
 {
   gtk_tree_store_clear(app->source_store);
@@ -705,6 +821,10 @@ static void populate_source_tree(AppData* app)
       add_object_to_tree(app, oid, NULL);
     sts = gdh_GetNextSibling(oid, &oid);
   }
+
+  /* After building tree, recalculate parent states based on loaded selections */
+  if (!app->selected_names.empty())
+    recalculate_all_parent_states(app);
 }
 
 /* Check if a row matches the current filter criteria */
@@ -1265,9 +1385,12 @@ static void on_save_clicked(GtkButton* button, gpointer user_data)
     gtk_tree_model_get(GTK_TREE_MODEL(app->selected_store), &iter, SEL_COL_NAME, &name, SEL_COL_TYPE,
                        &type_str, SEL_COL_DESCRIPTION, &desc, -1);
 
+    /* Convert name from UTF-8 (GTK) to Latin1 (ProviewR/GDH) */
+    gchar* name_latin1 = utf8_to_latin1(name);
+
     /* Get full aref info from GDH */
     pwr_tAttrRef aref;
-    pwr_tStatus sts = gdh_NameToAttrref(pwr_cNOid, name, &aref);
+    pwr_tStatus sts = gdh_NameToAttrref(pwr_cNOid, name_latin1, &aref);
     if (ODD(sts))
     {
       /* Get type ID */
@@ -1326,14 +1449,18 @@ static void on_save_clicked(GtkButton* button, gpointer user_data)
           else
           {
             /* Single class instance */
-            collect_primitive_attrs(name, tid, aref.Objid, prim_attrs, desc && desc[0] != '\0' ? desc : NULL);
+            collect_primitive_attrs(name_latin1, tid, aref.Objid, prim_attrs,
+                                    desc && desc[0] != '\0' ? desc : NULL);
           }
 
           /* Add all collected primitive attributes */
           for (const auto& pa : prim_attrs)
           {
             cJSON* signal = cJSON_CreateObject();
-            cJSON_AddStringToObject(signal, "name", pa.name.c_str());
+            /* Convert name from Latin1 to UTF-8 for JSON */
+            gchar* name_utf8 = latin1_to_utf8(pa.name.c_str());
+            cJSON_AddStringToObject(signal, "name", name_utf8);
+            g_free(name_utf8);
             cJSON_AddNumberToObject(signal, "type", (int)pa.type);
             cJSON_AddNumberToObject(signal, "flags", (int)pa.aref.Flags.m);
             cJSON_AddNumberToObject(signal, "enable", 1);
@@ -1384,6 +1511,7 @@ static void on_save_clicked(GtkButton* button, gpointer user_data)
     }
 
     g_free(name);
+    g_free(name_latin1);
     g_free(type_str);
     g_free(desc);
 
@@ -1516,6 +1644,13 @@ static void create_window(AppData* app)
   gtk_window_set_title(GTK_WINDOW(app->window), "ProviewR Export Signal Selector");
   gtk_window_set_default_size(GTK_WINDOW(app->window), 1400, 800);
   g_signal_connect(app->window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+
+  /* Set ProviewR owl icon */
+  pwr_tFileName icon_file;
+  dcli_translate_filename(icon_file, "$pwr_exe/pwr_icon16.png");
+  GdkPixbuf* icon = gdk_pixbuf_new_from_file(icon_file, NULL);
+  if (icon)
+    gtk_window_set_icon(GTK_WINDOW(app->window), icon);
 
   GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_container_add(GTK_CONTAINER(app->window), vbox);
