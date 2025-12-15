@@ -113,6 +113,7 @@ enum
   COL_CLASS_ID,
   COL_DESCRIPTION,
   COL_ENABLED,
+  COL_INCONSISTENT, /* Partially selected (some children selected) */
   COL_IS_SIGNAL,
   COL_SELECTABLE,
   COL_AREF_STR,
@@ -505,22 +506,27 @@ static void add_attributes_to_tree(AppData* app, pwr_tOid oid, pwr_tCid cid, con
         sts = gdh_GetAttrRefTid(&nested_aref, &nested_tid);
         if (ODD(sts))
         {
-          /* Create a container node for the nested class */
+          /* Create a selectable container node for the nested class */
           gchar* name_utf8 = latin1_to_utf8(display_name);
           gchar* class_utf8 = latin1_to_utf8(get_class_name(nested_tid));
+          gchar* aref_utf8 = latin1_to_utf8(attr_path);
+
+          bool enabled = (app->selected_names.find(std::string(aref_utf8)) != app->selected_names.end());
 
           GtkTreeIter attr_iter;
           gtk_tree_store_append(app->source_store, &attr_iter, parent);
           gtk_tree_store_set(app->source_store, &attr_iter, COL_NAME, name_utf8, COL_TYPE, "", COL_CLASS,
                              class_utf8, COL_CLASS_ID, (guint)parent_class_id, COL_DESCRIPTION, "",
-                             COL_ENABLED, FALSE, COL_IS_SIGNAL, FALSE, COL_SELECTABLE, FALSE, COL_AREF_STR,
-                             "", COL_OID_OIX, oid.oix, COL_OID_VID, oid.vid, COL_VISIBLE, TRUE, -1);
+                             COL_ENABLED, enabled, COL_INCONSISTENT, FALSE, COL_IS_SIGNAL, FALSE,
+                             COL_SELECTABLE, TRUE, COL_AREF_STR, aref_utf8, COL_OID_OIX, oid.oix, COL_OID_VID,
+                             oid.vid, COL_VISIBLE, TRUE, -1);
 
           /* Recursively add attributes of the nested class */
           add_attributes_to_tree(app, oid, nested_tid, attr_path, &attr_iter, false, parent_class_id);
 
           g_free(name_utf8);
           g_free(class_utf8);
+          g_free(aref_utf8);
         }
       }
       continue;
@@ -549,8 +555,9 @@ static void add_attributes_to_tree(AppData* app, pwr_tOid oid, pwr_tCid cid, con
           gtk_tree_store_append(app->source_store, &arr_iter, parent);
           gtk_tree_store_set(app->source_store, &arr_iter, COL_NAME, name_utf8, COL_TYPE, type_display,
                              COL_CLASS, "", COL_CLASS_ID, (guint)parent_class_id, COL_DESCRIPTION, "",
-                             COL_ENABLED, enabled, COL_IS_SIGNAL, FALSE, COL_SELECTABLE, TRUE, COL_AREF_STR,
-                             aref_utf8, COL_OID_OIX, oid.oix, COL_OID_VID, oid.vid, COL_VISIBLE, TRUE, -1);
+                             COL_ENABLED, enabled, COL_INCONSISTENT, FALSE, COL_IS_SIGNAL, FALSE,
+                             COL_SELECTABLE, TRUE, COL_AREF_STR, aref_utf8, COL_OID_OIX, oid.oix, COL_OID_VID,
+                             oid.vid, COL_VISIBLE, TRUE, -1);
 
           /* Add each array element as an expandable child */
           for (int j = 0; j < (int)info->Elements; j++)
@@ -562,20 +569,25 @@ static void add_attributes_to_tree(AppData* app, pwr_tOid oid, pwr_tCid cid, con
 
             gchar* elem_name_utf8 = latin1_to_utf8(elem_name);
             gchar* elem_class_utf8 = latin1_to_utf8(get_class_name(arr_tid));
+            gchar* elem_aref_utf8 = latin1_to_utf8(elem_path);
+
+            bool elem_enabled =
+                (app->selected_names.find(std::string(elem_aref_utf8)) != app->selected_names.end());
 
             GtkTreeIter elem_iter;
             gtk_tree_store_append(app->source_store, &elem_iter, &arr_iter);
             gtk_tree_store_set(app->source_store, &elem_iter, COL_NAME, elem_name_utf8, COL_TYPE, "",
                                COL_CLASS, elem_class_utf8, COL_CLASS_ID, (guint)parent_class_id,
-                               COL_DESCRIPTION, "", COL_ENABLED, FALSE, COL_IS_SIGNAL, FALSE, COL_SELECTABLE,
-                               FALSE, COL_AREF_STR, "", COL_OID_OIX, oid.oix, COL_OID_VID, oid.vid,
-                               COL_VISIBLE, TRUE, -1);
+                               COL_DESCRIPTION, "", COL_ENABLED, elem_enabled, COL_INCONSISTENT, FALSE,
+                               COL_IS_SIGNAL, FALSE, COL_SELECTABLE, TRUE, COL_AREF_STR, elem_aref_utf8,
+                               COL_OID_OIX, oid.oix, COL_OID_VID, oid.vid, COL_VISIBLE, TRUE, -1);
 
             /* Recursively add attributes of this array element */
             add_attributes_to_tree(app, oid, arr_tid, elem_path, &elem_iter, false, parent_class_id);
 
             g_free(elem_name_utf8);
             g_free(elem_class_utf8);
+            g_free(elem_aref_utf8);
           }
 
           g_free(name_utf8);
@@ -611,8 +623,9 @@ static void add_attributes_to_tree(AppData* app, pwr_tOid oid, pwr_tCid cid, con
     gtk_tree_store_append(app->source_store, &attr_iter, parent);
     gtk_tree_store_set(app->source_store, &attr_iter, COL_NAME, name_utf8, COL_TYPE, type_display, COL_CLASS,
                        "", COL_CLASS_ID, (guint)parent_class_id, COL_DESCRIPTION, "", COL_ENABLED, enabled,
-                       COL_IS_SIGNAL, is_signal_attr, COL_SELECTABLE, TRUE, COL_AREF_STR, aref_utf8,
-                       COL_OID_OIX, oid.oix, COL_OID_VID, oid.vid, COL_VISIBLE, TRUE, -1);
+                       COL_INCONSISTENT, FALSE, COL_IS_SIGNAL, is_signal_attr, COL_SELECTABLE, TRUE,
+                       COL_AREF_STR, aref_utf8, COL_OID_OIX, oid.oix, COL_OID_VID, oid.vid, COL_VISIBLE, TRUE,
+                       -1);
 
     g_free(name_utf8);
     g_free(aref_utf8);
@@ -651,15 +664,16 @@ static void add_object_to_tree(AppData* app, pwr_tOid oid, GtkTreeIter* parent)
   gchar* name_utf8 = latin1_to_utf8(name);
   gchar* desc_utf8 = latin1_to_utf8(description);
   gchar* class_utf8 = latin1_to_utf8(get_class_name(cid));
+  gchar* fullname_utf8 = latin1_to_utf8(fullname);
 
   GtkTreeIter iter;
   gtk_tree_store_append(app->source_store, &iter, parent);
 
-  /* All objects are container nodes with attributes as children */
+  /* Objects are selectable - selecting them selects all children */
   gtk_tree_store_set(app->source_store, &iter, COL_NAME, name_utf8, COL_TYPE, "", COL_CLASS, class_utf8,
-                     COL_CLASS_ID, (guint)cid, COL_DESCRIPTION, desc_utf8, COL_ENABLED, FALSE, COL_IS_SIGNAL,
-                     is_sig, COL_SELECTABLE, FALSE, COL_AREF_STR, "", COL_OID_OIX, oid.oix, COL_OID_VID,
-                     oid.vid, COL_VISIBLE, TRUE, -1);
+                     COL_CLASS_ID, (guint)cid, COL_DESCRIPTION, desc_utf8, COL_ENABLED, FALSE,
+                     COL_INCONSISTENT, FALSE, COL_IS_SIGNAL, is_sig, COL_SELECTABLE, TRUE, COL_AREF_STR,
+                     fullname_utf8, COL_OID_OIX, oid.oix, COL_OID_VID, oid.vid, COL_VISIBLE, TRUE, -1);
 
   /* Add all primitive attributes as child nodes */
   add_attributes_to_tree(app, oid, cid, fullname, &iter, is_sig, cid);
@@ -667,6 +681,7 @@ static void add_object_to_tree(AppData* app, pwr_tOid oid, GtkTreeIter* parent)
   g_free(name_utf8);
   g_free(desc_utf8);
   g_free(class_utf8);
+  g_free(fullname_utf8);
 
   /* Add child objects */
   pwr_tOid coid;
@@ -917,6 +932,10 @@ static gboolean on_query_tooltip(GtkWidget* widget, gint x, gint y, gboolean key
   return FALSE;
 }
 
+/* Forward declarations for hierarchical selection */
+static void set_children_enabled(AppData* app, GtkTreeIter* parent, gboolean enabled);
+static void update_parent_state(AppData* app, GtkTreeIter* child_iter);
+
 static void toggle_selected_row(AppData* app)
 {
   GtkTreeSelection* selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(app->source_tree));
@@ -929,21 +948,39 @@ static void toggle_selected_row(AppData* app)
     GtkTreeIter store_iter;
     gtk_tree_model_filter_convert_iter_to_child_iter(app->filter_model, &store_iter, &filter_iter);
 
-    gboolean enabled, selectable;
+    gboolean enabled, selectable, inconsistent;
     gchar* aref_str;
     gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), &store_iter, COL_ENABLED, &enabled, COL_SELECTABLE,
-                       &selectable, COL_AREF_STR, &aref_str, -1);
+                       &selectable, COL_INCONSISTENT, &inconsistent, COL_AREF_STR, &aref_str, -1);
 
     if (selectable && aref_str && aref_str[0] != '\0')
     {
-      enabled = !enabled;
-      gtk_tree_store_set(app->source_store, &store_iter, COL_ENABLED, enabled, -1);
-
-      if (enabled)
+      /* If currently inconsistent (partial), clicking makes it fully enabled */
+      if (inconsistent)
+      {
+        enabled = TRUE;
+        gtk_tree_store_set(app->source_store, &store_iter, COL_ENABLED, TRUE, COL_INCONSISTENT, FALSE, -1);
         app->selected_names.insert(aref_str);
+        set_children_enabled(app, &store_iter, TRUE);
+      }
       else
-        app->selected_names.erase(aref_str);
+      {
+        enabled = !enabled;
+        gtk_tree_store_set(app->source_store, &store_iter, COL_ENABLED, enabled, COL_INCONSISTENT, FALSE, -1);
 
+        if (enabled)
+        {
+          app->selected_names.insert(aref_str);
+          set_children_enabled(app, &store_iter, TRUE);
+        }
+        else
+        {
+          app->selected_names.erase(aref_str);
+          set_children_enabled(app, &store_iter, FALSE);
+        }
+      }
+
+      update_parent_state(app, &store_iter);
       rebuild_selected_list(app);
     }
     g_free(aref_str);
@@ -1004,6 +1041,149 @@ static gboolean on_tree_key_press(GtkWidget* widget, GdkEventKey* event, gpointe
   return FALSE; /* Let GTK handle other keys */
 }
 
+/*
+ * Set enabled state for all children of a node recursively.
+ * Also updates selected_names set accordingly.
+ */
+static void set_children_enabled(AppData* app, GtkTreeIter* parent, gboolean enabled)
+{
+  GtkTreeIter child;
+  if (!gtk_tree_model_iter_children(GTK_TREE_MODEL(app->source_store), &child, parent))
+    return;
+
+  do
+  {
+    gboolean selectable, visible;
+    gchar* aref_str;
+    gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), &child, COL_SELECTABLE, &selectable, COL_VISIBLE,
+                       &visible, COL_AREF_STR, &aref_str, -1);
+
+    /* Only affect visible (filtered) items */
+    if (selectable && visible)
+    {
+      gtk_tree_store_set(app->source_store, &child, COL_ENABLED, enabled, COL_INCONSISTENT, FALSE, -1);
+      if (aref_str && aref_str[0] != '\0')
+      {
+        if (enabled)
+          app->selected_names.insert(aref_str);
+        else
+          app->selected_names.erase(aref_str);
+      }
+    }
+
+    /* Recurse into children (regardless of visibility - children may be visible even if parent container
+     * isn't matching filter) */
+    set_children_enabled(app, &child, enabled);
+
+    g_free(aref_str);
+  } while (gtk_tree_model_iter_next(GTK_TREE_MODEL(app->source_store), &child));
+}
+
+/*
+ * Check children state and return:
+ *  0 = no children selected
+ *  1 = some children selected (inconsistent)
+ *  2 = all children selected
+ * Only counts visible (filtered) children
+ */
+static int get_children_state(AppData* app, GtkTreeIter* parent)
+{
+  GtkTreeIter child;
+  if (!gtk_tree_model_iter_children(GTK_TREE_MODEL(app->source_store), &child, parent))
+    return 2; /* No children = treat as all selected */
+
+  int total = 0;
+  int selected = 0;
+
+  do
+  {
+    gboolean selectable, enabled, inconsistent, visible;
+    gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), &child, COL_SELECTABLE, &selectable, COL_ENABLED,
+                       &enabled, COL_INCONSISTENT, &inconsistent, COL_VISIBLE, &visible, -1);
+
+    /* Only count visible children */
+    if (selectable && visible)
+    {
+      total++;
+      if (enabled)
+        selected++;
+      else if (inconsistent)
+        selected++; /* Inconsistent counts as partially selected */
+    }
+
+    /* Also check grandchildren */
+    if (gtk_tree_model_iter_has_child(GTK_TREE_MODEL(app->source_store), &child))
+    {
+      int child_state = get_children_state(app, &child);
+      if (child_state == 1)
+      {
+        /* If any descendant is inconsistent, we need to reflect that */
+        if (!selectable || !visible)
+        {
+          total++;
+          selected++;
+        }
+      }
+    }
+  } while (gtk_tree_model_iter_next(GTK_TREE_MODEL(app->source_store), &child));
+
+  if (total == 0)
+    return 2;
+  if (selected == 0)
+    return 0;
+  if (selected == total)
+    return 2;
+  return 1;
+}
+
+/*
+ * Update parent nodes' enabled/inconsistent state based on children.
+ * Called after a child's state changes.
+ */
+static void update_parent_state(AppData* app, GtkTreeIter* child_iter)
+{
+  GtkTreeIter parent;
+  if (!gtk_tree_model_iter_parent(GTK_TREE_MODEL(app->source_store), &parent, child_iter))
+    return; /* No parent */
+
+  gboolean selectable;
+  gchar* aref_str;
+  gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), &parent, COL_SELECTABLE, &selectable, COL_AREF_STR,
+                     &aref_str, -1);
+
+  if (selectable)
+  {
+    int state = get_children_state(app, &parent);
+
+    if (state == 0)
+    {
+      /* No children selected */
+      gtk_tree_store_set(app->source_store, &parent, COL_ENABLED, FALSE, COL_INCONSISTENT, FALSE, -1);
+      if (aref_str && aref_str[0] != '\0')
+        app->selected_names.erase(aref_str);
+    }
+    else if (state == 1)
+    {
+      /* Some children selected - show inconsistent */
+      gtk_tree_store_set(app->source_store, &parent, COL_ENABLED, FALSE, COL_INCONSISTENT, TRUE, -1);
+      if (aref_str && aref_str[0] != '\0')
+        app->selected_names.insert(aref_str); /* Still include in selection for saving */
+    }
+    else
+    {
+      /* All children selected */
+      gtk_tree_store_set(app->source_store, &parent, COL_ENABLED, TRUE, COL_INCONSISTENT, FALSE, -1);
+      if (aref_str && aref_str[0] != '\0')
+        app->selected_names.insert(aref_str);
+    }
+  }
+
+  g_free(aref_str);
+
+  /* Continue up the tree */
+  update_parent_state(app, &parent);
+}
+
 static void on_toggle_enabled(GtkCellRendererToggle* renderer, gchar* path_str, gpointer user_data)
 {
   AppData* app = (AppData*)user_data;
@@ -1017,20 +1197,44 @@ static void on_toggle_enabled(GtkCellRendererToggle* renderer, gchar* path_str, 
     GtkTreeIter store_iter;
     gtk_tree_model_filter_convert_iter_to_child_iter(app->filter_model, &store_iter, &filter_iter);
 
-    gboolean enabled;
+    gboolean enabled, inconsistent;
     gchar* aref_str;
-    gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), &store_iter, COL_ENABLED, &enabled, COL_AREF_STR,
-                       &aref_str, -1);
+    gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), &store_iter, COL_ENABLED, &enabled,
+                       COL_INCONSISTENT, &inconsistent, COL_AREF_STR, &aref_str, -1);
 
     if (aref_str && aref_str[0] != '\0')
     {
-      enabled = !enabled;
-      gtk_tree_store_set(app->source_store, &store_iter, COL_ENABLED, enabled, -1);
-
-      if (enabled)
+      /* If currently inconsistent (partial), clicking makes it fully enabled */
+      if (inconsistent)
+      {
+        enabled = TRUE;
+        gtk_tree_store_set(app->source_store, &store_iter, COL_ENABLED, TRUE, COL_INCONSISTENT, FALSE, -1);
         app->selected_names.insert(aref_str);
+        /* Enable all children */
+        set_children_enabled(app, &store_iter, TRUE);
+      }
       else
-        app->selected_names.erase(aref_str);
+      {
+        /* Toggle between enabled and disabled */
+        enabled = !enabled;
+        gtk_tree_store_set(app->source_store, &store_iter, COL_ENABLED, enabled, COL_INCONSISTENT, FALSE, -1);
+
+        if (enabled)
+        {
+          app->selected_names.insert(aref_str);
+          /* Enable all children */
+          set_children_enabled(app, &store_iter, TRUE);
+        }
+        else
+        {
+          app->selected_names.erase(aref_str);
+          /* Disable all children */
+          set_children_enabled(app, &store_iter, FALSE);
+        }
+      }
+
+      /* Update parent states */
+      update_parent_state(app, &store_iter);
     }
     g_free(aref_str);
   }
@@ -1223,7 +1427,7 @@ static void on_select_all_signals(GtkButton* button, gpointer user_data)
 
     if (is_signal && aref_str && aref_str[0] != '\0')
     {
-      gtk_tree_store_set(app->source_store, it, COL_ENABLED, TRUE, -1);
+      gtk_tree_store_set(app->source_store, it, COL_ENABLED, TRUE, COL_INCONSISTENT, FALSE, -1);
       app->selected_names.insert(aref_str);
     }
 
@@ -1288,7 +1492,7 @@ static void on_clear_all(GtkButton* button, gpointer user_data)
   AppData* app = (AppData*)user_data;
 
   auto clear_enabled = [&](GtkTreeIter* it)
-  { gtk_tree_store_set(app->source_store, it, COL_ENABLED, FALSE, -1); };
+  { gtk_tree_store_set(app->source_store, it, COL_ENABLED, FALSE, COL_INCONSISTENT, FALSE, -1); };
 
   GtkTreeIter iter;
   gboolean valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(app->source_store), &iter);
@@ -1389,6 +1593,7 @@ static void create_window(AppData* app)
                                          G_TYPE_UINT,             /* COL_CLASS_ID */
                                          G_TYPE_STRING,           /* COL_DESCRIPTION */
                                          G_TYPE_BOOLEAN,          /* COL_ENABLED */
+                                         G_TYPE_BOOLEAN,          /* COL_INCONSISTENT */
                                          G_TYPE_BOOLEAN,          /* COL_IS_SIGNAL */
                                          G_TYPE_BOOLEAN,          /* COL_SELECTABLE */
                                          G_TYPE_STRING,           /* COL_AREF_STR */
@@ -1411,9 +1616,9 @@ static void create_window(AppData* app)
   /* Toggle checkbox - sensitive only for selectable items */
   GtkCellRenderer* toggle_renderer = gtk_cell_renderer_toggle_new();
   g_signal_connect(toggle_renderer, "toggled", G_CALLBACK(on_toggle_enabled), app);
-  GtkTreeViewColumn* col_enabled =
-      gtk_tree_view_column_new_with_attributes("Export", toggle_renderer, "active", COL_ENABLED, "sensitive",
-                                               COL_SELECTABLE, "visible", COL_SELECTABLE, NULL);
+  GtkTreeViewColumn* col_enabled = gtk_tree_view_column_new_with_attributes(
+      "Export", toggle_renderer, "active", COL_ENABLED, "inconsistent", COL_INCONSISTENT, "sensitive",
+      COL_SELECTABLE, "visible", COL_SELECTABLE, NULL);
   gtk_tree_view_append_column(GTK_TREE_VIEW(app->source_tree), col_enabled);
 
   /* Text renderers with greyed out styling for non-selectable rows */
