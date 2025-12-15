@@ -129,10 +129,6 @@ enum
   SEL_NUM_COLS
 };
 
-/* Global theme state */
-static GtkCssProvider* g_css_provider = NULL;
-static bool g_dark_theme = true; /* Start with dark theme */
-
 struct AppData
 {
   GtkWidget* window;
@@ -144,7 +140,6 @@ struct AppData
   GtkWidget* stats_label;
   GtkWidget* statusbar;
   GtkWidget* search_entry;
-  GtkWidget* theme_btn;
   guint status_ctx;
 
   int signal_count;
@@ -892,7 +887,6 @@ static void on_clear_all(GtkButton* button, gpointer user_data)
 }
 
 /* Forward declaration for theme toggle */
-static void on_theme_toggle(GtkButton* button, gpointer user_data);
 
 /*_Window creation_______________________________________________________*/
 
@@ -925,11 +919,6 @@ static void create_window(AppData* app)
   GtkWidget* save_btn = gtk_button_new_with_label("Save");
   g_signal_connect(save_btn, "clicked", G_CALLBACK(on_save_clicked), app);
   gtk_box_pack_start(GTK_BOX(toolbar), save_btn, FALSE, FALSE, 0);
-
-  /* Theme toggle button */
-  app->theme_btn = gtk_button_new_with_label("☀ Light");
-  g_signal_connect(app->theme_btn, "clicked", G_CALLBACK(on_theme_toggle), app);
-  gtk_box_pack_start(GTK_BOX(toolbar), app->theme_btn, FALSE, FALSE, 0);
 
   app->stats_label = gtk_label_new("Selected: 0 total (0 signals, 0 variables)");
   gtk_widget_set_halign(app->stats_label, GTK_ALIGN_END);
@@ -1268,209 +1257,22 @@ static const gchar* get_dark_theme_css()
       "}";
 }
 
-static const gchar* get_light_theme_css()
+static void load_css()
 {
-  return
-      /* Material Light Theme - Primary: #6200EE, Surface: #FFFFFF */
-      "* {"
-      "  font-family: 'Roboto', 'DejaVu Sans', 'Liberation Sans', sans-serif;"
-      "}"
-
-      /* Window and containers */
-      "window, .background {"
-      "  background-color: #FAFAFA;"
-      "  color: #212121;"
-      "}"
-
-      "box {"
-      "  background-color: transparent;"
-      "}"
-
-      /* TreeView - Material Light Surface */
-      "treeview {"
-      "  background-color: #FFFFFF;"
-      "  color: #212121;"
-      "  border-radius: 4px;"
-      "}"
-      "treeview:selected {"
-      "  background-color: #6200EE;"
-      "  color: #FFFFFF;"
-      "}"
-      "treeview:hover {"
-      "  background-color: #F5F5F5;"
-      "}"
-      "treeview.expander {"
-      "  color: #6200EE;"
-      "  min-width: 16px;"
-      "  min-height: 16px;"
-      "  -gtk-icon-source: -gtk-icontheme('pan-end-symbolic');"
-      "}"
-      "treeview.expander:checked {"
-      "  -gtk-icon-source: -gtk-icontheme('pan-down-symbolic');"
-      "}"
-
-      /* Column headers */
-      "treeview header button {"
-      "  background-color: #FAFAFA;"
-      "  color: #6200EE;"
-      "  border: none;"
-      "  border-bottom: 2px solid #6200EE;"
-      "  padding: 8px 12px;"
-      "  font-weight: 500;"
-      "  font-size: 11pt;"
-      "}"
-      "treeview header button:hover {"
-      "  background-color: #F0F0F0;"
-      "}"
-
-      /* Scrolled windows */
-      "scrolledwindow {"
-      "  background-color: #FFFFFF;"
-      "  border-radius: 8px;"
-      "  border: 1px solid #E0E0E0;"
-      "}"
-
-      /* Buttons - Material Elevated */
-      "button {"
-      "  background-color: #6200EE;"
-      "  color: #FFFFFF;"
-      "  border: none;"
-      "  border-radius: 4px;"
-      "  padding: 8px 16px;"
-      "  font-weight: 500;"
-      "  min-height: 36px;"
-      "}"
-      "button:hover {"
-      "  background-color: #7C4DFF;"
-      "}"
-      "button:active {"
-      "  background-color: #5000D0;"
-      "}"
-
-      /* Toggle buttons for filters */
-      "togglebutton {"
-      "  background-color: #FFFFFF;"
-      "  color: #212121;"
-      "  border: 1px solid #BDBDBD;"
-      "  border-radius: 16px;"
-      "  padding: 4px 12px;"
-      "  min-height: 28px;"
-      "}"
-      "togglebutton:checked {"
-      "  background-color: #6200EE;"
-      "  color: #FFFFFF;"
-      "  border-color: #6200EE;"
-      "}"
-      "togglebutton:hover {"
-      "  background-color: #F5F5F5;"
-      "}"
-      "togglebutton:checked:hover {"
-      "  background-color: #7C4DFF;"
-      "}"
-
-      /* Labels */
-      "label {"
-      "  color: #212121;"
-      "}"
-
-      /* Entry/Search */
-      "entry {"
-      "  background-color: #F5F5F5;"
-      "  color: #212121;"
-      "  border: none;"
-      "  border-bottom: 2px solid #BDBDBD;"
-      "  border-radius: 4px 4px 0 0;"
-      "  padding: 8px 12px;"
-      "  min-height: 36px;"
-      "}"
-      "entry:focus {"
-      "  border-bottom-color: #6200EE;"
-      "  background-color: #EEEEEE;"
-      "}"
-
-      /* Checkboxes */
-      "check {"
-      "  min-width: 18px;"
-      "  min-height: 18px;"
-      "  -gtk-icon-source: none;"
-      "  background-color: transparent;"
-      "  border: 2px solid #757575;"
-      "  border-radius: 2px;"
-      "}"
-      "check:checked {"
-      "  background-color: #6200EE;"
-      "  border-color: #6200EE;"
-      "}"
-
-      /* Frame */
-      "frame {"
-      "  background-color: #FFFFFF;"
-      "  border-radius: 8px;"
-      "  border: 1px solid #E0E0E0;"
-      "}"
-      "frame > label {"
-      "  color: #6200EE;"
-      "  font-weight: 500;"
-      "}"
-
-      /* Paned separator */
-      "paned > separator {"
-      "  background-color: #E0E0E0;"
-      "  min-width: 6px;"
-      "}"
-      "paned > separator:hover {"
-      "  background-color: #6200EE;"
-      "}"
-
-      /* Statusbar */
-      "statusbar {"
-      "  background-color: #FAFAFA;"
-      "  color: #757575;"
-      "  padding: 4px 12px;"
-      "  border-top: 1px solid #E0E0E0;"
-      "}"
-
-      /* Scrollbars */
-      "scrollbar {"
-      "  background-color: #FAFAFA;"
-      "}"
-      "scrollbar slider {"
-      "  background-color: #BDBDBD;"
-      "  border-radius: 10px;"
-      "  min-width: 8px;"
-      "  min-height: 8px;"
-      "}"
-      "scrollbar slider:hover {"
-      "  background-color: #6200EE;"
-      "}";
-}
-
-static void apply_theme(bool dark)
-{
-  g_dark_theme = dark;
-
-  if (!g_css_provider)
-  {
-    g_css_provider = gtk_css_provider_new();
-    gtk_style_context_add_provider_for_screen(gdk_screen_get_default(), GTK_STYLE_PROVIDER(g_css_provider),
-                                              GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
-  }
-
-  const gchar* css = dark ? get_dark_theme_css() : get_light_theme_css();
+  GtkCssProvider* provider = gtk_css_provider_new();
+  const gchar* css = get_dark_theme_css();
   GError* error = NULL;
-  gtk_css_provider_load_from_data(g_css_provider, css, -1, &error);
+  gtk_css_provider_load_from_data(provider, css, -1, &error);
   if (error)
   {
     g_warning("CSS load error: %s", error->message);
     g_error_free(error);
   }
-}
-
-static void on_theme_toggle(GtkButton* button, gpointer user_data)
-{
-  g_dark_theme = !g_dark_theme;
-  apply_theme(g_dark_theme);
-  gtk_button_set_label(button, g_dark_theme ? "☀ Light" : "☾ Dark");
+  else
+  {
+    gtk_style_context_add_provider_for_screen(gdk_screen_get_default(), GTK_STYLE_PROVIDER(provider),
+                                              GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+  }
 }
 
 int main(int argc, char** argv)
@@ -1478,8 +1280,8 @@ int main(int argc, char** argv)
   gtk_init(&argc, &argv);
   errh_Interactive();
 
-  /* Apply dark theme by default */
-  apply_theme(true);
+  /* Load dark theme CSS */
+  load_css();
 
   pwr_tStatus sts = gdh_Init("rs_export_gen");
   if (EVEN(sts))
