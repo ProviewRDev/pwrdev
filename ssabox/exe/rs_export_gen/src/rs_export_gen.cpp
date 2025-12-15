@@ -167,6 +167,74 @@ struct AppData
 
 static char json_filename[] = "$pwrp_load/select.json";
 
+/*
+ * Load previously selected signals from select.json
+ * This populates app->selected_names so that the tree can be built with
+ * previously selected items already checked.
+ */
+static void load_selected_from_json(AppData* app)
+{
+  pwr_tFileName fname;
+  dcli_translate_filename(fname, json_filename);
+
+  FILE* fp = fopen(fname, "r");
+  if (!fp)
+    return; /* No previous selection file */
+
+  /* Get file size */
+  fseek(fp, 0, SEEK_END);
+  long fsize = ftell(fp);
+  fseek(fp, 0, SEEK_SET);
+
+  if (fsize <= 0)
+  {
+    fclose(fp);
+    return;
+  }
+
+  char* buffer = (char*)malloc(fsize + 1);
+  if (!buffer)
+  {
+    fclose(fp);
+    return;
+  }
+
+  size_t read_size = fread(buffer, 1, fsize, fp);
+  fclose(fp);
+  buffer[read_size] = '\0';
+
+  cJSON* parsed = cJSON_Parse(buffer);
+  free(buffer);
+
+  if (!parsed)
+    return;
+
+  const cJSON* signals = cJSON_GetObjectItemCaseSensitive(parsed, "signals");
+  if (!signals)
+  {
+    cJSON_Delete(parsed);
+    return;
+  }
+
+  const cJSON* item = NULL;
+  cJSON_ArrayForEach(item, signals)
+  {
+    const cJSON* name_json = cJSON_GetObjectItemCaseSensitive(item, "name");
+    const cJSON* enable_json = cJSON_GetObjectItemCaseSensitive(item, "enable");
+
+    if (name_json && cJSON_IsString(name_json) && name_json->valuestring)
+    {
+      /* Only add if enabled (or if enable field is missing, assume enabled) */
+      if (!enable_json || enable_json->valueint)
+      {
+        app->selected_names.insert(name_json->valuestring);
+      }
+    }
+  }
+
+  cJSON_Delete(parsed);
+}
+
 /*_Helper functions______________________________________________________*/
 
 static bool is_signal_class(pwr_tCid cid)
@@ -1654,10 +1722,18 @@ int main(int argc, char** argv)
   app.filter_po = true;
   app.filter_other = true;
 
+  /* Load previously selected signals from select.json */
+  load_selected_from_json(&app);
+
   create_window(&app);
   populate_source_tree(&app);
   apply_filter(&app);
-  on_select_all_signals(NULL, &app);
+
+  /* If no previous selection was loaded, select all IO signals by default */
+  if (app.selected_names.empty())
+    on_select_all_signals(NULL, &app);
+  else
+    rebuild_selected_list(&app);
 
   gtk_widget_show_all(app.window);
   gtk_main();
