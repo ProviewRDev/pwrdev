@@ -41,6 +41,7 @@
 #if defined PWRE_CONF_RDKAFKA
 
 #include <gtk/gtk.h>
+#include <gdk/gdkkeysyms.h>
 #include <string.h>
 #include <map>
 #include <set>
@@ -68,7 +69,7 @@ static gchar* latin1_to_utf8(const char* str)
   if (!str || !str[0])
     return g_strdup("");
 
-  /* Try to interpret as UTF-8 first - if valid, just duplicate */
+  /* Check if already valid UTF-8 */
   if (g_utf8_validate(str, -1, NULL))
     return g_strdup(str);
 
@@ -79,8 +80,24 @@ static gchar* latin1_to_utf8(const char* str)
   if (error)
   {
     g_error_free(error);
-    /* Fallback: replace invalid chars */
-    return g_strdup("?");
+    /* Fallback: manual conversion - each ISO-8859-1 byte becomes 1-2 UTF-8 bytes */
+    gsize len = strlen(str);
+    gchar* result = (gchar*)g_malloc(len * 2 + 1);
+    gchar* p = result;
+    for (gsize i = 0; i < len; i++)
+    {
+      unsigned char c = (unsigned char)str[i];
+      if (c < 0x80)
+        *p++ = c;
+      else
+      {
+        /* ISO-8859-1 to UTF-8: bytes 0x80-0xFF become 2-byte sequences */
+        *p++ = (gchar)(0xC0 | (c >> 6));
+        *p++ = (gchar)(0x80 | (c & 0x3F));
+      }
+    }
+    *p = '\0';
+    return result;
   }
   return utf8;
 }
@@ -207,6 +224,10 @@ static void get_description(pwr_tOid oid, char* desc, size_t size)
 
   strcat(attrname, ".Description");
   sts = gdh_GetObjectInfo(attrname, desc, size);
+  if (EVEN(sts))
+    desc[0] = '\0';
+  else
+    desc[size - 1] = '\0'; /* Ensure null termination */
 }
 
 static const char* get_class_name(pwr_tCid cid)
@@ -314,6 +335,9 @@ static void add_object_to_tree(AppData* app, pwr_tOid oid, GtkTreeIter* parent)
     char av_name[512];
     snprintf(av_name, sizeof(av_name), "%s.ActualValue", fullname);
 
+    /* Convert av_name to UTF-8 for display */
+    gchar* aref_utf8 = latin1_to_utf8(av_name);
+
     pwr_tAttrRef av_aref;
     sts = gdh_NameToAttrref(pwr_cNOid, av_name, &av_aref);
     if (ODD(sts))
@@ -322,13 +346,15 @@ static void add_object_to_tree(AppData* app, pwr_tOid oid, GtkTreeIter* parent)
       sts = gdh_GetAttrRefTid(&av_aref, &av_tid);
       const char* type_str = ODD(sts) ? get_type_name((pwr_eType)av_tid) : "Unknown";
 
-      bool enabled = is_sig || (app->selected_names.find(av_name) != app->selected_names.end());
+      bool enabled =
+          is_sig || (app->selected_names.find(std::string(aref_utf8)) != app->selected_names.end());
 
       gtk_tree_store_set(app->source_store, &iter, COL_NAME, name_utf8, COL_TYPE, type_str, COL_CLASS,
                          class_utf8, COL_CLASS_ID, (guint)cid, COL_DESCRIPTION, desc_utf8, COL_ENABLED,
-                         enabled, COL_IS_SIGNAL, is_sig, COL_SELECTABLE, TRUE, COL_AREF_STR, av_name,
+                         enabled, COL_IS_SIGNAL, is_sig, COL_SELECTABLE, TRUE, COL_AREF_STR, aref_utf8,
                          COL_OID_OIX, oid.oix, COL_OID_VID, oid.vid, COL_VISIBLE, TRUE, -1);
     }
+    g_free(aref_utf8);
   }
   else
   {
@@ -588,6 +614,93 @@ static gboolean on_query_tooltip(GtkWidget* widget, gint x, gint y, gboolean key
     return TRUE;
   }
   return FALSE;
+}
+
+static void toggle_selected_row(AppData* app)
+{
+  GtkTreeSelection* selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(app->source_tree));
+  GtkTreeModel* model;
+  GtkTreeIter filter_iter;
+
+  if (gtk_tree_selection_get_selected(selection, &model, &filter_iter))
+  {
+    /* Convert filter iter to store iter */
+    GtkTreeIter store_iter;
+    gtk_tree_model_filter_convert_iter_to_child_iter(app->filter_model, &store_iter, &filter_iter);
+
+    gboolean enabled, selectable;
+    gchar* aref_str;
+    gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), &store_iter, COL_ENABLED, &enabled, COL_SELECTABLE,
+                       &selectable, COL_AREF_STR, &aref_str, -1);
+
+    if (selectable && aref_str && aref_str[0] != '\0')
+    {
+      enabled = !enabled;
+      gtk_tree_store_set(app->source_store, &store_iter, COL_ENABLED, enabled, -1);
+
+      if (enabled)
+        app->selected_names.insert(aref_str);
+      else
+        app->selected_names.erase(aref_str);
+
+      rebuild_selected_list(app);
+    }
+    g_free(aref_str);
+  }
+}
+
+static gboolean on_tree_key_press(GtkWidget* widget, GdkEventKey* event, gpointer user_data)
+{
+  AppData* app = (AppData*)user_data;
+  GtkTreeView* tree = GTK_TREE_VIEW(widget);
+  GtkTreeSelection* selection = gtk_tree_view_get_selection(tree);
+  GtkTreeModel* model;
+  GtkTreeIter iter;
+
+  if (event->keyval == GDK_KEY_space)
+  {
+    toggle_selected_row(app);
+    return TRUE;
+  }
+
+  if (event->keyval == GDK_KEY_Right)
+  {
+    if (gtk_tree_selection_get_selected(selection, &model, &iter))
+    {
+      GtkTreePath* path = gtk_tree_model_get_path(model, &iter);
+      if (!gtk_tree_view_row_expanded(tree, path))
+      {
+        gtk_tree_view_expand_row(tree, path, FALSE);
+        gtk_tree_path_free(path);
+        return TRUE;
+      }
+      gtk_tree_path_free(path);
+    }
+  }
+
+  if (event->keyval == GDK_KEY_Left)
+  {
+    if (gtk_tree_selection_get_selected(selection, &model, &iter))
+    {
+      GtkTreePath* path = gtk_tree_model_get_path(model, &iter);
+      if (gtk_tree_view_row_expanded(tree, path))
+      {
+        gtk_tree_view_collapse_row(tree, path);
+        gtk_tree_path_free(path);
+        return TRUE;
+      }
+      /* If not expanded, go to parent */
+      if (gtk_tree_path_up(path) && gtk_tree_path_get_depth(path) > 0)
+      {
+        gtk_tree_view_set_cursor(tree, path, NULL, FALSE);
+        gtk_tree_path_free(path);
+        return TRUE;
+      }
+      gtk_tree_path_free(path);
+    }
+  }
+
+  return FALSE; /* Let GTK handle other keys */
 }
 
 static void on_toggle_enabled(GtkCellRendererToggle* renderer, gchar* path_str, gpointer user_data)
@@ -966,6 +1079,9 @@ static void create_window(AppData* app)
   /* Enable tooltips for non-selectable items */
   gtk_widget_set_has_tooltip(app->source_tree, TRUE);
   g_signal_connect(app->source_tree, "query-tooltip", G_CALLBACK(on_query_tooltip), NULL);
+
+  /* Enable keyboard navigation - space to toggle */
+  g_signal_connect(app->source_tree, "key-press-event", G_CALLBACK(on_tree_key_press), app);
 
   // Statusbar
   app->statusbar = gtk_statusbar_new();
