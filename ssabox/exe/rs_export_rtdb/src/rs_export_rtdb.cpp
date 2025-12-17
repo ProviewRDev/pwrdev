@@ -261,11 +261,10 @@ int rs_export_rtdb::gen_schema_main()
     cJSON_AddItemToObject(signal_field, "type", pwr_eType_to_json(it->second.type, &it->second.aref));
     cJSON_AddNullToObject(signal_field, "default");
 
-    /* Add doc attribute if description is available */
+    /* Add doc attribute if description is available (already UTF-8 from JSON) */
     if (!it->second.description.empty())
     {
-      std::string utf8_desc = to_utf8(it->second.description);
-      cJSON_AddStringToObject(signal_field, "doc", utf8_desc.c_str());
+      cJSON_AddStringToObject(signal_field, "doc", it->second.description.c_str());
     }
 
     cJSON_AddItemToArray(event_fields, signal_field);
