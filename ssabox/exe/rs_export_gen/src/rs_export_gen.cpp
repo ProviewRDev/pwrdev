@@ -545,7 +545,8 @@ static void rebuild_selected_list(AppData* app);
 
 /* Add primitive attributes of an object as child nodes in the tree */
 static void add_attributes_to_tree(AppData* app, pwr_tOid oid, pwr_tCid cid, const char* fullname,
-                                   GtkTreeIter* parent, bool is_signal, pwr_tCid parent_class_id)
+                                   GtkTreeIter* parent, bool is_signal, pwr_tCid parent_class_id,
+                                   const char* parent_desc, const char* parent_unit)
 {
   gdh_sAttrDef* bd;
   int rows;
@@ -600,13 +601,15 @@ static void add_attributes_to_tree(AppData* app, pwr_tOid oid, pwr_tCid cid, con
           GtkTreeIter attr_iter;
           gtk_tree_store_append(app->source_store, &attr_iter, parent);
           gtk_tree_store_set(app->source_store, &attr_iter, COL_NAME, name_utf8, COL_TYPE, "", COL_CLASS,
-                             class_utf8, COL_CLASS_ID, (guint)parent_class_id, COL_DESCRIPTION, "",
+                             class_utf8, COL_CLASS_ID, (guint)parent_class_id, COL_DESCRIPTION,
+                             parent_desc ? parent_desc : "", COL_UNIT, parent_unit ? parent_unit : "",
                              COL_ENABLED, enabled, COL_INCONSISTENT, FALSE, COL_IS_SIGNAL, FALSE,
                              COL_SELECTABLE, TRUE, COL_AREF_STR, aref_utf8, COL_OID_OIX, oid.oix, COL_OID_VID,
                              oid.vid, COL_VISIBLE, TRUE, -1);
 
           /* Recursively add attributes of the nested class */
-          add_attributes_to_tree(app, oid, nested_tid, attr_path, &attr_iter, false, parent_class_id);
+          add_attributes_to_tree(app, oid, nested_tid, attr_path, &attr_iter, false, parent_class_id,
+                                 parent_desc, parent_unit);
 
           g_free(name_utf8);
           g_free(class_utf8);
@@ -638,7 +641,8 @@ static void add_attributes_to_tree(AppData* app, pwr_tOid oid, pwr_tCid cid, con
           GtkTreeIter arr_iter;
           gtk_tree_store_append(app->source_store, &arr_iter, parent);
           gtk_tree_store_set(app->source_store, &arr_iter, COL_NAME, name_utf8, COL_TYPE, type_display,
-                             COL_CLASS, "", COL_CLASS_ID, (guint)parent_class_id, COL_DESCRIPTION, "",
+                             COL_CLASS, "", COL_CLASS_ID, (guint)parent_class_id, COL_DESCRIPTION,
+                             parent_desc ? parent_desc : "", COL_UNIT, parent_unit ? parent_unit : "",
                              COL_ENABLED, enabled, COL_INCONSISTENT, FALSE, COL_IS_SIGNAL, FALSE,
                              COL_SELECTABLE, TRUE, COL_AREF_STR, aref_utf8, COL_OID_OIX, oid.oix, COL_OID_VID,
                              oid.vid, COL_VISIBLE, TRUE, -1);
@@ -662,12 +666,15 @@ static void add_attributes_to_tree(AppData* app, pwr_tOid oid, pwr_tCid cid, con
             gtk_tree_store_append(app->source_store, &elem_iter, &arr_iter);
             gtk_tree_store_set(app->source_store, &elem_iter, COL_NAME, elem_name_utf8, COL_TYPE, "",
                                COL_CLASS, elem_class_utf8, COL_CLASS_ID, (guint)parent_class_id,
-                               COL_DESCRIPTION, "", COL_ENABLED, elem_enabled, COL_INCONSISTENT, FALSE,
-                               COL_IS_SIGNAL, FALSE, COL_SELECTABLE, TRUE, COL_AREF_STR, elem_aref_utf8,
-                               COL_OID_OIX, oid.oix, COL_OID_VID, oid.vid, COL_VISIBLE, TRUE, -1);
+                               COL_DESCRIPTION, parent_desc ? parent_desc : "", COL_UNIT,
+                               parent_unit ? parent_unit : "", COL_ENABLED, elem_enabled, COL_INCONSISTENT,
+                               FALSE, COL_IS_SIGNAL, FALSE, COL_SELECTABLE, TRUE, COL_AREF_STR,
+                               elem_aref_utf8, COL_OID_OIX, oid.oix, COL_OID_VID, oid.vid, COL_VISIBLE, TRUE,
+                               -1);
 
             /* Recursively add attributes of this array element */
-            add_attributes_to_tree(app, oid, arr_tid, elem_path, &elem_iter, false, parent_class_id);
+            add_attributes_to_tree(app, oid, arr_tid, elem_path, &elem_iter, false, parent_class_id,
+                                   parent_desc, parent_unit);
 
             g_free(elem_name_utf8);
             g_free(elem_class_utf8);
@@ -707,8 +714,9 @@ static void add_attributes_to_tree(AppData* app, pwr_tOid oid, pwr_tCid cid, con
     GtkTreeIter attr_iter;
     gtk_tree_store_append(app->source_store, &attr_iter, parent);
     gtk_tree_store_set(app->source_store, &attr_iter, COL_NAME, name_utf8, COL_TYPE, type_display, COL_CLASS,
-                       "", COL_CLASS_ID, (guint)parent_class_id, COL_DESCRIPTION, "", COL_ENABLED, enabled,
-                       COL_INCONSISTENT, FALSE, COL_IS_SIGNAL, is_signal_attr, COL_SELECTABLE, TRUE,
+                       "", COL_CLASS_ID, (guint)parent_class_id, COL_DESCRIPTION,
+                       parent_desc ? parent_desc : "", COL_UNIT, parent_unit ? parent_unit : "", COL_ENABLED,
+                       enabled, COL_INCONSISTENT, FALSE, COL_IS_SIGNAL, is_signal_attr, COL_SELECTABLE, TRUE,
                        COL_AREF_STR, aref_utf8, COL_OID_OIX, oid.oix, COL_OID_VID, oid.vid, COL_VISIBLE, TRUE,
                        -1);
 
@@ -765,7 +773,7 @@ static void add_object_to_tree(AppData* app, pwr_tOid oid, GtkTreeIter* parent)
                      TRUE, -1);
 
   /* Add all primitive attributes as child nodes */
-  add_attributes_to_tree(app, oid, cid, fullname, &iter, is_sig, cid);
+  add_attributes_to_tree(app, oid, cid, fullname, &iter, is_sig, cid, desc_utf8, unit_utf8);
 
   g_free(name_utf8);
   g_free(desc_utf8);
