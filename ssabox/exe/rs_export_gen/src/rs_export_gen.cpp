@@ -173,6 +173,7 @@ enum
   COL_CLASS,
   COL_CLASS_ID,
   COL_DESCRIPTION,
+  COL_UNIT,
   COL_ENABLED,
   COL_INCONSISTENT, /* Partially selected (some children selected) */
   COL_IS_SIGNAL,
@@ -189,6 +190,7 @@ enum
   SEL_COL_NAME = 0,
   SEL_COL_TYPE,
   SEL_COL_DESCRIPTION,
+  SEL_COL_UNIT,
   SEL_NUM_COLS
 };
 
@@ -353,6 +355,7 @@ struct PrimitiveAttr
   pwr_tAttrRef aref;
   pwr_eType type;
   std::string description;
+  std::string unit;
 };
 
 /*
@@ -361,7 +364,8 @@ struct PrimitiveAttr
  * If it's a class array, iterate through all elements.
  */
 static void collect_primitive_attrs(const char* base_path, pwr_tCid cid, pwr_tOid oid,
-                                    std::vector<PrimitiveAttr>& attrs, const char* base_desc)
+                                    std::vector<PrimitiveAttr>& attrs, const char* base_desc,
+                                    const char* base_unit)
 {
   pwr_tStatus sts;
   gdh_sAttrDef* bd;
@@ -392,6 +396,7 @@ static void collect_primitive_attrs(const char* base_path, pwr_tCid cid, pwr_tOi
       PrimitiveAttr pa;
       pa.name = attr_path;
       pa.description = base_desc ? base_desc : "";
+      pa.unit = base_unit ? base_unit : "";
 
       sts = gdh_NameToAttrref(pwr_cNOid, attr_path, &pa.aref);
       if (ODD(sts))
@@ -410,7 +415,7 @@ static void collect_primitive_attrs(const char* base_path, pwr_tCid cid, pwr_tOi
         pwr_tTid nested_tid;
         sts = gdh_GetAttrRefTid(&nested_aref, &nested_tid);
         if (ODD(sts))
-          collect_primitive_attrs(attr_path, nested_tid, oid, attrs, base_desc);
+          collect_primitive_attrs(attr_path, nested_tid, oid, attrs, base_desc, base_unit);
       }
     }
     /* Check if it's a class array - iterate through elements */
@@ -428,7 +433,7 @@ static void collect_primitive_attrs(const char* base_path, pwr_tCid cid, pwr_tOi
           {
             char elem_path[512];
             snprintf(elem_path, sizeof(elem_path), "%s[%d]", attr_path, j);
-            collect_primitive_attrs(elem_path, arr_tid, oid, attrs, base_desc);
+            collect_primitive_attrs(elem_path, arr_tid, oid, attrs, base_desc, base_unit);
           }
         }
       }
@@ -454,6 +459,24 @@ static void get_description(pwr_tOid oid, char* desc, size_t size)
     desc[0] = '\0';
   else
     desc[size - 1] = '\0'; /* Ensure null termination */
+}
+
+static void get_unit(pwr_tOid oid, char* unit, size_t size)
+{
+  pwr_tStatus sts;
+  pwr_tOName attrname;
+
+  unit[0] = '\0';
+  sts = gdh_ObjidToName(oid, attrname, sizeof(attrname), cdh_mName_volumeStrict);
+  if (EVEN(sts))
+    return;
+
+  strcat(attrname, ".Unit");
+  sts = gdh_GetObjectInfo(attrname, unit, size);
+  if (EVEN(sts))
+    unit[0] = '\0';
+  else
+    unit[size - 1] = '\0'; /* Ensure null termination */
 }
 
 static const char* get_class_name(pwr_tCid cid)
@@ -701,6 +724,7 @@ static void add_object_to_tree(AppData* app, pwr_tOid oid, GtkTreeIter* parent)
   pwr_tCid cid;
   pwr_tOName name;
   char description[256];
+  char unit[256];
 
   sts = gdh_GetObjectClass(oid, &cid);
   if (EVEN(sts))
@@ -719,12 +743,14 @@ static void add_object_to_tree(AppData* app, pwr_tOid oid, GtkTreeIter* parent)
     return;
 
   get_description(oid, description, sizeof(description));
+  get_unit(oid, unit, sizeof(unit));
 
   bool is_sig = is_signal_class(cid);
 
   /* Convert strings to UTF-8 for GTK */
   gchar* name_utf8 = latin1_to_utf8(name);
   gchar* desc_utf8 = latin1_to_utf8(description);
+  gchar* unit_utf8 = latin1_to_utf8(unit);
   gchar* class_utf8 = latin1_to_utf8(get_class_name(cid));
   gchar* fullname_utf8 = latin1_to_utf8(fullname);
 
@@ -733,15 +759,17 @@ static void add_object_to_tree(AppData* app, pwr_tOid oid, GtkTreeIter* parent)
 
   /* Objects are selectable - selecting them selects all children */
   gtk_tree_store_set(app->source_store, &iter, COL_NAME, name_utf8, COL_TYPE, "", COL_CLASS, class_utf8,
-                     COL_CLASS_ID, (guint)cid, COL_DESCRIPTION, desc_utf8, COL_ENABLED, FALSE,
-                     COL_INCONSISTENT, FALSE, COL_IS_SIGNAL, is_sig, COL_SELECTABLE, TRUE, COL_AREF_STR,
-                     fullname_utf8, COL_OID_OIX, oid.oix, COL_OID_VID, oid.vid, COL_VISIBLE, TRUE, -1);
+                     COL_CLASS_ID, (guint)cid, COL_DESCRIPTION, desc_utf8, COL_UNIT, unit_utf8, COL_ENABLED,
+                     FALSE, COL_INCONSISTENT, FALSE, COL_IS_SIGNAL, is_sig, COL_SELECTABLE, TRUE,
+                     COL_AREF_STR, fullname_utf8, COL_OID_OIX, oid.oix, COL_OID_VID, oid.vid, COL_VISIBLE,
+                     TRUE, -1);
 
   /* Add all primitive attributes as child nodes */
   add_attributes_to_tree(app, oid, cid, fullname, &iter, is_sig, cid);
 
   g_free(name_utf8);
   g_free(desc_utf8);
+  g_free(unit_utf8);
   g_free(class_utf8);
   g_free(fullname_utf8);
 
@@ -981,18 +1009,19 @@ static void rebuild_selected_list(AppData* app)
     gchar* name;
     gchar* type;
     gchar* desc;
+    gchar* unit;
     gchar* aref_str;
 
     gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), it, COL_ENABLED, &enabled, COL_IS_SIGNAL,
-                       &is_signal, COL_NAME, &name, COL_TYPE, &type, COL_DESCRIPTION, &desc, COL_AREF_STR,
-                       &aref_str, -1);
+                       &is_signal, COL_NAME, &name, COL_TYPE, &type, COL_DESCRIPTION, &desc, COL_UNIT, &unit,
+                       COL_AREF_STR, &aref_str, -1);
 
     if (enabled && aref_str && aref_str[0] != '\0')
     {
       GtkTreeIter sel_iter;
       gtk_list_store_append(app->selected_store, &sel_iter);
       gtk_list_store_set(app->selected_store, &sel_iter, SEL_COL_NAME, aref_str, SEL_COL_TYPE, type,
-                         SEL_COL_DESCRIPTION, desc, -1);
+                         SEL_COL_DESCRIPTION, desc, SEL_COL_UNIT, unit, -1);
 
       if (is_signal)
         app->signal_count++;
@@ -1004,6 +1033,7 @@ static void rebuild_selected_list(AppData* app)
     g_free(name);
     g_free(type);
     g_free(desc);
+    g_free(unit);
     g_free(aref_str);
   };
 
@@ -1381,9 +1411,10 @@ static void on_save_clicked(GtkButton* button, gpointer user_data)
     gchar* name;
     gchar* type_str;
     gchar* desc;
+    gchar* unit;
 
     gtk_tree_model_get(GTK_TREE_MODEL(app->selected_store), &iter, SEL_COL_NAME, &name, SEL_COL_TYPE,
-                       &type_str, SEL_COL_DESCRIPTION, &desc, -1);
+                       &type_str, SEL_COL_DESCRIPTION, &desc, SEL_COL_UNIT, &unit, -1);
 
     /* Convert name from UTF-8 (GTK) to Latin1 (ProviewR/GDH) */
     gchar* name_latin1 = utf8_to_latin1(name);
@@ -1440,7 +1471,8 @@ static void on_save_clicked(GtkButton* button, gpointer user_data)
                   {
                     snprintf(elem_path, sizeof(elem_path), "%s[%d]", attrname, i);
                     collect_primitive_attrs(elem_path, tid, aref.Objid, prim_attrs,
-                                            desc && desc[0] != '\0' ? desc : NULL);
+                                            desc && desc[0] != '\0' ? desc : NULL,
+                                            unit && unit[0] != '\0' ? unit : NULL);
                   }
                 }
               }
@@ -1450,7 +1482,8 @@ static void on_save_clicked(GtkButton* button, gpointer user_data)
           {
             /* Single class instance */
             collect_primitive_attrs(name_latin1, tid, aref.Objid, prim_attrs,
-                                    desc && desc[0] != '\0' ? desc : NULL);
+                                    desc && desc[0] != '\0' ? desc : NULL,
+                                    unit && unit[0] != '\0' ? unit : NULL);
           }
 
           /* Add all collected primitive attributes */
@@ -1466,6 +1499,8 @@ static void on_save_clicked(GtkButton* button, gpointer user_data)
             cJSON_AddNumberToObject(signal, "enable", 1);
             if (!pa.description.empty())
               cJSON_AddStringToObject(signal, "description", pa.description.c_str());
+            if (!pa.unit.empty())
+              cJSON_AddStringToObject(signal, "unit", pa.unit.c_str());
 
             cJSON* aref_json = cJSON_CreateObject();
             cJSON* oid_json = cJSON_CreateObject();
@@ -1492,6 +1527,8 @@ static void on_save_clicked(GtkButton* button, gpointer user_data)
           cJSON_AddNumberToObject(signal, "enable", 1);
           if (desc && desc[0] != '\0')
             cJSON_AddStringToObject(signal, "description", desc);
+          if (unit && unit[0] != '\0')
+            cJSON_AddStringToObject(signal, "unit", unit);
 
           cJSON* aref_json = cJSON_CreateObject();
           cJSON* oid_json = cJSON_CreateObject();
@@ -1514,6 +1551,7 @@ static void on_save_clicked(GtkButton* button, gpointer user_data)
     g_free(name_latin1);
     g_free(type_str);
     g_free(desc);
+    g_free(unit);
 
     valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(app->selected_store), &iter);
   }
@@ -1730,6 +1768,7 @@ static void create_window(AppData* app)
                                          G_TYPE_STRING,           /* COL_CLASS */
                                          G_TYPE_UINT,             /* COL_CLASS_ID */
                                          G_TYPE_STRING,           /* COL_DESCRIPTION */
+                                         G_TYPE_STRING,           /* COL_UNIT */
                                          G_TYPE_BOOLEAN,          /* COL_ENABLED */
                                          G_TYPE_BOOLEAN,          /* COL_INCONSISTENT */
                                          G_TYPE_BOOLEAN,          /* COL_IS_SIGNAL */
@@ -1804,7 +1843,8 @@ static void create_window(AppData* app)
                                  GTK_POLICY_AUTOMATIC);
   gtk_container_add(GTK_CONTAINER(right_frame), scrolled_selected);
 
-  app->selected_store = gtk_list_store_new(SEL_NUM_COLS, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
+  app->selected_store =
+      gtk_list_store_new(SEL_NUM_COLS, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
 
   app->selected_tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(app->selected_store));
   gtk_container_add(GTK_CONTAINER(scrolled_selected), app->selected_tree);
@@ -1821,6 +1861,10 @@ static void create_window(AppData* app)
   GtkTreeViewColumn* sel_col_desc = gtk_tree_view_column_new_with_attributes(
       "Description", text_renderer, "text", SEL_COL_DESCRIPTION, NULL);
   gtk_tree_view_append_column(GTK_TREE_VIEW(app->selected_tree), sel_col_desc);
+
+  GtkTreeViewColumn* sel_col_unit =
+      gtk_tree_view_column_new_with_attributes("Unit", text_renderer, "text", SEL_COL_UNIT, NULL);
+  gtk_tree_view_append_column(GTK_TREE_VIEW(app->selected_tree), sel_col_unit);
 
   gtk_paned_set_position(GTK_PANED(paned), 800);
 
