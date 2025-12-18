@@ -191,7 +191,7 @@ enum
   SEL_COL_TYPE,
   SEL_COL_DESCRIPTION,
   SEL_COL_UNIT,
-  SEL_COL_DISABLED,  /* TRUE if this is a disabled IO signal */
+  SEL_COL_DISABLED, /* TRUE if this is a disabled IO signal */
   SEL_NUM_COLS
 };
 
@@ -1211,12 +1211,8 @@ static void rebuild_selected_list(AppData* app)
   {
     GtkTreeIter sel_iter;
     gtk_list_store_append(app->selected_store, &sel_iter);
-    gtk_list_store_set(app->selected_store, &sel_iter, 
-                       SEL_COL_NAME, name.c_str(), 
-                       SEL_COL_TYPE, "(disabled)",
-                       SEL_COL_DESCRIPTION, "", 
-                       SEL_COL_UNIT, "", 
-                       SEL_COL_DISABLED, TRUE, -1);
+    gtk_list_store_set(app->selected_store, &sel_iter, SEL_COL_NAME, name.c_str(), SEL_COL_TYPE, "(disabled)",
+                       SEL_COL_DESCRIPTION, "", SEL_COL_UNIT, "", SEL_COL_DISABLED, TRUE, -1);
   }
 
   update_stats(app);
@@ -2086,15 +2082,15 @@ static void create_window(AppData* app)
                                  GTK_POLICY_AUTOMATIC);
   gtk_container_add(GTK_CONTAINER(right_frame), scrolled_selected);
 
-  app->selected_store =
-      gtk_list_store_new(SEL_NUM_COLS, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_BOOLEAN);
+  app->selected_store = gtk_list_store_new(SEL_NUM_COLS, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING,
+                                           G_TYPE_STRING, G_TYPE_BOOLEAN);
 
   app->selected_tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(app->selected_store));
   gtk_container_add(GTK_CONTAINER(scrolled_selected), app->selected_tree);
 
   /* Cell data function to style disabled rows with pastel red */
-  auto set_disabled_style = [](GtkTreeViewColumn* col, GtkCellRenderer* renderer, 
-                                GtkTreeModel* model, GtkTreeIter* iter, gpointer data)
+  auto set_disabled_style = [](GtkTreeViewColumn* col, GtkCellRenderer* renderer, GtkTreeModel* model,
+                               GtkTreeIter* iter, gpointer data)
   {
     gboolean disabled;
     gtk_tree_model_get(model, iter, SEL_COL_DISABLED, &disabled, -1);
@@ -2114,8 +2110,8 @@ static void create_window(AppData* app)
   gtk_tree_view_column_set_title(sel_col_name, "Attribute");
   gtk_tree_view_column_pack_start(sel_col_name, sel_name_renderer, TRUE);
   gtk_tree_view_column_add_attribute(sel_col_name, sel_name_renderer, "text", SEL_COL_NAME);
-  gtk_tree_view_column_set_cell_data_func(sel_col_name, sel_name_renderer, 
-                                          (GtkTreeCellDataFunc)+set_disabled_style, NULL, NULL);
+  gtk_tree_view_column_set_cell_data_func(sel_col_name, sel_name_renderer,
+                                          (GtkTreeCellDataFunc) + set_disabled_style, NULL, NULL);
   gtk_tree_view_column_set_expand(sel_col_name, TRUE);
   gtk_tree_view_append_column(GTK_TREE_VIEW(app->selected_tree), sel_col_name);
 
@@ -2124,8 +2120,8 @@ static void create_window(AppData* app)
   gtk_tree_view_column_set_title(sel_col_type, "Type");
   gtk_tree_view_column_pack_start(sel_col_type, sel_type_renderer, TRUE);
   gtk_tree_view_column_add_attribute(sel_col_type, sel_type_renderer, "text", SEL_COL_TYPE);
-  gtk_tree_view_column_set_cell_data_func(sel_col_type, sel_type_renderer, 
-                                          (GtkTreeCellDataFunc)+set_disabled_style, NULL, NULL);
+  gtk_tree_view_column_set_cell_data_func(sel_col_type, sel_type_renderer,
+                                          (GtkTreeCellDataFunc) + set_disabled_style, NULL, NULL);
   gtk_tree_view_append_column(GTK_TREE_VIEW(app->selected_tree), sel_col_type);
 
   GtkCellRenderer* sel_desc_renderer = gtk_cell_renderer_text_new();
@@ -2133,8 +2129,8 @@ static void create_window(AppData* app)
   gtk_tree_view_column_set_title(sel_col_desc, "Description");
   gtk_tree_view_column_pack_start(sel_col_desc, sel_desc_renderer, TRUE);
   gtk_tree_view_column_add_attribute(sel_col_desc, sel_desc_renderer, "text", SEL_COL_DESCRIPTION);
-  gtk_tree_view_column_set_cell_data_func(sel_col_desc, sel_desc_renderer, 
-                                          (GtkTreeCellDataFunc)+set_disabled_style, NULL, NULL);
+  gtk_tree_view_column_set_cell_data_func(sel_col_desc, sel_desc_renderer,
+                                          (GtkTreeCellDataFunc) + set_disabled_style, NULL, NULL);
   gtk_tree_view_append_column(GTK_TREE_VIEW(app->selected_tree), sel_col_desc);
 
   GtkCellRenderer* sel_unit_renderer = gtk_cell_renderer_text_new();
@@ -2142,8 +2138,8 @@ static void create_window(AppData* app)
   gtk_tree_view_column_set_title(sel_col_unit, "Unit");
   gtk_tree_view_column_pack_start(sel_col_unit, sel_unit_renderer, TRUE);
   gtk_tree_view_column_add_attribute(sel_col_unit, sel_unit_renderer, "text", SEL_COL_UNIT);
-  gtk_tree_view_column_set_cell_data_func(sel_col_unit, sel_unit_renderer, 
-                                          (GtkTreeCellDataFunc)+set_disabled_style, NULL, NULL);
+  gtk_tree_view_column_set_cell_data_func(sel_col_unit, sel_unit_renderer,
+                                          (GtkTreeCellDataFunc) + set_disabled_style, NULL, NULL);
   gtk_tree_view_append_column(GTK_TREE_VIEW(app->selected_tree), sel_col_unit);
 
   gtk_paned_set_position(GTK_PANED(paned), 800);
