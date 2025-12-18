@@ -203,15 +203,17 @@ struct AppData
   GtkTreeModelFilter* filter_model;
   GtkListStore* selected_store;
   GtkWidget* stats_label;
-  GtkWidget* statusbar;
+  GtkWidget* log_view; /* Scrolling log text view */
+  GtkTextBuffer* log_buffer;
   GtkWidget* search_entry;
-  guint status_ctx;
 
   int signal_count;
   int variable_count;
   int total_selected;
 
   std::set<std::string> selected_names;
+  std::set<std::string> disabled_names; /* Signals explicitly disabled by user (enable: 0) */
+  bool has_saved_config;                /* True if select.json was loaded */
 
   /* Filter state */
   bool filter_di;
@@ -288,15 +290,54 @@ static void load_selected_from_json(AppData* app)
 
     if (name_json && cJSON_IsString(name_json) && name_json->valuestring)
     {
-      /* Only add if enabled (or if enable field is missing, assume enabled) */
+      /* Track enabled and disabled signals separately */
       if (!enable_json || enable_json->valueint)
       {
         app->selected_names.insert(name_json->valuestring);
       }
+      else
+      {
+        /* Explicitly disabled by user */
+        app->disabled_names.insert(name_json->valuestring);
+      }
     }
   }
 
+  /* Only consider it a saved config if we loaded at least one signal */
+  if (!app->selected_names.empty() || !app->disabled_names.empty())
+    app->has_saved_config = true;
+
   cJSON_Delete(parsed);
+}
+
+/*
+ * Append a timestamped message to the log view
+ */
+static void log_message(AppData* app, const char* msg)
+{
+  if (!app->log_buffer)
+    return;
+
+  /* Get current time */
+  time_t now = time(NULL);
+  struct tm* tm_info = localtime(&now);
+  char timestamp[32];
+  strftime(timestamp, sizeof(timestamp), "%H:%M:%S", tm_info);
+
+  /* Format the log line */
+  char line[512];
+  snprintf(line, sizeof(line), "[%s] %s\n", timestamp, msg);
+
+  /* Append to buffer */
+  GtkTextIter end;
+  gtk_text_buffer_get_end_iter(app->log_buffer, &end);
+  gtk_text_buffer_insert(app->log_buffer, &end, line, -1);
+
+  /* Auto-scroll to bottom */
+  gtk_text_buffer_get_end_iter(app->log_buffer, &end);
+  GtkTextMark* mark = gtk_text_buffer_create_mark(app->log_buffer, NULL, &end, FALSE);
+  gtk_text_view_scroll_to_mark(GTK_TEXT_VIEW(app->log_view), mark, 0.0, FALSE, 0.0, 0.0);
+  gtk_text_buffer_delete_mark(app->log_buffer, mark);
 }
 
 /*_Helper functions______________________________________________________*/
@@ -704,12 +745,27 @@ static void add_attributes_to_tree(AppData* app, pwr_tOid oid, pwr_tCid cid, con
     gchar* name_utf8 = latin1_to_utf8(display_name);
     gchar* aref_utf8 = latin1_to_utf8(attr_path);
 
-    /* For signals, ActualValue is enabled by default only if no saved selections exist */
+    /* For signals, ActualValue is enabled by default only if no saved config exists */
     bool is_actual_value = streq(bd[i].attrName, "ActualValue");
     bool is_signal_attr = is_signal && is_actual_value;
     bool in_selection = (app->selected_names.find(std::string(aref_utf8)) != app->selected_names.end());
-    /* If we have saved selections, use them; otherwise default signals to enabled */
-    bool enabled = app->selected_names.empty() ? is_signal_attr : in_selection;
+
+    /* Determine enabled state:
+     * - No saved config: auto-enable IO signals and track them
+     * - Has saved config: only enable if explicitly in selected_names
+     */
+    bool enabled;
+    if (!app->has_saved_config && is_signal_attr)
+    {
+      /* Fresh start - auto-enable IO signals and add to selected_names */
+      enabled = true;
+      app->selected_names.insert(std::string(aref_utf8));
+    }
+    else
+    {
+      /* Has config - use saved state */
+      enabled = in_selection;
+    }
 
     GtkTreeIter attr_iter;
     gtk_tree_store_append(app->source_store, &attr_iter, parent);
@@ -766,11 +822,11 @@ static void add_object_to_tree(AppData* app, pwr_tOid oid, GtkTreeIter* parent)
   gtk_tree_store_append(app->source_store, &iter, parent);
 
   /* Objects are selectable - selecting them selects all children */
+  /* Note: COL_IS_SIGNAL is FALSE for objects - only the ActualValue attribute is marked as signal */
   gtk_tree_store_set(app->source_store, &iter, COL_NAME, name_utf8, COL_TYPE, "", COL_CLASS, class_utf8,
                      COL_CLASS_ID, (guint)cid, COL_DESCRIPTION, desc_utf8, COL_UNIT, unit_utf8, COL_ENABLED,
-                     FALSE, COL_INCONSISTENT, FALSE, COL_IS_SIGNAL, is_sig, COL_SELECTABLE, TRUE,
-                     COL_AREF_STR, fullname_utf8, COL_OID_OIX, oid.oix, COL_OID_VID, oid.vid, COL_VISIBLE,
-                     TRUE, -1);
+                     FALSE, COL_INCONSISTENT, FALSE, COL_IS_SIGNAL, FALSE, COL_SELECTABLE, TRUE, COL_AREF_STR,
+                     fullname_utf8, COL_OID_OIX, oid.oix, COL_OID_VID, oid.vid, COL_VISIBLE, TRUE, -1);
 
   /* Add all primitive attributes as child nodes */
   add_attributes_to_tree(app, oid, cid, fullname, &iter, is_sig, cid, desc_utf8, unit_utf8);
@@ -845,6 +901,67 @@ static void recalculate_all_parent_states(AppData* app)
   }
 }
 
+/*
+ * Auto-discover new IO signals in the tree that are not in selected_names or disabled_names.
+ * Enable them by default and add to selected_names.
+ */
+static int auto_discover_io_signals(AppData* app)
+{
+  int discovered_count = 0;
+
+  /* Lambda to process each tree row */
+  std::function<void(GtkTreeIter*)> check_and_enable = [&](GtkTreeIter* iter)
+  {
+    gboolean is_signal;
+    gchar* aref_str;
+    gboolean enabled;
+
+    gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), iter, COL_IS_SIGNAL, &is_signal, COL_AREF_STR,
+                       &aref_str, COL_ENABLED, &enabled, -1);
+
+    /* Check if this is a signal's ActualValue attribute */
+    if (is_signal && aref_str && aref_str[0] != '\0')
+    {
+      std::string name(aref_str);
+
+      /* Check if this signal is new (not in selected or disabled) */
+      bool in_selected = app->selected_names.find(name) != app->selected_names.end();
+      bool in_disabled = app->disabled_names.find(name) != app->disabled_names.end();
+
+      if (!in_selected && !in_disabled)
+      {
+        /* New signal - auto-enable it */
+        app->selected_names.insert(name);
+        gtk_tree_store_set(app->source_store, iter, COL_ENABLED, TRUE, -1);
+        discovered_count++;
+      }
+    }
+
+    g_free(aref_str);
+
+    /* Recurse into children */
+    GtkTreeIter child;
+    if (gtk_tree_model_iter_children(GTK_TREE_MODEL(app->source_store), &child, iter))
+    {
+      do
+      {
+        check_and_enable(&child);
+      } while (gtk_tree_model_iter_next(GTK_TREE_MODEL(app->source_store), &child));
+    }
+  };
+
+  /* Process all top-level nodes */
+  GtkTreeIter iter;
+  gboolean valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(app->source_store), &iter);
+  while (valid)
+  {
+    check_and_enable(&iter);
+    valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(app->source_store), &iter);
+  }
+
+  return discovered_count;
+}
+
 static void populate_source_tree(AppData* app)
 {
   gtk_tree_store_clear(app->source_store);
@@ -856,6 +973,39 @@ static void populate_source_tree(AppData* app)
     if (oid.oix != 0x80000001)
       add_object_to_tree(app, oid, NULL);
     sts = gdh_GetNextSibling(oid, &oid);
+  }
+
+  /* Auto-discover new IO signals not in select.json */
+  if (app->has_saved_config)
+  {
+    int discovered = auto_discover_io_signals(app);
+    if (discovered > 0)
+    {
+      char msg[256];
+      snprintf(msg, sizeof(msg), "Auto-discovered %d new IO signal%s", discovered,
+               discovered == 1 ? "" : "s");
+      log_message(app, msg);
+    }
+    else
+    {
+      log_message(app, "Loaded configuration from select.json");
+    }
+  }
+  else
+  {
+    /* Fresh start - count how many signals were auto-enabled */
+    int count = (int)app->selected_names.size();
+    if (count > 0)
+    {
+      char msg[256];
+      snprintf(msg, sizeof(msg), "No saved config - auto-enabled %d IO signal%s", count,
+               count == 1 ? "" : "s");
+      log_message(app, msg);
+    }
+    else
+    {
+      log_message(app, "No saved configuration found");
+    }
   }
 
   /* After building tree, recalculate parent states based on loaded selections */
@@ -1106,10 +1256,11 @@ static void toggle_selected_row(AppData* app)
     GtkTreeIter store_iter;
     gtk_tree_model_filter_convert_iter_to_child_iter(app->filter_model, &store_iter, &filter_iter);
 
-    gboolean enabled, selectable, inconsistent;
+    gboolean enabled, selectable, inconsistent, is_signal;
     gchar* aref_str;
     gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), &store_iter, COL_ENABLED, &enabled, COL_SELECTABLE,
-                       &selectable, COL_INCONSISTENT, &inconsistent, COL_AREF_STR, &aref_str, -1);
+                       &selectable, COL_INCONSISTENT, &inconsistent, COL_AREF_STR, &aref_str, COL_IS_SIGNAL,
+                       &is_signal, -1);
 
     if (selectable && aref_str && aref_str[0] != '\0')
     {
@@ -1119,6 +1270,7 @@ static void toggle_selected_row(AppData* app)
         enabled = TRUE;
         gtk_tree_store_set(app->source_store, &store_iter, COL_ENABLED, TRUE, COL_INCONSISTENT, FALSE, -1);
         app->selected_names.insert(aref_str);
+        app->disabled_names.erase(aref_str); /* No longer disabled */
         set_children_enabled(app, &store_iter, TRUE);
       }
       else
@@ -1129,11 +1281,15 @@ static void toggle_selected_row(AppData* app)
         if (enabled)
         {
           app->selected_names.insert(aref_str);
+          app->disabled_names.erase(aref_str); /* No longer disabled */
           set_children_enabled(app, &store_iter, TRUE);
         }
         else
         {
           app->selected_names.erase(aref_str);
+          /* Track disabled IO signals so they're saved with enable: 0 */
+          if (is_signal)
+            app->disabled_names.insert(aref_str);
           set_children_enabled(app, &store_iter, FALSE);
         }
       }
@@ -1211,10 +1367,10 @@ static void set_children_enabled(AppData* app, GtkTreeIter* parent, gboolean ena
 
   do
   {
-    gboolean selectable, visible;
+    gboolean selectable, visible, is_signal;
     gchar* aref_str;
     gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), &child, COL_SELECTABLE, &selectable, COL_VISIBLE,
-                       &visible, COL_AREF_STR, &aref_str, -1);
+                       &visible, COL_AREF_STR, &aref_str, COL_IS_SIGNAL, &is_signal, -1);
 
     /* Only affect visible (filtered) items */
     if (selectable && visible)
@@ -1223,9 +1379,17 @@ static void set_children_enabled(AppData* app, GtkTreeIter* parent, gboolean ena
       if (aref_str && aref_str[0] != '\0')
       {
         if (enabled)
+        {
           app->selected_names.insert(aref_str);
+          app->disabled_names.erase(aref_str);
+        }
         else
+        {
           app->selected_names.erase(aref_str);
+          /* Track disabled IO signals so they're saved with enable: 0 */
+          if (is_signal)
+            app->disabled_names.insert(aref_str);
+        }
       }
     }
 
@@ -1355,10 +1519,11 @@ static void on_toggle_enabled(GtkCellRendererToggle* renderer, gchar* path_str, 
     GtkTreeIter store_iter;
     gtk_tree_model_filter_convert_iter_to_child_iter(app->filter_model, &store_iter, &filter_iter);
 
-    gboolean enabled, inconsistent;
+    gboolean enabled, inconsistent, is_signal;
     gchar* aref_str;
     gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), &store_iter, COL_ENABLED, &enabled,
-                       COL_INCONSISTENT, &inconsistent, COL_AREF_STR, &aref_str, -1);
+                       COL_INCONSISTENT, &inconsistent, COL_AREF_STR, &aref_str, COL_IS_SIGNAL, &is_signal,
+                       -1);
 
     if (aref_str && aref_str[0] != '\0')
     {
@@ -1368,6 +1533,7 @@ static void on_toggle_enabled(GtkCellRendererToggle* renderer, gchar* path_str, 
         enabled = TRUE;
         gtk_tree_store_set(app->source_store, &store_iter, COL_ENABLED, TRUE, COL_INCONSISTENT, FALSE, -1);
         app->selected_names.insert(aref_str);
+        app->disabled_names.erase(aref_str); /* No longer disabled */
         /* Enable all children */
         set_children_enabled(app, &store_iter, TRUE);
       }
@@ -1380,12 +1546,16 @@ static void on_toggle_enabled(GtkCellRendererToggle* renderer, gchar* path_str, 
         if (enabled)
         {
           app->selected_names.insert(aref_str);
+          app->disabled_names.erase(aref_str); /* No longer disabled */
           /* Enable all children */
           set_children_enabled(app, &store_iter, TRUE);
         }
         else
         {
           app->selected_names.erase(aref_str);
+          /* Track disabled IO signals so they're saved with enable: 0 */
+          if (is_signal)
+            app->disabled_names.insert(aref_str);
           /* Disable all children */
           set_children_enabled(app, &store_iter, FALSE);
         }
@@ -1564,6 +1734,44 @@ static void on_save_clicked(GtkButton* button, gpointer user_data)
     valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(app->selected_store), &iter);
   }
 
+  /* Also save explicitly disabled signals with enable: 0 */
+  for (const auto& disabled_name : app->disabled_names)
+  {
+    /* Skip if this signal is now enabled (user re-enabled it) */
+    if (app->selected_names.find(disabled_name) != app->selected_names.end())
+      continue;
+
+    /* Get aref info from GDH */
+    pwr_tAttrRef aref;
+    pwr_tStatus sts = gdh_NameToAttrref(pwr_cNOid, disabled_name.c_str(), &aref);
+    if (EVEN(sts))
+      continue; /* Signal may have been deleted */
+
+    pwr_tTid tid;
+    sts = gdh_GetAttrRefTid(&aref, &tid);
+    if (EVEN(sts))
+      continue;
+
+    cJSON* signal = cJSON_CreateObject();
+    cJSON_AddStringToObject(signal, "name", disabled_name.c_str());
+    cJSON_AddNumberToObject(signal, "type", (int)tid);
+    cJSON_AddNumberToObject(signal, "flags", (int)aref.Flags.m);
+    cJSON_AddNumberToObject(signal, "enable", 0); /* Explicitly disabled */
+
+    cJSON* aref_json = cJSON_CreateObject();
+    cJSON* oid_json = cJSON_CreateObject();
+    cJSON_AddNumberToObject(oid_json, "oix", (int)aref.Objid.oix);
+    cJSON_AddNumberToObject(oid_json, "vid", (int)aref.Objid.vid);
+    cJSON_AddItemToObject(aref_json, "Objid", oid_json);
+    cJSON_AddNumberToObject(aref_json, "Body", (int)aref.Body);
+    cJSON_AddNumberToObject(aref_json, "Offset", (int)aref.Offset);
+    cJSON_AddNumberToObject(aref_json, "Size", (int)aref.Size);
+    cJSON_AddNumberToObject(aref_json, "Flags", (int)aref.Flags.m);
+    cJSON_AddItemToObject(signal, "aref", aref_json);
+
+    cJSON_AddItemToArray(signals, signal);
+  }
+
   pwr_tFileName fname;
   dcli_translate_filename(fname, json_filename);
 
@@ -1576,11 +1784,11 @@ static void on_save_clicked(GtkButton* button, gpointer user_data)
 
     char msg[512];
     snprintf(msg, sizeof(msg), "Saved %d signals to %s", saved_count, fname);
-    gtk_statusbar_push(GTK_STATUSBAR(app->statusbar), app->status_ctx, msg);
+    log_message(app, msg);
   }
   else
   {
-    gtk_statusbar_push(GTK_STATUSBAR(app->statusbar), app->status_ctx, "Error: Could not save file");
+    log_message(app, "Error: Could not save file");
   }
 
   free(json_str);
@@ -1668,8 +1876,22 @@ static void on_clear_all(GtkButton* button, gpointer user_data)
 {
   AppData* app = (AppData*)user_data;
 
+  /* Clear all enabled flags and track IO signals as disabled */
   auto clear_enabled = [&](GtkTreeIter* it)
-  { gtk_tree_store_set(app->source_store, it, COL_ENABLED, FALSE, COL_INCONSISTENT, FALSE, -1); };
+  {
+    gboolean is_signal;
+    gchar* aref_str;
+    gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), it, COL_IS_SIGNAL, &is_signal, COL_AREF_STR,
+                       &aref_str, -1);
+
+    gtk_tree_store_set(app->source_store, it, COL_ENABLED, FALSE, COL_INCONSISTENT, FALSE, -1);
+
+    /* Track IO signals as explicitly disabled */
+    if (is_signal && aref_str && aref_str[0] != '\0')
+      app->disabled_names.insert(aref_str);
+
+    g_free(aref_str);
+  };
 
   GtkTreeIter iter;
   gboolean valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(app->source_store), &iter);
@@ -1883,11 +2105,21 @@ static void create_window(AppData* app)
   /* Enable keyboard navigation - space to toggle */
   g_signal_connect(app->source_tree, "key-press-event", G_CALLBACK(on_tree_key_press), app);
 
-  // Statusbar
-  app->statusbar = gtk_statusbar_new();
-  gtk_box_pack_start(GTK_BOX(vbox), app->statusbar, FALSE, FALSE, 0);
-  app->status_ctx = gtk_statusbar_get_context_id(GTK_STATUSBAR(app->statusbar), "main");
-  gtk_statusbar_push(GTK_STATUSBAR(app->statusbar), app->status_ctx, "Ready");
+  // Log view with scrolling
+  GtkWidget* log_scroll = gtk_scrolled_window_new(NULL, NULL);
+  gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(log_scroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+  gtk_widget_set_size_request(log_scroll, -1, 80); /* Fixed height */
+  gtk_box_pack_start(GTK_BOX(vbox), log_scroll, FALSE, FALSE, 0);
+
+  app->log_buffer = gtk_text_buffer_new(NULL);
+  app->log_view = gtk_text_view_new_with_buffer(app->log_buffer);
+  gtk_text_view_set_editable(GTK_TEXT_VIEW(app->log_view), FALSE);
+  gtk_text_view_set_cursor_visible(GTK_TEXT_VIEW(app->log_view), FALSE);
+  gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(app->log_view), GTK_WRAP_NONE);
+  gtk_text_view_set_left_margin(GTK_TEXT_VIEW(app->log_view), 8);
+  gtk_text_view_set_right_margin(GTK_TEXT_VIEW(app->log_view), 8);
+  gtk_widget_set_name(app->log_view, "log-view");
+  gtk_container_add(GTK_CONTAINER(log_scroll), app->log_view);
 }
 
 /*_Theme and CSS________________________________________________________*/
@@ -2046,12 +2278,12 @@ static const gchar* get_dark_theme_css()
       "  background-color: #505050;"
       "}"
 
-      /* Statusbar */
-      "statusbar {"
+      /* Log view */
+      "#log-view, #log-view text {"
+      "  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'Consolas', monospace;"
+      "  font-size: 9pt;"
       "  background-color: #1a1a1a;"
-      "  color: #707070;"
-      "  padding: 3px 10px;"
-      "  border-top: 1px solid #303030;"
+      "  color: #808080;"
       "}"
 
       /* Scrollbars */
@@ -2124,11 +2356,8 @@ int main(int argc, char** argv)
   populate_source_tree(&app);
   apply_filter(&app);
 
-  /* If no previous selection was loaded, select all IO signals by default */
-  if (app.selected_names.empty())
-    on_select_all_signals(NULL, &app);
-  else
-    rebuild_selected_list(&app);
+  /* Rebuild selected list from tree state */
+  rebuild_selected_list(&app);
 
   gtk_widget_show_all(app.window);
   gtk_main();

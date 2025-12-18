@@ -47,6 +47,7 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <set>
 
 #include "rt_errh.h"
 #include "rt_gdh.h"
@@ -104,6 +105,7 @@ public:
   int gen_schema_main();
   int load_signals();             // New function to load signals from JSON
   int check_and_reload_signals(); // New function to check for file changes
+  int scan_io_signals();          // Scan RTDB for IO signals not in select.json
   int scan();
   char* read_file(const char* filename);
   cJSON* parse_file(const char* filename);
@@ -122,9 +124,11 @@ struct asdf
   pwr_tRefId dlid;
   void* valp;
   std::string description;
+  std::string unit;
 };
 typedef struct asdf asdfs;
 std::map<std::string, asdfs> arefs;
+std::set<std::string> disabled_signals; // Signals explicitly disabled by user (enable: 0)
 
 void rs_export_rtdb::get_confobj()
 {
@@ -603,14 +607,24 @@ int rs_export_rtdb::load_signals()
       gdh_DLUnrefObjectInfo(it->second.dlid);
   }
   arefs.clear();
+  disabled_signals.clear();
 
   const cJSON* item = NULL;
   cJSON_ArrayForEach(item, cJSON_GetObjectItemCaseSensitive(parsed, "signals"))
   {
     std::string name(cJSON_GetObjectItemCaseSensitive(item, "name")->valuestring);
 
+    int enabled = cJSON_GetObjectItemCaseSensitive(item, "enable")->valueint;
+
+    /* Track explicitly disabled signals - don't add them to arefs */
+    if (!enabled)
+    {
+      disabled_signals.insert(name);
+      continue;
+    }
+
     asdfs a;
-    a.to_send = cJSON_GetObjectItemCaseSensitive(item, "enable")->valueint;
+    a.to_send = true;
     a.flags = cJSON_GetObjectItemCaseSensitive(item, "flags")->valueint;
     a.type = (pwr_eType)cJSON_GetObjectItemCaseSensitive(item, "type")->valueint;
 
@@ -620,6 +634,13 @@ int rs_export_rtdb::load_signals()
       a.description = desc_json->valuestring;
     else
       a.description = "";
+
+    /* Load unit if present */
+    const cJSON* unit_json = cJSON_GetObjectItemCaseSensitive(item, "unit");
+    if (unit_json && cJSON_IsString(unit_json) && unit_json->valuestring)
+      a.unit = unit_json->valuestring;
+    else
+      a.unit = "";
 
     const cJSON* aref_json = cJSON_GetObjectItemCaseSensitive(item, "aref");
     a.aref.Flags.m = cJSON_GetObjectItemCaseSensitive(aref_json, "Flags")->valueint;
@@ -644,6 +665,117 @@ int rs_export_rtdb::load_signals()
 
   cJSON_Delete(parsed);
   return 1;
+}
+
+/*
+ * Scan RTDB for IO signals and add any that are not already in arefs or disabled_signals.
+ * This ensures new IO signals added to the system are automatically exported.
+ */
+int rs_export_rtdb::scan_io_signals()
+{
+  pwr_tStatus sts;
+  pwr_tOid oid;
+  int added_count = 0;
+
+  /* Signal classes to scan for */
+  static const pwr_tCid signal_classes[] = {pwr_cClass_Di, pwr_cClass_Do, pwr_cClass_Ai, pwr_cClass_Ao,
+                                            pwr_cClass_Ii, pwr_cClass_Io, pwr_cClass_Co, pwr_cClass_Po};
+  static const int num_classes = sizeof(signal_classes) / sizeof(signal_classes[0]);
+
+  for (int c = 0; c < num_classes; c++)
+  {
+    /* Iterate through all objects of this signal class */
+    sts = gdh_GetClassList(signal_classes[c], &oid);
+    while (ODD(sts))
+    {
+      pwr_tOName fullname;
+      char attrname[512];
+
+      sts = gdh_ObjidToName(oid, fullname, sizeof(fullname), cdh_mName_volumeStrict);
+      if (EVEN(sts))
+      {
+        sts = gdh_GetNextObject(oid, &oid);
+        continue;
+      }
+
+      /* Build the ActualValue attribute name */
+      snprintf(attrname, sizeof(attrname), "%s.ActualValue", fullname);
+
+      /* Check if this signal is already in our list or explicitly disabled */
+      if (arefs.find(attrname) != arefs.end())
+      {
+        /* Already in list */
+        sts = gdh_GetNextObject(oid, &oid);
+        continue;
+      }
+      if (disabled_signals.find(attrname) != disabled_signals.end())
+      {
+        /* User explicitly disabled this signal */
+        sts = gdh_GetNextObject(oid, &oid);
+        continue;
+      }
+
+      /* New signal found - add it */
+      asdfs a;
+      a.to_send = true;
+      a.flags = 0;
+
+      /* Get the aref for ActualValue */
+      pwr_tStatus aref_sts = gdh_NameToAttrref(pwr_cNOid, attrname, &a.aref);
+      if (EVEN(aref_sts))
+      {
+        sts = gdh_GetNextObject(oid, &oid);
+        continue;
+      }
+
+      /* Get type of ActualValue */
+      pwr_tTid tid;
+      aref_sts = gdh_GetAttrRefTid(&a.aref, &tid);
+      if (EVEN(aref_sts))
+      {
+        sts = gdh_GetNextObject(oid, &oid);
+        continue;
+      }
+      a.type = (pwr_eType)tid;
+
+      /* Get Description if available */
+      char desc[256] = "";
+      char desc_attr[512];
+      snprintf(desc_attr, sizeof(desc_attr), "%s.Description", fullname);
+      gdh_GetObjectInfo(desc_attr, desc, sizeof(desc));
+      a.description = desc;
+
+      /* Get Unit if available */
+      char unit[256] = "";
+      char unit_attr[512];
+      snprintf(unit_attr, sizeof(unit_attr), "%s.Unit", fullname);
+      gdh_GetObjectInfo(unit_attr, unit, sizeof(unit));
+      a.unit = unit;
+
+      /* Link to the runtime value */
+      a.sts = gdh_DLRefObjectInfoAttrref(&a.aref, &a.valp, &a.dlid);
+      if (EVEN(a.sts))
+      {
+        a.valp = 0;
+        errh_Warning("Could not link to auto-discovered signal: %s", attrname);
+      }
+
+      arefs[attrname] = a;
+      added_count++;
+
+      if (exp_debug)
+        printf("Auto-discovered IO signal: %s (type %d)\n", attrname, a.type);
+
+      sts = gdh_GetNextObject(oid, &oid);
+    }
+  }
+
+  if (added_count > 0)
+  {
+    errh_Info("Auto-discovered %d new IO signals not in select.json", added_count);
+  }
+
+  return added_count;
 }
 
 /*
@@ -672,6 +804,9 @@ int rs_export_rtdb::check_and_reload_signals()
       errh_Error("Failed to reload signals from select.json");
       return 0;
     }
+
+    // Re-scan RTDB for new IO signals after reload
+    scan_io_signals();
 
     if (!gen_schema_main())
     {
@@ -728,6 +863,11 @@ int rs_export_rtdb::init(qcom_sQid* qid)
     errh_SetStatus(PWR__SRVTERM);
     return 0;
   }
+
+  // Scan RTDB for IO signals not in select.json
+  int auto_discovered = scan_io_signals();
+  if (exp_debug && auto_discovered > 0)
+    printf("Auto-discovered %d new IO signals\n", auto_discovered);
 
   if (exp_debug)
   {
