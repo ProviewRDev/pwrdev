@@ -191,7 +191,8 @@ enum
   SEL_COL_TYPE,
   SEL_COL_DESCRIPTION,
   SEL_COL_UNIT,
-  SEL_COL_DISABLED, /* TRUE if this is a disabled IO signal */
+  SEL_COL_DISABLED,  /* TRUE if this is a disabled IO signal */
+  SEL_COL_IS_SIGNAL, /* TRUE if this is an IO signal (can be disabled, not removed) */
   SEL_NUM_COLS
 };
 
@@ -582,6 +583,7 @@ static void update_stats(AppData* app)
 /*_Forward declarations__________________________________________________*/
 
 static void rebuild_selected_list(AppData* app);
+static void update_parent_state(AppData* app, GtkTreeIter* child_iter);
 
 /*_Tree population_______________________________________________________*/
 
@@ -1182,7 +1184,8 @@ static void rebuild_selected_list(AppData* app)
       GtkTreeIter sel_iter;
       gtk_list_store_append(app->selected_store, &sel_iter);
       gtk_list_store_set(app->selected_store, &sel_iter, SEL_COL_NAME, aref_str, SEL_COL_TYPE, type,
-                         SEL_COL_DESCRIPTION, desc, SEL_COL_UNIT, unit, SEL_COL_DISABLED, FALSE, -1);
+                         SEL_COL_DESCRIPTION, desc, SEL_COL_UNIT, unit, SEL_COL_DISABLED, FALSE,
+                         SEL_COL_IS_SIGNAL, is_signal, -1);
 
       if (is_signal)
         app->signal_count++;
@@ -1212,10 +1215,290 @@ static void rebuild_selected_list(AppData* app)
     GtkTreeIter sel_iter;
     gtk_list_store_append(app->selected_store, &sel_iter);
     gtk_list_store_set(app->selected_store, &sel_iter, SEL_COL_NAME, name.c_str(), SEL_COL_TYPE, "(disabled)",
-                       SEL_COL_DESCRIPTION, "", SEL_COL_UNIT, "", SEL_COL_DISABLED, TRUE, -1);
+                       SEL_COL_DESCRIPTION, "", SEL_COL_UNIT, "", SEL_COL_DISABLED, TRUE, SEL_COL_IS_SIGNAL,
+                       TRUE, -1);
   }
 
   update_stats(app);
+}
+
+/*
+ * Find an item in the source tree by its aref string.
+ * Returns TRUE if found and sets the found_iter.
+ * Searches recursively through the tree.
+ */
+static gboolean find_in_source_tree(GtkTreeModel* model, GtkTreeIter* parent, const char* target_aref,
+                                    GtkTreeIter* found_iter)
+{
+  GtkTreeIter iter;
+  gboolean valid;
+
+  if (parent)
+    valid = gtk_tree_model_iter_children(model, &iter, parent);
+  else
+    valid = gtk_tree_model_get_iter_first(model, &iter);
+
+  while (valid)
+  {
+    gchar* aref_str;
+    gtk_tree_model_get(model, &iter, COL_AREF_STR, &aref_str, -1);
+
+    if (aref_str && strcmp(aref_str, target_aref) == 0)
+    {
+      *found_iter = iter;
+      g_free(aref_str);
+      return TRUE;
+    }
+    g_free(aref_str);
+
+    /* Search children recursively */
+    if (gtk_tree_model_iter_has_child(model, &iter))
+    {
+      if (find_in_source_tree(model, &iter, target_aref, found_iter))
+        return TRUE;
+    }
+
+    valid = gtk_tree_model_iter_next(model, &iter);
+  }
+
+  return FALSE;
+}
+
+/*
+ * Navigate to and highlight an item in the source tree.
+ * Expands parent nodes and scrolls to make the item visible.
+ */
+static void navigate_to_source_item(AppData* app, const char* aref)
+{
+  GtkTreeIter store_iter;
+
+  /* Find the item in the underlying store */
+  if (!find_in_source_tree(GTK_TREE_MODEL(app->source_store), NULL, aref, &store_iter))
+  {
+    log_message(app, "Item not found in source tree (may have been deleted)");
+    return;
+  }
+
+  /* Convert store iter to filter iter (needed for tree view) */
+  GtkTreeIter filter_iter;
+  if (!gtk_tree_model_filter_convert_child_iter_to_iter(app->filter_model, &filter_iter, &store_iter))
+  {
+    log_message(app, "Item is hidden by current filter");
+    return;
+  }
+
+  /* Get the path and expand all parent nodes */
+  GtkTreePath* path = gtk_tree_model_get_path(GTK_TREE_MODEL(app->filter_model), &filter_iter);
+  if (path)
+  {
+    /* Expand to the parent of this path so the item is visible */
+    GtkTreePath* parent_path = gtk_tree_path_copy(path);
+    if (gtk_tree_path_up(parent_path))
+      gtk_tree_view_expand_to_path(GTK_TREE_VIEW(app->source_tree), parent_path);
+    gtk_tree_path_free(parent_path);
+
+    /* Select and scroll to the item */
+    gtk_tree_view_set_cursor(GTK_TREE_VIEW(app->source_tree), path, NULL, FALSE);
+    gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(app->source_tree), path, NULL, TRUE, 0.5, 0.0);
+
+    gtk_tree_path_free(path);
+  }
+}
+
+/*
+ * Handler for double-click or Enter on the selected list.
+ * Navigates to the corresponding item in the source tree.
+ */
+static void on_selected_row_activated(GtkTreeView* tree_view, GtkTreePath* path, GtkTreeViewColumn* column,
+                                      gpointer user_data)
+{
+  AppData* app = (AppData*)user_data;
+  GtkTreeIter iter;
+
+  if (gtk_tree_model_get_iter(GTK_TREE_MODEL(app->selected_store), &iter, path))
+  {
+    gchar* name;
+    gboolean disabled;
+    gtk_tree_model_get(GTK_TREE_MODEL(app->selected_store), &iter, SEL_COL_NAME, &name, SEL_COL_DISABLED,
+                       &disabled, -1);
+
+    if (name)
+    {
+      /* For disabled items, the name still has the full aref */
+      navigate_to_source_item(app, name);
+      g_free(name);
+    }
+  }
+}
+
+/*
+ * Disable (for IO signals) or remove (for objects) the currently selected item
+ * in the export list.
+ */
+static void disable_or_remove_selected_export(AppData* app)
+{
+  GtkTreeSelection* selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(app->selected_tree));
+  GtkTreeIter sel_iter;
+
+  if (!gtk_tree_selection_get_selected(selection, NULL, &sel_iter))
+    return;
+
+  gchar* name;
+  gboolean disabled, is_signal;
+  gtk_tree_model_get(GTK_TREE_MODEL(app->selected_store), &sel_iter, SEL_COL_NAME, &name, SEL_COL_DISABLED,
+                     &disabled, SEL_COL_IS_SIGNAL, &is_signal, -1);
+
+  if (!name)
+    return;
+
+  /* If already disabled, re-enable it */
+  if (disabled)
+  {
+    /* Find in source tree and enable */
+    GtkTreeIter store_iter;
+    if (find_in_source_tree(GTK_TREE_MODEL(app->source_store), NULL, name, &store_iter))
+    {
+      gtk_tree_store_set(app->source_store, &store_iter, COL_ENABLED, TRUE, COL_INCONSISTENT, FALSE, -1);
+      update_parent_state(app, &store_iter);
+    }
+    app->disabled_names.erase(name);
+    app->selected_names.insert(name);
+
+    char msg[256];
+    snprintf(msg, sizeof(msg), "Re-enabled: %s", name);
+    log_message(app, msg);
+  }
+  else
+  {
+    /* Find in source tree and disable/uncheck */
+    GtkTreeIter store_iter;
+    if (find_in_source_tree(GTK_TREE_MODEL(app->source_store), NULL, name, &store_iter))
+    {
+      gtk_tree_store_set(app->source_store, &store_iter, COL_ENABLED, FALSE, COL_INCONSISTENT, FALSE, -1);
+      update_parent_state(app, &store_iter);
+    }
+
+    app->selected_names.erase(name);
+
+    if (is_signal)
+    {
+      /* IO signals are disabled (kept in JSON with enable: 0) */
+      app->disabled_names.insert(name);
+      char msg[256];
+      snprintf(msg, sizeof(msg), "Disabled IO signal: %s", name);
+      log_message(app, msg);
+    }
+    else
+    {
+      /* Objects are removed completely */
+      char msg[256];
+      snprintf(msg, sizeof(msg), "Removed from export: %s", name);
+      log_message(app, msg);
+    }
+  }
+
+  g_free(name);
+  rebuild_selected_list(app);
+}
+
+/*
+ * Context menu popup handler for selected tree
+ */
+static void on_context_menu_disable_remove(GtkMenuItem* item, gpointer user_data)
+{
+  AppData* app = (AppData*)user_data;
+  disable_or_remove_selected_export(app);
+}
+
+static void on_context_menu_navigate(GtkMenuItem* item, gpointer user_data)
+{
+  AppData* app = (AppData*)user_data;
+  GtkTreeSelection* selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(app->selected_tree));
+  GtkTreeIter iter;
+
+  if (gtk_tree_selection_get_selected(selection, NULL, &iter))
+  {
+    gchar* name;
+    gtk_tree_model_get(GTK_TREE_MODEL(app->selected_store), &iter, SEL_COL_NAME, &name, -1);
+    if (name)
+    {
+      navigate_to_source_item(app, name);
+      g_free(name);
+    }
+  }
+}
+
+static gboolean on_selected_button_press(GtkWidget* widget, GdkEventButton* event, gpointer user_data)
+{
+  AppData* app = (AppData*)user_data;
+
+  /* Right-click for context menu */
+  if (event->type == GDK_BUTTON_PRESS && event->button == 3)
+  {
+    GtkTreeSelection* selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(app->selected_tree));
+    GtkTreeIter iter;
+
+    /* Select the row under cursor if not already selected */
+    GtkTreePath* path;
+    if (gtk_tree_view_get_path_at_pos(GTK_TREE_VIEW(app->selected_tree), (gint)event->x, (gint)event->y,
+                                      &path, NULL, NULL, NULL))
+    {
+      gtk_tree_selection_select_path(selection, path);
+      gtk_tree_path_free(path);
+    }
+
+    if (!gtk_tree_selection_get_selected(selection, NULL, &iter))
+      return FALSE;
+
+    /* Get item info to determine action label */
+    gboolean disabled, is_signal;
+    gtk_tree_model_get(GTK_TREE_MODEL(app->selected_store), &iter, SEL_COL_DISABLED, &disabled,
+                       SEL_COL_IS_SIGNAL, &is_signal, -1);
+
+    /* Create context menu */
+    GtkWidget* menu = gtk_menu_new();
+
+    /* Navigate item */
+    GtkWidget* nav_item = gtk_menu_item_new_with_label("Show in Source Tree");
+    g_signal_connect(nav_item, "activate", G_CALLBACK(on_context_menu_navigate), app);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), nav_item);
+
+    /* Disable/Remove/Enable item */
+    const char* action_label;
+    if (disabled)
+      action_label = "Re-enable";
+    else if (is_signal)
+      action_label = "Disable";
+    else
+      action_label = "Remove";
+
+    GtkWidget* action_item = gtk_menu_item_new_with_label(action_label);
+    g_signal_connect(action_item, "activate", G_CALLBACK(on_context_menu_disable_remove), app);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), action_item);
+
+    gtk_widget_show_all(menu);
+    gtk_menu_popup_at_pointer(GTK_MENU(menu), (GdkEvent*)event);
+
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
+/*
+ * Key press handler for selected tree (Delete/Backspace to disable/remove)
+ */
+static gboolean on_selected_key_press(GtkWidget* widget, GdkEventKey* event, gpointer user_data)
+{
+  AppData* app = (AppData*)user_data;
+
+  if (event->keyval == GDK_KEY_Delete || event->keyval == GDK_KEY_BackSpace)
+  {
+    disable_or_remove_selected_export(app);
+    return TRUE;
+  }
+
+  return FALSE;
 }
 
 /*_Callbacks_____________________________________________________________*/
@@ -2083,7 +2366,7 @@ static void create_window(AppData* app)
   gtk_container_add(GTK_CONTAINER(right_frame), scrolled_selected);
 
   app->selected_store = gtk_list_store_new(SEL_NUM_COLS, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING,
-                                           G_TYPE_STRING, G_TYPE_BOOLEAN);
+                                           G_TYPE_STRING, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN);
 
   app->selected_tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(app->selected_store));
   gtk_container_add(GTK_CONTAINER(scrolled_selected), app->selected_tree);
@@ -2150,6 +2433,11 @@ static void create_window(AppData* app)
 
   /* Enable keyboard navigation - space to toggle */
   g_signal_connect(app->source_tree, "key-press-event", G_CALLBACK(on_tree_key_press), app);
+
+  /* Selected tree navigation and interaction */
+  g_signal_connect(app->selected_tree, "row-activated", G_CALLBACK(on_selected_row_activated), app);
+  g_signal_connect(app->selected_tree, "button-press-event", G_CALLBACK(on_selected_button_press), app);
+  g_signal_connect(app->selected_tree, "key-press-event", G_CALLBACK(on_selected_key_press), app);
 
   // Log view with scrolling
   GtkWidget* log_scroll = gtk_scrolled_window_new(NULL, NULL);
