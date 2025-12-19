@@ -286,6 +286,8 @@
     o->Action = co->Action;                                                                                  \
     o->Acked = co->Acked;                                                                                    \
     o->Blocked = co->Blocked;                                                                                \
+    co->ActiveNotAcked = (co->Action && !co->Acked);                                                         \
+    o->ActiveNotAcked = co->ActiveNotAcked;                                                                  \
   }
 
 /*_*
