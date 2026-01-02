@@ -2082,7 +2082,8 @@ static void on_save_clicked(GtkButton* button, gpointer user_data)
     fclose(fp);
 
     char msg[512];
-    snprintf(msg, sizeof(msg), "Saved %d signals to %s", saved_count, fname);
+    snprintf(msg, sizeof(msg), "Saved %d selections → %d attributes to %s", app->total_selected, saved_count,
+             fname);
     log_message(app, msg);
   }
   else
@@ -2548,19 +2549,32 @@ static const gchar* get_dark_theme_css()
       "}"
 
       /* Toggle buttons for filters */
-      "togglebutton {"
-      "  background-color: #2a2a2a;"
-      "  color: #909090;"
-      "  border: 1px solid #404040;"
+      "button.toggle {"
+      "  background-color: #333333;"
+      "  color: #808080;"
+      "  border: 1px solid #505050;"
+      "  border-bottom: 3px solid #505050;"
       "  padding: 3px 10px;"
+      "  border-radius: 3px;"
       "}"
-      "togglebutton:checked {"
-      "  background-color: #3a4a5a;"
-      "  color: #d0d0d0;"
-      "  border-color: #5080a0;"
+      "button.toggle:checked {"
+      "  background-color: #2a3a2a;"
+      "  color: #80c080;"
+      "  border: 1px solid #406040;"
+      "  border-bottom: 3px solid #50a060;"
+      "  font-weight: bold;"
       "}"
-      "togglebutton:hover {"
-      "  background-color: #353535;"
+      "button.toggle:not(:checked) {"
+      "  background-color: #3a2a2a;"
+      "  color: #705050;"
+      "  border: 1px solid #503030;"
+      "  border-bottom: 3px solid #803030;"
+      "}"
+      "button.toggle:hover {"
+      "  background-color: #505050;"
+      "  color: #ffffff;"
+      "  border-color: #707070;"
+      "  border-bottom-color: #909090;"
       "}"
 
       /* Labels */
