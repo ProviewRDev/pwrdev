@@ -296,13 +296,11 @@ static void load_selected_from_json(AppData* app)
       if (!enable_json || enable_json->valueint)
       {
         app->selected_names.insert(name_json->valuestring);
-        fprintf(stderr, "DEBUG load: enabled '%s'\n", name_json->valuestring);
       }
       else
       {
         /* Explicitly disabled by user */
         app->disabled_names.insert(name_json->valuestring);
-        fprintf(stderr, "DEBUG load: disabled '%s'\n", name_json->valuestring);
       }
     }
   }
@@ -933,16 +931,12 @@ static int auto_discover_io_signals(AppData* app)
       bool in_selected = app->selected_names.find(name) != app->selected_names.end();
       bool in_disabled = app->disabled_names.find(name) != app->disabled_names.end();
 
-      fprintf(stderr, "DEBUG auto-discover: '%s' in_selected=%d in_disabled=%d\n", 
-              aref_str, in_selected, in_disabled);
-
       if (!in_selected && !in_disabled)
       {
         /* New signal - auto-enable it */
         app->selected_names.insert(name);
         gtk_tree_store_set(app->source_store, iter, COL_ENABLED, TRUE, -1);
         discovered_count++;
-        fprintf(stderr, "DEBUG auto-discover: ADDED '%s'\n", aref_str);
       }
     }
 
