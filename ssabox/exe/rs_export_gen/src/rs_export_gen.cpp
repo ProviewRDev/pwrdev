@@ -1719,27 +1719,31 @@ static int get_children_state(AppData* app, GtkTreeIter* parent)
                        &enabled, COL_INCONSISTENT, &inconsistent, COL_VISIBLE, &visible, -1);
 
     /* Only count visible children */
-    if (selectable && visible)
+    if (visible)
     {
-      total++;
-      if (enabled)
-        selected++;
-      else if (inconsistent)
-        selected++; /* Inconsistent counts as partially selected */
-    }
-
-    /* Also check grandchildren */
-    if (gtk_tree_model_iter_has_child(GTK_TREE_MODEL(app->source_store), &child))
-    {
-      int child_state = get_children_state(app, &child);
-      if (child_state == 1)
+      if (selectable)
       {
-        /* If any descendant is inconsistent, we need to reflect that */
-        if (!selectable || !visible)
-        {
-          total++;
+        total++;
+        if (enabled)
           selected++;
+        else if (inconsistent)
+          selected++; /* Inconsistent counts as partially selected */
+      }
+      else if (gtk_tree_model_iter_has_child(GTK_TREE_MODEL(app->source_store), &child))
+      {
+        /* Non-selectable container (like "Enable") - check its children recursively */
+        int child_state = get_children_state(app, &child);
+        /* Aggregate grandchildren state into our counts */
+        total++;
+        if (child_state == 2)
+          selected++;
+        else if (child_state == 1)
+        {
+          /* Partial selection in descendants - treat as 0.5 to force inconsistent */
+          /* We achieve this by not incrementing selected, but total is incremented */
+          /* This will result in selected < total, yielding state 1 (inconsistent) */
         }
+        /* child_state == 0 means no grandchildren selected, don't increment selected */
       }
     }
   } while (gtk_tree_model_iter_next(GTK_TREE_MODEL(app->source_store), &child));
@@ -2106,6 +2110,7 @@ static void on_select_all_signals(GtkButton* button, gpointer user_data)
     {
       gtk_tree_store_set(app->source_store, it, COL_ENABLED, TRUE, COL_INCONSISTENT, FALSE, -1);
       app->selected_names.insert(aref_str);
+      app->disabled_names.erase(aref_str); /* Remove from disabled if it was there */
     }
 
     g_free(aref_str);
