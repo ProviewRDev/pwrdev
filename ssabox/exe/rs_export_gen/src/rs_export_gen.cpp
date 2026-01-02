@@ -296,11 +296,13 @@ static void load_selected_from_json(AppData* app)
       if (!enable_json || enable_json->valueint)
       {
         app->selected_names.insert(name_json->valuestring);
+        fprintf(stderr, "DEBUG load: enabled '%s'\n", name_json->valuestring);
       }
       else
       {
         /* Explicitly disabled by user */
         app->disabled_names.insert(name_json->valuestring);
+        fprintf(stderr, "DEBUG load: disabled '%s'\n", name_json->valuestring);
       }
     }
   }
@@ -931,12 +933,16 @@ static int auto_discover_io_signals(AppData* app)
       bool in_selected = app->selected_names.find(name) != app->selected_names.end();
       bool in_disabled = app->disabled_names.find(name) != app->disabled_names.end();
 
+      fprintf(stderr, "DEBUG auto-discover: '%s' in_selected=%d in_disabled=%d\n", 
+              aref_str, in_selected, in_disabled);
+
       if (!in_selected && !in_disabled)
       {
         /* New signal - auto-enable it */
         app->selected_names.insert(name);
         gtk_tree_store_set(app->source_store, iter, COL_ENABLED, TRUE, -1);
         discovered_count++;
+        fprintf(stderr, "DEBUG auto-discover: ADDED '%s'\n", aref_str);
       }
     }
 
@@ -1889,9 +1895,22 @@ static void on_save_clicked(GtkButton* button, gpointer user_data)
     gchar* type_str;
     gchar* desc;
     gchar* unit;
+    gboolean is_disabled;
 
     gtk_tree_model_get(GTK_TREE_MODEL(app->selected_store), &iter, SEL_COL_NAME, &name, SEL_COL_TYPE,
-                       &type_str, SEL_COL_DESCRIPTION, &desc, SEL_COL_UNIT, &unit, -1);
+                       &type_str, SEL_COL_DESCRIPTION, &desc, SEL_COL_UNIT, &unit, SEL_COL_DISABLED,
+                       &is_disabled, -1);
+
+    /* Skip disabled items - they're saved separately from disabled_names */
+    if (is_disabled)
+    {
+      g_free(name);
+      g_free(type_str);
+      g_free(desc);
+      g_free(unit);
+      valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(app->selected_store), &iter);
+      continue;
+    }
 
     /* Convert name from UTF-8 (GTK) to Latin1 (ProviewR/GDH) */
     gchar* name_latin1 = utf8_to_latin1(name);
@@ -2562,7 +2581,6 @@ static const gchar* get_dark_theme_css()
       "  color: #80c080;"
       "  border: 1px solid #406040;"
       "  border-bottom: 3px solid #50a060;"
-      "  font-weight: bold;"
       "}"
       "button.toggle:not(:checked) {"
       "  background-color: #3a2a2a;"
@@ -2575,6 +2593,18 @@ static const gchar* get_dark_theme_css()
       "  color: #ffffff;"
       "  border-color: #707070;"
       "  border-bottom-color: #909090;"
+      "}"
+      "button.toggle:checked:hover {"
+      "  background-color: #3a5a3a;"
+      "  color: #a0f0a0;"
+      "  border-color: #509050;"
+      "  border-bottom-color: #60c070;"
+      "}"
+      "button.toggle:not(:checked):hover {"
+      "  background-color: #5a3a3a;"
+      "  color: #f0a0a0;"
+      "  border-color: #905050;"
+      "  border-bottom-color: #c06060;"
       "}"
 
       /* Labels */
