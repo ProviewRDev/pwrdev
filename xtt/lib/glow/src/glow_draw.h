@@ -189,6 +189,7 @@ public:
   virtual GlowCustomColors* create_customcolors();
   virtual void reset_customcolors(GlowCustomColors* cc);
   virtual void remove_customcolors(GlowCustomColors* cc) {}
+  virtual void set_text_inputfocus(int focus) {}
 };
 
 class DrawWind {
