@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added BitField8/16/32/64 data representation. These represent bitfields that are not byte-swapped, in accordance with their definition.
 - New pin for DSup, ActiveNotAcked for when the DSup is active but has not yet been ackknowledged.
 - bcomp: Added MinOut to compposit
+- GrowWidgets now implement a minimal accessible interface adding "popup" support for external onscreen keyboards, like onboard for instance.
 
 ### Fixed
 
