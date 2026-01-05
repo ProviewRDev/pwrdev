@@ -2060,6 +2060,10 @@ void GlowCtx::register_inputfocus(GlowArrayElem* object, int focus)
 {
   if (!focus)
   {
+    /* Notify draw layer that text input is no longer active */
+    if (gdraw)
+      gdraw->set_text_inputfocus(0);
+
     if (event_callback[glow_eEvent_InputFocusLost])
     {
       // Send a input focus lost callback
@@ -2088,6 +2092,11 @@ void GlowCtx::register_inputfocus(GlowArrayElem* object, int focus)
       inputfocus_object->set_input_focus(0, glow_eEvent_InputFocusGained);
 
     inputfocus_object = object;
+
+    /* Notify draw layer that text input is now active */
+    if (gdraw)
+      gdraw->set_text_inputfocus(1);
+
     if (event_callback[glow_eEvent_InputFocusGained])
     {
       // Send a input focus gained callback

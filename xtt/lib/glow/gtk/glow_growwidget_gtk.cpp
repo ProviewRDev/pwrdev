@@ -35,15 +35,29 @@
  */
 
 #include <math.h>
+#include <atk/atk.h>
+#include <gtk/gtk-a11y.h>
 
 #include "glow_draw_gtk.h"
 #include "glow_growwidget_gtk.h"
+
+/* Forward declarations for accessible class */
+typedef struct _GrowWidgetAccessible GrowWidgetAccessible;
+typedef struct _GrowWidgetAccessibleClass GrowWidgetAccessibleClass;
+
+static GType grow_widget_accessible_get_type(void);
+
+#define GROW_TYPE_WIDGET_ACCESSIBLE (grow_widget_accessible_get_type())
+#define GROW_WIDGET_ACCESSIBLE(obj)                                                                          \
+  (G_TYPE_CHECK_INSTANCE_CAST((obj), GROW_TYPE_WIDGET_ACCESSIBLE, GrowWidgetAccessible))
+#define GROW_IS_WIDGET_ACCESSIBLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE((obj), GROW_TYPE_WIDGET_ACCESSIBLE))
 
 typedef struct _GrowWidgetGtk GrowWidgetGtk;
 typedef struct _GrowWidgetGtkClass GrowWidgetGtkClass;
 typedef struct _GrowWidgetGtkPrivate GrowWidgetGtkPrivate;
 
-typedef struct {
+typedef struct
+{
   GtkWidget* grow;
   GtkWidget* form;
   GtkWidget* scroll_h;
@@ -52,13 +66,15 @@ typedef struct {
   int scroll_v_managed;
 } growwidget_sScroll;
 
-struct _GrowWidgetGtk {
+struct _GrowWidgetGtk
+{
   GtkDrawingArea bin;
-  GrowWidgetGtkPrivate *priv;
+  GrowWidgetGtkPrivate* priv;
 };
 
-struct _GrowWidgetGtkPrivate {
-  GdkWindow *window;
+struct _GrowWidgetGtkPrivate
+{
+  GdkWindow* window;
   void* grow_ctx;
   void* draw_ctx;
   int (*init_proc)(GlowCtx* ctx, void* clien_data);
@@ -86,7 +102,8 @@ struct _GrowWidgetGtkPrivate {
   guint vscroll_policy : 1;
 };
 
-enum {
+enum
+{
   PROP_0,
   PROP_HADJUSTMENT,
   PROP_VADJUSTMENT,
@@ -94,24 +111,187 @@ enum {
   PROP_VSCROLL_POLICY
 };
 
-struct _GrowWidgetGtkClass {
+struct _GrowWidgetGtkClass
+{
   GtkDrawingAreaClass parent_class;
 };
 
+/* ============================================================
+ * GrowWidgetAccessible - Minimal accessible class for on-screen keyboard support
+ *
+ * On-screen keyboards like Onboard monitor AT-SPI2 for widgets implementing
+ * AtkText/AtkEditableText interfaces. Since GrowWidgetGtk is a drawing area,
+ * we provide a minimal implementation of these interfaces to allow the
+ * on-screen keyboard to recognize when text input focus is active.
+ * ============================================================ */
+
+struct _GrowWidgetAccessible
+{
+  GtkWidgetAccessible parent;
+  gboolean text_input_active;
+};
+
+struct _GrowWidgetAccessibleClass
+{
+  GtkWidgetAccessibleClass parent_class;
+};
+
+/* Minimal AtkText stubs - just enough to satisfy interface requirements */
+static gchar* grow_widget_accessible_get_text(AtkText* text, gint start_pos, gint end_pos)
+{
+  (void)text;
+  (void)start_pos;
+  (void)end_pos;
+  return g_strdup("");
+}
+
+static gint grow_widget_accessible_get_character_count(AtkText* text)
+{
+  (void)text;
+  return 0;
+}
+
+static gint grow_widget_accessible_get_caret_offset(AtkText* text)
+{
+  (void)text;
+  return 0;
+}
+
+static gboolean grow_widget_accessible_set_caret_offset(AtkText* text, gint offset)
+{
+  (void)text;
+  (void)offset;
+  return TRUE;
+}
+
+static void atk_text_interface_init(AtkTextIface* iface)
+{
+  iface->get_text = grow_widget_accessible_get_text;
+  iface->get_character_count = grow_widget_accessible_get_character_count;
+  iface->get_caret_offset = grow_widget_accessible_get_caret_offset;
+  iface->set_caret_offset = grow_widget_accessible_set_caret_offset;
+}
+
+/* Minimal AtkEditableText stubs */
+static void grow_widget_accessible_set_text_contents(AtkEditableText* text, const gchar* string)
+{
+  (void)text;
+  (void)string;
+}
+
+static void grow_widget_accessible_insert_text(AtkEditableText* text, const gchar* string, gint length,
+                                               gint* position)
+{
+  (void)text;
+  (void)string;
+  (void)length;
+  (void)position;
+}
+
+static void grow_widget_accessible_delete_text(AtkEditableText* text, gint start_pos, gint end_pos)
+{
+  (void)text;
+  (void)start_pos;
+  (void)end_pos;
+}
+
+static void atk_editable_text_interface_init(AtkEditableTextIface* iface)
+{
+  iface->set_text_contents = grow_widget_accessible_set_text_contents;
+  iface->insert_text = grow_widget_accessible_insert_text;
+  iface->delete_text = grow_widget_accessible_delete_text;
+}
+
+static void grow_widget_accessible_initialize(AtkObject* obj, gpointer data)
+{
+  ATK_OBJECT_CLASS(g_type_class_peek_parent(G_OBJECT_GET_CLASS(obj)))->initialize(obj, data);
+
+  GrowWidgetAccessible* accessible = GROW_WIDGET_ACCESSIBLE(obj);
+  accessible->text_input_active = FALSE;
+  obj->role = ATK_ROLE_DRAWING_AREA;
+}
+
+static AtkStateSet* grow_widget_accessible_ref_state_set(AtkObject* obj)
+{
+  AtkStateSet* state_set;
+  GtkWidget* widget;
+
+  state_set = ATK_OBJECT_CLASS(g_type_class_peek_parent(G_OBJECT_GET_CLASS(obj)))->ref_state_set(obj);
+  widget = gtk_accessible_get_widget(GTK_ACCESSIBLE(obj));
+
+  if (widget == NULL)
+    return state_set;
+
+  GrowWidgetAccessible* accessible = GROW_WIDGET_ACCESSIBLE(obj);
+
+  if (accessible->text_input_active)
+  {
+    atk_state_set_add_state(state_set, ATK_STATE_EDITABLE);
+  }
+
+  return state_set;
+}
+
+static void grow_widget_accessible_class_init(GrowWidgetAccessibleClass* klass)
+{
+  AtkObjectClass* atk_class = ATK_OBJECT_CLASS(klass);
+  atk_class->initialize = grow_widget_accessible_initialize;
+  atk_class->ref_state_set = grow_widget_accessible_ref_state_set;
+}
+
+static void grow_widget_accessible_init(GrowWidgetAccessible* accessible)
+{
+  accessible->text_input_active = FALSE;
+}
+
+G_DEFINE_TYPE_WITH_CODE(GrowWidgetAccessible, grow_widget_accessible, GTK_TYPE_WIDGET_ACCESSIBLE,
+                        G_IMPLEMENT_INTERFACE(ATK_TYPE_TEXT, atk_text_interface_init)
+                            G_IMPLEMENT_INTERFACE(ATK_TYPE_EDITABLE_TEXT, atk_editable_text_interface_init))
+
+/* Helper function to update accessible state when text input focus changes */
+static void grow_widget_accessible_set_text_input_active(GtkWidget* widget, gboolean active)
+{
+  AtkObject* accessible = gtk_widget_get_accessible(widget);
+  if (!GROW_IS_WIDGET_ACCESSIBLE(accessible))
+    return;
+
+  GrowWidgetAccessible* grow_acc = GROW_WIDGET_ACCESSIBLE(accessible);
+
+  if (grow_acc->text_input_active == active)
+    return;
+
+  grow_acc->text_input_active = active;
+
+  if (active)
+  {
+    atk_object_set_role(accessible, ATK_ROLE_TEXT);
+    atk_object_notify_state_change(accessible, ATK_STATE_EDITABLE, TRUE);
+    atk_object_notify_state_change(accessible, ATK_STATE_FOCUSED, TRUE);
+    g_signal_emit_by_name(accessible, "focus-event", TRUE);
+  }
+  else
+  {
+    atk_object_notify_state_change(accessible, ATK_STATE_FOCUSED, FALSE);
+    atk_object_notify_state_change(accessible, ATK_STATE_EDITABLE, FALSE);
+    atk_object_set_role(accessible, ATK_ROLE_DRAWING_AREA);
+  }
+}
+
+/* End of GrowWidgetAccessible */
+/* ============================================================ */
+
 G_DEFINE_TYPE_WITH_CODE(GrowWidgetGtk, growwidgetgtk, GTK_TYPE_DRAWING_AREA,
-			G_ADD_PRIVATE(GrowWidgetGtk)
-			G_IMPLEMENT_INTERFACE(GTK_TYPE_SCROLLABLE, NULL));
+                        G_ADD_PRIVATE(GrowWidgetGtk) G_IMPLEMENT_INTERFACE(GTK_TYPE_SCROLLABLE, NULL));
 
 static gboolean scroll_callback_cb(void* d);
-static void growwidgetgtk_get_property(GObject *object, guint prop_id, 
-				       GValue *value, GParamSpec *pspec);
-static void growwidgetgtk_set_property(GObject *object, guint prop_id, 
-				       const GValue *value, GParamSpec *pspec);
+static void growwidgetgtk_get_property(GObject* object, guint prop_id, GValue* value, GParamSpec* pspec);
+static void growwidgetgtk_set_property(GObject* object, guint prop_id, const GValue* value,
+                                       GParamSpec* pspec);
 
 static void scroll_callback(glow_sScroll* data)
 {
   growwidget_sScroll* scroll_data = (growwidget_sScroll*)data->scroll_data;
-  GrowWidgetGtkPrivate *grow = (GrowWidgetGtkPrivate *)((GrowWidgetGtk*)scroll_data->grow)->priv;
+  GrowWidgetGtkPrivate* grow = (GrowWidgetGtkPrivate*)((GrowWidgetGtk*)scroll_data->grow)->priv;
 
   if (grow->scroll_timerid)
     g_source_remove(grow->scroll_timerid);
@@ -122,41 +302,53 @@ static void scroll_callback(glow_sScroll* data)
 
 static gboolean scroll_callback_cb(void* d)
 {
-  GrowWidgetGtkPrivate *grow = ((GrowWidgetGtk*)d)->priv;
+  GrowWidgetGtkPrivate* grow = ((GrowWidgetGtk*)d)->priv;
   glow_sScroll* data = &((GrowWidgetGtk*)d)->priv->scroll_data;
   growwidget_sScroll* scroll_data = (growwidget_sScroll*)data->scroll_data;
-  GtkAdjustment *adj;
+  GtkAdjustment* adj;
 
   grow->scroll_timerid = 0;
 
-  if (data->total_width <= data->window_width) {
+  if (data->total_width <= data->window_width)
+  {
     if (data->offset_x == 0)
       data->total_width = data->window_width;
-    if (scroll_data->scroll_h_managed) {
+    if (scroll_data->scroll_h_managed)
+    {
       // Remove horizontal scrollbar
     }
-  } else {
-    if (!scroll_data->scroll_h_managed) {
+  }
+  else
+  {
+    if (!scroll_data->scroll_h_managed)
+    {
       // Insert horizontal scrollbar
     }
   }
 
-  if (data->total_height <= data->window_height) {
+  if (data->total_height <= data->window_height)
+  {
     if (data->offset_y == 0)
       data->total_height = data->window_height;
-    if (scroll_data->scroll_v_managed) {
+    if (scroll_data->scroll_v_managed)
+    {
       // Remove vertical scrollbar
     }
-  } else {
-    if (!scroll_data->scroll_v_managed) {
+  }
+  else
+  {
+    if (!scroll_data->scroll_v_managed)
+    {
       // Insert vertical scrollbar
     }
   }
-  if (data->offset_x < 0) {
+  if (data->offset_x < 0)
+  {
     data->total_width += -data->offset_x;
     data->offset_x = 0;
   }
-  if (data->offset_y < 0) {
+  if (data->offset_y < 0)
+  {
     data->total_height += -data->offset_y;
     data->offset_y = 0;
   }
@@ -169,16 +361,19 @@ static gboolean scroll_callback_cb(void* d)
   if (data->window_height < 1)
     data->window_height = 1;
 
-  if (scroll_data->scroll_h_managed) {
+  if (scroll_data->scroll_h_managed)
+  {
     grow->scroll_h_ignore = 1;
-    if (data->window_width != grow->scroll_h_pagesize
-        || data->total_width != grow->scroll_h_upper
-        || grow->scroll_configure) {
+    if (data->window_width != grow->scroll_h_pagesize || data->total_width != grow->scroll_h_upper ||
+        grow->scroll_configure)
+    {
       adj = gtk_range_get_adjustment(GTK_RANGE(scroll_data->scroll_h));
       gtk_adjustment_set_value(adj, data->offset_x);
       gtk_adjustment_set_upper(adj, data->total_width);
       gtk_adjustment_set_page_size(adj, data->window_width);
-    } else {
+    }
+    else
+    {
       adj = gtk_range_get_adjustment(GTK_RANGE(scroll_data->scroll_h));
       gtk_adjustment_set_value(adj, data->offset_x);
     }
@@ -187,18 +382,20 @@ static gboolean scroll_callback_cb(void* d)
     grow->scroll_h_upper = data->total_width;
   }
 
-  if (scroll_data->scroll_v_managed) {
+  if (scroll_data->scroll_v_managed)
+  {
     grow->scroll_v_ignore = 1;
-    if (data->window_height != grow->scroll_v_pagesize
-        || data->total_height != grow->scroll_v_upper
-        || grow->scroll_configure) {
+    if (data->window_height != grow->scroll_v_pagesize || data->total_height != grow->scroll_v_upper ||
+        grow->scroll_configure)
+    {
       adj = gtk_range_get_adjustment(GTK_RANGE(scroll_data->scroll_v));
       gtk_adjustment_set_upper(adj, data->total_height);
       gtk_adjustment_set_page_size(adj, data->window_height);
       gtk_adjustment_set_value(adj, data->offset_y);
-    } else {
-      gtk_range_set_value(
-          GTK_RANGE(scroll_data->scroll_v), (gdouble)data->offset_y);
+    }
+    else
+    {
+      gtk_range_set_value(GTK_RANGE(scroll_data->scroll_v), (gdouble)data->offset_y);
     }
     grow->scroll_v_value = (gdouble)data->offset_y;
     grow->scroll_v_pagesize = data->window_height;
@@ -211,7 +408,8 @@ static gboolean scroll_callback_cb(void* d)
 static void scroll_h_action(GtkWidget* w, gpointer data)
 {
   GrowWidgetGtkPrivate* groww = ((GrowWidgetGtk*)data)->priv;
-  if (groww->scroll_h_ignore) {
+  if (groww->scroll_h_ignore)
+  {
     groww->scroll_h_ignore = 0;
     return;
   }
@@ -220,7 +418,8 @@ static void scroll_h_action(GtkWidget* w, gpointer data)
   gdouble value;
   value = gtk_range_get_value(GTK_RANGE(groww->scroll_h));
 
-  if (feq(value, 0.0) && ABS(groww->scroll_h_value) > 2) {
+  if (feq(value, 0.0) && ABS(groww->scroll_h_value) > 2)
+  {
     // Probably a resize that seems to set value to zero, set old value
     ctx->change_scrollbar();
     return;
@@ -234,7 +433,8 @@ static void scroll_v_action(GtkWidget* w, gpointer data)
 {
   GrowWidgetGtkPrivate* groww = ((GrowWidgetGtk*)data)->priv;
 
-  if (groww->scroll_v_ignore) {
+  if (groww->scroll_v_ignore)
+  {
     groww->scroll_v_ignore = 0;
     return;
   }
@@ -243,7 +443,8 @@ static void scroll_v_action(GtkWidget* w, gpointer data)
   gdouble value;
   value = gtk_range_get_value(GTK_RANGE(groww->scroll_v));
 
-  if (feq(value, 0.0) && ABS(groww->scroll_v_value) > 2) {
+  if (feq(value, 0.0) && ABS(groww->scroll_v_value) > 2)
+  {
     // Probably a resize that seems to set value to zero, set old value
     ctx->change_scrollbar();
     return;
@@ -260,7 +461,8 @@ static int grow_init_proc(GtkWidget* w, GlowCtx* fctx, void* client_data)
 
   ctx = (GrowCtx*)((GrowWidgetGtk*)w)->priv->grow_ctx;
 
-  if (((GrowWidgetGtk*)w)->priv->scroll_h) {
+  if (((GrowWidgetGtk*)w)->priv->scroll_h)
+  {
     scroll_data = (growwidget_sScroll*)malloc(sizeof(growwidget_sScroll));
     scroll_data->grow = w;
     scroll_data->scroll_h = ((GrowWidgetGtk*)w)->priv->scroll_h;
@@ -278,30 +480,31 @@ static gboolean growwidgetgtk_expose(GtkWidget* widget, cairo_t* cr)
 {
   GrowWidgetGtk* grow = (GrowWidgetGtk*)widget;
 
-  ((GlowDrawGtk*)((GrowCtx*)grow->priv->grow_ctx)->gdraw)->
-      expose(cr, grow->priv->is_navigator);
+  ((GlowDrawGtk*)((GrowCtx*)grow->priv->grow_ctx)->gdraw)->expose(cr, grow->priv->is_navigator);
   return TRUE;
 }
 
 static void growwidgetgtk_grab_focus(GtkWidget* glow)
 {
   GTK_WIDGET_CLASS(growwidgetgtk_parent_class)->grab_focus(glow);
-  gdk_window_focus(((GrowWidgetGtk *)glow)->priv->window, GDK_CURRENT_TIME);
+  gdk_window_focus(((GrowWidgetGtk*)glow)->priv->window, GDK_CURRENT_TIME);
 }
 
 static void growwidgetgtk_destroy(GtkWidget* widget)
 {
   GrowWidgetGtk* grow = (GrowWidgetGtk*)widget;
 
-  if (!grow->priv->destroyed) {
+  if (!grow->priv->destroyed)
+  {
     grow->priv->destroyed = 1;
     if (grow->priv->scroll_timerid)
       g_source_remove(grow->priv->scroll_timerid);
-    if (grow->priv->is_navigator) {
-      if (grow->priv->grow_ctx
-          && !((GrowWidgetGtk*)grow->priv->main_grow_widget)->priv->destroyed)
+    if (grow->priv->is_navigator)
+    {
+      if (grow->priv->grow_ctx && !((GrowWidgetGtk*)grow->priv->main_grow_widget)->priv->destroyed)
         ((GrowCtx*)grow->priv->grow_ctx)->no_nav = 1;
-    } else
+    }
+    else
       delete (GlowDrawGtk*)grow->priv->draw_ctx;
     if (grow->priv->hadjustment)
       g_object_unref(grow->priv->hadjustment);
@@ -316,22 +519,24 @@ static gboolean growwidgetgtk_event(GtkWidget* glow, GdkEvent* event)
   if (((GrowWidgetGtk*)glow)->priv->destroyed)
     return TRUE;
 
-  if (event->type == GDK_MOTION_NOTIFY) {
-    gdk_display_flush(
-        ((GlowDrawGtk*)((GrowCtx*)((GrowWidgetGtk*)glow)->priv->grow_ctx)->gdraw)
-            ->display);
+  if (event->type == GDK_MOTION_NOTIFY)
+  {
+    gdk_display_flush(((GlowDrawGtk*)((GrowCtx*)((GrowWidgetGtk*)glow)->priv->grow_ctx)->gdraw)->display);
     GdkEvent* next = gdk_event_peek();
-    if (next && next->type == GDK_MOTION_NOTIFY) {
+    if (next && next->type == GDK_MOTION_NOTIFY)
+    {
       gdk_event_free(next);
       return TRUE;
-    } else if (next)
+    }
+    else if (next)
       gdk_event_free(next);
-  } else if (event->type == GDK_CONFIGURE) {
+  }
+  else if (event->type == GDK_CONFIGURE)
+  {
     ((GrowWidgetGtk*)glow)->priv->scroll_configure = 1;
   }
 
-  ((GlowDrawGtk*)((GrowCtx*)((GrowWidgetGtk*)glow)->priv->grow_ctx)->gdraw)
-      ->event_handler(*event);
+  ((GlowDrawGtk*)((GrowCtx*)((GrowWidgetGtk*)glow)->priv->grow_ctx)->gdraw)->event_handler(*event);
   return TRUE;
 }
 
@@ -355,34 +560,38 @@ static void growwidgetgtk_realize(GtkWidget* widget)
   attr.height = allocation.height;
   attr.wclass = GDK_INPUT_OUTPUT;
   attr.window_type = GDK_WINDOW_CHILD;
-  attr.event_mask = gtk_widget_get_events(widget) | GDK_EXPOSURE_MASK
-      | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_KEY_PRESS_MASK
-      | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK
-      | GDK_BUTTON_MOTION_MASK | GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK
-      | GDK_STRUCTURE_MASK | GDK_SCROLL_MASK;
+  attr.event_mask = gtk_widget_get_events(widget) | GDK_EXPOSURE_MASK | GDK_BUTTON_PRESS_MASK |
+                    GDK_BUTTON_RELEASE_MASK | GDK_KEY_PRESS_MASK | GDK_POINTER_MOTION_MASK |
+                    GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_MOTION_MASK | GDK_ENTER_NOTIFY_MASK |
+                    GDK_LEAVE_NOTIFY_MASK | GDK_STRUCTURE_MASK | GDK_SCROLL_MASK;
   attr.visual = gtk_widget_get_visual(widget);
 
   attr_mask = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL;
   grow->priv->window = gdk_window_new(gtk_widget_get_parent_window(widget), &attr, attr_mask);
   gtk_widget_set_window(widget, grow->priv->window);
   gtk_widget_register_window(widget, grow->priv->window);
-  //widget->style = gtk_style_attach(widget->style, widget->window);
-  //gtk_style_set_background(widget->style, widget->window, GTK_STATE_ACTIVE);
+  // widget->style = gtk_style_attach(widget->style, widget->window);
+  // gtk_style_set_background(widget->style, widget->window, GTK_STATE_ACTIVE);
 
   gtk_widget_set_can_focus(widget, TRUE);
 
-  if (grow->priv->is_navigator) {
-    if (!grow->priv->grow_ctx) {
+  if (grow->priv->is_navigator)
+  {
+    if (!grow->priv->grow_ctx)
+    {
       GrowWidgetGtk* main_grow = (GrowWidgetGtk*)grow->priv->main_grow_widget;
 
       grow->priv->grow_ctx = main_grow->priv->grow_ctx;
       grow->priv->draw_ctx = main_grow->priv->draw_ctx;
       ((GlowDrawGtk*)grow->priv->draw_ctx)->init_nav(widget);
     }
-  } else {
-    if (!grow->priv->grow_ctx) {
+  }
+  else
+  {
+    if (!grow->priv->grow_ctx)
+    {
       grow->priv->draw_ctx = new GlowDrawGtk(widget, &grow->priv->grow_ctx, grow_init_proc,
-          grow->priv->client_data, glow_eCtxType_Grow);
+                                             grow->priv->client_data, glow_eCtxType_Grow);
     }
   }
 }
@@ -401,6 +610,9 @@ static void growwidgetgtk_class_init(GrowWidgetGtkClass* klass)
   gobject_class->set_property = growwidgetgtk_set_property;
   gobject_class->get_property = growwidgetgtk_get_property;
 
+  /* Set custom accessible type for on-screen keyboard support */
+  gtk_widget_class_set_accessible_type(widget_class, GROW_TYPE_WIDGET_ACCESSIBLE);
+
   gtk_widget_class_set_css_name(widget_class, "growwidget");
 
   // GtkScrollable interface
@@ -412,11 +624,10 @@ static void growwidgetgtk_class_init(GrowWidgetGtkClass* klass)
 
 static void growwidgetgtk_init(GrowWidgetGtk* grow)
 {
-  grow->priv = (GrowWidgetGtkPrivate *)growwidgetgtk_get_instance_private(grow);
+  grow->priv = (GrowWidgetGtkPrivate*)growwidgetgtk_get_instance_private(grow);
 }
 
-GtkWidget* growwidgetgtk_new(
-    int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data)
+GtkWidget* growwidgetgtk_new(int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data)
 {
   GrowWidgetGtk* w;
   w = (GrowWidgetGtk*)g_object_new(GROWWIDGETGTK_TYPE, NULL);
@@ -432,9 +643,8 @@ GtkWidget* growwidgetgtk_new(
   return (GtkWidget*)w;
 }
 
-GtkWidget* scrolledgrowwidgetgtk_new(
-    int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data,
-    GtkWidget** growwidget)
+GtkWidget* scrolledgrowwidgetgtk_new(int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data,
+                                     GtkWidget** growwidget)
 {
   GrowWidgetGtk* w;
 
@@ -458,10 +668,10 @@ GtkWidget* scrolledgrowwidgetgtk_new(
   w->priv->vadjustment = gtk_adjustment_new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
   *growwidget = GTK_WIDGET(w);
 
-  g_signal_connect(gtk_range_get_adjustment(GTK_RANGE((GtkScrollbar*)w->priv->scroll_h)),
-      "value-changed", G_CALLBACK(scroll_h_action), w);
-  g_signal_connect(gtk_range_get_adjustment(GTK_RANGE((GtkScrollbar*)w->priv->scroll_v)),
-      "value-changed", G_CALLBACK(scroll_v_action), w);
+  g_signal_connect(gtk_range_get_adjustment(GTK_RANGE((GtkScrollbar*)w->priv->scroll_h)), "value-changed",
+                   G_CALLBACK(scroll_h_action), w);
+  g_signal_connect(gtk_range_get_adjustment(GTK_RANGE((GtkScrollbar*)w->priv->scroll_v)), "value-changed",
+                   G_CALLBACK(scroll_v_action), w);
 
   gtk_container_add(GTK_CONTAINER(form), GTK_WIDGET(w));
 
@@ -492,12 +702,20 @@ GtkWidget* grownavwidgetgtk_new(GtkWidget* main_grow)
   return (GtkWidget*)w;
 }
 
-static void growwidgetgtk_set_property(GObject *object, guint prop_id, 
-				       const GValue *value, GParamSpec *pspec)
+void growwidgetgtk_set_text_inputfocus(GtkWidget* widget, int focus)
 {
-  //FlowWidgetGtk *flow = (FlowWidgetGtk *)object;
+  g_return_if_fail(widget != NULL);
+  g_return_if_fail(IS_GROWWIDGETGTK(widget));
 
-  switch (prop_id) {
+  grow_widget_accessible_set_text_input_active(widget, focus ? TRUE : FALSE);
+}
+
+static void growwidgetgtk_set_property(GObject* object, guint prop_id, const GValue* value, GParamSpec* pspec)
+{
+  // FlowWidgetGtk *flow = (FlowWidgetGtk *)object;
+
+  switch (prop_id)
+  {
   case PROP_HADJUSTMENT:
     break;
   case PROP_VADJUSTMENT:
@@ -509,12 +727,12 @@ static void growwidgetgtk_set_property(GObject *object, guint prop_id,
   }
 }
 
-static void growwidgetgtk_get_property(GObject *object, guint prop_id, 
-				       GValue *value, GParamSpec *pspec)
+static void growwidgetgtk_get_property(GObject* object, guint prop_id, GValue* value, GParamSpec* pspec)
 {
-  GrowWidgetGtk *grow = (GrowWidgetGtk *)object;
+  GrowWidgetGtk* grow = (GrowWidgetGtk*)object;
 
-  switch (prop_id) {
+  switch (prop_id)
+  {
   case PROP_HADJUSTMENT:
     g_value_set_object(value, grow->priv->hadjustment);
     break;
