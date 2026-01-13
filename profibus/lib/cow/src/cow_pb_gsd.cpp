@@ -852,7 +852,7 @@ int pb_gsd::read(char* filename)
       {
         sts = sscanf(line_part[1], "%d", &e->Default_Value);
         if (sts != 1)
-          printf("Syntax error, line %d (%s)\n", line_cnt, line);
+          printf("Syntax error parsing default value, line %d (%s)\n", line_cnt, line);
       }
       if (part_cnt > 2)
       {
@@ -1398,7 +1398,32 @@ int pb_gsd::prm_items_to_data(gsd_sPrmDataItem* item, int item_size, unsigned ch
         }
       }
       if (!found)
-        printf("** Value not allowed\n");
+      {
+        // Check if default value is in allowed list
+        int default_allowed = 0;
+        for (int j = 0; j < pd->allowed_cnt; j++)
+        {
+          if (pd->Allowed_Values[j] == pd->Default_Value)
+          {
+            default_allowed = 1;
+            break;
+          }
+        }
+        if (default_allowed)
+        {
+          printf("** Value not allowed \"%s\" (ref=%d) value=%d, auto-correcting to default=%d\n",
+                 pd->Ext_User_Prm_Data_Name, item[i].ref->Reference_Number, item[i].value, pd->Default_Value);
+          item[i].value = pd->Default_Value;
+        }
+        else
+        {
+          printf("** Value not allowed \"%s\" (ref=%d) value=%d, allowed: ", pd->Ext_User_Prm_Data_Name,
+                 item[i].ref->Reference_Number, item[i].value);
+          for (int j = 0; j < pd->allowed_cnt; j++)
+            printf("%d%s", pd->Allowed_Values[j], j < pd->allowed_cnt - 1 ? "," : "");
+          printf("\n");
+        }
+      }
     }
     switch (pd->data_type)
     {
@@ -2401,6 +2426,10 @@ int pb_gsd::configure_module(gsd_sModuleConf* m)
         m->prm_dataitems[i].ref = ep;
         i++;
       }
+
+      // Set default values for module prm items from ExtUserPrmData Default_Value
+      prm_items_set_default_data(m->prm_dataitems, m->prm_dataitems_cnt);
+
       if (m->module->extuserprmdataconst)
       {
         memcpy(m->prm_data, m->module->extuserprmdataconst->Const_Prm_Data,
