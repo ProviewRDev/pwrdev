@@ -283,7 +283,7 @@ public:
   void pack_config(char* config, int* len);
   int get_user_prm_data(char* data, int* len, int size);
   int unpack_ext_user_prm_data(char* data, int len);
-  void pack_ext_user_prm_data(char* data, int* len);
+  void pack_ext_user_prm_data(char* data, int* len, int include_jokerblocks = 1);
   void compress(char* line);
   int syntax_check(int* idx);
   void set_modified(int mod) { modified = mod; }

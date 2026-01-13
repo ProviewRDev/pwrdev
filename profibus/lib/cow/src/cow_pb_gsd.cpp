@@ -2395,7 +2395,7 @@ void pb_gsd::pack_config(char* config, int* len)
   *len = conf_idx;
 }
 
-void pb_gsd::pack_ext_user_prm_data(char* data, int* len)
+void pb_gsd::pack_ext_user_prm_data(char* data, int* len, int include_jokerblocks)
 {
   int i;
   short data_idx;
@@ -2406,6 +2406,26 @@ void pb_gsd::pack_ext_user_prm_data(char* data, int* len)
   data_idx = 0;
   memcpy(&data[data_idx], extuserprmdataconst->Const_Prm_Data, items_user_prm_data_len);
   data_idx += items_user_prm_data_len;
+
+  // Insert Jokerblock for slot 0 (interface module) after device-level prm data
+  // Block header format per IEC 61158 / GSD Spec:
+  //   Byte 1: Length (255 = 0xFF signals Jokerblock "accept any length")
+  //   Byte 2: Structure_Type (32-128: manufacturer specific, 129: User_Prm_Data)
+  //   Byte 3: Slot_Number
+  //   Byte 4: Index (0 for User_Prm_Data)
+  if (include_jokerblocks && jokerblock_supp && jokerblock_list)
+  {
+    for (gsd_sJokerblockDef* jb = jokerblock_list; jb; jb = jb->next)
+    {
+      if (jb->Slot_Number == 0 && jb->Location <= 1)
+      {
+        data[data_idx++] = 0xFF;                              // Length = 255 signals Jokerblock
+        data[data_idx++] = (unsigned char)jb->Structure_Type; // Structure_Type
+        data[data_idx++] = (unsigned char)jb->Slot_Number;    // Slot_Number
+        data[data_idx++] = 0x00;                              // Index = 0 for User_Prm_Data
+      }
+    }
+  }
 
   for (i = 0; i < module_conf_cnt; i++)
   {
@@ -2420,28 +2440,20 @@ void pb_gsd::pack_ext_user_prm_data(char* data, int* len)
                       module_conf[i].module->Ext_Module_Prm_Data_Len);
     memcpy(&data[data_idx], module_conf[i].prm_data, module_conf[i].module->Ext_Module_Prm_Data_Len);
     data_idx += module_conf[i].module->Ext_Module_Prm_Data_Len;
-  }
 
-  // Append all Jokerblocks at the end of the parameterization telegram
-  // Per GSD Spec: "the Jokerblock shall be used at the end of the parameterization
-  // telegram (after fix defined blocks as well as after blocks who will be inserted
-  // by the configuration tool)"
-  // Block header format per IEC 61158 / GSD Spec:
-  //   Byte 1: Length (255 = 0xFF signals Jokerblock "accept any length")
-  //   Byte 2: Structure_Type (32-128: manufacturer specific, 129: User_Prm_Data)
-  //   Byte 3: Slot_Number
-  //   Byte 4: Index (0 for User_Prm_Data)
-  if (jokerblock_supp && jokerblock_list)
-  {
-    for (gsd_sJokerblockDef* jb = jokerblock_list; jb; jb = jb->next)
+    // Insert Jokerblock for this slot immediately after its prm data
+    if (include_jokerblocks && jokerblock_supp && jokerblock_list)
     {
-      // Location: 0 = Prm-Telegram only, 1 = both, 2 = Ext-Prm-Telegram only
-      if (jb->Location <= 1)
+      for (gsd_sJokerblockDef* jb = jokerblock_list; jb; jb = jb->next)
       {
-        data[data_idx++] = 0xFF;                              // Length = 255 signals Jokerblock
-        data[data_idx++] = (unsigned char)jb->Structure_Type; // Structure_Type
-        data[data_idx++] = (unsigned char)jb->Slot_Number;    // Slot_Number
-        data[data_idx++] = 0x00;                              // Index = 0 for User_Prm_Data
+        // Slot index in module_conf is 1-based, matching Jokerblock_Slot
+        if (jb->Slot_Number == module_conf[i].idx && jb->Location <= 1)
+        {
+          data[data_idx++] = 0xFF;                              // Length = 255 signals Jokerblock
+          data[data_idx++] = (unsigned char)jb->Structure_Type; // Structure_Type
+          data[data_idx++] = (unsigned char)jb->Slot_Number;    // Slot_Number
+          data[data_idx++] = 0x00;                              // Index = 0 for User_Prm_Data
+        }
       }
     }
   }
@@ -2482,6 +2494,12 @@ int pb_gsd::unpack_ext_user_prm_data(char* data, int len)
   prm_data_to_items(prm_dataitems, prm_dataitems_cnt, extuserprmdataconst->Const_Prm_Data,
                     items_user_prm_data_len);
 
+  // Skip Jokerblock for slot 0 if present (Length=255, Structure_Type, Slot=0, Index)
+  if (jokerblock_supp && data_idx + 4 <= len && (unsigned char)data[data_idx] == 0xFF)
+  {
+    data_idx += 4;
+  }
+
   for (i = 0; i < module_conf_cnt; i++)
   {
     if (!module_conf[i].module || !module_conf[i].module->extuserprmdataconst)
@@ -2492,6 +2510,12 @@ int pb_gsd::unpack_ext_user_prm_data(char* data, int len)
 
     prm_data_to_items(module_conf[i].prm_dataitems, module_conf[i].prm_dataitems_cnt, module_conf[i].prm_data,
                       module_conf[i].module->Ext_Module_Prm_Data_Len);
+
+    // Skip Jokerblock for this slot if present (Length=255, Structure_Type, Slot, Index)
+    if (jokerblock_supp && data_idx + 4 <= len && (unsigned char)data[data_idx] == 0xFF)
+    {
+      data_idx += 4;
+    }
   }
 
   if (len != data_idx)
