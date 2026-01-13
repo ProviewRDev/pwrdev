@@ -303,8 +303,23 @@ gsd_sKeyword pb_gsd::keywordlist[] = {
     {"Update_Alarm_required", "", gsd_D, gsd_Boolean, 0},
     {"Manufacturer_Specific_Alarm_required", "", gsd_D, gsd_Boolean, 0},
     {"DPV1_Data_Types", "", gsd_O, gsd_Boolean, 0},
-    {"WB_Base_1ms_supp", "", gsd_D, gsd_Boolean, 0},
+    {"WD_Base_1ms_supp", "", gsd_D, gsd_Boolean, 0},
     {"Check_Cfg_Mode", "", gsd_D, gsd_Boolean, 0},
+    {"Publisher_supp", "", gsd_D, gsd_Boolean, 0},
+    {"PrmCmd_supp", "", gsd_D, gsd_Boolean, 0},
+    {"Slave_Redundancy_supp", "", gsd_D, gsd_Boolean, 0},
+    {"Ident_Maintenance_supp", "", gsd_D, gsd_Boolean, 0},
+    {"Firmware_Download_supp", "", gsd_D, gsd_Boolean, 0},
+    {"Version_Firmware_Download", "", gsd_O, gsd_VersionFirmware, 0},
+    {"Version_Name", "Version_Firmware_Download", gsd_O, gsd_VString256, 0},
+    {"End_Version_Firmware_Download", "", gsd_O, gsd_EndVersionFirmware, 0},
+
+    // Extended Unit Diagnostics (UnitDiagType)
+    {"UnitDiagType", "", gsd_O, gsd_UnitDiagType, 0},
+    {"X_Unit_Diag_Area", "UnitDiagType", gsd_O, gsd_DiagArea, 0},
+    {"X_Unit_Diag_Area_End", "UnitDiagType", gsd_O, gsd_DiagAreaEnd, 0},
+    {"X_Value", "UnitDiagType", gsd_O, gsd_XValue, 0},
+    {"EndUnitDiagType", "", gsd_O, gsd_EndUnitDiagType, 0},
 
     // Prm_Block_Structure and Jokerblock support (GSD Revision 4/5)
     {"Prm_Block_Structure_supp", "", gsd_D, gsd_Boolean, 0},
@@ -923,6 +938,16 @@ int pb_gsd::read(char* filename)
     case gsd_EndJokerblockType:
     {
       current_jokerblock = 0;
+      datap->found = 1;
+      break;
+    }
+    case gsd_VersionFirmware:
+    case gsd_EndVersionFirmware:
+    case gsd_UnitDiagType:
+    case gsd_EndUnitDiagType:
+    case gsd_XValue:
+    {
+      // These are informational keywords - acknowledge but don't process
       datap->found = 1;
       break;
     }
@@ -2089,29 +2114,58 @@ int pb_gsd::read_line(char* line, int lsize, FILE* fp)
       if (streq(line, "") || (line[0] == '\r' && line[1] == '\0'))
         continue;
 
+      // Track if we're inside a quoted string for continuation handling
+      int continuation_in_string = 0;
+      for (s = line; *s; s++)
+      {
+        if (*s == '"')
+          continuation_in_string = !continuation_in_string;
+      }
+
       while (1)
       {
-        if (line[strlen(line) - 1] == '\\' || line[strlen(line) - 2] == '\\')
+        int linelen = strlen(line);
+        if (linelen > 0 && (line[linelen - 1] == '\\' || (linelen > 1 && line[linelen - 2] == '\\')))
         {
           char line2[500];
 
           // Add next line
-          sts = dcli_read_line(line2, lsize - strlen(line2), fp);
+          sts = dcli_read_line(line2, sizeof(line2), fp);
           if (!sts)
             break;
           line_cnt++;
 
-          // Remove comments
-          in_string = 0;
-          for (s = line2; *s; s++)
+          // Always remove trailing CR from continuation line
+          int len2 = strlen(line2);
+          if (len2 > 0 && line2[len2 - 1] == '\r')
+            line2[--len2] = 0;
+
+          // Remove comments only if not inside a string from original line
+          if (!continuation_in_string)
           {
-            if (*s == '"')
-              in_string = !in_string;
-            if (*s == ';' && !in_string)
-              *s = 0;
-          }
-          if (!in_string)
+            in_string = 0;
+            for (s = line2; *s; s++)
+            {
+              if (*s == '"')
+                in_string = !in_string;
+              if (*s == ';' && !in_string)
+              {
+                *s = 0;
+                break;
+              }
+            }
             str_trim(line2, line2);
+          }
+          else
+          {
+            // Update string state based on line2 content
+            for (s = line2; *s; s++)
+            {
+              if (*s == '"')
+                continuation_in_string = !continuation_in_string;
+            }
+          }
+
           if (strlen(line) + strlen(line2) > (unsigned int)lsize)
           {
             printf("** Line to long, line %d\n", line_cnt);

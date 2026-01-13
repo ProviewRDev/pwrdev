@@ -87,6 +87,11 @@ typedef enum
   gsd_Text,
   gsd_JokerblockType,
   gsd_EndJokerblockType,
+  gsd_VersionFirmware,
+  gsd_EndVersionFirmware,
+  gsd_UnitDiagType,
+  gsd_EndUnitDiagType,
+  gsd_XValue,
   gsd_End
 } gsd_eType;
 
