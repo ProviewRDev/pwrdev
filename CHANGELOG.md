@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A new Profinet Viewer has been added with more functionality and a topology view.
 - CoLogger has been added (co_logger.h) that can be used in applications for easy logging in RFC5424 format.
 - bcomp: Added MinOut to compposit
+- PROFIBUS: Added support for jokerblocks introduced in GSD revision 4/5
 
 ### Fixed
 
@@ -43,6 +44,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PROFINET: The configurator was unprepared for unpopulated slot 0. It is now well prepared for this.
 - PROFINET: The configurator could show some inconsistencies in slots when changing DAP when the starting index of the physical slots did not start at 0.
 - PROFINET: The configurator will now truncate strings to 79 characters before writing attributes using cdh-functions that doesn't add null termination.
+- PROFIBUS: The configurator has more known keywords, reducing amount of console ouptut.
+- PROFIBUS: The configurator supports multilines where windows style CRLF where used reducing weird console output that could occur.
 
 ### Changed
 
