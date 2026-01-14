@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New pin for DSup, ActiveNotAcked for when the DSup is active but has not yet been ackknowledged.
 - bcomp: Added MinOut to compposit
 - GrowWidgets now implement a minimal accessible interface adding "popup" support for external onscreen keyboards, like onboard for instance.
+- Accessibility support (ATK interface implementations) for widgets created by GE editor. Enabling external onscreen touch keyboards to popup when focusing input fields, if installed and activated.
 
 ### Fixed
 
