@@ -54,6 +54,14 @@
 
 #define SCHED_DEADLINE 6
 
+/*
+ * glibc 2.41+ (Debian Trixie and later) provides sched_attr and
+ * sched_setattr/sched_getattr in <bits/sched.h>. For older systems,
+ * we define them here using syscalls.
+ * SCHED_ATTR_SIZE_VER0 is defined when glibc provides these.
+ */
+#ifndef SCHED_ATTR_SIZE_VER0
+
 /* XXX use the proper syscall numbers */
 #ifdef __x86_64__
 #define __NR_sched_setattr 314
@@ -72,7 +80,8 @@
 #define __NR_sched_getattr 275
 #endif
 
-struct sched_attr {
+struct sched_attr
+{
   uint32_t size;
 
   uint32_t sched_policy;
@@ -90,16 +99,17 @@ struct sched_attr {
   uint64_t sched_period;
 };
 
-int sched_setattr(pid_t pid, const struct sched_attr* attr, unsigned int flags)
+static int sched_setattr(pid_t pid, const struct sched_attr* attr, unsigned int flags)
 {
   return syscall(__NR_sched_setattr, pid, attr, flags);
 }
 
-int sched_getattr(
-    pid_t pid, struct sched_attr* attr, unsigned int size, unsigned int flags)
+static int sched_getattr(pid_t pid, struct sched_attr* attr, unsigned int size, unsigned int flags)
 {
   return syscall(__NR_sched_getattr, pid, attr, size, flags);
 }
+
+#endif /* !SCHED_ATTR_SIZE_VER0 */
 
 pwr_tStatus thread_CondInit(thread_sCond* cp)
 {
@@ -109,28 +119,15 @@ pwr_tStatus thread_CondInit(thread_sCond* cp)
   return errno_Status(pthread_cond_init(&cp->c, &attr));
 }
 
-pwr_tStatus thread_MutexInit(thread_sMutex* mp)
-{
-  return errno_Status(pthread_mutex_init(mp, NULL));
-}
+pwr_tStatus thread_MutexInit(thread_sMutex* mp) { return errno_Status(pthread_mutex_init(mp, NULL)); }
 
-pwr_tStatus thread_MutexLock(thread_sMutex* mp)
-{
-  return errno_Status(pthread_mutex_lock(mp));
-}
+pwr_tStatus thread_MutexLock(thread_sMutex* mp) { return errno_Status(pthread_mutex_lock(mp)); }
 
-pwr_tStatus thread_MutexUnlock(thread_sMutex* mp)
-{
-  return errno_Status(pthread_mutex_unlock(mp));
-}
+pwr_tStatus thread_MutexUnlock(thread_sMutex* mp) { return errno_Status(pthread_mutex_unlock(mp)); }
 
-pwr_tStatus thread_Cancel(thread_s* tp)
-{
-  return errno_Status(pthread_cancel(*tp));
-}
+pwr_tStatus thread_Cancel(thread_s* tp) { return errno_Status(pthread_cancel(*tp)); }
 
-pwr_tStatus thread_Create(
-    thread_s* tp, char* name, void* (*routine)(), void* arg)
+pwr_tStatus thread_Create(thread_s* tp, char* name, void* (*routine)(), void* arg)
 {
   pthread_attr_t attr;
 
@@ -146,7 +143,8 @@ pwr_tStatus thread_CondWait(thread_sCond* cp, thread_sMutex* mp)
 
   cp->f = 0;
 
-  while (!cp->f) {
+  while (!cp->f)
+  {
     sts = errno_Status(pthread_cond_wait(&cp->c, mp));
     if (sts != ERRNO__INTR)
       break;
@@ -154,8 +152,7 @@ pwr_tStatus thread_CondWait(thread_sCond* cp, thread_sMutex* mp)
   return cp->f ? THREAD__SUCCESS : sts;
 }
 
-pwr_tStatus thread_CondTimedWait(
-    thread_sCond* cp, thread_sMutex* mp, pwr_tDeltaTime* time)
+pwr_tStatus thread_CondTimedWait(thread_sCond* cp, thread_sMutex* mp, pwr_tDeltaTime* time)
 {
   {
     pwr_tTime now;
@@ -186,21 +183,25 @@ pwr_tStatus thread_CondSignal(thread_sCond* cp)
 pwr_tStatus thread_Wait(pwr_tDeltaTime* tp)
 {
   pwr_tStatus sts = THREAD__SUCCESS;
-  pwr_tDeltaTime time = { 999999999, 0 };
+  pwr_tDeltaTime time = {999999999, 0};
 
   if (tp == NULL)
     tp = &time;
 
-  if ((int)tp->tv_sec > 0 || ((int)tp->tv_sec == 0 && tp->tv_nsec > 0)) {
+  if ((int)tp->tv_sec > 0 || ((int)tp->tv_sec == 0 && tp->tv_nsec > 0))
+  {
     struct timespec rmt;
-    struct timespec ttime = { 9999999, 0 };
+    struct timespec ttime = {9999999, 0};
     struct timespec ts;
 
-    if (tp == &time) {
+    if (tp == &time)
+    {
       int i;
       for (i = 0; i < 100; i++)
         sts = errno_Pstatus(nanosleep(&ttime, &rmt));
-    } else {
+    }
+    else
+    {
       ts.tv_sec = tp->tv_sec;
       ts.tv_nsec = tp->tv_nsec;
       sts = errno_Pstatus(nanosleep(&ts, &rmt));
@@ -218,17 +219,13 @@ pwr_tStatus thread_SetPrio(thread_s* tp, int prio)
 
     /* Set priority and scheduling mechanism for thread. */
     tid = pthread_self();
-    prio = MIN(sched_get_priority_max(SCHED_FIFO),
-        sched_get_priority_min(SCHED_FIFO) + prio);
+    prio = MIN(sched_get_priority_max(SCHED_FIFO), sched_get_priority_min(SCHED_FIFO) + prio);
     par.sched_priority = prio;
     return errno_Status(pthread_setschedparam(tid, SCHED_FIFO, &par));
   }
 }
 
-uint64_t toNs(float f)
-{
-  return ((uint64_t)f * 1000 * 1000 * 1000);
-}
+uint64_t toNs(float f) { return ((uint64_t)f * 1000 * 1000 * 1000); }
 
 pwr_tStatus thread_SetDeadline(pwr_sClass_PlcThread* o)
 {
@@ -244,23 +241,26 @@ pwr_tStatus thread_SetDeadline(pwr_sClass_PlcThread* o)
     attr.sched_priority = 0;
 
     attr.sched_policy = SCHED_DEADLINE;
-    attr.sched_runtime
-        = (o->Max > o->ScanTimeMax) ? toNs(o->Max) : toNs(o->ScanTimeMax);
+    attr.sched_runtime = (o->Max > o->ScanTimeMax) ? toNs(o->Max) : toNs(o->ScanTimeMax);
     attr.sched_period = toNs(o->ScanTime);
-    if (attr.sched_runtime > attr.sched_period) {
-      fprintf(stderr, "Warning! PLC thread %s has a period %" PRIu64
-                      " ms shorter than its WCET %" PRIu64 " ms\n",
-          o->Description, attr.sched_period / (1000 * 1000),
-          attr.sched_runtime / (1000 * 1000));
+    if (attr.sched_runtime > attr.sched_period)
+    {
+      fprintf(stderr,
+              "Warning! PLC thread %s has a period %" PRIu64 " ms shorter than its WCET %" PRIu64 " ms\n",
+              o->Description, attr.sched_period / (1000 * 1000), attr.sched_runtime / (1000 * 1000));
     }
-    if (o->Deadline > FLT_EPSILON) {
+    if (o->Deadline > FLT_EPSILON)
+    {
       attr.sched_deadline = toNs(o->Deadline);
-    } else {
+    }
+    else
+    {
       attr.sched_deadline = toNs(o->ScanTime);
     }
 
     int ret = sched_setattr(tid, &attr, 0);
-    if (ret != 0) {
+    if (ret != 0)
+    {
       fprintf(stderr, "sched_setattr returned %d\n", ret);
     }
     return errno_Status(ret);
