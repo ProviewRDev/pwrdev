@@ -76,6 +76,42 @@ template <typename T> T attr_to_val(pwr_sAttrRef* aref, void* val)
 
 int encode_val(AvroEncoder& enc, pwr_eType type_id, bool is_ptr, pwr_sAttrRef* aref, void* val)
 {
+  // Check if this is an array
+  if (aref && aref->Flags.b.Array)
+  {
+    int element_count = get_array_element_count(aref, type_id);
+    if (element_count > 0)
+    {
+      if (MAKE_VALUES_OPTIONAL)
+      {
+        enc.encodeUnionIndex(1); // Select non-null union branch
+      }
+
+      enc.setItemCount(element_count);
+
+      // Encode each array element
+      int element_size = aref->Size / element_count;
+      uint8_t* array_ptr = (uint8_t*)val;
+
+      for (int i = 0; i < element_count; i++)
+      {
+        void* element_ptr = array_ptr + (i * element_size);
+
+        // Recursively encode each element (without array flag)
+        pwr_sAttrRef element_aref = *aref;
+        element_aref.Flags.b.Array = 0;
+        element_aref.Size = element_size;
+
+        pwr_tStatus sts = encode_val(enc, type_id, is_ptr, &element_aref, element_ptr);
+        if (EVEN(sts))
+          return sts;
+      }
+
+      enc.arrayEnd();
+      return GDH__SUCCESS;
+    }
+  }
+
   if (MAKE_VALUES_OPTIONAL && type_id < pwr_eType_Void)
   {
     enc.encodeUnionIndex(1);
@@ -260,22 +296,81 @@ int encode_val(AvroEncoder& enc, pwr_eType type_id, bool is_ptr, pwr_sAttrRef* a
   return GDH__SUCCESS;
 }
 
-std::string pwr_eType_to_str(pwr_eType tid)
+// Get array element count based on aref Size and element type size
+int get_array_element_count(pwr_sAttrRef* aref, pwr_eType element_type)
 {
-  std::string str;
+  if (!aref || !(aref->Flags.b.Array))
+    return 0;
+
+  int element_size = 0;
+  switch (element_type)
+  {
+  case pwr_eType_Boolean:
+  case pwr_eType_Int8:
+  case pwr_eType_UInt8:
+  case pwr_eType_Char:
+    element_size = 1;
+    break;
+  case pwr_eType_Int16:
+  case pwr_eType_UInt16:
+    element_size = 2;
+    break;
+  case pwr_eType_Int32:
+  case pwr_eType_UInt32:
+  case pwr_eType_Float32:
+  case pwr_eType_Enum:
+  case pwr_eType_Mask:
+  case pwr_eType_Status:
+  case pwr_eType_NetStatus:
+  case pwr_eType_DisableAttr:
+    element_size = 4;
+    break;
+  case pwr_eType_Int64:
+  case pwr_eType_UInt64:
+  case pwr_eType_Float64:
+    element_size = 8;
+    break;
+  case pwr_eType_String:
+    element_size = 80;
+    break;
+  case pwr_eType_Text:
+    element_size = 256;
+    break;
+  case pwr_eType_Objid:
+    element_size = sizeof(pwr_tObjid);
+    break;
+  case pwr_eType_AttrRef:
+    element_size = sizeof(pwr_sAttrRef);
+    break;
+  case pwr_eType_Time:
+  case pwr_eType_DeltaTime:
+    element_size = sizeof(pwr_tTime);
+    break;
+  default:
+    return 0;
+  }
+
+  return (element_size > 0) ? (aref->Size / element_size) : 0;
+}
+
+// Convert ProviewR type to cJSON Avro schema type object
+cJSON* pwr_eType_to_json(pwr_eType tid, pwr_sAttrRef* aref)
+{
+  const char* base_type = NULL;
+
   switch (tid)
   {
   case pwr_eType_Boolean:
-    str = "boolean";
+    base_type = "boolean";
     break;
   case pwr_eType_Float32:
-    str = "float";
+    base_type = "float";
     break;
   case pwr_eType_Float64:
-    str = "double";
+    base_type = "double";
     break;
   case pwr_eType_Char:
-    str = "bytes";
+    base_type = "bytes";
     break;
   case pwr_eType_Int8:
   case pwr_eType_Int16:
@@ -288,15 +383,15 @@ std::string pwr_eType_to_str(pwr_eType tid)
   case pwr_eType_Enum:
   case pwr_eType_NetStatus:
   case pwr_eType_Status:
-    str = "int";
+    base_type = "int";
     break;
   case pwr_eType_Int64:
   case pwr_eType_UInt64:
-    str = "long";
+    base_type = "long";
     break;
   case pwr_eType_String:
   case pwr_eType_Text:
-    str = "string";
+    base_type = "string";
     break;
   case pwr_eType_Objid:
   case pwr_eType_AttrRef:
@@ -307,20 +402,48 @@ std::string pwr_eType_to_str(pwr_eType tid)
   case pwr_eType_CastId:
   case pwr_eType_VolumeId:
   case pwr_eType_RefId:
-    str = "bytes";
-    break;
   case pwr_eType_Time:
   case pwr_eType_DeltaTime:
-    str = "bytes";
+    base_type = "bytes";
     break;
   default:
-    str = "";
+    return cJSON_CreateString("");
   }
-  if (MAKE_VALUES_OPTIONAL && str.size() > 0)
+
+  // Check if this is an array
+  if (aref && aref->Flags.b.Array)
   {
-    return "[\\\"null\\\",\\\"" + str + "\\\"]";
+    int element_count = get_array_element_count(aref, tid);
+    if (element_count > 0)
+    {
+      // Create array type: {"type": "array", "items": <base_type>}
+      cJSON* array_type = cJSON_CreateObject();
+      cJSON_AddStringToObject(array_type, "type", "array");
+      cJSON_AddStringToObject(array_type, "items", base_type);
+
+      if (MAKE_VALUES_OPTIONAL)
+      {
+        // Return ["null", {array_type}]
+        cJSON* union_array = cJSON_CreateArray();
+        cJSON_AddItemToArray(union_array, cJSON_CreateString("null"));
+        cJSON_AddItemToArray(union_array, array_type);
+        return union_array;
+      }
+      return array_type;
+    }
   }
-  return str;
+
+  // Non-array type
+  if (MAKE_VALUES_OPTIONAL)
+  {
+    // Return ["null", "base_type"]
+    cJSON* union_array = cJSON_CreateArray();
+    cJSON_AddItemToArray(union_array, cJSON_CreateString("null"));
+    cJSON_AddItemToArray(union_array, cJSON_CreateString(base_type));
+    return union_array;
+  }
+
+  return cJSON_CreateString(base_type);
 }
 
 #endif
