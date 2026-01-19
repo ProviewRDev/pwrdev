@@ -34,23 +34,53 @@
  * General Public License plus this exception.
  */
 
-#ifndef pn_viewernav_qt_h
-#define pn_viewernav_qt_h
+#ifndef configured_devices_h
+#define configured_devices_h
 
-/* pn_viewernav_qt.h -- Profinet viewer */
+#include <string>
+#include <functional>
+#include "co_pugixml.hpp"
 
-#include "../src/pn_viewernav.h"
+namespace ProfinetDCP
+{
 
-class PnViewerNavQt : public PnViewerNav
+class ConfiguredDeviceReader
 {
 public:
-  PnViewerNavQt(void* v_parent_ctx, viewer_eType v_type, QWidget** w);
-  ~PnViewerNavQt();
+  // Callback function type for activity logging
+  using ActivityLogCallback = std::function<void(const std::string&)>;
+  
+  ConfiguredDeviceReader();
+  ~ConfiguredDeviceReader();
 
-  QWidget* brow_widget;
-  QWidget* form_widget;
+  // Load configured devices from XML file based on interface name
+  bool loadConfiguredDevices(const std::string& interface_name);
+  
+  // Get the XML document (contains all device nodes)
+  const pugi::xml_document& getXMLDocument() const { return m_xml_doc; }
+  
+  // Get the configuration file path for an interface
+  static std::string getConfigFilePath(const std::string& interface_name);
+  
+  // Check if devices are loaded
+  bool hasLoadedDevices() const { return m_devices_loaded; }
+  
+  // Get current interface name
+  const std::string& getCurrentInterface() const { return m_current_interface; }
+  
+  // Set activity log callback
+  void setActivityLogCallback(ActivityLogCallback callback) { m_activity_log_callback = callback; }
 
-  void set_input_focus();
+private:
+  pugi::xml_document m_xml_doc;
+  std::string m_current_interface;
+  bool m_devices_loaded;
+  ActivityLogCallback m_activity_log_callback;
+  
+  // Log missing file message
+  void logMissingFileMessage(const std::string& interface_name) const;
 };
 
-#endif
+} // namespace ProfinetDCP
+
+#endif // configured_devices_h

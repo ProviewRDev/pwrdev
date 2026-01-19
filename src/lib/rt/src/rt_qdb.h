@@ -52,7 +52,6 @@
 #include "co_time.h"
 #include "rt_hash.h"
 #include "rt_qcom.h"
-#include "rt_inet.h"
 #include "rt_sync.h"
 
 /* Version of the runtime database datastructures. Changing this
@@ -65,10 +64,10 @@
 #define qdb_cIexport (1 << 31 | 2)
 #define qdb_cImonitor (1 << 31 | 3)
 
-static const qcom_sQid qdb_cQloopBack = { qdb_cIloopBack, 0 };
-static const qcom_sQid qdb_cQimport = { qdb_cIimport, 0 };
-static const qcom_sQid qdb_cQexport = { qdb_cIexport, 0 };
-static const qcom_sQid qdb_cQmonitor = { qdb_cImonitor, 0 };
+static const qcom_sQid qdb_cQloopBack = {qdb_cIloopBack, 0};
+static const qcom_sQid qdb_cQimport = {qdb_cIimport, 0};
+static const qcom_sQid qdb_cQexport = {qdb_cIexport, 0};
+static const qcom_sQid qdb_cQmonitor = {qdb_cImonitor, 0};
 
 #define qdb_cNameDatabase "/tmp/pwr_qdb"
 
@@ -77,8 +76,7 @@ static const qcom_sQid qdb_cQmonitor = { qdb_cImonitor, 0 };
 
 #if defined OS_LINUX
 #define qdb_cSigMsg SIGRTMIN
-#elif defined OS_MACOS || defined OS_FREEBSD || defined OS_OPENBSD             \
-    || defined OS_CYGWIN
+#elif defined OS_MACOS || defined OS_FREEBSD || defined OS_OPENBSD || defined OS_CYGWIN
 #define qdb_cSigMsg SIGUSR1
 #endif
 
@@ -105,75 +103,82 @@ static const qcom_sQid qdb_cQmonitor = { qdb_cImonitor, 0 };
 
 #define qdb_LockOwned (qdb->g->lock_owner == qdb->my_pid)
 
-#define qdb_LockGlobal                                                         \
-  do {                                                                         \
-    if (qdb_LockOwned)                                                         \
-      errh_Bugcheck(QDB__LOCKCHECK, "qdb_Lock was taken");                     \
-    sect_Lock(NULL, &qdb->lock, &qdb->g->lock);                                \
-    qdb->g->lock_owner = qdb->my_pid;                                          \
-    qdb->lock_count++;                                                         \
+#define qdb_LockGlobal                                                                                       \
+  do                                                                                                         \
+  {                                                                                                          \
+    if (qdb_LockOwned)                                                                                       \
+      errh_Bugcheck(QDB__LOCKCHECK, "qdb_Lock was taken");                                                   \
+    sect_Lock(NULL, &qdb->lock, &qdb->g->lock);                                                              \
+    qdb->g->lock_owner = qdb->my_pid;                                                                        \
+    qdb->lock_count++;                                                                                       \
   } while (0)
 
-#define qdb_UnlockGlobal                                                       \
-  do {                                                                         \
-    if (!qdb_LockOwned)                                                        \
-      errh_Bugcheck(QDB__LOCKCHECK, "qdb_Lock was not taken");                 \
-    qdb->g->lock_owner = 0;                                                    \
-    sect_Unlock(NULL, &qdb->lock, &qdb->g->lock);                              \
+#define qdb_UnlockGlobal                                                                                     \
+  do                                                                                                         \
+  {                                                                                                          \
+    if (!qdb_LockOwned)                                                                                      \
+      errh_Bugcheck(QDB__LOCKCHECK, "qdb_Lock was not taken");                                               \
+    qdb->g->lock_owner = 0;                                                                                  \
+    sect_Unlock(NULL, &qdb->lock, &qdb->g->lock);                                                            \
   } while (0)
 
 #define qdb_LockLocal sync_MutexLock(&qdb->thread_lock.mutex)
 #define qdb_UnlockLocal sync_MutexUnlock(&qdb->thread_lock.mutex)
 
-#define qdb_Lock                                                               \
-  do {                                                                         \
-    qdb_LockLocal;                                                             \
-    qdb_LockGlobal;                                                            \
+#define qdb_Lock                                                                                             \
+  do                                                                                                         \
+  {                                                                                                          \
+    qdb_LockLocal;                                                                                           \
+    qdb_LockGlobal;                                                                                          \
   } while (0)
-#define qdb_Unlock                                                             \
-  do {                                                                         \
-    qdb_UnlockGlobal;                                                          \
-    qdb_UnlockLocal;                                                           \
+#define qdb_Unlock                                                                                           \
+  do                                                                                                         \
+  {                                                                                                          \
+    qdb_UnlockGlobal;                                                                                        \
+    qdb_UnlockLocal;                                                                                         \
   } while (0)
 
-#define qdb_ScopeLock                                                          \
-  qdb_Lock;                                                                    \
+#define qdb_ScopeLock                                                                                        \
+  qdb_Lock;                                                                                                  \
   do
-#define qdb_ScopeUnlock                                                        \
-  while (0)                                                                    \
-    ;                                                                          \
+#define qdb_ScopeUnlock                                                                                      \
+  while (0)                                                                                                  \
+    ;                                                                                                        \
   qdb_Unlock
 
-#define qdb_AssumeLocked                                                       \
-  do {                                                                         \
-    if (!qdb_LockOwned)                                                        \
-      errh_Bugcheck(QDB__LOCKCHECK, "qdb_AssumeLocked");                       \
+#define qdb_AssumeLocked                                                                                     \
+  do                                                                                                         \
+  {                                                                                                          \
+    if (!qdb_LockOwned)                                                                                      \
+      errh_Bugcheck(QDB__LOCKCHECK, "qdb_AssumeLocked");                                                     \
   } while (0)
-#define qdb_AssumeUnlocked                                                     \
-  do {                                                                         \
-    if (qdb_LockOwned)                                                         \
-      errh_Bugcheck(QDB__LOCKCHECK, "qdb_AssumeUnlocked");                     \
+#define qdb_AssumeUnlocked                                                                                   \
+  do                                                                                                         \
+  {                                                                                                          \
+    if (qdb_LockOwned)                                                                                       \
+      errh_Bugcheck(QDB__LOCKCHECK, "qdb_AssumeUnlocked");                                                   \
   } while (0)
 
 #define qdb_cCookie 550715339
 
-typedef struct {
+typedef struct
+{
   unsigned int qix : 32;
-  pwr_Endian_4(pwr_Bits(nid_0, 8), pwr_Bits(nid_1, 8), pwr_Bits(nid_2, 8),
-      pwr_Bits(nid_3, 8))
+  pwr_Endian_4(pwr_Bits(nid_0, 8), pwr_Bits(nid_1, 8), pwr_Bits(nid_2, 8), pwr_Bits(nid_3, 8))
 } qdb_mQid;
 
-typedef union {
+typedef union
+{
   qcom_sQid pwr;
   qdb_mQid q;
 } qdb_uQid;
 
-typedef union {
+typedef union
+{
   pwr_tBitMask m;
   pwr_32Bits(pwr_Bits(failIfAdded, 1),
 
-      pwr_Bits(fill, 31), , , , , , , , , , , , , , , , , , , , , , , , , , , ,
-      , , ) b;
+             pwr_Bits(fill, 31), , , , , , , , , , , , , , , , , , , , , , , , , , , , , , ) b;
 
 #define qdb_mAdd__ 0
 #define qdb_mAdd_failIfAdded pwr_Bit(0)
@@ -181,12 +186,12 @@ typedef union {
 
 } qdb_mAdd;
 
-typedef union {
+typedef union
+{
   pwr_tBitMask m;
   pwr_32Bits(pwr_Bits(multipleGet, 1),
 
-      pwr_Bits(fill, 31), , , , , , , , , , , , , , , , , , , , , , , , , , , ,
-      , , ) b;
+             pwr_Bits(fill, 31), , , , , , , , , , , , , , , , , , , , , , , , , , , , , , ) b;
 
 #define qdb_mGet__ 0
 #define qdb_mGet_multipleGet pwr_Bit(0)
@@ -194,12 +199,13 @@ typedef union {
 
 } qdb_mGet;
 
-typedef union {
+typedef union
+{
   pwr_tBitMask m;
   pwr_32Bits(pwr_Bits(ignoreStall, 1), pwr_Bits(fill_0, 7), , , , , , ,
 
-      pwr_Bits(fill_1, 8), , , , , , , , pwr_Bits(fill_2, 8), , , , , , , ,
-      pwr_Bits(fill_3, 8), , , , , , , ) b;
+             pwr_Bits(fill_1, 8), , , , , , , , pwr_Bits(fill_2, 8), , , , , , , , pwr_Bits(fill_3, 8), , , ,
+             , , , ) b;
 
 #define qdb_mLocal__ 0
 #define qdb_mLocal_ignoreStall pwr_Bit(0)
@@ -207,13 +213,13 @@ typedef union {
 
 } qdb_mLocal;
 
-typedef union {
+typedef union
+{
   pwr_tBitMask m;
-  pwr_32Bits(pwr_Bits(initiated, 1), pwr_Bits(connected, 1),
-      pwr_Bits(active, 1), pwr_Bits(fill_0, 5), , , , ,
+  pwr_32Bits(pwr_Bits(initiated, 1), pwr_Bits(connected, 1), pwr_Bits(active, 1), pwr_Bits(fill_0, 5), , , , ,
 
-      pwr_Bits(fill_1, 8), , , , , , , , pwr_Bits(fill_2, 8), , , , , , , ,
-      pwr_Bits(fill_3, 8), , , , , , , ) b;
+             pwr_Bits(fill_1, 8), , , , , , , , pwr_Bits(fill_2, 8), , , , , , , , pwr_Bits(fill_3, 8), , , ,
+             , , , ) b;
 
 #define qdb_mNode__ 0
 #define qdb_mNode_initiated pwr_Bit(0)
@@ -226,7 +232,8 @@ typedef union {
 
 } qdb_mNode;
 
-typedef enum {
+typedef enum
+{
   qdb_eBuffer__ = 0,
   qdb_eBuffer_base,
   qdb_eBuffer_segment,
@@ -234,15 +241,15 @@ typedef enum {
   qdb_eBuffer_
 } qdb_eBuffer;
 
-typedef union {
+typedef union
+{
   pwr_tBitMask m;
-  pwr_32Bits(pwr_Bits(source, 1), pwr_Bits(target, 1), pwr_Bits(broadcast, 1),
-      pwr_Bits(segmented, 1), pwr_Bits(remote, 1), pwr_Bits(imported, 1),
-      pwr_Bits(fill_0, 2), ,
+  pwr_32Bits(pwr_Bits(source, 1), pwr_Bits(target, 1), pwr_Bits(broadcast, 1), pwr_Bits(segmented, 1),
+             pwr_Bits(remote, 1), pwr_Bits(imported, 1), pwr_Bits(fill_0, 2), ,
 
-      pwr_Bits(request, 1), pwr_Bits(reply, 1), pwr_Bits(fill_1, 6), , , , , ,
+             pwr_Bits(request, 1), pwr_Bits(reply, 1), pwr_Bits(fill_1, 6), , , , , ,
 
-      pwr_Bits(fill_2, 8), , , , , , , , pwr_Bits(fill_3, 8), , , , , , , ) b;
+             pwr_Bits(fill_2, 8), , , , , , , , pwr_Bits(fill_3, 8), , , , , , , ) b;
 
 #define qdb_mBuffer__ 0
 #define qdb_mBuffer_source pwr_Bit(0)
@@ -257,25 +264,25 @@ typedef union {
 
 #define qdb_mBuffer_ (~qdb_mBuffer__)
 
-#define qdb_mBuffer_maskExport                                                 \
-  (qdb_mBuffer_request | qdb_mBuffer_reply | qdb_mBuffer_broadcast)
+#define qdb_mBuffer_maskExport (qdb_mBuffer_request | qdb_mBuffer_reply | qdb_mBuffer_broadcast)
 
 } qdb_mBuffer;
 
-typedef enum {
+typedef enum
+{
   qdb_eQue__ = 0,
   qdb_eQue_private,
   qdb_eQue_forward,
   qdb_eQue_
 } qdb_eQue;
 
-typedef union {
+typedef union
+{
   pwr_tBitMask m;
-  pwr_32Bits(pwr_Bits(broadcast, 1), pwr_Bits(system, 1), pwr_Bits(event, 1),
-      pwr_Bits(fill_0, 5), , , , ,
+  pwr_32Bits(pwr_Bits(broadcast, 1), pwr_Bits(system, 1), pwr_Bits(event, 1), pwr_Bits(fill_0, 5), , , , ,
 
-      pwr_Bits(reply, 1), pwr_Bits(fill_1, 7), , , , , , , pwr_Bits(fill_2, 8),
-      , , , , , , , pwr_Bits(fill_3, 8), , , , , , , ) b;
+             pwr_Bits(reply, 1), pwr_Bits(fill_1, 7), , , , , , , pwr_Bits(fill_2, 8), , , , , , , ,
+             pwr_Bits(fill_3, 8), , , , , , , ) b;
 
 #define qdb_mQue__ 0
 #define qdb_mQue_broadcast pwr_Bit(0)
@@ -288,13 +295,13 @@ typedef union {
 
 } qdb_mQue;
 
-typedef union {
+typedef union
+{
   pwr_tBitMask m;
-  pwr_32Bits(pwr_Bits(events, 1), pwr_Bits(states, 1), pwr_Bits(linkmsg, 1),
-      pwr_Bits(fill_0, 5), , , , ,
+  pwr_32Bits(pwr_Bits(events, 1), pwr_Bits(states, 1), pwr_Bits(linkmsg, 1), pwr_Bits(fill_0, 5), , , , ,
 
-      pwr_Bits(fill_1, 8), , , , , , , , pwr_Bits(fill_2, 8), , , , , , , ,
-      pwr_Bits(fill_3, 8), , , , , , , ) b;
+             pwr_Bits(fill_1, 8), , , , , , , , pwr_Bits(fill_2, 8), , , , , , , , pwr_Bits(fill_3, 8), , , ,
+             , , , ) b;
 
 #define qdb_mLog__ 0
 #define qdb_mLog_events pwr_Bit(0)
@@ -305,7 +312,8 @@ typedef union {
 
 } qdb_mLog;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 idx;
   pwr_tUInt32 bytes;
   pwr_tUInt32 segs;
@@ -315,26 +323,27 @@ typedef struct {
   pwr_tUInt32 timer_max;
 } qdb_sCount;
 
-typedef struct {
-  int version pwr_dPacked; /* Qcom protocol version */
+typedef struct
+{
+  int version pwr_dPacked;     /* Qcom protocol version */
   pwr_tNodeId nid pwr_dPacked; /* node index */
   int birth pwr_dPacked;
   char name[80]; /* node name  */
   struct sockaddr_in sa pwr_dPacked;
   qcom_tBus bus pwr_dPacked; /* buss number */
-  co_eOS os pwr_dPacked; /* operating system */
-  co_eHW hw pwr_dPacked; /* hardware */
-  co_eBO bo pwr_dPacked; /* big/little endian */
-  co_eFT ft pwr_dPacked; /* float type */
+  co_eOS os pwr_dPacked;     /* operating system */
+  co_eHW hw pwr_dPacked;     /* hardware */
+  co_eBO bo pwr_dPacked;     /* big/little endian */
+  co_eFT ft pwr_dPacked;     /* float type */
 } qdb_sLinkInfo;
 
-typedef union {
+typedef union
+{
   pwr_tBitMask m;
-  pwr_32Bits(pwr_Bits(connected, 1), pwr_Bits(active, 1), pwr_Bits(fill_0, 6), ,
-      , , , ,
+  pwr_32Bits(pwr_Bits(connected, 1), pwr_Bits(active, 1), pwr_Bits(fill_0, 6), , , , , ,
 
-      pwr_Bits(fill_1, 8), , , , , , , , pwr_Bits(fill_2, 8), , , , , , , ,
-      pwr_Bits(fill_3, 8), , , , , , , ) b;
+             pwr_Bits(fill_1, 8), , , , , , , , pwr_Bits(fill_2, 8), , , , , , , , pwr_Bits(fill_3, 8), , , ,
+             , , , ) b;
 
 #define qdb_mLink__ 0
 
@@ -345,14 +354,16 @@ typedef union {
 
 } qdb_mLink;
 
-typedef struct {
+typedef struct
+{
   int seq pwr_dPacked; /* Sequence number. */
-  int ts pwr_dPacked; /* Time stamp. */
+  int ts pwr_dPacked;  /* Time stamp. */
 } qdb_sAck;
 
 typedef char qdb_tQname[32];
 
-typedef struct {
+typedef struct
+{
   pwr_tBoolean isThreaded;
   thread_sCond cond;
   thread_sMutex mutex;
@@ -360,14 +371,16 @@ typedef struct {
   int (*cond_wait)(thread_sCond*, thread_sMutex*);
 } qdb_sLock;
 
-typedef struct {
+typedef struct
+{
   int pid;
   int waiting;
   pthread_mutex_t mutex;
   pthread_cond_t cond;
 } qdb_sQlock;
 
-typedef struct {
+typedef struct
+{
   qcom_sAid aid;
   pid_t pid;
 
@@ -398,7 +411,8 @@ typedef struct {
   unsigned int in_qouta;
 } qdb_sAppl;
 
-typedef struct {
+typedef struct
+{
   qcom_sAid sender pwr_dPacked;
   pid_t pid pwr_dPacked;
   qcom_sQid receiver pwr_dPacked;
@@ -411,14 +425,16 @@ typedef struct {
   qdb_mBuffer flags pwr_dPacked;
 } qdb_sInfo;
 
-typedef struct {
+typedef struct
+{
   qdb_mBuffer flags;
   qdb_eBuffer type;
   pool_sQlink ll; /* link in list of buffers */
 } qdb_sCbuffer;
 
-typedef struct {
-  qdb_sCbuffer c; /* common for all buffers */
+typedef struct
+{
+  qdb_sCbuffer c;     /* common for all buffers */
   pool_sQlink ref_lh; /* head of list of reference buffers */
   pool_sQlink seg_lh; /* head of list of segments */
   unsigned int size;
@@ -430,27 +446,31 @@ typedef struct {
   qdb_sInfo info;
 } qdb_sBbuffer;
 
-typedef struct {
-  qdb_sCbuffer c; /* common for all buffers */
+typedef struct
+{
+  qdb_sCbuffer c;     /* common for all buffers */
   pool_sQlink ref_ll; /* link in list of reference buffers */
-  pool_tRef src; /* pool reference of source buffer */
+  pool_tRef src;      /* pool reference of source buffer */
 } qdb_sRbuffer;
 
-typedef struct {
-  qdb_sCbuffer c; /* common for all buffers */
+typedef struct
+{
+  qdb_sCbuffer c;     /* common for all buffers */
   pool_sQlink seg_ll; /* link in list of segments  */
-  pool_tRef base; /* pool reference of base buffer */
-  unsigned int size; /* size of this segment */
+  pool_tRef base;     /* pool reference of base buffer */
+  unsigned int size;  /* size of this segment */
 } qdb_sSbuffer;
 
-typedef union {
+typedef union
+{
   qdb_sCbuffer c;
   qdb_sBbuffer b;
   qdb_sRbuffer r;
   qdb_sSbuffer s;
 } qdb_sBuffer;
 
-typedef struct {
+typedef struct
+{
   qcom_tQix srcQix; /* source, forwarding queue */
   pool_tRef srcQ;
   pool_sQlink src_ll;
@@ -460,7 +480,8 @@ typedef struct {
   pool_sQlink tgt_ll;
 } qdb_sQbond;
 
-typedef struct {
+typedef struct
+{
   qdb_mLink flags;
   pwr_tUInt32 birth; /* current incarnation identity */
   int win_count;
@@ -487,12 +508,12 @@ typedef struct {
   int err_seg_seq;
 
   /* Moved from qdb_sNode */
-  char name[80]; /* ascii name of node (nul-terminated)
-                    zero-length means empty slot */
+  char name[80];   /* ascii name of node (nul-terminated)
+                      zero-length means empty slot */
   pwr_tBoolean up; /* communication is up/down */
   qdb_mNode qflags;
-  pwr_tUInt32 upcnt; /* # of times up */
-  pwr_tTime timeup; /* Most recent time link came up */
+  pwr_tUInt32 upcnt;  /* # of times up */
+  pwr_tTime timeup;   /* Most recent time link came up */
   pwr_tTime timedown; /* Most recent time link went down */
 
   pwr_tUInt32 thrown_bufs;
@@ -508,10 +529,7 @@ typedef struct {
 
   qdb_sBuffer* bp;
 
-  pwr_tBoolean in_arp;
-  struct arpreq arp;
-
-  void* mon; /* Monitor private data. */
+  void* mon;                       /* Monitor private data. */
   qcom_eNodeConnection connection; /* Type of connection */
   pwr_tUInt32 min_resend_time;
   pwr_tUInt32 max_resend_time;
@@ -520,7 +538,8 @@ typedef struct {
   pwr_tUInt32 seg_size;
 } qdb_sLink;
 
-typedef struct {
+typedef struct
+{
   qcom_tQix qix;
   pool_sQlink qix_htl;
   qcom_sAid aid;
@@ -544,47 +563,48 @@ typedef struct {
   pool_sQlink in_lh; /* buffers to be read */
   unsigned int in_lc;
   unsigned int in_quota;
-  pool_sQlink rep_lh; /* reply list */
+  pool_sQlink rep_lh;  /* reply list */
   pool_sQlink read_lh; /* buffers already read, but not freed */
 
   unsigned int get_count;
   unsigned int request_count;
 } qdb_sQue;
 
-typedef struct {
-  pwr_tNodeId nid; /* node identity */
+typedef struct
+{
+  pwr_tNodeId nid;        /* node identity */
   pwr_tBoolean initiated; /* are values valid */
-  pool_sQlink nid_htl; /* link in nid-to-node hash table */
-  pool_sQlink node_ll; /* link in list of all links */
-  pool_sQlink own_lh; /*  */
-  pwr_tUInt32 own_lc; /* number of owned volumes */
-  char nidstr[20]; /* ascii name of node (nul-terminated)
-                      zero-length means empty slot */
-  int version; /* Qcom protocol version */
+  pool_sQlink nid_htl;    /* link in nid-to-node hash table */
+  pool_sQlink node_ll;    /* link in list of all links */
+  pool_sQlink own_lh;     /*  */
+  pwr_tUInt32 own_lc;     /* number of owned volumes */
+  char nidstr[20];        /* ascii name of node (nul-terminated)
+                             zero-length means empty slot */
+  int version;            /* Qcom protocol version */
 
   co_eOS os; /* operating system */
   co_eHW hw; /* hardware */
   co_eBO bo; /* byte order */
   co_eFT ft; /* float type */
 
-  unsigned int clx; /* Current link index */
-  unsigned int is_secondary; /* Node is secondary */
-  pwr_eRedundancyState
-      redundancy_state; /* Redundancy state, active, passive or off */
-  unsigned int link_cnt; /* Number of links */
-  qdb_sLink link[2]; /* Qmon link information for primary and secondary link */
+  unsigned int clx;                      /* Current link index */
+  unsigned int is_secondary;             /* Node is secondary */
+  pwr_eRedundancyState redundancy_state; /* Redundancy state, active, passive or off */
+  unsigned int link_cnt;                 /* Number of links */
+  qdb_sLink link[2];                     /* Qmon link information for primary and secondary link */
   struct sockaddr_in sa;
   pool_sQlink bcb_lh; /* broadcast buffer list header */
   qdb_sCount get;
   qdb_sCount put;
 } qdb_sNode;
 
-typedef struct {
+typedef struct
+{
   pwr_tNodeId nid; /* Node index for this node */
   qcom_tBus bus;
-  pwr_tUInt32 nodes; /* Number of  */
+  pwr_tUInt32 nodes;  /* Number of  */
   pwr_tUInt32 queues; /* Number of  */
-  pwr_tUInt32 appls; /* Number of  */
+  pwr_tUInt32 appls;  /* Number of  */
   pwr_tUInt32 sbufs;
   pwr_tUInt32 mbufs;
   pwr_tUInt32 lbufs;
@@ -597,10 +617,11 @@ typedef struct {
 
 /* The global database header.  */
 
-typedef struct {
-  sect_sMutex lock; /* Database lock */
+typedef struct
+{
+  sect_sMutex lock;     /* Database lock */
   qcom_tAix lock_owner; /* Owner of db lock */
-  pwr_tUInt32 version; /* Qdb structure revision.  */
+  pwr_tUInt32 version;  /* Qdb structure revision.  */
 
   qdb_sInit eval_init;
 
@@ -613,8 +634,8 @@ typedef struct {
 
   qcom_tRid rid; /* Request generation number */
 
-  qcom_sAid aid; /* next free application id */
-  qcom_sQid qid; /* Next free queue id.  */
+  qcom_sAid aid;   /* next free application id */
+  qcom_sQid qid;   /* Next free queue id.  */
   pwr_tNodeId nid; /* Nid of this node. */
   qcom_tBus bus;
 
@@ -642,12 +663,13 @@ typedef struct {
 
 /* Job local QCOM data, pointed to by gQcom, the root of all tables.  */
 
-typedef struct {
+typedef struct
+{
   qdb_mLocal flags;
   qdb_sLock thread_lock;
-  sect_sHead sect; /* section header for global database */
-  sect_sHead lock; /*   */
-  pool_sHead pool; /* pool for database */
+  sect_sHead sect;    /* section header for global database */
+  sect_sHead lock;    /*   */
+  pool_sHead pool;    /* pool for database */
   hash_sTable nid_ht; /* node id hash table.  */
   hash_sTable qix_ht; /* queue idx hash table.  */
   hash_sTable aix_ht; /* application idx hash table.  */
@@ -665,7 +687,7 @@ typedef struct {
   qcom_sAid my_aid;
   pwr_tNodeId my_nid;
 
-  qdb_sAppl* ap; /* my application */
+  qdb_sAppl* ap;       /* my application */
   qdb_sQue* exportque; /* the export que */
 } qdb_sLocal;
 
@@ -705,8 +727,7 @@ void qdb_RemoveAppl(pwr_tStatus*, qdb_sAppl*);
 void qdb_PutInfo(qdb_sBuffer*, qcom_sPut*, const qcom_sQid*, qcom_tRid);
 pwr_tBoolean qdb_RemoveQue(pwr_tStatus*, qdb_sQue*);
 qdb_sQue* qdb_Que(pwr_tStatus*, const qcom_sQid*, qdb_sNode**);
-void* qdb_Request(pwr_tStatus*, qdb_sBuffer*, qdb_sQue*, qdb_sQue*, int,
-    qcom_sGet*, pwr_tBitMask);
+void* qdb_Request(pwr_tStatus*, qdb_sBuffer*, qdb_sQue*, qdb_sQue*, int, qcom_sGet*, pwr_tBitMask);
 
 void qdb_DumpPool();
 #endif

@@ -1,0 +1,158 @@
+/* PROFINET DCP Tool - CSS for code-set classes only */
+
+/* Main box widget - vertical or horizontal */
+box {
+  border: none;
+  border-width: 0;
+  outline: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Main paned widget */
+paned.vertical {
+  border: none;
+  border-width: 0;
+  outline: none;
+  margin: 10px;
+  padding: 0px;
+}
+
+paned.horizontal {
+    margin: 0px;
+    padding: 0px;
+  /* height: 400px; */
+}
+
+paned.horizontal separator {
+  margin: 10px;
+}
+
+/* Remove border from scrolled window containing the device tree view */
+scrolledwindow {
+  border: none;
+  border-width: 0;
+  outline: none;
+  min-width: 50px;
+  min-height: 50px;
+  margin: 0px;
+  padding: 0px;
+}
+
+/* Remove border from device tree view but keep header borders */
+treeview {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+  border-width: 0;
+  outline: none;
+
+}
+
+/* Keep the header borders visible */
+treeview header {
+    font-weight: bold;
+    margin: 0px;
+    padding: 0px;
+    /* border: none; */
+  /* border: 0px solid #d0d0d0; */
+  /* border-bottom: 1px solid #a0a0a0; */
+}
+
+/* Optional: Style individual header buttons */
+treeview header button {
+  border: 0.2px solid #d0d0d0;
+  margin:  0px;
+  padding: 4px;
+}
+
+/* Remove the last header button's right border */
+/* treeview header button:last-child {
+  border-right: none;
+} */
+
+scrolledwindow treeview {
+  border: none;
+}
+
+.details-container {
+  margin: 0px;
+  padding: 0px;  
+}
+
+.details-frame  {  
+  margin: 0px;
+  padding: 0px;
+}
+
+.details-frame border {
+  border: none;
+  border-width: 0;
+  margin: 0px;
+  padding: 0px;
+}
+
+.log-frame {
+  margin-top: 5px;
+}
+
+.log-frame label {
+  font-weight: bold;
+  
+}
+
+.log-container {
+  padding: 5px;
+}
+
+.details-frame > label {
+    font-weight: bold;
+}
+
+.info-grid {
+  margin: 0px;
+  padding: 0px;
+}
+
+.log-container textview {
+  font-family: monospace;
+  font-size: 10pt;
+  margin: 0px;
+  padding: 0px;
+}
+
+.dialog-apply-button {
+    background-color: #4CAF50; /* Green */
+    color: white;
+}
+
+dialog > box {
+    border: none;
+    padding: 5px;
+    /* background-color: white; */
+}
+
+notebook > stack {    
+    padding: 10px;
+    border: none;
+    /* background-color: @view_bg_color; */
+}
+
+/* Topology button styling */
+/* .topology-button {
+    background: linear-gradient(to bottom, #2196F3, #1976D2);
+    color: white;
+    border: 1px solid #1565C0;
+    border-radius: 4px;
+    padding: 8px 12px;
+}
+
+.topology-button:hover {
+    background: linear-gradient(to bottom, #42A5F5, #1E88E5);
+    border-color: #1565C0;
+}
+
+.topology-button:active {
+    background: linear-gradient(to bottom, #1976D2, #1565C0);
+    border-color: #0D47A1;
+} */

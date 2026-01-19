@@ -54,6 +54,7 @@
 
 #include "co_cdh.h"
 #include "co_dcli.h"
+#include "co_logger.h"
 #include "pwr_profibusclasses.h"
 
 #include "rt_io_base.h"
@@ -81,6 +82,7 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
 
   /* Allocate area for local data structure */
   ap->Local = (io_sAgentLocal*)new io_sAgentLocal;
+
   if (!ap->Local)
   {
     //    errh_Error( "ERROR config Profibus DP Master %s - %s", ap->Name,
@@ -91,33 +93,30 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
   local = (io_sAgentLocal*)ap->Local;
   op = (pwr_sClass_PnControllerSoftingPNAK*)ap->op;
 
+  local->logger->log("Profinet Softing PNAK agent init (co_logger)", CoLogLevel::INFO);
+  errh_Info("Profinet Softing PNAK agent init");
+
   pnak_init();
 
   /* Active supervision thread */
 
-  pthread_attr_t attr;
+  pthread_attr_t pthread_attr;
 
   local->args.local = local;
   local->args.ap = ap;
 
   op->Status = PB__NOTINIT;
 
-  pthread_mutexattr_t mutexattr;
-  pthread_condattr_t condattr;
-
-  pthread_mutexattr_init(&mutexattr);
-  pthread_mutex_init(&local->mutex, &mutexattr);
-  pthread_mutexattr_destroy(&mutexattr);
-
-  pthread_condattr_init(&condattr);
-  pthread_cond_init(&local->cond, &condattr);
-  pthread_condattr_destroy(&condattr);
+  pthread_mutex_init(&local->mutex, NULL);
+  pthread_cond_init(&local->cond, NULL);
 
   pthread_mutex_lock(&local->mutex);
 
-  pthread_attr_init(&attr);
-  pthread_attr_setinheritsched(&attr, PTHREAD_INHERIT_SCHED);
-  pthread_create(&local->handle_events, &attr, handle_events, &local->args);
+  pthread_attr_init(&pthread_attr);
+  pthread_attr_setinheritsched(&pthread_attr, PTHREAD_INHERIT_SCHED);
+
+  pthread_create(&local->handle_events, &pthread_attr, handle_events, &local->args);
+  pthread_attr_destroy(&pthread_attr);
 
   pthread_cond_wait(&local->cond, &local->mutex);
   pthread_mutex_unlock(&local->mutex);
@@ -135,6 +134,7 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
   io_sAgentLocal* local;
   // PnIOCRData* pn_iocr_data;
   pwr_tUInt16 sts;
+  PN_U8 temp_status = 0;
   unsigned char* io_datap;
   unsigned char* clean_io_datap;
   unsigned char status_data = 0;
@@ -160,14 +160,36 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
     if (pn_device->m_rt_device_state & PNAK_DEVICE_STATE_CONNECTED)
     {
       auto& iocr = pn_device->m_IOCR_map.at(PROFINET_IO_CR_TYPE_INPUT);
-      //  TODO Implement iocrstate propagation to pn device. But as of now
-      //  the status_data doesn't change according to what the data frames says
-      //  in other words. It's showing normal operation even with all modules
-      //  pulled from an IO...The "problem" bit is not present at all :/
+
       data_length = iocr.m_rt_io_data_length;
       sts = pnak_get_iocr_data(0, iocr.m_rt_identifier, iocr.m_rt_io_data, &data_length, &ioxs, &status_data);
       if (sts == PNAK_OK)
       {
+        // Update the pwr enum reflecting this status for the device
+        temp_status = 0;
+        status_data = status_data & CYCLIC_DATA_STATUS_MASK;
+        if (status_data & CYCLIC_DATA_STATUS_DATA_VALID)
+          temp_status |= pwr_mPnIOCRStatus_DATA_VALID;
+        else
+          temp_status |= pwr_mPnIOCRStatus_DATA_INVALID;
+
+        if (status_data & CYCLIC_DATA_STATUS_STATE_PRIMARY)
+          temp_status |= pwr_mPnIOCRStatus_STATE_PRIMARY;
+        else
+          temp_status |= pwr_mPnIOCRStatus_STATE_BACKUP;
+
+        if (status_data & CYCLIC_DATA_STATUS_STATE_RUN)
+          temp_status |= pwr_mPnIOCRStatus_STATE_RUN;
+        else
+          temp_status |= pwr_mPnIOCRStatus_STATE_STOP;
+
+        if (status_data & CYCLIC_DATA_STATUS_NORMAL_OPERATION)
+          temp_status |= pwr_mPnIOCRStatus_NORMAL_OPERATION;
+        else
+          temp_status |= pwr_mPnIOCRStatus_PROBLEM_DETECTED;
+
+        pwr_device->CyclicDataStatus = temp_status;
+
         // Set the iocs status. If we have bad data, the stack will give us zeroed inputs and
         // the error counter will start increasing
         // Some converters have shown troubles during startup of the stack and if we disable these when they
@@ -175,7 +197,8 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
         // give them some time.
         // TODO Investigate further...
         io_sPnRackLocal* local_device = (io_sPnRackLocal*)device_list->Local;
-        if ((pwr_device->IOCS = ioxs) == 0x40 && local_device->start_cnt >= local_device->start_time)
+        if ((pwr_device->IOCS = ioxs) == PNAK_IOXS_STATUS_DETECTED_BY_DEVICE &&
+            local_device->start_cnt >= local_device->start_time)
         {
           pwr_device->Status = PB__DISABLED;
         } // 0x40 == Bad, 0x80 == Good...
@@ -186,9 +209,14 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
           {
             if (subslot.second.m_rt_io_submodule_type & PROFINET_IO_SUBMODULE_TYPE_INPUT)
             {
+              // char test =
+              //     iocr.m_rt_io_data[subslot.second.m_rt_offset_io_in + subslot.second.m_io_input_length];
               io_datap = iocr.m_rt_io_data + subslot.second.m_rt_offset_io_in;
               clean_io_datap = iocr.m_rt_clean_io_data + subslot.second.m_rt_offset_clean_io_in;
               memcpy(clean_io_datap, io_datap, subslot.second.m_io_input_length);
+
+              // printf("Input IOCS data...: %02x\n", (unsigned char)test);
+              // printf("Input IOXS data...: %02x\n", (unsigned char)ioxs);
             }
           }
         }

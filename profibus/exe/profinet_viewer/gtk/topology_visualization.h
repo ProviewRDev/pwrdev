@@ -34,67 +34,56 @@
  * General Public License plus this exception.
  */
 
-#ifndef pn_viewer_qt_h
-#define pn_viewer_qt_h
+#ifndef TOPOLOGY_VISUALIZATION_H
+#define TOPOLOGY_VISUALIZATION_H
 
-/* pn_viewer_qt.h -- Profinet viewer */
+#include <string>
+#include <vector>
+#include <map>
+#include "../src/topology-crawler.h" // For core network structures
 
-#include "../src/pn_viewer.h"
+// GTK visualization structures for topology display
+// These structures extend core network discovery with visualization properties
 
-#include "cow_wow_qt.h"
-
-#include <QLabel>
-
-class PnViewerQtWidget;
-
-class PnViewerQt : public PnViewer
+struct TopologyNode
 {
-public:
-  PnViewerQt(const char* v_name, const char* v_device, pwr_tStatus* status);
-  ~PnViewerQt();
+  // Core network data
+  std::string ip;
+  std::string device_name;
+  std::string sys_desc; // System description from LLDP
+  std::vector<PortInfo> ports;
 
-  QWidget* nav_widget;
-  QWidget* navconf_widget;
-  QLabel* msg_label;
-  QLabel* cmd_prompt;
-  CoWowFocusTimerQt focustimer;
-  CoWowRecall* value_recall;
-  CoWowEntryQt* cmd_entry;
-
-  void message(char severity, const char* msg);
-  void set_prompt(const char* prompt);
-  void open_change_value();
-
-  PnViewerQtWidget* toplevel;
+  // GTK visualization properties
+  double x{0.0}, y{0.0};             // Position for drawing
+  double width{120.0}, height{80.0}; // Drawing dimensions
+  std::string device_type;           // Device type from the DCP tool
+  std::string device_vendor;         // Vendor identifier from the DCP tool
+  bool selected{false};
 };
 
-class PnViewerQtWidget : public QWidget
+struct TopologyEdge
 {
-  Q_OBJECT
+  // Core network data
+  std::string from_ip;
+  std::string to_ip;
+  PortInfo from_port;
+  PortInfo to_port;
+  std::vector<std::string> mgmt_addrs; // Management addresses on this link
 
-public:
-  PnViewerQtWidget(PnViewerQt* parent_ctx)
-      : QWidget(), viewer(parent_ctx)
-  {
-  }
-
-protected:
-  void focusInEvent(QFocusEvent* event);
-  void closeEvent(QCloseEvent* event);
-
-public slots:
-  void valchanged_cmd_entry();
-  void activate_update();
-  void activate_filter();
-  void activate_setdevice();
-  void activate_changevalue();
-  void activate_zoom_in();
-  void activate_zoom_out();
-  void activate_zoom_reset();
-  void activate_help();
-
-private:
-  PnViewerQt* viewer;
+  // GTK visualization properties
+  bool highlighted{false};
+  std::string connection_type; // "ethernet", "management", etc.
 };
 
-#endif
+struct TopologyGraph
+{
+  std::map<std::string, TopologyNode> nodes;
+  std::vector<TopologyEdge> edges;
+
+  // Infinite canvas - no fixed dimensions
+  double width{2000.0};                   // Initial working area (can be expanded)
+  double height{2000.0};                  // Initial working area (can be expanded)
+  std::string layout_algorithm{"spring"}; // "spring", "hierarchical", "circular"
+};
+
+#endif // TOPOLOGY_VISUALIZATION_H

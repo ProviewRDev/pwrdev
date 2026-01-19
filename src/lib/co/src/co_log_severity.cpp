@@ -34,52 +34,61 @@
  * General Public License plus this exception.
  */
 
-#ifndef pn_viewer_h
-#define pn_viewer_h
+#include "co_log_severity.h"
 
-/* pn_viewer.h -- Profinet viewer */
-
-#include "pn_viewernav.h"
-
-class CoWow;
-class CoWowFocusTimer;
-class PnViewerPNAK;
-
-class PnViewer
+char pwr_severity_to_char(pwr_eSeverity severity)
 {
-public:
-  PnViewer(void* v_parent_ctx, const char* v_name, const char* v_device, pwr_tStatus* status);
-  virtual ~PnViewer();
+  switch (severity)
+  {
+  case pwr_eSeverity_Success:
+    return 'S';
+  case pwr_eSeverity_Info:
+    return 'I';
+  case pwr_eSeverity_Warning:
+    return 'W';
+  case pwr_eSeverity_Error:
+    return 'E';
+  case pwr_eSeverity_Fatal:
+    return 'F';
+  default:
+    return 'I';
+  }
+}
 
-  virtual void message(char severity, const char* msg) {}
-  virtual void set_prompt(const char* prompt) {}
-  virtual void open_change_value() {}
+pwr_eSeverity pwr_char_to_severity(char severity_char)
+{
+  switch (severity_char)
+  {
+  case 'S':
+    return pwr_eSeverity_Success;
+  case 'I':
+    return pwr_eSeverity_Info;
+  case 'W':
+    return pwr_eSeverity_Warning;
+  case 'E':
+    return pwr_eSeverity_Error;
+  case 'F':
+    return pwr_eSeverity_Fatal;
+  default:
+    return pwr_eSeverity_Info;
+  }
+}
 
-  void update_devices();
-  void set_device_properties(unsigned char* macaddress, unsigned char* ipaddress, char* devname);
-  int fetch_config(std::vector<PnDevice>& vect);
-  void filter(viewer_eFilterType filtertype);
-  void activate_update();
-  void activate_filter(viewer_eFilterType filtertype);
-  void activate_setdevice();
-  void activate_changevalue();
-  void activate_close();
-  void activate_help();
-
-  static void change_value(void* ctx);
-  static void message_cb(void* ctx, int severity, const char* msg);
-
-  void* parent_ctx;
-  char name[80];
-  char device[20];
-  PnViewerNav* viewernav;
-  PnViewerNav* viewernavconf;
-  CoWow* wow;
-  int input_open;
-  std::vector<PnDevice> dev_vect;
-  std::vector<PnDevice> conf_vect;
-  PnViewerPNAK* pnet;
-  void (*close_cb)(void*);
-};
-
-#endif
+const char* pwr_severity_to_string(pwr_eSeverity severity)
+{
+  switch (severity)
+  {
+  case pwr_eSeverity_Success:
+    return "SUCCESS";
+  case pwr_eSeverity_Info:
+    return "INFO";
+  case pwr_eSeverity_Warning:
+    return "WARNING";
+  case pwr_eSeverity_Error:
+    return "ERROR";
+  case pwr_eSeverity_Fatal:
+    return "FATAL";
+  default:
+    return "INFO";
+  }
+}
