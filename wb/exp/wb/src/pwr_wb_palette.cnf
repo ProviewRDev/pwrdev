@@ -245,6 +245,7 @@ palette NavigatorPalette
         {
           class Siemens_Motor_1LA
           class Sinamics_G120_Tgm1
+          class Sinamics_G120_Tgm999
         }
         menu Suco
         {
@@ -1355,6 +1356,7 @@ palette PlcEditorPalette
     menu Siemens
     {
       class Sinamics_G120_Tgm1Fo
+      class Sinamics_G120_Tgm999Fo
     }
     menu OtherManufacturer
     {
@@ -1391,6 +1393,7 @@ palette PlcEditorPalette
       class Eurotherm_EPowerSim
       class Eurotherm_EPowerAggrSim
       class SEW_Movidrive_1Sim
+      class Sinamics_G120_Tgm999Sim
     }
     menu Miscellaneous
     {
