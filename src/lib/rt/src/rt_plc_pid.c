@@ -48,10 +48,7 @@
   @aref inc3p Inc3p
 */
 
-void inc3p_init(pwr_sClass_inc3p* object)
-{
-  object->Acc = 0;
-}
+void inc3p_init(pwr_sClass_inc3p* object) { object->Acc = 0; }
 
 void inc3p_exec(plc_sThread* tp, pwr_sClass_inc3p* object)
 {
@@ -68,15 +65,16 @@ void inc3p_exec(plc_sThread* tp, pwr_sClass_inc3p* object)
   object->Acc += object->OutChange * object->Gain;
 
   if /* Open */
-      ((object->Acc >= object->MinTim)
-          || ((object->Open == TRUE) && (object->Acc > 0)
-                 && (object->TimerFlag == TRUE))) {
+      ((object->Acc >= object->MinTim) ||
+       ((object->Open == TRUE) && (object->Acc > 0) && (object->TimerFlag == TRUE)))
+  {
     *object->CloseP = FALSE;
     object->Close = FALSE;
     object->TimerDO = object->OpenP;
     object->TimerTime = object->Acc;
     timer_in(tp, object);
-    if (object->TimerCount > 0) {
+    if (object->TimerCount > 0)
+    {
       object->Open = TRUE;
       *object->OpenP = TRUE;
       object->AccTim = 0;
@@ -84,22 +82,26 @@ void inc3p_exec(plc_sThread* tp, pwr_sClass_inc3p* object)
         object->Acc -= *object->ScanTime;
       else
         object->Acc = 0;
-    } else {
+    }
+    else
+    {
       object->Open = FALSE;
       *object->OpenP = TRUE;
       object->TimerCount = 0;
       object->AccTim += *object->ScanTime;
     }
-  } else if /* Close */
-      ((object->Acc <= -object->MinTim)
-          || ((object->Close == TRUE) && (object->Acc < 0)
-                 && (object->TimerFlag == TRUE))) {
+  }
+  else if /* Close */
+      ((object->Acc <= -object->MinTim) ||
+       ((object->Close == TRUE) && (object->Acc < 0) && (object->TimerFlag == TRUE)))
+  {
     *object->OpenP = FALSE;
     object->Open = FALSE;
     object->TimerDO = object->CloseP;
     object->TimerTime = -object->Acc;
     timer_in(tp, object);
-    if (object->TimerCount > 0) {
+    if (object->TimerCount > 0)
+    {
       object->Close = TRUE;
       *object->CloseP = TRUE;
       object->AccTim = 0;
@@ -107,13 +109,16 @@ void inc3p_exec(plc_sThread* tp, pwr_sClass_inc3p* object)
         object->Acc += *object->ScanTime;
       else
         object->Acc = 0;
-    } else {
+    }
+    else
+    {
       object->Close = FALSE;
       *object->CloseP = TRUE;
       object->TimerCount = 0;
       object->AccTim += *object->ScanTime;
     }
-  } else /* No output */
+  }
+  else /* No output */
   {
     object->Open = FALSE;
     *object->OpenP = FALSE;
@@ -123,7 +128,8 @@ void inc3p_exec(plc_sThread* tp, pwr_sClass_inc3p* object)
     if (object->MaxTim > 0) /* Limit integration */
     {
       object->AccTim += *object->ScanTime;
-      if (object->AccTim >= object->MaxTim) {
+      if (object->AccTim >= object->MaxTim)
+      {
         object->Acc = 0;
         object->AccTim = 0;
       }
@@ -155,8 +161,8 @@ void pos3p_exec(plc_sThread* tp, pwr_sClass_pos3p* object)
   error = *object->OutValP - *object->PosP;
 
   /* Open ? */
-  if ((error > object->ErrSta)
-      || ((object->Open == TRUE) && (error > object->ErrSto))) {
+  if ((error > object->ErrSta) || ((object->Open == TRUE) && (error > object->ErrSto)))
+  {
     *object->CloseP = FALSE;
     object->Close = FALSE;
     object->Open = TRUE;
@@ -165,16 +171,19 @@ void pos3p_exec(plc_sThread* tp, pwr_sClass_pos3p* object)
     if ((error <= object->ErrSta) && (*object->OpenP == FALSE))
       object->TimerTime = 0;
     timer_in(tp, object);
-    if (object->TimerCount > 0) {
+    if (object->TimerCount > 0)
+    {
       *object->OpenP = TRUE;
-    } else {
+    }
+    else
+    {
       *object->OpenP = FALSE;
       object->TimerCount = 0;
     }
   }
   /* Close ? */
-  else if ((error < -object->ErrSta)
-      || ((object->Close == TRUE) && (error < -object->ErrSto))) {
+  else if ((error < -object->ErrSta) || ((object->Close == TRUE) && (error < -object->ErrSto)))
+  {
     *object->OpenP = FALSE;
     object->Open = FALSE;
     object->Close = TRUE;
@@ -183,13 +192,18 @@ void pos3p_exec(plc_sThread* tp, pwr_sClass_pos3p* object)
     if ((error >= -object->ErrSta) && (*object->CloseP == FALSE))
       object->TimerTime = 0;
     timer_in(tp, object);
-    if (object->TimerCount > 0) {
+    if (object->TimerCount > 0)
+    {
       *object->CloseP = TRUE;
-    } else {
+    }
+    else
+    {
       *object->CloseP = FALSE;
       object->TimerCount = 0;
     }
-  } else {
+  }
+  else
+  {
     /* No output */
     object->Open = FALSE;
     *object->OpenP = FALSE;
@@ -211,11 +225,13 @@ void out2p_exec(plc_sThread* tp, pwr_sClass_out2p* object)
   /* Get  Input */
   object->OutVal = *object->OutValP;
 
-  if (object->MaxOut > object->MinOut) {
-    ontime = (object->OutVal - object->MinOut)
-        / (object->MaxOut - object->MinOut) * object->Period;
+  if (object->MaxOut > object->MinOut)
+  {
+    ontime = (object->OutVal - object->MinOut) / (object->MaxOut - object->MinOut) * object->Period;
     offtime = object->Period - ontime;
-  } else {
+  }
+  else
+  {
     ontime = 0;
     offtime = 0;
   }
@@ -223,15 +239,19 @@ void out2p_exec(plc_sThread* tp, pwr_sClass_out2p* object)
   object->RunTime += *object->ScanTime;
 
   /* Should we turn off ? */
-  if (object->Order == TRUE) {
-    if ((object->RunTime > ontime) && (object->OutVal < object->MaxOut)) {
+  if (object->Order == TRUE)
+  {
+    if ((object->RunTime > ontime) && (object->OutVal < object->MaxOut))
+    {
       object->Order = FALSE;
       object->RunTime = 0;
     }
   }
   /* Should we turn on ? */
-  else {
-    if ((object->RunTime > offtime) && (object->OutVal > object->MinOut)) {
+  else
+  {
+    if ((object->RunTime > offtime) && (object->OutVal > object->MinOut))
+    {
       object->Order = TRUE;
       object->RunTime = 0;
     }
@@ -258,7 +278,8 @@ void mode_exec(plc_sThread* tp, pwr_sClass_mode* object)
   /* Make appropriate actions, depending on actual mode */
 
   /* Manual */
-  if (object->OpMod <= 1) {
+  if (object->OpMod <= 1)
+  {
     object->Force = TRUE;
     object->ManMode = TRUE;
     object->AutMode = FALSE;
@@ -269,33 +290,40 @@ void mode_exec(plc_sThread* tp, pwr_sClass_mode* object)
     /* Test if Force in manual mode */
     if (object->Forc1)
       object->ForcVal = object->XForcVal;
-    else {
+    else
+    {
       if (object->ForcVal < object->MinOut)
-	object->ForcVal = object->MinOut;
+        object->ForcVal = object->MinOut;
       else if (object->ForcVal > object->MaxOut)
-	object->ForcVal = object->MaxOut;
+        object->ForcVal = object->MaxOut;
     }
-  } else
+  }
+  else
   /* Not Manual Mode */
   {
     /* Auto */
-    if (object->OpMod == 2) {
+    if (object->OpMod == 2)
+    {
       object->ManMode = FALSE;
       object->AutMode = TRUE;
       object->CascMod = FALSE;
     }
     /* Cascade mode */
-    else {
+    else
+    {
       object->ManMode = FALSE;
       object->AutMode = FALSE;
       object->CascMod = TRUE;
       object->SetVal = object->XSetVal;
     }
     /* Test if force in Auto or Cascade */
-    if (object->Forc1 || object->Forc2) {
+    if (object->Forc1 || object->Forc2)
+    {
       object->Force = TRUE;
       object->ForcVal = object->XForcVal;
-    } else {
+    }
+    else
+    {
       object->Force = FALSE;
       object->ForcVal = object->OutVal;
     }
@@ -322,15 +350,15 @@ void mode_exec(plc_sThread* tp, pwr_sClass_mode* object)
 void pid_exec(plc_sThread* tp, pwr_sClass_pid* object)
 {
 /* Define Algoritm bitmask */
-#define IALG 1 /* Integral part -> Incremental algorithm */
-#define PALG 2 /* Proportional part exists */
-#define PAVV 4 /* Proportional part working on control difference */
-#define DALG 8 /* Derivative part exists */
+#define IALG 1  /* Integral part -> Incremental algorithm */
+#define PALG 2  /* Proportional part exists */
+#define PAVV 4  /* Proportional part working on control difference */
+#define DALG 8  /* Derivative part exists */
 #define DAVV 16 /* Derivative part working on control difference */
 
-//#define IWUP 1 /* Windup limitation on I part */
-#define BIWUP 2 /* Windup limitation on Bias and I part */
-#define BPIWUP 4 /* Windup limitation on Bias PI part */
+// #define IWUP 1 /* Windup limitation on I part */
+#define BIWUP 2   /* Windup limitation on Bias and I part */
+#define BPIWUP 4  /* Windup limitation on Bias PI part */
 #define BPIDWUP 8 /* Windup limitation on Bias and PID part (Default, old funcionality */
 
   float xold; /* Local variables */
@@ -361,13 +389,12 @@ void pid_exec(plc_sThread* tp, pwr_sClass_pid* object)
   /* Calculate Controller Error and Filtered derivate */
 
   object->ControlDiff = object->ProcVal - object->SetVal;
-  ddiff = ((object->PidAlg & DAVV) != 0)
-      ? (object->ControlDiff - eold) / *object->ScanTime
-      : (object->ProcVal - xold) / *object->ScanTime;
-  if (((object->DerGain * *object->ScanTime) >= object->DerTime)
-      || (object->DerTime <= 0))
+  ddiff = ((object->PidAlg & DAVV) != 0) ? (object->ControlDiff - eold) / *object->ScanTime
+                                         : (object->ProcVal - xold) / *object->ScanTime;
+  if (((object->DerGain * *object->ScanTime) >= object->DerTime) || (object->DerTime <= 0))
     object->FiltDer = ddiff; /* No Filter */
-  else {
+  else
+  {
     kd = 1.0 / (1.0 + object->DerGain * *object->ScanTime / object->DerTime);
     object->FiltDer += (ddiff - derold) * (1.0 - kd);
   }
@@ -386,8 +413,7 @@ void pid_exec(plc_sThread* tp, pwr_sClass_pid* object)
     object->EndMax = FALSE;
 
     /* Adjust for bumpless transfer to auto */
-    object->PDManOffset = object->OutVal - gain * object->ControlDiff
-        - object->BiasGain * object->Bias;
+    object->PDManOffset = object->OutVal - gain * object->ControlDiff - object->BiasGain * object->Bias;
 
     if ((object->PidAlg & IALG) != 0)
       object->AbsOut = 0.0;
@@ -400,7 +426,6 @@ void pid_exec(plc_sThread* tp, pwr_sClass_pid* object)
       object->OutWindup -= gain * object->ControlDiff;
 
     object->AbsOut = object->OutVal - object->OutWindup;
-
   }
 
   else
@@ -418,7 +443,14 @@ void pid_exec(plc_sThread* tp, pwr_sClass_pid* object)
       if ((object->PidAlg & PALG) != 0)
         dut *= gain;
       else
-        gain = 0.0; /* Pure I-controller */
+      {
+        /* Pure I-controller: apply Inverse sign even without P-part */
+        if (object->Inverse)
+        {
+          dut = -dut;
+        }
+        gain = 0.0;
+      }
 
       /* Bias */
       if (object->WindupMask >= BIWUP) /* Windup on Bias */
@@ -428,14 +460,14 @@ void pid_exec(plc_sThread* tp, pwr_sClass_pid* object)
 
       /* P-part */
       if (object->WindupMask >= BPIWUP) /* Windup on P */
-        dut += ((object->PidAlg & PAVV) != 0)
-            ? gain * (object->ControlDiff - eold)
-            : gain * (object->ProcVal - xold);
+        dut += ((object->PidAlg & PAVV) != 0) ? gain * (object->ControlDiff - eold)
+                                              : gain * (object->ProcVal - xold);
       else
         absut += gain * object->ControlDiff;
 
       /* Derivative-part */
-      if ((object->PidAlg & DALG) != 0) {
+      if ((object->PidAlg & DALG) != 0)
+      {
         if (object->WindupMask >= BPIDWUP) /* Windup on D */
           dut += gain * (object->FiltDer - derold) * object->DerTime;
         else
@@ -445,10 +477,13 @@ void pid_exec(plc_sThread* tp, pwr_sClass_pid* object)
       /* Limit output */
       object->OutWindup += dut;
 
-      if (object->OutWindup > object->MaxWindup) {
+      if (object->OutWindup > object->MaxWindup)
+      {
         object->OutWindup = object->MaxWindup;
         object->EndMax = TRUE;
-      } else if (object->OutWindup < object->MinWindup) {
+      }
+      else if (object->OutWindup < object->MinWindup)
+      {
         object->OutWindup = object->MinWindup;
         object->EndMin = TRUE;
       }
@@ -478,7 +513,8 @@ void pid_exec(plc_sThread* tp, pwr_sClass_pid* object)
       ut += object->BiasGain * object->Bias + object->PDManOffset;
 
       /* Limit output */
-      if (object->MaxOut > object->MinOut) {
+      if (object->MaxOut > object->MinOut)
+      {
         if (ut > object->MaxOut)
           ut = object->MaxOut;
         else if (ut < object->MinOut)

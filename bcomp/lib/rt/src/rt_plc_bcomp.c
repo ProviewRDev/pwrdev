@@ -340,8 +340,13 @@ void CompPID_Fo_exec(plc_sThread* tp, pwr_sClass_CompPID_Fo* o)
 
       if ((co->PidAlg & PALG) != 0)
         dut *= gain;
-      else
-        gain = 0.0; /* Pure I-controller */
+      else {
+        /* Pure I-controller: apply Inverse sign even without P-part */
+        if (co->Inverse) {
+          dut = -dut;
+        }
+        gain = 0.0;
+      }
 
       /* Bias */
       if (co->WindupMask >= BIWUP) /* Windup on Bias */
