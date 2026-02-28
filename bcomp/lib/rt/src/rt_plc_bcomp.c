@@ -55,8 +55,7 @@ void RunTimeCounterFo_init(pwr_sClass_RunTimeCounterFo* o)
   pwr_tDlid dlid;
   pwr_tStatus sts;
 
-  sts = gdh_DLRefObjectInfoAttrref(
-      &o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
+  sts = gdh_DLRefObjectInfoAttrref(&o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
   if (EVEN(sts))
     o->PlcConnectP = 0;
   if (o->PlcConnectP && o->ResetP == &o->Reset)
@@ -77,7 +76,8 @@ void RunTimeCounterFo_exec(plc_sThread* tp, pwr_sClass_RunTimeCounterFo* o)
   time_FloatToD(&TimeSince, *o->ScanTime);
 
   /* Test if New Trip */
-  if (co->TripReset) {
+  if (co->TripReset)
+  {
     co->OldTripNOfStarts = co->TripNOfStarts;
     co->OldTripUsage = co->TripUsage;
     co->OldTripTime = co->TripTime;
@@ -96,9 +96,11 @@ void RunTimeCounterFo_exec(plc_sThread* tp, pwr_sClass_RunTimeCounterFo* o)
 
   /* Test if running */
   o->Start = 0;
-  if (*o->RunningP) {
+  if (*o->RunningP)
+  {
     /* New start ? */
-    if (!o->Running) {
+    if (!o->Running)
+    {
       o->Start = 1;
       co->TotalNOfStarts++;
       co->TripNOfStarts++;
@@ -113,8 +115,7 @@ void RunTimeCounterFo_exec(plc_sThread* tp, pwr_sClass_RunTimeCounterFo* o)
 
   /* Calculate usage % */
   if (co->TotalRunTime.tv_sec)
-    co->TotalUsage
-        = ((float)co->TotalRunTime.tv_sec) / co->TotalTime.tv_sec * 100;
+    co->TotalUsage = ((float)co->TotalRunTime.tv_sec) / co->TotalTime.tv_sec * 100;
   if (co->TripTime.tv_sec)
     co->TripUsage = ((float)co->TripRunTime.tv_sec) / co->TripTime.tv_sec * 100;
 
@@ -132,8 +133,7 @@ void CompModePID_Fo_init(pwr_sClass_CompModePID_Fo* o)
   pwr_tDlid dlid;
   pwr_tStatus sts;
 
-  sts = gdh_DLRefObjectInfoAttrref(
-      &o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
+  sts = gdh_DLRefObjectInfoAttrref(&o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
   if (EVEN(sts))
     o->PlcConnectP = 0;
 }
@@ -157,7 +157,8 @@ void CompModePID_Fo_exec(plc_sThread* tp, pwr_sClass_CompModePID_Fo* o)
   /* Make appropriate actions, depending on actual mode */
 
   /* Manual */
-  if (co->OpMod <= 1) {
+  if (co->OpMod <= 1)
+  {
     co->Force = TRUE;
     co->ManMode = TRUE;
     co->AutMode = FALSE;
@@ -168,20 +169,26 @@ void CompModePID_Fo_exec(plc_sThread* tp, pwr_sClass_CompModePID_Fo* o)
     /* Test if Force in manual mode */
     if (co->Forc1)
       co->ForcVal = co->XForcVal;
-    else {
+    else
+    {
       if (co->ForcVal < co->MinOut)
-	co->ForcVal = co->MinOut;
+        co->ForcVal = co->MinOut;
       else if (co->ForcVal > co->MaxOut)
-	co->ForcVal = co->MaxOut;
+        co->ForcVal = co->MaxOut;
     }
-  } else {
+  }
+  else
+  {
     /* Not Manual Mode */
-    if (co->OpMod == 2) {
+    if (co->OpMod == 2)
+    {
       /* Auto */
       co->ManMode = FALSE;
       co->AutMode = TRUE;
       co->CascMod = FALSE;
-    } else {
+    }
+    else
+    {
       /* Cascade mode */
       co->ManMode = FALSE;
       co->AutMode = FALSE;
@@ -189,10 +196,13 @@ void CompModePID_Fo_exec(plc_sThread* tp, pwr_sClass_CompModePID_Fo* o)
       co->SetVal = o->SetVal = co->XSetVal;
     }
     /* Test if force in Auto or Cascade */
-    if (co->Forc1 || co->Forc2) {
+    if (co->Forc1 || co->Forc2)
+    {
       co->Force = TRUE;
       co->ForcVal = co->XForcVal;
-    } else {
+    }
+    else
+    {
       co->Force = FALSE;
       co->ForcVal = co->OutVal;
     }
@@ -227,24 +237,22 @@ void CompPID_Fo_init(pwr_sClass_CompPID_Fo* o)
   pwr_tDlid dlid;
   pwr_tStatus sts;
 
-  sts = gdh_DLRefObjectInfoAttrref(
-      &o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
+  sts = gdh_DLRefObjectInfoAttrref(&o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
   if (EVEN(sts))
     o->PlcConnectP = 0;
 }
 
 /* Define Algoritm bitmask */
-#define IALG 1 /* Integral part -> Incremental algorithm */
-#define PALG 2 /* Proportional part exists */
-#define PAVV 4 /* Proportional part working on control difference */
-#define DALG 8 /* Derivative part exists */
+#define IALG 1  /* Integral part -> Incremental algorithm */
+#define PALG 2  /* Proportional part exists */
+#define PAVV 4  /* Proportional part working on control difference */
+#define DALG 8  /* Derivative part exists */
 #define DAVV 16 /* Derivative part working on control difference */
 
-//#define IWUP 1 /* Windup limitation on I part */
-#define BIWUP 2 /* Windup limitation on Bias and I part */
-#define BPIWUP 4 /* Windup limitation on Bias PI part */
-#define BPIDWUP                                                                \
-  8 /* Windup limitation on Bias and PID part (Default, old funcionality */
+// #define IWUP 1 /* Windup limitation on I part */
+#define BIWUP 2   /* Windup limitation on Bias and I part */
+#define BPIWUP 4  /* Windup limitation on Bias PI part */
+#define BPIDWUP 8 /* Windup limitation on Bias and PID part (Default, old funcionality */
 
 void CompPID_Fo_exec(plc_sThread* tp, pwr_sClass_CompPID_Fo* o)
 {
@@ -292,7 +300,8 @@ void CompPID_Fo_exec(plc_sThread* tp, pwr_sClass_CompPID_Fo* o)
                                      : (co->ProcVal - xold) / *o->ScanTime;
   if (((co->DerGain * *o->ScanTime) >= co->DerTime) || (co->DerTime <= 0))
     co->FiltDer = ddiff; /* No Filter */
-  else {
+  else
+  {
     kd = 1.0 / (1.0 + co->DerGain * *o->ScanTime / co->DerTime);
     co->FiltDer += (ddiff - derold) * (1.0 - kd);
   }
@@ -302,7 +311,8 @@ void CompPID_Fo_exec(plc_sThread* tp, pwr_sClass_CompPID_Fo* o)
   else
     gain = -co->Gain;
 
-  if (co->Force) {
+  if (co->Force)
+  {
     /* Force */
     co->OutChange = co->ForcVal - co->OutVal;
     co->OutVal = co->OutWindup = co->ForcVal;
@@ -310,8 +320,7 @@ void CompPID_Fo_exec(plc_sThread* tp, pwr_sClass_CompPID_Fo* o)
     co->EndMax = FALSE;
 
     /* Adjust for bumpless transfer to auto */
-    co->PDManOffset
-        = co->OutVal - gain * co->ControlDiff - co->BiasGain * co->Bias;
+    co->PDManOffset = co->OutVal - gain * co->ControlDiff - co->BiasGain * co->Bias;
 
     if ((co->PidAlg & IALG) != 0)
       co->AbsOut = 0.0;
@@ -326,7 +335,8 @@ void CompPID_Fo_exec(plc_sThread* tp, pwr_sClass_CompPID_Fo* o)
     co->AbsOut = co->OutVal - co->OutWindup;
   }
 
-  else {
+  else
+  {
     /* Auto mode */
 
     dut = absut = 0.0;
@@ -340,9 +350,11 @@ void CompPID_Fo_exec(plc_sThread* tp, pwr_sClass_CompPID_Fo* o)
 
       if ((co->PidAlg & PALG) != 0)
         dut *= gain;
-      else {
+      else
+      {
         /* Pure I-controller: apply Inverse sign even without P-part */
-        if (co->Inverse) {
+        if (co->Inverse)
+        {
           dut = -dut;
         }
         gain = 0.0;
@@ -356,13 +368,13 @@ void CompPID_Fo_exec(plc_sThread* tp, pwr_sClass_CompPID_Fo* o)
 
       /* P-part */
       if (co->WindupMask >= BPIWUP) /* Windup on P */
-        dut += ((co->PidAlg & PAVV) != 0) ? gain * (co->ControlDiff - eold)
-                                          : gain * (co->ProcVal - xold);
+        dut += ((co->PidAlg & PAVV) != 0) ? gain * (co->ControlDiff - eold) : gain * (co->ProcVal - xold);
       else
         absut += gain * co->ControlDiff;
 
       /* Derivative-part */
-      if ((co->PidAlg & DALG) != 0) {
+      if ((co->PidAlg & DALG) != 0)
+      {
         if (co->WindupMask >= BPIDWUP) /* Windup on D */
           dut += gain * (co->FiltDer - derold) * co->DerTime;
         else
@@ -372,10 +384,13 @@ void CompPID_Fo_exec(plc_sThread* tp, pwr_sClass_CompPID_Fo* o)
       /* Limit output */
       co->OutWindup += dut;
 
-      if (co->OutWindup > co->MaxWindup) {
+      if (co->OutWindup > co->MaxWindup)
+      {
         co->OutWindup = co->MaxWindup;
         co->EndMax = TRUE;
-      } else if (co->OutWindup < co->MinWindup) {
+      }
+      else if (co->OutWindup < co->MinWindup)
+      {
         co->OutWindup = co->MinWindup;
         co->EndMin = TRUE;
       }
@@ -405,7 +420,8 @@ void CompPID_Fo_exec(plc_sThread* tp, pwr_sClass_CompPID_Fo* o)
       ut += co->BiasGain * co->Bias + co->PDManOffset;
 
       /* Limit output */
-      if (co->MaxOut > co->MinOut) {
+      if (co->MaxOut > co->MinOut)
+      {
         if (ut > co->MaxOut)
           ut = co->MaxOut;
         else if (ut < co->MinOut)
@@ -440,8 +456,7 @@ void CompOnOffBurnerFo_init(pwr_sClass_CompOnOffBurnerFo* o)
   pwr_tDlid dlid;
   pwr_tStatus sts;
 
-  sts = gdh_DLRefObjectInfoAttrref(
-      &o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
+  sts = gdh_DLRefObjectInfoAttrref(&o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
   if (EVEN(sts))
     o->PlcConnectP = 0;
 }
@@ -453,16 +468,16 @@ void CompOnOffBurnerFo_exec(plc_sThread* tp, pwr_sClass_CompOnOffBurnerFo* o)
   pwr_sClass_CompOnOffZone* zonco;
   pwr_tFloat32 Cnt;
 
-  zono = (pwr_sClass_CompOnOffZoneFo*)((char*)o->InP
-      - (sizeof(pwr_sClass_CompOnOffZoneFo)
-            - pwr_AlignLW(sizeof(pwr_tFloat32))));
+  zono = (pwr_sClass_CompOnOffZoneFo*)((char*)o->InP - (sizeof(pwr_sClass_CompOnOffZoneFo) -
+                                                        pwr_AlignLW(sizeof(pwr_tFloat32))));
   zonco = (pwr_sClass_CompOnOffZone*)zono->PlcConnectP;
 
   if (!co || !zonco)
     return;
 
   co->Executing = zonco->Executing;
-  if (!co->Executing) {
+  if (!co->Executing)
+  {
     o->Status = co->Status = 0;
     co->BrTime = 0;
     co->TrendStatus = (pwr_tFloat32)co->Number;
@@ -472,20 +487,23 @@ void CompOnOffBurnerFo_exec(plc_sThread* tp, pwr_sClass_CompOnOffBurnerFo* o)
   if (zonco->CycleCount < 0.5)
     co->OnDetected = 0;
 
-  if ((co->PulseOn && co->BrTime < zonco->BurnerTimeMinOn)
-      || (!co->PulseOn && co->BrTime < zonco->BurnerTimeMinOff)) {
+  if ((co->PulseOn && co->BrTime < zonco->BurnerTimeMinOn) ||
+      (!co->PulseOn && co->BrTime < zonco->BurnerTimeMinOff))
+  {
     co->BrTime += *o->ScanTime;
     return;
   }
 
-  if (co->ManMode && co->OpMan) {
+  if (co->ManMode && co->OpMan)
+  {
     if ((o->Status && !co->ManStatus) || (!o->Status && co->ManStatus))
       co->BrTime = 0;
     o->Status = co->Status = co->ManStatus;
     co->TrendStatus = (pwr_tFloat32)co->Number + 0.8 * (co->Status ? 1 : 0);
     co->BrTime += *o->ScanTime;
     return;
-  } else
+  }
+  else
     co->ManStatus = 0;
 
   if (zonco->PauseMode)
@@ -501,12 +519,15 @@ void CompOnOffBurnerFo_exec(plc_sThread* tp, pwr_sClass_CompOnOffBurnerFo* o)
   else
     co->OffCnt = (zonco->CycleTime - co->PulseTime) / zonco->CycleTime * 100;
 
-  if (Cnt >= 0 && Cnt < co->OffCnt && !co->Status) {
+  if (Cnt >= 0 && Cnt < co->OffCnt && !co->Status)
+  {
     // Turn on
     co->OnDetected = 1;
     co->Status = 1;
     co->BrTime = 0;
-  } else if (Cnt >= co->OffCnt && co->Status) {
+  }
+  else if (Cnt >= co->OffCnt && co->Status)
+  {
     // Turn off
     co->Status = 0;
     co->BrTime = 0;
@@ -527,8 +548,7 @@ void CompOnOffZoneFo_init(pwr_sClass_CompOnOffZoneFo* o)
   pwr_tDlid dlid;
   pwr_tStatus sts;
 
-  sts = gdh_DLRefObjectInfoAttrref(
-      &o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
+  sts = gdh_DLRefObjectInfoAttrref(&o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
   if (EVEN(sts))
     o->PlcConnectP = 0;
 }
@@ -547,21 +567,22 @@ void CompOnOffZoneFo_exec(plc_sThread* tp, pwr_sClass_CompOnOffZoneFo* o)
   if (co->Power > co->PowerMax)
     co->Power = co->PowerMax;
 
-  if (!co->Executing) {
+  if (!co->Executing)
+  {
     co->CycleCount = 0;
     return;
   }
 
-  co->PauseMode
-      = (co->Power / 100 > (co->BurnerTimeMinOff
-                               / (co->BurnerTimeMinOn + co->BurnerTimeMinOn)))
-      ? 0
-      : 1;
+  co->PauseMode =
+      (co->Power / 100 > (co->BurnerTimeMinOff / (co->BurnerTimeMinOn + co->BurnerTimeMinOn))) ? 0 : 1;
 
-  if (co->PauseMode) {
+  if (co->PauseMode)
+  {
     if (co->Power != 100.0)
       co->CycleTime = co->BurnerTimeMinOff * 100.0 / co->Power;
-  } else {
+  }
+  else
+  {
     if (!feqf(co->Power, 0.0f))
       co->CycleTime = co->BurnerTimeMinOn * 100.0 / (100.0 - co->Power);
   }
@@ -585,22 +606,21 @@ void CompOnOffZoneFo_exec(plc_sThread* tp, pwr_sClass_CompOnOffZoneFo* o)
 */
 
 #define MAXCELLS 100
-//#define Normalize(x, y, xmin, xmax, ymin, ymax) y =
+// #define Normalize(x, y, xmin, xmax, ymin, ymax) y =
 //(((((ymax)-(ymin))/((xmax)-(xmin)))*((x)-(xmin)))+(ymin)) // replaced by a
-// function in v0.3
+//  function in v0.3
 
 void CompIMC_Fo_init(pwr_sClass_CompIMC_Fo* plc_obj)
 {
   pwr_tDlid dlid;
   pwr_tStatus sts;
-  sts = gdh_DLRefObjectInfoAttrref(
-      &plc_obj->PlcConnect, (void**)&plc_obj->PlcConnectP, &dlid);
+  sts = gdh_DLRefObjectInfoAttrref(&plc_obj->PlcConnect, (void**)&plc_obj->PlcConnectP, &dlid);
   if (EVEN(sts))
     plc_obj->PlcConnectP = 0;
 }
 
-void Normalize(pwr_tFloat32 x, pwr_tFloat32* y, pwr_tFloat32 xmin,
-    pwr_tFloat32 xmax, pwr_tFloat32 ymin, pwr_tFloat32 ymax) // v0.3
+void Normalize(pwr_tFloat32 x, pwr_tFloat32* y, pwr_tFloat32 xmin, pwr_tFloat32 xmax, pwr_tFloat32 ymin,
+               pwr_tFloat32 ymax) // v0.3
 {
   if ((xmax - xmin) != 0.0)
     *y = (ymax - ymin) / (xmax - xmin) * (x - xmin) + ymin;
@@ -608,10 +628,10 @@ void Normalize(pwr_tFloat32 x, pwr_tFloat32* y, pwr_tFloat32 xmin,
     return;
 }
 
-void LagFilter(plc_sThread* tp, pwr_sClass_CompIMC* plant_obj, pwr_tInt16 n,
-    pwr_tFloat32 Tlag)
+void LagFilter(plc_sThread* tp, pwr_sClass_CompIMC* plant_obj, pwr_tInt16 n, pwr_tFloat32 Tlag)
 {
-  if (Tlag < tp->ActualScanTime) {
+  if (Tlag < tp->ActualScanTime)
+  {
     plant_obj->S[n + 1] = plant_obj->S[n];
     return;
   }
@@ -620,10 +640,11 @@ void LagFilter(plc_sThread* tp, pwr_sClass_CompIMC* plant_obj, pwr_tInt16 n,
   plant_obj->S[n + 1] = (1.0 - kf) * plant_obj->S[n + 1] + kf * plant_obj->S[n];
 }
 
-void LeadLagFilter(plc_sThread* tp, pwr_sClass_CompIMC* plant_obj, pwr_tInt16 n,
-    pwr_tFloat32 T1, pwr_tFloat32 T2)
+void LeadLagFilter(plc_sThread* tp, pwr_sClass_CompIMC* plant_obj, pwr_tInt16 n, pwr_tFloat32 T1,
+                   pwr_tFloat32 T2)
 {
-  if (T2 < tp->ActualScanTime) {
+  if (T2 < tp->ActualScanTime)
+  {
     plant_obj->S[n + 1] = plant_obj->S[n];
     plant_obj->M[n] = plant_obj->S[n];
     return;
@@ -635,19 +656,20 @@ void LeadLagFilter(plc_sThread* tp, pwr_sClass_CompIMC* plant_obj, pwr_tInt16 n,
   if (ka <= 0)
     return; // v0.3
   plant_obj->S[n + 1] = CLAMP(plant_obj->S[n + 1], 0.0, 100.0);
-  plant_obj->S[n + 1] = kd / ka * plant_obj->S[n + 1]
-      + kb / ka * plant_obj->S[n] + kc / ka * plant_obj->M[n];
+  plant_obj->S[n + 1] = kd / ka * plant_obj->S[n + 1] + kb / ka * plant_obj->S[n] + kc / ka * plant_obj->M[n];
   plant_obj->M[n] = plant_obj->S[n];
 }
 
-void SouFilter(plc_sThread* tp, pwr_sClass_CompIMC* plant_obj, pwr_tInt16 n,
-    pwr_tFloat32 w0P, pwr_tFloat32 ksi)
+void SouFilter(plc_sThread* tp, pwr_sClass_CompIMC* plant_obj, pwr_tInt16 n, pwr_tFloat32 w0P,
+               pwr_tFloat32 ksi)
 {
-  if (w0P <= 0.0) {
+  if (w0P <= 0.0)
+  {
     plant_obj->S[n + 1] = plant_obj->S[n];
     return;
   }
-  pwr_tFloat32 a0 = tp->ActualScanTime * tp->ActualScanTime * w0P * w0P + 2.0 * ksi * tp->ActualScanTime * w0P + 1.0;
+  pwr_tFloat32 a0 =
+      tp->ActualScanTime * tp->ActualScanTime * w0P * w0P + 2.0 * ksi * tp->ActualScanTime * w0P + 1.0;
   pwr_tFloat32 a1 = 2.0 * (ksi * tp->ActualScanTime * w0P + 1.0);
   pwr_tFloat32 a2 = -1.0;
   pwr_tFloat32 b0 = tp->ActualScanTime * tp->ActualScanTime * w0P * w0P;
@@ -656,18 +678,19 @@ void SouFilter(plc_sThread* tp, pwr_sClass_CompIMC* plant_obj, pwr_tInt16 n,
   plant_obj->S[n + 1] = CLAMP(plant_obj->S[n + 1], 0.0, 100.0);
   plant_obj->uOutm2 = plant_obj->uOutm1;
   plant_obj->uOutm1 = plant_obj->S[n + 1];
-  plant_obj->S[n + 1] = a1 / a0 * plant_obj->uOutm1
-      + a2 / a0 * plant_obj->uOutm2 + b0 / a0 * plant_obj->S[n];
+  plant_obj->S[n + 1] = a1 / a0 * plant_obj->uOutm1 + a2 / a0 * plant_obj->uOutm2 + b0 / a0 * plant_obj->S[n];
 }
 
-void SouTOoFilter(plc_sThread* tp, pwr_sClass_CompIMC* plant_obj, pwr_tInt16 n,
-    pwr_tFloat32 w0, pwr_tFloat32 ksi, pwr_tFloat32 Tl1, pwr_tFloat32 Tl2)
+void SouTOoFilter(plc_sThread* tp, pwr_sClass_CompIMC* plant_obj, pwr_tInt16 n, pwr_tFloat32 w0,
+                  pwr_tFloat32 ksi, pwr_tFloat32 Tl1, pwr_tFloat32 Tl2)
 {
-  if (w0 <= 0.0) {
+  if (w0 <= 0.0)
+  {
     plant_obj->S[n + 1] = plant_obj->S[n];
     return;
   }
-  pwr_tFloat32 b0 = tp->ActualScanTime * tp->ActualScanTime * w0 * w0 + 2.0 * ksi * tp->ActualScanTime * w0 + 1.0;
+  pwr_tFloat32 b0 =
+      tp->ActualScanTime * tp->ActualScanTime * w0 * w0 + 2.0 * ksi * tp->ActualScanTime * w0 + 1.0;
   pwr_tFloat32 b1 = -2.0 * (ksi * tp->ActualScanTime * w0 + 1.0);
   pwr_tFloat32 b2 = 1.0;
   pwr_tFloat32 a0 = w0 * w0 * (Tl1 + tp->ActualScanTime) * (Tl2 + tp->ActualScanTime);
@@ -678,54 +701,52 @@ void SouTOoFilter(plc_sThread* tp, pwr_sClass_CompIMC* plant_obj, pwr_tInt16 n,
   plant_obj->S[n + 1] = CLAMP(plant_obj->S[n + 1], 0.0, 100.0);
   plant_obj->Outm2 = plant_obj->Outm1;
   plant_obj->Outm1 = plant_obj->S[n + 1];
-  plant_obj->S[n + 1] = a1 / a0 * plant_obj->Outm1 + a2 / a0 * plant_obj->Outm2
-      + b0 / a0 * plant_obj->S[n] + b1 / a0 * plant_obj->Inm1
-      + b2 / a0 * plant_obj->Inm2;
+  plant_obj->S[n + 1] = a1 / a0 * plant_obj->Outm1 + a2 / a0 * plant_obj->Outm2 + b0 / a0 * plant_obj->S[n] +
+                        b1 / a0 * plant_obj->Inm1 + b2 / a0 * plant_obj->Inm2;
   plant_obj->Inm2 = plant_obj->Inm1;
   plant_obj->Inm1 = plant_obj->S[n];
 }
 
 void Delay(plc_sThread* tp, pwr_sClass_CompIMC* plant_obj, pwr_tInt16 n,
-    pwr_tFloat32 Delay) // Only one delay per IMC objectavailable
+           pwr_tFloat32 Delay) // Only one delay per IMC objectavailable
 {
   pwr_tFloat32 OP = 0.0;
   int i, Ntime, Nscan;
-  if ((int)Delay < tp->ActualScanTime) {
+  if ((int)Delay < tp->ActualScanTime)
+  {
     plant_obj->S[n + 1] = plant_obj->S[n];
     return;
   } // return if nothing can be done
   if (!feqf(plant_obj->PrevDelay, Delay))
     for (i = MAXCELLS - 1; i >= 0; i--)
-      plant_obj->D[i] = plant_obj->S[n]; // reset if delay param as changed
-  plant_obj->PrevDelay = Delay; // Apply new delay
+      plant_obj->D[i] = plant_obj->S[n];           // reset if delay param as changed
+  plant_obj->PrevDelay = Delay;                    // Apply new delay
   Nscan = (int)(0.5 + Delay / tp->ActualScanTime); // Calculate number of cells needed
-  if (Nscan > MAXCELLS) // Things to do if delay time is more than 100 times
+  if (Nscan > MAXCELLS)                            // Things to do if delay time is more than 100 times
   // scan time
   {
-    Ntime = (int)(0.5
-        + Delay
-            / (tp->ActualScanTime * (pwr_tFloat32)
-                        MAXCELLS)); // calculate number of time lags to count
+    Ntime = (int)(0.5 + Delay / (tp->ActualScanTime *
+                                 (pwr_tFloat32)MAXCELLS)); // calculate number of time lags to count
     if (plant_obj->DtCtr == 0)
       for (i = 0; i <= MAXCELLS; i++)
         plant_obj->D[i] = plant_obj->S[n]; // reset all the array
-    OP = plant_obj->D[MAXCELLS - 1]; // copy last array item to output
-    if (plant_obj->DtCtr >= Ntime) // if time elapsed -> shift array
+    OP = plant_obj->D[MAXCELLS - 1];       // copy last array item to output
+    if (plant_obj->DtCtr >= Ntime)         // if time elapsed -> shift array
     {
       plant_obj->DtCtr = 0; // Reset time lag counter
       for (i = MAXCELLS - 1; i > 0; i--)
         plant_obj->D[i] = plant_obj->D[i - 1]; // shift all the array
-      plant_obj->D[0] = plant_obj->S[n]; // copy input to first array item
+      plant_obj->D[0] = plant_obj->S[n];       // copy input to first array item
     }
     plant_obj->DtCtr++; // decrement time lag counter
-  } else // things to do if delay time is less than (or equal to) 100 times
+  }
+  else // things to do if delay time is less than (or equal to) 100 times
   // scan time
   {
     OP = plant_obj->D[Nscan - 1]; // copy last active array item to output
     for (i = Nscan; i > 0; i--)
-      plant_obj->D[i]
-          = plant_obj->D[i - 1]; // shift a sufficient part of the array
-    plant_obj->D[0] = plant_obj->S[n]; // copy input to first array item
+      plant_obj->D[i] = plant_obj->D[i - 1]; // shift a sufficient part of the array
+    plant_obj->D[0] = plant_obj->S[n];       // copy input to first array item
   }
   plant_obj->S[n + 1] = OP; // copy to function output
 }
@@ -740,29 +761,27 @@ void CompIMC_Fo_exec(plc_sThread* tp, pwr_sClass_CompIMC_Fo* plc_obj)
   pwr_tInt16 i;
   pwr_tFloat32 OP;
 
-  plant_obj->PV = *plc_obj->PVP; // Process value: copy IMC_Fo to IMC
-  plant_obj->SP = *plc_obj->SPP; // Setpoint value: copy IMC_Fo to IMC
-  plant_obj->aut = *plc_obj->autP; // Auto input: copy IMC_Fo to IMC
-  plant_obj->FF = *plc_obj->FFP; // FF: copy IMC_Fo to IMC
+  plant_obj->PV = *plc_obj->PVP;           // Process value: copy IMC_Fo to IMC
+  plant_obj->SP = *plc_obj->SPP;           // Setpoint value: copy IMC_Fo to IMC
+  plant_obj->aut = *plc_obj->autP;         // Auto input: copy IMC_Fo to IMC
+  plant_obj->FF = *plc_obj->FFP;           // FF: copy IMC_Fo to IMC
   plant_obj->Trim_SP = *plc_obj->Trim_SPP; // Trim_SP: copy IMC_Fo to IMC
 
-  LSP = plant_obj->SP + plant_obj->Trim_SP; // Calculate working setpoint
+  LSP = plant_obj->SP + plant_obj->Trim_SP;             // Calculate working setpoint
   LSP = CLAMP(LSP, plant_obj->LL_SP, plant_obj->HL_SP); // Apply limits
   Normalize(LSP, &nLSP, plant_obj->LR_PV, plant_obj->HR_PV, 0.0,
-      100.0); // Normalize setpoint value // v0.3
+            100.0); // Normalize setpoint value // v0.3
 
   PV = plant_obj->PV; // Copy from GUI
   Normalize(PV, &nPV, plant_obj->LR_PV, plant_obj->HR_PV, 0.0,
-      100.0); // Normalize process value // v0.3
-  sig = (plant_obj->Inverse)
-      ? nLSP - nPV
-      : nPV - nLSP; // Error signal after direct/inverse Comparator
-  plant_obj->EP = -sig; // Calculate error value to display
+            100.0);                                     // Normalize process value // v0.3
+  sig = (plant_obj->Inverse) ? nLSP - nPV : nPV - nLSP; // Error signal after direct/inverse Comparator
+  plant_obj->EP = -sig;                                 // Calculate error value to display
 
-  if (!plant_obj->aut) { // Manage manual mode & reset all buffers
+  if (!plant_obj->aut)
+  { // Manage manual mode & reset all buffers
     sig = 0;
-    Normalize(*plc_obj->Man_OPP, &man_OP, plant_obj->LR_OP, plant_obj->HR_OP,
-        0.0, 100.0); // v0.3
+    Normalize(*plc_obj->Man_OPP, &man_OP, plant_obj->LR_OP, plant_obj->HR_OP, 0.0, 100.0); // v0.3
 
     for (i = 0; i < 12; i++)
       plant_obj->S[i] = man_OP;
@@ -770,15 +789,16 @@ void CompIMC_Fo_exec(plc_sThread* tp, pwr_sClass_CompIMC_Fo* plc_obj)
       plant_obj->D[i] = man_OP;
     for (i = 0; i < 10; i++)
       plant_obj->M[i] = man_OP;
-    plant_obj->Inm1 = plant_obj->Inm2 = plant_obj->Outm1 = plant_obj->Outm2
-        = man_OP;
+    plant_obj->Inm1 = plant_obj->Inm2 = plant_obj->Outm1 = plant_obj->Outm2 = man_OP;
     plant_obj->uOutm1 = plant_obj->uOutm2 = man_OP;
 
     yr = *plc_obj->Man_OPP;
     yr = CLAMP(yr, plant_obj->LL_OP,
-        plant_obj->HL_OP); // Apply limits on control signal
+               plant_obj->HL_OP); // Apply limits on control signal
     plc_obj->OP = plant_obj->OP = yr;
-  } else { // Calculate IMC controller
+  }
+  else
+  { // Calculate IMC controller
 
     if (tp->ActualScanTime <= 0)
       return; // v0.3
@@ -792,41 +812,41 @@ void CompIMC_Fo_exec(plc_sThread* tp, pwr_sClass_CompIMC_Fo* plc_obj)
     plant_obj->S[0] = sig + plant_obj->S[11]; // Add previous model's feedback
 
     LagFilter(tp, plant_obj, 0,
-        plant_obj->RobTau); // Increasing robustness by low pass filtering
+              plant_obj->RobTau); // Increasing robustness by low pass filtering
 
-    if (plant_obj->ProcModel & 8) {
+    if (plant_obj->ProcModel & 8)
+    {
       LagFilter(tp, plant_obj, 1, plant_obj->LeadT);
-      LeadLagFilter(tp, plant_obj, 2, plant_obj->LagT3,
-          plant_obj->LagT3 / plant_obj->Accel);
-    } else
+      LeadLagFilter(tp, plant_obj, 2, plant_obj->LagT3, plant_obj->LagT3 / plant_obj->Accel);
+    }
+    else
       plant_obj->S[3] = plant_obj->S[2] = plant_obj->S[1];
 
     if (plant_obj->ProcModel & 1)
-      LeadLagFilter(tp, plant_obj, 3, plant_obj->LagT1,
-          plant_obj->LagT1 / plant_obj->Accel);
+      LeadLagFilter(tp, plant_obj, 3, plant_obj->LagT1, plant_obj->LagT1 / plant_obj->Accel);
     else
       plant_obj->S[4] = plant_obj->S[3];
 
     if (plant_obj->ProcModel & 2)
-      LeadLagFilter(tp, plant_obj, 4, plant_obj->LagT2,
-          plant_obj->LagT2 / plant_obj->Accel);
+      LeadLagFilter(tp, plant_obj, 4, plant_obj->LagT2, plant_obj->LagT2 / plant_obj->Accel);
     else
       plant_obj->S[5] = plant_obj->S[4];
 
-    if (plant_obj->ProcModel & 4) {
-      Tl1 = Tl2
-          = plant_obj->ksi * M_PI / (2.0 * plant_obj->Accel * plant_obj->w0);
+    if (plant_obj->ProcModel & 4)
+    {
+      Tl1 = Tl2 = plant_obj->ksi * M_PI / (2.0 * plant_obj->Accel * plant_obj->w0);
       SouTOoFilter(tp, plant_obj, 5, plant_obj->w0, plant_obj->ksi, Tl1, Tl2);
-    } else
+    }
+    else
       plant_obj->S[6] = plant_obj->S[5];
 
     OP = plant_obj->S[6];
     OP = CLAMP(OP, 0.0, 100.0); // Apply limits on model output
     Normalize(OP, &yr, 0.0, 100.0, plant_obj->LR_OP,
-        plant_obj->HR_OP); // Denormalize output // v0.3
-    yr += plant_obj->FF; // Add feedforward input value
+              plant_obj->HR_OP); // Denormalize output // v0.3
+    yr += plant_obj->FF;         // Add feedforward input value
     yr = CLAMP(yr, plant_obj->LL_OP,
-        plant_obj->HL_OP); // Apply limits to control signal
+               plant_obj->HL_OP);     // Apply limits to control signal
     plc_obj->OP = plant_obj->OP = yr; // copy to GUI objects
 
     // Model's feedback
@@ -871,16 +891,14 @@ void CompModeIMC_Fo_init(pwr_sClass_CompModeIMC_Fo* plc_obj)
 {
   pwr_tDlid dlid;
   pwr_tStatus sts;
-  sts = gdh_DLRefObjectInfoAttrref(
-      &plc_obj->PlcConnect, (void**)&plc_obj->PlcConnectP, &dlid);
+  sts = gdh_DLRefObjectInfoAttrref(&plc_obj->PlcConnect, (void**)&plc_obj->PlcConnectP, &dlid);
   if (EVEN(sts))
     plc_obj->PlcConnectP = 0;
 }
 
 void CompModeIMC_Fo_exec(plc_sThread* tp, pwr_sClass_CompModeIMC_Fo* plc_obj)
 {
-  pwr_sClass_CompModeIMC* plant_obj
-      = (pwr_sClass_CompModeIMC*)plc_obj->PlcConnectP;
+  pwr_sClass_CompModeIMC* plant_obj = (pwr_sClass_CompModeIMC*)plc_obj->PlcConnectP;
   if (!plc_obj)
     return;
 
@@ -896,29 +914,24 @@ void CompModeIMC_Fo_exec(plc_sThread* tp, pwr_sClass_CompModeIMC_Fo* plc_obj)
   else
     plc_obj->Man_OP = plant_obj->Loc_OP;
 
-  if ((plant_obj->Mode != pwr_eImcModeEnum_Manual)
-      && (plant_obj->PrevMode == pwr_eImcModeEnum_Manual)
-      && (plant_obj->BumpLess)) // copy PV to SP when bumpless is set & aut to
+  if ((plant_obj->Mode != pwr_eImcModeEnum_Manual) && (plant_obj->PrevMode == pwr_eImcModeEnum_Manual) &&
+      (plant_obj->BumpLess)) // copy PV to SP when bumpless is set & aut to
     // man transition
     plant_obj->Loc_SP = plant_obj->PV;
 
-  if ((plant_obj->Mode == pwr_eImcModeEnum_Auto)
-      && (plant_obj->PrevMode == pwr_eImcModeEnum_Remote)
-      && (plant_obj->BumpLess)) // copy PV to SP when bumpless is set & rem to
+  if ((plant_obj->Mode == pwr_eImcModeEnum_Auto) && (plant_obj->PrevMode == pwr_eImcModeEnum_Remote) &&
+      (plant_obj->BumpLess)) // copy PV to SP when bumpless is set & rem to
     // man transition
     plant_obj->Loc_SP = plant_obj->PV;
 
   if (!feqf(plant_obj->Loc_SP, plant_obj->SP))
     plant_obj->SP = plant_obj->Loc_SP; // set SP to manual GUI SP setting
   if (plant_obj->Mode == pwr_eImcModeEnum_Remote)
-    plant_obj->SP
-        = *plc_obj
-               ->Rem_SPP; // set SP to external SP when remote mode is selected
-  plc_obj->SP = plant_obj->SP; // copy plant SP to plc SP
-  plc_obj->aut = (plant_obj->Mode
-      != pwr_eImcModeEnum_Manual); // set aut output on plc object
-  plant_obj->EP = (plant_obj->PV - plant_obj->SP); // calculate EP
-  plant_obj->PrevMode = plant_obj->Mode; // memorize last mode
+    plant_obj->SP = *plc_obj->Rem_SPP; // set SP to external SP when remote mode is selected
+  plc_obj->SP = plant_obj->SP;         // copy plant SP to plc SP
+  plc_obj->aut = (plant_obj->Mode != pwr_eImcModeEnum_Manual); // set aut output on plc object
+  plant_obj->EP = (plant_obj->PV - plant_obj->SP);             // calculate EP
+  plant_obj->PrevMode = plant_obj->Mode;                       // memorize last mode
 }
 
 /*_*
@@ -931,24 +944,20 @@ void CompCurveTabValueFo_init(pwr_sClass_CompCurveTabValueFo* o)
   pwr_tDlid dlid;
   pwr_tStatus sts;
 
-  sts = gdh_DLRefObjectInfoAttrref(
-      &o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
+  sts = gdh_DLRefObjectInfoAttrref(&o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
   if (EVEN(sts))
     o->PlcConnectP = 0;
 
   if (ODD(sts))
-    sts = gdh_DLRefObjectInfoAttrref(
-        &((pwr_sClass_CompCurveTabValue*)o->PlcConnectP)->CurveTabObject,
-        (void**)&o->CurveTabObjectP, &dlid);
+    sts = gdh_DLRefObjectInfoAttrref(&((pwr_sClass_CompCurveTabValue*)o->PlcConnectP)->CurveTabObject,
+                                     (void**)&o->CurveTabObjectP, &dlid);
   if (EVEN(sts))
     o->CurveTabObjectP = 0;
 }
 
-void CompCurveTabValueFo_exec(
-    plc_sThread* tp, pwr_sClass_CompCurveTabValueFo* o)
+void CompCurveTabValueFo_exec(plc_sThread* tp, pwr_sClass_CompCurveTabValueFo* o)
 {
-  pwr_sClass_CompCurveTabValue* co
-      = (pwr_sClass_CompCurveTabValue*)o->PlcConnectP;
+  pwr_sClass_CompCurveTabValue* co = (pwr_sClass_CompCurveTabValue*)o->PlcConnectP;
   pwr_sClass_CompCurveTab* to = (pwr_sClass_CompCurveTab*)o->CurveTabObjectP;
   int ii;
   float x0, x1, y0, y1;
@@ -963,18 +972,22 @@ void CompCurveTabValueFo_exec(
     confError = 1;
   else if (to->NoOfPoints > 50)
     confError = 2;
-  else {
-    for (ii = 1; ii < to->NoOfPoints && !confError; ii++) {
+  else
+  {
+    for (ii = 1; ii < to->NoOfPoints && !confError; ii++)
+    {
       if (to->X[ii] < to->X[ii - 1])
         confError = 3;
     }
   }
   to->ConfigurationError = confError;
 
-  if (!confError) {
+  if (!confError)
+  {
     x1 = x0 = to->X[0];
     y1 = y0 = to->Y[0];
-    for (ii = 1; ii<to->NoOfPoints&& * o->InP> x1; ii++) {
+    for (ii = 1; ii < to->NoOfPoints && *o->InP > x1; ii++)
+    {
       x0 = x1;
       x1 = to->X[ii];
       y0 = y1;
@@ -985,8 +998,7 @@ void CompCurveTabValueFo_exec(
     else if (*o->InP >= x1)
       o->ActVal = y1; /* End of table */
     else
-      o->ActVal
-          = y0 + (y1 - y0) * (*o->InP - x0) / (x1 - x0); /* Interpolation */
+      o->ActVal = y0 + (y1 - y0) * (*o->InP - x0) / (x1 - x0); /* Interpolation */
   }
   co->ActVal = o->ActVal;
   co->In = *o->InP;
@@ -1005,15 +1017,19 @@ static void CompCurvePolValueFo_draw(pwr_sClass_CompCurvePol* o)
   pwr_tFloat32 x, y;
   pwr_tFloat32 dx = (o->MaxShowX - o->MinShowX) / CURVEPOL_POINTS;
 
-  if (o->Power == 1) {
+  if (o->Power == 1)
+  {
     o->DisplayNoOfPoints = 2;
     o->DisplayX[0] = o->MinShowX;
     o->DisplayX[1] = o->MaxShowX;
     o->DisplayY[0] = o->PolyCoeff[0] + o->MinShowX * o->PolyCoeff[1];
     o->DisplayY[1] = o->PolyCoeff[0] + o->MaxShowX * o->PolyCoeff[1];
-  } else {
+  }
+  else
+  {
     x = o->MinShowX;
-    for (i = 0; i <= CURVEPOL_POINTS; i++) {
+    for (i = 0; i <= CURVEPOL_POINTS; i++)
+    {
       y = 0;
       for (j = o->Power; j > 0; j--)
         y = x * (o->PolyCoeff[j] + y);
@@ -1032,28 +1048,23 @@ void CompCurvePolValueFo_init(pwr_sClass_CompCurvePolValueFo* o)
   pwr_tDlid dlid;
   pwr_tStatus sts;
 
-  sts = gdh_DLRefObjectInfoAttrref(
-      &o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
+  sts = gdh_DLRefObjectInfoAttrref(&o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
   if (EVEN(sts))
     o->PlcConnectP = 0;
 
   if (ODD(sts))
-    sts = gdh_DLRefObjectInfoAttrref(
-        &((pwr_sClass_CompCurvePolValue*)o->PlcConnectP)->CurvePolObject,
-        (void**)&o->CurvePolObjectP, &dlid);
+    sts = gdh_DLRefObjectInfoAttrref(&((pwr_sClass_CompCurvePolValue*)o->PlcConnectP)->CurvePolObject,
+                                     (void**)&o->CurvePolObjectP, &dlid);
   if (EVEN(sts))
     o->CurvePolObjectP = 0;
 
-  if (o->CurvePolObjectP
-      && ((pwr_sClass_CompCurvePol*)o->CurvePolObjectP)->UpdateDisplay)
+  if (o->CurvePolObjectP && ((pwr_sClass_CompCurvePol*)o->CurvePolObjectP)->UpdateDisplay)
     CompCurvePolValueFo_draw(o->CurvePolObjectP);
 }
 
-void CompCurvePolValueFo_exec(
-    plc_sThread* tp, pwr_sClass_CompCurvePolValueFo* o)
+void CompCurvePolValueFo_exec(plc_sThread* tp, pwr_sClass_CompCurvePolValueFo* o)
 {
-  pwr_sClass_CompCurvePolValue* co
-      = (pwr_sClass_CompCurvePolValue*)o->PlcConnectP;
+  pwr_sClass_CompCurvePolValue* co = (pwr_sClass_CompCurvePolValue*)o->PlcConnectP;
   pwr_sClass_CompCurvePol* to = (pwr_sClass_CompCurvePol*)o->CurvePolObjectP;
   int i;
   float x, y;
@@ -1063,13 +1074,16 @@ void CompCurvePolValueFo_exec(
 
   o->ActVal = *o->InP;
 
-  if (to->Power > 5) {
+  if (to->Power > 5)
+  {
     to->ConfigurationError = 1;
     return;
-  } else
+  }
+  else
     to->ConfigurationError = 0;
 
-  if (!to->ConfigurationError) {
+  if (!to->ConfigurationError)
+  {
     x = *o->InP;
     y = 0;
     for (i = to->Power; i > 0; i--)
@@ -1085,124 +1099,141 @@ void CompCurvePolValueFo_exec(
 }
 
 /* MPC Model predictive contoller */
-typedef struct {
+typedef struct
+{
   float acc;
   float value;
   float output;
 } t_vacc;
 
 /* Interpolation for Curve relations. */
-static float mpc_interpolate(float *curve, unsigned int c_len, float val)
+static float mpc_interpolate(float* curve, unsigned int c_len, float val)
 {
   unsigned int i;
   float ret;
 
-  if (val < curve[0]) {
-    ret = curve[1] - (curve[0] - val) * (curve[3]- curve[1]) / (curve[2] - curve[0]);
+  if (val < curve[0])
+  {
+    ret = curve[1] - (curve[0] - val) * (curve[3] - curve[1]) / (curve[2] - curve[0]);
     return ret;
   }
 
-  for (i = 1; i  < c_len * 2; i++) {
-    if (val < curve[i*2]) {
-      ret = curve[i*2+1] + (val - curve[i*2]) * (curve[i*2+1] - curve[(i-1)*2+1]) / (curve[i*2] - curve[(i-1)*2]);
+  for (i = 1; i < c_len * 2; i++)
+  {
+    if (val < curve[i * 2])
+    {
+      ret = curve[i * 2 + 1] + (val - curve[i * 2]) * (curve[i * 2 + 1] - curve[(i - 1) * 2 + 1]) /
+                                   (curve[i * 2] - curve[(i - 1) * 2]);
       return ret;
     }
   }
-  
-  ret = curve[(c_len-1)*2+1] + (val - curve[(c_len-1)*2]) * (curve[(c_len-1)*2+1] - curve[(c_len-2)*2+1]) / (curve[(c_len-1)*2] - curve[(c_len-2)*2]);
+
+  ret = curve[(c_len - 1) * 2 + 1] + (val - curve[(c_len - 1) * 2]) *
+                                         (curve[(c_len - 1) * 2 + 1] - curve[(c_len - 2) * 2 + 1]) /
+                                         (curve[(c_len - 1) * 2] - curve[(c_len - 2) * 2]);
   return ret;
 }
 
-
 /* Calculation of linear regression model */
-static float mpc_model(pwr_sClass_CompMPC_Fo *o, pwr_sClass_CompMPC *co, 
-		       float out, float av0, float timestep)
+static float mpc_model(pwr_sClass_CompMPC_Fo* o, pwr_sClass_CompMPC* co, float out, float av0, float timestep)
 {
   float av;
-  switch (co->Algorithm) {
+  switch (co->Algorithm)
+  {
   case pwr_eMpcAlgorithm_None:
     av = 0;
     break;
   case pwr_eMpcAlgorithm_FixTimeStep:
   case pwr_eMpcAlgorithm_ProgressiveTimeStep:
-  case pwr_eMpcAlgorithm_FirstTimeStep: {
+  case pwr_eMpcAlgorithm_FirstTimeStep:
+  {
     int i, j;
     pwr_tFloat32 val;
-    for (i = 0; i < co->NoOfAttr; i++) {
-      if (i == 0) {
-	if (co->BaseAttrRelation[0] == pwr_eMpcAttrRelation_Integral)
-	  av = av0;
-	else
-	  av = 0;
-	val = out;
+    for (i = 0; i < co->NoOfAttr; i++)
+    {
+      if (i == 0)
+      {
+        if (co->BaseAttrRelation[0] == pwr_eMpcAttrRelation_Integral)
+          av = av0;
+        else
+          av = 0;
+        val = out;
       }
       else
-	val = **(pwr_tFloat32 **)((char *)&o->Attr2P + pwr_cInputOffset * (i - 1));
-      switch (co->BaseAttrRelation[i]) {
-      case pwr_eMpcAttrRelation_Integral: {
-	switch (co->TightAttrRelation[i]) {
-	case pwr_eMpcAttrRelation_Curve: {
-	  if ( i > 9)
-	    break;
-	  pwr_sClass_table *t = *(pwr_sClass_table **)
-	    ((char *)&o->Curve1P + pwr_cInputOffset * i);
-	  val = mpc_interpolate(&t->TabVect[1], t->TabVect[0], val);
-	  break;
-	}
-	}
-	for (j = i + 1; j < co->NoOfAttr; j++) {
-	  if (co->BaseAttrRelation[j] == pwr_eMpcAttrRelation_No) {
-	    pwr_tFloat32 tval = **(pwr_tFloat32 **)((char *)&o->Attr2P + pwr_cInputOffset * (j - 1));
-	    switch (co->TightAttrRelation[j]) {
-	    case pwr_eMpcAttrRelation_Sub:
-	      val -= co->AttrCoeff[j] * tval;
-	      break;
-	    case pwr_eMpcAttrRelation_Add:
-	      val += co->AttrCoeff[j] * tval;
-	      break;
-	    case pwr_eMpcAttrRelation_Multiply:
-	      val *= co->AttrCoeff[j] * tval;
-	      break;
-	    case pwr_eMpcAttrRelation_Divide:
-	      val /= co->AttrCoeff[j] * tval;
-	      break;
-	    }
-	  }
-	  else {
-	    j--;
-	    break;
-	  }
-	}
-	av += val * co->AttrCoeff[i] * timestep;
-	i = j;
-	break;
+        val = **(pwr_tFloat32**)((char*)&o->Attr2P + pwr_cInputOffset * (i - 1));
+      switch (co->BaseAttrRelation[i])
+      {
+      case pwr_eMpcAttrRelation_Integral:
+      {
+        switch (co->TightAttrRelation[i])
+        {
+        case pwr_eMpcAttrRelation_Curve:
+        {
+          if (i > 9)
+            break;
+          pwr_sClass_table* t = *(pwr_sClass_table**)((char*)&o->Curve1P + pwr_cInputOffset * i);
+          val = mpc_interpolate(&t->TabVect[1], t->TabVect[0], val);
+          break;
+        }
+        }
+        for (j = i + 1; j < co->NoOfAttr; j++)
+        {
+          if (co->BaseAttrRelation[j] == pwr_eMpcAttrRelation_No)
+          {
+            pwr_tFloat32 tval = **(pwr_tFloat32**)((char*)&o->Attr2P + pwr_cInputOffset * (j - 1));
+            switch (co->TightAttrRelation[j])
+            {
+            case pwr_eMpcAttrRelation_Sub:
+              val -= co->AttrCoeff[j] * tval;
+              break;
+            case pwr_eMpcAttrRelation_Add:
+              val += co->AttrCoeff[j] * tval;
+              break;
+            case pwr_eMpcAttrRelation_Multiply:
+              val *= co->AttrCoeff[j] * tval;
+              break;
+            case pwr_eMpcAttrRelation_Divide:
+              val /= co->AttrCoeff[j] * tval;
+              break;
+            }
+          }
+          else
+          {
+            j--;
+            break;
+          }
+        }
+        av += val * co->AttrCoeff[i] * timestep;
+        i = j;
+        break;
       }
       case pwr_eMpcAttrRelation_Linear:
-	av += val * co->AttrCoeff[i];
-	break;
-      case pwr_eMpcAttrRelation_Curve: {
-	if ( i > 9)
-	  break;
-	pwr_sClass_table *t = *(pwr_sClass_table **)
-	    ((char *)&o->Curve1P + pwr_cInputOffset * i);
-	float p = mpc_interpolate(&t->TabVect[1], t->TabVect[0], val);
-	av += p * co->AttrCoeff[i];
-	//printf("Curve %6.3f %6.2f\n", p, val);
-	break;
+        av += val * co->AttrCoeff[i];
+        break;
+      case pwr_eMpcAttrRelation_Curve:
+      {
+        if (i > 9)
+          break;
+        pwr_sClass_table* t = *(pwr_sClass_table**)((char*)&o->Curve1P + pwr_cInputOffset * i);
+        float p = mpc_interpolate(&t->TabVect[1], t->TabVect[0], val);
+        av += p * co->AttrCoeff[i];
+        // printf("Curve %6.3f %6.2f\n", p, val);
+        break;
       }
       case pwr_eMpcAttrRelation_Multiply:
-	switch (co->TightAttrRelation[i]) {
-	case pwr_eMpcAttrRelation_Curve: {
-	  if ( i > 9)
-	    break;
-	  pwr_sClass_table *t = *(pwr_sClass_table **)
-	    ((char *)&o->Curve1P + pwr_cInputOffset * i);
-	  val = mpc_interpolate(&t->TabVect[1], t->TabVect[0], val);
-	  break;
-	}
-	}
-	av = av * val * co->AttrCoeff[i];
-	break;
+        switch (co->TightAttrRelation[i])
+        {
+        case pwr_eMpcAttrRelation_Curve:
+        {
+          if (i > 9)
+            break;
+          pwr_sClass_table* t = *(pwr_sClass_table**)((char*)&o->Curve1P + pwr_cInputOffset * i);
+          val = mpc_interpolate(&t->TabVect[1], t->TabVect[0], val);
+          break;
+        }
+        }
+        av = av * val * co->AttrCoeff[i];
+        break;
       }
     }
 
@@ -1211,17 +1242,16 @@ static float mpc_model(pwr_sClass_CompMPC_Fo *o, pwr_sClass_CompMPC *co,
   }
   }
   return av;
-} 
+}
 
 /* Executes one predictive time scan */
-static void mpc_tscan(plc_sThread* tp, pwr_sClass_CompMPC_Fo* o, 
-		      pwr_sClass_CompMPC* co, int tix, int *vix, 
-		      int iter, float *iter_vout, float close_timer)
+static void mpc_tscan(plc_sThread* tp, pwr_sClass_CompMPC_Fo* o, pwr_sClass_CompMPC* co, int tix, int* vix,
+                      int iter, float* iter_vout, float close_timer)
 {
   if (tix == co->Steps)
     return;
 
-  t_vacc **vacc = (t_vacc **)co->Vacc;
+  t_vacc** vacc = (t_vacc**)co->Vacc;
   int i;
   float t;
   float out;
@@ -1230,21 +1260,25 @@ static void mpc_tscan(plc_sThread* tp, pwr_sClass_CompMPC_Fo* o,
   float omin, omax, omiddle, oramp;
   float timestep;
 
-  switch (co->Algorithm) {
+  switch (co->Algorithm)
+  {
   case pwr_eMpcAlgorithm_ProgressiveTimeStep:
     t = 0;
     timestep = co->TimeStep;
-    for (i = 1; i < tix; i++) {
+    for (i = 1; i < tix; i++)
+    {
       t += timestep;
       timestep *= co->TimeStepFactor;
     }
     break;
   case pwr_eMpcAlgorithm_FirstTimeStep:
-    if (tix == 0) {
+    if (tix == 0)
+    {
       t = 0;
       timestep = co->TimeStepFirst;
     }
-    else {
+    else
+    {
       t = co->TimeStepFirst + co->TimeStep * (tix - 1);
       timestep = co->TimeStep;
     }
@@ -1255,56 +1289,61 @@ static void mpc_tscan(plc_sThread* tp, pwr_sClass_CompMPC_Fo* o,
   }
 
   oramp = co->OutRamp;
-  if (co->Options & pwr_mMpcOptionsMask_OutRampClose) {
+  if (co->Options & pwr_mMpcOptionsMask_OutRampClose)
+  {
     if (co->OutRampCloseActive)
       oramp = co->OutRampClose;
   }
 
-  for (i = 0; i < co->Splits; i++) {
-    if (iter == 0) {
-      if (tix == 0) {
-	if (co->Options & pwr_mMpcOptionsMask_OutDelay && co->OutDelayP)
-	  omiddle = co->OutDelayP[(int)(co->OutDelayTime / tp->f_scan_time)];
-	else
-	  omiddle = o->OutValue;
+  for (i = 0; i < co->Splits; i++)
+  {
+    if (iter == 0)
+    {
+      if (tix == 0)
+      {
+        if (co->Options & pwr_mMpcOptionsMask_OutDelay && co->OutDelayP)
+          omiddle = co->OutDelayP[(int)(co->OutDelayTime / tp->f_scan_time)];
+        else
+          omiddle = o->OutValue;
       }
       else
-	omiddle = vacc[tix-1][vix[tix-1]-1].output;
+        omiddle = vacc[tix - 1][vix[tix - 1] - 1].output;
       omax = MIN(omiddle + oramp * timestep, co->OutMax);
       omin = MAX(omiddle - oramp * timestep, co->OutMin);
     }
-    else {
+    else
+    {
       if (tix == 0)
-	omiddle = iter_vout[tix];
+        omiddle = iter_vout[tix];
       else
-	omiddle = vacc[tix-1][vix[tix-1]-1].output + iter_vout[tix] - iter_vout[tix-1];
-      omax = MIN(omiddle + oramp * timestep/(iter*2), co->OutMax);
-      omin = MAX(omiddle - oramp * timestep/(iter*2), co->OutMin);
+        omiddle = vacc[tix - 1][vix[tix - 1] - 1].output + iter_vout[tix] - iter_vout[tix - 1];
+      omax = MIN(omiddle + oramp * timestep / (iter * 2), co->OutMax);
+      omin = MAX(omiddle - oramp * timestep / (iter * 2), co->OutMin);
     }
-    out = omin + (omax - omin)/(co->Splits - 1) * i;
+    out = omin + (omax - omin) / (co->Splits - 1) * i;
     if (tix == 0)
       av0 = *o->ProcValueP;
     else
-      av0 = vacc[tix-1][vix[tix]/co->Splits].value;
+      av0 = vacc[tix - 1][vix[tix] / co->Splits].value;
 
-    av = mpc_model(o, co, out, av0, timestep); 
+    av = mpc_model(o, co, out, av0, timestep);
     vacc[tix][vix[tix]].output = out;
     vacc[tix][vix[tix]].value = av;
     if (tix > 0)
-      vacc[tix][vix[tix]].acc = vacc[tix-1][vix[tix-1]-1].acc;
+      vacc[tix][vix[tix]].acc = vacc[tix - 1][vix[tix - 1] - 1].acc;
 
     if (co->Options & pwr_mMpcOptionsMask_ModelCorrection)
       vacc[tix][vix[tix]].acc += fabs(av - (co->SetValue + co->ModelCorr));
     else
       vacc[tix][vix[tix]].acc += fabs(av - co->SetValue);
 
-    // printf("acc[%2d][%2d] %7.2f     sp %7.2f out %7.2f\n", tix, vix[tix], vacc[tix][vix[tix]].acc, co->SetValue, out);      
-    vix[tix]++;  
+    // printf("acc[%2d][%2d] %7.2f     sp %7.2f out %7.2f\n", tix, vix[tix], vacc[tix][vix[tix]].acc,
+    // co->SetValue, out);
+    vix[tix]++;
 
-    mpc_tscan(tp, o, co, tix+1, vix, iter, iter_vout, close_timer);
+    mpc_tscan(tp, o, co, tix + 1, vix, iter, iter_vout, close_timer);
   }
 }
-
 
 /*_*
   CompMPC_Fo
@@ -1313,33 +1352,34 @@ static void mpc_tscan(plc_sThread* tp, pwr_sClass_CompMPC_Fo* o,
 */
 void CompMPC_Fo_init(pwr_sClass_CompMPC_Fo* o)
 {
-  t_vacc **vacc;
+  t_vacc** vacc;
   int size;
   int i;
-  pwr_sClass_CompMPC *co;
+  pwr_sClass_CompMPC* co;
   pwr_tDlid dlid;
   pwr_tStatus sts;
 
-  sts = gdh_DLRefObjectInfoAttrref(
-      &o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
+  sts = gdh_DLRefObjectInfoAttrref(&o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
   if (EVEN(sts))
     o->PlcConnectP = 0;
 
-  co = (pwr_sClass_CompMPC *)o->PlcConnectP;
+  co = (pwr_sClass_CompMPC*)o->PlcConnectP;
   if (!co)
     return;
 
   co->NoOfPaths = 0;
   co->Vacc = malloc(co->Steps * sizeof(float*));
-  vacc = (t_vacc **)co->Vacc;
-  for (i = 0; i < co->Steps; i++) {
-    size = pow(co->Splits, i+1);
-    vacc[i] = (t_vacc *)malloc(size * sizeof(t_vacc));
-    memset(vacc[i], 0,  size * sizeof(t_vacc));
+  vacc = (t_vacc**)co->Vacc;
+  for (i = 0; i < co->Steps; i++)
+  {
+    size = pow(co->Splits, i + 1);
+    vacc[i] = (t_vacc*)malloc(size * sizeof(t_vacc));
+    memset(vacc[i], 0, size * sizeof(t_vacc));
     co->NoOfPaths += size;
   }
 
-  if (cdh_ObjidIsNotNull(co->MonitorObject)) {
+  if (cdh_ObjidIsNotNull(co->MonitorObject))
+  {
     pwr_tAttrRef a = cdh_ObjidToAref(co->MonitorObject);
     sts = gdh_DLRefObjectInfoAttrref(&a, (void**)&co->MonitorP, &dlid);
     if (EVEN(sts))
@@ -1349,14 +1389,14 @@ void CompMPC_Fo_init(pwr_sClass_CompMPC_Fo* o)
 
 void CompMPC_Fo_exec(plc_sThread* tp, pwr_sClass_CompMPC_Fo* o)
 {
-  t_vacc **vacc;
+  t_vacc** vacc;
   int i, j;
   int min_acc;
-  int *vix;
-  float *vout;
+  int* vix;
+  float* vout;
   int idx;
   int size;
-  pwr_sClass_CompMPC *co = (pwr_sClass_CompMPC *)o->PlcConnectP;
+  pwr_sClass_CompMPC* co = (pwr_sClass_CompMPC*)o->PlcConnectP;
 
   if (!co)
     return;
@@ -1366,147 +1406,173 @@ void CompMPC_Fo_exec(plc_sThread* tp, pwr_sClass_CompMPC_Fo* o)
   co->ForceValue = o->ForceValue = *o->ForceValueP;
   co->Force = o->Force = *o->ForceP;
 
-  if (*o->ForceP) {
+  if (*o->ForceP)
+  {
     o->OutValue = *o->ForceValueP;
     return;
   }
 
-  if (co->Options & pwr_mMpcOptionsMask_OutDelay) {
+  if (co->Options & pwr_mMpcOptionsMask_OutDelay)
+  {
     if (!co->OutDelayP)
       co->OutDelayP = calloc(1, ((int)(co->OutDelayMaxTime / tp->f_scan_time) + 1) * sizeof(pwr_tFloat32));
 
     for (i = (int)(co->OutDelayMaxTime / tp->f_scan_time); i >= 1; i--)
-      co->OutDelayP[i] = co->OutDelayP[i-1];
+      co->OutDelayP[i] = co->OutDelayP[i - 1];
     co->OutDelayP[0] = o->OutValue;
   }
 
   /* SetValue correction */
-  if (co->Options & pwr_mMpcOptionsMask_ModelCorrection) {
-    if ( fabs(*o->SetValueP - *o->ProcValueP) < co->ModelCorrInterval) {
-      if (!co->ModelCorrActive) {
-	if (co->ModelCorrDelay != 0.0f) {
-	  co->ModelCorrTimer += tp->f_scan_time;
-	  if (co->ModelCorrTimer >= co->ModelCorrDelay) {
-	    co->ModelCorr += (*o->SetValueP - *o->ProcValueP) * (*o->ScanTime) / co->ModelCorrIntTime;
-	    co->ModelCorrActive = 1;
-	  }
-	}
-	else {
-	  co->ModelCorr += (*o->SetValueP - *o->ProcValueP) * (*o->ScanTime) / co->ModelCorrIntTime;
-	  co->ModelCorrActive = 1;
-	}
+  if (co->Options & pwr_mMpcOptionsMask_ModelCorrection)
+  {
+    if (fabs(*o->SetValueP - *o->ProcValueP) < co->ModelCorrInterval)
+    {
+      if (!co->ModelCorrActive)
+      {
+        if (co->ModelCorrDelay != 0.0f)
+        {
+          co->ModelCorrTimer += tp->f_scan_time;
+          if (co->ModelCorrTimer >= co->ModelCorrDelay)
+          {
+            co->ModelCorr += (*o->SetValueP - *o->ProcValueP) * (*o->ScanTime) / co->ModelCorrIntTime;
+            co->ModelCorrActive = 1;
+          }
+        }
+        else
+        {
+          co->ModelCorr += (*o->SetValueP - *o->ProcValueP) * (*o->ScanTime) / co->ModelCorrIntTime;
+          co->ModelCorrActive = 1;
+        }
       }
       else
-	co->ModelCorr += (*o->SetValueP - *o->ProcValueP) * (*o->ScanTime) / co->ModelCorrIntTime;
+        co->ModelCorr += (*o->SetValueP - *o->ProcValueP) * (*o->ScanTime) / co->ModelCorrIntTime;
     }
-    else {
+    else
+    {
       co->ModelCorr = 0;
       co->ModelCorrActive = 0;
       co->ModelCorrTimer = 0;
     }
   }
-  else {
+  else
+  {
     co->ModelCorr = 0;
     co->ModelCorrActive = 0;
   }
 
-  if (co->Options & pwr_mMpcOptionsMask_OutRampClose) {
-    if ( fabsf(*o->SetValueP - *o->ProcValueP) < co->OutRampCloseInterval) {
-      if (!co->OutRampCloseActive) {
-	if (co->OutRampCloseDelay != 0.0f) {
-	  co->OutRampCloseTimer += tp->f_scan_time;
-	  if (co->OutRampCloseTimer >= co->OutRampCloseDelay)
-	    co->OutRampCloseActive = 1;
-	}
-	else
-	  co->OutRampCloseActive = 1;
+  if (co->Options & pwr_mMpcOptionsMask_OutRampClose)
+  {
+    if (fabsf(*o->SetValueP - *o->ProcValueP) < co->OutRampCloseInterval)
+    {
+      if (!co->OutRampCloseActive)
+      {
+        if (co->OutRampCloseDelay != 0.0f)
+        {
+          co->OutRampCloseTimer += tp->f_scan_time;
+          if (co->OutRampCloseTimer >= co->OutRampCloseDelay)
+            co->OutRampCloseActive = 1;
+        }
+        else
+          co->OutRampCloseActive = 1;
       }
     }
-    else {
+    else
+    {
       co->OutRampCloseActive = 0;
       co->OutRampCloseTimer = 0;
-    }    
+    }
   }
   else
     co->OutRampCloseActive = 0;
 
-  vacc = (t_vacc **)co->Vacc;
-  vix = (int *)calloc(1, co->Steps * sizeof(unsigned int));
+  vacc = (t_vacc**)co->Vacc;
+  vix = (int*)calloc(1, co->Steps * sizeof(unsigned int));
   mpc_tscan(tp, o, co, 0, vix, 0, 0, 0);
 
   min_acc = 0;
-  for (i = 0; i < pow(co->Splits, co->Steps); i++) {
-    if (vacc[co->Steps-1][i].acc < vacc[co->Steps-1][min_acc].acc)
-      min_acc = i;	
+  for (i = 0; i < pow(co->Splits, co->Steps); i++)
+  {
+    if (vacc[co->Steps - 1][i].acc < vacc[co->Steps - 1][min_acc].acc)
+      min_acc = i;
   }
 
   idx = min_acc;
-  for (i = co->Steps - 1; i >= 0; i--) {
+  for (i = co->Steps - 1; i >= 0; i--)
+  {
     idx = idx / co->Splits;
   }
 
-  vout = (float *)malloc(co->Steps * sizeof(float));
-  for ( j = 0; j < co->Iterations; j++) {
+  vout = (float*)malloc(co->Steps * sizeof(float));
+  for (j = 0; j < co->Iterations; j++)
+  {
     idx = min_acc;
-    for (i = co->Steps - 1; i >= 0; i--) {
+    for (i = co->Steps - 1; i >= 0; i--)
+    {
       vout[i] = vacc[i][idx].output;
       idx = idx / co->Splits;
     }
 
-    for (i = 0; i < co->Steps; i++) {
-      size = pow(co->Splits, i+1);
-      memset(vacc[i], 0,  size * sizeof(t_vacc));
+    for (i = 0; i < co->Steps; i++)
+    {
+      size = pow(co->Splits, i + 1);
+      memset(vacc[i], 0, size * sizeof(t_vacc));
     }
     memset(vix, 0, co->Steps * sizeof(unsigned int));
-    mpc_tscan(tp, o, co, 0, vix, j+1, vout, co->OutRampCloseTimer);
+    mpc_tscan(tp, o, co, 0, vix, j + 1, vout, co->OutRampCloseTimer);
 
     min_acc = 0;
-    for (i = 0; i < pow(co->Splits,co->Steps); i++) {
-      if (vacc[co->Steps-1][i].acc < vacc[co->Steps-1][min_acc].acc)
-	min_acc = i;	
+    for (i = 0; i < pow(co->Splits, co->Steps); i++)
+    {
+      if (vacc[co->Steps - 1][i].acc < vacc[co->Steps - 1][min_acc].acc)
+        min_acc = i;
     }
 
     idx = min_acc;
-    for (i = co->Steps - 1; i >= 0; i--) {
+    for (i = co->Steps - 1; i >= 0; i--)
+    {
       if (i == 0)
-	break;
+        break;
       idx = idx / co->Splits;
     }
   }
   free(vix);
   free(vout);
 
-  if (co->MonitorP) {
+  if (co->MonitorP)
+  {
     int idx2;
 
-    pwr_sClass_CompMPC_Monitor *mp = (pwr_sClass_CompMPC_Monitor *)co->MonitorP;
+    pwr_sClass_CompMPC_Monitor* mp = (pwr_sClass_CompMPC_Monitor*)co->MonitorP;
     mp->NoOfPoints = co->Steps + 1;
 
     idx2 = min_acc;
-    for (i = co->Steps - 1; i >= 0; i--) {
-      mp->Out[i+1] = vacc[i][idx2].output;
-      mp->Proc[i+1] = vacc[i][idx2].value;
+    for (i = co->Steps - 1; i >= 0; i--)
+    {
+      mp->Out[i + 1] = vacc[i][idx2].output;
+      mp->Proc[i + 1] = vacc[i][idx2].value;
       idx2 = idx2 / co->Splits;
     }
     mp->Out[0] = o->OutValue;
     mp->Proc[0] = *o->ProcValueP;
     mp->Time[0] = 0;
-    for (i = 0; i < co->Steps; i++) {
-      switch (co->Algorithm) {
+    for (i = 0; i < co->Steps; i++)
+    {
+      switch (co->Algorithm)
+      {
       case pwr_eMpcAlgorithm_ProgressiveTimeStep:
-	if (i == 0)
-	  mp->Time[i+1] = co->TimeStep;
-	else
-	  mp->Time[i+1] = mp->Time[i] * co->TimeStepFactor;
-	break;
+        if (i == 0)
+          mp->Time[i + 1] = co->TimeStep;
+        else
+          mp->Time[i + 1] = mp->Time[i] * co->TimeStepFactor;
+        break;
       case pwr_eMpcAlgorithm_FirstTimeStep:
-	if (i == 0)
-	  mp->Time[i+1] = co->TimeStepFirst;
-	else
-	  mp->Time[i+1] = co->TimeStepFirst + i * co->TimeStep;
-	break;
+        if (i == 0)
+          mp->Time[i + 1] = co->TimeStepFirst;
+        else
+          mp->Time[i + 1] = co->TimeStepFirst + i * co->TimeStep;
+        break;
       default:
-	mp->Time[i+1] = (i+1) * co->TimeStep;
+        mp->Time[i + 1] = (i + 1) * co->TimeStep;
       }
     }
     mp->Set = *o->SetValueP;
@@ -1515,15 +1581,17 @@ void CompMPC_Fo_exec(plc_sThread* tp, pwr_sClass_CompMPC_Fo* o)
     mp->MinProc = co->SetMin;
     mp->MaxProc = co->SetMax;
     mp->MinTime = 0;
-    mp->MaxTime = mp->Time[mp->NoOfPoints-1];
-    mp->ModelValue = mpc_model(o, co, co->OutValue, *o->ProcValueP, co->TimeStep); 
+    mp->MaxTime = mp->Time[mp->NoOfPoints - 1];
+    mp->ModelValue = mpc_model(o, co, co->OutValue, *o->ProcValueP, co->TimeStep);
   }
 
   co->CurrentPath = min_acc;
   co->Error = *o->SetValueP - *o->ProcValueP;
-  if (co->Options & pwr_mMpcOptionsMask_OutDelay && co->OutDelayP && co->OutDelayTime > FLT_EPSILON) {
+  if (co->Options & pwr_mMpcOptionsMask_OutDelay && co->OutDelayP && co->OutDelayTime > FLT_EPSILON)
+  {
     float dout, dlimit;
-    switch (co->Algorithm) {
+    switch (co->Algorithm)
+    {
     case pwr_eMpcAlgorithm_FirstTimeStep:
       dout = (vacc[0][idx].output - o->OutValue) * co->OutDelayTime / co->TimeStepFirst * co->Gain;
       break;
@@ -1537,7 +1605,7 @@ void CompMPC_Fo_exec(plc_sThread* tp, pwr_sClass_CompMPC_Fo* o)
     if (dout > dlimit)
       dout = dlimit;
     else if (dout < -dlimit)
-	dout = -dlimit;
+      dout = -dlimit;
 
     o->OutValue += dout;
     if (o->OutValue > co->OutMax)
@@ -1545,8 +1613,10 @@ void CompMPC_Fo_exec(plc_sThread* tp, pwr_sClass_CompMPC_Fo* o)
     if (o->OutValue < co->OutMin)
       o->OutValue = co->OutMin;
   }
-  else {
-    switch (co->Algorithm) {
+  else
+  {
+    switch (co->Algorithm)
+    {
     case pwr_eMpcAlgorithm_FirstTimeStep:
       o->OutValue += (vacc[0][idx].output - o->OutValue) * tp->f_scan_time / co->TimeStepFirst * co->Gain;
       break;
@@ -1556,12 +1626,12 @@ void CompMPC_Fo_exec(plc_sThread* tp, pwr_sClass_CompMPC_Fo* o)
   }
 
   co->OutValue = o->OutValue;
-
 }
 
 /* CompMPC_MLP */
 
-typedef enum {
+typedef enum
+{
   mlp_eActivation_No = 0,
   mlp_eActivation_Identity = 1,
   mlp_eActivation_Logistic = 2,
@@ -1569,20 +1639,20 @@ typedef enum {
   mlp_eActivation_Relu = 4
 } mlp_eActivation;
 
-typedef struct {
+typedef struct
+{
   unsigned int layers;
-  unsigned int *layer_sizes;
+  unsigned int* layer_sizes;
   mlp_eActivation activation;
-  double **intercepts;
-  double ***coefs;
-  double **h;
-  double *inputs;
+  double** intercepts;
+  double*** coefs;
+  double** h;
+  double* inputs;
   double aval[20];
-  pwr_tFloat32 *outlist;
+  pwr_tFloat32* outlist;
   unsigned int outlist_size;
   unsigned int outlist_idx;
 } mlp_sCtx, *mlp_tCtx;
-
 
 static void outlist_insert(mlp_tCtx mlp, pwr_tFloat32 out)
 {
@@ -1603,211 +1673,252 @@ static pwr_tFloat32 outlist_get(mlp_tCtx mlp, unsigned int idx)
   return mlp->outlist[i];
 }
 
-static void mpc_mlp_imodel(mlp_tCtx mlp, double *x, double *out)
+static void mpc_mlp_imodel(mlp_tCtx mlp, double* x, double* out)
 {
   unsigned int i, j, k;
 
-  for (i = 0; i < mlp->layers - 1; i++) {
-    for (j = 0; j < mlp->layer_sizes[i+1]; j++) {
+  for (i = 0; i < mlp->layers - 1; i++)
+  {
+    for (j = 0; j < mlp->layer_sizes[i + 1]; j++)
+    {
       mlp->h[i][j] = mlp->intercepts[i][j];
-      for (k = 0; k < mlp->layer_sizes[i]; k++) {
-	if (i == 0) {
-	  mlp->h[i][j] += mlp->coefs[i][j][k] * x[k];
-	}
-	else
-	  mlp->h[i][j] += mlp->coefs[i][j][k] * mlp->h[i-1][k];
+      for (k = 0; k < mlp->layer_sizes[i]; k++)
+      {
+        if (i == 0)
+        {
+          mlp->h[i][j] += mlp->coefs[i][j][k] * x[k];
+        }
+        else
+          mlp->h[i][j] += mlp->coefs[i][j][k] * mlp->h[i - 1][k];
       }
-      if (i != mlp->layers - 2) {
-	switch (mlp->activation) {
-	case mlp_eActivation_Tanh:
-	  mlp->h[i][j] = tanh(mlp->h[i][j]);
-	  break;
-	case mlp_eActivation_Identity:
-	  break;
-	case mlp_eActivation_Relu:
-	  if (mlp->h[i][j] < 0)
-	    mlp->h[i][j] = 0;
-	  break;
-	case mlp_eActivation_Logistic:
-	  mlp->h[i][j] = 1.0/(1.0 - exp(-mlp->h[i][j]));
-	  break;
-	default: ;
-	}
+      if (i != mlp->layers - 2)
+      {
+        switch (mlp->activation)
+        {
+        case mlp_eActivation_Tanh:
+          mlp->h[i][j] = tanh(mlp->h[i][j]);
+          break;
+        case mlp_eActivation_Identity:
+          break;
+        case mlp_eActivation_Relu:
+          if (mlp->h[i][j] < 0)
+            mlp->h[i][j] = 0;
+          break;
+        case mlp_eActivation_Logistic:
+          mlp->h[i][j] = 1.0 / (1.0 - exp(-mlp->h[i][j]));
+          break;
+        default:;
+        }
       }
     }
   }
   *out = mlp->h[mlp->layers - 2][0];
 }
 
-static int mpc_mlp_import(pwr_sClass_CompMPC_MLP *co, const char *file, mlp_sCtx *mlp)
+static int mpc_mlp_import(pwr_sClass_CompMPC_MLP* co, const char* file, mlp_sCtx* mlp)
 {
   pwr_tFileName fname;
-  FILE *fp;
+  FILE* fp;
   char line[2000];
   unsigned int i, j, k;
   unsigned int size, num;
-  char *s;
+  char* s;
 
   dcli_translate_filename(fname, file);
   fp = fopen(fname, "r");
   if (!fp)
     return PLC__FILE;
 
-  while (dcli_read_line(line, sizeof(line), fp)) {
-    if (strncmp(line, "Scaler ", 7) == 0) {
+  while (dcli_read_line(line, sizeof(line), fp))
+  {
+    if (strncmp(line, "Scaler ", 7) == 0)
+    {
       char sarray[20][40];
       if (sscanf(&line[7], "%d", &size) != 1)
-	return PLC__FILESYNTAX;
-      
+        return PLC__FILESYNTAX;
+
       dcli_read_line(line, sizeof(line), fp);
-      num = dcli_parse(line, " ", "", (char*)sarray,
-        sizeof(sarray) / sizeof(sarray[0]), sizeof(sarray[0]),
-        0);
+      num =
+          dcli_parse(line, " ", "", (char*)sarray, sizeof(sarray) / sizeof(sarray[0]), sizeof(sarray[0]), 0);
       if (num < size)
-	return PLC__FILESYNTAX;
-      for (i = 0; i < size; i++) {
-	if (sscanf(sarray[i], "%f", &co->ScaleCoeff0[i]) != 1)
-	  return PLC__FILESYNTAX;
+        return PLC__FILESYNTAX;
+      for (i = 0; i < size; i++)
+      {
+        if (sscanf(sarray[i], "%f", &co->ScaleCoeff0[i]) != 1)
+          return PLC__FILESYNTAX;
       }
       dcli_read_line(line, sizeof(line), fp);
-      num = dcli_parse(line, " ", "", (char*)sarray,
-        sizeof(sarray) / sizeof(sarray[0]), sizeof(sarray[0]),
-        0);
+      num =
+          dcli_parse(line, " ", "", (char*)sarray, sizeof(sarray) / sizeof(sarray[0]), sizeof(sarray[0]), 0);
       if (num < size)
-	return PLC__FILESYNTAX;
-      for (i = 0; i < size; i++) {
-	if (sscanf(sarray[i], "%f", &co->ScaleCoeff1[i]) != 1)
-	  return PLC__FILESYNTAX;
-      }
-	
-    }
-    if (strncmp(line, "Layers ", 7) == 0) {
-      if (sscanf(&line[7], "%d", &mlp->layers) != 1) {
-	return PLC__FILESYNTAX;
+        return PLC__FILESYNTAX;
+      for (i = 0; i < size; i++)
+      {
+        if (sscanf(sarray[i], "%f", &co->ScaleCoeff1[i]) != 1)
+          return PLC__FILESYNTAX;
       }
     }
-    else if (strncmp(line, "LayerSizes ", 11) == 0) {
-      mlp->layer_sizes = (unsigned int *)calloc(mlp->layers, sizeof(int));
+    if (strncmp(line, "Layers ", 7) == 0)
+    {
+      if (sscanf(&line[7], "%d", &mlp->layers) != 1)
+      {
+        return PLC__FILESYNTAX;
+      }
+    }
+    else if (strncmp(line, "LayerSizes ", 11) == 0)
+    {
+      mlp->layer_sizes = (unsigned int*)calloc(mlp->layers, sizeof(int));
       s = line;
-      for (i = 0; i < mlp->layers; i++) {
-	s = strchr(s, ' ');
-	if (!s) {
-	  return PLC__FILESYNTAX;
-	}
-	s++;
-	if (sscanf(s, "%d", &mlp->layer_sizes[i]) != 1) {
-	  return PLC__FILESYNTAX;
-	}
+      for (i = 0; i < mlp->layers; i++)
+      {
+        s = strchr(s, ' ');
+        if (!s)
+        {
+          return PLC__FILESYNTAX;
+        }
+        s++;
+        if (sscanf(s, "%d", &mlp->layer_sizes[i]) != 1)
+        {
+          return PLC__FILESYNTAX;
+        }
       }
     }
-    else if (strncmp(line, "Activation ", 11) == 0) {
-       if (strcmp(&line[11], "identity") == 0)
-	 mlp->activation = mlp_eActivation_Identity;
-       else if (strcmp(&line[11], "logistic") == 0)
-	 mlp->activation = mlp_eActivation_Logistic;
-       else if (strcmp(&line[11], "tanh") == 0)
-	 mlp->activation = mlp_eActivation_Tanh;
-       else if (strcmp(&line[11], "relu") == 0)
-	 mlp->activation = mlp_eActivation_Relu;
-       else
-	 mlp->activation = mlp_eActivation_No;
+    else if (strncmp(line, "Activation ", 11) == 0)
+    {
+      if (strcmp(&line[11], "identity") == 0)
+        mlp->activation = mlp_eActivation_Identity;
+      else if (strcmp(&line[11], "logistic") == 0)
+        mlp->activation = mlp_eActivation_Logistic;
+      else if (strcmp(&line[11], "tanh") == 0)
+        mlp->activation = mlp_eActivation_Tanh;
+      else if (strcmp(&line[11], "relu") == 0)
+        mlp->activation = mlp_eActivation_Relu;
+      else
+        mlp->activation = mlp_eActivation_No;
     }
-    else if (strncmp(line, "Intercepts", 9) == 0) {
-      mlp->intercepts = (double **)calloc(mlp->layers - 1, sizeof(double *));
+    else if (strncmp(line, "Intercepts", 9) == 0)
+    {
+      mlp->intercepts = (double**)calloc(mlp->layers - 1, sizeof(double*));
       for (i = 0; i < mlp->layers - 1; i++)
-	mlp->intercepts[i] = (double *)calloc(mlp->layer_sizes[i+1], sizeof(double));
-      for (i = 0; i < mlp->layers - 1; i++) {
-	dcli_read_line(line, sizeof(line), fp);
-	s = line;
-	for (j = 0; j < mlp->layer_sizes[i+1]; j++) {
-	  if (j != 0) {
-	    s = strchr(s, ' ');
-	    s++;
-	  }
-	  if (sscanf(s, "%lf", &mlp->intercepts[i][j]) != 1)
-	    return PLC__FILESYNTAX;
-	}
-      }	
+        mlp->intercepts[i] = (double*)calloc(mlp->layer_sizes[i + 1], sizeof(double));
+      for (i = 0; i < mlp->layers - 1; i++)
+      {
+        dcli_read_line(line, sizeof(line), fp);
+        s = line;
+        for (j = 0; j < mlp->layer_sizes[i + 1]; j++)
+        {
+          if (j != 0)
+          {
+            s = strchr(s, ' ');
+            s++;
+          }
+          if (sscanf(s, "%lf", &mlp->intercepts[i][j]) != 1)
+            return PLC__FILESYNTAX;
+        }
+      }
     }
-    else if (strncmp(line, "Coefs", 5) == 0) {
+    else if (strncmp(line, "Coefs", 5) == 0)
+    {
       unsigned int i1, j1, k1;
 
-      mlp->coefs = (double ***)calloc(mlp->layers, sizeof(double **));
-      for (i = 0; i < mlp->layers - 1; i++) {
-	mlp->coefs[i] = (double **)calloc(mlp->layer_sizes[i+1], sizeof(double));
-	for ( j = 0; j < mlp->layer_sizes[i+1]; j++) {
-	  mlp->coefs[i][j] = (double *)calloc(mlp->layer_sizes[i], sizeof(double));
-	}
+      mlp->coefs = (double***)calloc(mlp->layers, sizeof(double**));
+      for (i = 0; i < mlp->layers - 1; i++)
+      {
+        mlp->coefs[i] = (double**)calloc(mlp->layer_sizes[i + 1], sizeof(double));
+        for (j = 0; j < mlp->layer_sizes[i + 1]; j++)
+        {
+          mlp->coefs[i][j] = (double*)calloc(mlp->layer_sizes[i], sizeof(double));
+        }
       }
-      for (i = 0; i < mlp->layers - 1; i++) {
-	for (j = 0; j < mlp->layer_sizes[i+1]; j++) {
-	  for (k = 0; k < mlp->layer_sizes[i]; k++) {
-	    dcli_read_line(line, sizeof(line), fp);
-	    sscanf(line, "%d %d %d %lf", &i1, &j1, &k1, &mlp->coefs[i][j][k]);
-	    if (i1 != i || j1 != j || k1 != k)
-	      return PLC__FILESYNTAX;
-	  }
-	}	    
-      }	
+      for (i = 0; i < mlp->layers - 1; i++)
+      {
+        for (j = 0; j < mlp->layer_sizes[i + 1]; j++)
+        {
+          for (k = 0; k < mlp->layer_sizes[i]; k++)
+          {
+            dcli_read_line(line, sizeof(line), fp);
+            sscanf(line, "%d %d %d %lf", &i1, &j1, &k1, &mlp->coefs[i][j][k]);
+            if (i1 != i || j1 != j || k1 != k)
+              return PLC__FILESYNTAX;
+          }
+        }
+      }
     }
   }
 
   fclose(fp);
 
   /* Allocate weights */
-  mlp->h = (double **)calloc(mlp->layers - 1, sizeof(double *));
-  for (i = 0; i < mlp->layers - 1; i++) {
-    mlp->h[i] = (double *)calloc(mlp->layer_sizes[i+1], sizeof(double));
+  mlp->h = (double**)calloc(mlp->layers - 1, sizeof(double*));
+  for (i = 0; i < mlp->layers - 1; i++)
+  {
+    mlp->h[i] = (double*)calloc(mlp->layer_sizes[i + 1], sizeof(double));
   }
   return PLC__SUCCESS;
 }
 
-static float mpc_mlpacc_model(plc_sThread* tp, pwr_sClass_CompMPC_MLP_Fo *o, 
-		       pwr_sClass_CompMPC_MLP *co, 
-		       float out, float av0, float timestep, int tix, int *vix)
+static float mpc_mlpacc_model(plc_sThread* tp, pwr_sClass_CompMPC_MLP_Fo* o, pwr_sClass_CompMPC_MLP* co,
+                              float out, float av0, float timestep, int tix, int* vix)
 {
   float av;
   double val;
   int i, idx;
 
-  switch (co->Type) {
+  switch (co->Type)
+  {
   case pwr_eMlpType_Normal:
-    for (i = 0; i < co->LayerSizes[0]; i++) {
-      if ( i == 0) {
-	((mlp_tCtx)o->ModelP)->inputs[i] = (double)out;
+    for (i = 0; i < co->LayerSizes[0]; i++)
+    {
+      if (i == 0)
+      {
+        ((mlp_tCtx)o->ModelP)->inputs[i] = (double)out;
       }
-      else {
-	((mlp_tCtx)o->ModelP)->inputs[i] = (double)(**(pwr_tFloat32 **)((char *)&o->Attr2P + pwr_cInputOffset * (i - 1))) * co->ScaleCoeff1[i+1] + co->ScaleCoeff0[i+1];
+      else
+      {
+        ((mlp_tCtx)o->ModelP)->inputs[i] =
+            (double)(**(pwr_tFloat32**)((char*)&o->Attr2P + pwr_cInputOffset * (i - 1))) *
+                co->ScaleCoeff1[i + 1] +
+            co->ScaleCoeff0[i + 1];
       }
     }
     break;
 
   case pwr_eMlpType_Accumulating:
-    for (i = 0; i < co->LayerSizes[0]; i++) {
-      if (i == 0) {
-	((mlp_tCtx)o->ModelP)->inputs[i] = (double)out;
+    for (i = 0; i < co->LayerSizes[0]; i++)
+    {
+      if (i == 0)
+      {
+        ((mlp_tCtx)o->ModelP)->inputs[i] = (double)out;
       }
-      else if (i < co->NoOfShiftValues + 1) {
-	/* Backshifted output value */
-	if (i > tix) {
-	  if (i == tix + 1)
-	    idx = 0;
-	  else
-	    idx = (i - tix - 1) * co->TimeStep / tp->f_scan_time - 1;
-	  ((mlp_tCtx)o->ModelP)->inputs[i] = outlist_get((mlp_tCtx)o->ModelP, idx) * co->ScaleCoeff1[1] + co->ScaleCoeff0[1];
-	}
-	else
-	  ((mlp_tCtx)o->ModelP)->inputs[i] = ((t_vacc **)co->Vacc)[tix-i][vix[tix-i]-1].output;
+      else if (i < co->NoOfShiftValues + 1)
+      {
+        /* Backshifted output value */
+        if (i > tix)
+        {
+          if (i == tix + 1)
+            idx = 0;
+          else
+            idx = (i - tix - 1) * co->TimeStep / tp->f_scan_time - 1;
+          ((mlp_tCtx)o->ModelP)->inputs[i] =
+              outlist_get((mlp_tCtx)o->ModelP, idx) * co->ScaleCoeff1[1] + co->ScaleCoeff0[1];
+        }
+        else
+          ((mlp_tCtx)o->ModelP)->inputs[i] = ((t_vacc**)co->Vacc)[tix - i][vix[tix - i] - 1].output;
       }
-      else {
-	((mlp_tCtx)o->ModelP)->inputs[i] = (double)(**(pwr_tFloat32 **)((char *)&o->Attr2P + pwr_cInputOffset * (i - co->NoOfShiftValues - 1))) * co->ScaleCoeff1[i-co->NoOfShiftValues+1] + co->ScaleCoeff0[i-co->NoOfShiftValues+1];
+      else
+      {
+        ((mlp_tCtx)o->ModelP)->inputs[i] =
+            (double)(**(pwr_tFloat32**)((char*)&o->Attr2P +
+                                        pwr_cInputOffset * (i - co->NoOfShiftValues - 1))) *
+                co->ScaleCoeff1[i - co->NoOfShiftValues + 1] +
+            co->ScaleCoeff0[i - co->NoOfShiftValues + 1];
       }
     }
     break;
   }
 
   mpc_mlp_imodel((mlp_tCtx)o->ModelP, ((mlp_tCtx)o->ModelP)->inputs, &val);
-  av = (pwr_tFloat32)val; 
+  av = (pwr_tFloat32)val;
 
   return av;
 }
@@ -1815,14 +1926,13 @@ static float mpc_mlpacc_model(plc_sThread* tp, pwr_sClass_CompMPC_MLP_Fo *o,
 #define mlp_scale(value, idx) ((value) * co->ScaleCoeff1[(idx)] + co->ScaleCoeff0[(idx)])
 #define mlp_rescale(value, idx) (((value) - co->ScaleCoeff0[(idx)]) / co->ScaleCoeff1[(idx)])
 
-static void mpc_mlpacc_tscan(plc_sThread* tp, pwr_sClass_CompMPC_MLP_Fo* o, 
-	       pwr_sClass_CompMPC_MLP* co, int tix, int *vix, 
-	       int iter, float *iter_vout)
+static void mpc_mlpacc_tscan(plc_sThread* tp, pwr_sClass_CompMPC_MLP_Fo* o, pwr_sClass_CompMPC_MLP* co,
+                             int tix, int* vix, int iter, float* iter_vout)
 {
   if (tix == co->Steps)
     return;
 
-  t_vacc **vacc = (t_vacc **)co->Vacc;
+  t_vacc** vacc = (t_vacc**)co->Vacc;
   int i;
   float t;
   float out;
@@ -1832,21 +1942,25 @@ static void mpc_mlpacc_tscan(plc_sThread* tp, pwr_sClass_CompMPC_MLP_Fo* o,
   float timestep;
   float oramp;
 
-  switch (co->Algorithm) {
+  switch (co->Algorithm)
+  {
   case pwr_eMpcAlgorithm_ProgressiveTimeStep:
     t = 0;
     timestep = co->TimeStep;
-    for (i = 1; i < tix; i++) {
+    for (i = 1; i < tix; i++)
+    {
       t += timestep;
       timestep *= co->TimeStepFactor;
     }
     break;
   case pwr_eMpcAlgorithm_FirstTimeStep:
-    if (tix == 0) {
+    if (tix == 0)
+    {
       t = 0;
       timestep = co->TimeStepFirst;
     }
-    else {
+    else
+    {
       t = co->TimeStepFirst + co->TimeStep * (tix - 1);
       timestep = co->TimeStep;
     }
@@ -1857,56 +1971,61 @@ static void mpc_mlpacc_tscan(plc_sThread* tp, pwr_sClass_CompMPC_MLP_Fo* o,
   }
 
   oramp = co->OutRamp * co->ScaleCoeff1[1];
-  if (co->Options & pwr_mMpcOptionsMask_OutRampClose) {
+  if (co->Options & pwr_mMpcOptionsMask_OutRampClose)
+  {
     if (co->OutRampCloseActive)
       oramp = co->OutRampClose * co->ScaleCoeff1[1];
   }
 
-  for (i = 0; i < co->Splits; i++) {
-    if (iter == 0) {
-      if (tix == 0) {
-	if (co->Options & pwr_mMpcOptionsMask_OutDelay && co->OutDelayP)
-	  omiddle = mlp_scale(co->OutDelayP[(int)(co->OutDelayTime / tp->f_scan_time)], 1);
-	else
-	  omiddle = mlp_scale(o->OutValue, 1);
+  for (i = 0; i < co->Splits; i++)
+  {
+    if (iter == 0)
+    {
+      if (tix == 0)
+      {
+        if (co->Options & pwr_mMpcOptionsMask_OutDelay && co->OutDelayP)
+          omiddle = mlp_scale(co->OutDelayP[(int)(co->OutDelayTime / tp->f_scan_time)], 1);
+        else
+          omiddle = mlp_scale(o->OutValue, 1);
       }
       else
-	omiddle = vacc[tix-1][vix[tix-1]-1].output;
+        omiddle = vacc[tix - 1][vix[tix - 1] - 1].output;
       omax = MIN(omiddle + oramp * timestep, mlp_scale(co->OutMax, 1));
       omin = MAX(omiddle - oramp * timestep, mlp_scale(co->OutMin, 1));
     }
-    else {
+    else
+    {
       if (tix == 0)
-	omiddle = iter_vout[tix];
+        omiddle = iter_vout[tix];
       else
-	omiddle = vacc[tix-1][vix[tix-1]-1].output + iter_vout[tix] - iter_vout[tix-1];
-      omax = MIN(omiddle + oramp * timestep/(iter*2), mlp_scale(co->OutMax, 1));
-      omin = MAX(omiddle - oramp * timestep/(iter*2), mlp_scale(co->OutMin, 1));
+        omiddle = vacc[tix - 1][vix[tix - 1] - 1].output + iter_vout[tix] - iter_vout[tix - 1];
+      omax = MIN(omiddle + oramp * timestep / (iter * 2), mlp_scale(co->OutMax, 1));
+      omin = MAX(omiddle - oramp * timestep / (iter * 2), mlp_scale(co->OutMin, 1));
     }
-    out = omin + (omax - omin)/(co->Splits - 1) * i;
+    out = omin + (omax - omin) / (co->Splits - 1) * i;
     if (tix == 0)
       av0 = mlp_scale(*o->ProcValueP, 0);
     else
-      av0 = vacc[tix-1][vix[tix]/co->Splits].value;
+      av0 = vacc[tix - 1][vix[tix] / co->Splits].value;
 
-    av = mpc_mlpacc_model(tp, o, co, out, av0, timestep, tix, vix); 
+    av = mpc_mlpacc_model(tp, o, co, out, av0, timestep, tix, vix);
     vacc[tix][vix[tix]].output = out;
     vacc[tix][vix[tix]].value = av;
     if (tix > 0)
-      vacc[tix][vix[tix]].acc = vacc[tix-1][vix[tix-1]-1].acc;
+      vacc[tix][vix[tix]].acc = vacc[tix - 1][vix[tix - 1] - 1].acc;
 
     if (co->Options & pwr_mMpcOptionsMask_ModelCorrection)
       vacc[tix][vix[tix]].acc += fabs(av - mlp_scale((co->SetValue + co->ModelCorr), 0)) * timestep;
     else
       vacc[tix][vix[tix]].acc += fabs(av - mlp_scale(co->SetValue, 0)) * timestep;
-    
-    // printf("acc[%2d][%2d] %7.2f     sp %7.2f out %7.2f\n", tix, vix[tix], vacc[tix][vix[tix]].acc, co->SetValue, out);      
-    vix[tix]++;  
 
-    mpc_mlpacc_tscan(tp, o, co, tix+1, vix, iter, iter_vout);
+    // printf("acc[%2d][%2d] %7.2f     sp %7.2f out %7.2f\n", tix, vix[tix], vacc[tix][vix[tix]].acc,
+    // co->SetValue, out);
+    vix[tix]++;
+
+    mpc_mlpacc_tscan(tp, o, co, tix + 1, vix, iter, iter_vout);
   }
 }
-
 
 /*_*
   CompMPC_MLP_Fo
@@ -1915,35 +2034,36 @@ static void mpc_mlpacc_tscan(plc_sThread* tp, pwr_sClass_CompMPC_MLP_Fo* o,
 */
 void CompMPC_MLP_Fo_init(pwr_sClass_CompMPC_MLP_Fo* o)
 {
-  t_vacc **vacc;
+  t_vacc** vacc;
   int size;
   int i;
-  pwr_sClass_CompMPC_MLP *co;
+  pwr_sClass_CompMPC_MLP* co;
   pwr_tDlid dlid;
   pwr_tStatus sts;
 
-  sts = gdh_DLRefObjectInfoAttrref(
-      &o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
+  sts = gdh_DLRefObjectInfoAttrref(&o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
   if (EVEN(sts))
     o->PlcConnectP = 0;
 
-  co = (pwr_sClass_CompMPC_MLP *)o->PlcConnectP;
+  co = (pwr_sClass_CompMPC_MLP*)o->PlcConnectP;
   if (!co)
     return;
 
   co->NoOfPaths = 0;
   co->Vacc = malloc(co->Steps * sizeof(float*));
-  vacc = (t_vacc **)co->Vacc;
-  for (i = 0; i < co->Steps; i++) {
-    size = pow(co->Splits, i+1);
-    vacc[i] = (t_vacc *)malloc(size * sizeof(t_vacc));
-    memset(vacc[i], 0,  size * sizeof(t_vacc));
+  vacc = (t_vacc**)co->Vacc;
+  for (i = 0; i < co->Steps; i++)
+  {
+    size = pow(co->Splits, i + 1);
+    vacc[i] = (t_vacc*)malloc(size * sizeof(t_vacc));
+    memset(vacc[i], 0, size * sizeof(t_vacc));
     co->NoOfPaths += size;
   }
 
   o->ModelP = (mlp_tCtx)calloc(1, sizeof(mlp_sCtx));
   co->Status = mpc_mlp_import(co, co->ModelFile, (mlp_tCtx)o->ModelP);
-  if (EVEN(co->Status)) {
+  if (EVEN(co->Status))
+  {
     char astr[200];
     cdh_ArefToString(astr, sizeof(astr), &o->PlcConnect, 1);
     errh_Error("CompMPC_MLP initialization error, %s, %m", astr, co->Status);
@@ -1951,9 +2071,10 @@ void CompMPC_MLP_Fo_init(pwr_sClass_CompMPC_MLP_Fo* o)
   }
 
   co->Layers = ((mlp_tCtx)o->ModelP)->layers;
-  for (i = 0; i < MIN(co->Layers, sizeof(co->LayerSizes)/sizeof(co->LayerSizes[0])); i++)
+  for (i = 0; i < MIN(co->Layers, sizeof(co->LayerSizes) / sizeof(co->LayerSizes[0])); i++)
     co->LayerSizes[i] = ((mlp_tCtx)o->ModelP)->layer_sizes[i];
-  switch (((mlp_tCtx)o->ModelP)->activation) {
+  switch (((mlp_tCtx)o->ModelP)->activation)
+  {
   case mlp_eActivation_Tanh:
     strcpy(co->Activation, "tanh");
     break;
@@ -1967,10 +2088,11 @@ void CompMPC_MLP_Fo_init(pwr_sClass_CompMPC_MLP_Fo* o)
     strcpy(co->Activation, "logistic");
     break;
   default:
-    strcpy(co->Activation, "unknown");    
+    strcpy(co->Activation, "unknown");
   }
 
-  if (co->NoOfShiftValues > co->LayerSizes[0] - 2) {
+  if (co->NoOfShiftValues > co->LayerSizes[0] - 2)
+  {
     char astr[200];
     co->Status = PLC__MPC_SHIFTVAL;
     cdh_ArefToString(astr, sizeof(astr), &o->PlcConnect, 1);
@@ -1978,10 +2100,10 @@ void CompMPC_MLP_Fo_init(pwr_sClass_CompMPC_MLP_Fo* o)
     return;
   }
 
-  ((mlp_tCtx)o->ModelP)->inputs = (double *)calloc(((mlp_tCtx)o->ModelP)->layer_sizes[0],
-						   sizeof(double));
+  ((mlp_tCtx)o->ModelP)->inputs = (double*)calloc(((mlp_tCtx)o->ModelP)->layer_sizes[0], sizeof(double));
 
-  if (cdh_ObjidIsNotNull(co->MonitorObject)) {
+  if (cdh_ObjidIsNotNull(co->MonitorObject))
+  {
     pwr_tAttrRef a = cdh_ObjidToAref(co->MonitorObject);
     sts = gdh_DLRefObjectInfoAttrref(&a, (void**)&co->MonitorP, &dlid);
     if (EVEN(sts))
@@ -1991,21 +2113,23 @@ void CompMPC_MLP_Fo_init(pwr_sClass_CompMPC_MLP_Fo* o)
 
 void CompMPC_MLP_Fo_exec(plc_sThread* tp, pwr_sClass_CompMPC_MLP_Fo* o)
 {
-  t_vacc **vacc;
+  t_vacc** vacc;
   int i, j;
   int min_acc;
-  int *vix;
-  float *vout;
+  int* vix;
+  float* vout;
   int idx;
   int size;
-  pwr_sClass_CompMPC_MLP *co = (pwr_sClass_CompMPC_MLP *)o->PlcConnectP;
+  pwr_sClass_CompMPC_MLP* co = (pwr_sClass_CompMPC_MLP*)o->PlcConnectP;
 
   if (!co || co->Status == PLC__FILE || co->Status == PLC__FILESYNTAX)
     return;
 
-  if (((mlp_tCtx)o->ModelP)->outlist == 0) {
+  if (((mlp_tCtx)o->ModelP)->outlist == 0)
+  {
     ((mlp_tCtx)o->ModelP)->outlist_size = co->Steps * lroundf(co->NoOfShiftValues / tp->f_scan_time);
-    ((mlp_tCtx)o->ModelP)->outlist = (pwr_tFloat32 *)calloc(MAX(((mlp_tCtx)o->ModelP)->outlist_size, 1), sizeof(pwr_tFloat32));
+    ((mlp_tCtx)o->ModelP)->outlist =
+        (pwr_tFloat32*)calloc(MAX(((mlp_tCtx)o->ModelP)->outlist_size, 1), sizeof(pwr_tFloat32));
   }
 
   co->ProcValue = o->ProcValue = *o->ProcValueP;
@@ -2013,86 +2137,104 @@ void CompMPC_MLP_Fo_exec(plc_sThread* tp, pwr_sClass_CompMPC_MLP_Fo* o)
   co->ForceValue = o->ForceValue = *o->ForceValueP;
   co->Force = o->Force = *o->ForceP;
 
-  if (*o->ForceP) {
+  if (*o->ForceP)
+  {
     o->OutValue = *o->ForceValueP;
     outlist_insert((mlp_tCtx)o->ModelP, o->OutValue);
-    co->ModelValue = mlp_rescale(mpc_mlpacc_model(tp, o, co, mlp_scale(o->OutValue, 1), 0, 
-	co->TimeStep, -1, 0), 0);   
+    co->ModelValue =
+        mlp_rescale(mpc_mlpacc_model(tp, o, co, mlp_scale(o->OutValue, 1), 0, co->TimeStep, -1, 0), 0);
     return;
   }
 
-  if (co->Options & pwr_mMpcOptionsMask_OutDelay) {
+  if (co->Options & pwr_mMpcOptionsMask_OutDelay)
+  {
     if (!co->OutDelayP)
       co->OutDelayP = calloc(1, ((int)(co->OutDelayMaxTime / tp->f_scan_time) + 1) * sizeof(pwr_tFloat32));
 
     for (i = (int)(co->OutDelayMaxTime / tp->f_scan_time); i >= 1; i--)
-      co->OutDelayP[i] = co->OutDelayP[i-1];
+      co->OutDelayP[i] = co->OutDelayP[i - 1];
     co->OutDelayP[0] = o->OutValue;
   }
 
   /* SetValue correction */
-  if (co->Options & pwr_mMpcOptionsMask_ModelCorrection) {
-    if ( fabs(*o->SetValueP - *o->ProcValueP) < co->ModelCorrInterval) {
-      if (!co->ModelCorrActive) {
-	if (co->ModelCorrDelay != 0.0f) {
-	  co->ModelCorrTimer += tp->f_scan_time;
-	  if (co->ModelCorrTimer >= co->ModelCorrDelay) {
-	    co->ModelCorr += (*o->SetValueP - *o->ProcValueP) * (*o->ScanTime) / co->ModelCorrIntTime;
-	    co->ModelCorrActive = 1;
-	  }
-	}
-	else {
-	  co->ModelCorr += (*o->SetValueP - *o->ProcValueP) * (*o->ScanTime) / co->ModelCorrIntTime;
-	  co->ModelCorrActive = 1;
-	}
+  if (co->Options & pwr_mMpcOptionsMask_ModelCorrection)
+  {
+    if (fabs(*o->SetValueP - *o->ProcValueP) < co->ModelCorrInterval)
+    {
+      if (!co->ModelCorrActive)
+      {
+        if (co->ModelCorrDelay != 0.0f)
+        {
+          co->ModelCorrTimer += tp->f_scan_time;
+          if (co->ModelCorrTimer >= co->ModelCorrDelay)
+          {
+            co->ModelCorr += (*o->SetValueP - *o->ProcValueP) * (*o->ScanTime) / co->ModelCorrIntTime;
+            co->ModelCorrActive = 1;
+          }
+        }
+        else
+        {
+          co->ModelCorr += (*o->SetValueP - *o->ProcValueP) * (*o->ScanTime) / co->ModelCorrIntTime;
+          co->ModelCorrActive = 1;
+        }
       }
       else
-	co->ModelCorr += (*o->SetValueP - *o->ProcValueP) * (*o->ScanTime) / co->ModelCorrIntTime;
-    } else {
+        co->ModelCorr += (*o->SetValueP - *o->ProcValueP) * (*o->ScanTime) / co->ModelCorrIntTime;
+    }
+    else
+    {
       co->ModelCorr = 0;
       co->ModelCorrActive = 0;
       co->ModelCorrTimer = 0;
     }
   }
-  else {
+  else
+  {
     co->ModelCorr = 0;
     co->ModelCorrActive = 0;
   }
 
-  if (co->Options & pwr_mMpcOptionsMask_OutRampClose) {
-    if ( fabsf(*o->SetValueP - *o->ProcValueP) < co->OutRampCloseInterval) {
-      if (!co->OutRampCloseActive) {
-	if (co->OutRampCloseDelay != 0.0f) {
-	  co->OutRampCloseTimer += tp->f_scan_time;
-	  if (co->OutRampCloseTimer >= co->OutRampCloseDelay)
-	    co->OutRampCloseActive = 1;
-	}
-	else
-	  co->OutRampCloseActive = 1;
+  if (co->Options & pwr_mMpcOptionsMask_OutRampClose)
+  {
+    if (fabsf(*o->SetValueP - *o->ProcValueP) < co->OutRampCloseInterval)
+    {
+      if (!co->OutRampCloseActive)
+      {
+        if (co->OutRampCloseDelay != 0.0f)
+        {
+          co->OutRampCloseTimer += tp->f_scan_time;
+          if (co->OutRampCloseTimer >= co->OutRampCloseDelay)
+            co->OutRampCloseActive = 1;
+        }
+        else
+          co->OutRampCloseActive = 1;
       }
     }
-    else {
+    else
+    {
       co->OutRampCloseActive = 0;
       co->OutRampCloseTimer = 0;
-    }    
+    }
   }
   else
     co->OutRampCloseActive = 0;
 
-  vacc = (t_vacc **)co->Vacc;
-  vix = (int *)calloc(1, co->Steps * sizeof(unsigned int));
+  vacc = (t_vacc**)co->Vacc;
+  vix = (int*)calloc(1, co->Steps * sizeof(unsigned int));
   mpc_mlpacc_tscan(tp, o, co, 0, vix, 0, 0);
 
   min_acc = 0;
-  for (i = 0; i < pow(co->Splits, co->Steps); i++) {
-    if (vacc[co->Steps-1][i].acc < vacc[co->Steps-1][min_acc].acc)
-      min_acc = i;	
-    //printf( "%d acc %7.2f\n", i, vacc[co->Steps-1][i].acc);
+  for (i = 0; i < pow(co->Splits, co->Steps); i++)
+  {
+    if (vacc[co->Steps - 1][i].acc < vacc[co->Steps - 1][min_acc].acc)
+      min_acc = i;
+    // printf( "%d acc %7.2f\n", i, vacc[co->Steps-1][i].acc);
   }
   // printf("min_acc %d\n", min_acc);
 
   idx = min_acc;
-  for (i = co->Steps - 1; i >= 0; i--) {
+  for (i = co->Steps - 1; i >= 0; i--)
+  {
 #if 0
     printf("vacc[%d][%d] %7.2f %7.2f %7.2f\n", i, idx, vacc[i][idx].acc,
 	   vacc[i][idx].value, vacc[i][idx].output);
@@ -2100,73 +2242,82 @@ void CompMPC_MLP_Fo_exec(plc_sThread* tp, pwr_sClass_CompMPC_MLP_Fo* o)
     idx = idx / co->Splits;
   }
 
-  vout = (float *)malloc(co->Steps * sizeof(float));
-  for ( j = 0; j < co->Iterations; j++) {
+  vout = (float*)malloc(co->Steps * sizeof(float));
+  for (j = 0; j < co->Iterations; j++)
+  {
     idx = min_acc;
-    for (i = co->Steps - 1; i >= 0; i--) {
+    for (i = co->Steps - 1; i >= 0; i--)
+    {
       vout[i] = vacc[i][idx].output;
       idx = idx / co->Splits;
     }
 
-    for (i = 0; i < co->Steps; i++) {
-      size = pow(co->Splits, i+1);
-      memset(vacc[i], 0,  size * sizeof(t_vacc));
+    for (i = 0; i < co->Steps; i++)
+    {
+      size = pow(co->Splits, i + 1);
+      memset(vacc[i], 0, size * sizeof(t_vacc));
     }
     memset(vix, 0, co->Steps * sizeof(unsigned int));
-    mpc_mlpacc_tscan(tp, o, co, 0, vix, j+1, vout);
+    mpc_mlpacc_tscan(tp, o, co, 0, vix, j + 1, vout);
 
     min_acc = 0;
-    for (i = 0; i < pow(co->Splits,co->Steps); i++) {
-      if (vacc[co->Steps-1][i].acc < vacc[co->Steps-1][min_acc].acc)
-	min_acc = i;	
+    for (i = 0; i < pow(co->Splits, co->Steps); i++)
+    {
+      if (vacc[co->Steps - 1][i].acc < vacc[co->Steps - 1][min_acc].acc)
+        min_acc = i;
       // printf( "%d acc %7.2f\n", i, vacc[co->Steps-1][i].acc);
     }
 
     idx = min_acc;
-    for (i = co->Steps - 1; i >= 0; i--) {
+    for (i = co->Steps - 1; i >= 0; i--)
+    {
 #if 0
       printf("vacc[%d][%d] %7.2f %7.2f %7.2f\n", i, idx, vacc[i][idx].acc,
 	     vacc[i][idx].value, vacc[i][idx].output);
 #endif
       if (i == 0)
-	break;
+        break;
       idx = idx / co->Splits;
     }
   }
   free(vix);
   free(vout);
 
-  if (co->MonitorP) {
+  if (co->MonitorP)
+  {
     int idx2;
 
-    pwr_sClass_CompMPC_Monitor *mp = (pwr_sClass_CompMPC_Monitor *)co->MonitorP;
+    pwr_sClass_CompMPC_Monitor* mp = (pwr_sClass_CompMPC_Monitor*)co->MonitorP;
     mp->NoOfPoints = co->Steps + 1;
 
     idx2 = min_acc;
-    for (i = co->Steps - 1; i >= 0; i--) {
-      mp->Out[i+1] = mlp_rescale(vacc[i][idx2].output, 1);
-      mp->Proc[i+1] = mlp_rescale(vacc[i][idx2].value, 0);
+    for (i = co->Steps - 1; i >= 0; i--)
+    {
+      mp->Out[i + 1] = mlp_rescale(vacc[i][idx2].output, 1);
+      mp->Proc[i + 1] = mlp_rescale(vacc[i][idx2].value, 0);
       idx2 = idx2 / co->Splits;
     }
     mp->Out[0] = o->OutValue;
     mp->Proc[0] = *o->ProcValueP;
     mp->Time[0] = 0;
-    for (i = 0; i < co->Steps; i++) {
-      switch (co->Algorithm) {
+    for (i = 0; i < co->Steps; i++)
+    {
+      switch (co->Algorithm)
+      {
       case pwr_eMpcAlgorithm_ProgressiveTimeStep:
-	if (i == 0)
-	  mp->Time[i+1] = co->TimeStep;
-	else
-	  mp->Time[i+1] = mp->Time[i] * co->TimeStepFactor;
-	break;
+        if (i == 0)
+          mp->Time[i + 1] = co->TimeStep;
+        else
+          mp->Time[i + 1] = mp->Time[i] * co->TimeStepFactor;
+        break;
       case pwr_eMpcAlgorithm_FirstTimeStep:
-	if (i == 0)
-	  mp->Time[i+1] = co->TimeStepFirst;
-	else
-	  mp->Time[i+1] = co->TimeStepFirst + i * co->TimeStep;
-	break;
+        if (i == 0)
+          mp->Time[i + 1] = co->TimeStepFirst;
+        else
+          mp->Time[i + 1] = co->TimeStepFirst + i * co->TimeStep;
+        break;
       default:
-	mp->Time[i+1] = (i+1) * co->TimeStep;
+        mp->Time[i + 1] = (i + 1) * co->TimeStep;
       }
     }
     mp->Set = *o->SetValueP;
@@ -2175,16 +2326,19 @@ void CompMPC_MLP_Fo_exec(plc_sThread* tp, pwr_sClass_CompMPC_MLP_Fo* o)
     mp->MinProc = co->SetMin;
     mp->MaxProc = co->SetMax;
     mp->MinTime = 0;
-    mp->MaxTime = mp->Time[mp->NoOfPoints-1];
+    mp->MaxTime = mp->Time[mp->NoOfPoints - 1];
   }
 
   co->CurrentPath = min_acc;
   co->Error = *o->SetValueP - *o->ProcValueP;
-  if (co->Options & pwr_mMpcOptionsMask_OutDelay && co->OutDelayP && co->OutDelayTime > FLT_EPSILON) {
+  if (co->Options & pwr_mMpcOptionsMask_OutDelay && co->OutDelayP && co->OutDelayTime > FLT_EPSILON)
+  {
     float dout, dlimit;
-    switch (co->Algorithm) {
+    switch (co->Algorithm)
+    {
     case pwr_eMpcAlgorithm_FirstTimeStep:
-      dout = (mlp_rescale(vacc[0][idx].output, 1) - o->OutValue) * co->OutDelayTime / co->TimeStepFirst * co->Gain;
+      dout = (mlp_rescale(vacc[0][idx].output, 1) - o->OutValue) * co->OutDelayTime / co->TimeStepFirst *
+             co->Gain;
       break;
     default:
       dout = (mlp_rescale(vacc[0][idx].output, 1) - o->OutValue) * co->OutDelayTime / co->TimeStep * co->Gain;
@@ -2204,19 +2358,23 @@ void CompMPC_MLP_Fo_exec(plc_sThread* tp, pwr_sClass_CompMPC_MLP_Fo* o)
     if (o->OutValue < co->OutMin)
       o->OutValue = co->OutMin;
   }
-  else {
-    switch (co->Algorithm) {
+  else
+  {
+    switch (co->Algorithm)
+    {
     case pwr_eMpcAlgorithm_FirstTimeStep:
-      o->OutValue += (mlp_rescale(vacc[0][idx].output, 1) - o->OutValue) * tp->f_scan_time / co->TimeStepFirst * co->Gain;
+      o->OutValue += (mlp_rescale(vacc[0][idx].output, 1) - o->OutValue) * tp->f_scan_time /
+                     co->TimeStepFirst * co->Gain;
       break;
     default:
-      o->OutValue += (mlp_rescale(vacc[0][idx].output, 1) - o->OutValue) * tp->f_scan_time / co->TimeStep * co->Gain;
-      
+      o->OutValue +=
+          (mlp_rescale(vacc[0][idx].output, 1) - o->OutValue) * tp->f_scan_time / co->TimeStep * co->Gain;
     }
   }
   co->OutValue = o->OutValue;
   outlist_insert((mlp_tCtx)o->ModelP, o->OutValue);
-  co->ModelValue = mlp_rescale(mpc_mlpacc_model(tp, o, co, mlp_scale(co->OutValue, 1), 0, co->TimeStep, -1, 0), 0);   
+  co->ModelValue =
+      mlp_rescale(mpc_mlpacc_model(tp, o, co, mlp_scale(co->OutValue, 1), 0, co->TimeStep, -1, 0), 0);
   if (co->MonitorP)
-    ((pwr_sClass_CompMPC_Monitor *)co->MonitorP)->ModelValue = co->ModelValue;
+    ((pwr_sClass_CompMPC_Monitor*)co->MonitorP)->ModelValue = co->ModelValue;
 }
