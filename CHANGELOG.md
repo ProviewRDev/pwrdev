@@ -48,6 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PROFINET: The configurator will now truncate strings to 79 characters before writing attributes using cdh-functions that doesn't add null termination.
 - PROFIBUS: The configurator has more known keywords, reducing amount of console ouptut.
 - PROFIBUS: The configurator supports multilines where windows style CRLF where used reducing weird console output that could occur.
+- PID + CompPID: Fixed incorrect function when PidAlg was set to only I. It will now integrate correct with respect to Inverse flag.
 
 ### Changed
 
