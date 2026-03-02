@@ -129,6 +129,7 @@ public:
   void zoom() {a.zoom();}
   void nav_zoom() {a.nav_zoom();}
   void print_zoom() {a.print_zoom();}
+  using GlowArrayElem::print;
   void print(void* pos, void* node) {a.print(pos,node);}
   void draw_inverse(void* pos, int hot, void* node) {a.draw_inverse(pos,hot,node);}
   void nav_draw(void* pos, int highlight, void* node) {a.nav_draw(pos,highlight,node);}
@@ -175,6 +176,7 @@ public:
   void conpoint_refcon_erase(void* node, int conpoint) {
     a.conpoint_refcon_erase(node,conpoint);}
   void set_inverse(int on) {a.set_inverse(on);}
+  using GlowArrayElem::configure;
   void configure() {a.configure();}
     int move(GlowArrayElem* element, GlowArrayElem* destination, glow_eDest code) {
     return a.move(element,destination,code);}
