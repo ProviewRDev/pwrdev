@@ -289,9 +289,9 @@ int graph_layout(Graph* graph, int mod_size, float wind_width, float wind_height
   ctx = (sCtx *)calloc(1, sizeof(sCtx));
   ctx->row_idx[0] = (sRowItem *)calloc(mod_size, ROW_MAX * sizeof(sRowItem));
   ctx->row_idx[1] = (sRowItem *)calloc(mod_size, ROW_MAX * sizeof(sRowItem));
-  ctx->row_size[0] = (int *)calloc(sizeof(int), ROW_MAX);
-  ctx->row_size[1] = (int *)calloc(sizeof(int), ROW_MAX);
-  ctx->item = (sItem *)calloc(sizeof(sItem), mod_size);
+  ctx->row_size[0] = (int *)calloc(ROW_MAX, sizeof(int));
+  ctx->row_size[1] = (int *)calloc(ROW_MAX, sizeof(int));
+  ctx->item = (sItem *)calloc(mod_size, sizeof(sItem));
 
   // Insert data into context
   ctx->msize = mod_size;
