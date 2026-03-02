@@ -5612,7 +5612,7 @@ static int read_decimals(GeDyn* dyn, char* attr, int decr, char* format)
   int sts;
   int inverted;
   char* s;
-  pwr_tInt32 decimals;
+  pwr_tInt32 decimals = 0;
 
   dyn->parse_attr_name(attr, parsed_name, &inverted, &attr_type, &attr_size);
   switch (attr_type)
@@ -5621,6 +5621,10 @@ static int read_decimals(GeDyn* dyn, char* attr, int decr, char* format)
   case pwr_eType_UInt32:
   case pwr_eType_Enum:
   case pwr_eType_Mask:
+  case pwr_eType_UInt8:
+  case pwr_eType_Int8:
+  case pwr_eType_UInt16:
+  case pwr_eType_Int16:
     break;
   default:
     return 0;
