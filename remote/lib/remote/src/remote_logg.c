@@ -34,27 +34,73 @@
  * General Public License plus this exception.
  */
 
-#include "co_time.h"
+#include <string.h>
+
+#include "co_rfc5424_c.h"
 #include "rt_qcom.h"
 #include "pwr_remoteclasses.h"
 #include "remote.h"
 
-pwr_tStatus remote_logg(int identity, char* str, int size)
+/**
+ * @brief Send a log message with RFC 5424 formatting and severity level.
+ *
+ * This is the recommended function for new code. It formats the message
+ * according to RFC 5424 syslog format with the specified severity level.
+ *
+ * @param identity Log identity number (matches LoggConfig.Identity)
+ * @param severity Severity character: 'I' (Info), 'W' (Warning), 'E' (Error),
+ *                 'F' (Fatal), 'S' (Success)
+ * @param str The log message string
+ * @param size Maximum size of the message
+ * @return pwr_tStatus Status code
+ */
+pwr_tStatus remote_logg_rfc5424(int identity, char severity, char* str, int size)
 {
   qcom_sPut put;
   qcom_sQid qid;
   char* logmsg;
-  char timstr[26];
-  int logsize = size + 5 + sizeof(timstr);
+  char rfc5424_header[256];
+  int header_len;
+  int msg_len;
+  int logsize;
   pwr_tStatus sts;
 
-  time_AtoAscii(0, time_eFormat_DateAndTime, timstr, sizeof(timstr));
+  /* Format RFC 5424 header with severity */
+  header_len = co_rfc5424_format_header_c(severity, "rs_remote", rfc5424_header, sizeof(rfc5424_header));
+  if (header_len < 0)
+  {
+    /* Fallback: use simple header if RFC 5424 formatting fails */
+    header_len = 0;
+    rfc5424_header[0] = '\0';
+  }
+
+  /* Calculate message length (use strnlen to respect size limit) */
+  msg_len = strnlen(str, size);
+
+  /* Allocate: identity (4 bytes) + header + space + message + null terminator */
+  logsize = sizeof(int) + header_len + 1 + msg_len + 1;
 
   logmsg = malloc(logsize);
+  if (logmsg == NULL)
+  {
+    return 0; /* Memory allocation failed */
+  }
+
+  /* Pack identity at start of buffer */
   *(int*)logmsg = identity;
-  strcpy(&logmsg[4], timstr);
-  strcat(&logmsg[4], "  ");
-  strncat(&logmsg[4], str, size + 1);
+
+  /* Copy RFC 5424 header */
+  if (header_len > 0)
+  {
+    memcpy(&logmsg[sizeof(int)], rfc5424_header, header_len);
+  }
+
+  /* Append space separator between header and message (RFC 5424 requires space after SD) */
+  logmsg[sizeof(int) + header_len] = ' ';
+
+  /* Append message */
+  memcpy(&logmsg[sizeof(int) + header_len + 1], str, msg_len);
+  logmsg[sizeof(int) + header_len + 1 + msg_len] = '\0';
 
   put.data = logmsg;
   put.allocate = 1;
@@ -72,4 +118,22 @@ pwr_tStatus remote_logg(int identity, char* str, int size)
   free(logmsg);
 
   return sts;
+}
+
+/**
+ * @brief Send a log message (legacy function, maintained for backward compatibility).
+ *
+ * This function is maintained for backward compatibility with existing code.
+ * It now formats messages using RFC 5424 format with INFO severity level.
+ * For new code, prefer remote_logg_sev() which allows specifying severity.
+ *
+ * @param identity Log identity number (matches LoggConfig.Identity)
+ * @param str The log message string
+ * @param size Maximum size of the message
+ * @return pwr_tStatus Status code
+ */
+pwr_tStatus remote_logg(int identity, char* str, int size)
+{
+  /* Delegate to new function with INFO severity for backward compatibility */
+  return remote_logg_rfc5424(identity, 'I', str, size);
 }

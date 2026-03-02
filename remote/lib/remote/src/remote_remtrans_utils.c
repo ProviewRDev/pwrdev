@@ -76,9 +76,9 @@ qcom_sQid logg_qid;
 *
 * Input :       Pointer to struct remtrans_item with objid and pointer
 *
-* Output :      QCOM logg-message to RS_REMOTE_LOGG.
-* Description : Check if logging is to be done. Put log message together
-*		and send to queue RS_PWR_LOGG
+* Output :      Log message via remote_logg_rfc5424() to RS_REMOTE_LOGG.
+* Description : Check if logging is to be done. Format log message in
+*               RFC 5424 format and send via remote_logg_rfc5424().
 *
 **********************************************************************
 *********************************************************************/
@@ -87,141 +87,68 @@ void RemTrans_Logg(remtrans_item* remtrans)
 {
   pwr_sClass_RemTrans* RemTransP;
   pwr_tStatus sts;
-  pwr_tString80 rad1; /* Object name */
-  pwr_tString80 rad2; /* Time, status, length */
-  char* buffp; /* Pointer inside send buffer */
-  char* datap; /* Pointer to transdata buffer */
-  unsigned int i; /* Loop index */
-  unsigned int sizrad1; /* Buffer size row 1 */
-  unsigned int sizrad2; /* Buffer size row 2 */
-  unsigned int AntByt; /* Number of databytes to logg */
-  unsigned int AntRad; /* Number of lines data in logg */
-  unsigned int sign12;
-  unsigned int sign1;
-  unsigned int sign2;
-  unsigned int maxrad; /* Number of databytes in line */
-  unsigned int size; /* Total size of send buffer */
-  static unsigned short qcom_initialized = 0;
-  char* dynp; /* Allocated dynamic data area */
-  qcom_sPut put;
+  pwr_tString80 objname;
+  char* msgbuf;
+  char* bufp;
+  char* datap;
+  unsigned int i;
+  unsigned int data_bytes;
+  unsigned int max_data_bytes;
+  unsigned int msg_size;
+  char severity;
 
-  /* Shall we make a logg-entry ? */
   RemTransP = remtrans->objp;
-  if ((RemTransP->LoggLevel > 1)
-      || ((RemTransP->LoggLevel == 1) && EVEN(RemTransP->LastSts))) {
-    /* FIRST ROW: Get Object name */
-    sts = gdh_ObjidToName(
-        remtrans->objid, (char*)&rad1, sizeof(rad1), cdh_mNName);
+
+  /* Check if logging should be done */
+  if ((RemTransP->LoggLevel > 1) || ((RemTransP->LoggLevel == 1) && EVEN(RemTransP->LastSts)))
+  {
+
+    /* Get object name */
+    sts = gdh_ObjidToName(remtrans->objid, objname, sizeof(objname), cdh_mNName);
     if (EVEN(sts))
       return;
-    sizrad1 = strlen((char*)&rad1);
 
-    /* SECOND ROW: Get Date and Time */
-    time_AtoAscii(NULL, time_eFormat_ComprDateAndTime, rad2, sizeof(rad2));
-    sizrad2 = strlen(rad2);
-    datap = (char*)&rad2 + sizrad2;
-    /* Status and Buffer Length */
-    sizrad2 += sprintf(datap, "  Status %d  Length %d", RemTransP->LastSts,
-        RemTransP->DataLength);
-
-    /* Get size of data message to be logged */
+    /* Determine how much data to log */
     if (RemTransP->LoggLevel == 4)
-      AntByt = RemTransP->DataLength;
+      data_bytes = RemTransP->DataLength;
     else if (RemTransP->LoggLevel == 3)
-      AntByt = (RemTransP->DataLength > 48) ? 48 : RemTransP->DataLength;
+      data_bytes = (RemTransP->DataLength > 48) ? 48 : RemTransP->DataLength;
     else
-      AntByt = 0;
-    AntByt = MIN(AntByt, 10000);
-    AntRad = (AntByt + 23) / 24;
-    size = sizrad1 + sizrad2 + 9 + 3 * AntByt + AntRad;
+      data_bytes = 0;
+    max_data_bytes = 10000;
+    if (data_bytes > max_data_bytes)
+      data_bytes = max_data_bytes;
 
-    if (qcom_initialized == 0) {
-      /* Try to initiate qcom (it's probably already done) */
-      logg_qid = qcom_cNQid;
-      logg_qid.qix = rs_pwr_logg_qix;
-      qcom_Init(&sts, 0, "Logg");
-      if (EVEN(sts) && sts != QDB__ALRMAP) {
-        errh_Info("Qcom init failed, status: %d\n", sts);
-        return;
+    /* Calculate message size: objname + status info + hex data (3 chars per byte) + margin */
+    msg_size = strlen(objname) + 100 + (data_bytes * 3) + 1;
+
+    msgbuf = malloc(msg_size);
+    if (!msgbuf)
+      return;
+
+    /* Determine severity based on status */
+    severity = EVEN(RemTransP->LastSts) ? 'E' : 'I';
+
+    /* Build single-line message */
+    bufp = msgbuf;
+    bufp += sprintf(bufp, "%s Status=%d Length=%d", objname, RemTransP->LastSts, RemTransP->DataLength);
+
+    /* Append hex data if requested */
+    if (data_bytes > 0)
+    {
+      bufp += sprintf(bufp, " Data=");
+      datap = remtrans->datap;
+      for (i = 0; i < data_bytes; i++)
+      {
+        bufp += sprintf(bufp, "%02X", (unsigned char)*datap++);
       }
-      qcom_initialized = 1;
     }
 
-    /* Malloc dynamic data area */
+    /* Send via remote_logg_rfc5424 */
+    remote_logg_rfc5424(RS_PWR_LOGG_RemTransId, severity, msgbuf, (int)(bufp - msgbuf));
 
-    dynp = 0;
-    dynp = malloc(size + 1);
-    if (!dynp)
-      return;
-    buffp = dynp;
-
-    /* Get rad1 and rad2 into sendbuffer */
-    *buffp++ = RS_PWR_LOGG_RemTransId;
-    *buffp++ = 0;
-    *buffp++ = 0;
-    *buffp++ = 0;
-    memcpy(buffp, &rad1, sizrad1);
-    buffp += sizrad1;
-    *buffp = 13; /* CR */
-    buffp++;
-    *buffp = 10; /* LF */
-    buffp++;
-
-    memcpy(buffp, &rad2, sizrad2);
-    buffp += sizrad2;
-    *buffp = 13; /* CR */
-    buffp++;
-    *buffp = 10; /* LF */
-    buffp++;
-
-    /* Logg of Trans Data */
-    datap = remtrans->datap;
-    while (AntByt > 0) {
-      maxrad = AntByt;
-      if (AntByt > 24)
-        maxrad = 24;
-      for (i = 0; i < maxrad; i++) {
-        sign12 = *datap;
-        sign1 = (sign12 & 240) / 16; /* Most sign 4 bits */
-        sign2 = sign12 & 15; /* Least sign 4 bits */
-        datap++;
-        if (sign1 < 10)
-          *buffp = sign1 + 48; /* 0 - 9 */
-        else
-          *buffp = sign1 + 55; /* A - F */
-        buffp++;
-        if (sign2 < 10)
-          *buffp = sign2 + 48; /* 0 - 9 */
-        else
-          *buffp = sign2 + 55; /* A - F */
-        buffp++;
-        *buffp = 32; /* Space */
-        buffp++;
-      } /* EndLoop bytes in row */
-      buffp--;
-      *buffp = 13; /* CR */
-      buffp++;
-      *buffp = 10; /* LF */
-      buffp++;
-      AntByt -= maxrad;
-    } /* Endloop lines */
-    *buffp = 0; /* NULL as end sign */
-
-    /* Send to Logg-job */
-    put.data = dynp;
-    put.allocate = 1;
-    put.size = size;
-    put.type.b = qcom_eBtype__;
-    put.type.s = qcom_eStype__;
-    put.reply.qix = 0;
-    put.reply.nid = 0;
-
-    qcom_Put(&sts, &logg_qid, &put);
-
-    free(dynp);
-
-  } /* END Logging */
-  return;
+    free(msgbuf);
+  }
 }
 
 /*********************************************************************
@@ -255,10 +182,12 @@ pwr_tInt32 RemTrans_Init(remnode_item* remnode)
 
   /****** Get first child under RemNode ******/
   sts = gdh_GetChild(remnode->objid, &child_objid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     /****** Test if type remtrans ******/
     sts = gdh_GetObjectClass(child_objid, &class);
-    if (class == pwr_cClass_RemTrans) {
+    if (class == pwr_cClass_RemTrans)
+    {
       /****** Create remtrans_item and link it ******/
       remtrans = malloc(sizeof(remtrans_item));
       if (remtrans == 0)
@@ -281,20 +210,22 @@ pwr_tInt32 RemTrans_Init(remnode_item* remnode)
 
       /****** Check data object under RemTrans ******/
       sts = gdh_GetChild(child_objid, &data_objid);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         remtrans->objp->MaxLength = 0;
         remtrans->datap = 0;
       } /* END No Data */
-      else {
+      else
+      {
         sts = gdh_ObjidToPointer(data_objid, (pwr_tAddress*)&remtrans->datap);
-        sts = gdh_GetObjectSize(
-            data_objid, (unsigned int*)&remtrans->objp->MaxLength);
+        sts = gdh_GetObjectSize(data_objid, (unsigned int*)&remtrans->objp->MaxLength);
       } /* END Data found */
     } /* END Class RemTrans */
 
     /* If child is (first) MultiCast object, store pointer to this object in
      * remnode_item */
-    if (class == pwr_cClass_MultiCast && mc_found == 0) {
+    if (class == pwr_cClass_MultiCast && mc_found == 0)
+    {
       mc_found = 1;
       sts = gdh_ObjidToPointer(child_objid, (pwr_tAddress*)&remnode->multicast);
     }
@@ -321,8 +252,8 @@ pwr_tInt32 RemTrans_Init(remnode_item* remnode)
 *********************************************************************/
 
 pwr_tInt32 RemTrans_Cyclic(remnode_item* remnode,
-    unsigned int (*remnode_send)(remnode_item* remnode,
-        pwr_sClass_RemTrans* remtrans, char* buf, int buf_size))
+                           unsigned int (*remnode_send)(remnode_item* remnode, pwr_sClass_RemTrans* remtrans,
+                                                        char* buf, int buf_size))
 
 {
   pwr_tStatus sts = 0;
@@ -334,15 +265,17 @@ pwr_tInt32 RemTrans_Cyclic(remnode_item* remnode,
   pwr_tStatus SendSts;
 
   /* Test if there is a buffered trans */
-  if (remnode->transbuff) {
+  if (remnode->transbuff)
+  {
     buffp = (rem_t_transbuff*)remnode->transbuff;
     transp = (remtrans_item*)buffp->remtrans;
     /* Trans is not to be sent before time-out if buffered in wait for ack */
-    if ((transp->time_since_send >= remnode->retransmit_time)
-        || (buffp->ackbuf == 0)) {
+    if ((transp->time_since_send >= remnode->retransmit_time) || (buffp->ackbuf == 0))
+    {
       sts = (remnode_send)(remnode, transp->objp, &buffp->data, buffp->size);
       transp->time_since_send = 0;
-      if (ODD(sts)) {
+      if (ODD(sts))
+      {
         remnode->transbuff = (rem_t_transbuff*)buffp->next;
         transp->objp->Buffers--;
         free(buffp);
@@ -352,14 +285,15 @@ pwr_tInt32 RemTrans_Cyclic(remnode_item* remnode,
 
   /* Loop all remtrans under remnode */
   remtrans = remnode->remtrans;
-  while (remtrans) {
+  while (remtrans)
+  {
     RemTransP = remtrans->objp;
 
     /* Check if buffered receive */
-    if (RemTransP->Direction == REMTRANS_IN && RemTransP->Buffers > 0
-        && !RemTransP->DataValid) {
+    if (RemTransP->Direction == REMTRANS_IN && RemTransP->Buffers > 0 && !RemTransP->DataValid)
+    {
       buffp = (rem_t_transbuff*)remtrans->buffp;
-      buffsize = buffp->size; /* buffersize */
+      buffsize = buffp->size;        /* buffersize */
       remtrans->buffp = buffp->next; /* next buffer */
 
       memcpy(remtrans->datap, &buffp->data, buffsize); /* copy transdata */
@@ -372,33 +306,38 @@ pwr_tInt32 RemTrans_Cyclic(remnode_item* remnode,
       free(buffp); /* Dispose of buffer */
     } /* END buffered receive */
     /* Treat send trans */
-    else if (RemTransP->Direction == REMTRANS_OUT) {
+    else if (RemTransP->Direction == REMTRANS_OUT)
+    {
       /* Is there new data to send ? */
-      if (RemTransP->DataValid) {
-        if (RemTransP->DataLength > RemTransP->MaxLength) {
+      if (RemTransP->DataValid)
+      {
+        if (RemTransP->DataLength > RemTransP->MaxLength)
+        {
           RemTransP->ErrCount++;
           RemTransP->LastSts = STATUS_LENGTH;
         } /* END too long data */
-        else {
+        else
+        {
           SendSts = 0; /* Assume that we could not send */
-          if ((RemTransP->MaxBuffers == 0)
-              || !remnode->transbuff) { /* Try to send if no buffers */
-            SendSts = (remnode_send)(
-                remnode, RemTransP, remtrans->datap, RemTransP->DataLength);
+          if ((RemTransP->MaxBuffers == 0) || !remnode->transbuff)
+          { /* Try to send if no buffers */
+            SendSts = (remnode_send)(remnode, RemTransP, remtrans->datap, RemTransP->DataLength);
             remtrans->time_since_send = 0;
-            if (ODD(SendSts)) {
+            if (ODD(SendSts))
+            {
               RemTransP->TransCount++;
               time_GetTime(&RemTransP->TransTime);
               RemTransP->LastSts = STATUS_OK;
             } /* END Send OK */
           } /* END Try to send */
-          if (EVEN(SendSts)) { /* Trans should be buffered */
-            if ((RemTransP->MaxBuffers > 0)
-                && (RemTransP->Buffers < RemTransP->MaxBuffers)) {
-              buffp
-                  = malloc(RemTransP->DataLength + sizeof(rem_t_transbuff) - 1);
-              if (buffp) {
-                RemTransP->Buffers++; /* Buffer counter */
+          if (EVEN(SendSts))
+          { /* Trans should be buffered */
+            if ((RemTransP->MaxBuffers > 0) && (RemTransP->Buffers < RemTransP->MaxBuffers))
+            {
+              buffp = malloc(RemTransP->DataLength + sizeof(rem_t_transbuff) - 1);
+              if (buffp)
+              {
+                RemTransP->Buffers++;   /* Buffer counter */
                 RemTransP->BuffCount++; /* Buffered trans counter */
                 buffp->next = 0;
                 buffp->remtrans = remtrans;
@@ -407,7 +346,8 @@ pwr_tInt32 RemTrans_Cyclic(remnode_item* remnode,
                 memcpy(&buffp->data, remtrans->datap, RemTransP->DataLength);
                 if (remnode->transbuff == 0)
                   remnode->transbuff = buffp;
-                else { /* Put buffer last in queue */
+                else
+                { /* Put buffer last in queue */
                   nextp = (rem_t_transbuff*)remnode->transbuff;
                   while (nextp->next)
                     nextp = (rem_t_transbuff*)nextp->next;
@@ -417,7 +357,8 @@ pwr_tInt32 RemTrans_Cyclic(remnode_item* remnode,
                 time_GetTime(&RemTransP->TransTime);
                 RemTransP->LastSts = STATUS_BUFF;
               } /* END  Create new bufer */
-              else {
+              else
+              {
                 RemTransP->ErrCount++;
                 if (EVEN(sts))
                   RemTransP->LastSts = sts;
@@ -425,13 +366,14 @@ pwr_tInt32 RemTrans_Cyclic(remnode_item* remnode,
                   RemTransP->LastSts = STATUS_FELSEND;
               } /* END No memory for buffer */
             } /* END Buffering wanted */
-            else {
+            else
+            {
               RemTransP->ErrCount++;
               RemTransP->LastSts = STATUS_FELSEND;
             } /* END No more buffers */
           } /* END trans is not sent */
         } /* END Send request for valid trans */
-        RemTrans_Logg(remtrans); /* Logg */
+        RemTrans_Logg(remtrans);      /* Logg */
         RemTransP->DataValid = false; /* Trans is treated */
       } /* END Data valid was set */
     } /* END Send direction */
@@ -466,16 +408,19 @@ pwr_tInt32 RemTrans_Receive(remtrans_item* remtrans, char* buffer, int size)
   RemTransP->TransCount++;
   time_GetTime(&RemTransP->TransTime);
 
-  if ((unsigned int)size > RemTransP->MaxLength) { /* Too big trans */
+  if ((unsigned int)size > RemTransP->MaxLength)
+  { /* Too big trans */
     RemTransP->ErrCount++;
     RemTransP->LastSts = STATUS_LENGTH;
     RemTransP->DataLength = size;
     RemTrans_Logg(remtrans); /* Logg */
     return STATUS_LENGTH;
   } /* END Too big trans */
-  else {
+  else
+  {
     /* First dispose of buffer if last trans is treated */
-    if (!RemTransP->DataValid && (RemTransP->Buffers > 0)) {
+    if (!RemTransP->DataValid && (RemTransP->Buffers > 0))
+    {
       buffp = (rem_t_transbuff*)remtrans->buffp;
       remtrans->buffp = buffp->next;
 
@@ -487,7 +432,8 @@ pwr_tInt32 RemTrans_Receive(remtrans_item* remtrans, char* buffer, int size)
 
       free(buffp); /* Dispose of buffer */
     } /* END buffered receive */
-    if (!RemTransP->DataValid && RemTransP->Buffers == 0) { /* Store directly */
+    if (!RemTransP->DataValid && RemTransP->Buffers == 0)
+    { /* Store directly */
       memcpy(remtrans->datap, buffer, size);
       RemTransP->DataLength = size;
       RemTransP->LastSts = STATUS_OK;
@@ -495,18 +441,20 @@ pwr_tInt32 RemTrans_Receive(remtrans_item* remtrans, char* buffer, int size)
       RemTransP->DataValid = true;
       return STATUS_OK;
     } /* END Store trans directly */
-    else if ((RemTransP->MaxBuffers > 0)
-        && (RemTransP->Buffers < RemTransP->MaxBuffers)) {
+    else if ((RemTransP->MaxBuffers > 0) && (RemTransP->Buffers < RemTransP->MaxBuffers))
+    {
       buffp = malloc(size + sizeof(rem_t_transbuff) - 1);
-      if (buffp) {
-        RemTransP->Buffers++; /* Buffer counter */
+      if (buffp)
+      {
+        RemTransP->Buffers++;   /* Buffer counter */
         RemTransP->BuffCount++; /* Buffered trans counter */
         buffp->next = 0;
         buffp->size = size;
         memcpy(&buffp->data, buffer, size);
         if (remtrans->buffp == 0)
           remtrans->buffp = (struct rem_t_transbuff*)buffp;
-        else {
+        else
+        {
           nextp = (rem_t_transbuff*)remtrans->buffp;
           while (nextp->next)
             nextp = (rem_t_transbuff*)nextp->next;
@@ -514,14 +462,16 @@ pwr_tInt32 RemTrans_Receive(remtrans_item* remtrans, char* buffer, int size)
         } /* END New buffer last in queue */
         return STATUS_BUFF;
       } /* END  Create new bufer */
-      else {
+      else
+      {
         RemTransP->LostCount++;
         RemTransP->LastSts = STATUS_LOST;
         RemTrans_Logg(remtrans); /* Logg */
         return STATUS_LOST;
       } /* END  No memory for buffer*/
     } /* END Try to buffer */
-    else {
+    else
+    {
       RemTransP->LostCount++;
       RemTransP->LastSts = STATUS_LOST;
       RemTrans_Logg(remtrans); /* Logg */
