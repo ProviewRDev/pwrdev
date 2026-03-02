@@ -54,37 +54,38 @@
 #include "ge_dashboard.h"
 #include "ge_msg.h"
 
-typedef struct {
+typedef struct
+{
   char TypeStr[20];
   pwr_eType Type;
   int Size;
 } graph_sTypeStr;
 
-static const graph_sTypeStr graph_type_table[]
-    = { { "Boolean", pwr_eType_Boolean, sizeof(pwr_tBoolean) },
-        { "Float32", pwr_eType_Float32, sizeof(pwr_tFloat32) },
-        { "Float64", pwr_eType_Float64, sizeof(pwr_tFloat64) },
-        { "Char", pwr_eType_Char, sizeof(pwr_tChar) },
-        { "Int8", pwr_eType_Int8, sizeof(pwr_tInt8) },
-        { "Int16", pwr_eType_Int16, sizeof(pwr_tInt16) },
-        { "Int32", pwr_eType_Int32, sizeof(pwr_tInt32) },
-        { "Int64", pwr_eType_Int64, sizeof(pwr_tInt64) },
-        { "UInt8", pwr_eType_UInt8, sizeof(pwr_tUInt8) },
-        { "UInt16", pwr_eType_UInt16, sizeof(pwr_tUInt16) },
-        { "UInt32", pwr_eType_UInt32, sizeof(pwr_tUInt32) },
-        { "UInt64", pwr_eType_UInt64, sizeof(pwr_tUInt64) },
-        { "Objid", pwr_eType_Objid, sizeof(pwr_tObjid) },
-        { "Time", pwr_eType_Time, sizeof(pwr_tTime) },
-        { "DeltaTime", pwr_eType_DeltaTime, sizeof(pwr_tDeltaTime) },
-        { "AttrRef", pwr_eType_AttrRef, sizeof(pwr_sAttrRef) },
-        { "Status", pwr_eType_Status, sizeof(pwr_tStatus) },
-        { "NetStatus", pwr_eType_NetStatus, sizeof(pwr_tNetStatus) },
-        { "Enum", pwr_eType_Enum, sizeof(pwr_tEnum) },
-        { "Mask", pwr_eType_Mask, sizeof(pwr_tMask) },
-        { "DataRef", pwr_eType_DataRef, sizeof(pwr_tDataRef) },
-        { "VolumeId", pwr_eType_VolumeId, sizeof(pwr_tVolumeId) },
-        { "NodeId", (pwr_eType)graph_eType_NodeId, sizeof(pwr_tVolumeId) },
-        { "Bit", (pwr_eType)graph_eType_Bit, sizeof(pwr_tBit) } };
+static const graph_sTypeStr graph_type_table[] = {
+    {"Boolean", pwr_eType_Boolean, sizeof(pwr_tBoolean)},
+    {"Float32", pwr_eType_Float32, sizeof(pwr_tFloat32)},
+    {"Float64", pwr_eType_Float64, sizeof(pwr_tFloat64)},
+    {"Char", pwr_eType_Char, sizeof(pwr_tChar)},
+    {"Int8", pwr_eType_Int8, sizeof(pwr_tInt8)},
+    {"Int16", pwr_eType_Int16, sizeof(pwr_tInt16)},
+    {"Int32", pwr_eType_Int32, sizeof(pwr_tInt32)},
+    {"Int64", pwr_eType_Int64, sizeof(pwr_tInt64)},
+    {"UInt8", pwr_eType_UInt8, sizeof(pwr_tUInt8)},
+    {"UInt16", pwr_eType_UInt16, sizeof(pwr_tUInt16)},
+    {"UInt32", pwr_eType_UInt32, sizeof(pwr_tUInt32)},
+    {"UInt64", pwr_eType_UInt64, sizeof(pwr_tUInt64)},
+    {"Objid", pwr_eType_Objid, sizeof(pwr_tObjid)},
+    {"Time", pwr_eType_Time, sizeof(pwr_tTime)},
+    {"DeltaTime", pwr_eType_DeltaTime, sizeof(pwr_tDeltaTime)},
+    {"AttrRef", pwr_eType_AttrRef, sizeof(pwr_sAttrRef)},
+    {"Status", pwr_eType_Status, sizeof(pwr_tStatus)},
+    {"NetStatus", pwr_eType_NetStatus, sizeof(pwr_tNetStatus)},
+    {"Enum", pwr_eType_Enum, sizeof(pwr_tEnum)},
+    {"Mask", pwr_eType_Mask, sizeof(pwr_tMask)},
+    {"DataRef", pwr_eType_DataRef, sizeof(pwr_tDataRef)},
+    {"VolumeId", pwr_eType_VolumeId, sizeof(pwr_tVolumeId)},
+    {"NodeId", (pwr_eType)graph_eType_NodeId, sizeof(pwr_tVolumeId)},
+    {"Bit", (pwr_eType)graph_eType_Bit, sizeof(pwr_tBit)}};
 
 static char null_str[] = "";
 
@@ -93,14 +94,11 @@ static char null_str[] = "";
 // static void graph_attr_close_cb( Attr *attrctx);
 // static int graph_attr_set_data_cb( void *g, grow_tObject object, GeDyn
 // *data);
-static void graph_graphattr_redraw_cb(
-    void* ctx, void* attrctx, brow_tObject o, void* info);
-static void graph_graphattr_close_cb(
-    void* ctx, void* attrctx, brow_tObject o, void* info, int keep);
+static void graph_graphattr_redraw_cb(void* ctx, void* attrctx, brow_tObject o, void* info);
+static void graph_graphattr_close_cb(void* ctx, void* attrctx, brow_tObject o, void* info, int keep);
 static int graph_trace_disconnect_bc(grow_tObject object);
 static int graph_trace_scan_bc(grow_tObject object, void* p);
-static int graph_trace_connect_bc(
-    grow_tObject object, glow_sTraceData* trace_data);
+static int graph_trace_connect_bc(grow_tObject object, glow_sTraceData* trace_data);
 static int graph_trace_ctrl_bc(int type, void* data);
 static int graph_trace_grow_cb(GlowCtx* ctx, glow_tEvent event);
 // static int graph_get_subgraph_info_cb( void *g, char *name, attr_sItem
@@ -137,55 +135,42 @@ void Graph::message(char sev, const char* text)
 //
 // Create the navigator widget
 //
-Graph::Graph(void* xn_parent_ctx, const char* xn_name,
-    const char* xn_default_path, graph_eMode graph_mode, int xn_gdh_init_done,
-    const char* xn_object_name, int xn_use_default_access,
-    unsigned int xn_default_access, unsigned int xn_options, int xn_color_theme,
-    int xn_dashboard, void (*xn_keyboard_cb)(void*, int, int))
-    : attr_list(0, NULL), parent_ctx(xn_parent_ctx), grow(0), grow_cnt(0),
-      ldhses(0), journal(0), message_cb(NULL), get_current_subgraph_cb(NULL),
-      close_cb(NULL), get_current_colors_cb(NULL), set_current_colors_cb(NULL),
-      init_cb(NULL), cursor_motion_cb(NULL), change_text_cb(NULL),
-      change_value_cb(NULL), confirm_cb(NULL), load_graph_cb(NULL),
-      get_plant_select_cb(NULL), display_in_xnav_cb(NULL),
-      message_dialog_cb(NULL), is_authorized_cb(NULL), traverse_focus_cb(NULL),
-      set_focus_cb(NULL), get_ldhses_cb(NULL), check_ldh_object_cb(0),
-      get_current_objects_cb(NULL), popup_menu_cb(NULL), context_menu_cb(NULL),
-      call_method_cb(NULL), sound_cb(0), create_modal_dialog_cb(0), eventlog_cb(0),
-      update_colorpalette_cb(0), keyboard_cb(xn_keyboard_cb),
-      refresh_objects_cb(0), resize_cb(0), get_rtplant_select_cb(NULL),
-      extern_connect_cb(0),
-      linewidth(1), linetype(glow_eLineType_Solid),
-      textsize(2), textbold(0), textfont(glow_eFont_Helvetica), border_color(1),
-      fill_color(1), fill(0), border(1), shadow(0), grid_size_x(1),
-      grid_size_y(1), con_type(glow_eConType_Routed),
-      con_corner(glow_eCorner_Rounded),
-      conpoint_direction(glow_eDirection_Center), current_polyline(0),
-      current_slider(0), trace_started(0), gdh_init_done(xn_gdh_init_done),
-      arglist_cnt(0), corner_round_amount(0.5), mode(graph_mode),
-      scan_time(0.5), fast_scan_time(0.5), animation_scan_time(0.5),
-      closing_down(0), current_mb1_down(0), slow_scan_cnt(0), fast_scan_cnt(0),
-      displayed(0), ccm_func_registred(0), verify(0), scriptmode(0),
-      current_cmd_object(0), graph_object_data(0), graph_object_scan(0),
-      graph_object_close(0), local_db(0),
-      use_default_access(xn_use_default_access),
-      default_access(xn_default_access), keep_mode(false), subgraph_dyn(0),
-      was_subgraph(0), disable_log(1), pending_borders(0),
-      color_theme(xn_color_theme), syntax_instance(0), connect_now(false),
-      dashboard(xn_dashboard), mode_scriptmodule(0), options(xn_options),
-      reconfigure_width(0), reconfigure_height(0)
+Graph::Graph(void* xn_parent_ctx, const char* xn_name, const char* xn_default_path, graph_eMode graph_mode,
+             int xn_gdh_init_done, const char* xn_object_name, int xn_use_default_access,
+             unsigned int xn_default_access, unsigned int xn_options, int xn_color_theme, int xn_dashboard,
+             void (*xn_keyboard_cb)(void*, int, int))
+    : attr_list(0, NULL), parent_ctx(xn_parent_ctx), grow(0), grow_cnt(0), ldhses(0), journal(0),
+      message_cb(NULL), get_current_subgraph_cb(NULL), close_cb(NULL), get_current_colors_cb(NULL),
+      set_current_colors_cb(NULL), init_cb(NULL), cursor_motion_cb(NULL), change_text_cb(NULL),
+      change_value_cb(NULL), confirm_cb(NULL), load_graph_cb(NULL), get_plant_select_cb(NULL),
+      display_in_xnav_cb(NULL), message_dialog_cb(NULL), is_authorized_cb(NULL), traverse_focus_cb(NULL),
+      set_focus_cb(NULL), get_ldhses_cb(NULL), check_ldh_object_cb(0), get_current_objects_cb(NULL),
+      popup_menu_cb(NULL), context_menu_cb(NULL), call_method_cb(NULL), sound_cb(0),
+      create_modal_dialog_cb(0), eventlog_cb(0), update_colorpalette_cb(0), keyboard_cb(xn_keyboard_cb),
+      refresh_objects_cb(0), resize_cb(0), get_rtplant_select_cb(NULL), extern_connect_cb(0), linewidth(1),
+      linetype(glow_eLineType_Solid), textsize(2), textbold(0), textfont(glow_eFont_Helvetica),
+      border_color(1), fill_color(1), fill(0), border(1), shadow(0), grid_size_x(1), grid_size_y(1),
+      con_type(glow_eConType_Routed), con_corner(glow_eCorner_Rounded),
+      conpoint_direction(glow_eDirection_Center), current_polyline(0), current_slider(0), trace_started(0),
+      gdh_init_done(xn_gdh_init_done), arglist_cnt(0), corner_round_amount(0.5), mode(graph_mode),
+      scan_time(0.5), fast_scan_time(0.5), animation_scan_time(0.5), closing_down(0), current_mb1_down(0),
+      slow_scan_cnt(0), fast_scan_cnt(0), displayed(0), ccm_func_registred(0), verify(0), scriptmode(0),
+      current_cmd_object(0), graph_object_data(0), graph_object_scan(0), graph_object_close(0), local_db(0),
+      use_default_access(xn_use_default_access), default_access(xn_default_access), keep_mode(false),
+      subgraph_dyn(0), was_subgraph(0), disable_log(1), pending_borders(0), color_theme(xn_color_theme),
+      syntax_instance(0), connect_now(false), dashboard(xn_dashboard), mode_scriptmodule(0),
+      options(xn_options), reconfigure_width(0), reconfigure_height(0)
 {
   str_StrncpyCutOff(name, xn_name, sizeof(name), 1);
   strcpy(default_path, xn_default_path);
   memset(arglist_stack, 0, sizeof(arglist_stack));
-  for (unsigned int i = 0; i < sizeof(object_name) / sizeof(object_name[0]);
-       i++)
+  for (unsigned int i = 0; i < sizeof(object_name) / sizeof(object_name[0]); i++)
     strcpy(object_name[i], "");
-  if (xn_object_name) {
+  if (xn_object_name)
+  {
     if (strchr(xn_object_name, ',') != 0)
-      dcli_parse(xn_object_name, ",", "", (char*)object_name,
-          sizeof(object_name) / sizeof(object_name[0]), sizeof(object_name[0]),
-          0);
+      dcli_parse(xn_object_name, ",", "", (char*)object_name, sizeof(object_name) / sizeof(object_name[0]),
+                 sizeof(object_name[0]), 0);
     else
       strcpy(object_name[0], xn_object_name);
   }
@@ -193,8 +178,8 @@ Graph::Graph(void* xn_parent_ctx, const char* xn_name,
   strcpy(systemname, "");
 
   // Create journal file
-  if (mode == graph_eMode_Development
-      && !(xn_options & graph_mOption_IgnoreJournal)) {
+  if (mode == graph_eMode_Development && !(xn_options & graph_mOption_IgnoreJournal))
+  {
     int sts;
 
     journal = new GraphJournal(this, &sts);
@@ -214,24 +199,16 @@ Graph::~Graph()
     delete journal;
 }
 
-GraphGrow::~GraphGrow()
-{
-}
+GraphGrow::~GraphGrow() {}
 //
 //  Print
 //
-void Graph::print(char* filename)
-{
-  grow_Print(grow->ctx, filename, 0, 0, 1);
-}
+void Graph::print(char* filename) { grow_Print(grow->ctx, filename, 0, 0, 1); }
 
 //
 //  Export to image file
 //
-int Graph::export_image(char* filename)
-{
-  return grow_ExportImage(grow->ctx, filename);
-}
+int Graph::export_image(char* filename) { return grow_ExportImage(grow->ctx, filename); }
 
 //
 //  Rotate
@@ -276,7 +253,8 @@ void Graph::scale(double scalex, double scaley)
 {
   journal_store(journal_eAction_AntePropertiesSelect, 0);
 
-  switch (grow_GetMoveRestrictions(grow->ctx)) {
+  switch (grow_GetMoveRestrictions(grow->ctx))
+  {
   case glow_eMoveRestriction_Horizontal:
     grow_SetSelectScale(grow->ctx, scalex, 1, glow_eScaleType_UpperLeft);
     break;
@@ -295,10 +273,7 @@ void Graph::set_move_restriction(glow_eMoveRestriction restriction)
   grow_SetMoveRestrictions(grow->ctx, restriction, 0, 0, NULL);
 }
 
-void Graph::set_scale_equal(int equal)
-{
-  grow_SetScaleEqual(grow->ctx, equal);
-}
+void Graph::set_scale_equal(int equal) { grow_SetScaleEqual(grow->ctx, equal); }
 
 void Graph::align_select(glow_eAlignDirection direction)
 {
@@ -318,10 +293,7 @@ void Graph::equidistance_select(glow_eAlignDirection direction)
   journal_store(journal_eAction_PostPropertiesSelect, 0);
 }
 
-void Graph::set_default_layout()
-{
-  grow_SetDefaultLayout(grow->ctx);
-}
+void Graph::set_default_layout() { grow_SetDefaultLayout(grow->ctx); }
 
 void Graph::delete_select()
 {
@@ -337,7 +309,8 @@ void Graph::delete_select()
 
   journal_store(journal_eAction_DeleteSelect, 0);
 
-  while (sel_count) {
+  while (sel_count)
+  {
     grow_DeleteObject(grow->ctx, *sel_list);
     grow_GetSelectList(grow->ctx, &sel_list, &sel_count);
   }
@@ -359,54 +332,33 @@ void Graph::cut()
 //
 //  Copy
 //
-void Graph::copy()
-{
-  grow_Copy(grow->ctx);
-}
+void Graph::copy() { grow_Copy(grow->ctx); }
 
 //
 //  Paste
 //
-void Graph::paste()
-{
-  grow_Paste(grow->ctx);
-}
+void Graph::paste() { grow_Paste(grow->ctx); }
 
 //
 //  Store/Restore geometry
 //
-void Graph::store_geometry()
-{
-  grow_StoreGeometry(grow->ctx);
-}
-void Graph::restore_geometry()
-{
-  grow_RestoreGeometry(grow->ctx);
-}
+void Graph::store_geometry() { grow_StoreGeometry(grow->ctx); }
+void Graph::restore_geometry() { grow_RestoreGeometry(grow->ctx); }
 
 //
 //  Get next subgraph
 //
-void Graph::get_next_subgraph(char* next)
-{
-  grow_GetNextSubgraph(grow->ctx, next);
-}
+void Graph::get_next_subgraph(char* next) { grow_GetNextSubgraph(grow->ctx, next); }
 
 //
 //  Set next subgraph
 //
-void Graph::set_next_subgraph(const char* next)
-{
-  grow_SetNextSubgraph(grow->ctx, next);
-}
+void Graph::set_next_subgraph(const char* next) { grow_SetNextSubgraph(grow->ctx, next); }
 
 //
 //  Get name
 //
-void Graph::get_name(char* name)
-{
-  grow_GetName(grow->ctx, name);
-}
+void Graph::get_name(char* name) { grow_GetName(grow->ctx, name); }
 
 //
 //  Set name
@@ -419,10 +371,7 @@ void Graph::set_name(char* name)
 //
 //  Get java name
 //
-int Graph::get_java_name(char* name)
-{
-  return grow_GetJavaName(grow->ctx, name);
-}
+int Graph::get_java_name(char* name) { return grow_GetJavaName(grow->ctx, name); }
 
 //
 //  Set java name
@@ -432,7 +381,8 @@ void Graph::set_java_name(const char* name)
   char current_name[80];
 
   grow_GetJavaName(grow->ctx, current_name);
-  if (!streq(current_name, name)) {
+  if (!streq(current_name, name))
+  {
     grow_SetJavaName(grow->ctx, name);
     grow_SetModified(grow->ctx, 1);
   }
@@ -441,18 +391,12 @@ void Graph::set_java_name(const char* name)
 //
 //  Is java application
 //
-int Graph::is_javaapplication()
-{
-  return grow_IsJavaApplication(grow->ctx);
-}
+int Graph::is_javaapplication() { return grow_IsJavaApplication(grow->ctx); }
 
 //
 //  Is java applet
 //
-int Graph::is_javaapplet()
-{
-  return grow_IsJavaApplet(grow->ctx);
-}
+int Graph::is_javaapplet() { return grow_IsJavaApplet(grow->ctx); }
 
 //
 //  Clear all and reset
@@ -462,13 +406,15 @@ void Graph::clear_all()
   Attr* attrctx;
   int sts;
 
-  if (journal) {
+  if (journal)
+  {
     delete journal;
     journal = new GraphJournal(this, &sts);
   }
 
   sts = attr_list.get_first((void**)&attrctx);
-  while (sts) {
+  while (sts)
+  {
     attr_list.remove((void*)attrctx);
     delete attrctx;
     sts = attr_list.get_first((void**)&attrctx);
@@ -495,10 +441,12 @@ void Graph::get_filename(char* inname, char* outname)
   pwr_tFileName fname;
 
   // Add default directory
-  if (!strchr(inname, ':') && !strchr(inname, '/')) {
+  if (!strchr(inname, ':') && !strchr(inname, '/'))
+  {
     strcpy(fname, default_path);
     strcat(fname, inname);
-  } else
+  }
+  else
     strcpy(fname, inname);
   if (dashboard)
     dcli_get_defaultfilename(fname, fname, ".pwd");
@@ -512,10 +460,12 @@ void Graph::get_filename(char* inname, const char* def_path, int dashboard, char
   pwr_tFileName fname;
 
   // Add default directory
-  if (!strchr(inname, ':') && !strchr(inname, '/')) {
+  if (!strchr(inname, ':') && !strchr(inname, '/'))
+  {
     strcpy(fname, def_path);
     strcat(fname, inname);
-  } else
+  }
+  else
     strcpy(fname, inname);
   if (dashboard)
     dcli_get_defaultfilename(fname, fname, ".pwd");
@@ -534,7 +484,8 @@ int Graph::save(char* filename)
   int sts;
 
   grow_GetVersion(grow->ctx, &grow_version, &graph_version);
-  if (graph_version < 4500) {
+  if (graph_version < 4500)
+  {
     // Needs to be converted
     message('E', "Unable to save, graph needs conversion");
     return GE__NEEDCONV;
@@ -563,7 +514,8 @@ int Graph::save_subgraph(char* filename)
   int sts;
 
   grow_GetVersion(grow->ctx, &grow_version, &graph_version);
-  if (graph_version < 4500) {
+  if (graph_version < 4500)
+  {
     // Needs to be converted
     message('E', "Unable to save, graph needs conversion");
     return GE__NEEDCONV;
@@ -590,22 +542,24 @@ int Graph::open(char* filename)
 
   // Set temporary language translation on class graphs
   // if ( !streq( object_name, ""))
-  grow_EnableEvent(grow->ctx, glow_eEvent_Translate, glow_eEventType_CallBack,
-      graph_grow_cb);
+  grow_EnableEvent(grow->ctx, glow_eEvent_Translate, glow_eEventType_CallBack, graph_grow_cb);
 
   if (!streq(object_name[0], ""))
     grow_SetOwner(grow->ctx, object_name[0]);
 
-  if (!streq(filename, "_none_.pwg")) {
+  if (!streq(filename, "_none_.pwg"))
+  {
     get_filename(filename, fname);
     sts = grow_Open(grow->ctx, fname);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       if (is_dashboard())
-	dashboard_init();
-      else {
-	char tmp[512];
-	snprintf(tmp, sizeof(tmp), "Unable to open file \"%s\"", fname);
-	message('E', tmp);	
+        dashboard_init();
+      else
+      {
+        char tmp[512];
+        snprintf(tmp, sizeof(tmp), "Unable to open file \"%s\"", fname);
+        message('E', tmp);
       }
     }
   }
@@ -614,7 +568,8 @@ int Graph::open(char* filename)
   strcpy(this->filename, filename);
 
   grow_GetVersion(grow->ctx, &grow_version, &graph_version);
-  if (graph_version < 4500) {
+  if (graph_version < 4500)
+  {
     // Needs to be converted
     message('E', "Old version, graph needs conversion");
   }
@@ -651,10 +606,7 @@ void Graph::open_subgraph(char* filename)
 //
 //  Set subgraph path
 //
-void Graph::set_subgraph_path(int path_cnt, char* path)
-{
-  grow_SetPath(grow->ctx, path_cnt, path);
-}
+void Graph::set_subgraph_path(int path_cnt, char* path) { grow_SetPath(grow->ctx, path_cnt, path); }
 
 void Graph::dashboard_init()
 {
@@ -676,8 +628,7 @@ void Graph::dashboard_reconfigure()
   width = int(cell_width * columns * zoom_factor);
   height = int(cell_height * rows * zoom_factor);
 
-  grow_SetGraphBorders(grow->ctx, 0, 0, cell_width * columns, 
-		       cell_height * rows);
+  grow_SetGraphBorders(grow->ctx, 0, 0, cell_width * columns, cell_height * rows);
   if (resize_cb)
     (resize_cb)(parent_ctx, width, height);
 }
@@ -694,18 +645,12 @@ int Graph::dashboard_is_full()
 //
 //  Zoom
 //
-void Graph::zoom(double zoom_factor)
-{
-  grow_Zoom(grow->ctx, zoom_factor);
-}
+void Graph::zoom(double zoom_factor) { grow_Zoom(grow->ctx, zoom_factor); }
 
 //
 //  Return to base zoom factor
 //
-void Graph::unzoom()
-{
-  grow_UnZoom(grow->ctx);
-}
+void Graph::unzoom() { grow_UnZoom(grow->ctx); }
 
 //
 //  Return to base zoom factor
@@ -714,7 +659,8 @@ void Graph::set_borders(double* borders)
 {
   if (grow)
     grow_SetLayout(grow->ctx, borders[0], borders[1], borders[2], borders[3]);
-  else {
+  else
+  {
     pending_borders = (double*)calloc(4, sizeof(double));
     memcpy(pending_borders, borders, 4 * sizeof(double));
   }
@@ -725,14 +671,14 @@ void Graph::set_borders(double* borders)
 //
 void Graph::set_mode(grow_eMode mode, bool keep)
 {
-  if (mode == grow_eMode_EditPolyLine) {
+  if (mode == grow_eMode_EditPolyLine)
+  {
     grow_tObject* sel_list;
     int sel_count;
 
     grow_GetSelectList(grow->ctx, &sel_list, &sel_count);
-    if (!(sel_count == 1
-            && grow_GetObjectType(*sel_list)
-                == glow_eObjectType_GrowPolyLine)) {
+    if (!(sel_count == 1 && grow_GetObjectType(*sel_list) == glow_eObjectType_GrowPolyLine))
+    {
       message('E', "Select one polyline object");
       return;
     }
@@ -740,7 +686,8 @@ void Graph::set_mode(grow_eMode mode, bool keep)
   grow_SetMode(grow->ctx, mode);
   keep_mode = keep;
 
-  if (mode == grow_eMode_EditPolyLine || mode == grow_eMode_Scale) {
+  if (mode == grow_eMode_EditPolyLine || mode == grow_eMode_Scale)
+  {
     journal_store(journal_eAction_AntePropertiesSelect, 0);
   }
 }
@@ -797,10 +744,12 @@ int Graph::group_select(grow_tObject* object, char* last_group)
 
   grow_SetModified(grow->ctx, 1);
 
-  if (!streq(last_group_name, "")) {
+  if (!streq(last_group_name, ""))
+  {
     // Try to recover dynamics
     sts = recall.get(&data, last_group_name);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       delete data;
       *object = group;
       strcpy(last_group, last_group_name);
@@ -837,26 +786,31 @@ int Graph::ungroup_select(int force)
   char name[80];
   int sts;
 
-  if (!force) {
+  if (!force)
+  {
     grow_GetSelectList(grow->ctx, &sel_list, &sel_count);
-    for (i = 0; i < sel_count; i++) {
-      if (grow_GetObjectType(sel_list[i]) == glow_eObjectType_GrowGroup) {
+    for (i = 0; i < sel_count; i++)
+    {
+      if (grow_GetObjectType(sel_list[i]) == glow_eObjectType_GrowGroup)
+      {
         grow_GetUserData(sel_list[i], (void**)&dyn);
-        if (dyn->get_dyntype1(sel_list[i]) || dyn->get_actiontype1(sel_list[i])
-            || dyn->get_dyntype2(sel_list[i])
-            || dyn->get_actiontype2(sel_list[i]))
+        if (dyn->get_dyntype1(sel_list[i]) || dyn->get_actiontype1(sel_list[i]) ||
+            dyn->get_dyntype2(sel_list[i]) || dyn->get_actiontype2(sel_list[i]))
           return GE__GROUPDYNDATA;
       }
     }
-  } else {
+  }
+  else
+  {
     grow_GetSelectList(grow->ctx, &sel_list, &sel_count);
-    for (i = 0; i < sel_count; i++) {
-      if (grow_GetObjectType(sel_list[i]) == glow_eObjectType_GrowGroup) {
+    for (i = 0; i < sel_count; i++)
+    {
+      if (grow_GetObjectType(sel_list[i]) == glow_eObjectType_GrowGroup)
+      {
         grow_GetObjectName(sel_list[i], name, sizeof(name), glow_eName_Object);
         grow_GetUserData(sel_list[i], (void**)&dyn);
-        if (dyn->get_dyntype1(sel_list[i]) || dyn->get_actiontype1(sel_list[i])
-            || dyn->get_dyntype2(sel_list[i])
-            || dyn->get_actiontype2(sel_list[i]))
+        if (dyn->get_dyntype1(sel_list[i]) || dyn->get_actiontype1(sel_list[i]) ||
+            dyn->get_dyntype2(sel_list[i]) || dyn->get_actiontype2(sel_list[i]))
           recall.insert(dyn, name, sel_list[i]);
       }
     }
@@ -900,9 +854,8 @@ void Graph::set_grid(int grid_on)
   grow_SetAttributes(grow->ctx, &grow_attr, mask);
 }
 
-int Graph::get_conclass(glow_eDrawType drawtype, int linewidth,
-    glow_eConType contype, glow_eCorner corner, double round_amount,
-    grow_tConClass* cc)
+int Graph::get_conclass(glow_eDrawType drawtype, int linewidth, glow_eConType contype, glow_eCorner corner,
+                        double round_amount, grow_tConClass* cc)
 {
   char name[80];
   int sts;
@@ -916,11 +869,11 @@ int Graph::get_conclass(glow_eDrawType drawtype, int linewidth,
   sprintf(name, "cc_%d_%d_%d_%d", contype, linewidth, drawtype, r_amount);
 
   sts = grow_FindConClassByName(grow->ctx, name, cc);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     // Create the conclass
-    grow_CreateConClass(grow->ctx, name, contype, corner, drawtype, linewidth,
-        0.4 * linewidth, 0.6 * linewidth, round_amount, glow_eConGroup_Common,
-        cc);
+    grow_CreateConClass(grow->ctx, name, contype, corner, drawtype, linewidth, 0.4 * linewidth,
+                        0.6 * linewidth, round_amount, glow_eConGroup_Common, cc);
   }
   return 1;
 }
@@ -963,9 +916,10 @@ void Graph::change_select_text()
   char text[200];
 
   grow_GetSelectList(grow->ctx, &sel_list, &sel_count);
-  if (sel_count == 1
-      && grow_GetObjectType(*sel_list) == glow_eObjectType_GrowText) {
-    if (change_text_cb) {
+  if (sel_count == 1 && grow_GetObjectType(*sel_list) == glow_eObjectType_GrowText)
+  {
+    if (change_text_cb)
+    {
       journal_store(journal_eAction_AntePropertiesSelect, 0);
 
       grow_GetObjectText(*sel_list, text, sizeof(text));
@@ -973,7 +927,8 @@ void Graph::change_select_text()
 
       journal_store(journal_eAction_PostPropertiesSelect, 0);
     }
-  } else
+  }
+  else
     message('E', "Select one text object");
 }
 
@@ -984,12 +939,15 @@ void Graph::change_select_name()
   char name[80];
 
   grow_GetSelectList(grow->ctx, &sel_list, &sel_count);
-  if (sel_count == 1) {
-    if (change_name_cb) {
+  if (sel_count == 1)
+  {
+    if (change_name_cb)
+    {
       grow_GetObjectName(*sel_list, name, sizeof(name), glow_eName_Object);
       (change_name_cb)(parent_ctx, *sel_list, name);
     }
-  } else
+  }
+  else
     message('E', "Select one object");
 }
 
@@ -1002,19 +960,20 @@ void Graph::change_value(grow_tObject object, char* text)
   GeDyn* dyn;
 
   grow_GetUserData(object, (void**)&dyn);
-  if (dyn->action_type1 & ge_mActionType1_Confirm) {
+  if (dyn->action_type1 & ge_mActionType1_Confirm)
+  {
     glow_sEvent event;
 
     event.event = glow_eEvent_MB1Click;
 
     // Trigger the confirm action
-    dyn->total_action_type1 = ge_mActionType1(
-        dyn->total_action_type1 & ~ge_mActionType1_ValueInput);
+    dyn->total_action_type1 = ge_mActionType1(dyn->total_action_type1 & ~ge_mActionType1_ValueInput);
     strncpy(confirm_text, text, sizeof(confirm_text));
     dyn->action(object, &event);
-    dyn->total_action_type1
-        = ge_mActionType1(dyn->total_action_type1 | ge_mActionType1_ValueInput);
-  } else {
+    dyn->total_action_type1 = ge_mActionType1(dyn->total_action_type1 | ge_mActionType1_ValueInput);
+  }
+  else
+  {
     dyn->change_value(object, text);
 
     // Send a Key_Tab event
@@ -1046,7 +1005,8 @@ void Graph::set_select_fill_color()
   grow_DisableHighlight(grow->ctx);
   grow_SetSelectOrigFillColor(grow->ctx, drawtype);
 
-  if (grow_AnySelectIsCon(grow->ctx)) {
+  if (grow_AnySelectIsCon(grow->ctx))
+  {
     grow_tConClass cc;
     int i;
     grow_tCon *conlist, *con_ptr;
@@ -1059,11 +1019,11 @@ void Graph::set_select_fill_color()
 
     grow_GetSelectedCons(grow->ctx, &conlist, &con_cnt);
     con_ptr = conlist;
-    for (i = 0; i < con_cnt; i++) {
-      grow_GetConAttributes(*con_ptr, &con_drawtype, &con_linewidth,
-          &con_contype, &con_corner, &con_corner_round_amount);
-      get_conclass(drawtype, con_linewidth, con_contype, con_corner,
-          con_corner_round_amount, &cc);
+    for (i = 0; i < con_cnt; i++)
+    {
+      grow_GetConAttributes(*con_ptr, &con_drawtype, &con_linewidth, &con_contype, &con_corner,
+                            &con_corner_round_amount);
+      get_conclass(drawtype, con_linewidth, con_contype, con_corner, con_corner_round_amount, &cc);
       grow_ChangeConConClass(*con_ptr, cc);
       con_ptr++;
     }
@@ -1135,7 +1095,8 @@ void Graph::set_select_linewidth(int width)
   grow_DisableHighlight(grow->ctx);
   grow_SetSelectLineWidth(grow->ctx, width);
 
-  if (grow_AnySelectIsCon(grow->ctx)) {
+  if (grow_AnySelectIsCon(grow->ctx))
+  {
     grow_tConClass cc;
     int i;
     grow_tCon *conlist, *con_ptr;
@@ -1148,11 +1109,11 @@ void Graph::set_select_linewidth(int width)
 
     grow_GetSelectedCons(grow->ctx, &conlist, &con_cnt);
     con_ptr = conlist;
-    for (i = 0; i < con_cnt; i++) {
-      grow_GetConAttributes(*con_ptr, &con_drawtype, &con_linewidth,
-          &con_contype, &con_corner, &con_corner_round_amount);
-      get_conclass(con_drawtype, width, con_contype, con_corner,
-          con_corner_round_amount, &cc);
+    for (i = 0; i < con_cnt; i++)
+    {
+      grow_GetConAttributes(*con_ptr, &con_drawtype, &con_linewidth, &con_contype, &con_corner,
+                            &con_corner_round_amount);
+      get_conclass(con_drawtype, width, con_contype, con_corner, con_corner_round_amount, &cc);
       grow_ChangeConConClass(*con_ptr, cc);
       con_ptr++;
     }
@@ -1215,7 +1176,8 @@ void Graph::set_select_textsize(int size)
 {
   int textsize = 0;
 
-  switch (size) {
+  switch (size)
+  {
   case 0:
     textsize = 0;
     break;
@@ -1265,9 +1227,9 @@ void Graph::set_background_color()
 {
   glow_eDrawType fill_color, border_color, text_color;
 
-  if (get_current_colors_cb) {
-    (get_current_colors_cb)(
-        parent_ctx, &fill_color, &border_color, &text_color);
+  if (get_current_colors_cb)
+  {
+    (get_current_colors_cb)(parent_ctx, &fill_color, &border_color, &text_color);
     grow_SetBackgroundColor(grow->ctx, fill_color);
   }
 }
@@ -1280,26 +1242,16 @@ void Graph::set_nav_background_color()
   grow_SetBackgroundColor(grow->ctx, color);
 }
 
-int Graph::set_custom_color(
-    glow_eDrawType color, double red, double green, double blue)
+int Graph::set_custom_color(glow_eDrawType color, double red, double green, double blue)
 {
   return grow_SetCustomColor(grow->ctx, color, red, green, blue);
 }
 
-void* Graph::get_custom_colors()
-{
-  return grow_GetCustomColors(grow->ctx);
-}
+void* Graph::get_custom_colors() { return grow_GetCustomColors(grow->ctx); }
 
-int Graph::custom_colors_is_empty()
-{
-  return grow_CustomColorsIsEmpty(grow->ctx);
-}
+int Graph::custom_colors_is_empty() { return grow_CustomColorsIsEmpty(grow->ctx); }
 
-void Graph::set_default_background_color()
-{
-  grow_SetBackgroundColor(grow->ctx, glow_eDrawType_Color32);
-}
+void Graph::set_default_background_color() { grow_SetBackgroundColor(grow->ctx, glow_eDrawType_Color32); }
 
 void Graph::colortheme_init(int ct)
 {
@@ -1307,35 +1259,26 @@ void Graph::colortheme_init(int ct)
   grow_SetBackgroundColor(grow->ctx, glow_eDrawType_CustomColor1);
 }
 
-void Graph::set_show_grid(int show)
-{
-  grow_SetShowGrid(grow->ctx, show);
-}
+void Graph::set_show_grid(int show) { grow_SetShowGrid(grow->ctx, show); }
 
-int Graph::get_show_grid()
-{
-  return grow_GetShowGrid(grow->ctx);
-}
+int Graph::get_show_grid() { return grow_GetShowGrid(grow->ctx); }
 
 glow_eDrawType Graph::get_border_drawtype()
 {
   glow_eDrawType fill_color, text_color, border_color = glow_eDrawType_Line;
 
   if (get_current_colors_cb)
-    (get_current_colors_cb)(
-        parent_ctx, &fill_color, &border_color, &text_color);
+    (get_current_colors_cb)(parent_ctx, &fill_color, &border_color, &text_color);
 
   return border_color;
 }
 
 glow_eDrawType Graph::get_fill_drawtype()
 {
-  glow_eDrawType border_color, text_color,
-      fill_color = glow_eDrawType_LightGray;
+  glow_eDrawType border_color, text_color, fill_color = glow_eDrawType_LightGray;
 
   if (get_current_colors_cb)
-    (get_current_colors_cb)(
-        parent_ctx, &fill_color, &border_color, &text_color);
+    (get_current_colors_cb)(parent_ctx, &fill_color, &border_color, &text_color);
 
   return fill_color;
 }
@@ -1345,8 +1288,7 @@ glow_eDrawType Graph::get_text_drawtype()
   glow_eDrawType fill_color, border_color, text_color = glow_eDrawType_Line;
 
   if (get_current_colors_cb)
-    (get_current_colors_cb)(
-        parent_ctx, &fill_color, &border_color, &text_color);
+    (get_current_colors_cb)(parent_ctx, &fill_color, &border_color, &text_color);
 
   return text_color;
 }
@@ -1369,8 +1311,10 @@ void Graph::select_all_cons()
   grow_SelectClear(grow->ctx);
   grow_GetObjectList(grow->ctx, &objectlist, &object_cnt);
   object_p = objectlist;
-  for (i = 0; i < object_cnt; i++) {
-    if (grow_GetObjectType(*object_p) == glow_eObjectType_Con) {
+  for (i = 0; i < object_cnt; i++)
+  {
+    if (grow_GetObjectType(*object_p) == glow_eObjectType_Con)
+    {
       grow_SetHighlight(*object_p, 1);
       grow_SelectInsert(grow->ctx, *object_p);
     }
@@ -1385,17 +1329,23 @@ void Graph::select_all_objects()
 
   grow_SelectClear(grow->ctx);
   grow_GetObjectList(grow->ctx, &olist, &ocnt);
-  for (int i = 0; i < ocnt; i++) {
-    if (grow_GetObjectType(olist[i]) != glow_eObjectType_Con) {
-      if (grow_GetObjectType(olist[i]) == glow_eObjectType_GrowLayer) {
-	grow_GetLayerObjectList(olist[i], &llist, &lcnt);
-	for (int j = 0; j < lcnt; j++) {
-	  grow_SetHighlight(llist[j], 1);
-	  grow_SelectInsert(grow->ctx, llist[j]);
-	}
-      } else {
-	grow_SetHighlight(olist[i], 1);
-	grow_SelectInsert(grow->ctx, olist[i]);
+  for (int i = 0; i < ocnt; i++)
+  {
+    if (grow_GetObjectType(olist[i]) != glow_eObjectType_Con)
+    {
+      if (grow_GetObjectType(olist[i]) == glow_eObjectType_GrowLayer)
+      {
+        grow_GetLayerObjectList(olist[i], &llist, &lcnt);
+        for (int j = 0; j < lcnt; j++)
+        {
+          grow_SetHighlight(llist[j], 1);
+          grow_SelectInsert(grow->ctx, llist[j]);
+        }
+      }
+      else
+      {
+        grow_SetHighlight(olist[i], 1);
+        grow_SelectInsert(grow->ctx, olist[i]);
       }
     }
   }
@@ -1404,11 +1354,14 @@ void Graph::select_all_objects()
 
 void Graph::select_object(grow_tObject o)
 {
-  if (grow_GetObjectType(o) == glow_eObjectType_GrowLayer) {
+  if (grow_GetObjectType(o) == glow_eObjectType_GrowLayer)
+  {
     grow_SelectClear(grow->ctx);
     grow_SetHighlight(o, 1);
     grow_SelectInsert(grow->ctx, o);
-  } else {
+  }
+  else
+  {
     journal_store(journal_eAction_AnteSelectObject, o);
     grow_SelectClear(grow->ctx);
     grow_SetHighlight(o, 1);
@@ -1419,13 +1372,16 @@ void Graph::select_object(grow_tObject o)
 
 void Graph::select_layer(grow_tObject o, int select)
 {
-  if (grow_GetObjectType(o) == glow_eObjectType_GrowLayer) {
-    if (select && !grow_LayerIsActive(o)) {
+  if (grow_GetObjectType(o) == glow_eObjectType_GrowLayer)
+  {
+    if (select && !grow_LayerIsActive(o))
+    {
       journal_store(journal_eAction_AnteActivateLayer, o);
       grow_LayerSetActive(o, 1);
       journal_store(journal_eAction_PostActivateLayer, o);
     }
-    else if (!select && grow_LayerIsActive(o)) {
+    else if (!select && grow_LayerIsActive(o))
+    {
       grow_LayerSetActive(o, 0);
       journal_store(journal_eAction_InactivateLayer, o);
     }
@@ -1434,10 +1390,13 @@ void Graph::select_layer(grow_tObject o, int select)
 
 void Graph::add_select_object(grow_tObject o, int select)
 {
-  if (select) {
+  if (select)
+  {
     grow_SetHighlight(o, 1);
     grow_SelectInsert(grow->ctx, o);
-  } else {
+  }
+  else
+  {
     grow_SetHighlight(o, 0);
     grow_SelectRemove(grow->ctx, o);
   }
@@ -1452,25 +1411,32 @@ void Graph::select_nextobject(glow_eDirection dir)
   sts = get_selected_object(&sel);
   if (EVEN(sts))
     sel = 0;
-  else {
-    if (grow_GetObjectType(sel) == glow_eObjectType_Con) {
+  else
+  {
+    if (grow_GetObjectType(sel) == glow_eObjectType_Con)
+    {
       message('E', "Select an object");
       return;
     }
   }
 
-  if (!sel || !grow_IsVisible(grow->ctx, sel, glow_eVisible_Partial)) {
+  if (!sel || !grow_IsVisible(grow->ctx, sel, glow_eVisible_Partial))
+  {
     sts = grow_GetNextObjectPosition(grow->ctx, 0, dir, &next);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       message('E', "Unable to find visible object");
       return;
     }
     grow_SelectClear(grow->ctx);
     grow_SetHighlight(next, 1);
     grow_SelectInsert(grow->ctx, next);
-  } else {
+  }
+  else
+  {
     sts = grow_GetNextObjectPosition(grow->ctx, sel, dir, &next);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       message('E', "Unable to find next object");
       return;
     }
@@ -1505,14 +1471,12 @@ int Graph::get_selected_object(grow_tObject* object)
   return GE__SUCCESS;
 }
 
-int Graph::is_subgraph()
-{
-  return grow_IsSubGraph(grow->ctx);
-}
+int Graph::is_subgraph() { return grow_IsSubGraph(grow->ctx); }
 
 int Graph::is_authorized(unsigned int access)
 {
-  if (is_authorized_cb) {
+  if (is_authorized_cb)
+  {
     if (use_default_access && (access & pwr_mAccess_Default))
       return (is_authorized_cb)(parent_ctx, default_access);
     else
@@ -1521,8 +1485,7 @@ int Graph::is_authorized(unsigned int access)
   return 1;
 }
 
-int Graph::get_attr_items(grow_tObject object, attr_sItem** itemlist,
-    int* item_cnt, void** client_data)
+int Graph::get_attr_items(grow_tObject object, attr_sItem** itemlist, int* item_cnt, void** client_data)
 {
   static attr_sItem items[200];
   int i;
@@ -1530,24 +1493,25 @@ int Graph::get_attr_items(grow_tObject object, attr_sItem** itemlist,
   int grow_info_cnt = 0;
 
   memset(items, 0, sizeof(items));
-  if (grow_GetObjectType(object) == glow_eObjectType_GrowNode
-      || grow_GetObjectType(object) == glow_eObjectType_GrowGroup
-      || grow_GetObjectType(object) == glow_eObjectType_GrowToolbar
-      || grow_GetObjectType(object) == glow_eObjectType_GrowLayer) {
+  if (grow_GetObjectType(object) == glow_eObjectType_GrowNode ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowGroup ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowToolbar ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowLayer)
+  {
     GeDyn* dyn;
     char* transtab;
     grow_GetUserData(object, (void**)&dyn);
 
     dyn->get_transtab(object, &transtab);
     if (transtab)
-      grow_GetObjectAttrInfo(
-          object, (char*)transtab, &grow_info, &grow_info_cnt);
+      grow_GetObjectAttrInfo(object, (char*)transtab, &grow_info, &grow_info_cnt);
 
     *itemlist = items;
     *item_cnt = 0;
 
     grow_info_p = grow_info;
-    for (i = *item_cnt; i < grow_info_cnt + *item_cnt; i++) {
+    for (i = *item_cnt; i < grow_info_cnt + *item_cnt; i++)
+    {
       items[i].value = grow_info_p->value_p;
       strcpy(items[i].name, grow_info_p->name);
       items[i].type = grow_info_p->type;
@@ -1567,12 +1531,13 @@ int Graph::get_attr_items(grow_tObject object, attr_sItem** itemlist,
     dyn->get_attributes(object, items, item_cnt);
 
     return 1;
-
-  } else if (grow_GetObjectType(object) == glow_eObjectType_GrowBar) {
-    char transtab[][32] = { "MaxValue", "Bar.MaxValue", "MinValue",
-      "Bar.MinValue", "BarValue", "Bar.Value", "BarColor", "Bar.BarColor",
-      "BarBorderColor", "Bar.BorderColor", "BarBorderWidth", "Bar.BorderWidth",
-      "Dynamic", "Dynamic", "" };
+  }
+  else if (grow_GetObjectType(object) == glow_eObjectType_GrowBar)
+  {
+    char transtab[][32] = {
+        "MaxValue",       "Bar.MaxValue",    "MinValue",     "Bar.MinValue",   "BarValue",
+        "Bar.Value",      "BarColor",        "Bar.BarColor", "BarBorderColor", "Bar.BorderColor",
+        "BarBorderWidth", "Bar.BorderWidth", "Dynamic",      "Dynamic",        ""};
     GeDyn* dyn;
 
     grow_GetObjectAttrInfo(object, (char*)transtab, &grow_info, &grow_info_cnt);
@@ -1583,13 +1548,32 @@ int Graph::get_attr_items(grow_tObject object, attr_sItem** itemlist,
     dyn->get_attributes(object, items, item_cnt);
 
     *client_data = 0;
-  } else if (grow_GetObjectType(object) == glow_eObjectType_GrowBarArc) {
-    char transtab[][32] = { "MaxValue", "BarArc.MaxValue", "MinValue",
-      "BarArc.MinValue", "Angle1", "BarArc.Angle1", "Angle2", "BarArc.Angle2",
-      "BarWidth", "BarArc.BarWidth", "BarDirection", "BarArc.Direction",
-      "BarValue", "BarArc.Value", "BarColor", "BarArc.BarColor",
-      "BarBorderColor", "BarArc.BorderColor", "BarBorderWidth", "BarArc.BorderWidth",
-      "Dynamic", "Dynamic", "" };
+  }
+  else if (grow_GetObjectType(object) == glow_eObjectType_GrowBarArc)
+  {
+    char transtab[][32] = {"MaxValue",
+                           "BarArc.MaxValue",
+                           "MinValue",
+                           "BarArc.MinValue",
+                           "Angle1",
+                           "BarArc.Angle1",
+                           "Angle2",
+                           "BarArc.Angle2",
+                           "BarWidth",
+                           "BarArc.BarWidth",
+                           "BarDirection",
+                           "BarArc.Direction",
+                           "BarValue",
+                           "BarArc.Value",
+                           "BarColor",
+                           "BarArc.BarColor",
+                           "BarBorderColor",
+                           "BarArc.BorderColor",
+                           "BarBorderWidth",
+                           "BarArc.BorderWidth",
+                           "Dynamic",
+                           "Dynamic",
+                           ""};
     GeDyn* dyn;
 
     grow_GetObjectAttrInfo(object, (char*)transtab, &grow_info, &grow_info_cnt);
@@ -1600,13 +1584,26 @@ int Graph::get_attr_items(grow_tObject object, attr_sItem** itemlist,
     dyn->get_attributes(object, items, item_cnt);
 
     *client_data = 0;
-  } else if (grow_GetObjectType(object) == glow_eObjectType_GrowWindow) {
-    char transtab[][32] = { "FileName", "Window.FileName", "WindowScale",
-      "Window.Scale", "VerticalScrollbar", "Window.VerticalScrollbar",
-      "HorizontalScrollbar", "Window.HorizontalScrollbar", "ScrollbarWidth",
-      "Window.ScrollbarWidth", "ScrollbarColor", "Window.ScrollbarColor",
-      "ScrollbarBgColor", "Window.ScrollbarBgColor", "Owner", "Window.Object",
-      "" };
+  }
+  else if (grow_GetObjectType(object) == glow_eObjectType_GrowWindow)
+  {
+    char transtab[][32] = {"FileName",
+                           "Window.FileName",
+                           "WindowScale",
+                           "Window.Scale",
+                           "VerticalScrollbar",
+                           "Window.VerticalScrollbar",
+                           "HorizontalScrollbar",
+                           "Window.HorizontalScrollbar",
+                           "ScrollbarWidth",
+                           "Window.ScrollbarWidth",
+                           "ScrollbarColor",
+                           "Window.ScrollbarColor",
+                           "ScrollbarBgColor",
+                           "Window.ScrollbarBgColor",
+                           "Owner",
+                           "Window.Object",
+                           ""};
     GeDyn* dyn;
 
     grow_GetObjectAttrInfo(object, (char*)transtab, &grow_info, &grow_info_cnt);
@@ -1617,42 +1614,116 @@ int Graph::get_attr_items(grow_tObject object, attr_sItem** itemlist,
     dyn->get_attributes(object, items, item_cnt);
 
     *client_data = 0;
-  } else if (grow_GetObjectType(object) == glow_eObjectType_GrowTable) {
-    char transtab[][32] = { "Rows", "Table.Rows", "Columns", "Table.Columns",
-      "RowHeight", "Table.RowHeight", "HeaderRow", "Table.HeaderRow",
-      "HeaderColumn", "Table.HeaderColumn", "HeaderRowHeight",
-      "Table.HeaderRowHeight", "HeaderTextSize", "Table.HeaderTextSize",
-      "HeaderTextBold", "Table.HeaderTextBold", "HeaderTextBold",
-      "Table.HeaderTextBold", "HeaderTextColor", "Table.HeaderTextColor", 
-      "SelectColor", "Table.SelectColor", "Options",
-      "Table.Options", "VerticalScrollbar", "Table.VerticalScrollbar",
-      "HorizontalScrollbar", "Table.HorizontalScrollbar", "ScrollbarWidth",
-      "Table.ScrollbarWidth", "ScrollbarColor", "Table.ScrollbarColor",
-      "ScrollbarBgColor", "Table.ScrollbarBgColor", "ColumnWidth1",
-      "Column1.Width", "ColumnAdjustment1", "Column1.Adjustment", "HeaderText1",
-      "Column1.HeaderText", "ColumnWidth2", "Column2.Width",
-      "ColumnAdjustment2", "Column2.Adjustment", "HeaderText2",
-      "Column2.HeaderText", "ColumnWidth3", "Column3.Width",
-      "ColumnAdjustment3", "Column3.Adjustment", "HeaderText3",
-      "Column3.HeaderText", "ColumnWidth4", "Column4.Width",
-      "ColumnAdjustment4", "Column4.Adjustment", "HeaderText4",
-      "Column4.HeaderText", "ColumnWidth5", "Column5.Width",
-      "ColumnAdjustment5", "Column5.Adjustment", "HeaderText5",
-      "Column5.HeaderText", "ColumnWidth6", "Column6.Width",
-      "ColumnAdjustment6", "Column6.Adjustment", "HeaderText6",
-      "Column6.HeaderText", "ColumnWidth7", "Column7.Width",
-      "ColumnAdjustment7", "Column7.Adjustment", "HeaderText7",
-      "Column7.HeaderText", "ColumnWidth8", "Column8.Width",
-      "ColumnAdjustment8", "Column8.Adjustment", "HeaderText8",
-      "Column8.HeaderText", "ColumnWidth9", "Column9.Width",
-      "ColumnAdjustment9", "Column9.Adjustment", "HeaderText9",
-      "Column9.HeaderText", "ColumnWidth10", "Column10.Width",
-      "ColumnAdjustment10", "Column10.Adjustment", "HeaderText10",
-      "Column10.HeaderText", "ColumnWidth11", "Column11.Width",
-      "ColumnAdjustment11", "Column11.Adjustment", "HeaderText11",
-      "Column11.HeaderText", "ColumnWidth12", "Column12.Width",
-      "ColumnAdjustment12", "Column12.Adjustment", "HeaderText12",
-      "Column12.HeaderText", "" };
+  }
+  else if (grow_GetObjectType(object) == glow_eObjectType_GrowTable)
+  {
+    char transtab[][32] = {"Rows",
+                           "Table.Rows",
+                           "Columns",
+                           "Table.Columns",
+                           "RowHeight",
+                           "Table.RowHeight",
+                           "HeaderRow",
+                           "Table.HeaderRow",
+                           "HeaderColumn",
+                           "Table.HeaderColumn",
+                           "HeaderRowHeight",
+                           "Table.HeaderRowHeight",
+                           "HeaderTextSize",
+                           "Table.HeaderTextSize",
+                           "HeaderTextBold",
+                           "Table.HeaderTextBold",
+                           "HeaderTextBold",
+                           "Table.HeaderTextBold",
+                           "HeaderTextColor",
+                           "Table.HeaderTextColor",
+                           "SelectColor",
+                           "Table.SelectColor",
+                           "Options",
+                           "Table.Options",
+                           "VerticalScrollbar",
+                           "Table.VerticalScrollbar",
+                           "HorizontalScrollbar",
+                           "Table.HorizontalScrollbar",
+                           "ScrollbarWidth",
+                           "Table.ScrollbarWidth",
+                           "ScrollbarColor",
+                           "Table.ScrollbarColor",
+                           "ScrollbarBgColor",
+                           "Table.ScrollbarBgColor",
+                           "ColumnWidth1",
+                           "Column1.Width",
+                           "ColumnAdjustment1",
+                           "Column1.Adjustment",
+                           "HeaderText1",
+                           "Column1.HeaderText",
+                           "ColumnWidth2",
+                           "Column2.Width",
+                           "ColumnAdjustment2",
+                           "Column2.Adjustment",
+                           "HeaderText2",
+                           "Column2.HeaderText",
+                           "ColumnWidth3",
+                           "Column3.Width",
+                           "ColumnAdjustment3",
+                           "Column3.Adjustment",
+                           "HeaderText3",
+                           "Column3.HeaderText",
+                           "ColumnWidth4",
+                           "Column4.Width",
+                           "ColumnAdjustment4",
+                           "Column4.Adjustment",
+                           "HeaderText4",
+                           "Column4.HeaderText",
+                           "ColumnWidth5",
+                           "Column5.Width",
+                           "ColumnAdjustment5",
+                           "Column5.Adjustment",
+                           "HeaderText5",
+                           "Column5.HeaderText",
+                           "ColumnWidth6",
+                           "Column6.Width",
+                           "ColumnAdjustment6",
+                           "Column6.Adjustment",
+                           "HeaderText6",
+                           "Column6.HeaderText",
+                           "ColumnWidth7",
+                           "Column7.Width",
+                           "ColumnAdjustment7",
+                           "Column7.Adjustment",
+                           "HeaderText7",
+                           "Column7.HeaderText",
+                           "ColumnWidth8",
+                           "Column8.Width",
+                           "ColumnAdjustment8",
+                           "Column8.Adjustment",
+                           "HeaderText8",
+                           "Column8.HeaderText",
+                           "ColumnWidth9",
+                           "Column9.Width",
+                           "ColumnAdjustment9",
+                           "Column9.Adjustment",
+                           "HeaderText9",
+                           "Column9.HeaderText",
+                           "ColumnWidth10",
+                           "Column10.Width",
+                           "ColumnAdjustment10",
+                           "Column10.Adjustment",
+                           "HeaderText10",
+                           "Column10.HeaderText",
+                           "ColumnWidth11",
+                           "Column11.Width",
+                           "ColumnAdjustment11",
+                           "Column11.Adjustment",
+                           "HeaderText11",
+                           "Column11.HeaderText",
+                           "ColumnWidth12",
+                           "Column12.Width",
+                           "ColumnAdjustment12",
+                           "Column12.Adjustment",
+                           "HeaderText12",
+                           "Column12.HeaderText",
+                           ""};
     GeDyn* dyn;
 
     grow_GetObjectAttrInfo(object, (char*)transtab, &grow_info, &grow_info_cnt);
@@ -1663,49 +1734,162 @@ int Graph::get_attr_items(grow_tObject object, attr_sItem** itemlist,
     dyn->get_attributes(object, items, item_cnt);
 
     *client_data = 0;
-  } else if (grow_GetObjectType(object) == glow_eObjectType_GrowFolder) {
-    char transtab[][32] = { "Folders", "Folder.NumberOfFolders",
-      "ColorSelected", "Folder.ColorSelected", "ColorUnselected",
-      "Folder.ColorUnselected", "HeaderHeight", "Folder.HeaderHeight",
-      "FileName1", "Folder1.FileName", "Text1", "Folder1.Text", "Scale1",
-      "Folder1.Scale", "VerticalScrollbar1", "Folder1.VerticalScrollbar",
-      "HorizontalScrollbar1", "Folder1.HorizontalScrollbar", "Owner1",
-      "Folder1.Object", "FileName2", "Folder2.FileName", "Text2",
-      "Folder2.Text", "Scale2", "Folder2.Scale", "VerticalScrollbar2",
-      "Folder2.VerticalScrollbar", "HorizontalScrollbar2",
-      "Folder2.HorizontalScrollbar", "Owner2", "Folder2.Object", "FileName3",
-      "Folder3.FileName", "Text3", "Folder3.Text", "Scale3", "Folder3.Scale",
-      "VerticalScrollbar3", "Folder3.VerticalScrollbar", "HorizontalScrollbar3",
-      "Folder3.HorizontalScrollbar", "Owner3", "Folder3.Object", "FileName4",
-      "Folder4.FileName", "Text4", "Folder4.Text", "Scale4", "Folder4.Scale",
-      "VerticalScrollbar4", "Folder4.VerticalScrollbar", "HorizontalScrollbar4",
-      "Folder4.HorizontalScrollbar", "Owner4", "Folder4.Object", "FileName5",
-      "Folder5.FileName", "Text5", "Folder5.Text", "Scale5", "Folder5.Scale",
-      "VerticalScrollbar5", "Folder5.VerticalScrollbar", "HorizontalScrollbar5",
-      "Folder5.HorizontalScrollbar", "Owner5", "Folder5.Object", "FileName6",
-      "Folder6.FileName", "Text6", "Folder6.Text", "Scale6", "Folder6.Scale",
-      "VerticalScrollbar6", "Folder6.VerticalScrollbar", "HorizontalScrollbar6",
-      "Folder6.HorizontalScrollbar", "Owner6", "Folder6.Object", "FileName7",
-      "Folder7.FileName", "Text7", "Folder7.Text", "Scale7", "Folder7.Scale",
-      "VerticalScrollbar7", "Folder7.VerticalScrollbar", "HorizontalScrollbar7",
-      "Folder7.HorizontalScrollbar", "Owner7", "Folder7.Object", "FileName8",
-      "Folder8.FileName", "Text8", "Folder8.Text", "Scale8", "Folder8.Scale",
-      "VerticalScrollbar8", "Folder8.VerticalScrollbar", "HorizontalScrollbar8",
-      "Folder8.HorizontalScrollbar", "Owner8", "Folder8.Object", "FileName9",
-      "Folder9.FileName", "Text9", "Folder9.Text", "Scale9", "Folder9.Scale",
-      "VerticalScrollbar9", "Folder9.VerticalScrollbar", "HorizontalScrollbar9",
-      "Folder9.HorizontalScrollbar", "Owner9", "Folder9.Object", "FileName10",
-      "Folder10.FileName", "Text10", "Folder10.Text", "Scale10",
-      "Folder10.Scale", "VerticalScrollbar10", "Folder10.VerticalScrollbar",
-      "HorizontalScrollbar10", "Folder10.HorizontalScrollbar", "Owner10",
-      "Folder10.Object", "FileName11", "Folder11.FileName", "Text11",
-      "Folder11.Text", "Scale11", "Folder11.Scale", "VerticalScrollbar11",
-      "Folder11.VerticalScrollbar", "HorizontalScrollbar11",
-      "Folder11.HorizontalScrollbar", "Owner11", "Folder11.Object",
-      "FileName12", "Folder12.FileName", "Text12", "Folder12.Text", "Scale12",
-      "Folder12.Scale", "VerticalScrollbar12", "Folder12.VerticalScrollbar",
-      "HorizontalScrollbar12", "Folder12.HorizontalScrollbar", "Owner12",
-      "Folder12.Object", "" };
+  }
+  else if (grow_GetObjectType(object) == glow_eObjectType_GrowFolder)
+  {
+    char transtab[][32] = {"Folders",
+                           "Folder.NumberOfFolders",
+                           "ColorSelected",
+                           "Folder.ColorSelected",
+                           "ColorUnselected",
+                           "Folder.ColorUnselected",
+                           "HeaderHeight",
+                           "Folder.HeaderHeight",
+                           "FileName1",
+                           "Folder1.FileName",
+                           "Text1",
+                           "Folder1.Text",
+                           "Scale1",
+                           "Folder1.Scale",
+                           "VerticalScrollbar1",
+                           "Folder1.VerticalScrollbar",
+                           "HorizontalScrollbar1",
+                           "Folder1.HorizontalScrollbar",
+                           "Owner1",
+                           "Folder1.Object",
+                           "FileName2",
+                           "Folder2.FileName",
+                           "Text2",
+                           "Folder2.Text",
+                           "Scale2",
+                           "Folder2.Scale",
+                           "VerticalScrollbar2",
+                           "Folder2.VerticalScrollbar",
+                           "HorizontalScrollbar2",
+                           "Folder2.HorizontalScrollbar",
+                           "Owner2",
+                           "Folder2.Object",
+                           "FileName3",
+                           "Folder3.FileName",
+                           "Text3",
+                           "Folder3.Text",
+                           "Scale3",
+                           "Folder3.Scale",
+                           "VerticalScrollbar3",
+                           "Folder3.VerticalScrollbar",
+                           "HorizontalScrollbar3",
+                           "Folder3.HorizontalScrollbar",
+                           "Owner3",
+                           "Folder3.Object",
+                           "FileName4",
+                           "Folder4.FileName",
+                           "Text4",
+                           "Folder4.Text",
+                           "Scale4",
+                           "Folder4.Scale",
+                           "VerticalScrollbar4",
+                           "Folder4.VerticalScrollbar",
+                           "HorizontalScrollbar4",
+                           "Folder4.HorizontalScrollbar",
+                           "Owner4",
+                           "Folder4.Object",
+                           "FileName5",
+                           "Folder5.FileName",
+                           "Text5",
+                           "Folder5.Text",
+                           "Scale5",
+                           "Folder5.Scale",
+                           "VerticalScrollbar5",
+                           "Folder5.VerticalScrollbar",
+                           "HorizontalScrollbar5",
+                           "Folder5.HorizontalScrollbar",
+                           "Owner5",
+                           "Folder5.Object",
+                           "FileName6",
+                           "Folder6.FileName",
+                           "Text6",
+                           "Folder6.Text",
+                           "Scale6",
+                           "Folder6.Scale",
+                           "VerticalScrollbar6",
+                           "Folder6.VerticalScrollbar",
+                           "HorizontalScrollbar6",
+                           "Folder6.HorizontalScrollbar",
+                           "Owner6",
+                           "Folder6.Object",
+                           "FileName7",
+                           "Folder7.FileName",
+                           "Text7",
+                           "Folder7.Text",
+                           "Scale7",
+                           "Folder7.Scale",
+                           "VerticalScrollbar7",
+                           "Folder7.VerticalScrollbar",
+                           "HorizontalScrollbar7",
+                           "Folder7.HorizontalScrollbar",
+                           "Owner7",
+                           "Folder7.Object",
+                           "FileName8",
+                           "Folder8.FileName",
+                           "Text8",
+                           "Folder8.Text",
+                           "Scale8",
+                           "Folder8.Scale",
+                           "VerticalScrollbar8",
+                           "Folder8.VerticalScrollbar",
+                           "HorizontalScrollbar8",
+                           "Folder8.HorizontalScrollbar",
+                           "Owner8",
+                           "Folder8.Object",
+                           "FileName9",
+                           "Folder9.FileName",
+                           "Text9",
+                           "Folder9.Text",
+                           "Scale9",
+                           "Folder9.Scale",
+                           "VerticalScrollbar9",
+                           "Folder9.VerticalScrollbar",
+                           "HorizontalScrollbar9",
+                           "Folder9.HorizontalScrollbar",
+                           "Owner9",
+                           "Folder9.Object",
+                           "FileName10",
+                           "Folder10.FileName",
+                           "Text10",
+                           "Folder10.Text",
+                           "Scale10",
+                           "Folder10.Scale",
+                           "VerticalScrollbar10",
+                           "Folder10.VerticalScrollbar",
+                           "HorizontalScrollbar10",
+                           "Folder10.HorizontalScrollbar",
+                           "Owner10",
+                           "Folder10.Object",
+                           "FileName11",
+                           "Folder11.FileName",
+                           "Text11",
+                           "Folder11.Text",
+                           "Scale11",
+                           "Folder11.Scale",
+                           "VerticalScrollbar11",
+                           "Folder11.VerticalScrollbar",
+                           "HorizontalScrollbar11",
+                           "Folder11.HorizontalScrollbar",
+                           "Owner11",
+                           "Folder11.Object",
+                           "FileName12",
+                           "Folder12.FileName",
+                           "Text12",
+                           "Folder12.Text",
+                           "Scale12",
+                           "Folder12.Scale",
+                           "VerticalScrollbar12",
+                           "Folder12.VerticalScrollbar",
+                           "HorizontalScrollbar12",
+                           "Folder12.HorizontalScrollbar",
+                           "Owner12",
+                           "Folder12.Object",
+                           ""};
     GeDyn* dyn;
 
     grow_GetObjectAttrInfo(object, (char*)transtab, &grow_info, &grow_info_cnt);
@@ -1716,169 +1900,415 @@ int Graph::get_attr_items(grow_tObject object, attr_sItem** itemlist,
     dyn->get_attributes(object, items, item_cnt);
 
     *client_data = 0;
-  } else if (grow_GetObjectType(object) == glow_eObjectType_GrowTrend
-      || grow_GetObjectType(object) == glow_eObjectType_GrowXYCurve) {
+  }
+  else if (grow_GetObjectType(object) == glow_eObjectType_GrowTrend ||
+           grow_GetObjectType(object) == glow_eObjectType_GrowXYCurve)
+  {
     GeDyn* dyn;
 
     grow_GetUserData(object, (void**)&dyn);
 
-    if (dyn->dyn_type1 & ge_mDynType1_FastCurve) {
-      char transtab[][32] = { "NoOfPoints", "FastCurve.NoOfPoints", "ScanTime",
-        "", "CurveWidth", "FastCurve.CurveLineWidth", "FillCurve",
-        "FastCurve.FillCurve", "HorizontalLines", "FastCurve.HorizontalLines",
-        "VerticalLines", "FastCurve.VerticalLines", "MaxValue1",
-        "FastCurve.MaxValue1", "MinValue1", "FastCurve.MinValue1",
-        "CurveColor1", "FastCurve.CurveColor1", "CurveFillColor1",
-        "FastCurve.CurveFillColor1", "MaxValue2", "FastCurve.MaxValue2",
-        "MinValue2", "FastCurve.MinValue2", "CurveColor2",
-        "FastCurve.CurveColor2", "CurveFillColor2", "FastCurve.CurveFillColor2",
-	"Direction", "", "Dynamic", "", "" };
-      grow_GetObjectAttrInfo(
-          object, (char*)transtab, &grow_info, &grow_info_cnt);
+    if (dyn->dyn_type1 & ge_mDynType1_FastCurve)
+    {
+      char transtab[][32] = {"NoOfPoints",
+                             "FastCurve.NoOfPoints",
+                             "ScanTime",
+                             "",
+                             "CurveWidth",
+                             "FastCurve.CurveLineWidth",
+                             "FillCurve",
+                             "FastCurve.FillCurve",
+                             "HorizontalLines",
+                             "FastCurve.HorizontalLines",
+                             "VerticalLines",
+                             "FastCurve.VerticalLines",
+                             "MaxValue1",
+                             "FastCurve.MaxValue1",
+                             "MinValue1",
+                             "FastCurve.MinValue1",
+                             "CurveColor1",
+                             "FastCurve.CurveColor1",
+                             "CurveFillColor1",
+                             "FastCurve.CurveFillColor1",
+                             "MaxValue2",
+                             "FastCurve.MaxValue2",
+                             "MinValue2",
+                             "FastCurve.MinValue2",
+                             "CurveColor2",
+                             "FastCurve.CurveColor2",
+                             "CurveFillColor2",
+                             "FastCurve.CurveFillColor2",
+                             "Direction",
+                             "",
+                             "Dynamic",
+                             "",
+                             ""};
+      grow_GetObjectAttrInfo(object, (char*)transtab, &grow_info, &grow_info_cnt);
 
       *item_cnt = 0;
       dyn->get_attributes(object, items, item_cnt);
-    } else if (dyn->dyn_type2 & ge_mDynType2_DsTrend) {
-      char transtab[][32] = { "NoOfPoints", "DsTrend.NoOfPoints", "ScanTime",
-        "DsTrend.ScanTime", "CurveWidth", "DsTrend.CurveLineWidth", "FillCurve",
-        "DsTrend.FillCurve", "HorizontalLines", "DsTrend.HorizontalLines",
-        "VerticalLines", "DsTrend.VerticalLines", "MaxValue1",
-        "DsTrend.MaxValue1", "MinValue1", "DsTrend.MinValue1",
-        "CurveColor1", "DsTrend.CurveColor1", "CurveFillColor1",
-        "DsTrend.CurveFillColor1", "MaxValue2", "DsTrend.MaxValue2",
-        "MinValue2", "DsTrend.MinValue2", "CurveColor2",
-        "DsTrend.CurveColor2", "CurveFillColor2", "DsTrend.CurveFillColor2",
-	"Direction", "DsTrend.Direction", "Dynamic", "", "" };
-      grow_GetObjectAttrInfo(
-          object, (char*)transtab, &grow_info, &grow_info_cnt);
+    }
+    else if (dyn->dyn_type2 & ge_mDynType2_DsTrend)
+    {
+      char transtab[][32] = {"NoOfPoints",
+                             "DsTrend.NoOfPoints",
+                             "ScanTime",
+                             "DsTrend.ScanTime",
+                             "CurveWidth",
+                             "DsTrend.CurveLineWidth",
+                             "FillCurve",
+                             "DsTrend.FillCurve",
+                             "HorizontalLines",
+                             "DsTrend.HorizontalLines",
+                             "VerticalLines",
+                             "DsTrend.VerticalLines",
+                             "MaxValue1",
+                             "DsTrend.MaxValue1",
+                             "MinValue1",
+                             "DsTrend.MinValue1",
+                             "CurveColor1",
+                             "DsTrend.CurveColor1",
+                             "CurveFillColor1",
+                             "DsTrend.CurveFillColor1",
+                             "MaxValue2",
+                             "DsTrend.MaxValue2",
+                             "MinValue2",
+                             "DsTrend.MinValue2",
+                             "CurveColor2",
+                             "DsTrend.CurveColor2",
+                             "CurveFillColor2",
+                             "DsTrend.CurveFillColor2",
+                             "Direction",
+                             "DsTrend.Direction",
+                             "Dynamic",
+                             "",
+                             ""};
+      grow_GetObjectAttrInfo(object, (char*)transtab, &grow_info, &grow_info_cnt);
 
       *item_cnt = 0;
       dyn->get_attributes(object, items, item_cnt);
-    } else if (dyn->dyn_type2 & ge_mDynType2_DsTrendCurve) {
-      char transtab[][32] = { "NoOfPoints", "DsTrendCurve.NoOfPoints", "ScanTime",
-        "DsTrendCurve.ScanTime", "CurveWidth", "DsTrendCurve.CurveLineWidth", "FillCurve",
-        "DsTrendCurve.FillCurve", "HorizontalLines", "DsTrendCurve.HorizontalLines",
-        "VerticalLines", "DsTrendCurve.VerticalLines", "MaxValue1",
-        "DsTrendCurve.MaxValue1", "MinValue1", "DsTrendCurve.MinValue1",
-        "CurveColor1", "DsTrendCurve.CurveColor1", "CurveFillColor1",
-        "DsTrendCurve.CurveFillColor1", "MaxValue2", "DsTrendCurve.MaxValue2",
-        "MinValue2", "DsTrendCurve.MinValue2", "CurveColor2",
-        "DsTrendCurve.CurveColor2", "CurveFillColor2", "DsTrendCurve.CurveFillColor2",
-	"Direction", "DsTrendCurve.Direction", "Dynamic", "", "" };
-      grow_GetObjectAttrInfo(
-          object, (char*)transtab, &grow_info, &grow_info_cnt);
+    }
+    else if (dyn->dyn_type2 & ge_mDynType2_DsTrendCurve)
+    {
+      char transtab[][32] = {"NoOfPoints",
+                             "DsTrendCurve.NoOfPoints",
+                             "ScanTime",
+                             "DsTrendCurve.ScanTime",
+                             "CurveWidth",
+                             "DsTrendCurve.CurveLineWidth",
+                             "FillCurve",
+                             "DsTrendCurve.FillCurve",
+                             "HorizontalLines",
+                             "DsTrendCurve.HorizontalLines",
+                             "VerticalLines",
+                             "DsTrendCurve.VerticalLines",
+                             "MaxValue1",
+                             "DsTrendCurve.MaxValue1",
+                             "MinValue1",
+                             "DsTrendCurve.MinValue1",
+                             "CurveColor1",
+                             "DsTrendCurve.CurveColor1",
+                             "CurveFillColor1",
+                             "DsTrendCurve.CurveFillColor1",
+                             "MaxValue2",
+                             "DsTrendCurve.MaxValue2",
+                             "MinValue2",
+                             "DsTrendCurve.MinValue2",
+                             "CurveColor2",
+                             "DsTrendCurve.CurveColor2",
+                             "CurveFillColor2",
+                             "DsTrendCurve.CurveFillColor2",
+                             "Direction",
+                             "DsTrendCurve.Direction",
+                             "Dynamic",
+                             "",
+                             ""};
+      grow_GetObjectAttrInfo(object, (char*)transtab, &grow_info, &grow_info_cnt);
 
       *item_cnt = 0;
       dyn->get_attributes(object, items, item_cnt);
-    } else if (dyn->dyn_type1 & ge_mDynType1_XY_Curve) {
-      char transtab[][32] = { "NoOfPoints", "XY_Curve.NoOfPoints", "ScanTime",
-        "", "CurveWidth", "XY_Curve.CurveLineWidth", "FillCurve",
-        "XY_Curve.FillCurve", "HorizontalLines", "XY_Curve.HorizontalLines",
-        "VerticalLines", "XY_Curve.VerticalLines", "MaxValue1", "", "MinValue1",
-        "", "CurveColor1", "", "CurveFillColor1", "", "MaxValue2", "",
-        "MinValue2", "", "CurveColor2", "", "CurveFillColor2", "",
-	"Direction", "",  "Dynamic",
-        "", "" };
-      grow_GetObjectAttrInfo(
-          object, (char*)transtab, &grow_info, &grow_info_cnt);
+    }
+    else if (dyn->dyn_type1 & ge_mDynType1_XY_Curve)
+    {
+      char transtab[][32] = {"NoOfPoints",
+                             "XY_Curve.NoOfPoints",
+                             "ScanTime",
+                             "",
+                             "CurveWidth",
+                             "XY_Curve.CurveLineWidth",
+                             "FillCurve",
+                             "XY_Curve.FillCurve",
+                             "HorizontalLines",
+                             "XY_Curve.HorizontalLines",
+                             "VerticalLines",
+                             "XY_Curve.VerticalLines",
+                             "MaxValue1",
+                             "",
+                             "MinValue1",
+                             "",
+                             "CurveColor1",
+                             "",
+                             "CurveFillColor1",
+                             "",
+                             "MaxValue2",
+                             "",
+                             "MinValue2",
+                             "",
+                             "CurveColor2",
+                             "",
+                             "CurveFillColor2",
+                             "",
+                             "Direction",
+                             "",
+                             "Dynamic",
+                             "",
+                             ""};
+      grow_GetObjectAttrInfo(object, (char*)transtab, &grow_info, &grow_info_cnt);
 
       *item_cnt = 0;
       dyn->get_attributes(object, items, item_cnt);
-    } else if (dyn->dyn_type2 & ge_mDynType2_SevHist) {
-      char transtab[][32] = { "NoOfPoints", "SevHist.MaxPoints", "ScanTime",
-        "", "CurveWidth", "SevHist.CurveLineWidth", "FillCurve",
-        "SevHist.FillCurve", "HorizontalLines", "SevHist.HorizontalLines",
-        "VerticalLines", "SevHist.VerticalLines", "MaxValue1", "SevHist.MaxValue1", 
-	"MinValue1", "SevHist.MinValue1", "CurveColor1", "SevHist.CurveColor1", 
-        "CurveFillColor1", "SevHist.CurveFillColor1", "MaxValue2", "SevHist.MaxValue2",
-        "MinValue2", "SevHist.MinValue2", "CurveColor2", "SevHist.CurveColor2", 
-	"CurveFillColor2", "SevHist.CurveFillColor2", "Direction", "SevHist.Direction",
-        "Dynamic",
-        "", "" };
-      grow_GetObjectAttrInfo(
-          object, (char*)transtab, &grow_info, &grow_info_cnt);
+    }
+    else if (dyn->dyn_type2 & ge_mDynType2_SevHist)
+    {
+      char transtab[][32] = {"NoOfPoints",
+                             "SevHist.MaxPoints",
+                             "ScanTime",
+                             "",
+                             "CurveWidth",
+                             "SevHist.CurveLineWidth",
+                             "FillCurve",
+                             "SevHist.FillCurve",
+                             "HorizontalLines",
+                             "SevHist.HorizontalLines",
+                             "VerticalLines",
+                             "SevHist.VerticalLines",
+                             "MaxValue1",
+                             "SevHist.MaxValue1",
+                             "MinValue1",
+                             "SevHist.MinValue1",
+                             "CurveColor1",
+                             "SevHist.CurveColor1",
+                             "CurveFillColor1",
+                             "SevHist.CurveFillColor1",
+                             "MaxValue2",
+                             "SevHist.MaxValue2",
+                             "MinValue2",
+                             "SevHist.MinValue2",
+                             "CurveColor2",
+                             "SevHist.CurveColor2",
+                             "CurveFillColor2",
+                             "SevHist.CurveFillColor2",
+                             "Direction",
+                             "SevHist.Direction",
+                             "Dynamic",
+                             "",
+                             ""};
+      grow_GetObjectAttrInfo(object, (char*)transtab, &grow_info, &grow_info_cnt);
 
       *item_cnt = 0;
       dyn->get_attributes(object, items, item_cnt);
-    } else {
-      char transtab[][32] = { "NoOfPoints", "Trend.NoOfPoints", "ScanTime",
-        "Trend.ScanTime", "CurveWidth", "Trend.CurveLineWidth", "FillCurve",
-        "Trend.FillCurve", "HorizontalLines", "Trend.HorizontalLines",
-        "VerticalLines", "Trend.VerticalLines", "MaxValue1", "Trend.MaxValue1",
-        "MinValue1", "Trend.MinValue1", "CurveColor1", "Trend.CurveColor1",
-        "CurveFillColor1", "Trend.CurveFillColor1", "MaxValue2",
-        "Trend.MaxValue2", "MinValue2", "Trend.MinValue2", "CurveColor2",
-        "Trend.CurveColor2", "CurveFillColor2", "Trend.CurveFillColor2",
-	"Direction", "Trend.Direction", "Dynamic", "", "" };
-      grow_GetObjectAttrInfo(
-          object, (char*)transtab, &grow_info, &grow_info_cnt);
+    }
+    else
+    {
+      char transtab[][32] = {"NoOfPoints",
+                             "Trend.NoOfPoints",
+                             "ScanTime",
+                             "Trend.ScanTime",
+                             "CurveWidth",
+                             "Trend.CurveLineWidth",
+                             "FillCurve",
+                             "Trend.FillCurve",
+                             "HorizontalLines",
+                             "Trend.HorizontalLines",
+                             "VerticalLines",
+                             "Trend.VerticalLines",
+                             "MaxValue1",
+                             "Trend.MaxValue1",
+                             "MinValue1",
+                             "Trend.MinValue1",
+                             "CurveColor1",
+                             "Trend.CurveColor1",
+                             "CurveFillColor1",
+                             "Trend.CurveFillColor1",
+                             "MaxValue2",
+                             "Trend.MaxValue2",
+                             "MinValue2",
+                             "Trend.MinValue2",
+                             "CurveColor2",
+                             "Trend.CurveColor2",
+                             "CurveFillColor2",
+                             "Trend.CurveFillColor2",
+                             "Direction",
+                             "Trend.Direction",
+                             "Dynamic",
+                             "",
+                             ""};
+      grow_GetObjectAttrInfo(object, (char*)transtab, &grow_info, &grow_info_cnt);
 
       *item_cnt = 0;
       dyn->get_attributes(object, items, item_cnt);
     }
     *client_data = 0;
-  } else if (grow_GetObjectType(object) == glow_eObjectType_GrowAxis) {
+  }
+  else if (grow_GetObjectType(object) == glow_eObjectType_GrowAxis)
+  {
     GeDyn* dyn;
 
     grow_GetUserData(object, (void**)&dyn);
 
-    if (!dyn) {
-      char transtab[][32] = { "MaxValue", "MaxValue", "MinValue", "MinValue",
-        "Lines", "Lines", "LongQuotient", "LongQuotient", "ValueQuotient",
-        "ValueQuotient", "Format", "Format", "Dynamic", "", "" };
+    if (!dyn)
+    {
+      char transtab[][32] = {"MaxValue",
+                             "MaxValue",
+                             "MinValue",
+                             "MinValue",
+                             "Lines",
+                             "Lines",
+                             "LongQuotient",
+                             "LongQuotient",
+                             "ValueQuotient",
+                             "ValueQuotient",
+                             "Format",
+                             "Format",
+                             "Dynamic",
+                             "",
+                             ""};
 
-      grow_GetObjectAttrInfo(
-          object, (char*)transtab, &grow_info, &grow_info_cnt);
+      grow_GetObjectAttrInfo(object, (char*)transtab, &grow_info, &grow_info_cnt);
       *item_cnt = 0;
-    } else {
-      char transtab[][32] = { "MaxValue", "Axis.MaxValue", "MinValue",
-        "Axis.MinValue", "Lines", "Axis.Lines", "LongQuotient",
-        "Axis.LongQuotient", "ValueQuotient", "Axis.ValueQuotient", "Format",
-        "Axis.Format", "Dynamic", "", "" };
-      grow_GetObjectAttrInfo(
-          object, (char*)transtab, &grow_info, &grow_info_cnt);
+    }
+    else
+    {
+      char transtab[][32] = {"MaxValue",
+                             "Axis.MaxValue",
+                             "MinValue",
+                             "Axis.MinValue",
+                             "Lines",
+                             "Axis.Lines",
+                             "LongQuotient",
+                             "Axis.LongQuotient",
+                             "ValueQuotient",
+                             "Axis.ValueQuotient",
+                             "Format",
+                             "Axis.Format",
+                             "Dynamic",
+                             "",
+                             ""};
+      grow_GetObjectAttrInfo(object, (char*)transtab, &grow_info, &grow_info_cnt);
       *item_cnt = 0;
       dyn->get_attributes(object, items, item_cnt);
     }
-  } else if (grow_GetObjectType(object) == glow_eObjectType_GrowAxisArc) {
+  }
+  else if (grow_GetObjectType(object) == glow_eObjectType_GrowAxisArc)
+  {
     GeDyn* dyn;
 
     grow_GetUserData(object, (void**)&dyn);
 
-    if (!dyn) {
-      char transtab[][32]
-          = { "Angle1", "Angle1", "Angle2", "Angle2", "LineLength",
-              "LineLength", "MaxValue", "MaxValue", "MinValue", "MinValue",
-              "Lines", "Lines", "LongQuotient", "LongQuotient", "ValueQuotient",
-              "ValueQuotient", "Format", "Format", "Dynamic", "", "" };
-      grow_GetObjectAttrInfo(
-          object, (char*)transtab, &grow_info, &grow_info_cnt);
+    if (!dyn)
+    {
+      char transtab[][32] = {"Angle1",
+                             "Angle1",
+                             "Angle2",
+                             "Angle2",
+                             "LineLength",
+                             "LineLength",
+                             "MaxValue",
+                             "MaxValue",
+                             "MinValue",
+                             "MinValue",
+                             "Lines",
+                             "Lines",
+                             "LongQuotient",
+                             "LongQuotient",
+                             "ValueQuotient",
+                             "ValueQuotient",
+                             "Format",
+                             "Format",
+                             "Dynamic",
+                             "",
+                             ""};
+      grow_GetObjectAttrInfo(object, (char*)transtab, &grow_info, &grow_info_cnt);
       *item_cnt = 0;
-    } else {
-      char transtab[][32] = { "Angle1", "Axis.Angle1", "Angle2", "Axis.Angle2",
-        "LineLength", "Axis.LineLength", "MaxValue", "Axis.MaxValue",
-        "MinValue", "Axis.MinValue", "Lines", "Axis.Lines", "LongQuotient",
-        "Axis.LongQuotient", "ValueQuotient", "Axis.ValueQuotient", "Format",
-        "Axis.Format", "Dynamic", "", "" };
+    }
+    else
+    {
+      char transtab[][32] = {"Angle1",
+                             "Axis.Angle1",
+                             "Angle2",
+                             "Axis.Angle2",
+                             "LineLength",
+                             "Axis.LineLength",
+                             "MaxValue",
+                             "Axis.MaxValue",
+                             "MinValue",
+                             "Axis.MinValue",
+                             "Lines",
+                             "Axis.Lines",
+                             "LongQuotient",
+                             "Axis.LongQuotient",
+                             "ValueQuotient",
+                             "Axis.ValueQuotient",
+                             "Format",
+                             "Axis.Format",
+                             "Dynamic",
+                             "",
+                             ""};
 
-      grow_GetObjectAttrInfo(
-          object, (char*)transtab, &grow_info, &grow_info_cnt);
+      grow_GetObjectAttrInfo(object, (char*)transtab, &grow_info, &grow_info_cnt);
       *item_cnt = 0;
       dyn->get_attributes(object, items, item_cnt);
     }
-  } else if (grow_GetObjectType(object) == glow_eObjectType_GrowPie) {
-    char transtab[][32] = { "Angle1", "Pie.Angle1", "Angle2", "Pie.Angle2",
-      "Sectors", "Pie.Sectors", "MinValue", "Pie.MinValue", "MaxValue",
-      "Pie.MaxValue", "SectorColor1", "Pie.SectorColor1", "SectorColor2",
-      "Pie.SectorColor2", "SectorColor3", "Pie.SectorColor3", "SectorColor4",
-      "Pie.SectorColor4", "SectorColor5", "Pie.SectorColor5", "SectorColor6",
-      "Pie.SectorColor6", "SectorColor7", "Pie.SectorColor7", "SectorColor8",
-      "Pie.SectorColor8", "SectorColor9", "Pie.SectorColor9", "SectorColor10",
-      "Pie.SectorColor10", "SectorColor11", "Pie.SectorColor11",
-      "SectorColor12", "Pie.SectorColor12", "ShadowWidth", "Pie.ShadowWidth",
-      "ShadowContrast", "Pie.ShadowContrast", "GradientContrast",
-      "Pie.GradientContrast", "Gradient", "Pie.Gradient", "Relief",
-      "Pie.Relief", "Dynamic", "Dynamic", "" };
+  }
+  else if (grow_GetObjectType(object) == glow_eObjectType_GrowPie)
+  {
+    char transtab[][32] = {"Angle1",
+                           "Pie.Angle1",
+                           "Angle2",
+                           "Pie.Angle2",
+                           "Sectors",
+                           "Pie.Sectors",
+                           "MinValue",
+                           "Pie.MinValue",
+                           "MaxValue",
+                           "Pie.MaxValue",
+                           "SectorColor1",
+                           "Pie.SectorColor1",
+                           "SectorColor2",
+                           "Pie.SectorColor2",
+                           "SectorColor3",
+                           "Pie.SectorColor3",
+                           "SectorColor4",
+                           "Pie.SectorColor4",
+                           "SectorColor5",
+                           "Pie.SectorColor5",
+                           "SectorColor6",
+                           "Pie.SectorColor6",
+                           "SectorColor7",
+                           "Pie.SectorColor7",
+                           "SectorColor8",
+                           "Pie.SectorColor8",
+                           "SectorColor9",
+                           "Pie.SectorColor9",
+                           "SectorColor10",
+                           "Pie.SectorColor10",
+                           "SectorColor11",
+                           "Pie.SectorColor11",
+                           "SectorColor12",
+                           "Pie.SectorColor12",
+                           "ShadowWidth",
+                           "Pie.ShadowWidth",
+                           "ShadowContrast",
+                           "Pie.ShadowContrast",
+                           "GradientContrast",
+                           "Pie.GradientContrast",
+                           "Gradient",
+                           "Pie.Gradient",
+                           "Relief",
+                           "Pie.Relief",
+                           "Dynamic",
+                           "Dynamic",
+                           ""};
     GeDyn* dyn;
 
     grow_GetObjectAttrInfo(object, (char*)transtab, &grow_info, &grow_info_cnt);
@@ -1889,19 +2319,54 @@ int Graph::get_attr_items(grow_tObject object, attr_sItem** itemlist,
     dyn->get_attributes(object, items, item_cnt);
 
     *client_data = 0;
-  } else if (grow_GetObjectType(object) == glow_eObjectType_GrowBarChart) {
-    char transtab[][32] = { "Bars", "BarChart.Bars", "BarSegments",
-      "BarChart.BarSegments", "MinValue", "BarChart.MinValue", "MaxValue",
-      "BarChart.MaxValue", "SectorColor1", "BarChart.BarColor1", "BarColor2",
-      "BarChart.BarColor2", "BarColor3", "BarChart.BarColor3", "BarColor4",
-      "BarChart.BarColor4", "BarColor5", "BarChart.BarColor5", "BarColor6",
-      "BarChart.BarColor6", "BarColor7", "BarChart.BarColor7", "BarColor8",
-      "BarChart.BarColor8", "BarColor9", "BarChart.BarColor9", "BarColor10",
-      "BarChart.BarColor10", "BarColor11", "BarChart.BarColor11", "BarColor12",
-      "BarChart.BarColor12", "ShadowWidth", "BarChart.ShadowWidth",
-      "ShadowContrast", "BarChart.ShadowContrast", "GradientContrast",
-      "BarChart.GradientContrast", "Gradient", "BarChart.Gradient", "Relief",
-      "BarChart.Relief", "Dynamic", "Dynamic", "" };
+  }
+  else if (grow_GetObjectType(object) == glow_eObjectType_GrowBarChart)
+  {
+    char transtab[][32] = {"Bars",
+                           "BarChart.Bars",
+                           "BarSegments",
+                           "BarChart.BarSegments",
+                           "MinValue",
+                           "BarChart.MinValue",
+                           "MaxValue",
+                           "BarChart.MaxValue",
+                           "SectorColor1",
+                           "BarChart.BarColor1",
+                           "BarColor2",
+                           "BarChart.BarColor2",
+                           "BarColor3",
+                           "BarChart.BarColor3",
+                           "BarColor4",
+                           "BarChart.BarColor4",
+                           "BarColor5",
+                           "BarChart.BarColor5",
+                           "BarColor6",
+                           "BarChart.BarColor6",
+                           "BarColor7",
+                           "BarChart.BarColor7",
+                           "BarColor8",
+                           "BarChart.BarColor8",
+                           "BarColor9",
+                           "BarChart.BarColor9",
+                           "BarColor10",
+                           "BarChart.BarColor10",
+                           "BarColor11",
+                           "BarChart.BarColor11",
+                           "BarColor12",
+                           "BarChart.BarColor12",
+                           "ShadowWidth",
+                           "BarChart.ShadowWidth",
+                           "ShadowContrast",
+                           "BarChart.ShadowContrast",
+                           "GradientContrast",
+                           "BarChart.GradientContrast",
+                           "Gradient",
+                           "BarChart.Gradient",
+                           "Relief",
+                           "BarChart.Relief",
+                           "Dynamic",
+                           "Dynamic",
+                           ""};
     GeDyn* dyn;
 
     grow_GetObjectAttrInfo(object, (char*)transtab, &grow_info, &grow_info_cnt);
@@ -1912,11 +2377,17 @@ int Graph::get_attr_items(grow_tObject object, attr_sItem** itemlist,
     dyn->get_attributes(object, items, item_cnt);
 
     *client_data = 0;
-  } else if (grow_GetObjectType(object) == glow_eObjectType_GrowSlider) {
-    char transtab[][32] = { "SubGraph", "SubGraph", "Direction",
-      "Slider.Direction", "MaxValue", "Slider.MaxValue", "MinValue",
-      "Slider.MinValue", "MaxPos", "Slider.MaxPosition", "MinPos",
-      "Slider.MinPosition", "Dynamic", "", "" };
+  }
+  else if (grow_GetObjectType(object) == glow_eObjectType_GrowSlider)
+  {
+    char transtab[][32] = {"SubGraph",  "SubGraph",
+                           "Direction", "Slider.Direction",
+                           "MaxValue",  "Slider.MaxValue",
+                           "MinValue",  "Slider.MinValue",
+                           "MaxPos",    "Slider.MaxPosition",
+                           "MinPos",    "Slider.MinPosition",
+                           "Dynamic",   "",
+                           ""};
     GeDyn* dyn;
 
     grow_GetObjectAttrInfo(object, (char*)transtab, &grow_info, &grow_info_cnt);
@@ -1925,7 +2396,8 @@ int Graph::get_attr_items(grow_tObject object, attr_sItem** itemlist,
 
     grow_info_p = grow_info;
     *item_cnt = 0;
-    for (i = *item_cnt; i < grow_info_cnt + *item_cnt; i++) {
+    for (i = *item_cnt; i < grow_info_cnt + *item_cnt; i++)
+    {
       items[i].value = grow_info_p->value_p;
       strcpy(items[i].name, grow_info_p->name);
       items[i].type = grow_info_p->type;
@@ -1944,13 +2416,14 @@ int Graph::get_attr_items(grow_tObject object, attr_sItem** itemlist,
     *client_data = (void*)grow_info;
 
     return 1;
-  } else if (grow_GetObjectType(object) == glow_eObjectType_GrowDashCell) {
+  }
+  else if (grow_GetObjectType(object) == glow_eObjectType_GrowDashCell)
+  {
     GeDash* dash;
 
     grow_GetUserData(object, (void**)&dash);
 
-    char transtab[][32] = { "CellRows", "Dash.CellRows", "CellColumns",
-      "Dash.CellColumns", "", "" };
+    char transtab[][32] = {"CellRows", "Dash.CellRows", "CellColumns", "Dash.CellColumns", "", ""};
     GeDyn* dyn;
 
     grow_GetObjectAttrInfo(object, (char*)transtab, &grow_info, &grow_info_cnt);
@@ -1959,7 +2432,8 @@ int Graph::get_attr_items(grow_tObject object, attr_sItem** itemlist,
 
     grow_info_p = grow_info;
     *item_cnt = 0;
-    for (i = *item_cnt; i < grow_info_cnt + *item_cnt; i++) {
+    for (i = *item_cnt; i < grow_info_cnt + *item_cnt; i++)
+    {
       items[i].value = grow_info_p->value_p;
       strcpy(items[i].name, grow_info_p->name);
       items[i].type = grow_info_p->type;
@@ -1977,13 +2451,16 @@ int Graph::get_attr_items(grow_tObject object, attr_sItem** itemlist,
     *itemlist = items;
     *client_data = (void*)grow_info;
     return 1;
-  } else {
+  }
+  else
+  {
     grow_GetObjectAttrInfo(object, NULL, &grow_info, &grow_info_cnt);
     *item_cnt = 0;
   }
 
   grow_info_p = grow_info;
-  for (i = *item_cnt; i < grow_info_cnt + *item_cnt; i++) {
+  for (i = *item_cnt; i < grow_info_cnt + *item_cnt; i++)
+  {
     items[i].value = grow_info_p->value_p;
     strcpy(items[i].name, grow_info_p->name);
     items[i].type = grow_info_p->type;
@@ -2043,14 +2520,14 @@ int Graph::graph_get_plant_select_cb(void* g, char* value, int size)
   return 0;
 }
 
-int Graph::graph_get_current_colors_cb(void* g, glow_eDrawType* fill_color,
-    glow_eDrawType* border_color, glow_eDrawType* text_color)
+int Graph::graph_get_current_colors_cb(void* g, glow_eDrawType* fill_color, glow_eDrawType* border_color,
+                                       glow_eDrawType* text_color)
 {
   Graph* graph = (Graph*)g;
 
-  if (graph->get_current_colors_cb) {
-    (graph->get_current_colors_cb)(
-        graph->parent_ctx, fill_color, border_color, text_color);
+  if (graph->get_current_colors_cb)
+  {
+    (graph->get_current_colors_cb)(graph->parent_ctx, fill_color, border_color, text_color);
     return 1;
   }
   return 0;
@@ -2060,38 +2537,47 @@ int Graph::graph_get_current_color_tone_cb(void* g, glow_eDrawType* color_tone)
 {
   Graph* graph = (Graph*)g;
 
-  if (graph->get_current_color_tone_cb) {
+  if (graph->get_current_color_tone_cb)
+  {
     (graph->get_current_color_tone_cb)(graph->parent_ctx, color_tone);
     return 1;
   }
   return 0;
 }
 
-int Graph::graph_reconfigure_attr_cb(void* g, grow_tObject object,
-    attr_sItem** itemlist, int* itemlist_cnt, void** client_data)
+int Graph::graph_reconfigure_attr_cb(void* g, grow_tObject object, attr_sItem** itemlist, int* itemlist_cnt,
+                                     void** client_data)
 {
   Graph* graph = (Graph*)g;
 
-  if (object) {
-    if (grow_GetObjectType(object) == glow_eObjectType_GrowDashCell) {
+  if (object)
+  {
+    if (grow_GetObjectType(object) == glow_eObjectType_GrowDashCell)
+    {
       grow_FreeObjectAttrInfo(*(grow_sAttrInfo**)client_data);
       return graph->get_attr_items(object, itemlist, itemlist_cnt, client_data);
-    } else {
+    }
+    else
+    {
       // Object attributes
       grow_FreeObjectAttrInfo(*(grow_sAttrInfo**)client_data);
       return graph->get_attr_items(object, itemlist, itemlist_cnt, client_data);
     }
-  } else {
+  }
+  else
+  {
     if (graph->was_subgraph)
       grow_FreeSubGraphAttrInfo(*(grow_sAttrInfo**)client_data);
     else
       grow_FreeGraphAttrInfo(*(grow_sAttrInfo**)client_data);
 
-    if (graph->is_subgraph()) {
+    if (graph->is_subgraph())
+    {
       // Subgraph attributes
-      return graph->get_subgraph_attr_items(
-          itemlist, itemlist_cnt, client_data);
-    } else {
+      return graph->get_subgraph_attr_items(itemlist, itemlist_cnt, client_data);
+    }
+    else
+    {
       // Graph attributes
       return graph->get_graph_attr_items(itemlist, itemlist_cnt, client_data);
     }
@@ -2108,33 +2594,35 @@ void Graph::graph_attr_store_cb(void* g, grow_tObject object)
     graph->recall.insert(dyn, "", object);
 }
 
-int Graph::graph_attr_recall_cb(
-    void* g, grow_tObject object, int idx, GeDyn** old_dyn)
+int Graph::graph_attr_recall_cb(void* g, grow_tObject object, int idx, GeDyn** old_dyn)
 {
   Graph* graph = (Graph*)g;
   GeDyn* dyn;
   int sts;
 
-  if (grow_GetObjectType(object) == glow_eObjectType_GrowNode
-      || grow_GetObjectType(object) == glow_eObjectType_GrowSlider
-      || grow_GetObjectType(object) == glow_eObjectType_GrowGroup
-      || grow_GetObjectType(object) == glow_eObjectType_GrowWindow
-      || grow_GetObjectType(object) == glow_eObjectType_GrowTrend
-      || grow_GetObjectType(object) == glow_eObjectType_GrowXYCurve
-      || grow_GetObjectType(object) == glow_eObjectType_GrowTable
-      || grow_GetObjectType(object) == glow_eObjectType_GrowBar
-      || grow_GetObjectType(object) == glow_eObjectType_GrowBarArc
-      || grow_GetObjectType(object) == glow_eObjectType_GrowPie
-      || grow_GetObjectType(object) == glow_eObjectType_GrowBarChart
-      || grow_GetObjectType(object) == glow_eObjectType_GrowAxis
-      || grow_GetObjectType(object) == glow_eObjectType_GrowAxisArc) {
+  if (grow_GetObjectType(object) == glow_eObjectType_GrowNode ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowSlider ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowGroup ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowWindow ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowTrend ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowXYCurve ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowTable ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowBar ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowBarArc ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowPie ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowBarChart ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowAxis ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowAxisArc)
+  {
     sts = graph->recall.get(&dyn, idx);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       grow_GetUserData(object, (void**)old_dyn);
       grow_SetUserData(object, (void*)dyn);
     }
     return sts;
-  } else
+  }
+  else
     return 0;
 }
 
@@ -2144,8 +2632,7 @@ int Graph::graph_attr_set_data_cb(void* g, grow_tObject object, GeDyn* data)
   return 1;
 }
 
-int Graph::graph_get_dyn_info_cb(
-    void* g, GeDyn* dyn, attr_sItem** itemlist, int* itemlist_cnt)
+int Graph::graph_get_dyn_info_cb(void* g, GeDyn* dyn, attr_sItem** itemlist, int* itemlist_cnt)
 {
   static attr_sItem items[100];
 
@@ -2157,8 +2644,7 @@ int Graph::graph_get_dyn_info_cb(
   return 1;
 }
 
-int Graph::graph_get_subgraph_info_cb(
-    void* g, char* name, attr_sItem** itemlist, int* itemlist_cnt)
+int Graph::graph_get_subgraph_info_cb(void* g, char* name, attr_sItem** itemlist, int* itemlist_cnt)
 {
   Graph* graph = (Graph*)g;
   static attr_sItem items[100];
@@ -2178,19 +2664,21 @@ int Graph::graph_get_subgraph_info_cb(
     return sts;
 
   grow_GetObjectAttrInfo(object, NULL, &grow_info, &grow_info_cnt);
-  grow_GetNodeClassDynType(
-      object, &dyn_type1, &dyn_type2, &dyn_action_type1, &dyn_action_type2);
+  grow_GetNodeClassDynType(object, &dyn_type1, &dyn_type2, &dyn_action_type1, &dyn_action_type2);
 
   grow_info_p = grow_info;
-  for (i = 0; i < grow_info_cnt; i++) {
+  for (i = 0; i < grow_info_cnt; i++)
+  {
     items[i].value = grow_info_p->value_p;
     strcpy(items[i].name, grow_info_p->name);
-    if (grow_info_p->type == glow_eType_TraceColor) {
+    if (grow_info_p->type == glow_eType_TraceColor)
+    {
       if (dyn_type1 & ge_mDynType1_Tone)
         items[i].type = glow_eType_ToneOrColor;
       else
         items[i].type = glow_eType_Color;
-    } else
+    }
+    else
       items[i].type = grow_info_p->type;
     items[i].size = grow_info_p->size;
     items[i].minlimit = 0;
@@ -2204,11 +2692,13 @@ int Graph::graph_get_subgraph_info_cb(
   grow_GetUserData(object, (void**)&dyn);
 
   item_cnt = 0;
-  if (dyn && dyn_type1 & ge_mDynType1_HostObject) {
+  if (dyn && dyn_type1 & ge_mDynType1_HostObject)
+  {
     dyn->get_attributes(0, &items[grow_info_cnt], &item_cnt);
 
     // Add "HostObject." to hostobjects items
-    for (i = grow_info_cnt; i < grow_info_cnt + item_cnt; i++) {
+    for (i = grow_info_cnt; i < grow_info_cnt + item_cnt; i++)
+    {
       char n[80];
       strcpy(n, "HostObject.");
       strcat(n, items[i].name);
@@ -2224,17 +2714,19 @@ int Graph::graph_get_subgraph_info_cb(
   return 1;
 }
 
-void Graph::graph_get_object_list_cb(void* g, unsigned int type,
-    grow_tObject** list, int* list_cnt, grow_tObject* parent, int parent_cnt)
+void Graph::graph_get_object_list_cb(void* g, unsigned int type, grow_tObject** list, int* list_cnt,
+                                     grow_tObject* parent, int parent_cnt)
 {
   Graph* graph = (Graph*)g;
 
-  if (!graph->grow) {
+  if (!graph->grow)
+  {
     *list_cnt = 0;
     return;
   }
 
-  switch (type) {
+  switch (type)
+  {
   case attr_eList_Objects:
     grow_GetObjectList(graph->grow->ctx, list, list_cnt);
     break;
@@ -2252,8 +2744,7 @@ void Graph::graph_get_object_list_cb(void* g, unsigned int type,
   }
 }
 
-int Graph::get_subgraph_attr_items(
-    attr_sItem** itemlist, int* item_cnt, void** client_data)
+int Graph::get_subgraph_attr_items(attr_sItem** itemlist, int* item_cnt, void** client_data)
 {
   static attr_sItem items[100];
   int i;
@@ -2263,29 +2754,31 @@ int Graph::get_subgraph_attr_items(
   int dyn_type2;
   int dyn_action_type1;
   int dyn_action_type2;
-  char transtab[][32] = { "DynType1", "DynType1", "DynType2", "DynType2",
-    "DynActionType1", "Action", "DynColor1", "Color1", "DynColor2", "Color2",
-    "DynColor3", "Color3", "DynColor4", "Color4", "DynAttr1", "AnimSequence",
-    "DynAttr2", "", "DynAttr3", "", "DynAttr4", "", "Dynamic", "", "" };
+  char transtab[][32] = {"DynType1",     "DynType1",  "DynType2",  "DynType2",  "DynActionType1",
+                         "Action",       "DynColor1", "Color1",    "DynColor2", "Color2",
+                         "DynColor3",    "Color3",    "DynColor4", "Color4",    "DynAttr1",
+                         "AnimSequence", "DynAttr2",  "",          "DynAttr3",  "",
+                         "DynAttr4",     "",          "Dynamic",   "",          ""};
 
-  grow_GetSubGraphAttrInfo(
-      grow->ctx, (char*)transtab, &grow_info, &grow_info_cnt);
-  grow_GetSubGraphDynType(
-      grow->ctx, &dyn_type1, &dyn_type2, &dyn_action_type1, &dyn_action_type2);
+  grow_GetSubGraphAttrInfo(grow->ctx, (char*)transtab, &grow_info, &grow_info_cnt);
+  grow_GetSubGraphDynType(grow->ctx, &dyn_type1, &dyn_type2, &dyn_action_type1, &dyn_action_type2);
 
   // Create dyn if change from graph to subgraph
-  if (!was_subgraph) {
+  if (!was_subgraph)
+  {
     subgraph_dyn = new GeDyn(0);
     was_subgraph = 1;
   }
 
   memset(items, 0, sizeof(items));
   *item_cnt = 0;
-  if (subgraph_dyn && dyn_type1 & ge_mDynType1_HostObject) {
+  if (subgraph_dyn && dyn_type1 & ge_mDynType1_HostObject)
+  {
     subgraph_dyn->get_attributes(0, items, item_cnt);
 
     // Add "HostObject." to hostobjects items
-    for (i = 0; i < *item_cnt; i++) {
+    for (i = 0; i < *item_cnt; i++)
+    {
       char n[80];
       strcpy(n, "HostObject.");
       strcat(n, items[i].name);
@@ -2294,16 +2787,19 @@ int Graph::get_subgraph_attr_items(
   }
 
   grow_info_p = grow_info;
-  for (i = *item_cnt; i < grow_info_cnt + *item_cnt; i++) {
+  for (i = *item_cnt; i < grow_info_cnt + *item_cnt; i++)
+  {
     items[i].value = grow_info_p->value_p;
     strcpy(items[i].name, grow_info_p->name);
 
-    if (grow_info_p->type == glow_eType_TraceColor) {
+    if (grow_info_p->type == glow_eType_TraceColor)
+    {
       if (dyn_type1 & ge_mDynType1_Tone)
         items[i].type = glow_eType_ToneOrColor;
       else
         items[i].type = glow_eType_Color;
-    } else if (grow_info_p->type == glow_eType_DynType1)
+    }
+    else if (grow_info_p->type == glow_eType_DynType1)
       items[i].type = ge_eAttrType_DynType1;
     else if (grow_info_p->type == glow_eType_DynType2)
       items[i].type = ge_eAttrType_DynType2;
@@ -2348,8 +2844,7 @@ int Graph::edit_subgraph_attributes()
   return 1;
 }
 
-int Graph::get_graph_attr_items(
-    attr_sItem** itemlist, int* item_cnt, void** client_data)
+int Graph::get_graph_attr_items(attr_sItem** itemlist, int* item_cnt, void** client_data)
 {
   static attr_sItem items[100];
   int i;
@@ -2357,7 +2852,8 @@ int Graph::get_graph_attr_items(
   int grow_info_cnt;
 
   // Delete dyn if change from subgraph to graph
-  if (was_subgraph) {
+  if (was_subgraph)
+  {
     delete subgraph_dyn;
     subgraph_dyn = 0;
     was_subgraph = 0;
@@ -2366,7 +2862,8 @@ int Graph::get_graph_attr_items(
   grow_GetGraphAttrInfo(grow->ctx, &grow_info, &grow_info_cnt);
 
   grow_info_p = grow_info;
-  for (i = 0; i < grow_info_cnt; i++) {
+  for (i = 0; i < grow_info_cnt; i++)
+  {
     items[i].value = grow_info_p->value_p;
     strcpy(items[i].name, grow_info_p->name);
     items[i].type = grow_info_p->type;
@@ -2404,15 +2901,17 @@ int Graph::edit_graph_attributes()
 
 void Graph::reset_mode(bool select_clear, bool keep)
 {
-  if (grow_Mode(grow->ctx) == grow_eMode_PolyLine && current_polyline) {
+  if (grow_Mode(grow->ctx) == grow_eMode_PolyLine && current_polyline)
+  {
     if (fill)
       grow_SetObjectFill(current_polyline, 1);
     if (shadow)
       grow_SetObjectShadow(current_polyline, 1);
 
     journal_store(journal_eAction_CreateObject, current_polyline);
-  } else if (grow_Mode(grow->ctx) == grow_eMode_EditPolyLine
-      || grow_Mode(grow->ctx) == grow_eMode_Scale) {
+  }
+  else if (grow_Mode(grow->ctx) == grow_eMode_EditPolyLine || grow_Mode(grow->ctx) == grow_eMode_Scale)
+  {
     journal_store(journal_eAction_PostPropertiesSelect, 0);
   }
 
@@ -2424,7 +2923,8 @@ void Graph::reset_mode(bool select_clear, bool keep)
   grow_SetMoveRestrictions(grow->ctx, glow_eMoveRestriction_No, 0, 0, NULL);
   grow_SetScaleEqual(grow->ctx, 0);
   keep_mode = keep;
-  if (select_clear) {
+  if (select_clear)
+  {
     journal_store(journal_eAction_AnteSelectReset, 0);
     grow_SelectClear(grow->ctx);
     journal_store(journal_eAction_PostSelectReset, 0);
@@ -2449,21 +2949,25 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
   if (event->event != glow_eEvent_CursorMotion && event->event != glow_eEvent_GrowDynamics)
     graph->message(' ', null_str);
 
-  if (graph->trace_started || event->event == glow_eEvent_Open) {
+  if (graph->trace_started || event->event == glow_eEvent_Open)
+  {
     return graph_trace_grow_cb(ctx, event);
   }
 
-  if (event->any.type == glow_eEventType_CreateCon) {
+  if (event->any.type == glow_eEventType_CreateCon)
+  {
     grow_tConClass cc;
     grow_tCon con;
     char name[80];
 
-    if (grow_LayerActive(graph->grow->ctx)) {
+    if (grow_LayerActive(graph->grow->ctx))
+    {
       graph->message('E', "Connections are only allowed in background layer");
       return 1;
     }
 
-    if (!event->con_create.dest_object) {
+    if (!event->con_create.dest_object)
+    {
       // Create a ConGlue object
       grow_tObject t1;
       double x, y;
@@ -2471,16 +2975,18 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
       double margin = 1;
 
       // Select direction
-      grow_GetNodeConPoint(event->con_create.source_object,
-          event->con_create.source_conpoint, &x, &y, &dir);
-      if (event->con_create.y < y + margin) {
+      grow_GetNodeConPoint(event->con_create.source_object, event->con_create.source_conpoint, &x, &y, &dir);
+      if (event->con_create.y < y + margin)
+      {
         if (event->con_create.x > x + margin)
           event->con_create.dest_conpoint = 3;
         else if (event->con_create.x < x - margin)
           event->con_create.dest_conpoint = 1;
         else
           event->con_create.dest_conpoint = 2;
-      } else {
+      }
+      else
+      {
         if (event->con_create.x > x + margin)
           event->con_create.dest_conpoint = 3;
         else if (event->con_create.x < x - margin)
@@ -2489,47 +2995,45 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
           event->con_create.dest_conpoint = 0;
       }
       sprintf(name, "O%d", grow_IncrNextObjectNameNumber(graph->grow->ctx));
-      grow_CreateGrowConGlue(graph->grow->ctx, name, event->con_create.x,
-          event->con_create.y, &t1);
+      grow_CreateGrowConGlue(graph->grow->ctx, name, event->con_create.x, event->con_create.y, &t1);
       event->con_create.dest_object = t1;
     }
 
-    graph->get_conclass(graph->get_fill_drawtype(), graph->linewidth,
-        graph->con_type, graph->con_corner, graph->corner_round_amount, &cc);
+    graph->get_conclass(graph->get_fill_drawtype(), graph->linewidth, graph->con_type, graph->con_corner,
+                        graph->corner_round_amount, &cc);
     sprintf(name, "C%d", grow_IncrNextObjectNameNumber(graph->grow->ctx));
-    grow_CreateCon(graph->grow->ctx, "", cc, event->con_create.source_object,
-        event->con_create.dest_object, event->con_create.source_conpoint,
-        event->con_create.dest_conpoint, NULL, &con, 0, NULL, NULL,
-        graph->border, graph->shadow);
+    grow_CreateCon(graph->grow->ctx, "", cc, event->con_create.source_object, event->con_create.dest_object,
+                   event->con_create.source_conpoint, event->con_create.dest_conpoint, NULL, &con, 0, NULL,
+                   NULL, graph->border, graph->shadow);
     grow_SetModified(graph->grow->ctx, 1);
     return 1;
   }
-  switch (event->event) {
+  switch (event->event)
+  {
   case glow_eEvent_CreateGrowObject:
     // Create some object
-    switch (event->create_grow_object.mode) {
-    case grow_eMode_Rect: {
+    switch (event->create_grow_object.mode)
+    {
+    case grow_eMode_Rect:
+    {
       grow_tObject r1;
       char name[80];
 
       sprintf(name, "O%d", grow_IncrNextObjectNameNumber(graph->grow->ctx));
 
       if (!graph->mode_scriptmodule)
-        grow_CreateGrowRect(graph->grow->ctx, name, event->create_grow_object.x,
-            event->create_grow_object.y,
-            event->create_grow_object.x2 - event->create_grow_object.x,
-            event->create_grow_object.y2 - event->create_grow_object.y,
-            graph->get_border_drawtype(), graph->linewidth, 0,
-            glow_mDisplayLevel_1, graph->fill, graph->border, graph->shadow,
-            graph->get_fill_drawtype(), NULL, &r1);
+        grow_CreateGrowRect(graph->grow->ctx, name, event->create_grow_object.x, event->create_grow_object.y,
+                            event->create_grow_object.x2 - event->create_grow_object.x,
+                            event->create_grow_object.y2 - event->create_grow_object.y,
+                            graph->get_border_drawtype(), graph->linewidth, 0, glow_mDisplayLevel_1,
+                            graph->fill, graph->border, graph->shadow, graph->get_fill_drawtype(), NULL, &r1);
       else
         grow_CreateGrowScriptModule(graph->grow->ctx, name, event->create_grow_object.x,
-            event->create_grow_object.y,
-            event->create_grow_object.x2 - event->create_grow_object.x,
-            event->create_grow_object.y2 - event->create_grow_object.y,
-            graph->get_border_drawtype(), graph->linewidth,
-            glow_mDisplayLevel_1, graph->fill, graph->border,
-            graph->get_fill_drawtype(), NULL, &r1);
+                                    event->create_grow_object.y,
+                                    event->create_grow_object.x2 - event->create_grow_object.x,
+                                    event->create_grow_object.y2 - event->create_grow_object.y,
+                                    graph->get_border_drawtype(), graph->linewidth, glow_mDisplayLevel_1,
+                                    graph->fill, graph->border, graph->get_fill_drawtype(), NULL, &r1);
 
       grow_SetModified(graph->grow->ctx, 1);
       if (!graph->keep_mode)
@@ -2539,18 +3043,18 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
 
       break;
     }
-    case grow_eMode_RectRounded: {
+    case grow_eMode_RectRounded:
+    {
       grow_tObject r1;
       char name[80];
 
       sprintf(name, "O%d", grow_IncrNextObjectNameNumber(graph->grow->ctx));
 
-      grow_CreateGrowRectRounded(graph->grow->ctx, name,
-          event->create_grow_object.x, event->create_grow_object.y,
+      grow_CreateGrowRectRounded(
+          graph->grow->ctx, name, event->create_grow_object.x, event->create_grow_object.y,
           event->create_grow_object.x2 - event->create_grow_object.x,
-          event->create_grow_object.y2 - event->create_grow_object.y,
-          graph->get_border_drawtype(), graph->linewidth, 0,
-          glow_mDisplayLevel_1, graph->fill, graph->border, graph->shadow,
+          event->create_grow_object.y2 - event->create_grow_object.y, graph->get_border_drawtype(),
+          graph->linewidth, 0, glow_mDisplayLevel_1, graph->fill, graph->border, graph->shadow,
           graph->get_fill_drawtype(), NULL, &r1);
       grow_SetModified(graph->grow->ctx, 1);
       if (!graph->keep_mode)
@@ -2560,16 +3064,16 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
 
       break;
     }
-    case grow_eMode_Line: {
+    case grow_eMode_Line:
+    {
       grow_tObject l1;
       char name[80];
 
       sprintf(name, "O%d", grow_IncrNextObjectNameNumber(graph->grow->ctx));
 
-      grow_CreateGrowLine(graph->grow->ctx, name, event->create_grow_object.x,
-          event->create_grow_object.y, event->create_grow_object.x2,
-          event->create_grow_object.y2, graph->get_border_drawtype(),
-          graph->linewidth, 0, NULL, &l1);
+      grow_CreateGrowLine(graph->grow->ctx, name, event->create_grow_object.x, event->create_grow_object.y,
+                          event->create_grow_object.x2, event->create_grow_object.y2,
+                          graph->get_border_drawtype(), graph->linewidth, 0, NULL, &l1);
       grow_SetModified(graph->grow->ctx, 1);
       if (graph->linetype != glow_eLineType_Solid)
         grow_SetObjectLinetype(l1, graph->linetype);
@@ -2581,12 +3085,14 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
 
       break;
     }
-    case grow_eMode_PolyLine: {
+    case grow_eMode_PolyLine:
+    {
       glow_sPoint points[2];
       int point_cnt;
       char name[80];
 
-      if (event->create_grow_object.first_line) {
+      if (event->create_grow_object.first_line)
+      {
         sprintf(name, "O%d", grow_IncrNextObjectNameNumber(graph->grow->ctx));
 
         points[0].x = event->create_grow_object.x2;
@@ -2594,31 +3100,31 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
         points[1].x = event->create_grow_object.x;
         points[1].y = event->create_grow_object.y;
         point_cnt = 2;
-        grow_CreateGrowPolyLine(graph->grow->ctx, name, (glow_sPoint*)&points,
-            point_cnt, graph->get_border_drawtype(), graph->linewidth, 0, 0,
-            graph->border, 0, graph->get_fill_drawtype(), 0, NULL,
-            &graph->current_polyline);
-      } else {
+        grow_CreateGrowPolyLine(graph->grow->ctx, name, (glow_sPoint*)&points, point_cnt,
+                                graph->get_border_drawtype(), graph->linewidth, 0, 0, graph->border, 0,
+                                graph->get_fill_drawtype(), 0, NULL, &graph->current_polyline);
+      }
+      else
+      {
         points[0].x = event->create_grow_object.x;
         points[0].y = event->create_grow_object.y;
         point_cnt = 1;
-        grow_AddPolyLinePoints(
-            graph->current_polyline, (glow_sPoint*)&points, point_cnt);
+        grow_AddPolyLinePoints(graph->current_polyline, (glow_sPoint*)&points, point_cnt);
       }
       grow_SetModified(graph->grow->ctx, 1);
       break;
     }
-    case grow_eMode_Circle: {
+    case grow_eMode_Circle:
+    {
       grow_tObject a1;
       char name[80];
 
       sprintf(name, "O%d", grow_IncrNextObjectNameNumber(graph->grow->ctx));
 
-      grow_CreateGrowArc(graph->grow->ctx, name, event->create_grow_object.x,
-          event->create_grow_object.y, event->create_grow_object.x2,
-          event->create_grow_object.y2, 0, 360, graph->get_border_drawtype(),
-          graph->linewidth, graph->fill, graph->border, graph->shadow,
-          graph->get_fill_drawtype(), NULL, &a1);
+      grow_CreateGrowArc(graph->grow->ctx, name, event->create_grow_object.x, event->create_grow_object.y,
+                         event->create_grow_object.x2, event->create_grow_object.y2, 0, 360,
+                         graph->get_border_drawtype(), graph->linewidth, graph->fill, graph->border,
+                         graph->shadow, graph->get_fill_drawtype(), NULL, &a1);
       grow_SetModified(graph->grow->ctx, 1);
       if (!graph->keep_mode)
         grow_SetMode(graph->grow->ctx, grow_eMode_Edit);
@@ -2633,16 +3139,18 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
   case glow_eEvent_SelectClear:
     grow_ResetSelectHighlight(graph->grow->ctx);
     break;
-  case glow_eEvent_ObjectDeleted: {
-    if (graph->current_polyline
-        && event->object.object == graph->current_polyline) {
+  case glow_eEvent_ObjectDeleted:
+  {
+    if (graph->current_polyline && event->object.object == graph->current_polyline)
+    {
       grow_PolylineEnd(graph->grow->ctx);
       graph->current_polyline = 0;
     }
     grow_SetModified(graph->grow->ctx, 1);
 
     Attr* attrctx;
-    if (graph->attr_list.find(event->object.object, (void**)&attrctx)) {
+    if (graph->attr_list.find(event->object.object, (void**)&attrctx))
+    {
       graph->attr_list.remove((void*)attrctx);
       delete attrctx;
     }
@@ -2655,8 +3163,9 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
       (graph->cursor_motion_cb)(graph->parent_ctx, event->any.x, event->any.y);
     break;
   case glow_eEvent_MB1DoubleClick:
-    if (event->object.object_type != glow_eObjectType_NoObject
-        && event->object.object_type != glow_eObjectType_Con) {
+    if (event->object.object_type != glow_eObjectType_NoObject &&
+        event->object.object_type != glow_eObjectType_Con)
+    {
       graph->edit_attributes(event->object.object);
     }
     break;
@@ -2664,17 +3173,21 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
     if (grow_GetPasteActive(graph->grow->ctx))
       break;
 
-    if (event->object.object_type != glow_eObjectType_NoObject) {
+    if (event->object.object_type != glow_eObjectType_NoObject)
+    {
       graph->journal_store(journal_eAction_DeleteObject, event->object.object);
 
       grow_DeleteObject(graph->grow->ctx, event->object.object);
       grow_SetModified(graph->grow->ctx, 1);
-    } else {
+    }
+    else
+    {
       graph->delete_select();
     }
     graph->refresh_objects(attr_mRefresh_Objects);
     break;
-  case glow_eEvent_MB2Click: {
+  case glow_eEvent_MB2Click:
+  {
     char sub_name[80] = "graph";
     pwr_tFileName filename;
     char name[80];
@@ -2689,28 +3202,32 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
     if (!graph->get_current_subgraph_cb)
       break;
 
-    sts = (graph->get_current_subgraph_cb)(
-        graph->parent_ctx, sub_name, filename);
-    if (EVEN(sts)) {
+    sts = (graph->get_current_subgraph_cb)(graph->parent_ctx, sub_name, filename);
+    if (EVEN(sts))
+    {
       graph->message('E', "Select a SubGraph");
       break;
     }
     dcli_parse_filename(filename, dev, dir, file, type, &version);
     str_ToLower(sub_name, file);
-    if (streq(type, ".pwsg")) {
+    if (streq(type, ".pwsg"))
+    {
       sts = grow_FindNodeClassByName(graph->grow->ctx, sub_name, &nc);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         // Load the subgraph
         grow_OpenSubGraph(graph->grow->ctx, filename);
       }
       sts = grow_FindNodeClassByName(graph->grow->ctx, sub_name, &nc);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         graph->message('E', "Unable to open subgraph");
         break;
       }
 
       grow_GetUserData(nc, (void**)&dyn);
-      if (!dyn) {
+      if (!dyn)
+      {
         // Old version nodeclass without dyn, create dyn
         GeDyn* dyn = new GeDyn(graph);
         grow_SetUserData(nc, (void*)dyn);
@@ -2719,11 +3236,9 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
       sprintf(name, "O%d", grow_IncrNextObjectNameNumber(graph->grow->ctx));
 
       if (!grow_IsSliderClass(nc))
-        grow_CreateGrowNode(
-            graph->grow->ctx, name, nc, event->any.x, event->any.y, NULL, &n1);
+        grow_CreateGrowNode(graph->grow->ctx, name, nc, event->any.x, event->any.y, NULL, &n1);
       else
-        grow_CreateGrowSlider(
-            graph->grow->ctx, name, nc, event->any.x, event->any.y, NULL, &n1);
+        grow_CreateGrowSlider(graph->grow->ctx, name, nc, event->any.x, event->any.y, NULL, &n1);
 
       if (graph->shadow)
         grow_SetObjectShadow(n1, 1);
@@ -2731,238 +3246,284 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
       GeDyn* dyn = new GeDyn(graph);
       grow_SetUserData(n1, (void*)dyn);
       if (grow_IsSliderClass(nc))
-        dyn->action_type1
-            = ge_mActionType1(dyn->action_type1 | ge_mActionType1_Slider);
+        dyn->action_type1 = ge_mActionType1(dyn->action_type1 | ge_mActionType1_Slider);
 
       graph->journal_store(journal_eAction_CreateObject, n1);
-    } else if (streq(type, ".gif") || streq(type, ".jpg")
-        || streq(type, ".svg") || streq(type, ".png")) {
+    }
+    else if (streq(type, ".gif") || streq(type, ".jpg") || streq(type, ".svg") || streq(type, ".png"))
+    {
       grow_tObject i1;
       char name[80];
 
       sprintf(name, "O%d", grow_IncrNextObjectNameNumber(graph->grow->ctx));
 
-      if (str_StartsWith(dir, "jpwr/")) {
+      if (str_StartsWith(dir, "jpwr/"))
+      {
         strcpy(filename, dir);
         strcat(filename, file);
         strcat(filename, type);
-      } else {
+      }
+      else
+      {
         strcpy(filename, file);
         strcat(filename, type);
       }
-      grow_CreateGrowImage(graph->grow->ctx, name, filename,
-          event->create_grow_object.x, event->create_grow_object.y, NULL, &i1);
+      grow_CreateGrowImage(graph->grow->ctx, name, filename, event->create_grow_object.x,
+                           event->create_grow_object.y, NULL, &i1);
 
       graph->journal_store(journal_eAction_CreateObject, i1);
-    } else if (streq(type, ".component")) {
-      if (streq(sub_name, "pwr_trend")) {
+    }
+    else if (streq(type, ".component"))
+    {
+      if (streq(sub_name, "pwr_trend"))
+      {
         grow_tObject t1;
-        graph->create_trend(&t1, event->create_grow_object.x,
-			    event->create_grow_object.y, (unsigned int)ge_mDynType1_Trend, 0, 0);
+        graph->create_trend(&t1, event->create_grow_object.x, event->create_grow_object.y,
+                            (unsigned int)ge_mDynType1_Trend, 0, 0);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
-
-      } else if (streq(sub_name, "pwrct_trend")) {
+      }
+      else if (streq(sub_name, "pwrct_trend"))
+      {
         grow_tObject t1;
-        graph->create_trend(&t1, event->create_grow_object.x,
-	    event->create_grow_object.y, (unsigned int)ge_mDynType1_Trend, 0, 1);
-
-        graph->journal_store(journal_eAction_CreateObject, t1);
-
-      } else if (streq(sub_name, "pwr_fastcurve")) {
-        grow_tObject t1;
-        graph->create_trend(&t1, event->create_grow_object.x,
-	    event->create_grow_object.y, (unsigned int)ge_mDynType1_FastCurve, 0,
-            0);
+        graph->create_trend(&t1, event->create_grow_object.x, event->create_grow_object.y,
+                            (unsigned int)ge_mDynType1_Trend, 0, 1);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
-      } else if (streq(sub_name, "pwrct_fastcurve")) {
+      }
+      else if (streq(sub_name, "pwr_fastcurve"))
+      {
         grow_tObject t1;
-        graph->create_trend(&t1, event->create_grow_object.x,
-	    event->create_grow_object.y, (unsigned int)ge_mDynType1_FastCurve, 0,
-            1);
+        graph->create_trend(&t1, event->create_grow_object.x, event->create_grow_object.y,
+                            (unsigned int)ge_mDynType1_FastCurve, 0, 0);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
-      } else if (streq(sub_name, "pwr_dstrend")) {
+      }
+      else if (streq(sub_name, "pwrct_fastcurve"))
+      {
         grow_tObject t1;
-        graph->create_trend(&t1, event->create_grow_object.x,
-	    event->create_grow_object.y, 0, (unsigned int)ge_mDynType2_DsTrend,
-	    0);
+        graph->create_trend(&t1, event->create_grow_object.x, event->create_grow_object.y,
+                            (unsigned int)ge_mDynType1_FastCurve, 0, 1);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
-      } else if (streq(sub_name, "pwrct_dstrend")) {
+      }
+      else if (streq(sub_name, "pwr_dstrend"))
+      {
         grow_tObject t1;
-        graph->create_trend(&t1, event->create_grow_object.x,
-	    event->create_grow_object.y, 0, (unsigned int)ge_mDynType2_DsTrend,
-	    1);
+        graph->create_trend(&t1, event->create_grow_object.x, event->create_grow_object.y, 0,
+                            (unsigned int)ge_mDynType2_DsTrend, 0);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
-      } else if (streq(sub_name, "pwr_dstrendcurve")) {
+      }
+      else if (streq(sub_name, "pwrct_dstrend"))
+      {
         grow_tObject t1;
-        graph->create_trend(&t1, event->create_grow_object.x,
-	    event->create_grow_object.y, 0, (unsigned int)ge_mDynType2_DsTrendCurve,
-	    0);
+        graph->create_trend(&t1, event->create_grow_object.x, event->create_grow_object.y, 0,
+                            (unsigned int)ge_mDynType2_DsTrend, 1);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
-      } else if (streq(sub_name, "pwrct_dstrendcurve")) {
+      }
+      else if (streq(sub_name, "pwr_dstrendcurve"))
+      {
         grow_tObject t1;
-        graph->create_trend(&t1, event->create_grow_object.x,
-	    event->create_grow_object.y, 0, (unsigned int)ge_mDynType2_DsTrendCurve,
-	    1);
+        graph->create_trend(&t1, event->create_grow_object.x, event->create_grow_object.y, 0,
+                            (unsigned int)ge_mDynType2_DsTrendCurve, 0);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
-      } else if (streq(sub_name, "pwr_xycurve")) {
+      }
+      else if (streq(sub_name, "pwrct_dstrendcurve"))
+      {
         grow_tObject t1;
-        graph->create_xycurve(&t1, event->create_grow_object.x,
-	    event->create_grow_object.y, (unsigned int)ge_mDynType1_XY_Curve, 0, 0);
+        graph->create_trend(&t1, event->create_grow_object.x, event->create_grow_object.y, 0,
+                            (unsigned int)ge_mDynType2_DsTrendCurve, 1);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
-      } else if (streq(sub_name, "pwrct_xycurve")) {
+      }
+      else if (streq(sub_name, "pwr_xycurve"))
+      {
         grow_tObject t1;
-        graph->create_xycurve(&t1, event->create_grow_object.x,
-	    event->create_grow_object.y, (unsigned int)ge_mDynType1_XY_Curve, 0, 1);
+        graph->create_xycurve(&t1, event->create_grow_object.x, event->create_grow_object.y,
+                              (unsigned int)ge_mDynType1_XY_Curve, 0, 0);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
-      } else if (streq(sub_name, "pwr_sevhist")) {
+      }
+      else if (streq(sub_name, "pwrct_xycurve"))
+      {
         grow_tObject t1;
-        graph->create_xycurve(&t1, event->create_grow_object.x,
-	    event->create_grow_object.y, 0, (unsigned int)ge_mDynType2_SevHist, 0);
+        graph->create_xycurve(&t1, event->create_grow_object.x, event->create_grow_object.y,
+                              (unsigned int)ge_mDynType1_XY_Curve, 0, 1);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
-      } else if (streq(sub_name, "pwrct_sevhist")) {
+      }
+      else if (streq(sub_name, "pwr_sevhist"))
+      {
         grow_tObject t1;
-        graph->create_xycurve(&t1, event->create_grow_object.x,
-	    event->create_grow_object.y, 0, (unsigned int)ge_mDynType2_SevHist, 1);
+        graph->create_xycurve(&t1, event->create_grow_object.x, event->create_grow_object.y, 0,
+                              (unsigned int)ge_mDynType2_SevHist, 0);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
-      } else if (streq(sub_name, "pwr_bar")) {
+      }
+      else if (streq(sub_name, "pwrct_sevhist"))
+      {
         grow_tObject t1;
-        graph->create_bar(
-            &t1, event->create_grow_object.x, event->create_grow_object.y, 0);
+        graph->create_xycurve(&t1, event->create_grow_object.x, event->create_grow_object.y, 0,
+                              (unsigned int)ge_mDynType2_SevHist, 1);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
-      } else if (streq(sub_name, "pwrct_bar")) {
+      }
+      else if (streq(sub_name, "pwr_bar"))
+      {
         grow_tObject t1;
-        graph->create_bar(
-            &t1, event->create_grow_object.x, event->create_grow_object.y, 1);
+        graph->create_bar(&t1, event->create_grow_object.x, event->create_grow_object.y, 0);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
-      } else if (streq(sub_name, "pwr_bararc")) {
+      }
+      else if (streq(sub_name, "pwrct_bar"))
+      {
         grow_tObject t1;
-        graph->create_bararc(
-            &t1, event->create_grow_object.x, event->create_grow_object.y, 0);
+        graph->create_bar(&t1, event->create_grow_object.x, event->create_grow_object.y, 1);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
-      } else if (streq(sub_name, "pwrct_bararc")) {
+      }
+      else if (streq(sub_name, "pwr_bararc"))
+      {
         grow_tObject t1;
-        graph->create_bararc(
-            &t1, event->create_grow_object.x, event->create_grow_object.y, 1);
+        graph->create_bararc(&t1, event->create_grow_object.x, event->create_grow_object.y, 0);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
-      } else if (streq(sub_name, "pwr_window")) {
+      }
+      else if (streq(sub_name, "pwrct_bararc"))
+      {
         grow_tObject t1;
-        graph->create_window(
-	    &t1, event->create_grow_object.x, event->create_grow_object.y, 0);
+        graph->create_bararc(&t1, event->create_grow_object.x, event->create_grow_object.y, 1);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
-      } else if (streq(sub_name, "pwrct_window")) {
+      }
+      else if (streq(sub_name, "pwr_window"))
+      {
         grow_tObject t1;
-        graph->create_window(
-	    &t1, event->create_grow_object.x, event->create_grow_object.y, 1);
+        graph->create_window(&t1, event->create_grow_object.x, event->create_grow_object.y, 0);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
-      } else if (streq(sub_name, "pwr_table")) {
+      }
+      else if (streq(sub_name, "pwrct_window"))
+      {
         grow_tObject t1;
-        graph->create_table(
-	    &t1, event->create_grow_object.x, event->create_grow_object.y, 0);
+        graph->create_window(&t1, event->create_grow_object.x, event->create_grow_object.y, 1);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
-      } else if (streq(sub_name, "pwrct_table")) {
+      }
+      else if (streq(sub_name, "pwr_table"))
+      {
         grow_tObject t1;
-        graph->create_table(
-	    &t1, event->create_grow_object.x, event->create_grow_object.y, 1);
+        graph->create_table(&t1, event->create_grow_object.x, event->create_grow_object.y, 0);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
-      } else if (streq(sub_name, "pwr_folder")) {
+      }
+      else if (streq(sub_name, "pwrct_table"))
+      {
         grow_tObject t1;
-        graph->create_folder(
-	    &t1, event->create_grow_object.x, event->create_grow_object.y, 0);
+        graph->create_table(&t1, event->create_grow_object.x, event->create_grow_object.y, 1);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
-      } else if (streq(sub_name, "pwrct_folder")) {
+      }
+      else if (streq(sub_name, "pwr_folder"))
+      {
         grow_tObject t1;
-        graph->create_folder(
-	    &t1, event->create_grow_object.x, event->create_grow_object.y, 1);
+        graph->create_folder(&t1, event->create_grow_object.x, event->create_grow_object.y, 0);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
-      } else if (streq(sub_name, "pwr_axis")) {
+      }
+      else if (streq(sub_name, "pwrct_folder"))
+      {
         grow_tObject t1;
-        graph->create_axis(&t1, event->create_grow_object.x,
-            event->create_grow_object.y, 0, 0);
-      } else if (streq(sub_name, "pwrct_axis")) {
-        grow_tObject t1;
-        graph->create_axis(&t1, event->create_grow_object.x,
-            event->create_grow_object.y, 0, 1);
-      } else if (streq(sub_name, "pwr_dynamicaxis")) {
-        grow_tObject t1;
-        graph->create_axis(&t1, event->create_grow_object.x,
-            event->create_grow_object.y, 1, 0);
-      } else if (streq(sub_name, "pwrct_dynamicaxis")) {
-        grow_tObject t1;
-        graph->create_axis(&t1, event->create_grow_object.x,
-            event->create_grow_object.y, 1, 1);
-      } else if (streq(sub_name, "pwr_axisarc")) {
-        grow_tObject t1;
-        graph->create_axisarc(&t1, event->create_grow_object.x,
-            event->create_grow_object.y, 0, 0);
-      } else if (streq(sub_name, "pwrct_axisarc")) {
-        grow_tObject t1;
-        graph->create_axisarc(&t1, event->create_grow_object.x,
-            event->create_grow_object.y, 0, 1);
-      } else if (streq(sub_name, "pwr_dynamicaxisarc")) {
-        grow_tObject t1;
-        graph->create_axisarc(&t1, event->create_grow_object.x,
-            event->create_grow_object.y, 1, 0);
-      } else if (streq(sub_name, "pwrct_dynamicaxisarc")) {
-        grow_tObject t1;
-        graph->create_axisarc(&t1, event->create_grow_object.x,
-            event->create_grow_object.y, 1, 1);
-      } else if (streq(sub_name, "pwr_pie")) {
-        grow_tObject t1;
-        graph->create_pie(
-	    &t1, event->create_grow_object.x, event->create_grow_object.y, 0);
-      } else if (streq(sub_name, "pwrct_pie")) {
-        grow_tObject t1;
-        graph->create_pie(
-	    &t1, event->create_grow_object.x, event->create_grow_object.y, 1);
-      } else if (streq(sub_name, "pwr_barchart")) {
-        grow_tObject t1;
-        graph->create_barchart(
-	    &t1, event->create_grow_object.x, event->create_grow_object.y, 0);
-      } else if (streq(sub_name, "pwrct_barchart")) {
-        grow_tObject t1;
-        graph->create_barchart(
-	    &t1, event->create_grow_object.x, event->create_grow_object.y, 1);
-      } else if (streq(sub_name, "pwr_methodtoolbar")) {
-        grow_tObject t1;
-        graph->create_toolbar(
-            &t1, event->create_grow_object.x, event->create_grow_object.y);
+        graph->create_folder(&t1, event->create_grow_object.x, event->create_grow_object.y, 1);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
-      } else if (streq(sub_name, "pwr_dashcell")) {
+      }
+      else if (streq(sub_name, "pwr_axis"))
+      {
         grow_tObject t1;
-        graph->create_dashcell(
-            &t1, event->create_grow_object.x, event->create_grow_object.y, 0);
-	GeDash* dash = new GeDash(graph);
-	grow_SetUserData(t1, (void*)dash);
+        graph->create_axis(&t1, event->create_grow_object.x, event->create_grow_object.y, 0, 0);
+      }
+      else if (streq(sub_name, "pwrct_axis"))
+      {
+        grow_tObject t1;
+        graph->create_axis(&t1, event->create_grow_object.x, event->create_grow_object.y, 0, 1);
+      }
+      else if (streq(sub_name, "pwr_dynamicaxis"))
+      {
+        grow_tObject t1;
+        graph->create_axis(&t1, event->create_grow_object.x, event->create_grow_object.y, 1, 0);
+      }
+      else if (streq(sub_name, "pwrct_dynamicaxis"))
+      {
+        grow_tObject t1;
+        graph->create_axis(&t1, event->create_grow_object.x, event->create_grow_object.y, 1, 1);
+      }
+      else if (streq(sub_name, "pwr_axisarc"))
+      {
+        grow_tObject t1;
+        graph->create_axisarc(&t1, event->create_grow_object.x, event->create_grow_object.y, 0, 0);
+      }
+      else if (streq(sub_name, "pwrct_axisarc"))
+      {
+        grow_tObject t1;
+        graph->create_axisarc(&t1, event->create_grow_object.x, event->create_grow_object.y, 0, 1);
+      }
+      else if (streq(sub_name, "pwr_dynamicaxisarc"))
+      {
+        grow_tObject t1;
+        graph->create_axisarc(&t1, event->create_grow_object.x, event->create_grow_object.y, 1, 0);
+      }
+      else if (streq(sub_name, "pwrct_dynamicaxisarc"))
+      {
+        grow_tObject t1;
+        graph->create_axisarc(&t1, event->create_grow_object.x, event->create_grow_object.y, 1, 1);
+      }
+      else if (streq(sub_name, "pwr_pie"))
+      {
+        grow_tObject t1;
+        graph->create_pie(&t1, event->create_grow_object.x, event->create_grow_object.y, 0);
+      }
+      else if (streq(sub_name, "pwrct_pie"))
+      {
+        grow_tObject t1;
+        graph->create_pie(&t1, event->create_grow_object.x, event->create_grow_object.y, 1);
+      }
+      else if (streq(sub_name, "pwr_barchart"))
+      {
+        grow_tObject t1;
+        graph->create_barchart(&t1, event->create_grow_object.x, event->create_grow_object.y, 0);
+      }
+      else if (streq(sub_name, "pwrct_barchart"))
+      {
+        grow_tObject t1;
+        graph->create_barchart(&t1, event->create_grow_object.x, event->create_grow_object.y, 1);
+      }
+      else if (streq(sub_name, "pwr_methodtoolbar"))
+      {
+        grow_tObject t1;
+        graph->create_toolbar(&t1, event->create_grow_object.x, event->create_grow_object.y);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
-      } else if (streq(sub_name, "pwr_conglue")) {
+      }
+      else if (streq(sub_name, "pwr_dashcell"))
+      {
+        grow_tObject t1;
+        graph->create_dashcell(&t1, event->create_grow_object.x, event->create_grow_object.y, 0);
+        GeDash* dash = new GeDash(graph);
+        grow_SetUserData(t1, (void*)dash);
+
+        graph->journal_store(journal_eAction_CreateObject, t1);
+      }
+      else if (streq(sub_name, "pwr_conglue"))
+      {
         grow_tObject t1;
 
         sprintf(name, "O%d", grow_IncrNextObjectNameNumber(graph->grow->ctx));
-        grow_CreateGrowConGlue(graph->grow->ctx, name,
-            event->create_grow_object.x, event->create_grow_object.y, &t1);
+        grow_CreateGrowConGlue(graph->grow->ctx, name, event->create_grow_object.x,
+                               event->create_grow_object.y, &t1);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
       }
@@ -2977,17 +3538,18 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
     if (graph->set_focus_cb)
       (graph->set_focus_cb)(graph->parent_ctx, graph);
 
-    switch (grow_Mode(graph->grow->ctx)) {
-    case grow_eMode_ConPoint: {
+    switch (grow_Mode(graph->grow->ctx))
+    {
+    case grow_eMode_ConPoint:
+    {
       grow_tObject cp1;
       char name[80];
 
       sprintf(name, "O%d", grow_IncrNextObjectNameNumber(graph->grow->ctx));
 
-      grow_CreateGrowConPoint(graph->grow->ctx, name,
-          event->create_grow_object.x, event->create_grow_object.y,
-          grow_GetNextConPointNumber(graph->grow->ctx),
-          graph->conpoint_direction, NULL, &cp1);
+      grow_CreateGrowConPoint(graph->grow->ctx, name, event->create_grow_object.x,
+                              event->create_grow_object.y, grow_GetNextConPointNumber(graph->grow->ctx),
+                              graph->conpoint_direction, NULL, &cp1);
       grow_SetModified(graph->grow->ctx, 1);
       if (!graph->keep_mode)
         grow_SetMode(graph->grow->ctx, grow_eMode_Edit);
@@ -2995,7 +3557,8 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
       graph->refresh_objects(attr_mRefresh_Objects);
       break;
     }
-    case grow_eMode_Annot: {
+    case grow_eMode_Annot:
+    {
       grow_tObject a1;
       glow_eDrawType drawtype;
       int textsize = 0;
@@ -3008,7 +3571,8 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
       else
         drawtype = glow_eDrawType_TextHelvetica;
 
-      switch (graph->textsize) {
+      switch (graph->textsize)
+      {
       case 0:
         textsize = 0;
         break;
@@ -3028,10 +3592,9 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
         textsize = 8;
         break;
       }
-      grow_CreateGrowAnnot(graph->grow->ctx, name, event->create_grow_object.x,
-          event->create_grow_object.y, 1, drawtype, graph->get_text_drawtype(),
-          textsize, glow_eAnnotType_OneLine, 0, glow_mDisplayLevel_1, NULL,
-          &a1);
+      grow_CreateGrowAnnot(graph->grow->ctx, name, event->create_grow_object.x, event->create_grow_object.y,
+                           1, drawtype, graph->get_text_drawtype(), textsize, glow_eAnnotType_OneLine, 0,
+                           glow_mDisplayLevel_1, NULL, &a1);
       grow_SetModified(graph->grow->ctx, 1);
       if (!graph->keep_mode)
         grow_SetMode(graph->grow->ctx, grow_eMode_Edit);
@@ -3039,7 +3602,8 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
       graph->refresh_objects(attr_mRefresh_Objects);
       break;
     }
-    case grow_eMode_Text: {
+    case grow_eMode_Text:
+    {
       grow_tObject t1;
       glow_eDrawType drawtype;
       int textsize = 0;
@@ -3052,7 +3616,8 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
       else
         drawtype = glow_eDrawType_TextHelvetica;
 
-      switch (graph->textsize) {
+      switch (graph->textsize)
+      {
       case 0:
         textsize = 0;
         break;
@@ -3072,10 +3637,9 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
         textsize = 8;
         break;
       }
-      grow_CreateGrowText(graph->grow->ctx, name, "",
-          event->create_grow_object.x, event->create_grow_object.y, drawtype,
-          graph->get_text_drawtype(), textsize, graph->textfont,
-          glow_mDisplayLevel_1, NULL, &t1);
+      grow_CreateGrowText(graph->grow->ctx, name, "", event->create_grow_object.x,
+                          event->create_grow_object.y, drawtype, graph->get_text_drawtype(), textsize,
+                          graph->textfont, glow_mDisplayLevel_1, NULL, &t1);
       if (graph->change_text_cb)
         (graph->change_text_cb)(graph->parent_ctx, t1, "");
       grow_SetModified(graph->grow->ctx, 1);
@@ -3087,23 +3651,29 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
       graph->refresh_objects(attr_mRefresh_Objects);
       break;
     }
-    case grow_eMode_Edit: {
+    case grow_eMode_Edit:
+    {
       // Select
-      if (event->object.object_type == glow_eObjectType_NoObject) {
-	graph->journal_store(journal_eAction_AnteSelectReset, 0);
+      if (event->object.object_type == glow_eObjectType_NoObject)
+      {
+        graph->journal_store(journal_eAction_AnteSelectReset, 0);
         grow_SelectClear(graph->grow->ctx);
-	graph->journal_store(journal_eAction_PostSelectReset, 0);
+        graph->journal_store(journal_eAction_PostSelectReset, 0);
       }
-      else {
-	graph->journal_store(journal_eAction_AnteSelectObject, event->object.object);
-	if (grow_FindSelectedObject(graph->grow->ctx, event->object.object)) {
-	  grow_SelectClear(graph->grow->ctx);
-	} else {
-	  grow_SelectClear(graph->grow->ctx);
-	  grow_SetHighlight(event->object.object, 1);
-	  grow_SelectInsert(graph->grow->ctx, event->object.object);
-	}
-	graph->journal_store(journal_eAction_PostSelectObject, event->object.object);
+      else
+      {
+        graph->journal_store(journal_eAction_AnteSelectObject, event->object.object);
+        if (grow_FindSelectedObject(graph->grow->ctx, event->object.object))
+        {
+          grow_SelectClear(graph->grow->ctx);
+        }
+        else
+        {
+          grow_SelectClear(graph->grow->ctx);
+          grow_SetHighlight(event->object.object, 1);
+          grow_SelectInsert(graph->grow->ctx, event->object.object);
+        }
+        graph->journal_store(journal_eAction_PostSelectObject, event->object.object);
       }
 
       graph->refresh_objects(attr_mRefresh_Select);
@@ -3122,11 +3692,15 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
     if (graph->set_focus_cb)
       (graph->set_focus_cb)(graph->parent_ctx, graph);
 
-    if (event->object.object_type != glow_eObjectType_NoObject) {
-      if (grow_FindSelectedObject(graph->grow->ctx, event->object.object)) {
+    if (event->object.object_type != glow_eObjectType_NoObject)
+    {
+      if (grow_FindSelectedObject(graph->grow->ctx, event->object.object))
+      {
         grow_SetHighlight(event->object.object, 0);
         grow_SelectRemove(graph->grow->ctx, event->object.object);
-      } else {
+      }
+      else
+      {
         grow_SetHighlight(event->object.object, 1);
         grow_SelectInsert(graph->grow->ctx, event->object.object);
       }
@@ -3154,20 +3728,22 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
     graph->journal_store(journal_eAction_PostSelectRegionAdd, 0);
     graph->refresh_objects(attr_mRefresh_Select);
     break;
-  case glow_eEvent_PasteSequenceStart: {
+  case glow_eEvent_PasteSequenceStart:
+  {
     grow_tObject* move_list;
     int move_count;
     int i;
 
     grow_GetMoveList(graph->grow->ctx, &move_list, &move_count);
-    for (i = 0; i < move_count; i++) {
-      switch (grow_GetObjectType(move_list[i])) {
+    for (i = 0; i < move_count; i++)
+    {
+      switch (grow_GetObjectType(move_list[i]))
+      {
       case glow_eObjectType_Con:
         grow_SetObjectName(move_list[i], graph->get_next_object_name("C", ""));
         break;
       case glow_eObjectType_GrowGroup:
-        grow_SetObjectName(
-            move_list[i], graph->get_next_object_name("Grp", "_"));
+        grow_SetObjectName(move_list[i], graph->get_next_object_name("Grp", "_"));
         break;
       default:
         grow_SetObjectName(move_list[i], graph->get_next_object_name("O", ""));
@@ -3178,63 +3754,68 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
     graph->journal_store(journal_eAction_AntePaste, 0);
     break;
   }
-  case glow_eEvent_PasteSequenceEnd: {
+  case glow_eEvent_PasteSequenceEnd:
+  {
     graph->journal_store(journal_eAction_PostPaste, 0);
 
     graph->refresh_objects(attr_mRefresh_Objects);
     break;
   }
   case glow_eEvent_GrowDynamics:
-    graph->exec_dynamic(event->dynamics.object, event->dynamics.code,
-        event->dynamics.dynamic_type);
+    graph->exec_dynamic(event->dynamics.object, event->dynamics.code, event->dynamics.dynamic_type);
     break;
   case glow_eEvent_CursorMotion:
     if (graph->cursor_motion_cb)
       (graph->cursor_motion_cb)(graph->parent_ctx, event->any.x, event->any.y);
     break;
   case glow_eEvent_MB1DoubleClickCtrl:
-  case glow_eEvent_MB1DoubleClickShiftCtrl: {
+  case glow_eEvent_MB1DoubleClickShiftCtrl:
+  {
     pwr_tAName attr_name;
     pwr_tTypeId type;
     int sts;
 
-    if (event->object.object_type != glow_eObjectType_NoObject) {
-      if (graph->get_rtplant_select_cb) {
-        sts = (graph->get_rtplant_select_cb)(graph->parent_ctx, attr_name,
-	    sizeof(attr_name), &type);
-	if (EVEN(sts)) {
-	  graph->message('E', "Select an object in the Navigator");
-	  break;
-	}
-	if (event->event == glow_eEvent_MB1DoubleClickShiftCtrl)
-	  sts = graph->dashboard_connect(event->object.object, 1, attr_name, type);
-	else
-	  sts = graph->dashboard_connect(event->object.object, 0, attr_name, type);
-	if (EVEN(sts)) {
-	  graph->message('E', "Unable to connect");
-	  break;
-	}	
-      } else if (graph->get_plant_select_cb) {
-	sts = (graph->get_plant_select_cb)(
-	    graph->parent_ctx, attr_name, sizeof(attr_name));
-	if (EVEN(sts)) {
-	  graph->message('E', "Select an object in the Plant palette");
-	  break;
-	}
+    if (event->object.object_type != glow_eObjectType_NoObject)
+    {
+      if (graph->get_rtplant_select_cb)
+      {
+        sts = (graph->get_rtplant_select_cb)(graph->parent_ctx, attr_name, sizeof(attr_name), &type);
+        if (EVEN(sts))
+        {
+          graph->message('E', "Select an object in the Navigator");
+          break;
+        }
+        if (event->event == glow_eEvent_MB1DoubleClickShiftCtrl)
+          sts = graph->dashboard_connect(event->object.object, 1, attr_name, type);
+        else
+          sts = graph->dashboard_connect(event->object.object, 0, attr_name, type);
+        if (EVEN(sts))
+        {
+          graph->message('E', "Unable to connect");
+          break;
+        }
+      }
+      else if (graph->get_plant_select_cb)
+      {
+        sts = (graph->get_plant_select_cb)(graph->parent_ctx, attr_name, sizeof(attr_name));
+        if (EVEN(sts))
+        {
+          graph->message('E', "Select an object in the Plant palette");
+          break;
+        }
 
-	graph->connect(event->object.object, attr_name,
-            event->event == glow_eEvent_MB1DoubleClickShiftCtrl);
-	grow_SetModified(graph->grow->ctx, 1);
+        graph->connect(event->object.object, attr_name, event->event == glow_eEvent_MB1DoubleClickShiftCtrl);
+        grow_SetModified(graph->grow->ctx, 1);
       }
     }
     break;
   }
-  case glow_eEvent_MB1DoubleClickShift: {
-    if (event->object.object_type != glow_eObjectType_NoObject
-        && (grow_GetObjectType(event->object.object)
-                   == glow_eObjectType_GrowNode
-               || grow_GetObjectType(event->object.object)
-                   == glow_eObjectType_GrowGroup)) {
+  case glow_eEvent_MB1DoubleClickShift:
+  {
+    if (event->object.object_type != glow_eObjectType_NoObject &&
+        (grow_GetObjectType(event->object.object) == glow_eObjectType_GrowNode ||
+         grow_GetObjectType(event->object.object) == glow_eObjectType_GrowGroup))
+    {
       glow_eDrawType color;
       GeDyn* dyn;
 
@@ -3245,16 +3826,19 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
     }
     break;
   }
-  case glow_eEvent_Key_Tab: {
+  case glow_eEvent_Key_Tab:
+  {
     if (graph->traverse_focus_cb)
       (graph->traverse_focus_cb)(graph->parent_ctx, graph);
     break;
   }
-  case glow_eEvent_Map: {
+  case glow_eEvent_Map:
+  {
     graph->displayed = 1;
     break;
   }
-  case glow_eEvent_Translate: {
+  case glow_eEvent_Translate:
+  {
     static char new_text[200];
     int sts;
 
@@ -3263,26 +3847,28 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
       event->translate.new_text = new_text;
     return sts;
   }
-  case glow_eEvent_ScrollUp: {
+  case glow_eEvent_ScrollUp:
+  {
     grow_Scroll(graph->grow->ctx, 0, 0.05);
     break;
   }
-  case glow_eEvent_ScrollDown: {
+  case glow_eEvent_ScrollDown:
+  {
     grow_Scroll(graph->grow->ctx, 0, -0.05);
     break;
   }
-  case glow_eEvent_AnteUndo: {
+  case glow_eEvent_AnteUndo:
+  {
     if (event->object.object)
-      graph->journal_store(
-          journal_eAction_AntePropertiesObject, event->object.object);
+      graph->journal_store(journal_eAction_AntePropertiesObject, event->object.object);
     else
       graph->journal_store(journal_eAction_AntePropertiesSelect, 0);
     break;
   }
-  case glow_eEvent_PostUndo: {
+  case glow_eEvent_PostUndo:
+  {
     if (event->object.object)
-      graph->journal_store(
-          journal_eAction_PostPropertiesObject, event->object.object);
+      graph->journal_store(journal_eAction_PostPropertiesObject, event->object.object);
     else
       graph->journal_store(journal_eAction_PostPropertiesSelect, 0);
     break;
@@ -3314,16 +3900,21 @@ void graph_userdata_save_cb(void* f, void* object, glow_eUserdataCbType utype)
 {
   std::ofstream* fp = (std::ofstream*)f;
 
-  switch (utype) {
+  switch (utype)
+  {
   case glow_eUserdataCbType_Node:
-  case glow_eUserdataCbType_NodeClass: {
+  case glow_eUserdataCbType_NodeClass:
+  {
 
-    if (grow_GetObjectType(object) == glow_eObjectType_GrowDashCell) {
+    if (grow_GetObjectType(object) == glow_eObjectType_GrowDashCell)
+    {
       GeDash* dash;
 
       grow_GetUserData(object, (void**)&dash);
       dash->save(*fp);
-    } else {
+    }
+    else
+    {
       GeDyn* dyn;
 
       grow_GetUserData(object, (void**)&dyn);
@@ -3331,12 +3922,14 @@ void graph_userdata_save_cb(void* f, void* object, glow_eUserdataCbType utype)
     }
     break;
   }
-  case glow_eUserdataCbType_Ctx: {
+  case glow_eUserdataCbType_Ctx:
+  {
     Graph* graph;
 
     grow_GetCtxUserData((GrowCtx*)object, (void**)&graph);
 
-    if (graph->is_subgraph()) {
+    if (graph->is_subgraph())
+    {
       if (graph->subgraph_dyn)
         graph->subgraph_dyn->save(*fp);
       else
@@ -3347,14 +3940,15 @@ void graph_userdata_save_cb(void* f, void* object, glow_eUserdataCbType utype)
   }
 }
 
-static void graph_scriptexec_cb(void *ctx, char *filename)
+static void graph_scriptexec_cb(void* ctx, char* filename)
 {
   Graph* graph;
   int ctx_popped = 0;
 
   grow_GetCtxUserData((GrowCtx*)ctx, (void**)&graph);
 
-  if (ctx != graph->grow->ctx) {
+  if (ctx != graph->grow->ctx)
+  {
     graph->grow->pop((GrowCtx*)ctx);
     ctx_popped = 1;
   }
@@ -3363,7 +3957,7 @@ static void graph_scriptexec_cb(void *ctx, char *filename)
   graph->set_modified(0);
 
   if (ctx_popped)
-    graph->grow->push();    
+    graph->grow->push();
 }
 
 static void graph_userdata_open_cb(void* f, void* object, glow_eUserdataCbType utype)
@@ -3371,42 +3965,49 @@ static void graph_userdata_open_cb(void* f, void* object, glow_eUserdataCbType u
   std::ifstream* fp = (std::ifstream*)f;
   Graph* graph;
 
-  switch (utype) {
+  switch (utype)
+  {
   case glow_eUserdataCbType_Node:
-  case glow_eUserdataCbType_NodeClass: {
-    if (grow_GetObjectType(object) == glow_eObjectType_GrowDashCell) {
+  case glow_eUserdataCbType_NodeClass:
+  {
+    if (grow_GetObjectType(object) == glow_eObjectType_GrowDashCell)
+    {
       GeDash* dash;
 
       grow_GetCtxUserData(grow_GetCtx(object), (void**)&graph);
 
       grow_GetUserData(object, (void**)&dash);
       if (dash)
-	delete dash;
+        delete dash;
 
       dash = new GeDash(graph);
       grow_SetUserData(object, (void*)dash);
-      
+
       dash->open(*fp);
-    } else {
+    }
+    else
+    {
       GeDyn* dyn;
 
       grow_GetCtxUserData(grow_GetCtx(object), (void**)&graph);
 
       grow_GetUserData(object, (void**)&dyn);
       if (dyn)
-	delete dyn;
+        delete dyn;
 
       dyn = new GeDyn(graph);
       grow_SetUserData(object, (void*)dyn);
-      
+
       dyn->open(*fp);
     }
     break;
   }
-  case glow_eUserdataCbType_Ctx: {
+  case glow_eUserdataCbType_Ctx:
+  {
     grow_GetCtxUserData((GrowCtx*)object, (void**)&graph);
 
-    if (graph->is_subgraph()) {
+    if (graph->is_subgraph())
+    {
       graph->subgraph_dyn = new GeDyn(graph);
       graph->subgraph_dyn->open(*fp);
     }
@@ -3415,26 +4016,32 @@ static void graph_userdata_open_cb(void* f, void* object, glow_eUserdataCbType u
   }
 }
 
-void graph_userdata_copy_cb(
-    void* object, void* old_data, void** new_data, glow_eUserdataCbType utype)
+void graph_userdata_copy_cb(void* object, void* old_data, void** new_data, glow_eUserdataCbType utype)
 {
-  switch (utype) {
+  switch (utype)
+  {
   case glow_eUserdataCbType_NodeClass:
-  case glow_eUserdataCbType_Node: {
-    if (grow_GetObjectType(object) == glow_eObjectType_GrowDashCell) {
-      if (!old_data) {
-	*new_data = 0;
-	break;
+  case glow_eUserdataCbType_Node:
+  {
+    if (grow_GetObjectType(object) == glow_eObjectType_GrowDashCell)
+    {
+      if (!old_data)
+      {
+        *new_data = 0;
+        break;
       }
 
       GeDash* dash = (GeDash*)old_data;
       GeDash* new_dash = new GeDash(*dash);
 
       *new_data = (void*)new_dash;
-    } else {
-      if (!old_data) {
-	*new_data = 0;
-	break;
+    }
+    else
+    {
+      if (!old_data)
+      {
+        *new_data = 0;
+        break;
       }
 
       GeDyn* dyn = (GeDyn*)old_data;
@@ -3449,32 +4056,20 @@ void graph_userdata_copy_cb(
   }
 }
 
-GraphGbl::GraphGbl()
-{
-  strcpy(version, graph_cVersion);
-}
+GraphGbl::GraphGbl() { strcpy(version, graph_cVersion); }
 
-int GraphGbl::load_config(void* graph)
-{
-  return 1;
-}
+int GraphGbl::load_config(void* graph) { return 1; }
 
-GraphRef::GraphRef(pwr_tAName name, pwr_tRefId* id, int size, glow_eCycle cycle,
-    grow_tObject object, void** data)
+GraphRef::GraphRef(pwr_tAName name, pwr_tRefId* id, int size, glow_eCycle cycle, grow_tObject object,
+                   void** data)
     : m_id(id), m_size(size), m_cycle(cycle), m_object(object), m_data(data)
 {
   strcpy(m_name, name);
 }
 
-int Graph::grow_pop()
-{
-  return 1;
-}
+int Graph::grow_pop() { return 1; }
 
-int Graph::grow_push()
-{
-  return 1;
-}
+int Graph::grow_push() { return 1; }
 
 int Graph::grow_push_all()
 {
@@ -3510,12 +4105,16 @@ void GraphGrow::grow_setup()
   else
     grow_attr.enable_bg_pixmap = 1;
   mask |= grow_eAttr_environment;
-  if (((Graph*)graph)->mode == graph_eMode_Development) {
+  if (((Graph*)graph)->mode == graph_eMode_Development)
+  {
     grow_attr.environment = glow_eEnv_Development;
-  } else {
+  }
+  else
+  {
     grow_attr.environment = glow_eEnv_Runtime;
   }
-  if (((Graph*)graph)->dashboard) {
+  if (((Graph*)graph)->dashboard)
+  {
     mask |= grow_eAttr_color_theme;
     strcpy(grow_attr.color_theme, "$default");
   }
@@ -3526,65 +4125,36 @@ void GraphGrow::grow_setup()
   grow_SetMoveRestrictions(ctx, glow_eMoveRestriction_No, 0, 0, NULL);
 
   grow_DisableEventAll(ctx);
-  grow_EnableEvent(
-      ctx, glow_eEvent_MB1DoubleClick, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_MB2DoubleClick, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(ctx, glow_eEvent_MB1DoubleClickCtrl,
-      glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(ctx, glow_eEvent_MB1DoubleClickShiftCtrl,
-      glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(ctx, glow_eEvent_MB1DoubleClickShift,
-      glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_MB1Click, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_MB1ClickShift, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_SelectClear, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_ObjectDeleted, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_MB1Press, glow_eEventType_RegionSelect, graph_grow_cb);
-  grow_EnableEvent(ctx, glow_eEvent_MB1PressShift,
-      glow_eEventType_RegionAddSelect, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_MB2Press, glow_eEventType_CreateCon, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_MB1Press, glow_eEventType_MoveNode, graph_grow_cb);
-  grow_EnableEvent(ctx, glow_eEvent_CreateGrowObject, glow_eEventType_CallBack,
-      graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_MB3Click, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_MB2Click, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(ctx, glow_eEvent_PasteSequenceStart,
-      glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(ctx, glow_eEvent_PasteSequenceEnd, glow_eEventType_CallBack,
-      graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_GrowDynamics, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_CursorMotion, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_Map, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_Key_Tab, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_ScrollUp, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_ScrollDown, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_AnteUndo, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_PostUndo, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(ctx, glow_eEvent_AnteRegionSelect, glow_eEventType_CallBack,
-      graph_grow_cb);
-  grow_EnableEvent(ctx, glow_eEvent_AnteRegionAddSelect, glow_eEventType_CallBack,
-      graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_MB1DoubleClick, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_MB2DoubleClick, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_MB1DoubleClickCtrl, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_MB1DoubleClickShiftCtrl, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_MB1DoubleClickShift, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_MB1Click, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_MB1ClickShift, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_SelectClear, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_ObjectDeleted, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_MB1Press, glow_eEventType_RegionSelect, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_MB1PressShift, glow_eEventType_RegionAddSelect, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_MB2Press, glow_eEventType_CreateCon, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_MB1Press, glow_eEventType_MoveNode, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_CreateGrowObject, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_MB3Click, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_MB2Click, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_PasteSequenceStart, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_PasteSequenceEnd, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_GrowDynamics, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_CursorMotion, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_Map, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_Key_Tab, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_ScrollUp, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_ScrollDown, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_AnteUndo, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_PostUndo, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_AnteRegionSelect, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_AnteRegionAddSelect, glow_eEventType_CallBack, graph_grow_cb);
 
-  grow_RegisterUserDataCallbacks(ctx, graph_userdata_save_cb,
-      graph_userdata_open_cb, graph_userdata_copy_cb);
+  grow_RegisterUserDataCallbacks(ctx, graph_userdata_save_cb, graph_userdata_open_cb, graph_userdata_copy_cb);
   grow_RegisterScriptExecCallback(ctx, graph_scriptexec_cb);
 }
 
@@ -3622,94 +4192,53 @@ void GraphGrow::grow_trace_setup()
   grow_SetMoveRestrictions(ctx, glow_eMoveRestriction_Disable, 0, 0, NULL);
 
   grow_DisableEventAll(ctx);
-  grow_EnableEvent(
-      ctx, glow_eEvent_MB1DoubleClick, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_MB2DoubleClick, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_MB1DoubleClick, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_MB2DoubleClick, glow_eEventType_CallBack, graph_grow_cb);
   if (((Graph*)graph)->dashboard)
-    grow_EnableEvent(ctx, glow_eEvent_MB1DoubleClickCtrl,
-        glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_MB1Click, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_MB1ClickShift, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_SelectClear, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_ObjectDeleted, glow_eEventType_CallBack, graph_grow_cb);
+    grow_EnableEvent(ctx, glow_eEvent_MB1DoubleClickCtrl, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_MB1Click, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_MB1ClickShift, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_SelectClear, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_ObjectDeleted, glow_eEventType_CallBack, graph_grow_cb);
   // grow_EnableEvent( ctx, glow_eEvent_MB1Press, glow_eEventType_RegionSelect,
   //	graph_grow_cb);
   // grow_EnableEvent( ctx, glow_eEvent_MB1PressShift,
   // glow_eEventType_RegionAddSelect,
   //	graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_MB1Press, glow_eEventType_MoveNode, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_MB3Click, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_MB3Press, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_MB2Click, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_GrowDynamics, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_CursorMotion, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_SliderMoved, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(ctx, glow_eEvent_SliderMoveStart, glow_eEventType_CallBack,
-      graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_SliderMoveEnd, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(ctx, glow_eEvent_AnnotationInput, glow_eEventType_CallBack,
-      graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_InputFocusLost, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(ctx, glow_eEvent_InputFocusGained, glow_eEventType_CallBack,
-      graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_InputFocusInit, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_HotRequest, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_MB1Down, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_MB1Up, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_MB3Down, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_TipText, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_Key_Tab, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_Key_ShiftTab, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_Key_Escape, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_Key_Return, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_Key_Left, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_Key_Right, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_Key_Up, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_Key_Down, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_Key_CtrlAscii, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_MenuActivated, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_MenuCreate, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_MenuDelete, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_Signal, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_Open, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_Close, glow_eEventType_CallBack, graph_grow_cb);
-  grow_EnableEvent(
-      ctx, glow_eEvent_Resized, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_MB1Press, glow_eEventType_MoveNode, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_MB3Click, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_MB3Press, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_MB2Click, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_GrowDynamics, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_CursorMotion, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_SliderMoved, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_SliderMoveStart, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_SliderMoveEnd, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_AnnotationInput, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_InputFocusLost, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_InputFocusGained, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_InputFocusInit, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_HotRequest, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_MB1Down, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_MB1Up, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_MB3Down, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_TipText, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_Key_Tab, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_Key_ShiftTab, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_Key_Escape, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_Key_Return, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_Key_Left, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_Key_Right, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_Key_Up, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_Key_Down, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_Key_CtrlAscii, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_MenuActivated, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_MenuCreate, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_MenuDelete, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_Signal, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_Open, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_Close, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_Resized, glow_eEventType_CallBack, graph_grow_cb);
 
   grow_RegisterEventLogCallback(ctx, graph_eventlog_cb);
 }
@@ -3725,7 +4254,7 @@ int graph_init_grow_base_cb(GlowCtx* fctx, void* client_data)
   // GrowCtx *secondary_ctx;
 
   graph->grow = new GraphGrow(ctx, (void*)graph);
-  //graph->grow_stack[0] = new GraphGrow(ctx, (void*)graph);
+  // graph->grow_stack[0] = new GraphGrow(ctx, (void*)graph);
   graph->grow_cnt++;
 
   graph->grow->grow_setup();
@@ -3738,10 +4267,10 @@ int graph_init_grow_base_cb(GlowCtx* fctx, void* client_data)
   if (graph->init_cb)
     (graph->init_cb)(graph->parent_ctx);
 
-  if (graph->pending_borders) {
-    grow_SetLayout(graph->grow->ctx, graph->pending_borders[0],
-        graph->pending_borders[1], graph->pending_borders[2],
-        graph->pending_borders[3]);
+  if (graph->pending_borders)
+  {
+    grow_SetLayout(graph->grow->ctx, graph->pending_borders[0], graph->pending_borders[1],
+                   graph->pending_borders[2], graph->pending_borders[3]);
     free(graph->pending_borders);
     graph->pending_borders = 0;
   }
@@ -3749,15 +4278,16 @@ int graph_init_grow_base_cb(GlowCtx* fctx, void* client_data)
   return 1;
 }
 
-void Graph::graph_attr_redraw_cb(
-    void* gctx, void* attrctx, grow_tObject object, void* info)
+void Graph::graph_attr_redraw_cb(void* gctx, void* attrctx, grow_tObject object, void* info)
 {
   Graph* graph = (Graph*)gctx;
 
-  if (info) {
+  if (info)
+  {
     grow_UpdateObject(graph->grow->ctx, object, (grow_sAttrInfo*)info);
 
-    if (grow_GetObjectType(object) == glow_eObjectType_GrowDashCell) {
+    if (grow_GetObjectType(object) == glow_eObjectType_GrowDashCell)
+    {
       GeDash* dash;
 
       grow_GetUserData(object, (void**)&dash);
@@ -3766,11 +4296,11 @@ void Graph::graph_attr_redraw_cb(
   }
 }
 
-static void graph_graphattr_redraw_cb(
-    void* gctx, void* attrctx, grow_tObject object, void* info)
+static void graph_graphattr_redraw_cb(void* gctx, void* attrctx, grow_tObject object, void* info)
 {
   Graph* graph = (Graph*)gctx;
-  if (graph->is_subgraph()) {
+  if (graph->is_subgraph())
+  {
     char* argnames;
     int* argtypes;
     int* arg_cnt;
@@ -3780,22 +4310,24 @@ static void graph_graphattr_redraw_cb(
     grow_UpdateSubGraph(graph->grow->ctx, (grow_sAttrInfo*)info);
 
     grow_GetSubGraphDynamic(graph->grow->ctx, &code, &size);
-    if (size) {
-      grow_RefSubGraphArgNames(
-          graph->grow->ctx, &argnames, &argtypes, &arg_cnt);
+    if (size)
+    {
+      grow_RefSubGraphArgNames(graph->grow->ctx, &argnames, &argtypes, &arg_cnt);
       graph->get_argnames(code, argnames, argtypes, arg_cnt);
     }
-  } else {
+  }
+  else
+  {
     grow_UpdateGraph(graph->grow->ctx, (grow_sAttrInfo*)info);
   }
 }
 
-void Graph::graph_attr_close_cb(
-    void* gctx, void* attrctx, grow_tObject object, void* info, int keep)
+void Graph::graph_attr_close_cb(void* gctx, void* attrctx, grow_tObject object, void* info, int keep)
 {
   Graph* graph = (Graph*)gctx;
 
-  if (grow_GetObjectType(object) == glow_eObjectType_GrowDashCell) {
+  if (grow_GetObjectType(object) == glow_eObjectType_GrowDashCell)
+  {
     if (info)
       grow_UpdateObject(graph->grow->ctx, object, (grow_sAttrInfo*)info);
 
@@ -3808,7 +4340,9 @@ void Graph::graph_attr_close_cb(
     dash->update(object);
 
     // graph->journal_store(journal_eAction_PostPropertiesObject, object);
-  } else {
+  }
+  else
+  {
     if (info)
       grow_UpdateObject(graph->grow->ctx, object, (grow_sAttrInfo*)info);
 
@@ -3821,8 +4355,7 @@ void Graph::graph_attr_close_cb(
     delete (Attr*)attrctx;
 }
 
-static void graph_graphattr_close_cb(
-    void* gctx, void* attrctx, grow_tObject object, void* info, int keep)
+static void graph_graphattr_close_cb(void* gctx, void* attrctx, grow_tObject object, void* info, int keep)
 {
   Graph* graph = (Graph*)gctx;
 
@@ -3839,29 +4372,28 @@ static void graph_graphattr_close_cb(
     graph->dashboard_reconfigure();
 }
 
-int Graph::is_modified()
-{
-  return grow_GetModified(grow->ctx);
-}
+int Graph::is_modified() { return grow_GetModified(grow->ctx); }
 
 int Graph::init_trace()
 {
   int sts;
 
-  if (grow_GetModified(grow->ctx) && mode != graph_eMode_Runtime) {
+  if (grow_GetModified(grow->ctx) && mode != graph_eMode_Runtime)
+  {
     message('E', "Session is not saved");
     return 0;
   }
 
-  if (!gdh_init_done) {
+  if (!gdh_init_done)
+  {
     sts = gdh_Init("ge");
     if (EVEN(sts))
       return sts;
   }
 
-  if (!trace_started) {
-    grow_GetScanTime(
-        grow->ctx, &scan_time, &fast_scan_time, &animation_scan_time);
+  if (!trace_started)
+  {
+    grow_GetScanTime(grow->ctx, &scan_time, &fast_scan_time, &animation_scan_time);
     if (fast_scan_time < animation_scan_time)
       fast_scan_time = animation_scan_time;
     if (scan_time < animation_scan_time)
@@ -3878,8 +4410,8 @@ int Graph::init_trace()
     if (!streq(object_name[0], ""))
       init_object_graph(0);
 
-    sts = grow_TraceInit(grow->ctx, graph_trace_connect_bc,
-        graph_trace_disconnect_bc, graph_trace_scan_bc, graph_trace_ctrl_bc);
+    sts = grow_TraceInit(grow->ctx, graph_trace_connect_bc, graph_trace_disconnect_bc, graph_trace_scan_bc,
+                         graph_trace_ctrl_bc);
 
     // Look for object graph
     if (!streq(object_name[0], ""))
@@ -3898,7 +4430,8 @@ void Graph::close_trace(int reload)
 {
   char graphname[80];
 
-  if (trace_started) {
+  if (trace_started)
+  {
     trace_timer_remove();
 
     grow_TraceClose(grow->ctx);
@@ -3908,12 +4441,14 @@ void Graph::close_trace(int reload)
 
     trace_started = 0;
 
-    if (reload) {
+    if (reload)
+    {
       grow->grow_setup();
 
       // Refresh the graph by loading it from file
 
-      if (load_graph_cb) {
+      if (load_graph_cb)
+      {
         get_name(graphname);
         (load_graph_cb)(parent_ctx, graphname);
       }
@@ -3925,28 +4460,26 @@ void Graph::trace_scan(Graph* graph)
 {
   int time = int(graph->animation_scan_time * 1000);
 
-  if (graph->trace_started) {
+  if (graph->trace_started)
+  {
     if (graph->graph_object_scan)
       (graph->graph_object_scan)(graph);
 
     grow_TraceScan(graph->grow->ctx);
 
     graph->slow_scan_cnt++;
-    if (graph->slow_scan_cnt
-        >= int(graph->scan_time / graph->animation_scan_time + 0.5))
+    if (graph->slow_scan_cnt >= int(graph->scan_time / graph->animation_scan_time + 0.5))
       graph->slow_scan_cnt = 0;
 
     graph->fast_scan_cnt++;
-    if (graph->fast_scan_cnt
-        >= int(graph->fast_scan_time / graph->animation_scan_time + 0.5))
+    if (graph->fast_scan_cnt >= int(graph->fast_scan_time / graph->animation_scan_time + 0.5))
       graph->fast_scan_cnt = 0;
 
     graph->trace_timer_add(time);
   }
 }
 
-static int graph_trace_connect_bc(
-    grow_tObject object, glow_sTraceData* trace_data)
+static int graph_trace_connect_bc(grow_tObject object, glow_sTraceData* trace_data)
 {
   GeDyn* dyn;
   int dyn_type1;
@@ -3958,7 +4491,8 @@ static int graph_trace_connect_bc(
   Graph* graph;
   int ctx_popped = 0;
 
-  if (!trace_data) {
+  if (!trace_data)
+  {
     // Everything is connected
     grow_GetCtxUserData((GrowCtx*)object, (void**)&graph);
     graph->ref_object_info_all();
@@ -3968,38 +4502,39 @@ static int graph_trace_connect_bc(
   // Check if new ctx
   ctx = grow_GetCtx(object);
   grow_GetCtxUserData((GrowCtx*)ctx, (void**)&graph);
-  if (ctx != graph->grow->ctx) {
+  if (ctx != graph->grow->ctx)
+  {
     graph->grow->pop(ctx);
     ctx_popped = 1;
   }
 
   grow_GetUserData(object, (void**)&dyn);
-  if (!dyn) {
+  if (!dyn)
+  {
     if (ctx_popped)
       graph->grow->push();
     return 1;
   }
 
   // Get Dyn from nodeclass if dyn_type1 is HostObject
-  grow_GetObjectClassDynType(
-      object, &dyn_type1, &dyn_type2, &dyn_action_type1, &dyn_action_type2);
-  if (dyn_type1 & ge_mDynType1_HostObject
-      && (dyn->dyn_type1 & ge_mDynType1_Inherit
-             || dyn->dyn_type1 & ge_mDynType1_HostObject)) {
+  grow_GetObjectClassDynType(object, &dyn_type1, &dyn_type2, &dyn_action_type1, &dyn_action_type2);
+  if (dyn_type1 & ge_mDynType1_HostObject &&
+      (dyn->dyn_type1 & ge_mDynType1_Inherit || dyn->dyn_type1 & ge_mDynType1_HostObject))
+  {
     GeDyn* nodeclass_dyn;
     GeDyn* old_dyn;
     pwr_tAName hostobject;
 
     grow_GetObjectClassUserData(object, (void**)&nodeclass_dyn);
-    if (nodeclass_dyn) {
+    if (nodeclass_dyn)
+    {
       old_dyn = dyn;
       dyn = new GeDyn(*nodeclass_dyn);
       old_dyn->get_hostobject(hostobject);
       dyn->merge(*old_dyn);
       if (old_dyn->cycle != glow_eCycle_Inherit)
         dyn->cycle = old_dyn->cycle;
-      if (!(old_dyn->action_type1 == ge_mActionType1_Inherit
-              && old_dyn->action_type2 == 0))
+      if (!(old_dyn->action_type1 == ge_mActionType1_Inherit && old_dyn->action_type2 == 0))
         dyn->access = old_dyn->access;
       grow_SetUserData(object, (void*)dyn);
 
@@ -4029,15 +4564,18 @@ static int graph_trace_disconnect_bc(grow_tObject object)
 
 static int graph_trace_ctrl_bc(int type, void* data)
 {
-  switch (type) {
-  case glow_eTraceCtrl_CtxPop: {
+  switch (type)
+  {
+  case glow_eTraceCtrl_CtxPop:
+  {
     Graph* graph;
 
     grow_GetCtxUserData((GrowCtx*)data, (void**)&graph);
     graph->grow->pop((GrowCtx*)data);
     break;
   }
-  case glow_eTraceCtrl_CtxPush: {
+  case glow_eTraceCtrl_CtxPush:
+  {
     Graph* graph;
 
     grow_GetCtxUserData((GrowCtx*)data, (void**)&graph);
@@ -4060,18 +4598,15 @@ static int graph_trace_scan_bc(grow_tObject object, void* p)
 
   if (dyn->cycle == glow_eCycle_Inherit)
     return 1;
-  if (dyn->cycle == glow_eCycle_Slow && dyn->graph->slow_scan_cnt != 0
-      && !(dyn->total_dyn_type1 & ge_mDynType1_Animation
-             || dyn->total_dyn_type2 & ge_mDynType2_ScrollingText))
+  if (dyn->cycle == glow_eCycle_Slow && dyn->graph->slow_scan_cnt != 0 &&
+      !(dyn->total_dyn_type1 & ge_mDynType1_Animation || dyn->total_dyn_type2 & ge_mDynType2_ScrollingText))
     return 1;
-  if (dyn->cycle == glow_eCycle_Fast && dyn->graph->fast_scan_cnt != 0
-      && !(dyn->total_dyn_type1 & ge_mDynType1_Animation
-             || dyn->total_dyn_type2 & ge_mDynType2_ScrollingText))
+  if (dyn->cycle == glow_eCycle_Fast && dyn->graph->fast_scan_cnt != 0 &&
+      !(dyn->total_dyn_type1 & ge_mDynType1_Animation || dyn->total_dyn_type2 & ge_mDynType2_ScrollingText))
     return 1;
 
   sts = dyn->scan(object);
-  if (sts == GLOW__TERMINATED || sts == GLOW__SUBTERMINATED
-      || sts == GLOW__SWAPTERMINATED)
+  if (sts == GLOW__TERMINATED || sts == GLOW__SUBTERMINATED || sts == GLOW__SWAPTERMINATED)
     return sts;
 
   return 1;
@@ -4089,92 +4624,78 @@ static int graph_trace_grow_cb(GlowCtx* ctx, glow_tEvent event)
   if (event->event != glow_eEvent_CursorMotion && event->event != glow_eEvent_GrowDynamics)
     graph->message(' ', null_str);
 
-  if (ctx != graph->grow->ctx) {
+  if (ctx != graph->grow->ctx)
+  {
     graph->grow->pop((GrowCtx*)ctx);
     ctx_popped = 1;
   }
-  switch (event->event) {
+  switch (event->event)
+  {
   case glow_eEvent_ObjectDeleted:
     break;
-  case glow_eEvent_MB1Down: {
-    if (event->object.object_type != glow_eObjectType_NoObject
-        && (grow_GetObjectType(event->object.object)
-                   == glow_eObjectType_GrowNode
-               || grow_GetObjectType(event->object.object)
-                   == glow_eObjectType_GrowGroup
-               || grow_GetObjectType(event->object.object)
-                   == glow_eObjectType_GrowSlider
-               || grow_GetObjectType(event->object.object)
-                   == glow_eObjectType_GrowWindow
-               || grow_GetObjectType(event->object.object)
-                   == glow_eObjectType_GrowTrend
-               || grow_GetObjectType(event->object.object)
-                   == glow_eObjectType_GrowXYCurve
-               || grow_GetObjectType(event->object.object)
-                   == glow_eObjectType_GrowTable
-               || grow_GetObjectType(event->object.object)
-                   == glow_eObjectType_GrowBar
-               || grow_GetObjectType(event->object.object)
-                   == glow_eObjectType_GrowBarArc
-               || grow_GetObjectType(event->object.object)
-                   == glow_eObjectType_GrowPie
-               || grow_GetObjectType(event->object.object)
-                   == glow_eObjectType_GrowBarChart
-               || grow_GetObjectType(event->object.object)
-                   == glow_eObjectType_GrowAxis
-               || grow_GetObjectType(event->object.object)
-                   == glow_eObjectType_GrowAxisArc)) {
+  case glow_eEvent_MB1Down:
+  {
+    if (event->object.object_type != glow_eObjectType_NoObject &&
+        (grow_GetObjectType(event->object.object) == glow_eObjectType_GrowNode ||
+         grow_GetObjectType(event->object.object) == glow_eObjectType_GrowGroup ||
+         grow_GetObjectType(event->object.object) == glow_eObjectType_GrowSlider ||
+         grow_GetObjectType(event->object.object) == glow_eObjectType_GrowWindow ||
+         grow_GetObjectType(event->object.object) == glow_eObjectType_GrowTrend ||
+         grow_GetObjectType(event->object.object) == glow_eObjectType_GrowXYCurve ||
+         grow_GetObjectType(event->object.object) == glow_eObjectType_GrowTable ||
+         grow_GetObjectType(event->object.object) == glow_eObjectType_GrowBar ||
+         grow_GetObjectType(event->object.object) == glow_eObjectType_GrowBarArc ||
+         grow_GetObjectType(event->object.object) == glow_eObjectType_GrowPie ||
+         grow_GetObjectType(event->object.object) == glow_eObjectType_GrowBarChart ||
+         grow_GetObjectType(event->object.object) == glow_eObjectType_GrowAxis ||
+         grow_GetObjectType(event->object.object) == glow_eObjectType_GrowAxisArc))
+    {
       GeDyn* dyn;
 
       grow_GetUserData(event->object.object, (void**)&dyn);
-      if (dyn) {
+      if (dyn)
+      {
         dyn->action(event->object.object, event);
         graph->current_mb1_down = event->object.object;
       }
     }
     break;
   }
-  case glow_eEvent_MB1Up: {
+  case glow_eEvent_MB1Up:
+  {
     if (!graph->current_mb1_down)
       break;
-    if (grow_GetObjectType(graph->current_mb1_down) == glow_eObjectType_GrowNode
-        || grow_GetObjectType(graph->current_mb1_down)
-            == glow_eObjectType_GrowSlider
-        || grow_GetObjectType(graph->current_mb1_down)
-            == glow_eObjectType_GrowGroup
-        || grow_GetObjectType(graph->current_mb1_down)
-            == glow_eObjectType_GrowWindow
-        || grow_GetObjectType(graph->current_mb1_down)
-            == glow_eObjectType_GrowTrend
-        || grow_GetObjectType(graph->current_mb1_down)
-            == glow_eObjectType_GrowXYCurve
-        || grow_GetObjectType(graph->current_mb1_down)
-            == glow_eObjectType_GrowTable
-        || grow_GetObjectType(graph->current_mb1_down)
-            == glow_eObjectType_GrowBar
-        || grow_GetObjectType(graph->current_mb1_down)
-            == glow_eObjectType_GrowBarArc
-        || grow_GetObjectType(graph->current_mb1_down)
-            == glow_eObjectType_GrowPie
-        || grow_GetObjectType(graph->current_mb1_down)
-            == glow_eObjectType_GrowBarChart
-        || grow_GetObjectType(graph->current_mb1_down)
-            == glow_eObjectType_GrowAxis
-        || grow_GetObjectType(graph->current_mb1_down)
-            == glow_eObjectType_GrowAxisArc) {
+    if (grow_GetObjectType(graph->current_mb1_down) == glow_eObjectType_GrowNode ||
+        grow_GetObjectType(graph->current_mb1_down) == glow_eObjectType_GrowSlider ||
+        grow_GetObjectType(graph->current_mb1_down) == glow_eObjectType_GrowGroup ||
+        grow_GetObjectType(graph->current_mb1_down) == glow_eObjectType_GrowWindow ||
+        grow_GetObjectType(graph->current_mb1_down) == glow_eObjectType_GrowTrend ||
+        grow_GetObjectType(graph->current_mb1_down) == glow_eObjectType_GrowXYCurve ||
+        grow_GetObjectType(graph->current_mb1_down) == glow_eObjectType_GrowTable ||
+        grow_GetObjectType(graph->current_mb1_down) == glow_eObjectType_GrowBar ||
+        grow_GetObjectType(graph->current_mb1_down) == glow_eObjectType_GrowBarArc ||
+        grow_GetObjectType(graph->current_mb1_down) == glow_eObjectType_GrowPie ||
+        grow_GetObjectType(graph->current_mb1_down) == glow_eObjectType_GrowBarChart ||
+        grow_GetObjectType(graph->current_mb1_down) == glow_eObjectType_GrowAxis ||
+        grow_GetObjectType(graph->current_mb1_down) == glow_eObjectType_GrowAxisArc)
+    {
       GeDyn* dyn;
 
       grow_GetUserData(graph->current_mb1_down, (void**)&dyn);
-      if (dyn) {
+      if (dyn)
+      {
         dyn->action(graph->current_mb1_down, event);
         graph->current_mb1_down = 0;
       }
     }
     break;
   }
-  case glow_eEvent_MB3Down: {
-    if (graph->mode == graph_eMode_Runtime) {
-      switch (grow_GetMB3Action(graph->grow->ctx)) {
+  case glow_eEvent_MB3Down:
+  {
+    if (graph->mode == graph_eMode_Runtime)
+    {
+      switch (grow_GetMB3Action(graph->grow->ctx))
+      {
       case glow_eMB3Action_Close:
         grow_SetClickSensitivity(graph->grow->ctx, glow_mSensitivity_MB3Click);
         break;
@@ -4186,57 +4707,62 @@ static int graph_trace_grow_cb(GlowCtx* ctx, glow_tEvent event)
     }
     break;
   }
-  case glow_eEvent_HotRequest: {
-    if (grow_GetObjectType(event->object.object) == glow_eObjectType_GrowNode
-        || grow_GetObjectType(event->object.object)
-            == glow_eObjectType_GrowSlider
-        || grow_GetObjectType(event->object.object)
-            == glow_eObjectType_GrowGroup
-        || grow_GetObjectType(event->object.object)
-            == glow_eObjectType_GrowToolbar) {
+  case glow_eEvent_HotRequest:
+  {
+    if (grow_GetObjectType(event->object.object) == glow_eObjectType_GrowNode ||
+        grow_GetObjectType(event->object.object) == glow_eObjectType_GrowSlider ||
+        grow_GetObjectType(event->object.object) == glow_eObjectType_GrowGroup ||
+        grow_GetObjectType(event->object.object) == glow_eObjectType_GrowToolbar)
+    {
       GeDyn* dyn;
 
       grow_GetUserData(event->object.object, (void**)&dyn);
-      if (grow_GetObjectType(event->object.object)
-          == glow_eObjectType_GrowSlider) {
-        if (dyn->get_slider_disabled()) {
+      if (grow_GetObjectType(event->object.object) == glow_eObjectType_GrowSlider)
+      {
+        if (dyn->get_slider_disabled())
+        {
           if (ctx_popped)
             graph->grow->push();
           return 0;
         }
       }
-      if (graph->is_authorized(dyn->access)
-          && dyn->get_actiontype1(event->object.object)
-              & ~ge_mActionType1_Inherit) {
-        if (dyn->get_actiontype1(event->object.object)
-            & ~ge_mActionType1_PopupMenu) {
+      if (graph->is_authorized(dyn->access) &&
+          dyn->get_actiontype1(event->object.object) & ~ge_mActionType1_Inherit)
+      {
+        if (dyn->get_actiontype1(event->object.object) & ~ge_mActionType1_PopupMenu)
+        {
           if (ctx_popped)
             graph->grow->push();
           return int(glow_mHotType_CursorCrossHair);
-        } else {
+        }
+        else
+        {
           if (ctx_popped)
             graph->grow->push();
           return int(glow_mHotType_CursorHand);
         }
-      } else {
+      }
+      else
+      {
         if (ctx_popped)
           graph->grow->push();
         return 0;
       }
-    } else {
+    }
+    else
+    {
       if (ctx_popped)
         graph->grow->push();
       return 0;
     }
   }
-  case glow_eEvent_TipText: {
-    if (grow_GetObjectType(event->object.object) == glow_eObjectType_GrowNode
-        || grow_GetObjectType(event->object.object)
-            == glow_eObjectType_GrowSlider
-        || grow_GetObjectType(event->object.object)
-            == glow_eObjectType_GrowGroup
-        || grow_GetObjectType(event->object.object)
-            == glow_eObjectType_GrowToolbar) {
+  case glow_eEvent_TipText:
+  {
+    if (grow_GetObjectType(event->object.object) == glow_eObjectType_GrowNode ||
+        grow_GetObjectType(event->object.object) == glow_eObjectType_GrowSlider ||
+        grow_GetObjectType(event->object.object) == glow_eObjectType_GrowGroup ||
+        grow_GetObjectType(event->object.object) == glow_eObjectType_GrowToolbar)
+    {
       GeDyn* dyn;
 
       grow_GetUserData(event->object.object, (void**)&dyn);
@@ -4244,18 +4770,19 @@ static int graph_trace_grow_cb(GlowCtx* ctx, glow_tEvent event)
     }
     break;
   }
-  case glow_eEvent_SliderMoveEnd: {
+  case glow_eEvent_SliderMoveEnd:
+  {
     GeDyn* dyn;
 
     grow_GetUserData(event->object.object, (void**)&dyn);
     dyn->action(event->object.object, event);
 
-    grow_SetMoveRestrictions(
-        graph->grow->ctx, glow_eMoveRestriction_Disable, 0, 0, NULL);
+    grow_SetMoveRestrictions(graph->grow->ctx, glow_eMoveRestriction_Disable, 0, 0, NULL);
     graph->current_slider = NULL;
     break;
   }
-  case glow_eEvent_SliderMoveStart: {
+  case glow_eEvent_SliderMoveStart:
+  {
     GeDyn* dyn;
 
     grow_GetUserData(event->object.object, (void**)&dyn);
@@ -4263,20 +4790,25 @@ static int graph_trace_grow_cb(GlowCtx* ctx, glow_tEvent event)
 
     break;
   }
-  case glow_eEvent_SliderMoved: {
+  case glow_eEvent_SliderMoved:
+  {
     GeDyn* dyn;
 
     grow_GetUserData(event->object.object, (void**)&dyn);
     dyn->action(event->object.object, event);
     break;
   }
-  case glow_eEvent_MB3Click: {
-    if (graph->mode == graph_eMode_Runtime) {
-      switch (grow_GetMB3Action(graph->grow->ctx)) {
+  case glow_eEvent_MB3Click:
+  {
+    if (graph->mode == graph_eMode_Runtime)
+    {
+      switch (grow_GetMB3Action(graph->grow->ctx))
+      {
       case glow_eMB3Action_Close:
       case glow_eMB3Action_Both:
         // Close
-        if (graph->close_cb) {
+        if (graph->close_cb)
+        {
           if ((graph->close_cb)(graph->parent_ctx))
             return GLOW__TERMINATED;
         }
@@ -4286,11 +4818,15 @@ static int graph_trace_grow_cb(GlowCtx* ctx, glow_tEvent event)
     }
     break;
   }
-  case glow_eEvent_MB3Press: {
-    if (event->any.type == glow_eEventType_Table) {
-      switch (grow_GetMB3Action(graph->grow->ctx)) {
+  case glow_eEvent_MB3Press:
+  {
+    if (event->any.type == glow_eEventType_Table)
+    {
+      switch (grow_GetMB3Action(graph->grow->ctx))
+      {
       case glow_eMB3Action_PopupMenu:
-      case glow_eMB3Action_Both: {
+      case glow_eMB3Action_Both:
+      {
         GeDyn* dyn;
 
         grow_GetUserData(event->table.object, (void**)&dyn);
@@ -4304,38 +4840,28 @@ static int graph_trace_grow_cb(GlowCtx* ctx, glow_tEvent event)
 
     if (event->object.object_type == glow_eObjectType_NoObject)
       break;
-    if (!(grow_GetObjectType(event->object.object) == glow_eObjectType_GrowNode
-            || grow_GetObjectType(event->object.object)
-                == glow_eObjectType_GrowGroup
-            || grow_GetObjectType(event->object.object)
-                == glow_eObjectType_GrowToolbar
-            || grow_GetObjectType(event->object.object)
-                == glow_eObjectType_GrowWindow
-            || grow_GetObjectType(event->object.object)
-                == glow_eObjectType_GrowBar
-            || grow_GetObjectType(event->object.object)
-                == glow_eObjectType_GrowBarArc
-            || grow_GetObjectType(event->object.object)
-                == glow_eObjectType_GrowTable
-            || grow_GetObjectType(event->object.object)
-                == glow_eObjectType_GrowXYCurve
-            || grow_GetObjectType(event->object.object)
-                == glow_eObjectType_GrowTrend
-            || grow_GetObjectType(event->object.object)
-                == glow_eObjectType_GrowPie
-            || grow_GetObjectType(event->object.object)
-                == glow_eObjectType_GrowBarChart
-            || grow_GetObjectType(event->object.object)
-                == glow_eObjectType_GrowAxis
-            || grow_GetObjectType(event->object.object)
-                == glow_eObjectType_GrowAxisArc))
+    if (!(grow_GetObjectType(event->object.object) == glow_eObjectType_GrowNode ||
+          grow_GetObjectType(event->object.object) == glow_eObjectType_GrowGroup ||
+          grow_GetObjectType(event->object.object) == glow_eObjectType_GrowToolbar ||
+          grow_GetObjectType(event->object.object) == glow_eObjectType_GrowWindow ||
+          grow_GetObjectType(event->object.object) == glow_eObjectType_GrowBar ||
+          grow_GetObjectType(event->object.object) == glow_eObjectType_GrowBarArc ||
+          grow_GetObjectType(event->object.object) == glow_eObjectType_GrowTable ||
+          grow_GetObjectType(event->object.object) == glow_eObjectType_GrowXYCurve ||
+          grow_GetObjectType(event->object.object) == glow_eObjectType_GrowTrend ||
+          grow_GetObjectType(event->object.object) == glow_eObjectType_GrowPie ||
+          grow_GetObjectType(event->object.object) == glow_eObjectType_GrowBarChart ||
+          grow_GetObjectType(event->object.object) == glow_eObjectType_GrowAxis ||
+          grow_GetObjectType(event->object.object) == glow_eObjectType_GrowAxisArc))
       break;
     if (graph->mode != graph_eMode_Runtime)
       break;
 
-    switch (grow_GetMB3Action(graph->grow->ctx)) {
+    switch (grow_GetMB3Action(graph->grow->ctx))
+    {
     case glow_eMB3Action_PopupMenu:
-    case glow_eMB3Action_Both: {
+    case glow_eMB3Action_Both:
+    {
       GeDyn* dyn;
 
       grow_GetUserData(event->object.object, (void**)&dyn);
@@ -4347,24 +4873,27 @@ static int graph_trace_grow_cb(GlowCtx* ctx, glow_tEvent event)
     }
     break;
   }
-  case glow_eEvent_MB1Click: {
+  case glow_eEvent_MB1Click:
+  {
     GeDyn* dyn;
     int sts;
 
-    if (event->any.type == glow_eEventType_Table) {
+    if (event->any.type == glow_eEventType_Table)
+    {
       grow_GetUserData(event->table.object, (void**)&dyn);
       dyn->action(event->table.object, event);
       break;
     }
-    if (event->any.type == glow_eEventType_Toolbar) {
+    if (event->any.type == glow_eEventType_Toolbar)
+    {
       grow_GetUserData(event->toolbar.object, (void**)&dyn);
       dyn->action(event->toolbar.object, event);
       break;
     }
 
-    if (event->object.object_type == glow_eObjectType_NoObject
-        || grow_GetObjectType(event->object.object)
-            != glow_eObjectType_GrowMenu) {
+    if (event->object.object_type == glow_eObjectType_NoObject ||
+        grow_GetObjectType(event->object.object) != glow_eObjectType_GrowMenu)
+    {
       // Close any open menu, if not click in menu
       glow_sEvent e;
       grow_tObject* objectlist;
@@ -4376,12 +4905,12 @@ static int graph_trace_grow_cb(GlowCtx* ctx, glow_tEvent event)
       e.menu.object = 0;
 
       grow_GetObjectList(graph->grow->ctx, &objectlist, &object_cnt);
-      for (i = 0; i < object_cnt; i++) {
-        if ((grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowNode
-                || grow_GetObjectType(objectlist[i])
-                    == glow_eObjectType_GrowGroup)
-            && (event->object.object_type == glow_eObjectType_NoObject
-                   || objectlist[i] != event->object.object)) {
+      for (i = 0; i < object_cnt; i++)
+      {
+        if ((grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowNode ||
+             grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowGroup) &&
+            (event->object.object_type == glow_eObjectType_NoObject || objectlist[i] != event->object.object))
+        {
           grow_GetUserData(objectlist[i], (void**)&dyn);
           dyn->action(objectlist[i], &e);
           grow_GetObjectList(graph->grow->ctx, &objectlist, &cnt);
@@ -4394,33 +4923,28 @@ static int graph_trace_grow_cb(GlowCtx* ctx, glow_tEvent event)
 
     if (event->object.object_type == glow_eObjectType_NoObject)
       break;
-    if (grow_GetObjectType(event->object.object) == glow_eObjectType_GrowNode
-        || grow_GetObjectType(event->object.object)
-            == glow_eObjectType_GrowGroup
-        || grow_GetObjectType(event->object.object)
-            == glow_eObjectType_GrowToolbar
-        || grow_GetObjectType(event->object.object)
-            == glow_eObjectType_GrowWindow
-        || grow_GetObjectType(event->object.object) == glow_eObjectType_GrowBar
-        || grow_GetObjectType(event->object.object) == glow_eObjectType_GrowBarArc
-        || grow_GetObjectType(event->object.object)
-            == glow_eObjectType_GrowTable
-        || grow_GetObjectType(event->object.object)
-            == glow_eObjectType_GrowXYCurve
-        || grow_GetObjectType(event->object.object)
-            == glow_eObjectType_GrowTrend
-        || grow_GetObjectType(event->object.object) == glow_eObjectType_GrowPie
-        || grow_GetObjectType(event->object.object)
-            == glow_eObjectType_GrowBarChart
-        || grow_GetObjectType(event->object.object) == glow_eObjectType_GrowAxis
-        || grow_GetObjectType(event->object.object)
-            == glow_eObjectType_GrowAxisArc) {
+    if (grow_GetObjectType(event->object.object) == glow_eObjectType_GrowNode ||
+        grow_GetObjectType(event->object.object) == glow_eObjectType_GrowGroup ||
+        grow_GetObjectType(event->object.object) == glow_eObjectType_GrowToolbar ||
+        grow_GetObjectType(event->object.object) == glow_eObjectType_GrowWindow ||
+        grow_GetObjectType(event->object.object) == glow_eObjectType_GrowBar ||
+        grow_GetObjectType(event->object.object) == glow_eObjectType_GrowBarArc ||
+        grow_GetObjectType(event->object.object) == glow_eObjectType_GrowTable ||
+        grow_GetObjectType(event->object.object) == glow_eObjectType_GrowXYCurve ||
+        grow_GetObjectType(event->object.object) == glow_eObjectType_GrowTrend ||
+        grow_GetObjectType(event->object.object) == glow_eObjectType_GrowPie ||
+        grow_GetObjectType(event->object.object) == glow_eObjectType_GrowBarChart ||
+        grow_GetObjectType(event->object.object) == glow_eObjectType_GrowAxis ||
+        grow_GetObjectType(event->object.object) == glow_eObjectType_GrowAxisArc)
+    {
       grow_GetUserData(event->object.object, (void**)&dyn);
-      if (dyn) {
+      if (dyn)
+      {
         sts = dyn->action(event->object.object, event);
         if (sts == GLOW__TERMINATED)
           return sts;
-        else if (sts == GLOW__SUBTERMINATED || sts == GLOW__SWAPTERMINATED) {
+        else if (sts == GLOW__SUBTERMINATED || sts == GLOW__SWAPTERMINATED)
+        {
           if (ctx_popped)
             graph->grow->push();
           return sts;
@@ -4429,12 +4953,13 @@ static int graph_trace_grow_cb(GlowCtx* ctx, glow_tEvent event)
     }
     break;
   }
-  case glow_eEvent_MB1DoubleClick: {
+  case glow_eEvent_MB1DoubleClick:
+  {
     if (event->object.object_type == glow_eObjectType_NoObject)
       break;
-    if (grow_GetObjectType(event->object.object) == glow_eObjectType_GrowNode
-        || grow_GetObjectType(event->object.object)
-            == glow_eObjectType_GrowGroup) {
+    if (grow_GetObjectType(event->object.object) == glow_eObjectType_GrowNode ||
+        grow_GetObjectType(event->object.object) == glow_eObjectType_GrowGroup)
+    {
       GeDyn* dyn;
 
       grow_GetUserData(event->object.object, (void**)&dyn);
@@ -4442,10 +4967,12 @@ static int graph_trace_grow_cb(GlowCtx* ctx, glow_tEvent event)
     }
     break;
   }
-  case glow_eEvent_MB1DoubleClickCtrl: {
+  case glow_eEvent_MB1DoubleClickCtrl:
+  {
     break;
   }
-  case glow_eEvent_AnnotationInput: {
+  case glow_eEvent_AnnotationInput:
+  {
     GeDyn* dyn;
 
     grow_GetUserData(event->annot_input.object, (void**)&dyn);
@@ -4454,7 +4981,8 @@ static int graph_trace_grow_cb(GlowCtx* ctx, glow_tEvent event)
     break;
   }
   case glow_eEvent_InputFocusLost:
-  case glow_eEvent_InputFocusGained: {
+  case glow_eEvent_InputFocusGained:
+  {
     GeDyn* dyn;
 
     grow_GetUserData(event->object.object, (void**)&dyn);
@@ -4466,10 +4994,12 @@ static int graph_trace_grow_cb(GlowCtx* ctx, glow_tEvent event)
   case glow_eEvent_Key_Right:
   case glow_eEvent_Key_Up:
   case glow_eEvent_Key_Down:
-  case glow_eEvent_Key_Return: {
+  case glow_eEvent_Key_Return:
+  {
     GeDyn* dyn;
 
-    if (!(event->object.object_type == glow_eObjectType_NoObject)) {
+    if (!(event->object.object_type == glow_eObjectType_NoObject))
+    {
       grow_GetUserData(event->object.object, (void**)&dyn);
       dyn->action(event->object.object, event);
     }
@@ -4478,23 +5008,26 @@ static int graph_trace_grow_cb(GlowCtx* ctx, glow_tEvent event)
   case glow_eEvent_Key_Tab:
   case glow_eEvent_Key_ShiftTab:
   case glow_eEvent_Key_Escape:
-  case glow_eEvent_InputFocusInit: {
+  case glow_eEvent_InputFocusInit:
+  {
     GeDyn* dyn;
 
-    if (event->object.object_type == glow_eObjectType_NoObject) {
+    if (event->object.object_type == glow_eObjectType_NoObject)
+    {
       grow_tObject* objectlist;
       int object_cnt;
       int new_object_cnt;
       int i;
 
       grow_GetObjectList(graph->grow->ctx, &objectlist, &object_cnt);
-      for (i = 0; i < object_cnt; i++) {
-        if (grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowNode
-            || grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowSlider
-            || grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowGroup
-            || grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowToolbar
-            || grow_GetObjectType(objectlist[i])
-                == glow_eObjectType_GrowWindow) {
+      for (i = 0; i < object_cnt; i++)
+      {
+        if (grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowNode ||
+            grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowSlider ||
+            grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowGroup ||
+            grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowToolbar ||
+            grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowWindow)
+        {
           grow_GetUserData(objectlist[i], (void**)&dyn);
           dyn->action(objectlist[i], event);
 
@@ -4504,22 +5037,28 @@ static int graph_trace_grow_cb(GlowCtx* ctx, glow_tEvent event)
             break;
         }
       }
-    } else {
+    }
+    else
+    {
       grow_GetUserData(event->object.object, (void**)&dyn);
       dyn->action(event->object.object, event);
     }
     break;
   }
 
-  case glow_eEvent_Key_CtrlAscii: {
-    if (event->key.ascii == 23) {
+  case glow_eEvent_Key_CtrlAscii:
+  {
+    if (event->key.ascii == 23)
+    {
       // Ctrl W, close graph
-      if (graph->close_cb) {
+      if (graph->close_cb)
+      {
         if ((graph->close_cb)(graph->parent_ctx))
           return GLOW__TERMINATED;
       }
     }
-    if (event->object.object_type != glow_eObjectType_NoObject) {
+    if (event->object.object_type != glow_eObjectType_NoObject)
+    {
       GeDyn* dyn;
 
       grow_GetUserData(event->object.object, (void**)&dyn);
@@ -4530,7 +5069,8 @@ static int graph_trace_grow_cb(GlowCtx* ctx, glow_tEvent event)
 
   case glow_eEvent_MenuActivated:
   case glow_eEvent_MenuCreate:
-  case glow_eEvent_MenuDelete: {
+  case glow_eEvent_MenuDelete:
+  {
     grow_tObject* objectlist;
     int object_cnt;
     int new_object_cnt;
@@ -4539,55 +5079,61 @@ static int graph_trace_grow_cb(GlowCtx* ctx, glow_tEvent event)
     int sts;
 
     grow_GetObjectList(graph->grow->ctx, &objectlist, &object_cnt);
-    for (i = 0; i < object_cnt; i++) {
-      if (grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowNode
-          || grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowGroup
-          || grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowToolbar
-          || grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowDashCell) {
+    for (i = 0; i < object_cnt; i++)
+    {
+      if (grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowNode ||
+          grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowGroup ||
+          grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowToolbar ||
+          grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowDashCell)
+      {
 
-	if (grow_GetObjectType(objectlist[i]) != glow_eObjectType_GrowDashCell) {
-	  grow_GetUserData(objectlist[i], (void**)&dyn);
-	  sts = dyn->action(objectlist[i], event);
-	  if (sts == GLOW__TERMINATED)
-	    return sts;
-	}
+        if (grow_GetObjectType(objectlist[i]) != glow_eObjectType_GrowDashCell)
+        {
+          grow_GetUserData(objectlist[i], (void**)&dyn);
+          sts = dyn->action(objectlist[i], event);
+          if (sts == GLOW__TERMINATED)
+            return sts;
+        }
 
-	if (grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowGroup ||
-	    grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowDashCell) {
-	  grow_tObject* gobjectlist;
-	  int gobject_cnt, gnew_object_cnt;
-	  int j;
+        if (grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowGroup ||
+            grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowDashCell)
+        {
+          grow_tObject* gobjectlist;
+          int gobject_cnt, gnew_object_cnt;
+          int j;
 
-	  grow_GetGroupObjectList(objectlist[i], &gobjectlist, &gobject_cnt);
+          grow_GetGroupObjectList(objectlist[i], &gobjectlist, &gobject_cnt);
 
-	  for (j = 0; j < gobject_cnt; j++) {
-	    if (grow_GetObjectType(gobjectlist[j]) == glow_eObjectType_GrowNode
-		|| grow_GetObjectType(gobjectlist[j]) == glow_eObjectType_GrowGroup
-		|| grow_GetObjectType(gobjectlist[j])
-		== glow_eObjectType_GrowToolbar) {
-	      grow_GetUserData(gobjectlist[j], (void**)&dyn);
-	      sts = dyn->action(gobjectlist[j], event);
-	      if (sts == GLOW__TERMINATED)
-		return sts;
+          for (j = 0; j < gobject_cnt; j++)
+          {
+            if (grow_GetObjectType(gobjectlist[j]) == glow_eObjectType_GrowNode ||
+                grow_GetObjectType(gobjectlist[j]) == glow_eObjectType_GrowGroup ||
+                grow_GetObjectType(gobjectlist[j]) == glow_eObjectType_GrowToolbar)
+            {
+              grow_GetUserData(gobjectlist[j], (void**)&dyn);
+              sts = dyn->action(gobjectlist[j], event);
+              if (sts == GLOW__TERMINATED)
+                return sts;
 
-	      // Check if anything is deleted
-	      grow_GetGroupObjectList(objectlist[i], &gobjectlist, &gnew_object_cnt);
-	      if (gnew_object_cnt != gobject_cnt)
-		break;
-	    }
-	  }
-	}
+              // Check if anything is deleted
+              grow_GetGroupObjectList(objectlist[i], &gobjectlist, &gnew_object_cnt);
+              if (gnew_object_cnt != gobject_cnt)
+                break;
+            }
+          }
+        }
 
         // Check if anything is deleted
         grow_GetObjectList(graph->grow->ctx, &objectlist, &new_object_cnt);
         if (new_object_cnt != object_cnt)
-	  break;
+          break;
       }
     }
     break;
   }
 
-  case glow_eEvent_Translate: {
+  case glow_eEvent_Translate:
+  {
     static char new_text[200];
     int sts;
 
@@ -4599,15 +5145,15 @@ static int graph_trace_grow_cb(GlowCtx* ctx, glow_tEvent event)
     return sts;
   }
   case glow_eEvent_GrowDynamics:
-    graph->exec_dynamic(event->dynamics.object, event->dynamics.code,
-        event->dynamics.dynamic_type);
+    graph->exec_dynamic(event->dynamics.object, event->dynamics.code, event->dynamics.dynamic_type);
     break;
-  case glow_eEvent_Signal: {
+  case glow_eEvent_Signal:
+  {
     if (event->signal.object_type == glow_eObjectType_NoObject)
       break;
-    if (grow_GetObjectType(event->signal.object) == glow_eObjectType_GrowNode
-        || grow_GetObjectType(event->signal.object)
-            == glow_eObjectType_GrowGroup) {
+    if (grow_GetObjectType(event->signal.object) == glow_eObjectType_GrowNode ||
+        grow_GetObjectType(event->signal.object) == glow_eObjectType_GrowGroup)
+    {
       GeDyn* dyn;
       int sts;
 
@@ -4615,7 +5161,8 @@ static int graph_trace_grow_cb(GlowCtx* ctx, glow_tEvent event)
       sts = dyn->action(event->signal.object, event);
       if (sts == GLOW__TERMINATED)
         return GLOW__NO_PROPAGATE;
-      else if (sts == GLOW__SUBTERMINATED || sts == GLOW__SWAPTERMINATED) {
+      else if (sts == GLOW__SUBTERMINATED || sts == GLOW__SWAPTERMINATED)
+      {
         if (ctx_popped)
           graph->grow->push();
         return GLOW__NO_PROPAGATE;
@@ -4623,40 +5170,45 @@ static int graph_trace_grow_cb(GlowCtx* ctx, glow_tEvent event)
     }
     break;
   }
-  case glow_eEvent_Resized: {
-    if (graph->options & graph_mOption_ResizeReconfigure) {
+  case glow_eEvent_Resized:
+  {
+    if (graph->options & graph_mOption_ResizeReconfigure)
+    {
       char name[80];
       int w, h;
 
       grow_GetWindowSize(graph->grow->ctx, &w, &h);
-      if (graph->reconfigure_width == 0 && graph->reconfigure_height == 0) {
-	graph->reconfigure_width = w;
-	graph->reconfigure_height = h;
-	break;
+      if (graph->reconfigure_width == 0 && graph->reconfigure_height == 0)
+      {
+        graph->reconfigure_width = w;
+        graph->reconfigure_height = h;
+        break;
       }
-      if (abs(graph->reconfigure_width - w) > 50 || abs(graph->reconfigure_height - h) > 50) {
-	graph->get_name(name);
-	graph->trace_timer_remove();
-	grow_TraceClose(graph->grow->ctx);
-	graph->trace_started = 0;
-	graph->clear_all();
-	grow_SetNodraw(graph->grow->ctx);
-	graph->read_scriptfile(name);
-	grow_TraceInit(graph->grow->ctx, graph_trace_connect_bc,
-	    graph_trace_disconnect_bc, graph_trace_scan_bc, graph_trace_ctrl_bc);
-	grow_SetDefaultLayout(graph->grow->ctx);
-	grow_ResetNodraw(graph->grow->ctx);
-	graph->trace_started = 1;
-	graph->trace_scan(graph);
-	graph->reconfigure_width = w;
-	graph->reconfigure_height = h;
+      if (abs(graph->reconfigure_width - w) > 50 || abs(graph->reconfigure_height - h) > 50)
+      {
+        graph->get_name(name);
+        graph->trace_timer_remove();
+        grow_TraceClose(graph->grow->ctx);
+        graph->trace_started = 0;
+        graph->clear_all();
+        grow_SetNodraw(graph->grow->ctx);
+        graph->read_scriptfile(name);
+        grow_TraceInit(graph->grow->ctx, graph_trace_connect_bc, graph_trace_disconnect_bc,
+                       graph_trace_scan_bc, graph_trace_ctrl_bc);
+        grow_SetDefaultLayout(graph->grow->ctx);
+        grow_ResetNodraw(graph->grow->ctx);
+        graph->trace_started = 1;
+        graph->trace_scan(graph);
+        graph->reconfigure_width = w;
+        graph->reconfigure_height = h;
       }
     }
 
     break;
   }
   case glow_eEvent_Open:
-  case glow_eEvent_Close: {
+  case glow_eEvent_Close:
+  {
     grow_tObject* objectlist;
     int object_cnt;
     int i;
@@ -4664,14 +5216,16 @@ static int graph_trace_grow_cb(GlowCtx* ctx, glow_tEvent event)
     int sts;
 
     grow_GetObjectList(graph->grow->ctx, &objectlist, &object_cnt);
-    for (i = 0; i < object_cnt; i++) {
-      if (grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowNode
-          || grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowGroup
-          || grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowToolbar) {
-	grow_GetUserData(objectlist[i], (void**)&dyn);
-	sts = dyn->action(objectlist[i], event);
-	if (sts == GLOW__TERMINATED)
-	  return sts;
+    for (i = 0; i < object_cnt; i++)
+    {
+      if (grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowNode ||
+          grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowGroup ||
+          grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowToolbar)
+      {
+        grow_GetUserData(objectlist[i], (void**)&dyn);
+        sts = dyn->action(objectlist[i], event);
+        if (sts == GLOW__TERMINATED)
+          return sts;
       }
     }
     break;
@@ -4703,15 +5257,18 @@ void Graph::connect(grow_tObject object, char* attr_name, int second)
   char* s;
   pwr_tAName name;
 
-  if ((s = strstr(attr_name, "-Template.")) != 0) {
+  if ((s = strstr(attr_name, "-Template.")) != 0)
+  {
     // This is a class graph, replace the template object with '$object'
 
     strcpy(name, "$object.");
     strcat(name, s + strlen("-Template."));
-  } else
+  }
+  else
     strcpy(name, attr_name);
 
-  if (grow_GetObjectType(object) == glow_eObjectType_GrowDashCell) {
+  if (grow_GetObjectType(object) == glow_eObjectType_GrowDashCell)
+  {
     GeDash* dash;
 
     grow_GetUserData(object, (void**)&dash);
@@ -4719,7 +5276,9 @@ void Graph::connect(grow_tObject object, char* attr_name, int second)
       dash->set_attribute(object, name, second);
     else
       message('E', "No dynamics for this object");
-  } else {  
+  }
+  else
+  {
     grow_GetUserData(object, (void**)&dyn);
     if (dyn)
       dyn->set_attribute(object, name, second);
@@ -4736,10 +5295,13 @@ int Graph::set_object_focus(const char* name, int empty)
   grow_tObject object;
   GeDyn* dyn;
 
-  if (!name) {
+  if (!name)
+  {
     // Remove focus
     grow_ResetInputFocusAll(grow->ctx);
-  } else {
+  }
+  else
+  {
     // Set focus
     if (!change_value_cb)
       return 0;
@@ -4758,8 +5320,7 @@ int Graph::set_object_focus(const char* name, int empty)
     if (!is_authorized(dyn->access))
       return GE__NOACCESS;
 
-    if (action_type1 & ge_mActionType1_InputFocus
-        || action_type1 & ge_mActionType1_ValueInput)
+    if (action_type1 & ge_mActionType1_InputFocus || action_type1 & ge_mActionType1_ValueInput)
       grow_SetObjectInputFocus(object, 1, glow_eEvent_Null);
   }
   return GE__SUCCESS;
@@ -4797,18 +5358,18 @@ int Graph::set_subwindow_source(const char* name, char* source, char* owner)
   if (grow_GetObjectType(object) != glow_eObjectType_GrowWindow)
     return 0;
 
-  if ( grow_GetWindowCtx(object) == ctx)
+  if (grow_GetWindowCtx(object) == ctx)
     remove_self = true;
 
-  grow_EnableEvent(grow->ctx, glow_eEvent_Translate, glow_eEventType_CallBack,
-      graph_grow_cb);
+  grow_EnableEvent(grow->ctx, glow_eEvent_Translate, glow_eEventType_CallBack, graph_grow_cb);
 
   sts = grow_SetWindowSource(object, source, owner);
 
   grow_DisableEvent(grow->ctx, glow_eEvent_Translate);
 
-  if (ctx != grow->ctx) {
-    if ( remove_self)
+  if (ctx != grow->ctx)
+  {
+    if (remove_self)
       ctx = 0; // Should not be used!!
     grow->pop(ctx);
   }
@@ -4825,22 +5386,16 @@ int Graph::sound(pwr_tAttrRef* aref)
   return 1;
 }
 
-int Graph::export_plcfo(char* filename)
-{
-  return grow_ExportFlow(grow->ctx, filename);
-}
+int Graph::export_plcfo(char* filename) { return grow_ExportFlow(grow->ctx, filename); }
 
-static int script_dyn_cb(void *dyn, grow_tObject o, std::ofstream& fp, char *indentation)
+static int script_dyn_cb(void* dyn, grow_tObject o, std::ofstream& fp, char* indentation)
 {
   char prefix[80] = "";
 
-  return ((GeDyn *)dyn)->export_script(o, fp, indentation, prefix);
+  return ((GeDyn*)dyn)->export_script(o, fp, indentation, prefix);
 }
 
-int Graph::export_script(char* filename)
-{
-  return grow_ExportScript(grow->ctx, filename, script_dyn_cb);
-}
+int Graph::export_script(char* filename) { return grow_ExportScript(grow->ctx, filename, script_dyn_cb); }
 
 void Graph::get_command(char* in, char* out, GeDyn* dyn)
 {
@@ -4850,17 +5405,22 @@ void Graph::get_command(char* in, char* out, GeDyn* dyn)
   bool object_found = false;
 
   pwr_tAName oname[4];
-  if (grow->stack_cnt == 0) {
+  if (grow->stack_cnt == 0)
+  {
     for (int i = 0; i < 4; i++)
       strcpy(oname[i], object_name[i]);
-  } else {
+  }
+  else
+  {
     grow_GetOwner(grow->ctx, oname[0]);
 
-    if (!streq(object_name[0], "")) {
+    if (!streq(object_name[0], ""))
+    {
       pwr_tOName n;
       t0 = n;
       s0 = oname[0];
-      while ((s = strstr(s0, "$object"))) {
+      while ((s = strstr(s0, "$object")))
+      {
         strncpy(t0, s0, s - s0);
         t0 += s - s0;
         strcpy(t0, object_name[0]);
@@ -4874,15 +5434,16 @@ void Graph::get_command(char* in, char* out, GeDyn* dyn)
       strcpy(oname[i], object_name[i]);
   }
   s0 = in;
-  if (dyn && (dyn->total_dyn_type1 & ge_mDynType1_HostObject
-                 || !streq(dyn->recursive_hostobject, ""))) {
+  if (dyn && (dyn->total_dyn_type1 & ge_mDynType1_HostObject || !streq(dyn->recursive_hostobject, "")))
+  {
     pwr_tAName hostobject;
 
     dyn->get_hostobject(hostobject);
 
     t0 = str;
     s0 = in;
-    while ((s = strstr(s0, "$hostobject"))) {
+    while ((s = strstr(s0, "$hostobject")))
+    {
       str_Strncpy(t0, s0, s - s0);
       t0 += s - s0;
       strcpy(t0, hostobject);
@@ -4891,21 +5452,27 @@ void Graph::get_command(char* in, char* out, GeDyn* dyn)
     }
     str_Strcpy(t0, s0);
 
-    if (streq(oname[0], "")) {
+    if (streq(oname[0], ""))
+    {
       strcpy(out, str);
     }
     s0 = str;
-  } else if (streq(oname[0], "")) {
+  }
+  else if (streq(oname[0], ""))
+  {
     str_Strcpy(out, in);
   }
 
-  if (!streq(oname[0], "")) {
+  if (!streq(oname[0], ""))
+  {
     t0 = out;
-    while ((s = strstr(s0, "$object"))) {
+    while ((s = strstr(s0, "$object")))
+    {
       int idx;
       object_found = true;
       char* sidx = s + strlen("$object");
-      switch (*sidx) {
+      switch (*sidx)
+      {
       case '2':
         idx = 1;
         break;
@@ -4929,9 +5496,11 @@ void Graph::get_command(char* in, char* out, GeDyn* dyn)
 
     t0 = out;
   }
-  if ((s = strchr(out, '&')) && *(s + 1) == '(') {
+  if ((s = strchr(out, '&')) && *(s + 1) == '(')
+  {
     // Replace attribute in parenthesis with its value
-    if (*(s + 2) == '&' && *(s + 3) == '(') {
+    if (*(s + 2) == '&' && *(s + 3) == '(')
+    {
       pwr_tAName refname;
       pwr_sAttrRef aref;
       pwr_tStatus sts;
@@ -4967,21 +5536,23 @@ void Graph::get_command(char* in, char* out, GeDyn* dyn)
       if (EVEN(sts))
         return;
 
-      switch (atid) {
-      case pwr_eType_AttrRef: {
+      switch (atid)
+      {
+      case pwr_eType_AttrRef:
+      {
         pwr_tAttrRef aref;
 
         sts = gdh_GetObjectInfo(refname, &aref, sizeof(aref));
         if (EVEN(sts))
           return;
 
-        sts = gdh_AttrrefToName(
-            &aref, str, sizeof(str), cdh_mName_volumeStrict);
+        sts = gdh_AttrrefToName(&aref, str, sizeof(str), cdh_mName_volumeStrict);
         if (EVEN(sts))
           return;
         break;
       }
-      case pwr_eType_Objid: {
+      case pwr_eType_Objid:
+      {
         pwr_tOid oid;
 
         sts = gdh_GetObjectInfo(refname, &oid, sizeof(oid));
@@ -4993,7 +5564,8 @@ void Graph::get_command(char* in, char* out, GeDyn* dyn)
           return;
         break;
       }
-      case pwr_eType_String: {
+      case pwr_eType_String:
+      {
         sts = gdh_GetObjectInfo(refname, str, sizeof(str));
         if (EVEN(sts))
           return;
@@ -5005,7 +5577,9 @@ void Graph::get_command(char* in, char* out, GeDyn* dyn)
       }
       strcat(str, end);
       strcpy(start, str);
-    } else {
+    }
+    else
+    {
       pwr_tAName refname;
       pwr_tStatus sts;
       char *start, *end;
@@ -5024,21 +5598,23 @@ void Graph::get_command(char* in, char* out, GeDyn* dyn)
       if (EVEN(sts))
         return;
 
-      switch (atid) {
-      case pwr_eType_AttrRef: {
+      switch (atid)
+      {
+      case pwr_eType_AttrRef:
+      {
         pwr_tAttrRef aref;
 
         sts = gdh_GetObjectInfo(refname, &aref, sizeof(aref));
         if (EVEN(sts))
           return;
 
-        sts = gdh_AttrrefToName(
-            &aref, str, sizeof(str), cdh_mName_volumeStrict);
+        sts = gdh_AttrrefToName(&aref, str, sizeof(str), cdh_mName_volumeStrict);
         if (EVEN(sts))
           return;
         break;
       }
-      case pwr_eType_Objid: {
+      case pwr_eType_Objid:
+      {
         pwr_tOid oid;
 
         sts = gdh_GetObjectInfo(refname, &oid, sizeof(oid));
@@ -5050,7 +5626,8 @@ void Graph::get_command(char* in, char* out, GeDyn* dyn)
           return;
         break;
       }
-      case pwr_eType_String: {
+      case pwr_eType_String:
+      {
         sts = gdh_GetObjectInfo(refname, str, sizeof(str));
         if (EVEN(sts))
           return;
@@ -5067,8 +5644,10 @@ void Graph::get_command(char* in, char* out, GeDyn* dyn)
   }
 
   // Translate index variable
-  for (int i = 0; i < 2; i++) {
-    if ((s = strstr(out, "[&("))) {
+  for (int i = 0; i < 2; i++)
+  {
+    if ((s = strstr(out, "[&(")))
+    {
       int idx;
       pwr_tAName iname, rest;
       pwr_tStatus sts;
@@ -5079,51 +5658,66 @@ void Graph::get_command(char* in, char* out, GeDyn* dyn)
       strcpy(iname, s + 2);
       s1 = strchr(iname, ')');
       strncpy(rest, s1 + 1, sizeof(rest));
-      if (s1) {
+      if (s1)
+      {
         *s1 = 0;
         sts = gdh_GetObjectInfo(iname, &idx, sizeof(idx));
-        if (ODD(sts) && idx >= 0 && idx <= 100) {
+        if (ODD(sts) && idx >= 0 && idx <= 100)
+        {
           len = sprintf(s, "%d", idx);
           strcpy(s + len, rest);
         }
-      } else
+      }
+      else
         break;
-    } else
+    }
+    else
       break;
   }
 
-  if (object_found) {
-    for (int i = 0; i < 4; i++) {
+  if (object_found)
+  {
+    for (int i = 0; i < 4; i++)
+    {
       // Remove attribute before
-      if ((s = strstr(out, ".<"))) {
+      if ((s = strstr(out, ".<")))
+      {
         pwr_tAName rest;
 
         strcpy(rest, s + 2);
-        for (s--; s >= out; s--) {
-          if (*s == '.') {
+        for (s--; s >= out; s--)
+        {
+          if (*s == '.')
+          {
             strcpy(s, rest);
             break;
           }
         }
-      } else
+      }
+      else
         break;
       if (s == out)
         break;
     }
 
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; i++)
+    {
       // Remove segment name before
-      if ((s = strstr(out, "-<"))) {
+      if ((s = strstr(out, "-<")))
+      {
         pwr_tAName rest;
 
         strcpy(rest, s + 2);
-        for (s--; s >= out; s--) {
-          if (*s == '-') {
+        for (s--; s >= out; s--)
+        {
+          if (*s == '-')
+          {
             strcpy(s, rest);
             break;
           }
         }
-      } else
+      }
+      else
         break;
       if (s == out)
         break;
@@ -5131,9 +5725,9 @@ void Graph::get_command(char* in, char* out, GeDyn* dyn)
   }
 }
 
-int Graph::get_refupdate(char* in, pwr_tAName ref[], pwr_tTid ref_tid[],
-    int ref_size[], int* ref_cnt, pwr_tAName idx_ref[], pwr_tTid idx_ref_tid[],
-    int idx_ref_size[], int* idx_ref_cnt, GeDyn* dyn)
+int Graph::get_refupdate(char* in, pwr_tAName ref[], pwr_tTid ref_tid[], int ref_size[], int* ref_cnt,
+                         pwr_tAName idx_ref[], pwr_tTid idx_ref_tid[], int idx_ref_size[], int* idx_ref_cnt,
+                         GeDyn* dyn)
 {
   char *s, *t0;
   char* s0 = in;
@@ -5145,17 +5739,22 @@ int Graph::get_refupdate(char* in, pwr_tAName ref[], pwr_tTid ref_tid[],
   *idx_ref_cnt = 0;
 
   pwr_tAName oname[4];
-  if (grow->stack_cnt == 0) {
+  if (grow->stack_cnt == 0)
+  {
     for (int i = 0; i < 4; i++)
       strcpy(oname[i], object_name[i]);
-  } else {
+  }
+  else
+  {
     grow_GetOwner(grow->ctx, oname[0]);
 
-    if (!streq(object_name[0], "")) {
+    if (!streq(object_name[0], ""))
+    {
       pwr_tOName n;
       t0 = n;
       s0 = oname[0];
-      while ((s = strstr(s0, "$object"))) {
+      while ((s = strstr(s0, "$object")))
+      {
         strncpy(t0, s0, s - s0);
         t0 += s - s0;
         strcpy(t0, object_name[0]);
@@ -5169,15 +5768,16 @@ int Graph::get_refupdate(char* in, pwr_tAName ref[], pwr_tTid ref_tid[],
       strcpy(oname[i], object_name[i]);
   }
   s0 = in;
-  if (dyn && (dyn->total_dyn_type1 & ge_mDynType1_HostObject
-                 || !streq(dyn->recursive_hostobject, ""))) {
+  if (dyn && (dyn->total_dyn_type1 & ge_mDynType1_HostObject || !streq(dyn->recursive_hostobject, "")))
+  {
     pwr_tAName hostobject;
 
     dyn->get_hostobject(hostobject);
 
     t0 = str;
     s0 = in;
-    while ((s = strstr(s0, "$hostobject"))) {
+    while ((s = strstr(s0, "$hostobject")))
+    {
       str_Strncpy(t0, s0, s - s0);
       t0 += s - s0;
       strcpy(t0, hostobject);
@@ -5186,21 +5786,27 @@ int Graph::get_refupdate(char* in, pwr_tAName ref[], pwr_tTid ref_tid[],
     }
     str_Strcpy(t0, s0);
 
-    if (streq(oname[0], "")) {
+    if (streq(oname[0], ""))
+    {
       strcpy(out, str);
     }
     s0 = str;
-  } else if (streq(oname[0], "")) {
+  }
+  else if (streq(oname[0], ""))
+  {
     str_Strcpy(out, in);
   }
 
-  if (!streq(oname[0], "")) {
+  if (!streq(oname[0], ""))
+  {
     t0 = out;
-    while ((s = strstr(s0, "$object"))) {
+    while ((s = strstr(s0, "$object")))
+    {
       int idx;
       object_found = true;
       char* sidx = s + strlen("$object");
-      switch (*sidx) {
+      switch (*sidx)
+      {
       case '2':
         idx = 1;
         break;
@@ -5226,8 +5832,10 @@ int Graph::get_refupdate(char* in, pwr_tAName ref[], pwr_tTid ref_tid[],
   }
 
   // Get index variables and replace
-  for (int i = 0; i < 2; i++) {
-    if ((s = strstr(out, "[&("))) {
+  for (int i = 0; i < 2; i++)
+  {
+    if ((s = strstr(out, "[&(")))
+    {
       int idx;
       pwr_tAName iname, rest;
       pwr_tStatus sts;
@@ -5243,7 +5851,8 @@ int Graph::get_refupdate(char* in, pwr_tAName ref[], pwr_tTid ref_tid[],
       *s1 = 0;
 
       sts = gdh_GetObjectInfo(iname, &idx, sizeof(idx));
-      if (ODD(sts) && idx >= 0 && idx <= 100) {
+      if (ODD(sts) && idx >= 0 && idx <= 100)
+      {
         len = sprintf(s, "%d", idx);
         strcpy(s + len, rest);
       }
@@ -5251,14 +5860,17 @@ int Graph::get_refupdate(char* in, pwr_tAName ref[], pwr_tTid ref_tid[],
       idx_ref_size[*ref_cnt] = sizeof(pwr_tInt32);
       idx_ref_tid[*ref_cnt] = pwr_eType_Int32;
       (*idx_ref_cnt)++;
-    } else
+    }
+    else
       break;
   }
 
   // Get references
-  if ((s = strchr(out, '&')) && *(s + 1) == '(') {
+  if ((s = strchr(out, '&')) && *(s + 1) == '(')
+  {
     // Replace attribute in parenthesis with its value
-    if (*(s + 2) == '&' && *(s + 3) == '(') {
+    if (*(s + 2) == '&' && *(s + 3) == '(')
+    {
       pwr_tAName refname;
       pwr_tStatus sts;
       char *start, *end, *start2;
@@ -5283,34 +5895,36 @@ int Graph::get_refupdate(char* in, pwr_tAName ref[], pwr_tTid ref_tid[],
 
       end = start + strlen(refname) + 5;
       start2 = s + 1;
-      switch (atid) {
-      case pwr_eType_AttrRef: {
+      switch (atid)
+      {
+      case pwr_eType_AttrRef:
+      {
         pwr_tAttrRef aref;
 
         sts = gdh_GetObjectInfo(refname, &aref, sizeof(aref));
         if (EVEN(sts))
           return sts;
 
-        sts = gdh_AttrrefToName(
-            &aref, str, sizeof(str), cdh_mName_volumeStrict);
+        sts = gdh_AttrrefToName(&aref, str, sizeof(str), cdh_mName_volumeStrict);
         if (EVEN(sts))
           return sts;
         break;
       }
-      case pwr_eType_DataRef: {
+      case pwr_eType_DataRef:
+      {
         pwr_tDataRef dref;
 
         sts = gdh_GetObjectInfo(refname, &dref, sizeof(dref));
         if (EVEN(sts))
           return sts;
 
-        sts = gdh_AttrrefToName(
-            &dref.Aref, str, sizeof(str), cdh_mName_volumeStrict);
+        sts = gdh_AttrrefToName(&dref.Aref, str, sizeof(str), cdh_mName_volumeStrict);
         if (EVEN(sts))
           return sts;
         break;
       }
-      case pwr_eType_Objid: {
+      case pwr_eType_Objid:
+      {
         pwr_tOid oid;
 
         sts = gdh_GetObjectInfo(refname, &oid, sizeof(oid));
@@ -5342,8 +5956,9 @@ int Graph::get_refupdate(char* in, pwr_tAName ref[], pwr_tTid ref_tid[],
       ref_tid[*ref_cnt] = atid;
       ref_size[*ref_cnt] = asize;
       (*ref_cnt)++;
-
-    } else {
+    }
+    else
+    {
       pwr_tAName refname;
       pwr_tStatus sts;
       char *start, *end;
@@ -5372,8 +5987,8 @@ int Graph::get_refupdate(char* in, pwr_tAName ref[], pwr_tTid ref_tid[],
   return GE__SUCCESS;
 }
 
-graph_eDatabase Graph::parse_attr_name(char* name, char* parsed_name,
-    int* inverted, int* type, int* size, int* elem, graph_mParseOpt options)
+graph_eDatabase Graph::parse_attr_name(char* name, char* parsed_name, int* inverted, int* type, int* size,
+                                       int* elem, graph_mParseOpt options)
 {
   pwr_tAName str;
   pwr_tAName str1;
@@ -5382,68 +5997,96 @@ graph_eDatabase Graph::parse_attr_name(char* name, char* parsed_name,
 
   str_trim(str, name);
 
-  if ((s = strstr(str, "$user"))) {
-    if ((s = strchr(str, '#'))) {
-      if (streq(s, "##Float32")) {
+  if ((s = strstr(str, "$user")))
+  {
+    if ((s = strchr(str, '#')))
+    {
+      if (streq(s, "##Float32"))
+      {
         *type = pwr_eType_Float32;
         *size = sizeof(pwr_tFloat32);
-      } else if (streq(s, "##Float64")) {
+      }
+      else if (streq(s, "##Float64"))
+      {
         *type = pwr_eType_Float64;
         *size = sizeof(pwr_tFloat64);
-      } else if (streq(s, "##Int32")) {
+      }
+      else if (streq(s, "##Int32"))
+      {
         *type = pwr_eType_Int32;
         *size = sizeof(pwr_tInt32);
-      } else if (streq(s, "##Boolean")) {
+      }
+      else if (streq(s, "##Boolean"))
+      {
         *type = pwr_eType_Boolean;
         *size = sizeof(pwr_tBoolean);
-      } else {
+      }
+      else
+      {
         *type = pwr_eType_String;
         *size = 80;
       }
       *s = 0;
     }
-    if (str[0] == '!') {
+    if (str[0] == '!')
+    {
       *inverted = 1;
       str_trim(str, &str[1]);
-    } else
+    }
+    else
       *inverted = 0;
     strcpy(parsed_name, str);
 
     return graph_eDatabase_User;
   }
-  if ((s = strstr(str, "$local."))) {
+  if ((s = strstr(str, "$local.")))
+  {
     strcpy(parsed_name, s + strlen("$local."));
-    if ((s = strchr(parsed_name, '#'))) {
-      if (streq(s, "##Float32")) {
+    if ((s = strchr(parsed_name, '#')))
+    {
+      if (streq(s, "##Float32"))
+      {
         *type = pwr_eType_Float32;
         *size = sizeof(pwr_tFloat32);
-      } else if (streq(s, "##Float64")) {
+      }
+      else if (streq(s, "##Float64"))
+      {
         *type = pwr_eType_Float64;
         *size = sizeof(pwr_tFloat64);
-      } else if (streq(s, "##Int32")) {
+      }
+      else if (streq(s, "##Int32"))
+      {
         *type = pwr_eType_Int32;
         *size = sizeof(pwr_tInt32);
-      } else if (streq(s, "##Boolean")) {
+      }
+      else if (streq(s, "##Boolean"))
+      {
         *type = pwr_eType_Boolean;
         *size = sizeof(pwr_tBoolean);
-      } else {
+      }
+      else
+      {
         *type = pwr_eType_String;
         *size = 80;
       }
       *s = 0;
     }
-    if (str[0] == '!') {
+    if (str[0] == '!')
+    {
       *inverted = 1;
       str_trim(str, &str[1]);
-    } else
+    }
+    else
       *inverted = 0;
 
-    if (grow->stack_cnt) {
+    if (grow->stack_cnt)
+    {
       // Add suffix to make name unique for subwindow context
       char owner[256];
 
       grow_GetOwner(grow->ctx, owner);
-      if (!streq(owner, "")) {
+      if (!streq(owner, ""))
+      {
         strcat(parsed_name, "-");
         strcat(parsed_name, owner);
       }
@@ -5451,46 +6094,61 @@ graph_eDatabase Graph::parse_attr_name(char* name, char* parsed_name,
 
     return graph_eDatabase_Local;
   }
-  if ((s = strstr(str, "$ccm."))) {
+  if ((s = strstr(str, "$ccm.")))
+  {
     strcpy(parsed_name, s + strlen("$ccm."));
-    if ((s = strchr(parsed_name, '#'))) {
-      if (streq(s, "##Float32")) {
+    if ((s = strchr(parsed_name, '#')))
+    {
+      if (streq(s, "##Float32"))
+      {
         *type = pwr_eType_Float32;
         *size = sizeof(pwr_tFloat32);
-      } else if (streq(s, "##Int32")) {
+      }
+      else if (streq(s, "##Int32"))
+      {
         *type = pwr_eType_Int32;
         *size = sizeof(pwr_tInt32);
-      } else if (streq(s, "##Boolean")) {
+      }
+      else if (streq(s, "##Boolean"))
+      {
         *type = pwr_eType_Boolean;
         *size = sizeof(pwr_tBoolean);
-      } else {
+      }
+      else
+      {
         *type = pwr_eType_String;
         *size = 400;
       }
       *s = 0;
     }
-    if (str[0] == '!') {
+    if (str[0] == '!')
+    {
       *inverted = 1;
       str_trim(str, &str[1]);
-    } else
+    }
+    else
       *inverted = 0;
 
     return graph_eDatabase_Ccm;
   }
 
-  for (int i = 0; i < 4; i++) {
-    if ((s = strstr(str, "$object"))) {
+  for (int i = 0; i < 4; i++)
+  {
+    if ((s = strstr(str, "$object")))
+    {
       pwr_tAName oname[4];
       for (int i = 1; i < 4; i++)
         strcpy(oname[i], object_name[i]);
       if (grow->stack_cnt == 0)
         strcpy(oname[0], object_name[0]);
-      else {
+      else
+      {
         grow_GetOwner(grow->ctx, oname[0]);
 
         // Replace $object in oname (one level only)
         char* s1;
-        if ((s1 = strstr(oname[0], "$object"))) {
+        if ((s1 = strstr(oname[0], "$object")))
+        {
           strcpy(str1, s1 + strlen("$object"));
           strcpy(s1, object_name[0]);
           strcat(oname[0], str1);
@@ -5499,7 +6157,8 @@ graph_eDatabase Graph::parse_attr_name(char* name, char* parsed_name,
 
       int idx;
       char* sidx = s + strlen("$object");
-      switch (*sidx) {
+      switch (*sidx)
+      {
       case '2':
         idx = 1;
         break;
@@ -5515,14 +6174,18 @@ graph_eDatabase Graph::parse_attr_name(char* name, char* parsed_name,
       strcpy(str1, s + strlen("$object") + (idx > 0 ? 1 : 0));
       strcpy(s, oname[idx]);
       strcat(str, str1);
-    } else
+    }
+    else
       break;
   }
 
-  if (!(options & graph_mParseOpt_KeepIndex)) {
+  if (!(options & graph_mParseOpt_KeepIndex))
+  {
     // Translate index variable
-    for (int i = 0; i < 2; i++) {
-      if ((s = strstr(str, "[&("))) {
+    for (int i = 0; i < 2; i++)
+    {
+      if ((s = strstr(str, "[&(")))
+      {
         int idx;
         pwr_tAName iname, rest;
         pwr_tStatus sts;
@@ -5532,72 +6195,89 @@ graph_eDatabase Graph::parse_attr_name(char* name, char* parsed_name,
         strcpy(iname, s + 2);
         s1 = strchr(iname, ')');
         strncpy(rest, s1 + 1, sizeof(rest));
-        if (s1) {
+        if (s1)
+        {
           *s1 = 0;
           sts = gdh_GetObjectInfo(iname, &idx, sizeof(idx));
-          if (ODD(sts) && idx >= 0 && idx <= 100) {
+          if (ODD(sts) && idx >= 0 && idx <= 100)
+          {
             len = sprintf(s, "%d", idx);
             strcpy(s + len, rest);
           }
-        } else
+        }
+        else
           break;
-      } else
+      }
+      else
         break;
     }
   }
 
-  for (int i = 0; i < 4; i++) {
+  for (int i = 0; i < 4; i++)
+  {
     // Remove attribute before
-    if ((s = strstr(str, ".<"))) {
+    if ((s = strstr(str, ".<")))
+    {
       pwr_tAName rest;
 
       strcpy(rest, s + 2);
-      for (s--; s >= str; s--) {
-        if (*s == '.') {
+      for (s--; s >= str; s--)
+      {
+        if (*s == '.')
+        {
           strcpy(s, rest);
           break;
         }
       }
-    } else
+    }
+    else
       break;
     if (s == str)
       break;
   }
 
-  for (int i = 0; i < 4; i++) {
+  for (int i = 0; i < 4; i++)
+  {
     // Remove segment name before
-    if ((s = strstr(str, "-<"))) {
+    if ((s = strstr(str, "-<")))
+    {
       pwr_tAName rest;
 
       strcpy(rest, s + 2);
-      for (s--; s >= str; s--) {
-        if (*s == '-') {
+      for (s--; s >= str; s--)
+      {
+        if (*s == '-')
+        {
           strcpy(s, rest);
           break;
         }
       }
-    } else
+    }
+    else
       break;
     if (s == str)
       break;
   }
 
-  if (((s = strstr(str, "$node")) || (s = strstr(str, "$NODE")))
-      && mode != graph_eMode_Development) {
+  if (((s = strstr(str, "$node")) || (s = strstr(str, "$NODE"))) && mode != graph_eMode_Development)
+  {
     char nodename[80];
     pwr_tOid oid;
     pwr_tStatus sts;
 
-    if (!streq(object_name[0], "")) {
+    if (!streq(object_name[0], ""))
+    {
       sts = gdh_NameToObjid(object_name[0], &oid);
       if (ODD(sts))
         sts = gdh_GetNodeObject(oid.vid, &oid);
-    } else
+    }
+    else
       sts = gdh_GetNodeObject(0, &oid);
-    if (ODD(sts)) {
-      sts = gdh_ObjidToName(
-          oid, nodename, sizeof(nodename), cdh_mName_pathStrict);
-      if (ODD(sts)) {
+    if (ODD(sts))
+    {
+      sts = gdh_ObjidToName(oid, nodename, sizeof(nodename), cdh_mName_pathStrict);
+      if (ODD(sts))
+      {
         strcpy(str1, s + strlen("$node"));
         strcpy(s, nodename);
         strcat(str, str1);
@@ -5607,22 +6287,27 @@ graph_eDatabase Graph::parse_attr_name(char* name, char* parsed_name,
 
   if ((s = strstr(str, "##")))
     string_to_type(s + 2, (pwr_eType*)type, size, &elements);
-  else {
+  else
+  {
     *type = pwr_eType__;
     *size = 0;
   }
 
-  if ((s = strchr(str, '#'))) {
+  if ((s = strchr(str, '#')))
+  {
     *s = 0;
     if ((s1 = strchr(s + 1, '[')))
       strcat(str, s1);
   }
 
-  if (str[0] == '!') {
+  if (str[0] == '!')
+  {
     *inverted = 1;
     str_trim(str, &str[1]);
     strcpy(parsed_name, str);
-  } else {
+  }
+  else
+  {
     *inverted = 0;
     strcpy(parsed_name, str);
   }
@@ -5635,9 +6320,10 @@ int Graph::type_to_string(pwr_eType type, char* type_buf, int* size)
 {
   int i;
 
-  for (i = 0; i < int(sizeof(graph_type_table) / sizeof(graph_type_table[0]));
-       i++) {
-    if (graph_type_table[i].Type == type) {
+  for (i = 0; i < int(sizeof(graph_type_table) / sizeof(graph_type_table[0])); i++)
+  {
+    if (graph_type_table[i].Type == type)
+    {
       strcpy(type_buf, graph_type_table[i].TypeStr);
       if (size)
         *size = graph_type_table[i].Size;
@@ -5645,7 +6331,8 @@ int Graph::type_to_string(pwr_eType type, char* type_buf, int* size)
     }
   }
 
-  if (type == pwr_eType_String) {
+  if (type == pwr_eType_String)
+  {
     strcpy(type_buf, "String");
     if (size)
       *size = 1; /* This is not the real size */
@@ -5654,8 +6341,7 @@ int Graph::type_to_string(pwr_eType type, char* type_buf, int* size)
   return 0;
 }
 
-void Graph::string_to_type(
-    char* type_str, pwr_eType* type, int* size, int* elements)
+void Graph::string_to_type(char* type_str, pwr_eType* type, int* size, int* elements)
 {
   int i;
   int found;
@@ -5665,13 +6351,15 @@ void Graph::string_to_type(
   str_ToUpper(str, type_str);
 
   // Check if there is a array size
-  if ((s = strchr(str, '#'))) {
+  if ((s = strchr(str, '#')))
+  {
     if (!(s1 = strchr(s + 1, '[')))
       *elements = atoi(s + 1);
     else
       *elements = 1;
     *s = 0;
-  } else
+  }
+  else
     *elements = 1;
 
   // Default to float
@@ -5679,10 +6367,11 @@ void Graph::string_to_type(
   *size = 4;
 
   found = 0;
-  for (i = 0; i < int(sizeof(graph_type_table) / sizeof(graph_type_table[0]));
-       i++) {
+  for (i = 0; i < int(sizeof(graph_type_table) / sizeof(graph_type_table[0])); i++)
+  {
     str_ToUpper(table_str, (char*)graph_type_table[i].TypeStr);
-    if (streq(table_str, str)) {
+    if (streq(table_str, str))
+    {
       *size = graph_type_table[i].Size;
       *type = graph_type_table[i].Type;
       found = 1;
@@ -5690,19 +6379,24 @@ void Graph::string_to_type(
     }
   }
 
-  if (!found && str_StartsWith(str, "STRING")) {
+  if (!found && str_StartsWith(str, "STRING"))
+  {
     *type = pwr_eType_String;
     if (*(str + 6) == 0)
       *size = 80;
     else
       *size = atoi(str + 6);
-  } else if (!found && str_StartsWith(str, "TEXT")) {
+  }
+  else if (!found && str_StartsWith(str, "TEXT"))
+  {
     *type = pwr_eType_Text;
     if (*(str + 4) == 0)
       *size = 80;
     else
       *size = atoi(str + 4);
-  } else if (!found && str_StartsWith(str, "BIT")) {
+  }
+  else if (!found && str_StartsWith(str, "BIT"))
+  {
     *type = (pwr_eType)graph_eType_Bit;
     *size = 4;
   }
@@ -5711,22 +6405,17 @@ void Graph::string_to_type(
     *size *= *elements;
 }
 
-void Graph::get_systemname(char* name)
-{
-  strcpy(name, systemname);
-}
+void Graph::get_systemname(char* name) { strcpy(name, systemname); }
 
-void Graph::set_systemname(char* name)
-{
-  strcpy(systemname, name);
-}
+void Graph::set_systemname(char* name) { strcpy(systemname, name); }
 
 int Graph::ccm_ref_variable(char* name, int type, void** data)
 {
   int ccm_type;
   int sts;
 
-  switch (type) {
+  switch (type)
+  {
   case pwr_eType_UInt32:
   case pwr_eType_Int32:
   case pwr_eType_Boolean:
@@ -5751,7 +6440,8 @@ int Graph::ccm_set_variable(char* name, int type, void* data)
   int ccm_type;
   int sts;
 
-  switch (type) {
+  switch (type)
+  {
   case pwr_eType_UInt32:
   case pwr_eType_Int32:
   case pwr_eType_Boolean:
@@ -5776,7 +6466,8 @@ int Graph::ccm_get_variable(char* name, int type, void* data)
   int ccm_type;
   int sts;
 
-  switch (type) {
+  switch (type)
+  {
   case pwr_eType_UInt32:
   case pwr_eType_Int32:
   case pwr_eType_Boolean:
@@ -5800,7 +6491,8 @@ int Graph::get_reference_name(char* name, char* tname)
 {
   pwr_tStatus sts;
 
-  if (name[0] == '&') {
+  if (name[0] == '&')
+  {
     // Name contains a reference, get the reference
     pwr_tAName refname;
     pwr_tAName aname;
@@ -5809,27 +6501,31 @@ int Graph::get_reference_name(char* name, char* tname)
     pwr_tTypeId atid;
     pwr_tUInt32 asize, aoffs, aelem;
 
-    if (name[1] == '(') {
+    if (name[1] == '(')
+    {
       strcpy(refname, &name[2]);
-      if ((s = strrchr(refname, ')'))) {
+      if ((s = strrchr(refname, ')')))
+      {
         *s = 0;
         strcpy(refattrname, s + 1);
       }
-    } else
+    }
+    else
       strcpy(refname, &name[1]);
 
-    if (refname[0] == '&') {
+    if (refname[0] == '&')
+    {
       sts = get_reference_name(refname, refname);
       if (EVEN(sts))
         return sts;
     }
 
-    sts = gdh_GetAttributeCharacteristics(
-        refname, &atid, &asize, &aoffs, &aelem);
+    sts = gdh_GetAttributeCharacteristics(refname, &atid, &asize, &aoffs, &aelem);
     if (EVEN(sts))
       return sts;
 
-    if (asize == sizeof(pwr_tOid)) {
+    if (asize == sizeof(pwr_tOid))
+    {
       // Reference is an objid
       pwr_tOid oid;
 
@@ -5840,7 +6536,9 @@ int Graph::get_reference_name(char* name, char* tname)
       sts = gdh_ObjidToName(oid, aname, sizeof(aname), cdh_mName_volumeStrict);
       if (EVEN(sts))
         return sts;
-    } else if (asize == sizeof(pwr_tDataRef)) {
+    }
+    else if (asize == sizeof(pwr_tDataRef))
+    {
       // Reference is an dataref
       pwr_tDataRef dataref;
 
@@ -5848,11 +6546,12 @@ int Graph::get_reference_name(char* name, char* tname)
       if (EVEN(sts))
         return sts;
 
-      sts = gdh_AttrrefToName(
-          &dataref.Aref, aname, sizeof(aname), cdh_mName_volumeStrict);
+      sts = gdh_AttrrefToName(&dataref.Aref, aname, sizeof(aname), cdh_mName_volumeStrict);
       if (EVEN(sts))
         return sts;
-    } else {
+    }
+    else
+    {
       // Reference is an attrref
 
       pwr_sAttrRef aref;
@@ -5860,42 +6559,48 @@ int Graph::get_reference_name(char* name, char* tname)
       if (EVEN(sts))
         return sts;
 
-      sts = gdh_AttrrefToName(
-          &aref, aname, sizeof(aname), cdh_mName_volumeStrict);
+      sts = gdh_AttrrefToName(&aref, aname, sizeof(aname), cdh_mName_volumeStrict);
       if (EVEN(sts))
         return sts;
     }
     strcat(aname, refattrname);
     strcpy(tname, aname);
-  } else
+  }
+  else
     strcpy(tname, name);
 
   return 1;
 }
 
-int Graph::ref_object_info(glow_eCycle cycle, char* name, void** data,
-    pwr_tSubid* subid, unsigned int size, grow_tObject object, bool now)
+int Graph::ref_object_info(glow_eCycle cycle, char* name, void** data, pwr_tSubid* subid, unsigned int size,
+                           grow_tObject object, bool now)
 {
   pwr_tAName aname;
   pwr_tStatus sts;
 
-  if (strncmp(name, "$extern.", 8) == 0) {
+  if (strncmp(name, "$extern.", 8) == 0)
+  {
     if (extern_connect_cb)
       return (extern_connect_cb)(parent_ctx, &name[8], data, subid);
     else
       return 0;
   }
-  if (name[0] == '&') {
+  if (name[0] == '&')
+  {
     sts = get_reference_name(name, aname);
     if (EVEN(sts))
       return sts;
-  } else
+  }
+  else
     strcpy(aname, name);
 
-  if (!now) {
+  if (!now)
+  {
     GraphRef gr(aname, subid, size, cycle, object, data);
     reflist.push_back(gr);
-  } else {
+  }
+  else
+  {
     int dt;
 
     if (cycle == glow_eCycle_Fast)
@@ -5914,17 +6619,19 @@ int Graph::ref_object_info_all()
 {
   pwr_tStatus sts;
   int dt;
-  int refcount[2] = { 0, 0 };
-  glow_eCycle cycle[2] = { glow_eCycle_Slow, glow_eCycle_Fast };
+  int refcount[2] = {0, 0};
+  glow_eCycle cycle[2] = {glow_eCycle_Slow, glow_eCycle_Fast};
 
-  for (unsigned int i = 0; i < reflist.size(); i++) {
+  for (unsigned int i = 0; i < reflist.size(); i++)
+  {
     if (reflist[i].m_cycle == cycle[0])
       refcount[0]++;
     else
       refcount[1]++;
   }
 
-  for (int j = 0; j < 2; j++) {
+  for (int j = 0; j < 2; j++)
+  {
     if (!refcount[j])
       continue;
 
@@ -5932,8 +6639,10 @@ int Graph::ref_object_info_all()
     pwr_tRefId* refid = (pwr_tRefId*)calloc(refcount[j], sizeof(pwr_tRefId));
 
     int refcnt = 0;
-    for (unsigned int i = 0; i < reflist.size(); i++) {
-      if (reflist[i].m_cycle == cycle[j]) {
+    for (unsigned int i = 0; i < reflist.size(); i++)
+    {
+      if (reflist[i].m_cycle == cycle[j])
+      {
         strcpy(oref[refcnt].fullname, reflist[i].m_name);
         oref[refcnt].bufsize = reflist[i].m_size;
         refcnt++;
@@ -5947,20 +6656,23 @@ int Graph::ref_object_info_all()
     gdh_SetSubscriptionDefaults(dt, tmo);
 
     sts = gdh_RefObjectInfoList(refcnt, oref, refid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       printf("** Link error for local object\n");
     }
 
     refcnt = 0;
-    for (unsigned int i = 0; i < reflist.size(); i++) {
-      if (reflist[i].m_cycle == cycle[j]) {
+    for (unsigned int i = 0; i < reflist.size(); i++)
+    {
+      if (reflist[i].m_cycle == cycle[j])
+      {
         *reflist[i].m_data = oref[refcnt].adrs;
         *reflist[i].m_id = refid[refcnt];
-        if (EVEN(sts) && cdh_RefIdIsNull(refid[refcnt])) {
+        if (EVEN(sts) && cdh_RefIdIsNull(refid[refcnt]))
+        {
           char oname[80] = "";
           if (reflist[i].m_object != 0)
-            grow_GetObjectName(
-                reflist[i].m_object, oname, sizeof(oname), glow_eName_Path);
+            grow_GetObjectName(reflist[i].m_object, oname, sizeof(oname), glow_eName_Path);
           printf("** %s, %s\n", oname, reflist[i].m_name);
         }
         refcnt++;
@@ -5974,8 +6686,8 @@ int Graph::ref_object_info_all()
   return GE__SUCCESS;
 }
 
-void Graph::create_trend(grow_tObject* object, double x, double y,
-			 unsigned int dyn_type1, unsigned int dyn_type2, int colortheme)
+void Graph::create_trend(grow_tObject* object, double x, double y, unsigned int dyn_type1,
+                         unsigned int dyn_type2, int colortheme)
 {
   double width = 7;
   double height = 5;
@@ -5983,16 +6695,19 @@ void Graph::create_trend(grow_tObject* object, double x, double y,
   glow_sTrendInfo info;
   glow_eDrawType fcolor, bcolor;
 
-  if (colortheme) {
+  if (colortheme)
+  {
     fcolor = glow_eCtColor_DiagramFillcolor;
     bcolor = glow_eCtColor_DiagramBordercolor;
-  } else {
+  }
+  else
+  {
     fcolor = glow_eDrawType_Color40;
     bcolor = glow_eDrawType_Color37;
   }
 
-  grow_CreateGrowTrend(grow->ctx, get_next_object_name("O", ""), x, y, width,
-      height, bcolor, 1, glow_mDisplayLevel_1, 1, 1, fcolor, NULL, object);
+  grow_CreateGrowTrend(grow->ctx, get_next_object_name("O", ""), x, y, width, height, bcolor, 1,
+                       glow_mDisplayLevel_1, 1, 1, fcolor, NULL, object);
   dyn = new GeDyn(this);
   dyn->dyn_type1 = dyn->total_dyn_type1 = (ge_mDynType1)dyn_type1;
   dyn->dyn_type2 = dyn->total_dyn_type2 = (ge_mDynType2)dyn_type2;
@@ -6009,14 +6724,17 @@ void Graph::create_trend(grow_tObject* object, double x, double y,
   info.y_min_value[1] = 0;
   info.y_max_value[0] = 100;
   info.y_max_value[1] = 100;
-  if (colortheme) {
+  if (colortheme)
+  {
     info.curve_drawtype[0] = glow_eCtColor_DiagramCurveColor;
     info.curve_drawtype[1] = glow_eCtColor_OrangeCurve;
     info.curve_fill_drawtype[0] = glow_eCtColor_BarBarColor;
     info.curve_fill_drawtype[1] = glow_eCtColor_OrangeBar;
     info.mark1_color = glow_eCtColor_YellowCurve;
     info.mark2_color = glow_eCtColor_RedCurve;
-  } else {
+  }
+  else
+  {
     info.curve_drawtype[0] = glow_eDrawType_Color145;
     info.curve_drawtype[1] = glow_eDrawType_Color295;
     info.curve_fill_drawtype[0] = glow_eDrawType_Color139;
@@ -6029,8 +6747,8 @@ void Graph::create_trend(grow_tObject* object, double x, double y,
   grow_Redraw(grow->ctx);
 }
 
-void Graph::create_xycurve(
-    grow_tObject* object, double x, double y, unsigned int dyn_type1, unsigned int dyn_type2, int colortheme)
+void Graph::create_xycurve(grow_tObject* object, double x, double y, unsigned int dyn_type1,
+                           unsigned int dyn_type2, int colortheme)
 {
   double width = 7;
   double height = 5;
@@ -6038,17 +6756,19 @@ void Graph::create_xycurve(
   glow_sTrendInfo info;
   glow_eDrawType fcolor, bcolor;
 
-  if (colortheme) {
+  if (colortheme)
+  {
     fcolor = glow_eCtColor_DiagramFillcolor;
     bcolor = glow_eCtColor_DiagramBordercolor;
-  } else {
+  }
+  else
+  {
     fcolor = glow_eDrawType_Color40;
     bcolor = glow_eDrawType_Color37;
   }
 
-  grow_CreateGrowXYCurve(grow->ctx, get_next_object_name("O", ""), x, y, width,
-      height, bcolor, 1, glow_mDisplayLevel_1, 1, 1,
-      fcolor, NULL, object);
+  grow_CreateGrowXYCurve(grow->ctx, get_next_object_name("O", ""), x, y, width, height, bcolor, 1,
+                         glow_mDisplayLevel_1, 1, 1, fcolor, NULL, object);
   dyn = new GeDyn(this);
   dyn->dyn_type1 = dyn->total_dyn_type1 = (ge_mDynType1)dyn_type1;
   dyn->dyn_type2 = dyn->total_dyn_type2 = (ge_mDynType2)dyn_type2;
@@ -6065,7 +6785,8 @@ void Graph::create_xycurve(
   info.y_min_value[1] = 0;
   info.y_max_value[0] = 100;
   info.y_max_value[1] = 100;
-  if (colortheme) {
+  if (colortheme)
+  {
     info.curve_drawtype[0] = glow_eCtColor_DiagramCurveColor;
     info.curve_drawtype[1] = glow_eCtColor_OrangeCurve;
     info.curve_fill_drawtype[0] = glow_eCtColor_BarBarColor;
@@ -6073,7 +6794,8 @@ void Graph::create_xycurve(
     info.mark1_color = glow_eCtColor_YellowCurve;
     info.mark2_color = glow_eCtColor_RedCurve;
   }
-  else {
+  else
+  {
     info.curve_drawtype[0] = glow_eDrawType_Color145;
     info.curve_drawtype[1] = glow_eDrawType_Color295;
     info.curve_fill_drawtype[0] = glow_eDrawType_Color139;
@@ -6094,21 +6816,23 @@ void Graph::create_bar(grow_tObject* object, double x, double y, int colortheme)
   glow_sBarInfo info;
   glow_eDrawType backgroundcolor, barcolor, barbordercolor, bordercolor;
 
-  if (colortheme) {
+  if (colortheme)
+  {
     backgroundcolor = glow_eCtColor_BarBackgroundColor;
     barcolor = glow_eCtColor_BarBarColor;
     barbordercolor = glow_eCtColor_BarBarLimitColor;
     bordercolor = glow_eCtColor_IndicatorBorderColor;
-  } else {
+  }
+  else
+  {
     backgroundcolor = glow_eDrawType_Color40;
     barcolor = glow_eDrawType_Color147;
     barbordercolor = glow_eDrawType_Color145;
     bordercolor = glow_eDrawType_Line;
   }
 
-  grow_CreateGrowBar(grow->ctx, get_next_object_name("O", ""), x, y, width,
-      height, bordercolor, 1, glow_mDisplayLevel_1, 1, 1,
-      backgroundcolor, NULL, object);
+  grow_CreateGrowBar(grow->ctx, get_next_object_name("O", ""), x, y, width, height, bordercolor, 1,
+                     glow_mDisplayLevel_1, 1, 1, backgroundcolor, NULL, object);
   dyn = new GeDyn(this);
   dyn->dyn_type1 = dyn->total_dyn_type1 = ge_mDynType1_Bar;
   dyn->update_elements();
@@ -6132,21 +6856,23 @@ void Graph::create_bararc(grow_tObject* object, double x, double y, int colorthe
   glow_sBarInfo info;
   glow_eDrawType backgroundcolor, barcolor, barbordercolor, bordercolor;
 
-  if (colortheme) {
+  if (colortheme)
+  {
     backgroundcolor = glow_eCtColor_BarBackgroundColor;
     barcolor = glow_eCtColor_BarBarColor;
     barbordercolor = glow_eCtColor_BarBarLimitColor;
     bordercolor = glow_eCtColor_IndicatorBorderColor;
-  } else {
+  }
+  else
+  {
     backgroundcolor = glow_eDrawType_Color40;
     barcolor = glow_eDrawType_Color147;
     barbordercolor = glow_eDrawType_Color145;
     bordercolor = glow_eDrawType_Line;
   }
 
-  grow_CreateGrowBarArc(grow->ctx, get_next_object_name("O", ""), x, y, x + width,
-			y + height, 0, 360, bar_width, bordercolor, 1, 1,
-			backgroundcolor, NULL, object);
+  grow_CreateGrowBarArc(grow->ctx, get_next_object_name("O", ""), x, y, x + width, y + height, 0, 360,
+                        bar_width, bordercolor, 1, 1, backgroundcolor, NULL, object);
   dyn = new GeDyn(this);
   dyn->dyn_type1 = dyn->total_dyn_type1 = ge_mDynType1_Bar;
   dyn->update_elements();
@@ -6168,14 +6894,17 @@ void Graph::create_window(grow_tObject* object, double x, double y, int colorthe
   GeDyn* dyn;
   glow_eDrawType bordercolor;
 
-  if (colortheme) {
+  if (colortheme)
+  {
     bordercolor = glow_eCtColor_IndicatorBorderColor;
-  } else {
+  }
+  else
+  {
     bordercolor = glow_eDrawType_Line;
   }
 
-  grow_CreateGrowWindow(grow->ctx, get_next_object_name("O", ""), x, y, width,
-      height, bordercolor, 1, glow_mDisplayLevel_1, NULL, object);
+  grow_CreateGrowWindow(grow->ctx, get_next_object_name("O", ""), x, y, width, height, bordercolor, 1,
+                        glow_mDisplayLevel_1, NULL, object);
   dyn = new GeDyn(this);
   dyn->update_elements();
   grow_SetUserData(*object, (void*)dyn);
@@ -6190,20 +6919,24 @@ void Graph::create_table(grow_tObject* object, double x, double y, int colorthem
   GeDyn* dyn;
   glow_eDrawType fillcolor, bordercolor, textcolor;
 
-  if (colortheme) {
+  if (colortheme)
+  {
     fillcolor = glow_eCtColor_TableFillcolor;
     bordercolor = glow_eCtColor_TableBordercolor;
     textcolor = glow_eCtColor_TableTextcolor;
-  } else {
+  }
+  else
+  {
     fillcolor = glow_eDrawType_Color33;
     bordercolor = glow_eDrawType_Line;
     textcolor = glow_eDrawType_Color145;
   }
 
-  grow_CreateGrowTable(grow->ctx, get_next_object_name("O", ""), x, y, width,
-      height, bordercolor, 1, 1, fillcolor, glow_mDisplayLevel_1, NULL, object);
+  grow_CreateGrowTable(grow->ctx, get_next_object_name("O", ""), x, y, width, height, bordercolor, 1, 1,
+                       fillcolor, glow_mDisplayLevel_1, NULL, object);
 
-  if (colortheme) {
+  if (colortheme)
+  {
     grow_SetObjectOriginalTextColor(*object, textcolor);
   }
 
@@ -6222,20 +6955,22 @@ void Graph::create_folder(grow_tObject* object, double x, double y, int colorthe
   GeDyn* dyn;
   glow_eDrawType bordercolor, selectedcolor, unselectedcolor, textcolor;
 
-  if (colortheme) {
+  if (colortheme)
+  {
     bordercolor = glow_eCtColor_IndicatorBorderColor;
     selectedcolor = glow_eCtColor_FolderActiveColor;
     unselectedcolor = glow_eCtColor_FolderInactiveColor;
     textcolor = glow_eCtColor_BackgroundTextAndLines;
-  } else {
+  }
+  else
+  {
     bordercolor = glow_eDrawType_Line;
     selectedcolor = glow_eDrawType_Color22;
     unselectedcolor = glow_eDrawType_Color25;
   }
 
-  grow_CreateGrowFolder(grow->ctx, get_next_object_name("O", ""), x, y, width,
-      height, bordercolor, 1, selectedcolor,
-      unselectedcolor, glow_mDisplayLevel_1, NULL, object);
+  grow_CreateGrowFolder(grow->ctx, get_next_object_name("O", ""), x, y, width, height, bordercolor, 1,
+                        selectedcolor, unselectedcolor, glow_mDisplayLevel_1, NULL, object);
 
   if (colortheme)
     grow_SetObjectOriginalTextColor(*object, textcolor);
@@ -6251,9 +6986,9 @@ void Graph::create_toolbar(grow_tObject* object, double x, double y)
 {
   GeDyn* dyn;
 
-  grow_CreateGrowToolbar(grow->ctx, "mbtoolbar", "mbtoolbar",
-      (char*)GeMethods::op_subgraph, (char*)GeMethods::mnt_subgraph,
-      GeMethods::opmeth_size, GeMethods::mntmeth_size, x, y, NULL, object);
+  grow_CreateGrowToolbar(grow->ctx, "mbtoolbar", "mbtoolbar", (char*)GeMethods::op_subgraph,
+                         (char*)GeMethods::mnt_subgraph, GeMethods::opmeth_size, GeMethods::mntmeth_size, x,
+                         y, NULL, object);
   dyn = new GeDyn(this);
   dyn->action_type1 = dyn->total_action_type1 = ge_mActionType1_MethodToolbar;
   dyn->update_elements();
@@ -6262,8 +6997,7 @@ void Graph::create_toolbar(grow_tObject* object, double x, double y)
   grow_Redraw(grow->ctx);
 }
 
-void Graph::create_axis(
-    grow_tObject* object, double x, double y, int dynamic, int colortheme)
+void Graph::create_axis(grow_tObject* object, double x, double y, int dynamic, int colortheme)
 {
   double width = 1.2;
   double height = 5;
@@ -6275,10 +7009,11 @@ void Graph::create_axis(
   else
     bcolor = glow_eDrawType_Line;
 
-  grow_CreateGrowAxis(grow->ctx, get_next_object_name("O", ""), x, y, x + width,
-      y + height, bcolor, 1, 1, glow_eDrawType_TextHelvetica, NULL, object);
+  grow_CreateGrowAxis(grow->ctx, get_next_object_name("O", ""), x, y, x + width, y + height, bcolor, 1, 1,
+                      glow_eDrawType_TextHelvetica, NULL, object);
 
-  if (dynamic) {
+  if (dynamic)
+  {
     GeDyn* dyn;
 
     dyn = new GeDyn(this);
@@ -6296,15 +7031,14 @@ void Graph::create_axis(
   grow_SetAxisInfo(*object, &info);
   grow_Redraw(grow->ctx);
 
-  if (colortheme) {
-    grow_SetObjectOriginalTextColor(
-        *object, glow_eCtColor_BackgroundTextAndLines);
+  if (colortheme)
+  {
+    grow_SetObjectOriginalTextColor(*object, glow_eCtColor_BackgroundTextAndLines);
     // grow_SetObjectTextFont( *object, glow_eFont_LucidaSans);
   }
 }
 
-void Graph::create_axisarc(
-    grow_tObject* object, double x, double y, int dynamic, int colortheme)
+void Graph::create_axisarc(grow_tObject* object, double x, double y, int dynamic, int colortheme)
 {
   double width = 5;
   double height = 5;
@@ -6316,11 +7050,11 @@ void Graph::create_axisarc(
   else
     bcolor = glow_eDrawType_Line;
 
-  grow_CreateGrowAxisArc(grow->ctx, get_next_object_name("O", ""), x, y,
-      x + width, y + height, 0, 180, bcolor, 1, 1, glow_eDrawType_TextHelvetica,
-      NULL, object);
+  grow_CreateGrowAxisArc(grow->ctx, get_next_object_name("O", ""), x, y, x + width, y + height, 0, 180,
+                         bcolor, 1, 1, glow_eDrawType_TextHelvetica, NULL, object);
 
-  if (dynamic) {
+  if (dynamic)
+  {
     GeDyn* dyn;
 
     dyn = new GeDyn(this);
@@ -6338,9 +7072,9 @@ void Graph::create_axisarc(
   grow_SetAxisInfo(*object, &info);
   grow_Redraw(grow->ctx);
 
-  if (colortheme) {
-    grow_SetObjectOriginalTextColor(
-        *object, glow_eCtColor_BackgroundTextAndLines);
+  if (colortheme)
+  {
+    grow_SetObjectOriginalTextColor(*object, glow_eCtColor_BackgroundTextAndLines);
     // grow_SetObjectTextFont( *object, glow_eFont_LucidaSans);
   }
 }
@@ -6350,17 +7084,16 @@ void Graph::create_pie(grow_tObject* object, double x, double y, int colortheme)
   GeDyn* dyn;
   double width = 5;
   double height = 5;
-  glow_eDrawType color[12] = { glow_eDrawType_Color115, glow_eDrawType_Color145,
-    glow_eDrawType_Color175, glow_eDrawType_Color205, glow_eDrawType_Color235,
-    glow_eDrawType_Color265, glow_eDrawType_Color295, glow_eDrawType_Color105,
-    glow_eDrawType_Color135, glow_eDrawType_Color165, glow_eDrawType_Color195,
-    glow_eDrawType_Color225 };
-  double values[12] = { 8.333, 8.333, 8.333, 8.333, 8.333, 8.333, 8.333, 8.333,
-    8.333, 8.333, 8.333, 8.333 };
+  glow_eDrawType color[12] = {glow_eDrawType_Color115, glow_eDrawType_Color145, glow_eDrawType_Color175,
+                              glow_eDrawType_Color205, glow_eDrawType_Color235, glow_eDrawType_Color265,
+                              glow_eDrawType_Color295, glow_eDrawType_Color105, glow_eDrawType_Color135,
+                              glow_eDrawType_Color165, glow_eDrawType_Color195, glow_eDrawType_Color225};
+  double values[12] = {8.333, 8.333, 8.333, 8.333, 8.333, 8.333, 8.333, 8.333, 8.333, 8.333, 8.333, 8.333};
 
   glow_eDrawType backgroundcolor, bordercolor;
 
-  if (colortheme) {
+  if (colortheme)
+  {
     backgroundcolor = glow_eCtColor_BarBackgroundColor;
     bordercolor = glow_eCtColor_IndicatorBorderColor;
     color[0] = glow_eCtColor_BlueIndicator;
@@ -6369,14 +7102,15 @@ void Graph::create_pie(grow_tObject* object, double x, double y, int colortheme)
     color[3] = glow_eCtColor_MagentaIndicator;
     color[4] = glow_eCtColor_YellowIndicator;
     color[5] = glow_eCtColor_RedIndicator;
-  } else {
+  }
+  else
+  {
     backgroundcolor = glow_eDrawType_Color38;
     bordercolor = glow_eDrawType_Line;
   }
 
-  grow_CreateGrowPie(grow->ctx, get_next_object_name("O", ""), x, y, x + width,
-      y + height, 0, 360, bordercolor, 1, 1, 0, backgroundcolor,
-      NULL, object);
+  grow_CreateGrowPie(grow->ctx, get_next_object_name("O", ""), x, y, x + width, y + height, 0, 360,
+                     bordercolor, 1, 1, 0, backgroundcolor, NULL, object);
 
   grow_SetPieConf(*object, 12, 0, 100, color);
   grow_SetPieValues(*object, values);
@@ -6392,14 +7126,14 @@ void Graph::create_barchart(grow_tObject* object, double x, double y, int colort
   GeDyn* dyn;
   double width = 7;
   double height = 5;
-  glow_eDrawType color[12] = { glow_eDrawType_Color115, glow_eDrawType_Color145,
-    glow_eDrawType_Color175, glow_eDrawType_Color205, glow_eDrawType_Color235,
-    glow_eDrawType_Color265, glow_eDrawType_Color295, glow_eDrawType_Color105,
-    glow_eDrawType_Color135, glow_eDrawType_Color165, glow_eDrawType_Color195,
-    glow_eDrawType_Color225 };
+  glow_eDrawType color[12] = {glow_eDrawType_Color115, glow_eDrawType_Color145, glow_eDrawType_Color175,
+                              glow_eDrawType_Color205, glow_eDrawType_Color235, glow_eDrawType_Color265,
+                              glow_eDrawType_Color295, glow_eDrawType_Color105, glow_eDrawType_Color135,
+                              glow_eDrawType_Color165, glow_eDrawType_Color195, glow_eDrawType_Color225};
   glow_eDrawType fcolor, bcolor, linecolor;
 
-  if (colortheme) {
+  if (colortheme)
+  {
     color[0] = glow_eCtColor_BlueIndicator;
     color[1] = glow_eCtColor_OrangeIndicator;
     color[2] = glow_eCtColor_GreenIndicator;
@@ -6409,18 +7143,18 @@ void Graph::create_barchart(grow_tObject* object, double x, double y, int colort
     fcolor = glow_eCtColor_DiagramFillcolor;
     bcolor = glow_eCtColor_DiagramBordercolor;
     linecolor = glow_eCtColor_DiagramBordercolor;
-  } else {
+  }
+  else
+  {
     fcolor = glow_eDrawType_Color40;
     bcolor = glow_eDrawType_Line;
     linecolor = glow_eDrawType_Color37;
   }
 
-  grow_CreateGrowBarChart(grow->ctx, get_next_object_name("O", ""), x, y, width,
-      height, bcolor, 1, 1, 0, fcolor, NULL,
-      object);
+  grow_CreateGrowBarChart(grow->ctx, get_next_object_name("O", ""), x, y, width, height, bcolor, 1, 1, 0,
+                          fcolor, NULL, object);
 
-  grow_SetBarChartConf(
-      *object, 12, 10, 0, 100, 4, 4, linecolor, color);
+  grow_SetBarChartConf(*object, 12, 10, 0, 100, 4, 4, linecolor, color);
   dyn = new GeDyn(this);
   dyn->dyn_type1 = dyn->total_dyn_type1 = ge_mDynType1_BarChart;
   dyn->update_elements();
@@ -6449,12 +7183,14 @@ void Graph::delete_layer()
   int sts;
 
   sts = grow_GetActiveLayer(grow->ctx, &layer);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('E', "No layer is active");
     return;
   }
 
-  if (layer == grow_GetBackgroundLayer(grow->ctx)) {
+  if (layer == grow_GetBackgroundLayer(grow->ctx))
+  {
     message('E', "Can't delete background layer");
     return;
   }
@@ -6490,17 +7226,20 @@ void Graph::move_select_to_layer()
 {
   grow_tObject layer;
   int sts;
-  grow_tObject *list;
+  grow_tObject* list;
   int list_cnt;
 
   sts = grow_GetActiveLayer(grow->ctx, &layer);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('E', "No layer is active");
     return;
   }
   grow_GetSelectList(grow->ctx, &list, &list_cnt);
-  for (int i = 0; i < list_cnt; i++) {
-    if (grow_GetObjectType(list[i]) == glow_eObjectType_GrowLayer) {
+  for (int i = 0; i < list_cnt; i++)
+  {
+    if (grow_GetObjectType(list[i]) == glow_eObjectType_GrowLayer)
+    {
       message('E', "Layer is selected. Unable to move layer.");
       return;
     }
@@ -6512,14 +7251,14 @@ void Graph::move_select_to_layer()
   refresh_objects(attr_mRefresh_Objects);
 }
 
-int Graph::create_dashcell_next(grow_tObject *o, int colortheme, int select, char *attr, pwr_tTypeId atype)
+int Graph::create_dashcell_next(grow_tObject* o, int colortheme, int select, char* attr, pwr_tTypeId atype)
 {
   int sts;
   double x, y;
   char typestr[80];
   int size;
   pwr_tAName text;
-  char *s;
+  char* s;
 
   sts = grow_GetDashboardNextFree(grow->ctx, 0, 0, 1, 1, &x, &y);
   if (EVEN(sts))
@@ -6528,26 +7267,29 @@ int Graph::create_dashcell_next(grow_tObject *o, int colortheme, int select, cha
   GeDash* dash = new GeDash(this);
   grow_SetUserData(*o, (void*)dash);
 
-  if (attr) {
+  if (attr)
+  {
     if ((s = strrchr(attr, '-')))
-      strcpy(text, s+1);
+      strcpy(text, s + 1);
     else
       strcpy(text, attr);
-    if (atype != 0) {
+    if (atype != 0)
+    {
       if ((s = strrchr(text, '.')))
-	*s = 0;
+        *s = 0;
     }
-    switch (atype) {
+    switch (atype)
+    {
     case pwr_eType_Float32:
       dash->type = ge_eDashType_Bar;
       strcpy(dash->title, text);
       dash->update(*o);
-      strcpy(((GeDashAnalog *)dash->elem[0])->attribute, attr);
-      strcat(((GeDashAnalog *)dash->elem[0])->attribute, "##Float32");
-      strcpy(((GeDashAnalog *)dash->elem[0])->text, text);
-      strcpy(((GeDashAnalog *)dash->elem[0])->format, "%5.2f");
-      ((GeDashAnalog *)dash->elem[0])->min_value = 0;
-      ((GeDashAnalog *)dash->elem[0])->max_value = 100;
+      strcpy(((GeDashAnalog*)dash->elem[0])->attribute, attr);
+      strcat(((GeDashAnalog*)dash->elem[0])->attribute, "##Float32");
+      strcpy(((GeDashAnalog*)dash->elem[0])->text, text);
+      strcpy(((GeDashAnalog*)dash->elem[0])->format, "%5.2f");
+      ((GeDashAnalog*)dash->elem[0])->min_value = 0;
+      ((GeDashAnalog*)dash->elem[0])->max_value = 100;
       dash->update(*o);
       break;
     case pwr_eType_Int16:
@@ -6560,41 +7302,42 @@ int Graph::create_dashcell_next(grow_tObject *o, int colortheme, int select, cha
       dash->type = ge_eDashType_Bar;
       strcpy(dash->title, text);
       dash->update(*o);
-      strcpy(((GeDashAnalog *)dash->elem[0])->attribute, attr);
-      strcat(((GeDashAnalog *)dash->elem[0])->attribute, "##");
-      strcat(((GeDashAnalog *)dash->elem[0])->attribute, typestr);
-      strcpy(((GeDashAnalog *)dash->elem[0])->text, text);
-      strcpy(((GeDashAnalog *)dash->elem[0])->format, "%d");
-      ((GeDashAnalog *)dash->elem[0])->min_value = 0;
-      ((GeDashAnalog *)dash->elem[0])->max_value = 100;
+      strcpy(((GeDashAnalog*)dash->elem[0])->attribute, attr);
+      strcat(((GeDashAnalog*)dash->elem[0])->attribute, "##");
+      strcat(((GeDashAnalog*)dash->elem[0])->attribute, typestr);
+      strcpy(((GeDashAnalog*)dash->elem[0])->text, text);
+      strcpy(((GeDashAnalog*)dash->elem[0])->format, "%d");
+      ((GeDashAnalog*)dash->elem[0])->min_value = 0;
+      ((GeDashAnalog*)dash->elem[0])->max_value = 100;
       dash->update(o);
       break;
     case pwr_eType_Boolean:
       dash->type = ge_eDashType_Indicator;
       strcpy(dash->title, text);
       dash->update(*o);
-      strcpy(((GeDashDigital *)dash->elem[0])->attribute, attr);
-      strcat(((GeDashDigital *)dash->elem[0])->attribute, "##Boolean");
-      strcpy(((GeDashDigital *)dash->elem[0])->text, text);
+      strcpy(((GeDashDigital*)dash->elem[0])->attribute, attr);
+      strcat(((GeDashDigital*)dash->elem[0])->attribute, "##Boolean");
+      strcpy(((GeDashDigital*)dash->elem[0])->text, text);
       dash->update(*o);
       break;
     case 0:
       dash->type = ge_eDashType_ObjectGraph;
       strcpy(dash->title, text);
       dash->update(*o);
-      strcpy(((GeDashObject *)dash->elem[0])->object, attr);
-      strcpy(((GeDashObject *)dash->elem[0])->text, text);
+      strcpy(((GeDashObject*)dash->elem[0])->object, attr);
+      strcpy(((GeDashObject*)dash->elem[0])->text, text);
       dash->update(*o);
-    default:
-      ;
+    default:;
     }
-    if (mode == graph_eMode_Runtime) {
+    if (mode == graph_eMode_Runtime)
+    {
       connect_now = true;
       sts = grow_TraceInitObject(grow->ctx, *o);
       connect_now = false;
     }
   }
-  if (select && mode == graph_eMode_Development) {
+  if (select && mode == graph_eMode_Development)
+  {
     grow_SelectClear(grow->ctx);
     grow_SetHighlight(*o, 1);
     grow_SelectInsert(grow->ctx, *o);
@@ -6608,19 +7351,21 @@ int Graph::merge_dashcells()
   grow_tObject* sel_list;
   grow_tObject* sellist;
   int sel_count;
-  GeDash **dashlist;
+  GeDash** dashlist;
   int elements = 0;
 
   grow_GetSelectList(grow->ctx, &sel_list, &sel_count);
   if (sel_count <= 1)
     return GE__SELECTTWO;
-  
-  dashlist = (GeDash **)calloc(sel_count, sizeof(*dashlist));
-  sellist = (grow_tObject *)calloc(sel_count, sizeof(grow_tObject));
+
+  dashlist = (GeDash**)calloc(sel_count, sizeof(*dashlist));
+  sellist = (grow_tObject*)calloc(sel_count, sizeof(grow_tObject));
   memcpy(sellist, sel_list, sel_count * sizeof(grow_tObject));
 
-  for (int i = 0; i < sel_count; i++) {
-    if (grow_GetObjectType(sellist[i]) != glow_eObjectType_GrowDashCell) {
+  for (int i = 0; i < sel_count; i++)
+  {
+    if (grow_GetObjectType(sellist[i]) != glow_eObjectType_GrowDashCell)
+    {
       free(dashlist);
       free(sellist);
       return GE__INVALIDOBJECT;
@@ -6629,21 +7374,25 @@ int Graph::merge_dashcells()
     elements += dashlist[i]->elements;
   }
 
-  if (elements > dashlist[0]->max_elements()) {
+  if (elements > dashlist[0]->max_elements())
+  {
     free(dashlist);
     free(sellist);
     return GE__ELEMSIZE;
   }
 
-  for (int i = 1; i < sel_count; i++) {
-    if (dashlist[i]->get_attr_type() != dashlist[0]->get_attr_type()) {
+  for (int i = 1; i < sel_count; i++)
+  {
+    if (dashlist[i]->get_attr_type() != dashlist[0]->get_attr_type())
+    {
       free(dashlist);
       free(sellist);
       return GE__INVALIDOBJECT;
     }
   }
 
-  for (int i = 1; i < sel_count; i++) {
+  for (int i = 1; i < sel_count; i++)
+  {
     dashlist[0]->merge(sellist[0], dashlist[i]);
     grow_DeleteObject(grow->ctx, sellist[i]);
   }
@@ -6682,8 +7431,8 @@ void Graph::create_dashcell(grow_tObject* object, double x, double y, int colort
     bordercolor = glow_eDrawType_Line;
 
   grow_GetDashboardInfo(grow->ctx, &width, &height, &columns, &rows);
-  grow_CreateGrowDashCell(grow->ctx, get_next_object_name("O", ""), x, y, width,
-      height, bordercolor, NULL, object);
+  grow_CreateGrowDashCell(grow->ctx, get_next_object_name("O", ""), x, y, width, height, bordercolor, NULL,
+                          object);
   dyn = new GeDyn(this);
   dyn->dyn_type1 = dyn->total_dyn_type1 = ge_mDynType1_Bar;
   dyn->update_elements();
@@ -6706,26 +7455,31 @@ int Graph::create_node_floating(double x, double y)
 
   // Create subgraph object
   sts = (get_current_subgraph_cb)(parent_ctx, sub_name, filename);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('E', "Select a SubGraph");
     return sts;
   }
   dcli_parse_filename(filename, dev, dir, file, type, &version);
   str_ToLower(sub_name, file);
-  if (streq(type, ".pwsg")) {
+  if (streq(type, ".pwsg"))
+  {
     sts = grow_FindNodeClassByName(grow->ctx, sub_name, &nc);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       // Load the subgraph
       grow_OpenSubGraph(grow->ctx, filename);
     }
     sts = grow_FindNodeClassByName(grow->ctx, sub_name, &nc);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       message('E', "Unable to open subgraph");
       return sts;
     }
 
     grow_GetUserData(nc, (void**)&dyn);
-    if (!dyn) {
+    if (!dyn)
+    {
       // Old version nodeclass without dyn, create dyn
       GeDyn* dyn = new GeDyn(this);
       grow_SetUserData(nc, (void*)dyn);
@@ -6743,8 +7497,7 @@ int Graph::create_node_floating(double x, double y)
     GeDyn* dyn = new GeDyn(this);
     grow_SetUserData(n1, (void*)dyn);
     if (grow_IsSliderClass(nc))
-      dyn->action_type1
-          = ge_mActionType1(dyn->action_type1 | ge_mActionType1_Slider);
+      dyn->action_type1 = ge_mActionType1(dyn->action_type1 | ge_mActionType1_Slider);
 
     grow_Paste(grow->ctx);
     // grow_SetSelectHighlight( grow->ctx);
@@ -6754,26 +7507,30 @@ int Graph::create_node_floating(double x, double y)
 
 void Graph::swap(int mode)
 {
-  if (mode == 0) {
+  if (mode == 0)
+  {
     // Swap starting
-    if (trace_started) {
+    if (trace_started)
+    {
       trace_timer_remove();
       grow_TraceClose(grow->ctx);
       trace_started = 0;
     }
-  } else if (mode == 1) {
+  }
+  else if (mode == 1)
+  {
     // Swap done
-    if (!trace_started) {
-      grow_TraceInit(grow->ctx, graph_trace_connect_bc,
-          graph_trace_disconnect_bc, graph_trace_scan_bc, graph_trace_ctrl_bc);
+    if (!trace_started)
+    {
+      grow_TraceInit(grow->ctx, graph_trace_connect_bc, graph_trace_disconnect_bc, graph_trace_scan_bc,
+                     graph_trace_ctrl_bc);
       trace_started = 1;
       trace_scan(this);
     }
   }
 }
 
-int Graph::get_dimension(
-    char* filename, const char* def_path, int dashboard, int* width, int* height)
+int Graph::get_dimension(char* filename, const char* def_path, int dashboard, int* width, int* height)
 {
   pwr_tFileName fname;
 
@@ -6811,9 +7568,9 @@ char* Graph::get_next_object_name(const char* prefix, const char* suffix)
   static char name[32];
   int sts = 0;
 
-  while (EVEN(sts)) {
-    sprintf(name, "%s%d%s", prefix, grow_IncrNextObjectNameNumber(grow->ctx),
-        suffix);
+  while (EVEN(sts))
+  {
+    sprintf(name, "%s%d%s", prefix, grow_IncrNextObjectNameNumber(grow->ctx), suffix);
     sts = grow_CheckObjectName(grow->ctx, name);
   }
   return name;
@@ -6823,7 +7580,8 @@ void Graph::set_text_coding(lng_eCoding coding)
 {
   glow_eTextCoding c;
 
-  switch (coding) {
+  switch (coding)
+  {
   case lng_eCoding_ISO8859_1:
     c = glow_eTextCoding_ISO8859_1;
     break;
@@ -6835,10 +7593,7 @@ void Graph::set_text_coding(lng_eCoding coding)
   grow_SetTextCoding(grow->base_ctx(), c);
 }
 
-int Graph::key_pressed(int key)
-{
-  return grow_KeyPressed(grow->ctx, key);
-}
+int Graph::key_pressed(int key) { return grow_KeyPressed(grow->ctx, key); }
 
 void Graph::close_input_all()
 {
@@ -6854,35 +7609,34 @@ int Graph::get_object_name(unsigned int idx, int size, char* name)
   return 1;
 }
 
-void Graph::signal_send(char* signalname)
-{
-  grow_SignalSend(grow->ctx, signalname);
-}
+void Graph::signal_send(char* signalname) { grow_SignalSend(grow->ctx, signalname); }
 
 static void graph_free_dyn(grow_tObject object)
 {
-  if (grow_GetObjectType(object) == glow_eObjectType_GrowNode
-      || grow_GetObjectType(object) == glow_eObjectType_GrowSlider
-      || grow_GetObjectType(object) == glow_eObjectType_GrowGroup
-      || grow_GetObjectType(object) == glow_eObjectType_GrowToolbar
-      || grow_GetObjectType(object) == glow_eObjectType_GrowWindow
-      || grow_GetObjectType(object) == glow_eObjectType_GrowTrend
-      || grow_GetObjectType(object) == glow_eObjectType_GrowXYCurve
-      || grow_GetObjectType(object) == glow_eObjectType_GrowTable
-      || grow_GetObjectType(object) == glow_eObjectType_GrowBar
-      || grow_GetObjectType(object) == glow_eObjectType_GrowBarArc
-      || grow_GetObjectType(object) == glow_eObjectType_GrowPie
-      || grow_GetObjectType(object) == glow_eObjectType_GrowBarChart
-      || grow_GetObjectType(object) == glow_eObjectType_GrowAxis
-      || grow_GetObjectType(object) == glow_eObjectType_GrowAxisArc
-      || grow_GetObjectType(object) == glow_eObjectType_NodeClass) {
+  if (grow_GetObjectType(object) == glow_eObjectType_GrowNode ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowSlider ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowGroup ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowToolbar ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowWindow ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowTrend ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowXYCurve ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowTable ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowBar ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowBarArc ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowPie ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowBarChart ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowAxis ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowAxisArc ||
+      grow_GetObjectType(object) == glow_eObjectType_NodeClass)
+  {
     GeDyn* dyn;
 
     grow_GetUserData(object, (void**)&dyn);
     if (dyn)
       delete dyn;
   }
-  else if (grow_GetObjectType(object) == glow_eObjectType_GrowDashCell) {
+  else if (grow_GetObjectType(object) == glow_eObjectType_GrowDashCell)
+  {
     GeDash* dash;
 
     grow_GetUserData(object, (void**)&dash);
@@ -6916,18 +7670,20 @@ void Graph::syntax_check(char* instance)
 
   get_name(name);
 
-  if (error_cnt || warning_cnt) {
+  if (error_cnt || warning_cnt)
+  {
     char msg[200];
 
     severity = 'E';
     if (error_cnt == 0)
       severity = 'W';
 
-    sprintf(msg, "Ge syntax check %s, %d errors and %d warnings", name,
-        error_cnt, warning_cnt);
+    sprintf(msg, "Ge syntax check %s, %d errors and %d warnings", name, error_cnt, warning_cnt);
 
     MsgWindow::message(severity, msg);
-  } else {
+  }
+  else
+  {
     char msg[200];
 
     sprintf(msg, "Successful syntax control %s", name);
@@ -6938,16 +7694,17 @@ void Graph::syntax_check(char* instance)
     strcpy(object_name[0], "");
 }
 
-int Graph::syntax_check_list(
-    grow_tObject* list, int list_cnt, int* error_cnt, int* warning_cnt)
+int Graph::syntax_check_list(grow_tObject* list, int list_cnt, int* error_cnt, int* warning_cnt)
 {
   GeDyn* dyn;
   grow_tObject* grouplist;
   int group_cnt;
   int sts;
 
-  for (int i = 0; i < list_cnt; i++) {
-    switch (grow_GetObjectType(list[i])) {
+  for (int i = 0; i < list_cnt; i++)
+  {
+    switch (grow_GetObjectType(list[i]))
+    {
     case glow_eObjectType_GrowNode:
     case glow_eObjectType_GrowSlider:
     case glow_eObjectType_GrowToolbar:
@@ -6987,8 +7744,7 @@ void Graph::syntax_msg(int severity, grow_tObject object, const char* msg)
   grow_GetObjectName(object, name, sizeof(name), glow_eName_Path);
 
   printf("%c %-20s %s\n", severity, name, msg);
-  MsgWindow::message(
-      severity, msg, "   in object ", name, name, parent_ctx, msgw_eRow_Ge);
+  MsgWindow::message(severity, msg, "   in object ", name, name, parent_ctx, msgw_eRow_Ge);
 }
 
 int Graph::check_ldh_object(char* name, pwr_eType* type)
@@ -7004,7 +7760,8 @@ void Graph::set_subgraph_extern_all(int sg_extern)
   int object_cnt;
 
   grow_GetNodeClassList(grow->ctx, &objectlist, &object_cnt);
-  for (int i = 0; i < object_cnt; i++) {
+  for (int i = 0; i < object_cnt; i++)
+  {
     grow_SetNodeClassExtern(objectlist[i], sg_extern);
   }
 }
@@ -7022,13 +7779,18 @@ void GraphApplList::remove(void* ctx)
 {
   GraphApplList* appl_p;
 
-  for (appl_p = next; appl_p; appl_p = appl_p->next) {
-    if (appl_p->ctx == ctx) {
-      if (!appl_p->prev) {
+  for (appl_p = next; appl_p; appl_p = appl_p->next)
+  {
+    if (appl_p->ctx == ctx)
+    {
+      if (!appl_p->prev)
+      {
         next = appl_p->next;
         if (appl_p->next)
           appl_p->next->prev = NULL;
-      } else {
+      }
+      else
+      {
         appl_p->prev->next = appl_p->next;
         if (appl_p->next)
           appl_p->next->prev = appl_p->prev;
@@ -7043,8 +7805,10 @@ int GraphApplList::find(void* key, void** ctx)
 {
   GraphApplList* appl_p;
 
-  for (appl_p = next; appl_p; appl_p = appl_p->next) {
-    if (appl_p->key == key) {
+  for (appl_p = next; appl_p; appl_p = appl_p->next)
+  {
+    if (appl_p->key == key)
+    {
       *ctx = appl_p->ctx;
       return 1;
     }
@@ -7054,32 +7818,38 @@ int GraphApplList::find(void* key, void** ctx)
 
 int GraphApplList::get_first(void** ctx)
 {
-  if (next) {
+  if (next)
+  {
     *ctx = next->ctx;
     return 1;
-  } else
+  }
+  else
     return 0;
 }
 
 //
 // Convert attribute string to value
 //
-int graph_attr_string_to_value(int type_id, const char* value_str,
-    void* buffer_ptr, int buff_size, int attr_size)
+int graph_attr_string_to_value(int type_id, const char* value_str, void* buffer_ptr, int buff_size,
+                               int attr_size)
 {
   int sts;
   char s[100];
 
-  switch (type_id) {
-  case pwr_eType_Boolean: {
+  switch (type_id)
+  {
+  case pwr_eType_Boolean:
+  {
     if (sscanf(value_str, "%d%s", (pwr_tBoolean*)buffer_ptr, s) != 1)
       return GE__INPUT_SYNTAX;
     if (*(pwr_tBoolean*)buffer_ptr > 1)
       return GE__INPUT_SYNTAX;
     break;
   }
-  case pwr_eType_Float32: {
-    if (sscanf(value_str, "%f%s", (float*)buffer_ptr, s) != 1) {
+  case pwr_eType_Float32:
+  {
+    if (sscanf(value_str, "%f%s", (float*)buffer_ptr, s) != 1)
+    {
       char val[40];
       char* sp;
       strncpy(val, value_str, sizeof(val));
@@ -7092,10 +7862,12 @@ int graph_attr_string_to_value(int type_id, const char* value_str,
     }
     break;
   }
-  case pwr_eType_Float64: {
+  case pwr_eType_Float64:
+  {
     pwr_tFloat32 f;
     pwr_tFloat64 d;
-    if (sscanf(value_str, "%f%s", &f, s) != 1) {
+    if (sscanf(value_str, "%f%s", &f, s) != 1)
+    {
       char val[40];
       char* sp;
       strncpy(val, value_str, sizeof(val));
@@ -7111,12 +7883,14 @@ int graph_attr_string_to_value(int type_id, const char* value_str,
 
     break;
   }
-  case pwr_eType_Char: {
+  case pwr_eType_Char:
+  {
     if (sscanf(value_str, "%c%s", (char*)buffer_ptr, s) != 1)
       return GE__INPUT_SYNTAX;
     break;
   }
-  case pwr_eType_Int8: {
+  case pwr_eType_Int8:
+  {
     pwr_tInt8 i8;
     pwr_tInt16 i16;
     if (sscanf(value_str, "%hd%s", &i16, s) != 1)
@@ -7125,24 +7899,27 @@ int graph_attr_string_to_value(int type_id, const char* value_str,
     memcpy(buffer_ptr, (char*)&i8, sizeof(i8));
     break;
   }
-  case pwr_eType_Int16: {
+  case pwr_eType_Int16:
+  {
     if (sscanf(value_str, "%hd%s", (short*)buffer_ptr, s) != 1)
       return GE__INPUT_SYNTAX;
     break;
   }
   case pwr_eType_Int32:
-  case pwr_eType_Enum: {
+  case pwr_eType_Enum:
+  {
     if (sscanf(value_str, "%d%s", (int*)buffer_ptr, s) != 1)
       return GE__INPUT_SYNTAX;
     break;
   }
-  case pwr_eType_Int64: {
-    if (sscanf(value_str, pwr_dFormatInt64 "%s", (pwr_tInt64*)buffer_ptr, s)
-        != 1)
+  case pwr_eType_Int64:
+  {
+    if (sscanf(value_str, pwr_dFormatInt64 "%s", (pwr_tInt64*)buffer_ptr, s) != 1)
       return GE__INPUT_SYNTAX;
     break;
   }
-  case pwr_eType_UInt8: {
+  case pwr_eType_UInt8:
+  {
     pwr_tUInt8 i8;
     pwr_tUInt16 i16;
     if (sscanf(value_str, "%hu%s", &i16, s) != 1)
@@ -7151,30 +7928,34 @@ int graph_attr_string_to_value(int type_id, const char* value_str,
     memcpy(buffer_ptr, (char*)&i8, sizeof(i8));
     break;
   }
-  case pwr_eType_UInt16: {
+  case pwr_eType_UInt16:
+  {
     if (sscanf(value_str, "%hu%s", (unsigned short*)buffer_ptr, s) != 1)
       return GE__INPUT_SYNTAX;
     break;
   }
   case pwr_eType_UInt32:
-  case pwr_eType_Mask: {
+  case pwr_eType_Mask:
+  {
     if (sscanf(value_str, "%lu%s", (unsigned long*)buffer_ptr, s) != 1)
       return GE__INPUT_SYNTAX;
     break;
   }
-  case pwr_eType_UInt64: {
-    if (sscanf(value_str, pwr_dFormatUInt64 "%s", (pwr_tUInt64*)buffer_ptr, s)
-        != 1)
+  case pwr_eType_UInt64:
+  {
+    if (sscanf(value_str, pwr_dFormatUInt64 "%s", (pwr_tUInt64*)buffer_ptr, s) != 1)
       return GE__INPUT_SYNTAX;
     break;
   }
-  case pwr_eType_String: {
+  case pwr_eType_String:
+  {
     if ((int)strlen(value_str) >= attr_size)
       return GE__STRINGTOLONG;
     strncpy((char*)buffer_ptr, value_str, MIN(attr_size, buff_size));
     break;
   }
-  case pwr_eType_ObjDId: {
+  case pwr_eType_ObjDId:
+  {
     pwr_tObjid objid;
 
     sts = gdh_NameToObjid(value_str, &objid);
@@ -7183,7 +7964,8 @@ int graph_attr_string_to_value(int type_id, const char* value_str,
     memcpy(buffer_ptr, &objid, sizeof(objid));
     break;
   }
-  case pwr_eType_ClassId: {
+  case pwr_eType_ClassId:
+  {
     pwr_tClassId classid;
     pwr_tObjid objid;
 
@@ -7194,7 +7976,8 @@ int graph_attr_string_to_value(int type_id, const char* value_str,
     memcpy(buffer_ptr, (char*)&classid, sizeof(classid));
     break;
   }
-  case pwr_eType_TypeId: {
+  case pwr_eType_TypeId:
+  {
     pwr_tTypeId val_typeid;
     pwr_tObjid objid;
 
@@ -7205,7 +7988,8 @@ int graph_attr_string_to_value(int type_id, const char* value_str,
     memcpy(buffer_ptr, (char*)&val_typeid, sizeof(val_typeid));
     break;
   }
-  case pwr_eType_ObjectIx: {
+  case pwr_eType_ObjectIx:
+  {
     pwr_tObjectIx objectix;
 
     sts = cdh_StringToObjectIx(value_str, &objectix);
@@ -7214,7 +7998,8 @@ int graph_attr_string_to_value(int type_id, const char* value_str,
     memcpy(buffer_ptr, (char*)&objectix, sizeof(objectix));
     break;
   }
-  case pwr_eType_VolumeId: {
+  case pwr_eType_VolumeId:
+  {
     pwr_tVolumeId volumeid;
 
     sts = cdh_StringToVolumeId(value_str, &volumeid);
@@ -7223,7 +8008,8 @@ int graph_attr_string_to_value(int type_id, const char* value_str,
     memcpy(buffer_ptr, (char*)&volumeid, sizeof(volumeid));
     break;
   }
-  case pwr_eType_RefId: {
+  case pwr_eType_RefId:
+  {
     pwr_tRefId subid;
 
     sts = cdh_StringToSubid(value_str, &subid);
@@ -7232,7 +8018,8 @@ int graph_attr_string_to_value(int type_id, const char* value_str,
     memcpy(buffer_ptr, (char*)&subid, sizeof(subid));
     break;
   }
-  case pwr_eType_AttrRef: {
+  case pwr_eType_AttrRef:
+  {
     pwr_sAttrRef attrref;
 
     sts = gdh_NameToAttrref(pwr_cNObjid, value_str, &attrref);
@@ -7241,7 +8028,8 @@ int graph_attr_string_to_value(int type_id, const char* value_str,
     memcpy(buffer_ptr, &attrref, sizeof(attrref));
     break;
   }
-  case pwr_eType_Time: {
+  case pwr_eType_Time:
+  {
     pwr_tTime time;
 
     sts = time_AsciiToA(value_str, &time);
@@ -7250,7 +8038,8 @@ int graph_attr_string_to_value(int type_id, const char* value_str,
     memcpy(buffer_ptr, (char*)&time, sizeof(time));
     break;
   }
-  case pwr_eType_DeltaTime: {
+  case pwr_eType_DeltaTime:
+  {
     pwr_tDeltaTime deltatime;
 
     sts = time_AsciiToD(value_str, &deltatime);
@@ -7263,18 +8052,14 @@ int graph_attr_string_to_value(int type_id, const char* value_str,
   return 1;
 }
 
-GraphRecallBuff::GraphRecallBuff() : cnt(0), size(RECALL_BUFF_SIZE)
-{
-  memset(key, 0, sizeof(key));
-}
+GraphRecallBuff::GraphRecallBuff() : cnt(0), size(RECALL_BUFF_SIZE) { memset(key, 0, sizeof(key)); }
 
 GraphRecallBuff::~GraphRecallBuff()
 {
   for (int i = 0; i < cnt; i++)
     delete buff[i];
 }
-void GraphRecallBuff::insert(
-    GeDyn* data, const char* data_key, grow_tObject object)
+void GraphRecallBuff::insert(GeDyn* data, const char* data_key, grow_tObject object)
 {
   int i;
   char new_key[80];
@@ -7284,11 +8069,13 @@ void GraphRecallBuff::insert(
   else
     strcpy(new_key, data_key);
 
-  if (cnt == size) {
+  if (cnt == size)
+  {
     delete buff[size - 1];
     cnt = size - 1;
   }
-  for (i = cnt; i > 0; i--) {
+  for (i = cnt; i > 0; i--)
+  {
     buff[i] = buff[i - 1];
     strcpy(key[i], key[i - 1]);
   }
@@ -7308,8 +8095,10 @@ int GraphRecallBuff::get(GeDyn** data, int idx)
 
 int GraphRecallBuff::get(GeDyn** data, char* k)
 {
-  for (int i = 0; i < cnt; i++) {
-    if (streq(k, key[i])) {
+  for (int i = 0; i < cnt; i++)
+  {
+    if (streq(k, key[i]))
+    {
       *data = new GeDyn(*buff[i]);
       return 1;
     }
