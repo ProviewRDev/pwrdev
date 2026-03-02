@@ -485,7 +485,7 @@ else
     pwre_config_check_lib rabbitmq  RABBITMQ lib rabbitmq  1 "/usr/lib/$hwpl-linux-$gnu/librabbitmq.so"
     pwre_config_check_lib mqtt      MQTT lib mqtt  1 "/usr/lib/$hwpl-linux-$gnu/libmosquitto.so"
     pwre_config_check_lib mq        MQ       lib mq  1 "/usr/lib/libdmq.so:/usr/local/dmq/lib/libdmq.so:/usr/local/lib/libdmq.so"
-    pwre_config_check_lib wmq       WMQ      lib wmq 1 "/usr/lib/libmqic.so"
+    pwre_config_check_lib wmq       WMQ      lib wmq 1 "/opt/mqm/lib64/libmqic.so:/usr/lib/libmqic.so"
     pwre_config_check_include rdkafka RDKAFKA 1 "/usr/include/librdkafka/rdkafka.h"
     pwre_config_check_lib rdkafka   LIBRDKAFKA  lib librdkafka 1 "/usr/lib/librdkafka.so:/usr/lib/$hwpl-linux-$gnu/librdkafka.so"
     pwre_config_check_include profinet.h PNAK 0 "/usr/include/softing/profinet/profinet.h"
