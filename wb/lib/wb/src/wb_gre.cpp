@@ -3051,6 +3051,8 @@ int WGre::set_trace_attributes(char* host)
       case pwr_cClass_CStoBoInt32:
       case pwr_cClass_CStoBoFloat32:
       case pwr_cClass_CStoBoString80:
+      case pwr_cClass_GetConstAv:
+      case pwr_cClass_GetConstIv:
         sts = ldh_GetObjectBodyDef(wind->hw.ldhses, (*node_ptr)->ln.cid,
             "DevBody", 1, &bodydef, &rows);
         if (EVEN(sts))
@@ -3144,6 +3146,8 @@ int WGre::set_trace_attributes(char* host)
       case pwr_cClass_cstoii:
       case pwr_cClass_cstoio:
       case pwr_cClass_cstoiv:
+      case pwr_cClass_GetConstAv:
+      case pwr_cClass_GetConstIv:
         strcpy(attr_str, "ActualValue");
         break;
       default:;
