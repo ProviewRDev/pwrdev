@@ -272,6 +272,53 @@ void pack_read_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, unsigned short device_
   pRR->LengthLowByte = _PN_U16_LOW_BYTE(read_request->Length);
 }
 
+void pack_read_im0_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, unsigned short device_ref)
+{
+  unsigned offset = 0u;
+
+  T_PNAK_SERVICE_DESCRIPTION* service_desc;
+  T_PN_SERVICE_READ_REQ* pRR;
+
+  memset(ServiceReqRes, 0, sizeof(T_PNAK_SERVICE_REQ_RES));
+  ServiceReqRes->NumberEntries = 1;
+  ServiceReqRes->ServiceEntry[0].ServiceOffset = 0;
+
+  service_desc = (T_PNAK_SERVICE_DESCRIPTION*)&ServiceReqRes->ServiceChannel[offset];
+
+  service_desc->DeviceRef = device_ref;
+  service_desc->Instance = PN_CONTROLLER;
+  service_desc->Service = PN_SERVICE_READ;
+  service_desc->Primitive = PNAK_SERVICE_REQ;
+  service_desc->ClientId = 1; // Use ClientId 1 to identify IM0 read
+  service_desc->InvokeId = 0;
+  service_desc->DataLength = sizeof(T_PN_SERVICE_READ_REQ);
+
+  pRR = (T_PN_SERVICE_READ_REQ*)(service_desc + 1);
+
+  pRR->VersionHighByte = 1;
+  pRR->VersionLowByte = 0;
+
+  // API = 0 (default API)
+  pRR->APIHighWordHighByte = 0;
+  pRR->APIHighWordLowByte = 0;
+  pRR->APILowWordHighByte = 0;
+  pRR->APILowWordLowByte = 0;
+
+  // Slot 0, Subslot 1 (DAP subslot for IM0)
+  pRR->SlotNumberHighByte = _PN_U16_HIGH_BYTE(0u);
+  pRR->SlotNumberLowByte = _PN_U16_LOW_BYTE(0u);
+  pRR->SubSlotNumberHighByte = _PN_U16_HIGH_BYTE(1u);
+  pRR->SubSlotNumberLowByte = _PN_U16_LOW_BYTE(1u);
+
+  // Index for I&M0 = 0xAFF0
+  pRR->IndexHighByte = _PN_U16_HIGH_BYTE(PROFINET_INDEX_IDENT_AND_MAINTENANCE_0);
+  pRR->IndexLowByte = _PN_U16_LOW_BYTE(PROFINET_INDEX_IDENT_AND_MAINTENANCE_0);
+
+  // Length of T_PROFINET_IDENT_MAINTENANCE
+  pRR->LengthHighByte = _PN_U16_HIGH_BYTE(sizeof(T_PROFINET_IDENT_MAINTENANCE));
+  pRR->LengthLowByte = _PN_U16_LOW_BYTE(sizeof(T_PROFINET_IDENT_MAINTENANCE));
+}
+
 void pack_write_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, unsigned short device_ref,
                     pwr_sClass_PnWriteReq* wr_req)
 {
@@ -1020,6 +1067,107 @@ int unpack_read_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local)
     error_con->Detail = pErrorCon->Detail;
     error_con->AdditionalDetail = pErrorCon->AdditionalDetail;
     error_con->AreaCode = pErrorCon->AreaCode;
+  }
+
+  return -1;
+}
+
+int unpack_read_im0_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local, io_sAgent* ap)
+{
+  int i;
+  io_sRack* slave_list;
+  pwr_sClass_PnDevice* dev = NULL;
+  unsigned short device_ref = pSdb->DeviceRef;
+  std::shared_ptr<ProfinetDevice> pn_device;
+
+  if (!ap)
+  {
+    errh_Warning("PROFINET: No valid agent pointer while unpacking IM0 read con "
+                 "for device %d",
+                 device_ref);
+    return PNAK_OK;
+  }
+
+  // Find device in agent rack. Start iterating on 1 since 0 is our "station".
+  for (slave_list = ap->racklist, i = 1; slave_list != NULL; slave_list = slave_list->next, i++)
+  {
+    if (local->device_list[i]->m_rt_device_ref == device_ref)
+    {
+      dev = (pwr_sClass_PnDevice*)slave_list->op;
+      pn_device = local->device_list[i];
+      break;
+    }
+  }
+
+  if (!dev)
+  {
+    errh_Warning("PROFINET: No device found for IM0 read, device reference %d", device_ref);
+    return PNAK_OK;
+  }
+
+  if (pSdb->Result == PNAK_RESULT_POS)
+  {
+    T_PN_SERVICE_READ_CON* pReadCon = (T_PN_SERVICE_READ_CON*)(pSdb + 1);
+    PN_U16 length = _HIGH_LOW_BYTES_TO_PN_U16(pReadCon->LengthHighByte, pReadCon->LengthLowByte);
+
+    if (length >= sizeof(T_PROFINET_IDENT_MAINTENANCE))
+    {
+      T_PROFINET_IDENT_MAINTENANCE* pIM0 = (T_PROFINET_IDENT_MAINTENANCE*)(pReadCon + 1);
+
+      // Fill in the IM0 structure in the PnDevice
+      pwr_sClass_IM0* im0 = &dev->IM.IM0;
+
+      im0->BlockType = _HIGH_LOW_BYTES_TO_PN_U16(pIM0->Header.TypeHighByte, pIM0->Header.TypeLowByte);
+      im0->BlockLength = _HIGH_LOW_BYTES_TO_PN_U16(pIM0->Header.LengthHighByte, pIM0->Header.LengthLowByte);
+      im0->BlockVersionHighByte = pIM0->Header.VersionHighByte;
+      im0->BlockVersionLowByte = pIM0->Header.VersionLowByte;
+
+      im0->ManufacturerID = _HIGH_LOW_BYTES_TO_PN_U16(pIM0->VendorIdHighByte, pIM0->VendorIdLowByte);
+
+      // Copy OrderId (20 bytes, null-terminate)
+      memcpy(im0->OrderNo, pIM0->OrderId, PROFINET_IDENT_MAINTENANCE_ORDER_ID_LENGTH);
+
+      // Copy SerialNumber (16 bytes, null-terminate)
+      memcpy(im0->SerialNo, pIM0->SerialNumber, PROFINET_IDENT_MAINTENANCE_SR_NUMBER_LENGTH);
+
+      im0->HardwareRevision = _HIGH_LOW_BYTES_TO_PN_U16(pIM0->HwRevisionHighByte, pIM0->HwRevisionLowByte);
+
+      // Software revision is stored as 4 bytes: prefix (V/R/P/U/T) + major + minor + patch
+      im0->SoftwareRevision[0] = pIM0->SwRevisionHighWordHighByte;
+      im0->SoftwareRevision[1] = pIM0->SwRevisionHighWordLowByte;
+      im0->SoftwareRevision[2] = pIM0->SwRevisionLowWordHighByte;
+      im0->SoftwareRevision[3] = pIM0->SwRevisionLowWordLowByte;
+
+      im0->RevisionStatus =
+          _HIGH_LOW_BYTES_TO_PN_U16(pIM0->RevisionCounterHighByte, pIM0->RevisionCounterLowByte);
+
+      im0->ProfileID = _HIGH_LOW_BYTES_TO_PN_U16(pIM0->ProfileIdHighByte, pIM0->ProfileIdLowByte);
+
+      im0->ProfileSpecificType =
+          _HIGH_LOW_BYTES_TO_PN_U16(pIM0->ProfileTypeHighByte, pIM0->ProfileTypeLowByte);
+
+      im0->IMVersion = _HIGH_LOW_BYTES_TO_PN_U16(pIM0->VersionHighByte, pIM0->VersionLowByte);
+
+      im0->IMSupport = _HIGH_LOW_BYTES_TO_PN_U16(pIM0->SupportedHighByte, pIM0->SupportedLowByte);
+
+      // Mark IM0 as read for this device
+      pn_device->m_rt_im0_read = true;
+
+      errh_Info("PROFINET: IM0 read successfully for device %s, ManufacturerID: 0x%04X, OrderNo: %.20s",
+                slave_list->Name, im0->ManufacturerID, im0->OrderNo);
+    }
+    else
+    {
+      errh_Warning("PROFINET: IM0 read returned insufficient data length %d for device %d", length,
+                   device_ref);
+    }
+
+    return PNAK_OK;
+  }
+  else if (pSdb->Result == PNAK_RESULT_NEG)
+  {
+    T_PN_SERVICE_ERROR_CON* pErrorCon = (T_PN_SERVICE_ERROR_CON*)(pSdb + 1);
+    print_error_con(pErrorCon, device_ref, __FILE__, __LINE__, "unpack_read_im0_con()");
   }
 
   return -1;
@@ -1781,7 +1929,15 @@ int handle_service_con(io_sAgentLocal* local, io_sAgent* ap)
         }
         case PN_SERVICE_READ:
         {
-          sts = unpack_read_con(pSdb, local);
+          // ClientId 1 is used for IM0 read requests
+          if (pSdb->ClientId == 1)
+          {
+            sts = unpack_read_im0_con(pSdb, local, ap);
+          }
+          else
+          {
+            sts = unpack_read_con(pSdb, local);
+          }
           break;
         }
 
@@ -1927,6 +2083,19 @@ void handle_device_state_changed(io_sAgentLocal* local, io_sAgent* ap)
           if (sts == PNAK_OK)
           {
             sts = wait_service_con(local, ap);
+          }
+
+          // Read IM0 data only once when device becomes connected
+          if (!local->device_list[ii]->m_rt_im0_read)
+          {
+            pack_read_im0_req(&local->service_req_res, local->device_list[ii]->m_rt_device_ref);
+
+            sts = pnak_send_service_req_res(0, &local->service_req_res);
+
+            if (sts == PNAK_OK)
+            {
+              sts = wait_service_con(local, ap);
+            }
           }
         }
       }

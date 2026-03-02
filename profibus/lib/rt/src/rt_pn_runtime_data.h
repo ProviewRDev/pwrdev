@@ -322,6 +322,7 @@ public:
   unsigned char m_rt_macaddress[6];
   std::string m_rt_interface_name;  // Used by the controller. Ignored by other devices...
   std::string m_rt_version = "1.0"; // Who knows? According to manual set this to "1.0"
+  bool m_rt_im0_read = false;       // Flag to indicate whether IM0 has been read
 };
 
 class ProfinetRuntimeData
