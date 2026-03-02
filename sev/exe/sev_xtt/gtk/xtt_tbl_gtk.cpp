@@ -52,7 +52,10 @@
 #include "xtt_sevhist_gtk.h"
 #include "xtt_tbl_gtk.h"
 
-void XttTblGtk::message(char severity, const char* message) { gtk_label_set_text(GTK_LABEL(msg_label), message); }
+void XttTblGtk::message(char severity, const char* message)
+{
+  gtk_label_set_text(GTK_LABEL(msg_label), message);
+}
 
 static gint delete_event(GtkWidget* w, GdkEvent* event, gpointer data)
 {
