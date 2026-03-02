@@ -247,7 +247,8 @@ pwr_tStatus thread_SetDeadline(pwr_sClass_PlcThread* o)
     {
       fprintf(stderr,
               "Warning! PLC thread %s has a period %" PRIu64 " ms shorter than its WCET %" PRIu64 " ms\n",
-              o->Description, attr.sched_period / (1000 * 1000), attr.sched_runtime / (1000 * 1000));
+              o->Description, (uint64_t)(attr.sched_period / (1000 * 1000)),
+              (uint64_t)(attr.sched_runtime / (1000 * 1000)));
     }
     if (o->Deadline > FLT_EPSILON)
     {
