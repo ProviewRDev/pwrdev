@@ -511,7 +511,11 @@ $(pwre_sroot)/doc/man/%.pdf : $(pwre_sroot)/doc/man/%.fo $(pwre_sroot)/doc/man/s
 #$(doc_dir)/sv_se/%_index.html :: $(pwre_sroot)/doc/man/sv_se/%.xml
 #	$(xsltproc) $(xsltproc_args) $(chunk_args_sv_se) $(chunk_xsl) $(source)
 
-$(doc_dir)/sv_se/%.css $(doc_dir)/en_us/%.css :: $(pwre_sroot)/doc/man/src/%.css
+$(doc_dir)/sv_se/%.css :: $(pwre_sroot)/doc/man/src/%.css
+	@ $(log_cp)
+	@ cp $(source) $(target)
+
+$(doc_dir)/en_us/%.css :: $(pwre_sroot)/doc/man/src/%.css
 	@ $(log_cp)
 	@ cp $(source) $(target)
 
