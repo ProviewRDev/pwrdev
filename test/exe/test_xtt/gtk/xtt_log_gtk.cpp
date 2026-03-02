@@ -48,7 +48,7 @@
 
 #include "xtt_log_gtk.h"
 
-void XttLogGtk::message(char severity, char* message)
+void XttLogGtk::message(char severity, const char* message)
 {
   gtk_label_set_text(GTK_LABEL(msg_label), message);
 }

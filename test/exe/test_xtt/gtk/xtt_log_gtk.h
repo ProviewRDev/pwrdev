@@ -60,7 +60,7 @@ public:
   CoWowRecall* cmd_recall;
   CoWowEntryGtk* cmd_entry;
 
-  void message(char severity, char* message);
+  void message(char severity, const char* message);
   void set_prompt(const char* prompt);
 
   static void activate_command(GtkWidget* w, gpointer data);

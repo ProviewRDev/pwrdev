@@ -3255,7 +3255,7 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
     break;
   }
   case glow_eEvent_Translate: {
-    char new_text[200];
+    static char new_text[200];
     int sts;
 
     sts = Lng::translate(event->translate.text, new_text);
@@ -4588,7 +4588,7 @@ static int graph_trace_grow_cb(GlowCtx* ctx, glow_tEvent event)
   }
 
   case glow_eEvent_Translate: {
-    char new_text[200];
+    static char new_text[200];
     int sts;
 
     sts = Lng::translate(event->translate.text, new_text);
