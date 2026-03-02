@@ -1341,7 +1341,6 @@ int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local
 
           std::string event_text = event_text_stream.str();
           std::string event_more_text = event_more_text_stream.str();
-          local->logger->log(event_text + event_more_text, CoLogLevel::INFO, CoLogFacility::Local0);
           event_text.resize(sizeof(pwr_tString80) - 1);
           event_more_text.resize(sizeof(pwr_tString256) - 1);
 
@@ -2033,16 +2032,12 @@ void* handle_events(void* ptr)
   local = (io_sAgentLocal*)args->local;
   ap = args->ap;
 
-  local->logger->log("Started supervision thread");
-
   // Connect to alarm handling
   sts = connect_alarm();
   if EVEN (sts)
   {
     errh_Warning("PROFINET: Unable to initialize alarm queue. Alarms from this "
                  "service won't work...");
-    local->logger->log("Unable to initialize alarm queue. Alarms from this service won't work...",
-                       CoLogLevel::WARNING);
   }
 
   pthread_mutex_lock(&local->mutex);
