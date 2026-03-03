@@ -54,7 +54,6 @@
 
 #include "co_cdh.h"
 #include "co_dcli.h"
-#include "co_logger.h"
 #include "pwr_profibusclasses.h"
 
 #include "rt_io_base.h"
@@ -93,7 +92,6 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
   local = (io_sAgentLocal*)ap->Local;
   op = (pwr_sClass_PnControllerSoftingPNAK*)ap->op;
 
-  local->logger->log("Profinet Softing PNAK agent init (co_logger)", CoLogLevel::INFO);
   errh_Info("Profinet Softing PNAK agent init");
 
   pnak_init();

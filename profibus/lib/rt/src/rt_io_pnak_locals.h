@@ -46,7 +46,6 @@
 #include "rt_pn_runtime_data.h"
 #include "profinet.h"
 #include "pnak.h"
-#include "co_logger.h"
 
 /* rt_io_pnak_locals.h -- Profinet io handling locals. */
 
@@ -61,17 +60,7 @@ typedef struct _agent_args
 class io_sAgentLocal
 {
 public:
-  io_sAgentLocal()
-  {
-    logger = &CoLogger::instance("PnControllerSoftingPNAK");
-    logger->setFacility(CoLogFacility::Local6);
-    logger->addStructuredData("proviewr", {{"pwr-agent", "PnControllerSoftingPNAK"}});
-#ifdef DEBUG
-    logger->setLogLevel(CoLogLevel::DEBUG);
-#else
-    logger->setLogLevel(CoLogLevel::INFO);
-#endif
-  }
+  io_sAgentLocal() {}
 
   T_PNAK_SERVICE_REQ_RES service_req_res;
   T_PNAK_SERVICE_CON service_con;
@@ -80,8 +69,6 @@ public:
 
   pthread_t handle_events;
   agent_args args;
-
-  CoLogger* logger;
 
   pthread_mutex_t mutex;
   pthread_cond_t cond;

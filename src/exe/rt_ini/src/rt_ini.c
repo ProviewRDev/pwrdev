@@ -976,7 +976,7 @@ static pwr_tStatus events(ini_sContext* cp)
         s += len + 1;
         totlen += len + 1;
       }
-      argv = (char**)calloc(sizeof(void*), argc);
+      argv = (char**)calloc(argc, sizeof(void*));
       for (i = 0, s = get.data; i < argc; i++)
       {
         len = strlen(s);
@@ -1330,7 +1330,7 @@ static void load_backup()
   pwr_tInt32** rscoa = NULL;
 
   // Store ActualValue pointers
-  rsav = calloc(sizeof(ini_sRestoreSig), iop->AvCount);
+  rsav = calloc(iop->AvCount, sizeof(ini_sRestoreSig));
   i = 0;
   for (sts = gdh_GetClassListAttrRef(pwr_cClass_Av, &aref); ODD(sts);
        sts = gdh_GetNextAttrRef(pwr_cClass_Av, &aref, &aref))
@@ -1350,7 +1350,7 @@ static void load_backup()
     i++;
   }
 
-  rsdv = calloc(sizeof(ini_sRestoreSig), iop->DvCount);
+  rsdv = calloc(iop->DvCount, sizeof(ini_sRestoreSig));
   i = 0;
   for (sts = gdh_GetClassListAttrRef(pwr_cClass_Dv, &aref); ODD(sts);
        sts = gdh_GetNextAttrRef(pwr_cClass_Dv, &aref, &aref))
@@ -1370,7 +1370,7 @@ static void load_backup()
     i++;
   }
 
-  rsiv = calloc(sizeof(ini_sRestoreSig), iop->IvCount);
+  rsiv = calloc(iop->IvCount, sizeof(ini_sRestoreSig));
   i = 0;
   for (sts = gdh_GetClassListAttrRef(pwr_cClass_Iv, &aref); ODD(sts);
        sts = gdh_GetNextAttrRef(pwr_cClass_Iv, &aref, &aref))
@@ -1390,7 +1390,7 @@ static void load_backup()
     i++;
   }
 
-  rsatv = calloc(sizeof(ini_sRestoreSig), iop->ATvCount);
+  rsatv = calloc(iop->ATvCount, sizeof(ini_sRestoreSig));
   i = 1;
   for (sts = gdh_GetClassListAttrRef(pwr_cClass_ATv, &aref); ODD(sts);
        sts = gdh_GetNextAttrRef(pwr_cClass_ATv, &aref, &aref))
@@ -1410,7 +1410,7 @@ static void load_backup()
     i++;
   }
 
-  rsdtv = calloc(sizeof(ini_sRestoreSig), iop->DTvCount);
+  rsdtv = calloc(iop->DTvCount, sizeof(ini_sRestoreSig));
   i = 0;
   for (sts = gdh_GetClassListAttrRef(pwr_cClass_DTv, &aref); ODD(sts);
        sts = gdh_GetNextAttrRef(pwr_cClass_DTv, &aref, &aref))
@@ -1430,7 +1430,7 @@ static void load_backup()
     i++;
   }
 
-  rssv = calloc(sizeof(ini_sRestoreSig), iop->SvCount);
+  rssv = calloc(iop->SvCount, sizeof(ini_sRestoreSig));
   i = 0;
   for (sts = gdh_GetClassListAttrRef(pwr_cClass_Sv, &aref); ODD(sts);
        sts = gdh_GetNextAttrRef(pwr_cClass_Sv, &aref, &aref))
@@ -1450,7 +1450,7 @@ static void load_backup()
     i++;
   }
 
-  rsai = calloc(sizeof(ini_sRestoreSig), iop->AiCount);
+  rsai = calloc(iop->AiCount, sizeof(ini_sRestoreSig));
   i = 0;
   for (sts = gdh_GetClassListAttrRef(pwr_cClass_Ai, &aref); ODD(sts);
        sts = gdh_GetNextAttrRef(pwr_cClass_Ai, &aref, &aref))
@@ -1470,7 +1470,7 @@ static void load_backup()
     i++;
   }
 
-  rsao = calloc(sizeof(ini_sRestoreSig), iop->AoCount);
+  rsao = calloc(iop->AoCount, sizeof(ini_sRestoreSig));
   i = 0;
   for (sts = gdh_GetClassListAttrRef(pwr_cClass_Ao, &aref); ODD(sts);
        sts = gdh_GetNextAttrRef(pwr_cClass_Ao, &aref, &aref))
@@ -1490,7 +1490,7 @@ static void load_backup()
     i++;
   }
 
-  rsii = calloc(sizeof(ini_sRestoreSig), iop->IiCount);
+  rsii = calloc(iop->IiCount, sizeof(ini_sRestoreSig));
   i = 0;
   for (sts = gdh_GetClassListAttrRef(pwr_cClass_Ii, &aref); ODD(sts);
        sts = gdh_GetNextAttrRef(pwr_cClass_Ii, &aref, &aref))
@@ -1510,7 +1510,7 @@ static void load_backup()
     i++;
   }
 
-  rsio = calloc(sizeof(ini_sRestoreSig), iop->IoCount);
+  rsio = calloc(iop->IoCount, sizeof(ini_sRestoreSig));
   i = 0;
   for (sts = gdh_GetClassListAttrRef(pwr_cClass_Io, &aref); ODD(sts);
        sts = gdh_GetNextAttrRef(pwr_cClass_Io, &aref, &aref))
@@ -1530,7 +1530,7 @@ static void load_backup()
     i++;
   }
 
-  rsdi = calloc(sizeof(ini_sRestoreSig), iop->DiCount);
+  rsdi = calloc(iop->DiCount, sizeof(ini_sRestoreSig));
   i = 0;
   for (sts = gdh_GetClassListAttrRef(pwr_cClass_Di, &aref); ODD(sts);
        sts = gdh_GetNextAttrRef(pwr_cClass_Di, &aref, &aref))
@@ -1550,7 +1550,7 @@ static void load_backup()
     i++;
   }
 
-  rsdo = calloc(sizeof(ini_sRestoreSig), iop->DoCount);
+  rsdo = calloc(iop->DoCount, sizeof(ini_sRestoreSig));
   i = 0;
   for (sts = gdh_GetClassListAttrRef(pwr_cClass_Do, &aref); ODD(sts);
        sts = gdh_GetNextAttrRef(pwr_cClass_Do, &aref, &aref))
@@ -1570,8 +1570,8 @@ static void load_backup()
     i++;
   }
 
-  rsco = calloc(sizeof(ini_sRestoreSig), iop->CoCount);
-  rscoa = calloc(sizeof(pwr_tInt32*), iop->CoCount);
+  rsco = calloc(iop->CoCount, sizeof(ini_sRestoreSig));
+  rscoa = calloc(iop->CoCount, sizeof(pwr_tInt32*));
   i = 0;
   for (sts = gdh_GetClassListAttrRef(pwr_cClass_Co, &aref); ODD(sts);
        sts = gdh_GetNextAttrRef(pwr_cClass_Co, &aref, &aref))

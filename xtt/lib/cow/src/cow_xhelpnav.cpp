@@ -59,7 +59,7 @@ static void xhelpnav_open_URL(CoXHelpNav* xhelpnav, char* url)
     (xhelpnav->open_URL_cb)(xhelpnav->parent_ctx, url);
 }
 
-static void xhelpnav_help_message_cb(void* ctx, char sev, char* text)
+static void __attribute__((unused)) xhelpnav_help_message_cb(void* ctx, char sev, char* text)
 {
   CoXHelpNav* xhelpnav = (CoXHelpNav*)ctx;
   xhelpnav->message(sev, text);
@@ -659,7 +659,7 @@ HItemHelpImage::HItemHelpImage(CoXHelpNavBrow* brow, const char* item_name, brow
 
 int HItemHelpImage::doubleclick_action(CoXHelpNavBrow* brow, CoXHelpNav* xhelpnav, double x, double y)
 {
-  int sts;
+  int sts = 0;
 
   if (!streq(link, ""))
   {
@@ -778,7 +778,7 @@ bool HItemHelp::search(char* str, bool strict)
 
 int HItemHelp::doubleclick_action(CoXHelpNavBrow* brow, CoXHelpNav* xhelpnav, double x, double y)
 {
-  int sts;
+  int sts = 0;
 
   if (index)
   {
@@ -848,7 +848,7 @@ bool HItemHelpBold::search(char* str, bool strict)
 
 int HItemHelpBold::doubleclick_action(CoXHelpNavBrow* brow, CoXHelpNav* xhelpnav, double x, double y)
 {
-  int sts;
+  int sts = 0;
 
   if (index)
   {
@@ -927,7 +927,7 @@ void doubleclick_action_helper_func(CoXHelpNav* xhelpnav, int sts, char* link, c
 
   if (file_name[0] == 0)
   {
-    sprintf(temp_file_name, "");
+    temp_file_name[0] = '\0';
     sts = xhelpnav->help(link, bookmark, navh_eHelpFile_Base, NULL, 1, true, &error_optional_log);
     if (EVEN(sts))
       sts = xhelpnav->help(link, bookmark, navh_eHelpFile_Project, NULL, 1, true, &error_optional_log);
