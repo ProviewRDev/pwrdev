@@ -45,6 +45,7 @@
 #include "co_dcli.h"
 #include "co_string.h"
 #include "co_ver.h"
+#include "pwr_version.h"
 
 #include "rt_errh_msg.h"
 #include "rt_ini_event.h"
@@ -304,8 +305,8 @@ static ini_sContext* createContext(int argc, char** argv)
 
   if (argc > 1 && streq(argv[1], "--version"))
   {
-    system("cat $pwr_exe/rt_version.dat");
-    exit(1);
+    printf("Version: %s\n", pwrv_cPwrVersionStr);
+    exit(0);
   }
   if (!(cp = ini_CreateContext(&sts)))
   {

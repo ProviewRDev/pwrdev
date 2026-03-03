@@ -50,6 +50,7 @@
 #include "co_string.h"
 #include "co_time.h"
 #include "co_ver.h"
+#include "pwr_version.h"
 
 #include "rt_bck_load.h"
 #include "rt_errh.h"
@@ -662,8 +663,8 @@ static ini_sContext* createContext(int argc, char** argv)
 
   if (argc > 1 && streq(argv[1], "--version"))
   {
-    system("cat $pwr_exe/rt_version.dat");
-    exit(1);
+    printf("Version: %s\n", pwrv_cPwrVersionStr);
+    exit(0);
   }
   if (!(cp = ini_CreateContext(&sts)))
   {
