@@ -146,10 +146,10 @@ void GlowExportFlow::text(GrowText* o)
 
   switch (o->draw_type) {
   case glow_eDrawType_TextHelveticaBold:
-    draw_type = flow_eDrawType_TextHelveticaBold;
+    draw_type = flow_eDrawType_TextRobotoBold;
     break;
   default:
-    draw_type = flow_eDrawType_TextHelvetica;
+    draw_type = flow_eDrawType_TextRoboto;
   }
 
   fp << int(flow_eSave_Text) << '\n';
@@ -167,10 +167,10 @@ void GlowExportFlow::annot(GrowSubAnnot* o)
 
   switch (o->draw_type) {
   case glow_eDrawType_TextHelveticaBold:
-    draw_type = flow_eDrawType_TextHelveticaBold;
+    draw_type = flow_eDrawType_TextRobotoBold;
     break;
   default:
-    draw_type = flow_eDrawType_TextHelvetica;
+    draw_type = flow_eDrawType_TextRoboto;
   }
 
   fp << int(flow_eSave_Annot) << '\n';

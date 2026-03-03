@@ -47,9 +47,9 @@ static void tiptext_timer_cb(GlowCtx* ctx)
   ctx->tiptext->timer_id = 0;
   ctx->tiptext->active = true;
 
-  ctx->draw(&ctx->mw, ctx->tiptext->text_x - 1, ctx->tiptext->text_y - 1, 
-      ctx->tiptext->text_x + ctx->tiptext->text_width + 1,
-      ctx->tiptext->text_y + ctx->tiptext->text_height + 1);
+  ctx->draw(&ctx->mw, ctx->tiptext->text_x - 1, ctx->tiptext->text_y - 1,
+            ctx->tiptext->text_x + ctx->tiptext->text_width + 1,
+            ctx->tiptext->text_y + ctx->tiptext->text_height + 1);
 }
 GlowTipText::~GlowTipText()
 {
@@ -63,15 +63,15 @@ void GlowTipText::draw_text(GlowArrayElem* e, char* text, int x, int y)
 
   if (active)
     remove_text(text_object);
-  if (timer_id) {
+  if (timer_id)
+  {
     ctx->gdraw->remove_timer(timer_id);
     timer_id = 0;
   }
 
-  ctx->gdraw->get_text_extent(text, strlen(text), glow_eDrawType_TextHelvetica,
-      text_size, glow_eFont_LucidaSans, &z_width, &z_height, &z_descent,
-      ctx->mw.zoom_factor_y / ctx->mw.base_zoom_factor * (8 + 2 * text_size),
-      0);
+  ctx->gdraw->get_text_extent(text, strlen(text), glow_eDrawType_TextHelvetica, text_size,
+                              glow_eFont_Helvetica, &z_width, &z_height, &z_descent,
+                              ctx->mw.zoom_factor_y / ctx->mw.base_zoom_factor * (8 + 2 * text_size), 0);
 
   text_x = x + TIPTEXT_OFFSET_X;
   text_y = y + TIPTEXT_OFFSET_Y;
@@ -98,16 +98,11 @@ void GlowTipText::draw()
   if (!active)
     return;
 
-  ctx->gdraw->fill_rect(
-      &ctx->mw, text_x, text_y, text_width, text_height, glow_eDrawType_Color4);
-  ctx->gdraw->rect(&ctx->mw, text_x, text_y, text_width, text_height,
-      glow_eDrawType_Line, 0, 0);
-  ctx->gdraw->text(&ctx->mw, text_x + 2,
-      text_y + text_height - text_descent - 2, tiptext, strlen(tiptext),
-      glow_eDrawType_TextHelvetica, glow_eDrawType_Line, text_size, 0, 0,
-      glow_eFont_LucidaSans,
-      ctx->mw.zoom_factor_y / ctx->mw.base_zoom_factor * (8 + 2 * text_size),
-      0);
+  ctx->gdraw->fill_rect(&ctx->mw, text_x, text_y, text_width, text_height, glow_eDrawType_Color4);
+  ctx->gdraw->rect(&ctx->mw, text_x, text_y, text_width, text_height, glow_eDrawType_Line, 0, 0);
+  ctx->gdraw->text(&ctx->mw, text_x + 2, text_y + text_height - text_descent - 2, tiptext, strlen(tiptext),
+                   glow_eDrawType_TextRoboto, glow_eDrawType_Line, text_size, 0, 0, glow_eFont_Roboto,
+                   ctx->mw.zoom_factor_y / ctx->mw.base_zoom_factor * (8 + 2 * text_size), 0);
 }
 
 void GlowTipText::remove_text(GlowArrayElem* e)
@@ -115,22 +110,24 @@ void GlowTipText::remove_text(GlowArrayElem* e)
   if (e != text_object)
     return;
 
-  if (timer_id) {
+  if (timer_id)
+  {
     ctx->gdraw->remove_timer(timer_id);
     timer_id = 0;
     return;
   }
 
-  if (active) {
+  if (active)
+  {
     active = false;
-    ctx->draw(&ctx->mw, text_x - 1, text_y - 1, text_x + text_width + 1,
-        text_y + text_height + 1);
+    ctx->draw(&ctx->mw, text_x - 1, text_y - 1, text_x + text_width + 1, text_y + text_height + 1);
   }
 }
 
 void GlowTipText::remove()
 {
-  if (timer_id) {
+  if (timer_id)
+  {
     ctx->gdraw->remove_timer(timer_id);
     timer_id = 0;
   }

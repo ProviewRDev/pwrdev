@@ -19,10 +19,10 @@ main()
   SetColorTheme(1);
   SetBackgroundColor(eDrawType_CustomColor1);
 
-  GetTextExtent(p1, 6, eFont_LucidaSans, 0, width);  
+  GetTextExtent(p1, 6, eFont_Helvetica, 0, width);  
   xm = x0 + 3.0 - width;
   ym = y0 + 1;
-  id = CreateText(p1, xm, ym, 6, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText(p1, xm, ym, 6, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   xm = x0 + 2;
   ym = y0 + 2;

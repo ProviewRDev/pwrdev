@@ -74,6 +74,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - Java support, only the websocket server will remain java for now. This was however removed several versions back. It's here to make it official.
+- Lucida Sans font due to it being licensed. All uses of this font will be replaced with Helvetica.
 - errh_Log function was removed due to it not being used throughout the codebase.
 - The old Profinet Viewer has been removed and replaced with the new and improved one.
 

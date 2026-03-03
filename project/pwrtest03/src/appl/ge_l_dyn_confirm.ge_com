@@ -43,13 +43,13 @@ main()
 
   xm = x0 + 1;
   ym = y0 + 1;
-  id = CreateText("Confirm", xm, ym, 4, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Confirm", xm, ym, 4, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # Confirm on each click
   ym += 1.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Confirm on each click", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Confirm on each click", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   ym += 0.0;
   x1 = xm;
@@ -76,7 +76,7 @@ main()
   ym += 5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Confirm on set only", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Confirm on set only", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   ym += 0.0;
   x1 = xm;
@@ -104,7 +104,7 @@ main()
   ym += 5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Confirm on reset only", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Confirm on reset only", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   ym += 0.0;
   x1 = xm;

@@ -47,7 +47,7 @@ main()
 
   x = x0 + 1;
   y = y0 + 1;
-  id = CreateText("DigWarning", x, y, 4, eFont_LucidaSans, 0, eDrawType_CustomColor34);
+  id = CreateText("DigWarning", x, y, 4, eFont_Helvetica, 0, eDrawType_CustomColor34);
 
 # Yellow/Dark
   y += 1;

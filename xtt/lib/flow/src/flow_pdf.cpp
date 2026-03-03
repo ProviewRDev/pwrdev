@@ -142,7 +142,7 @@ int FlowPdf::text(double x, double y, char* text, int len, flow_eDrawType type,
   }
   *t2 = 0;
 
-  int bold = (type == flow_eDrawType_TextHelveticaBold);
+  int bold = (type == flow_eDrawType_TextRobotoBold);
 
   topdf->draw_text(x - offset_x, offset_y - y, t, bold, size);
   return 1;

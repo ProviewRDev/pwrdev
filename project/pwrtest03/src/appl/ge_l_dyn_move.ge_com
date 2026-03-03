@@ -47,14 +47,14 @@ main()
 
   xm = x0 + 1;
   ym = y0 + 1;
-  id = CreateText("Move", xm, ym, 4, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Move", xm, ym, 4, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # Move x
 
   ym += 1.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Move x", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Move x", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   ym += 1.5;
   x1 = xm + 1;
@@ -78,7 +78,7 @@ main()
   ym += 4;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Move y", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Move y", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   x1 = xm;
   y1 = ym + 1.5;
@@ -105,7 +105,7 @@ main()
   xm += 6;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Move x and y", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Move x and y", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   x1 = xm + 1;
   y1 = ym + 1;
@@ -132,7 +132,7 @@ main()
   xm = x0 + 1;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Move x and scale", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Move x and scale", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   ym += 1.5;
   x1 = xm + 1;
@@ -160,7 +160,7 @@ main()
   ym += 4;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Move y and scale", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Move y and scale", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   x1 = xm;
   y1 = ym + 1.5;
@@ -192,7 +192,7 @@ main()
   xm += 6;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Move x y and scale", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Move x y and scale", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   x1 = xm + 1;
   y1 = ym + 1;
@@ -223,7 +223,7 @@ main()
   xm = 18;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Scale x", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Scale x", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   ym += 0.5;
   x1 = xm;
@@ -284,7 +284,7 @@ main()
   ym += 4;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Scale y", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Scale y", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   x1 = xm + 3;
   y1 = ym + 1;

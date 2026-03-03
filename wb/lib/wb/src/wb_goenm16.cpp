@@ -161,17 +161,17 @@ int goen_create_nodetype_m16(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
   annot_width[1] = 0;
   annot_width[2] = 0;
   if (annot_count > 0) {
-    flow_MeasureAnnotText(ctx, annot_str[0], flow_eDrawType_TextHelvetica,
+    flow_MeasureAnnotText(ctx, annot_str[0], flow_eDrawType_TextRoboto,
         GOEN_F_TEXTSIZE, flow_eAnnotType_OneLine, &annot_width[0],
         &annot_height, &annot_rows);
   }
   if (annot_count > 1) {
-    flow_MeasureAnnotText(ctx, annot_str[1], flow_eDrawType_TextHelvetica,
+    flow_MeasureAnnotText(ctx, annot_str[1], flow_eDrawType_TextRoboto,
         GOEN_F_TEXTSIZE, flow_eAnnotType_OneLine, &annot_width[1],
         &annot_height, &annot_rows);
   }
   if (annot_count > 2) {
-    flow_MeasureAnnotText(ctx, annot_str[2], flow_eDrawType_TextHelvetica,
+    flow_MeasureAnnotText(ctx, annot_str[2], flow_eDrawType_TextRoboto,
         GOEN_F_TEXTSIZE, flow_eAnnotType_OneLine, &annot_width[2],
         &annot_height, &annot_rows);
   }
@@ -277,7 +277,7 @@ int goen_create_nodetype_m16(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
 
   /* Draw the objname */
   flow_AddText(nc_pid, graphbody->graphname, f_namepos,
-      f_repeat / 2 + f_strheight / 2 - f_yoffs, flow_eDrawType_TextHelvetica,
+      f_repeat / 2 + f_strheight / 2 - f_yoffs, flow_eDrawType_TextRoboto,
       GOEN_F_TEXTSIZE);
 
   /* Draw the leadnames and lines					      */
@@ -309,7 +309,7 @@ int goen_create_nodetype_m16(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
           flow_AddText(nc_pid, bodydef[i].Par->Output.Graph.GraphName,
               f_nameoffin,
               f_repeat * (1.5 + i_inpoints) + f_strheight / 2 - f_yoffs,
-              flow_eDrawType_TextHelvetica, 2);
+              flow_eDrawType_TextRoboto, 2);
 
           if ((*invertmask_pointer & inpointmask) == 0) {
             flow_AddLine(nc_pid, 0, f_repeat * (1.5 + i_inpoints) - f_yoffs,
@@ -364,7 +364,7 @@ int goen_create_nodetype_m16(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
           flow_AddText(nc_pid, bodydef[i].Par->Output.Graph.GraphName,
               f_width - f_nameoffout - f_namelength,
               f_repeat * (1.5 + i_outpoints) + f_strheight / 2 - f_yoffs,
-              flow_eDrawType_TextHelvetica, 2);
+              flow_eDrawType_TextRoboto, 2);
           flow_AddLine(nc_pid, f_width,
               f_repeat * (1.5 + i_outpoints) - f_yoffs, f_width + f_pinlength,
               f_repeat * (1.5 + i_outpoints) - f_yoffs, flow_eDrawType_Line, 2);
@@ -412,7 +412,7 @@ int goen_create_nodetype_m16(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
 
   flow_AddAnnot(nc_pid, f_strlength,
       f_height - (f_repeat - f_strheight) / 2.0 - f_yoffs, 0,
-      flow_eDrawType_TextHelvetica, GOEN_F_TEXTSIZE, flow_eAnnotType_OneLine,
+      flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE, flow_eAnnotType_OneLine,
       flow_mDisplayLevel_1);
 
   /* Add execute order display */
@@ -424,7 +424,7 @@ int goen_create_nodetype_m16(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
       flow_mDisplayLevel_2);
   flow_AddAnnot(nc_pid, f_width - GOEN_DISPLAYNODEWIDTH + f_strlength,
       (GOEN_DISPLAYNODEHEIGHT + f_strheight) / 2.0 - f_yoffs,
-      GOEN_DISPLAYNODE_ANNOT, flow_eDrawType_TextHelvetica, GOEN_F_TEXTSIZE,
+      GOEN_DISPLAYNODE_ANNOT, flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE,
       flow_eAnnotType_OneLine, flow_mDisplayLevel_2);
 
   free((char*)bodydef);

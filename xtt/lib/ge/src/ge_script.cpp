@@ -58,23 +58,18 @@
 
 static Graph* current_graph;
 
-void Graph::script_store_graph()
-{
-  current_graph = this;
-}
+void Graph::script_store_graph() { current_graph = this; }
 
-static void graph_get_stored_graph(Graph** graph)
-{
-  *graph = current_graph;
-}
+static void graph_get_stored_graph(Graph** graph) { *graph = current_graph; }
 
 static int text_idx_to_size(int idx)
 {
-  switch (idx) {
+  switch (idx)
+  {
   case 0:
-    return 0; 
+    return 0;
   case 1:
-    return 1; 
+    return 1;
   case 2:
     return 2;
   case 3:
@@ -88,14 +83,13 @@ static int text_idx_to_size(int idx)
   }
 }
 
-static int graph_gettextextent_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_gettextextent_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
-  ccm_sArg* arg_p2; // Textsize
-  ccm_sArg* arg_p3; // Font
-  ccm_sArg* arg_p4; // Bold
-  ccm_sArg* arg_p5; // Width
+  ccm_sArg* arg_p2;        // Textsize
+  ccm_sArg* arg_p3;        // Font
+  ccm_sArg* arg_p4;        // Bold
+  ccm_sArg* arg_p5;        // Width
   ccm_sArg* arg_p6 = NULL; // Height
   ccm_sArg* arg_p7 = NULL; // Descent
   Graph* graph;
@@ -138,7 +132,8 @@ static int graph_gettextextent_func(void* filectx, ccm_sArg* arg_list,
   else
     draw_type = glow_eDrawType_TextHelvetica;
 
-  switch (arg_p2->value_int) {
+  switch (arg_p2->value_int)
+  {
   case 0:
     textsize = 0;
     break;
@@ -162,28 +157,28 @@ static int graph_gettextextent_func(void* filectx, ccm_sArg* arg_list,
   }
   font = (glow_eFont)arg_p3->value_int;
 
-  grow_GetTextExtent(graph->grow->ctx, arg_list->value_string,
-      strlen(arg_list->value_string), draw_type, textsize, font,
-      &z_width, &z_height, &z_descent);
+  grow_GetTextExtent(graph->grow->ctx, arg_list->value_string, strlen(arg_list->value_string), draw_type,
+                     textsize, font, &z_width, &z_height, &z_descent);
 
   arg_p5->value_float = float(z_width);
   arg_p5->value_returned = 1;
 
-  if (arg_count > 5) {
+  if (arg_count > 5)
+  {
     arg_p6->value_float = float(z_height);
     arg_p6->value_returned = 1;
   }
 
-  if (arg_count > 6) {
+  if (arg_count > 6)
+  {
     arg_p7->value_float = float(z_descent);
     arg_p7->value_returned = 1;
   }
   return 1;
 }
 
-static int graph_selectadd_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_selectadd_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
 
@@ -199,9 +194,8 @@ static int graph_selectadd_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_selectclear_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_selectclear_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                  ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
 
@@ -214,9 +208,8 @@ static int graph_selectclear_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_getcurrentobject_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_getcurrentobject_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                       ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
 
@@ -231,9 +224,8 @@ static int graph_getcurrentobject_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_setextern_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_setextern_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   int sts;
@@ -247,22 +239,23 @@ static int graph_setextern_func(void* filectx, ccm_sArg* arg_list,
 
   graph_get_stored_graph(&graph);
 
-  sts = grow_FindNodeClassByName(
-      graph->grow->ctx, arg_list->value_string, &nodeclass);
-  if (ODD(sts)) {
+  sts = grow_FindNodeClassByName(graph->grow->ctx, arg_list->value_string, &nodeclass);
+  if (ODD(sts))
+  {
     grow_SetNodeClassExtern(nodeclass, 1);
     *return_int = 1;
     *return_decl = CCM_DECL_INT;
-  } else {
+  }
+  else
+  {
     *return_int = 0;
     *return_decl = CCM_DECL_INT;
   }
   return 1;
 }
 
-static int graph_setexternall_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_setexternall_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                   ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
 
@@ -275,9 +268,8 @@ static int graph_setexternall_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_setintern_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_setintern_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   int sts;
@@ -291,22 +283,23 @@ static int graph_setintern_func(void* filectx, ccm_sArg* arg_list,
 
   graph_get_stored_graph(&graph);
 
-  sts = grow_FindNodeClassByName(
-      graph->grow->ctx, arg_list->value_string, &nodeclass);
-  if (ODD(sts)) {
+  sts = grow_FindNodeClassByName(graph->grow->ctx, arg_list->value_string, &nodeclass);
+  if (ODD(sts))
+  {
     grow_SetNodeClassExtern(nodeclass, 0);
     *return_int = 1;
     *return_decl = CCM_DECL_INT;
-  } else {
+  }
+  else
+  {
     *return_int = 0;
     *return_decl = CCM_DECL_INT;
   }
   return 1;
 }
 
-static int graph_setinternall_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_setinternall_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                   ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
 
@@ -319,9 +312,8 @@ static int graph_setinternall_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_true_func(void* filectx, ccm_sArg* arg_list, int arg_count,
-    int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
-    char* return_string)
+static int graph_true_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                           ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   if (arg_count != 0)
     return CCM__ARGMISM;
@@ -331,9 +323,8 @@ static int graph_true_func(void* filectx, ccm_sArg* arg_list, int arg_count,
   return 1;
 }
 
-static int graph_false_func(void* filectx, ccm_sArg* arg_list, int arg_count,
-    int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
-    char* return_string)
+static int graph_false_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                            ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   if (arg_count != 0)
     return CCM__ARGMISM;
@@ -343,9 +334,8 @@ static int graph_false_func(void* filectx, ccm_sArg* arg_list, int arg_count,
   return 1;
 }
 
-static int graph_setdraw_func(void* filectx, ccm_sArg* arg_list, int arg_count,
-    int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
-    char* return_string)
+static int graph_setdraw_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                              ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
 
@@ -359,7 +349,8 @@ static int graph_setdraw_func(void* filectx, ccm_sArg* arg_list, int arg_count,
 
   if (arg_list->value_int == 0)
     grow_SetNodraw(graph->grow->ctx);
-  else {
+  else
+  {
     grow_ResetNodraw(graph->grow->ctx);
     grow_Redraw(graph->grow->ctx);
   }
@@ -367,9 +358,8 @@ static int graph_setdraw_func(void* filectx, ccm_sArg* arg_list, int arg_count,
   return 1;
 }
 
-static int graph_getfirstobject_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_getfirstobject_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                     ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   grow_tObject first;
@@ -390,9 +380,8 @@ static int graph_getfirstobject_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_getnextobject_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_getnextobject_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   grow_tObject next;
@@ -406,8 +395,7 @@ static int graph_getnextobject_func(void* filectx, ccm_sArg* arg_list,
 
   graph_get_stored_graph(&graph);
 
-  sts = grow_GetNextObject(
-      graph->grow->ctx, (grow_tObject)arg_list->value_int, &next);
+  sts = grow_GetNextObject(graph->grow->ctx, (grow_tObject)arg_list->value_int, &next);
   if (ODD(sts))
     *return_int = (long int)next;
   else
@@ -417,9 +405,8 @@ static int graph_getnextobject_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_groupgetfirstobject_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_groupgetfirstobject_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                          ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   grow_tObject first;
@@ -443,9 +430,8 @@ static int graph_groupgetfirstobject_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_groupgetnextobject_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_groupgetnextobject_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                         ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   grow_tObject next;
@@ -464,8 +450,7 @@ static int graph_groupgetnextobject_func(void* filectx, ccm_sArg* arg_list,
 
   graph_get_stored_graph(&graph);
 
-  sts = grow_GroupGetNextObject((grow_tObject)arg_list->value_int,
-      (grow_tObject)arg_p2->value_int, &next);
+  sts = grow_GroupGetNextObject((grow_tObject)arg_list->value_int, (grow_tObject)arg_p2->value_int, &next);
   if (ODD(sts))
     *return_int = (long int)next;
   else
@@ -475,9 +460,8 @@ static int graph_groupgetnextobject_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_dashinsertobject_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_dashinsertobject_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                       ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   int sts;
@@ -495,17 +479,15 @@ static int graph_dashinsertobject_func(void* filectx, ccm_sArg* arg_list,
 
   graph_get_stored_graph(&graph);
 
-  sts = grow_DashInsertObject((grow_tObject)arg_list->value_int,
-      (grow_tObject)arg_p2->value_int);
+  sts = grow_DashInsertObject((grow_tObject)arg_list->value_int, (grow_tObject)arg_p2->value_int);
   *return_int = sts;
   *return_decl = CCM_DECL_INT;
 
   return 1;
 }
 
-static int graph_groupselected_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_groupselected_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   grow_tObject group;
@@ -518,7 +500,8 @@ static int graph_groupselected_func(void* filectx, ccm_sArg* arg_list,
   graph_get_stored_graph(&graph);
 
   sts = grow_GroupSelect(graph->grow->ctx, &group, last_group_name);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     *return_int = 0;
     *return_decl = CCM_DECL_INT;
     return 1;
@@ -535,9 +518,8 @@ static int graph_groupselected_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_getobjecttype_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_getobjecttype_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   int type;
@@ -557,9 +539,8 @@ static int graph_getobjecttype_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_getobjectclass_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_getobjectclass_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                     ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   grow_tNodeClass classid;
@@ -576,17 +557,18 @@ static int graph_getobjectclass_func(void* filectx, ccm_sArg* arg_list,
   *return_decl = CCM_DECL_STRING;
 
   grow_GetObjectClass((grow_tObject)arg_list->value_int, &classid);
-  if (classid != 0) {
+  if (classid != 0)
+  {
     grow_GetNodeClassName(classid, name, sizeof(name));
     strcpy(return_string, name);
-  } else
+  }
+  else
     strcpy(return_string, "");
   return 1;
 }
 
-static int graph_getobjectfill_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_getobjectfill_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
 
@@ -603,9 +585,8 @@ static int graph_getobjectfill_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_setobjectfill_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_setobjectfill_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
@@ -629,9 +610,8 @@ static int graph_setobjectfill_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_getobjectborder_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_getobjectborder_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                      ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
 
@@ -651,9 +631,8 @@ static int graph_getobjectborder_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_setobjectborder_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_setobjectborder_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                      ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
@@ -677,9 +656,8 @@ static int graph_setobjectborder_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_getobjectgradient_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_getobjectgradient_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                        ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
 
@@ -699,9 +677,8 @@ static int graph_getobjectgradient_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_setobjectgradient_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_setobjectgradient_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                        ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
@@ -721,14 +698,13 @@ static int graph_setobjectgradient_func(void* filectx, ccm_sArg* arg_list,
 
   graph_get_stored_graph(&graph);
 
-  grow_SetObjectGradient(
-      (grow_tObject)arg_list->value_int, (glow_eGradient)arg_p2->value_int);
+  grow_SetObjectGradient((grow_tObject)arg_list->value_int, (glow_eGradient)arg_p2->value_int);
   return 1;
 }
 
-static int graph_getobjecttransparency_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_getobjecttransparency_func(void* filectx, ccm_sArg* arg_list, int arg_count,
+                                            int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
+                                            char* return_string)
 {
   Graph* graph;
 
@@ -748,9 +724,9 @@ static int graph_getobjecttransparency_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_setobjecttransparency_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_setobjecttransparency_func(void* filectx, ccm_sArg* arg_list, int arg_count,
+                                            int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
+                                            char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
@@ -770,14 +746,12 @@ static int graph_setobjecttransparency_func(void* filectx, ccm_sArg* arg_list,
 
   graph_get_stored_graph(&graph);
 
-  grow_SetObjectTransparency(
-      (grow_tObject)arg_list->value_int, arg_p2->value_float);
+  grow_SetObjectTransparency((grow_tObject)arg_list->value_int, arg_p2->value_float);
   return 1;
 }
 
-static int graph_getobjectfillcolor_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_getobjectfillcolor_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                         ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
 
@@ -792,15 +766,13 @@ static int graph_getobjectfillcolor_func(void* filectx, ccm_sArg* arg_list,
 
   graph_get_stored_graph(&graph);
 
-  *return_int
-      = (long int)grow_GetObjectFillColor((grow_tObject)arg_list->value_int);
+  *return_int = (long int)grow_GetObjectFillColor((grow_tObject)arg_list->value_int);
   *return_decl = CCM_DECL_INT;
   return 1;
 }
 
-static int graph_setobjectfillcolor_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_setobjectfillcolor_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                         ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
@@ -820,14 +792,13 @@ static int graph_setobjectfillcolor_func(void* filectx, ccm_sArg* arg_list,
 
   graph_get_stored_graph(&graph);
 
-  grow_SetObjectOriginalFillColor(
-      (grow_tObject)arg_list->value_int, (glow_eDrawType)arg_p2->value_int);
+  grow_SetObjectOriginalFillColor((grow_tObject)arg_list->value_int, (glow_eDrawType)arg_p2->value_int);
   return 1;
 }
 
-static int graph_getobjectbordercolor_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_getobjectbordercolor_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                           ccm_tFloat* return_float, ccm_tInt* return_int,
+                                           char* return_string)
 {
   Graph* graph;
 
@@ -842,15 +813,14 @@ static int graph_getobjectbordercolor_func(void* filectx, ccm_sArg* arg_list,
 
   graph_get_stored_graph(&graph);
 
-  *return_int
-      = (long int)grow_GetObjectBorderColor((grow_tObject)arg_list->value_int);
+  *return_int = (long int)grow_GetObjectBorderColor((grow_tObject)arg_list->value_int);
   *return_decl = CCM_DECL_INT;
   return 1;
 }
 
-static int graph_setobjectbordercolor_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_setobjectbordercolor_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                           ccm_tFloat* return_float, ccm_tInt* return_int,
+                                           char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
@@ -870,14 +840,12 @@ static int graph_setobjectbordercolor_func(void* filectx, ccm_sArg* arg_list,
 
   graph_get_stored_graph(&graph);
 
-  grow_SetObjectOriginalBorderColor(
-      (grow_tObject)arg_list->value_int, (glow_eDrawType)arg_p2->value_int);
+  grow_SetObjectOriginalBorderColor((grow_tObject)arg_list->value_int, (glow_eDrawType)arg_p2->value_int);
   return 1;
 }
 
-static int graph_getobjecttextcolor_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_getobjecttextcolor_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                         ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
 
@@ -892,15 +860,13 @@ static int graph_getobjecttextcolor_func(void* filectx, ccm_sArg* arg_list,
 
   graph_get_stored_graph(&graph);
 
-  *return_int
-      = (long int)grow_GetObjectTextColor((grow_tObject)arg_list->value_int);
+  *return_int = (long int)grow_GetObjectTextColor((grow_tObject)arg_list->value_int);
   *return_decl = CCM_DECL_INT;
   return 1;
 }
 
-static int graph_setobjecttextcolor_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_setobjecttextcolor_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                         ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
@@ -920,14 +886,13 @@ static int graph_setobjecttextcolor_func(void* filectx, ccm_sArg* arg_list,
 
   graph_get_stored_graph(&graph);
 
-  grow_SetObjectOriginalTextColor(
-      (grow_tObject)arg_list->value_int, (glow_eDrawType)arg_p2->value_int);
+  grow_SetObjectOriginalTextColor((grow_tObject)arg_list->value_int, (glow_eDrawType)arg_p2->value_int);
   return 1;
 }
 
-static int graph_setobjectbackgroundcolor_func(void* filectx,
-    ccm_sArg* arg_list, int arg_count, int* return_decl,
-    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
+static int graph_setobjectbackgroundcolor_func(void* filectx, ccm_sArg* arg_list, int arg_count,
+                                               int* return_decl, ccm_tFloat* return_float,
+                                               ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
@@ -947,14 +912,12 @@ static int graph_setobjectbackgroundcolor_func(void* filectx,
 
   graph_get_stored_graph(&graph);
 
-  grow_SetObjectOriginalBackgroundColor(
-      (grow_tObject)arg_list->value_int, (glow_eDrawType)arg_p2->value_int);
+  grow_SetObjectOriginalBackgroundColor((grow_tObject)arg_list->value_int, (glow_eDrawType)arg_p2->value_int);
   return 1;
 }
 
-static int graph_setobjectlinewidth_func(void* filectx,
-    ccm_sArg* arg_list, int arg_count, int* return_decl,
-    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
+static int graph_setobjectlinewidth_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                         ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
@@ -974,14 +937,12 @@ static int graph_setobjectlinewidth_func(void* filectx,
 
   graph_get_stored_graph(&graph);
 
-  grow_SetObjectLinewidth(
-      (grow_tObject)arg_list->value_int, arg_p2->value_int);
+  grow_SetObjectLinewidth((grow_tObject)arg_list->value_int, arg_p2->value_int);
   return 1;
 }
 
-static int graph_setobjectlinetype_func(void* filectx,
-    ccm_sArg* arg_list, int arg_count, int* return_decl,
-    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
+static int graph_setobjectlinetype_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                        ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
@@ -1001,14 +962,12 @@ static int graph_setobjectlinetype_func(void* filectx,
 
   graph_get_stored_graph(&graph);
 
-  grow_SetObjectLinetype(
-      (grow_tObject)arg_list->value_int, (glow_eLineType) arg_p2->value_int);
+  grow_SetObjectLinetype((grow_tObject)arg_list->value_int, (glow_eLineType)arg_p2->value_int);
   return 1;
 }
 
-static int graph_getobjectshadow_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_getobjectshadow_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                      ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
 
@@ -1028,9 +987,8 @@ static int graph_getobjectshadow_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_setobjectshadow_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_setobjectshadow_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                      ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
@@ -1054,9 +1012,8 @@ static int graph_setobjectshadow_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_setobjecttextsize_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_setobjecttextsize_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                        ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
@@ -1078,14 +1035,12 @@ static int graph_setobjecttextsize_func(void* filectx, ccm_sArg* arg_list,
   graph_get_stored_graph(&graph);
 
   textsize = text_idx_to_size(arg_p2->value_int);
-  grow_SetObjectTextSize(
-      (grow_tObject)arg_list->value_int, textsize);
+  grow_SetObjectTextSize((grow_tObject)arg_list->value_int, textsize);
   return 1;
 }
 
-static int graph_setobjecttextbold_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_setobjecttextbold_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                        ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
@@ -1105,14 +1060,12 @@ static int graph_setobjecttextbold_func(void* filectx, ccm_sArg* arg_list,
 
   graph_get_stored_graph(&graph);
 
-  grow_SetObjectTextBold(
-      (grow_tObject)arg_list->value_int, arg_p2->value_int);
+  grow_SetObjectTextBold((grow_tObject)arg_list->value_int, arg_p2->value_int);
   return 1;
 }
 
-static int graph_setobjecttextfont_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_setobjecttextfont_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                        ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
@@ -1132,14 +1085,12 @@ static int graph_setobjecttextfont_func(void* filectx, ccm_sArg* arg_list,
 
   graph_get_stored_graph(&graph);
 
-  grow_SetObjectTextFont(
-      (grow_tObject)arg_list->value_int, (glow_eFont)arg_p2->value_int);
+  grow_SetObjectTextFont((grow_tObject)arg_list->value_int, (glow_eFont)arg_p2->value_int);
   return 1;
 }
 
-static int graph_setcurrentobject_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_setcurrentobject_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                       ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
 
@@ -1155,9 +1106,8 @@ static int graph_setcurrentobject_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_getobjectname_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_getobjectname_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   char name[80];
@@ -1185,10 +1135,9 @@ static int graph_getobjectname_func(void* filectx, ccm_sArg* arg_list,
   } else
     strcpy(return_string, "");
 #endif
-  sts = grow_GetObjectName((grow_tObject)arg_list->value_int, name, sizeof(name),
-      glow_eName_Object);
+  sts = grow_GetObjectName((grow_tObject)arg_list->value_int, name, sizeof(name), glow_eName_Object);
   if (ODD(sts))
-    strcpy(return_string, name);    
+    strcpy(return_string, name);
   else
     strcpy(return_string, "");
 
@@ -1196,9 +1145,8 @@ static int graph_getobjectname_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_setobjectname_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_setobjectname_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
@@ -1222,9 +1170,8 @@ static int graph_setobjectname_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_setobjectvisibility_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_setobjectvisibility_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                          ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   ccm_sArg* arg_p2;
 
@@ -1241,19 +1188,16 @@ static int graph_setobjectvisibility_func(void* filectx, ccm_sArg* arg_list,
   if (arg_list->value_int == 0)
     return CCM__INVARG;
 
-  grow_SetObjectVisibility((grow_tObject)arg_list->value_int, 
-      (glow_eVis)arg_p2->value_int);
+  grow_SetObjectVisibility((grow_tObject)arg_list->value_int, (glow_eVis)arg_p2->value_int);
   return 1;
 }
 
-
-static int graph_getobjectdyntype_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_getobjectdyntype_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                       ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   int type;
-  ccm_sArg* arg_p2; // Dyntype1 return
+  ccm_sArg* arg_p2;        // Dyntype1 return
   ccm_sArg* arg_p3 = NULL; // Dyntype2 return
   ccm_sArg* arg_p4 = NULL; // Actiontype1 return
   ccm_sArg* arg_p5 = NULL; // Actiontype2 return
@@ -1289,37 +1233,45 @@ static int graph_getobjectdyntype_func(void* filectx, ccm_sArg* arg_list,
   graph_get_stored_graph(&graph);
 
   type = grow_GetObjectType(o);
-  if (type == glow_eObjectType_GrowNode || type == glow_eObjectType_GrowSlider
-      || type == glow_eObjectType_GrowGroup
-      || type == glow_eObjectType_GrowLayer
-      || type == glow_eObjectType_GrowToolbar) {
+  if (type == glow_eObjectType_GrowNode || type == glow_eObjectType_GrowSlider ||
+      type == glow_eObjectType_GrowGroup || type == glow_eObjectType_GrowLayer ||
+      type == glow_eObjectType_GrowToolbar)
+  {
     grow_GetUserData(o, (void**)&dyn);
     arg_p2->value_int = dyn->get_dyntype1(o);
     arg_p2->value_returned = 1;
-    if (arg_count > 2) {
+    if (arg_count > 2)
+    {
       arg_p3->value_int = dyn->get_dyntype2(o);
       arg_p3->value_returned = 1;
     }
-    if (arg_count > 3) {
+    if (arg_count > 3)
+    {
       arg_p4->value_int = dyn->get_actiontype1(o);
       arg_p4->value_returned = 1;
     }
-    if (arg_count > 4) {
+    if (arg_count > 4)
+    {
       arg_p5->value_int = dyn->get_actiontype2(o);
       arg_p5->value_returned = 1;
     }
-  } else {
+  }
+  else
+  {
     arg_p2->value_int = 0;
     arg_p2->value_returned = 1;
-    if (arg_count > 2) {
+    if (arg_count > 2)
+    {
       arg_p3->value_int = 0;
       arg_p3->value_returned = 1;
     }
-    if (arg_count > 3) {
+    if (arg_count > 3)
+    {
       arg_p4->value_int = 0;
       arg_p4->value_returned = 1;
     }
-    if (arg_count > 4) {
+    if (arg_count > 4)
+    {
       arg_p5->value_int = 0;
       arg_p5->value_returned = 1;
     }
@@ -1327,9 +1279,8 @@ static int graph_getobjectdyntype_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_getobjecttext_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_getobjecttext_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   int type;
@@ -1349,19 +1300,20 @@ static int graph_getobjecttext_func(void* filectx, ccm_sArg* arg_list,
   graph_get_stored_graph(&graph);
 
   type = grow_GetObjectType(o);
-  if (type == glow_eObjectType_GrowText) {
+  if (type == glow_eObjectType_GrowText)
+  {
     grow_GetObjectText(o, text, sizeof(text));
     strncpy(return_string, text, sizeof(K_STRING_SIZE));
-  } else
+  }
+  else
     strcpy(return_string, "");
 
   *return_decl = CCM_DECL_STRING;
   return 1;
 }
 
-static int graph_setobjecttext_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_setobjecttext_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   int type;
@@ -1385,19 +1337,19 @@ static int graph_setobjecttext_func(void* filectx, ccm_sArg* arg_list,
   graph_get_stored_graph(&graph);
 
   type = grow_GetObjectType(o);
-  if (type == glow_eObjectType_GrowText) {
+  if (type == glow_eObjectType_GrowText)
+  {
     grow_SetObjectText(o, arg_p2->value_string);
   }
   return 1;
 }
 
-static int graph_setobjecttransform_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_setobjecttransform_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                         ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   grow_tObject o;
-  ccm_sArg* arg_p2, *arg_p3, *arg_p4, *arg_p5, *arg_p6, *arg_p7, *arg_p8;
+  ccm_sArg *arg_p2, *arg_p3, *arg_p4, *arg_p5, *arg_p6, *arg_p7, *arg_p8;
 
   if (arg_count != 8)
     return CCM__ARGMISM;
@@ -1433,14 +1385,13 @@ static int graph_setobjecttransform_func(void* filectx, ccm_sArg* arg_list,
   o = (grow_tObject)arg_list->value_int;
   graph_get_stored_graph(&graph);
 
-  grow_InitTransform(o, arg_p2->value_float, arg_p3->value_float, arg_p4->value_float, 
-      arg_p5->value_float, arg_p6->value_float, arg_p7->value_float, arg_p8->value_float);
+  grow_InitTransform(o, arg_p2->value_float, arg_p3->value_float, arg_p4->value_float, arg_p5->value_float,
+                     arg_p6->value_float, arg_p7->value_float, arg_p8->value_float);
   return 1;
 }
 
-static int graph_findobjectbyname_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_findobjectbyname_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                       ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   grow_tObject object;
@@ -1454,8 +1405,7 @@ static int graph_findobjectbyname_func(void* filectx, ccm_sArg* arg_list,
 
   graph_get_stored_graph(&graph);
 
-  sts = grow_FindObjectByName(
-      graph->grow->ctx, arg_list->value_string, &object);
+  sts = grow_FindObjectByName(graph->grow->ctx, arg_list->value_string, &object);
   if (ODD(sts))
     *return_int = (long int)object;
   else
@@ -1465,9 +1415,8 @@ static int graph_findobjectbyname_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_reload_func(void* filectx, ccm_sArg* arg_list, int arg_count,
-    int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
-    char* return_string)
+static int graph_reload_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                             ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   char name[80];
@@ -1478,16 +1427,16 @@ static int graph_reload_func(void* filectx, ccm_sArg* arg_list, int arg_count,
   graph_get_stored_graph(&graph);
 
   grow_GetName(graph->grow->ctx, name);
-  if (!streq(name, "")) {
+  if (!streq(name, ""))
+  {
     grow_New(graph->grow->ctx);
     graph->open(name);
   }
   return 1;
 }
 
-static int graph_rotateselected_func(void* filectx, ccm_sArg* arg_list, int arg_count,
-    int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
-    char* return_string)
+static int graph_rotateselected_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                     ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
@@ -1499,8 +1448,9 @@ static int graph_rotateselected_func(void* filectx, ccm_sArg* arg_list, int arg_
 
   if (arg_list->value_decl != CCM_DECL_FLOAT)
     return CCM__ARGMISM;
-  
-  if (arg_count > 1) {
+
+  if (arg_count > 1)
+  {
     arg_p2 = arg_list->next;
     if (arg_p2->value_decl != CCM_DECL_INT)
       return CCM__ARGMISM;
@@ -1518,9 +1468,8 @@ static int graph_rotateselected_func(void* filectx, ccm_sArg* arg_list, int arg_
   return 1;
 }
 
-static int graph_setselecttextsize_func(void* filectx, ccm_sArg* arg_list, int arg_count,
-    int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
-    char* return_string)
+static int graph_setselecttextsize_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                        ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
 
@@ -1529,7 +1478,7 @@ static int graph_setselecttextsize_func(void* filectx, ccm_sArg* arg_list, int a
 
   if (arg_list->value_decl != CCM_DECL_INT)
     return CCM__ARGMISM;
-  
+
   graph_get_stored_graph(&graph);
 
   grow_SetSelectTextSize(graph->grow->ctx, arg_list->value_int);
@@ -1537,9 +1486,8 @@ static int graph_setselecttextsize_func(void* filectx, ccm_sArg* arg_list, int a
   return 1;
 }
 
-static int graph_setselecttextfont_func(void* filectx, ccm_sArg* arg_list, int arg_count,
-    int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
-    char* return_string)
+static int graph_setselecttextfont_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                        ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
 
@@ -1548,7 +1496,7 @@ static int graph_setselecttextfont_func(void* filectx, ccm_sArg* arg_list, int a
 
   if (arg_list->value_decl != CCM_DECL_INT)
     return CCM__ARGMISM;
-  
+
   graph_get_stored_graph(&graph);
 
   grow_SetSelectTextFont(graph->grow->ctx, (glow_eFont)arg_list->value_int);
@@ -1556,9 +1504,8 @@ static int graph_setselecttextfont_func(void* filectx, ccm_sArg* arg_list, int a
   return 1;
 }
 
-static int graph_setselecttextbold_func(void* filectx, ccm_sArg* arg_list, int arg_count,
-    int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
-    char* return_string)
+static int graph_setselecttextbold_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                        ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
 
@@ -1567,7 +1514,7 @@ static int graph_setselecttextbold_func(void* filectx, ccm_sArg* arg_list, int a
 
   if (arg_list->value_decl != CCM_DECL_INT)
     return CCM__ARGMISM;
-  
+
   graph_get_stored_graph(&graph);
 
   grow_SetSelectTextBold(graph->grow->ctx, arg_list->value_int);
@@ -1575,9 +1522,8 @@ static int graph_setselecttextbold_func(void* filectx, ccm_sArg* arg_list, int a
   return 1;
 }
 
-static int graph_setgraphattribute_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_setgraphattribute_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                        ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
@@ -1593,10 +1539,11 @@ static int graph_setgraphattribute_func(void* filectx, ccm_sArg* arg_list,
   int sts;
   int found;
 
-  char transtab[][32] = { "DynType1", "DynType1", "DynType2", "DynType2",
-    "DynActionType1", "Action", "DynColor1", "Color1", "DynColor2", "Color2",
-    "DynColor3", "Color3", "DynColor4", "Color4", "DynAttr1", "AnimSequence",
-    "DynAttr2", "", "DynAttr3", "", "DynAttr4", "", "Dynamic", "", "" };
+  char transtab[][32] = {"DynType1",     "DynType1",  "DynType2",  "DynType2",  "DynActionType1",
+                         "Action",       "DynColor1", "Color1",    "DynColor2", "Color2",
+                         "DynColor3",    "Color3",    "DynColor4", "Color4",    "DynAttr1",
+                         "AnimSequence", "DynAttr2",  "",          "DynAttr3",  "",
+                         "DynAttr4",     "",          "Dynamic",   "",          ""};
 
   if (arg_count != 2)
     return CCM__ARGMISM;
@@ -1609,28 +1556,34 @@ static int graph_setgraphattribute_func(void* filectx, ccm_sArg* arg_list,
   graph_get_stored_graph(&graph);
 
   found = 0;
-  for (j = 0; j < 2; j++) {
-    if (j == 0) {
-      grow_GetSubGraphAttrInfo(
-	graph->grow->ctx, (char*)transtab, &grow_info_sub, &grow_info_cnt);
+  for (j = 0; j < 2; j++)
+  {
+    if (j == 0)
+    {
+      grow_GetSubGraphAttrInfo(graph->grow->ctx, (char*)transtab, &grow_info_sub, &grow_info_cnt);
       grow_info_p = grow_info_sub;
-    } else {
+    }
+    else
+    {
       grow_GetGraphAttrInfo(graph->grow->ctx, &grow_info, &grow_info_cnt);
       grow_info_p = grow_info;
     }
-    for (i = 0; i < grow_info_cnt; i++) {
+    for (i = 0; i < grow_info_cnt; i++)
+    {
       // str_ToUpper( attr_name, grow_info_p->name);
       strcpy(attr_name, grow_info_p->name);
-      if (str_NoCaseStrcmp(arg_list->value_string, attr_name) == 0) {
-	found = 1;
-	break;
+      if (str_NoCaseStrcmp(arg_list->value_string, attr_name) == 0)
+      {
+        found = 1;
+        break;
       }
       grow_info_p++;
     }
     if (found)
       break;
   }
-  if (!found) {
+  if (!found)
+  {
     grow_FreeSubGraphAttrInfo(grow_info_sub);
     if (grow_info)
       grow_FreeGraphAttrInfo(grow_info);
@@ -1639,7 +1592,8 @@ static int graph_setgraphattribute_func(void* filectx, ccm_sArg* arg_list,
     return 1;
   }
 
-  switch (grow_info_p->type) {
+  switch (grow_info_p->type)
+  {
   case glow_eType_Int:
   case glow_eType_Boolean:
     i_value = arg_p2->value_int;
@@ -1673,13 +1627,15 @@ static int graph_setgraphattribute_func(void* filectx, ccm_sArg* arg_list,
   case glow_eType_HotIndication:
   case glow_eType_AppMotion:
   case glow_eType_AnnotType:
-  case ge_eAttrType_OptionMenuType: {
+  case ge_eAttrType_OptionMenuType:
+  {
     int value;
     sts = AttrNav::string_to_enum(grow_info_p->type, arg_p2->value_string, &value);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       grow_FreeSubGraphAttrInfo(grow_info_sub);
       if (grow_info)
-	grow_FreeGraphAttrInfo(grow_info);
+        grow_FreeGraphAttrInfo(grow_info);
       *return_int = GE__SYNTAX;
       *return_decl = CCM_DECL_INT;
       return 1;
@@ -1687,13 +1643,15 @@ static int graph_setgraphattribute_func(void* filectx, ccm_sArg* arg_list,
     memcpy(grow_info_p->value_p, (char*)&value, sizeof(value));
     break;
   }
-  case glow_eType_TextSize: {
+  case glow_eType_TextSize:
+  {
     int value;
     sts = AttrNav::string_to_enum(grow_info_p->type, arg_p2->value_string, &value);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       grow_FreeSubGraphAttrInfo(grow_info_sub);
       if (grow_info)
-	grow_FreeGraphAttrInfo(grow_info);
+        grow_FreeGraphAttrInfo(grow_info);
       *return_int = GE__SYNTAX;
       *return_decl = CCM_DECL_INT;
       return 1;
@@ -1705,13 +1663,15 @@ static int graph_setgraphattribute_func(void* filectx, ccm_sArg* arg_list,
   case ge_eAttrType_DynType1:
   case ge_eAttrType_DynType2:
   case ge_eAttrType_ActionType1:
-  case ge_eAttrType_InputFocus: {
+  case ge_eAttrType_InputFocus:
+  {
     unsigned int value;
     sts = AttrNav::string_to_mask(grow_info_p->type, arg_p2->value_string, &value);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       grow_FreeSubGraphAttrInfo(grow_info_sub);
       if (grow_info)
-	grow_FreeGraphAttrInfo(grow_info);
+        grow_FreeGraphAttrInfo(grow_info);
       *return_int = GE__SYNTAX;
       *return_decl = CCM_DECL_INT;
       return 1;
@@ -1721,9 +1681,10 @@ static int graph_setgraphattribute_func(void* filectx, ccm_sArg* arg_list,
   }
   default:;
   }
-  
+
   grow_FreeSubGraphAttrInfo(grow_info_sub);
-  if (grow_info) {
+  if (grow_info)
+  {
     grow_UpdateGraph(graph->grow->ctx, grow_info);
     grow_FreeGraphAttrInfo(grow_info);
   }
@@ -1733,9 +1694,8 @@ static int graph_setgraphattribute_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_getgraphattribute_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_getgraphattribute_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                        ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
@@ -1750,10 +1710,11 @@ static int graph_getgraphattribute_func(void* filectx, ccm_sArg* arg_list,
   int sts;
   int found;
 
-  char transtab[][32] = { "DynType1", "DynType1", "DynType2", "DynType2",
-    "DynActionType1", "Action", "DynColor1", "Color1", "DynColor2", "Color2",
-    "DynColor3", "Color3", "DynColor4", "Color4", "DynAttr1", "AnimSequence",
-    "DynAttr2", "", "DynAttr3", "", "DynAttr4", "", "Dynamic", "", "" };
+  char transtab[][32] = {"DynType1",     "DynType1",  "DynType2",  "DynType2",  "DynActionType1",
+                         "Action",       "DynColor1", "Color1",    "DynColor2", "Color2",
+                         "DynColor3",    "Color3",    "DynColor4", "Color4",    "DynAttr1",
+                         "AnimSequence", "DynAttr2",  "",          "DynAttr3",  "",
+                         "DynAttr4",     "",          "Dynamic",   "",          ""};
 
   if (arg_count != 2)
     return CCM__ARGMISM;
@@ -1766,28 +1727,34 @@ static int graph_getgraphattribute_func(void* filectx, ccm_sArg* arg_list,
   graph_get_stored_graph(&graph);
 
   found = 0;
-  for (j = 0; j < 2; j++) {
-    if (j == 0) {
-      grow_GetSubGraphAttrInfo(
-	graph->grow->ctx, (char*)transtab, &grow_info_sub, &grow_info_cnt);
+  for (j = 0; j < 2; j++)
+  {
+    if (j == 0)
+    {
+      grow_GetSubGraphAttrInfo(graph->grow->ctx, (char*)transtab, &grow_info_sub, &grow_info_cnt);
       grow_info_p = grow_info_sub;
-    } else {
+    }
+    else
+    {
       grow_GetGraphAttrInfo(graph->grow->ctx, &grow_info, &grow_info_cnt);
       grow_info_p = grow_info;
     }
-    for (i = 0; i < grow_info_cnt; i++) {
+    for (i = 0; i < grow_info_cnt; i++)
+    {
       // str_ToUpper( attr_name, grow_info_p->name);
       strcpy(attr_name, grow_info_p->name);
-      if (str_NoCaseStrcmp(arg_list->value_string, attr_name) == 0) {
-	found = 1;
-	break;
+      if (str_NoCaseStrcmp(arg_list->value_string, attr_name) == 0)
+      {
+        found = 1;
+        break;
       }
       grow_info_p++;
     }
     if (found)
       break;
   }
-  if (!found) {
+  if (!found)
+  {
     grow_FreeSubGraphAttrInfo(grow_info_sub);
     if (grow_info)
       grow_FreeGraphAttrInfo(grow_info);
@@ -1796,7 +1763,8 @@ static int graph_getgraphattribute_func(void* filectx, ccm_sArg* arg_list,
     return 1;
   }
 
-  switch (grow_info_p->type) {
+  switch (grow_info_p->type)
+  {
   case glow_eType_Int:
   case glow_eType_Boolean:
     memcpy((char*)&i_value, grow_info_p->value_p, sizeof(i_value));
@@ -1835,16 +1803,18 @@ static int graph_getgraphattribute_func(void* filectx, ccm_sArg* arg_list,
   case glow_eType_HotIndication:
   case glow_eType_AppMotion:
   case glow_eType_AnnotType:
-  case ge_eAttrType_OptionMenuType: {
+  case ge_eAttrType_OptionMenuType:
+  {
     int value;
     memcpy((char*)&value, grow_info_p->value_p, sizeof(value));
     arg_p2->value_int = value;
-    sts = AttrNav::enum_to_string(grow_info_p->type, value, arg_p2->value_string,
-				  sizeof(arg_p2->value_string));
-    if (EVEN(sts)) {
+    sts =
+        AttrNav::enum_to_string(grow_info_p->type, value, arg_p2->value_string, sizeof(arg_p2->value_string));
+    if (EVEN(sts))
+    {
       grow_FreeSubGraphAttrInfo(grow_info_sub);
       if (grow_info)
-	grow_FreeGraphAttrInfo(grow_info);
+        grow_FreeGraphAttrInfo(grow_info);
       *return_int = GE__SYNTAX;
       *return_decl = CCM_DECL_INT;
       return 1;
@@ -1853,13 +1823,15 @@ static int graph_getgraphattribute_func(void* filectx, ccm_sArg* arg_list,
     arg_p2->value_decl = CCM_DECL_STRING;
     break;
   }
-  case glow_eType_TextSize: {
+  case glow_eType_TextSize:
+  {
     int value;
     sts = AttrNav::string_to_enum(grow_info_p->type, arg_p2->value_string, &value);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       grow_FreeSubGraphAttrInfo(grow_info_sub);
       if (grow_info)
-	grow_FreeGraphAttrInfo(grow_info);
+        grow_FreeGraphAttrInfo(grow_info);
       *return_int = GE__SYNTAX;
       *return_decl = CCM_DECL_INT;
       return 1;
@@ -1873,7 +1845,8 @@ static int graph_getgraphattribute_func(void* filectx, ccm_sArg* arg_list,
   case ge_eAttrType_DynType1:
   case ge_eAttrType_DynType2:
   case ge_eAttrType_ActionType1:
-  case ge_eAttrType_InputFocus: {
+  case ge_eAttrType_InputFocus:
+  {
     unsigned int value;
     memcpy((char*)&value, grow_info_p->value_p, sizeof(value));
     arg_p2->value_int = value;
@@ -1883,7 +1856,7 @@ static int graph_getgraphattribute_func(void* filectx, ccm_sArg* arg_list,
   }
   default:;
   }
-  
+
   grow_FreeSubGraphAttrInfo(grow_info_sub);
   if (grow_info)
     grow_FreeGraphAttrInfo(grow_info);
@@ -1893,20 +1866,23 @@ static int graph_getgraphattribute_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static void trim_script(char *out, char *in)
+static void trim_script(char* out, char* in)
 {
-  char *s = in;
-  char *t = out;
-  while(*s) {
-    if (*s == '\\' && *(s+1) == '\"') {
+  char* s = in;
+  char* t = out;
+  while (*s)
+  {
+    if (*s == '\\' && *(s + 1) == '\"')
+    {
       *t = '\"';
       s++;
     }
-    else if (*s == '\\' && *(s+1) == '\\' && *(s+2) == 'n') {
+    else if (*s == '\\' && *(s + 1) == '\\' && *(s + 2) == 'n')
+    {
       *t = '\n';
       s += 2;
     }
-    else 
+    else
       *t = *s;
     s++;
     t++;
@@ -1914,9 +1890,8 @@ static void trim_script(char *out, char *in)
   *t = 0;
 }
 
-static int graph_setobjectattribute_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_setobjectattribute_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                         ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   int type;
@@ -1939,7 +1914,8 @@ static int graph_setobjectattribute_func(void* filectx, ccm_sArg* arg_list,
     return CCM__INVARG;
 
   o = (grow_tObject)arg_list->value_int;
-  if (!o) {
+  if (!o)
+  {
     *return_int = GE__ARG;
     *return_decl = CCM_DECL_INT;
     return 1;
@@ -1947,29 +1923,19 @@ static int graph_setobjectattribute_func(void* filectx, ccm_sArg* arg_list,
   graph_get_stored_graph(&graph);
 
   type = grow_GetObjectType(o);
-  if (type == glow_eObjectType_GrowNode 
-      || type == glow_eObjectType_GrowSlider
-      || type == glow_eObjectType_GrowGroup
-      || type == glow_eObjectType_GrowLayer
-      || type == glow_eObjectType_GrowToolbar
-      || type == glow_eObjectType_GrowTable
-      || type == glow_eObjectType_GrowWindow
-      || type == glow_eObjectType_GrowFolder 
-      || type == glow_eObjectType_GrowBar
-      || type == glow_eObjectType_GrowBarArc
-      || type == glow_eObjectType_GrowXYCurve
-      || type == glow_eObjectType_GrowPie
-      || type == glow_eObjectType_GrowBarChart
-      || type == glow_eObjectType_GrowAxis
-      || type == glow_eObjectType_GrowAxisArc
-      || type == glow_eObjectType_GrowTrend 
-      || type == glow_eObjectType_GrowRect
-      || type == glow_eObjectType_GrowRectRounded
-      || type == glow_eObjectType_GrowArc
-      || type == glow_eObjectType_GrowLine
-      || type == glow_eObjectType_GrowPolyLine
-      || type == glow_eObjectType_GrowText
-      || type == glow_eObjectType_GrowImage) {
+  if (type == glow_eObjectType_GrowNode || type == glow_eObjectType_GrowSlider ||
+      type == glow_eObjectType_GrowGroup || type == glow_eObjectType_GrowLayer ||
+      type == glow_eObjectType_GrowToolbar || type == glow_eObjectType_GrowTable ||
+      type == glow_eObjectType_GrowWindow || type == glow_eObjectType_GrowFolder ||
+      type == glow_eObjectType_GrowBar || type == glow_eObjectType_GrowBarArc ||
+      type == glow_eObjectType_GrowXYCurve || type == glow_eObjectType_GrowPie ||
+      type == glow_eObjectType_GrowBarChart || type == glow_eObjectType_GrowAxis ||
+      type == glow_eObjectType_GrowAxisArc || type == glow_eObjectType_GrowTrend ||
+      type == glow_eObjectType_GrowRect || type == glow_eObjectType_GrowRectRounded ||
+      type == glow_eObjectType_GrowArc || type == glow_eObjectType_GrowLine ||
+      type == glow_eObjectType_GrowPolyLine || type == glow_eObjectType_GrowText ||
+      type == glow_eObjectType_GrowImage)
+  {
     attr_sItem* itemlist;
     attr_sItem* item_p;
     int item_cnt;
@@ -1987,31 +1953,38 @@ static int graph_setobjectattribute_func(void* filectx, ccm_sArg* arg_list,
 
     found = 0;
     item_p = itemlist;
-    for (i = 0; i < item_cnt; i++) {
+    for (i = 0; i < item_cnt; i++)
+    {
       strcpy(attr_name, item_p->name);
-      if (item_p->type == ge_eAttrType_Dyn) {
-	if (str_NoCaseStrncmp(arg_p2->value_string, attr_name, strlen(attr_name)) == 0 &&
-	    arg_p2->value_string[strlen(attr_name)] == '.') {
-	  found = 1;
-	  break;
-	}
+      if (item_p->type == ge_eAttrType_Dyn)
+      {
+        if (str_NoCaseStrncmp(arg_p2->value_string, attr_name, strlen(attr_name)) == 0 &&
+            arg_p2->value_string[strlen(attr_name)] == '.')
+        {
+          found = 1;
+          break;
+        }
       }
-      else {
-	if (str_NoCaseStrcmp(arg_p2->value_string, attr_name) == 0) {
-	  found = 1;
-	  break;
-	}
+      else
+      {
+        if (str_NoCaseStrcmp(arg_p2->value_string, attr_name) == 0)
+        {
+          found = 1;
+          break;
+        }
       }
       item_p++;
     }
 
-    if (!found) {
+    if (!found)
+    {
       *return_decl = CCM_DECL_INT;
       *return_int = GE__NOATTR;
       return 1;
     }
 
-    switch (item_p->type) {
+    switch (item_p->type)
+    {
     case glow_eType_Int:
     case glow_eType_TraceColor:
     case glow_eType_Boolean:
@@ -2035,7 +2008,8 @@ static int graph_setobjectattribute_func(void* filectx, ccm_sArg* arg_list,
       d_value = double(arg_p3->value_float);
       memcpy(item_p->value, (char*)&d_value, sizeof(d_value));
       break;
-    case glow_eType_String: {
+    case glow_eType_String:
+    {
       char str[K_STRING_SIZE];
 
       if (arg_p3->value_decl != CCM_DECL_STRING)
@@ -2056,7 +2030,7 @@ static int graph_setobjectattribute_func(void* filectx, ccm_sArg* arg_list,
     case glow_eType_MB3Action:
     case glow_eType_InputFocusMark:
     case glow_eType_Relief:
-    //case glow_eType_TextSize:
+    // case glow_eType_TextSize:
     case glow_eType_Gradient:
     case glow_eType_HotIndication:
     case glow_eType_AppMotion:
@@ -2068,36 +2042,39 @@ static int graph_setobjectattribute_func(void* filectx, ccm_sArg* arg_list,
     case ge_eAttrType_MethodsMenuType:
     case ge_eAttrType_MethodToolbarType:
     case ge_eAttrType_KeyboardType:
-    case ge_eAttrType_UcEntity: 
-    case ge_eAttrType_UcAcceleration: 
-    case ge_eAttrType_UcAngle: 
-    case ge_eAttrType_UcArea: 
-    case ge_eAttrType_UcEnergy: 
-    case ge_eAttrType_UcForce: 
-    case ge_eAttrType_UcFrequency: 
-    case ge_eAttrType_UcGeneral: 
-    case ge_eAttrType_UcLength: 
-    case ge_eAttrType_UcMass: 
-    case ge_eAttrType_UcMassFlow: 
-    case ge_eAttrType_UcPower: 
-    case ge_eAttrType_UcPressure: 
-    case ge_eAttrType_UcTemperature: 
-    case ge_eAttrType_UcTime: 
-    case ge_eAttrType_UcSpeed: 
+    case ge_eAttrType_UcEntity:
+    case ge_eAttrType_UcAcceleration:
+    case ge_eAttrType_UcAngle:
+    case ge_eAttrType_UcArea:
+    case ge_eAttrType_UcEnergy:
+    case ge_eAttrType_UcForce:
+    case ge_eAttrType_UcFrequency:
+    case ge_eAttrType_UcGeneral:
+    case ge_eAttrType_UcLength:
+    case ge_eAttrType_UcMass:
+    case ge_eAttrType_UcMassFlow:
+    case ge_eAttrType_UcPower:
+    case ge_eAttrType_UcPressure:
+    case ge_eAttrType_UcTemperature:
+    case ge_eAttrType_UcTime:
+    case ge_eAttrType_UcSpeed:
     case ge_eAttrType_UcVolume:
-    case ge_eAttrType_UcVolumeFlow: {
+    case ge_eAttrType_UcVolumeFlow:
+    {
       int value;
 
-      if (!(arg_p3->value_decl == CCM_DECL_INT
-              || arg_p3->value_decl == CCM_DECL_STRING))
+      if (!(arg_p3->value_decl == CCM_DECL_INT || arg_p3->value_decl == CCM_DECL_STRING))
         return CCM__ARGMISM;
 
-      if (arg_p3->value_decl == CCM_DECL_INT) {
+      if (arg_p3->value_decl == CCM_DECL_INT)
+      {
         value = arg_p3->value_int;
-      } else {
-        sts = AttrNav::string_to_enum(
-            item_p->type, arg_p3->value_string, &value);
-        if (EVEN(sts)) {
+      }
+      else
+      {
+        sts = AttrNav::string_to_enum(item_p->type, arg_p3->value_string, &value);
+        if (EVEN(sts))
+        {
           *return_int = GE__SYNTAX;
           *return_decl = CCM_DECL_INT;
           return 1;
@@ -2106,12 +2083,12 @@ static int graph_setobjectattribute_func(void* filectx, ccm_sArg* arg_list,
       memcpy(item_p->value, (char*)&value, sizeof(value));
       break;
     }
-    case glow_eType_TextSize: {
+    case glow_eType_TextSize:
+    {
       int value;
       char str[40];
 
-      if (!(arg_p3->value_decl == CCM_DECL_INT
-              || arg_p3->value_decl == CCM_DECL_STRING))
+      if (!(arg_p3->value_decl == CCM_DECL_INT || arg_p3->value_decl == CCM_DECL_STRING))
         return CCM__ARGMISM;
 
       if (arg_p3->value_decl == CCM_DECL_INT)
@@ -2120,7 +2097,8 @@ static int graph_setobjectattribute_func(void* filectx, ccm_sArg* arg_list,
         strncpy(str, arg_p3->value_string, sizeof(str));
 
       sts = AttrNav::string_to_enum(item_p->type, str, &value);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         *return_int = GE__SYNTAX;
         *return_decl = CCM_DECL_INT;
         return 1;
@@ -2134,139 +2112,157 @@ static int graph_setobjectattribute_func(void* filectx, ccm_sArg* arg_list,
     case ge_eAttrType_ActionType1:
     case ge_eAttrType_ActionType2:
     case ge_eAttrType_InstanceMask:
-    case ge_eAttrType_InputFocus: {
+    case ge_eAttrType_InputFocus:
+    {
       unsigned int value;
 
-      if (!(arg_p3->value_decl == CCM_DECL_INT
-              || arg_p3->value_decl == CCM_DECL_STRING))
+      if (!(arg_p3->value_decl == CCM_DECL_INT || arg_p3->value_decl == CCM_DECL_STRING))
         return CCM__ARGMISM;
 
       if (arg_p3->value_decl == CCM_DECL_INT)
         value = arg_p3->value_int;
-      else {
-        sts = AttrNav::string_to_mask(
-            item_p->type, arg_p3->value_string, &value);
-        if (EVEN(sts)) {
+      else
+      {
+        sts = AttrNav::string_to_mask(item_p->type, arg_p3->value_string, &value);
+        if (EVEN(sts))
+        {
           return GE__SYNTAX;
         }
       }
       memcpy(item_p->value, (char*)&value, sizeof(value));
-      if (item_p->type == ge_eAttrType_DynType1
-          || item_p->type == ge_eAttrType_DynType2
-          || item_p->type == ge_eAttrType_ActionType1
-          || item_p->type == ge_eAttrType_ActionType2) {
+      if (item_p->type == ge_eAttrType_DynType1 || item_p->type == ge_eAttrType_DynType2 ||
+          item_p->type == ge_eAttrType_ActionType1 || item_p->type == ge_eAttrType_ActionType2)
+      {
         grow_GetUserData(o, (void**)&dyn);
-	dyn->update_dyntype(o);
+        dyn->update_dyntype(o);
         dyn->update_elements();
       }
       break;
     }
-    case ge_eAttrType_Dyn: {
+    case ge_eAttrType_Dyn:
+    {
       attr_sItem dyn_itemlist[100];
-      attr_sItem *dyn_item_p;
+      attr_sItem* dyn_item_p;
       int dyn_itemlist_cnt = 0;
       int j;
-      char *dyn_attr_name;
+      char* dyn_attr_name;
       int dyn_found;
 
-      dyn = (GeDyn *)item_p->value;
-      if (!dyn) {
-	dyn = new GeDyn(graph);
-	item_p->value = &dyn;
+      dyn = (GeDyn*)item_p->value;
+      if (!dyn)
+      {
+        dyn = new GeDyn(graph);
+        item_p->value = &dyn;
       }
       dyn->get_attributes(0, dyn_itemlist, &dyn_itemlist_cnt);
       dyn_found = 0;
-      dyn_attr_name = &arg_p2->value_string[strlen(attr_name)+1];
+      dyn_attr_name = &arg_p2->value_string[strlen(attr_name) + 1];
       dyn_item_p = dyn_itemlist;
-      for (j = 0; j < dyn_itemlist_cnt; j++) {
-	if (str_NoCaseStrcmp(dyn_attr_name, dyn_item_p->name) == 0) {
-	  dyn_found = 1;
-	  break;
-	}
-	dyn_item_p++;
+      for (j = 0; j < dyn_itemlist_cnt; j++)
+      {
+        if (str_NoCaseStrcmp(dyn_attr_name, dyn_item_p->name) == 0)
+        {
+          dyn_found = 1;
+          break;
+        }
+        dyn_item_p++;
       }
-      if (dyn_found) {
-	if (arg_p3->value_decl == CCM_DECL_INT) {
-	  int value;
-	  value = arg_p3->value_int;
-	  memcpy(dyn_item_p->value, (char*)&value, sizeof(value));
-	  if (dyn_item_p->type == ge_eAttrType_DynType1
-	      || dyn_item_p->type == ge_eAttrType_DynType2
-	      || dyn_item_p->type == ge_eAttrType_ActionType1
-	      || dyn_item_p->type == ge_eAttrType_ActionType2)
-	    dyn->update_elements();
-	}
-	else if (arg_p3->value_decl == CCM_DECL_FLOAT) {
-	  float fvalue = arg_p3->value_float;
-	  memcpy(dyn_item_p->value, (char*)&fvalue, sizeof(fvalue));
-	}
-	else if (arg_p3->value_decl == CCM_DECL_STRING) {
-	  char str[K_STRING_SIZE];
+      if (dyn_found)
+      {
+        if (arg_p3->value_decl == CCM_DECL_INT)
+        {
+          int value;
+          value = arg_p3->value_int;
+          memcpy(dyn_item_p->value, (char*)&value, sizeof(value));
+          if (dyn_item_p->type == ge_eAttrType_DynType1 || dyn_item_p->type == ge_eAttrType_DynType2 ||
+              dyn_item_p->type == ge_eAttrType_ActionType1 || dyn_item_p->type == ge_eAttrType_ActionType2)
+            dyn->update_elements();
+        }
+        else if (arg_p3->value_decl == CCM_DECL_FLOAT)
+        {
+          float fvalue = arg_p3->value_float;
+          memcpy(dyn_item_p->value, (char*)&fvalue, sizeof(fvalue));
+        }
+        else if (arg_p3->value_decl == CCM_DECL_STRING)
+        {
+          char str[K_STRING_SIZE];
 
-	  trim_script(str, arg_p3->value_string);
-	  strncpy((char *)dyn_item_p->value, str, dyn_item_p->size);
-	}
+          trim_script(str, arg_p3->value_string);
+          strncpy((char*)dyn_item_p->value, str, dyn_item_p->size);
+        }
       }
-      else {
-	dyn_item_p = dyn_itemlist;
-	for (j = 0; j < dyn_itemlist_cnt; j++) {
-	  if (str_NoCaseStrncmp(dyn_attr_name, dyn_item_p->name, strlen(dyn_item_p->name)) == 0 &&
-	    dyn_attr_name[strlen(dyn_item_p->name)] == '.') {
-	    dyn_found = 1;
-	    break;
-	  }
-	  dyn_item_p++;
-	}
+      else
+      {
+        dyn_item_p = dyn_itemlist;
+        for (j = 0; j < dyn_itemlist_cnt; j++)
+        {
+          if (str_NoCaseStrncmp(dyn_attr_name, dyn_item_p->name, strlen(dyn_item_p->name)) == 0 &&
+              dyn_attr_name[strlen(dyn_item_p->name)] == '.')
+          {
+            dyn_found = 1;
+            break;
+          }
+          dyn_item_p++;
+        }
 
-	if (dyn_found) {
-	  if (dyn_item_p->type == ge_eAttrType_Dyn) {
-	    attr_sItem dyn2_itemlist[100];
-	    attr_sItem *dyn2_item_p;
-	    int dyn2_itemlist_cnt = 0;
-	    int j;
-	    char *dyn2_attr_name;
-	    int dyn2_found;
-	    
-	    dyn = (GeDyn *)dyn_item_p->value;
-	    if (!dyn) {
-	      dyn = new GeDyn(graph);
-	      dyn_item_p->value = &dyn;
-	    }
-	    dyn->get_attributes(0, dyn2_itemlist, &dyn2_itemlist_cnt);
-	    dyn2_found = 0;
-	    dyn2_attr_name = &dyn_attr_name[strlen(dyn_item_p->name)+1];
-	    dyn2_item_p = dyn2_itemlist;
-	    for (j = 0; j < dyn2_itemlist_cnt; j++) {
-	      if (str_NoCaseStrcmp(dyn2_attr_name, dyn2_item_p->name) == 0) {
-		dyn2_found = 1;
-		break;
-	      }
-	      dyn2_item_p++;
-	    }
-	    if (dyn2_found) {
-	      if (arg_p3->value_decl == CCM_DECL_INT) {
-		int value;
-		value = arg_p3->value_int;
-		memcpy(dyn2_item_p->value, (char*)&value, sizeof(value));
-		if (dyn2_item_p->type == ge_eAttrType_DynType1
-		    || dyn2_item_p->type == ge_eAttrType_DynType2
-		    || dyn2_item_p->type == ge_eAttrType_ActionType1
-		    || dyn2_item_p->type == ge_eAttrType_ActionType2)
-		  dyn->update_elements();
-	      }
-	      else if (arg_p3->value_decl == CCM_DECL_FLOAT) {
-		float fvalue = arg_p3->value_float;
-		memcpy(dyn2_item_p->value, (char*)&fvalue, sizeof(fvalue));
-	      }
-	      else if (arg_p3->value_decl == CCM_DECL_STRING) {
-		char str[K_STRING_SIZE];
-		
-		trim_script(str, arg_p3->value_string);
-		strncpy((char *)dyn2_item_p->value, str, dyn2_item_p->size);
-	      }
-	    }
-	  }
-	}
+        if (dyn_found)
+        {
+          if (dyn_item_p->type == ge_eAttrType_Dyn)
+          {
+            attr_sItem dyn2_itemlist[100];
+            attr_sItem* dyn2_item_p;
+            int dyn2_itemlist_cnt = 0;
+            int j;
+            char* dyn2_attr_name;
+            int dyn2_found;
+
+            dyn = (GeDyn*)dyn_item_p->value;
+            if (!dyn)
+            {
+              dyn = new GeDyn(graph);
+              dyn_item_p->value = &dyn;
+            }
+            dyn->get_attributes(0, dyn2_itemlist, &dyn2_itemlist_cnt);
+            dyn2_found = 0;
+            dyn2_attr_name = &dyn_attr_name[strlen(dyn_item_p->name) + 1];
+            dyn2_item_p = dyn2_itemlist;
+            for (j = 0; j < dyn2_itemlist_cnt; j++)
+            {
+              if (str_NoCaseStrcmp(dyn2_attr_name, dyn2_item_p->name) == 0)
+              {
+                dyn2_found = 1;
+                break;
+              }
+              dyn2_item_p++;
+            }
+            if (dyn2_found)
+            {
+              if (arg_p3->value_decl == CCM_DECL_INT)
+              {
+                int value;
+                value = arg_p3->value_int;
+                memcpy(dyn2_item_p->value, (char*)&value, sizeof(value));
+                if (dyn2_item_p->type == ge_eAttrType_DynType1 ||
+                    dyn2_item_p->type == ge_eAttrType_DynType2 ||
+                    dyn2_item_p->type == ge_eAttrType_ActionType1 ||
+                    dyn2_item_p->type == ge_eAttrType_ActionType2)
+                  dyn->update_elements();
+              }
+              else if (arg_p3->value_decl == CCM_DECL_FLOAT)
+              {
+                float fvalue = arg_p3->value_float;
+                memcpy(dyn2_item_p->value, (char*)&fvalue, sizeof(fvalue));
+              }
+              else if (arg_p3->value_decl == CCM_DECL_STRING)
+              {
+                char str[K_STRING_SIZE];
+
+                trim_script(str, arg_p3->value_string);
+                strncpy((char*)dyn2_item_p->value, str, dyn2_item_p->size);
+              }
+            }
+          }
+        }
       }
     }
     default:;
@@ -2279,9 +2275,8 @@ static int graph_setobjectattribute_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_getobjectattribute_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_getobjectattribute_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                         ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   int type;
@@ -2304,30 +2299,19 @@ static int graph_getobjectattribute_func(void* filectx, ccm_sArg* arg_list,
   graph_get_stored_graph(&graph);
 
   type = grow_GetObjectType(o);
-  if (type == glow_eObjectType_GrowNode 
-      || type == glow_eObjectType_GrowSlider
-      || type == glow_eObjectType_GrowGroup
-      || type == glow_eObjectType_GrowLayer
-      || type == glow_eObjectType_GrowToolbar
-      || type == glow_eObjectType_GrowTable
-      || type == glow_eObjectType_GrowWindow
-      || type == glow_eObjectType_GrowFolder 
-      || type == glow_eObjectType_GrowBar
-      || type == glow_eObjectType_GrowBarArc
-      || type == glow_eObjectType_GrowXYCurve
-      || type == glow_eObjectType_GrowPie
-      || type == glow_eObjectType_GrowBarChart
-      || type == glow_eObjectType_GrowAxis
-      || type == glow_eObjectType_GrowAxisArc
-      || type == glow_eObjectType_GrowTrend 
-      || type == glow_eObjectType_GrowRect
-      || type == glow_eObjectType_GrowRectRounded
-      || type == glow_eObjectType_GrowArc
-      || type == glow_eObjectType_GrowLine
-      || type == glow_eObjectType_GrowPolyLine
-      || type == glow_eObjectType_GrowText
-      || type == glow_eObjectType_GrowImage
-      || type == glow_eObjectType_GrowDashCell) {
+  if (type == glow_eObjectType_GrowNode || type == glow_eObjectType_GrowSlider ||
+      type == glow_eObjectType_GrowGroup || type == glow_eObjectType_GrowLayer ||
+      type == glow_eObjectType_GrowToolbar || type == glow_eObjectType_GrowTable ||
+      type == glow_eObjectType_GrowWindow || type == glow_eObjectType_GrowFolder ||
+      type == glow_eObjectType_GrowBar || type == glow_eObjectType_GrowBarArc ||
+      type == glow_eObjectType_GrowXYCurve || type == glow_eObjectType_GrowPie ||
+      type == glow_eObjectType_GrowBarChart || type == glow_eObjectType_GrowAxis ||
+      type == glow_eObjectType_GrowAxisArc || type == glow_eObjectType_GrowTrend ||
+      type == glow_eObjectType_GrowRect || type == glow_eObjectType_GrowRectRounded ||
+      type == glow_eObjectType_GrowArc || type == glow_eObjectType_GrowLine ||
+      type == glow_eObjectType_GrowPolyLine || type == glow_eObjectType_GrowText ||
+      type == glow_eObjectType_GrowImage || type == glow_eObjectType_GrowDashCell)
+  {
     attr_sItem* itemlist;
     attr_sItem* item_p;
     int item_cnt;
@@ -2345,43 +2329,52 @@ static int graph_getobjectattribute_func(void* filectx, ccm_sArg* arg_list,
 
     found = 0;
     item_p = itemlist;
-    for (i = 0; i < item_cnt; i++) {
+    for (i = 0; i < item_cnt; i++)
+    {
       strcpy(attr_name, item_p->name);
-      if (item_p->type == ge_eAttrType_Dyn) {
-	if (str_NoCaseStrncmp(arg_p2->value_string, attr_name, strlen(attr_name)) == 0) {
-	  found = 1;
-	  break;
-	}
+      if (item_p->type == ge_eAttrType_Dyn)
+      {
+        if (str_NoCaseStrncmp(arg_p2->value_string, attr_name, strlen(attr_name)) == 0)
+        {
+          found = 1;
+          break;
+        }
       }
-      else {
-	if (str_NoCaseStrcmp(arg_p2->value_string, attr_name) == 0) {
-	  found = 1;
-	  break;
-	}
+      else
+      {
+        if (str_NoCaseStrcmp(arg_p2->value_string, attr_name) == 0)
+        {
+          found = 1;
+          break;
+        }
       }
       item_p++;
     }
 
-    if (!found) {
+    if (!found)
+    {
       *return_decl = CCM_DECL_INT;
       *return_int = GE__NOATTR;
       return CCM__INVARG;
     }
 
-    switch (item_p->type) {
+    switch (item_p->type)
+    {
     case glow_eType_Int:
     case glow_eType_TraceColor:
     case glow_eType_Boolean:
       if (arg_p3->value_decl != CCM_DECL_INT)
         return CCM__ARGMISM;
 
-      if (item_p->size == 4) {
-	memcpy(&i32_value, item_p->value, sizeof(i32_value));
-	arg_p3->value_int = i32_value;
+      if (item_p->size == 4)
+      {
+        memcpy(&i32_value, item_p->value, sizeof(i32_value));
+        arg_p3->value_int = i32_value;
       }
-      else {
-	memcpy(&i64_value, item_p->value, sizeof(i64_value));
-	arg_p3->value_int = i64_value;	
+      else
+      {
+        memcpy(&i64_value, item_p->value, sizeof(i64_value));
+        arg_p3->value_int = i64_value;
       }
       arg_p3->value_returned = 1;
       break;
@@ -2405,7 +2398,7 @@ static int graph_getobjectattribute_func(void* filectx, ccm_sArg* arg_list,
       if (arg_p3->value_decl != CCM_DECL_STRING)
         return CCM__ARGMISM;
       strncpy(arg_p3->value_string, (char*)item_p->value,
-          MIN(item_p->size, (int)sizeof(arg_p3->value_string)));
+              MIN(item_p->size, (int)sizeof(arg_p3->value_string)));
       arg_p3->value_returned = 1;
       break;
     case glow_eType_Direction:
@@ -2432,39 +2425,43 @@ static int graph_getobjectattribute_func(void* filectx, ccm_sArg* arg_list,
     case ge_eAttrType_MethodsMenuType:
     case ge_eAttrType_MethodToolbarType:
     case ge_eAttrType_KeyboardType:
-    case ge_eAttrType_UcEntity: 
-    case ge_eAttrType_UcAcceleration: 
-    case ge_eAttrType_UcAngle: 
-    case ge_eAttrType_UcArea: 
-    case ge_eAttrType_UcEnergy: 
-    case ge_eAttrType_UcForce: 
-    case ge_eAttrType_UcFrequency: 
-    case ge_eAttrType_UcGeneral: 
-    case ge_eAttrType_UcLength: 
-    case ge_eAttrType_UcMass: 
-    case ge_eAttrType_UcMassFlow: 
-    case ge_eAttrType_UcPower: 
-    case ge_eAttrType_UcPressure: 
-    case ge_eAttrType_UcTemperature: 
-    case ge_eAttrType_UcTime: 
-    case ge_eAttrType_UcSpeed: 
+    case ge_eAttrType_UcEntity:
+    case ge_eAttrType_UcAcceleration:
+    case ge_eAttrType_UcAngle:
+    case ge_eAttrType_UcArea:
+    case ge_eAttrType_UcEnergy:
+    case ge_eAttrType_UcForce:
+    case ge_eAttrType_UcFrequency:
+    case ge_eAttrType_UcGeneral:
+    case ge_eAttrType_UcLength:
+    case ge_eAttrType_UcMass:
+    case ge_eAttrType_UcMassFlow:
+    case ge_eAttrType_UcPower:
+    case ge_eAttrType_UcPressure:
+    case ge_eAttrType_UcTemperature:
+    case ge_eAttrType_UcTime:
+    case ge_eAttrType_UcSpeed:
     case ge_eAttrType_UcVolume:
-    case ge_eAttrType_UcVolumeFlow: {
+    case ge_eAttrType_UcVolumeFlow:
+    {
       int value;
 
-      if (!(arg_p3->value_decl == CCM_DECL_INT
-              || arg_p3->value_decl == CCM_DECL_STRING))
+      if (!(arg_p3->value_decl == CCM_DECL_INT || arg_p3->value_decl == CCM_DECL_STRING))
         return CCM__ARGMISM;
 
       memcpy((char*)&value, item_p->value, sizeof(value));
 
-      if (arg_p3->value_decl == CCM_DECL_INT) {
+      if (arg_p3->value_decl == CCM_DECL_INT)
+      {
         arg_p3->value_int = value;
         arg_p3->value_returned = 1;
-      } else {
-        sts = AttrNav::enum_to_string(item_p->type, value, arg_p3->value_string,
-            sizeof(arg_p3->value_string));
-        if (EVEN(sts)) {
+      }
+      else
+      {
+        sts =
+            AttrNav::enum_to_string(item_p->type, value, arg_p3->value_string, sizeof(arg_p3->value_string));
+        if (EVEN(sts))
+        {
           *return_int = GE__SYNTAX;
           *return_decl = CCM_DECL_INT;
           return 1;
@@ -2473,17 +2470,18 @@ static int graph_getobjectattribute_func(void* filectx, ccm_sArg* arg_list,
       }
       break;
     }
-    case glow_eType_TextSize: {
+    case glow_eType_TextSize:
+    {
       int value;
       char str[40];
 
-      if (!(arg_p3->value_decl == CCM_DECL_INT
-              || arg_p3->value_decl == CCM_DECL_STRING))
+      if (!(arg_p3->value_decl == CCM_DECL_INT || arg_p3->value_decl == CCM_DECL_STRING))
         return CCM__ARGMISM;
 
       memcpy((char*)&value, item_p->value, sizeof(value));
       sts = AttrNav::enum_to_string(item_p->type, value, str, sizeof(str));
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         *return_int = GE__SYNTAX;
         *return_decl = CCM_DECL_INT;
         return 1;
@@ -2502,7 +2500,8 @@ static int graph_getobjectattribute_func(void* filectx, ccm_sArg* arg_list,
     case ge_eAttrType_ActionType1:
     case ge_eAttrType_ActionType2:
     case ge_eAttrType_InstanceMask:
-    case ge_eAttrType_InputFocus: {
+    case ge_eAttrType_InputFocus:
+    {
       unsigned int value;
 
       if (arg_p3->value_decl != CCM_DECL_INT)
@@ -2514,76 +2513,84 @@ static int graph_getobjectattribute_func(void* filectx, ccm_sArg* arg_list,
       arg_p3->var_decl = arg_p3->value_decl;
       break;
     }
-    case ge_eAttrType_Dyn: {
+    case ge_eAttrType_Dyn:
+    {
       attr_sItem dyn_itemlist[100];
-      attr_sItem *dyn_item_p;
+      attr_sItem* dyn_item_p;
       int dyn_itemlist_cnt = 0;
       int j;
-      char *dyn_attr_name;
+      char* dyn_attr_name;
       int dyn_found;
-      GeDyn *dyn;
+      GeDyn* dyn;
 
-      dyn = (GeDyn *)item_p->value;
-      if (!dyn) {
-	dyn = new GeDyn(graph);
-	item_p->value = &dyn;
+      dyn = (GeDyn*)item_p->value;
+      if (!dyn)
+      {
+        dyn = new GeDyn(graph);
+        item_p->value = &dyn;
       }
       dyn->get_attributes(0, dyn_itemlist, &dyn_itemlist_cnt);
       dyn_found = 0;
-      dyn_attr_name = &arg_p2->value_string[strlen(attr_name)+1];
+      dyn_attr_name = &arg_p2->value_string[strlen(attr_name) + 1];
       dyn_item_p = dyn_itemlist;
-      for (j = 0; j < dyn_itemlist_cnt; j++) {
-	if (str_NoCaseStrcmp(dyn_attr_name, dyn_item_p->name) == 0) {
-	  dyn_found = 1;
-	  break;
-	}
-	dyn_item_p++;
+      for (j = 0; j < dyn_itemlist_cnt; j++)
+      {
+        if (str_NoCaseStrcmp(dyn_attr_name, dyn_item_p->name) == 0)
+        {
+          dyn_found = 1;
+          break;
+        }
+        dyn_item_p++;
       }
-      if (dyn_found) {
-	switch (dyn_item_p->type) {
-	case glow_eType_Int:
-	case glow_eType_TraceColor:
-	case glow_eType_Boolean:
-	case glow_eType_DynType1:
-	case glow_eType_DynType2:
-	case glow_eType_ActionType1:
-	case glow_eType_ActionType2:
-	  if (arg_p3->value_decl != CCM_DECL_INT)
-	    return CCM__ARGMISM;
+      if (dyn_found)
+      {
+        switch (dyn_item_p->type)
+        {
+        case glow_eType_Int:
+        case glow_eType_TraceColor:
+        case glow_eType_Boolean:
+        case glow_eType_DynType1:
+        case glow_eType_DynType2:
+        case glow_eType_ActionType1:
+        case glow_eType_ActionType2:
+          if (arg_p3->value_decl != CCM_DECL_INT)
+            return CCM__ARGMISM;
 
-	  if (dyn_item_p->size == 4) {
-	    memcpy(&i32_value, dyn_item_p->value, sizeof(i32_value));
-	    arg_p3->value_int = i32_value;
-	  }
-	  else {
-	    memcpy(&i64_value, dyn_item_p->value, sizeof(i64_value));
-	    arg_p3->value_int = i64_value;	
-	  }
-	  arg_p3->value_returned = 1;
-	  break;
-	case glow_eType_Float:
-	  if (arg_p3->value_decl != CCM_DECL_FLOAT)
-	    return CCM__ARGMISM;
-	  
-	  memcpy((char*)&f_value, dyn_item_p->value, sizeof(f_value));
-	  arg_p3->value_float = f_value;
-	  arg_p3->value_returned = 1;
-	  break;
-	case glow_eType_Double:
-	  if (arg_p3->value_decl != CCM_DECL_FLOAT)
-	    return CCM__ARGMISM;
-	  
-	  memcpy((char*)&d_value, dyn_item_p->value, sizeof(d_value));
-	  arg_p3->value_float = (float)d_value;
-	  arg_p3->value_returned = 1;
-	  break;
-	case glow_eType_String:
-	  if (arg_p3->value_decl != CCM_DECL_STRING)
-	    return CCM__ARGMISM;
-	  strncpy(arg_p3->value_string, (char*)dyn_item_p->value,
-		  MIN(dyn_item_p->size, (int)sizeof(arg_p3->value_string)));
-	  arg_p3->value_returned = 1;
-	}
+          if (dyn_item_p->size == 4)
+          {
+            memcpy(&i32_value, dyn_item_p->value, sizeof(i32_value));
+            arg_p3->value_int = i32_value;
+          }
+          else
+          {
+            memcpy(&i64_value, dyn_item_p->value, sizeof(i64_value));
+            arg_p3->value_int = i64_value;
+          }
+          arg_p3->value_returned = 1;
+          break;
+        case glow_eType_Float:
+          if (arg_p3->value_decl != CCM_DECL_FLOAT)
+            return CCM__ARGMISM;
+
+          memcpy((char*)&f_value, dyn_item_p->value, sizeof(f_value));
+          arg_p3->value_float = f_value;
+          arg_p3->value_returned = 1;
+          break;
+        case glow_eType_Double:
+          if (arg_p3->value_decl != CCM_DECL_FLOAT)
+            return CCM__ARGMISM;
+
+          memcpy((char*)&d_value, dyn_item_p->value, sizeof(d_value));
+          arg_p3->value_float = (float)d_value;
+          arg_p3->value_returned = 1;
+          break;
+        case glow_eType_String:
+          if (arg_p3->value_decl != CCM_DECL_STRING)
+            return CCM__ARGMISM;
+          strncpy(arg_p3->value_string, (char*)dyn_item_p->value,
+                  MIN(dyn_item_p->size, (int)sizeof(arg_p3->value_string)));
+          arg_p3->value_returned = 1;
+        }
       }
     }
     default:;
@@ -2595,9 +2602,8 @@ static int graph_getobjectattribute_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_getrgbcolor_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_getrgbcolor_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                  ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2; // Red
@@ -2623,8 +2629,7 @@ static int graph_getrgbcolor_func(void* filectx, ccm_sArg* arg_list,
 
   graph_get_stored_graph(&graph);
 
-  grow_GetRgbColor(
-      graph->grow->ctx, (glow_eDrawType)arg_list->value_int, &r, &g, &b);
+  grow_GetRgbColor(graph->grow->ctx, (glow_eDrawType)arg_list->value_int, &r, &g, &b);
 
   arg_p2->value_float = (float)r;
   arg_p3->value_float = (float)g;
@@ -2636,9 +2641,8 @@ static int graph_getrgbcolor_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_setrgbcolor_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_setrgbcolor_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                  ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2; // Red
@@ -2668,17 +2672,15 @@ static int graph_setrgbcolor_func(void* filectx, ccm_sArg* arg_list,
   g = (double)arg_p3->value_float;
   b = (double)arg_p4->value_float;
 
-  grow_SetRgbColor(
-      graph->grow->ctx, (glow_eDrawType)arg_list->value_int, r, g, b);
+  grow_SetRgbColor(graph->grow->ctx, (glow_eDrawType)arg_list->value_int, r, g, b);
   if (graph->update_colorpalette_cb)
     (graph->update_colorpalette_cb)(graph->parent_ctx);
 
   return 1;
 }
 
-static int graph_measureobject_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_measureobject_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2; // ll_x
@@ -2708,8 +2710,7 @@ static int graph_measureobject_func(void* filectx, ccm_sArg* arg_list,
 
   graph_get_stored_graph(&graph);
 
-  grow_MeasureNode(
-      (grow_tObject)arg_list->value_int, &ll_x, &ll_y, &ur_x, &ur_y);
+  grow_MeasureNode((grow_tObject)arg_list->value_int, &ll_x, &ll_y, &ur_x, &ur_y);
   arg_p2->value_float = (float)ll_x;
   arg_p3->value_float = (float)ll_y;
   arg_p4->value_float = (float)ur_x;
@@ -2722,9 +2723,8 @@ static int graph_measureobject_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_deleteobject_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_deleteobject_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                   ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
 
@@ -2744,9 +2744,8 @@ static int graph_deleteobject_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_setobjectclass_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_setobjectclass_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                     ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2; // Class
@@ -2770,7 +2769,8 @@ static int graph_setobjectclass_func(void* filectx, ccm_sArg* arg_list,
   graph_get_stored_graph(&graph);
 
   sts = grow_FindNodeClassByName(graph->grow->ctx, arg_p2->value_string, &nc);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     // Load the subgraph
 
     strcpy(cname, "$pwrp_exe/");
@@ -2778,7 +2778,8 @@ static int graph_setobjectclass_func(void* filectx, ccm_sArg* arg_list,
     strncat(cname, ".pwsg", sizeof(cname) - strlen(cname) - 1);
 
     sts = grow_OpenSubGraph(graph->grow->ctx, cname);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       strcpy(cname, "$pwr_exe/");
       strncat(cname, arg_p2->value_string, sizeof(cname) - strlen(cname) - 1);
       strncat(cname, ".pwsg", sizeof(cname) - strlen(cname) - 1);
@@ -2787,7 +2788,8 @@ static int graph_setobjectclass_func(void* filectx, ccm_sArg* arg_list,
     }
   }
   sts = grow_FindNodeClassByName(graph->grow->ctx, arg_p2->value_string, &nc);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     *return_int = sts;
     *return_decl = CCM_DECL_INT;
     return 1;
@@ -2801,9 +2803,8 @@ static int graph_setobjectclass_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_scaleobject_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_scaleobject_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                  ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2; // scale x
@@ -2840,9 +2841,8 @@ static int graph_scaleobject_func(void* filectx, ccm_sArg* arg_list,
 
   return 1;
 }
-static int graph_moveobject_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_moveobject_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                 ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2; // scale x
@@ -2876,9 +2876,8 @@ static int graph_moveobject_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_moveabsobject_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_moveabsobject_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2; // scale x
@@ -2915,9 +2914,8 @@ static int graph_moveabsobject_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_setbackgroundcolor_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_setbackgroundcolor_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                         ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
 
@@ -2929,7 +2927,8 @@ static int graph_setbackgroundcolor_func(void* filectx, ccm_sArg* arg_list,
 
   graph_get_stored_graph(&graph);
 
-  if (arg_list->value_int < 0 || arg_list->value_int >= glow_eDrawType_CustomColor__) {
+  if (arg_list->value_int < 0 || arg_list->value_int >= glow_eDrawType_CustomColor__)
+  {
     *return_int = GE__SYNTAX;
     *return_decl = CCM_DECL_INT;
     return 1;
@@ -2940,9 +2939,8 @@ static int graph_setbackgroundcolor_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_setcolortheme_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_setcolortheme_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   int color_theme;
@@ -2950,14 +2948,16 @@ static int graph_setcolortheme_func(void* filectx, ccm_sArg* arg_list,
   if (arg_count > 1)
     return CCM__ARGMISM;
 
-  if (arg_count > 0) {
+  if (arg_count > 0)
+  {
     if (arg_list->value_decl != CCM_DECL_INT)
       return CCM__ARGMISM;
   }
 
   graph_get_stored_graph(&graph);
-  
-  if (arg_count > 0) {
+
+  if (arg_count > 0)
+  {
     color_theme = arg_list->value_int;
     color_theme = CoWow::SetColorTheme(color_theme);
     graph->update_color_theme(color_theme);
@@ -2967,15 +2967,14 @@ static int graph_setcolortheme_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_opengraph_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_opengraph_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   char name[80];
   pwr_tFileName filename;
-  char *s;
-  
+  char* s;
+
   if (arg_count != 1)
     return CCM__ARGMISM;
 
@@ -2996,34 +2995,35 @@ static int graph_opengraph_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_savegraph_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_savegraph_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   int sts;
-  char *s;
+  char* s;
   char name[100];
   char oldname[100];
   pwr_tFileName filename;
-    
+
   if (arg_count > 1)
     return CCM__ARGMISM;
 
-  if (arg_count == 1) {
+  if (arg_count == 1)
+  {
     if (arg_list->value_decl != CCM_DECL_STRING)
       return CCM__ARGMISM;
 
     strcpy(name, arg_list->value_string);
     if ((s = strchr(name, '.')))
-      *s = 0;		 
+      *s = 0;
   }
 
   graph_get_stored_graph(&graph);
 
   if (arg_count == 0)
     graph->get_name(name);
-  else {
+  else
+  {
     graph->get_name(oldname);
     if (!streq(name, oldname) && !streq(oldname, ""))
       // Name changed
@@ -3034,16 +3034,15 @@ static int graph_savegraph_func(void* filectx, ccm_sArg* arg_list,
   str_ToLower(filename, name);
   if (!strrchr(filename, '.'))
     strcat(filename, ".pwg");
-  
+
   sts = graph->save(filename);
   *return_int = sts;
   *return_decl = CCM_DECL_INT;
   return 1;
 }
 
-static int graph_buildgraph_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_buildgraph_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                 ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   int sts = GE__SUCCESS;
@@ -3058,7 +3057,8 @@ static int graph_buildgraph_func(void* filectx, ccm_sArg* arg_list,
     sts = GE__NOTSAVED;
   else if (streq(name, ""))
     sts = GE__NONAME;
-  else {
+  else
+  {
     sprintf(cmd, "cp -a $pwrp_pop/%s.pwg $pwrp_exe/", name);
     system(cmd);
     if (sts != 0)
@@ -3070,9 +3070,8 @@ static int graph_buildgraph_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_clearall_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_clearall_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                               ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
 
@@ -3084,9 +3083,8 @@ static int graph_clearall_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_createrectangle_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_createrectangle_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                      ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
@@ -3118,10 +3116,9 @@ static int graph_createrectangle_func(void* filectx, ccm_sArg* arg_list,
 
   graph_get_stored_graph(&graph);
 
-  grow_CreateGrowRect(graph->grow->ctx, "", x, y, width, height,
-		      graph->get_border_drawtype(), graph->linewidth, 0, glow_mDisplayLevel_1,
-		      graph->fill, graph->border, graph->shadow, graph->get_fill_drawtype(),
-		      NULL, &graph->current_cmd_object);
+  grow_CreateGrowRect(graph->grow->ctx, "", x, y, width, height, graph->get_border_drawtype(),
+                      graph->linewidth, 0, glow_mDisplayLevel_1, graph->fill, graph->border, graph->shadow,
+                      graph->get_fill_drawtype(), NULL, &graph->current_cmd_object);
   grow_SetModified(graph->grow->ctx, 1);
 
   *return_int = (long int)graph->current_cmd_object;
@@ -3129,9 +3126,8 @@ static int graph_createrectangle_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_createrectrounded_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_createrectrounded_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                        ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
@@ -3163,10 +3159,9 @@ static int graph_createrectrounded_func(void* filectx, ccm_sArg* arg_list,
 
   graph_get_stored_graph(&graph);
 
-  grow_CreateGrowRectRounded(graph->grow->ctx, "", x, y, width, height,
-		      graph->get_border_drawtype(), graph->linewidth, 0, glow_mDisplayLevel_1,
-		      graph->fill, graph->border, graph->shadow, graph->get_fill_drawtype(),
-		      NULL, &graph->current_cmd_object);
+  grow_CreateGrowRectRounded(graph->grow->ctx, "", x, y, width, height, graph->get_border_drawtype(),
+                             graph->linewidth, 0, glow_mDisplayLevel_1, graph->fill, graph->border,
+                             graph->shadow, graph->get_fill_drawtype(), NULL, &graph->current_cmd_object);
   grow_SetModified(graph->grow->ctx, 1);
 
   *return_int = (long int)graph->current_cmd_object;
@@ -3174,9 +3169,8 @@ static int graph_createrectrounded_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_createarc_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_createarc_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
@@ -3219,10 +3213,9 @@ static int graph_createarc_func(void* filectx, ccm_sArg* arg_list,
 
   graph_get_stored_graph(&graph);
 
-  grow_CreateGrowArc(graph->grow->ctx, "", x1, y1, x2, y2, angle1, angle2,
-		     graph->get_border_drawtype(), graph->linewidth, graph->fill,
-		     graph->border, graph->shadow, graph->get_fill_drawtype(), NULL,
-		     &graph->current_cmd_object);
+  grow_CreateGrowArc(graph->grow->ctx, "", x1, y1, x2, y2, angle1, angle2, graph->get_border_drawtype(),
+                     graph->linewidth, graph->fill, graph->border, graph->shadow, graph->get_fill_drawtype(),
+                     NULL, &graph->current_cmd_object);
   grow_SetModified(graph->grow->ctx, 1);
 
   *return_int = (long int)graph->current_cmd_object;
@@ -3230,9 +3223,8 @@ static int graph_createarc_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_createline_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_createline_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                 ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
@@ -3264,9 +3256,8 @@ static int graph_createline_func(void* filectx, ccm_sArg* arg_list,
 
   graph_get_stored_graph(&graph);
 
-  grow_CreateGrowLine(graph->grow->ctx, "", x1, y1, x2, y2,
-		      graph->get_border_drawtype(), graph->linewidth, 0, NULL,
-		      &graph->current_cmd_object);
+  grow_CreateGrowLine(graph->grow->ctx, "", x1, y1, x2, y2, graph->get_border_drawtype(), graph->linewidth, 0,
+                      NULL, &graph->current_cmd_object);
   grow_SetModified(graph->grow->ctx, 1);
 
   *return_int = (long int)graph->current_cmd_object;
@@ -3274,9 +3265,8 @@ static int graph_createline_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_createpolyline_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_createpolyline_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                     ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
@@ -3315,10 +3305,9 @@ static int graph_createpolyline_func(void* filectx, ccm_sArg* arg_list,
   points[1].x = x2;
   points[1].y = y2;
   point_cnt = 2;
-  grow_CreateGrowPolyLine(graph->grow->ctx, "", (glow_sPoint*)&points,
-			  point_cnt, graph->get_border_drawtype(), graph->linewidth, 0,
-			  graph->fill, graph->border, graph->shadow, graph->get_fill_drawtype(),
-			  0, NULL, &graph->current_cmd_object);
+  grow_CreateGrowPolyLine(graph->grow->ctx, "", (glow_sPoint*)&points, point_cnt,
+                          graph->get_border_drawtype(), graph->linewidth, 0, graph->fill, graph->border,
+                          graph->shadow, graph->get_fill_drawtype(), 0, NULL, &graph->current_cmd_object);
   grow_SetModified(graph->grow->ctx, 1);
 
   *return_int = (long int)graph->current_cmd_object;
@@ -3326,9 +3315,8 @@ static int graph_createpolyline_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_polylineadd_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_polylineadd_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                  ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
@@ -3367,9 +3355,8 @@ static int graph_polylineadd_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_createtext_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_createtext_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                 ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2; // x
@@ -3399,7 +3386,8 @@ static int graph_createtext_func(void* filectx, ccm_sArg* arg_list,
   if (arg_p3->value_decl != CCM_DECL_FLOAT)
     return CCM__ARGMISM;
 
-  if (arg_count > 3) {
+  if (arg_count > 3)
+  {
     arg_p4 = arg_p3->next;
     if (arg_p4->value_decl != CCM_DECL_INT)
       return CCM__ARGMISM;
@@ -3408,7 +3396,8 @@ static int graph_createtext_func(void* filectx, ccm_sArg* arg_list,
   else
     textsize = text_idx_to_size(graph->textsize);
 
-  if (arg_count > 4) {
+  if (arg_count > 4)
+  {
     arg_p5 = arg_p4->next;
     if (arg_p5->value_decl != CCM_DECL_INT)
       return CCM__ARGMISM;
@@ -3417,30 +3406,33 @@ static int graph_createtext_func(void* filectx, ccm_sArg* arg_list,
   else
     textfont = graph->textfont;
 
-  if (arg_count > 5) {
+  if (arg_count > 5)
+  {
     arg_p6 = arg_p5->next;
     if (arg_p6->value_decl != CCM_DECL_INT)
       return CCM__ARGMISM;
     textbold = arg_p6->value_int;
   }
-  else {
+  else
+  {
     textbold = graph->textbold;
   }
 
-  if (arg_count > 6) {
+  if (arg_count > 6)
+  {
     arg_p7 = arg_p6->next;
     if (arg_p7->value_decl != CCM_DECL_INT)
       return CCM__ARGMISM;
     text_color = (glow_eDrawType)arg_p7->value_int;
   }
-  else {
-    if (graph->get_current_colors_cb) 
-      (graph->get_current_colors_cb)(
-	  graph->parent_ctx, &fill_color, &border_color, &text_color);
+  else
+  {
+    if (graph->get_current_colors_cb)
+      (graph->get_current_colors_cb)(graph->parent_ctx, &fill_color, &border_color, &text_color);
     else
       text_color = glow_eDrawType_Line;
   }
- 
+
   x = arg_p2->value_float;
   y = arg_p3->value_float;
 
@@ -3451,10 +3443,8 @@ static int graph_createtext_func(void* filectx, ccm_sArg* arg_list,
   else
     drawtype = glow_eDrawType_TextHelvetica;
 
-
-  grow_CreateGrowText(graph->grow->ctx, "", arg_list->value_string, x, y, drawtype,
-      text_color, textsize, textfont, glow_mDisplayLevel_1, NULL,
-      &graph->current_cmd_object);
+  grow_CreateGrowText(graph->grow->ctx, "", arg_list->value_string, x, y, drawtype, text_color, textsize,
+                      textfont, glow_mDisplayLevel_1, NULL, &graph->current_cmd_object);
   grow_SetModified(graph->grow->ctx, 1);
 
   *return_int = (long int)graph->current_cmd_object;
@@ -3462,23 +3452,22 @@ static int graph_createtext_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_createimage_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_createimage_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                  ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
   ccm_sArg* arg_p3;
   ccm_sArg* arg_p4;
   ccm_sArg* arg_p5;
-  
+
   double x1, y1, x2, y2;
   char name[80];
   grow_tNode n1;
   int scale_x, scale_y;
   double sx, sy;
   double ll_x, ll_y, ur_x, ur_y;
-    
+
   if (arg_count < 3 || arg_count > 5)
     return CCM__ARGMISM;
 
@@ -3495,7 +3484,8 @@ static int graph_createimage_func(void* filectx, ccm_sArg* arg_list,
   x1 = arg_p2->value_float;
   y1 = arg_p3->value_float;
 
-  if (arg_count >= 4) {
+  if (arg_count >= 4)
+  {
     arg_p4 = arg_p3->next;
     if (arg_p4->value_decl != CCM_DECL_FLOAT)
       return CCM__ARGMISM;
@@ -3505,24 +3495,25 @@ static int graph_createimage_func(void* filectx, ccm_sArg* arg_list,
   else
     scale_x = 0;
 
-  if (arg_count == 5) {
+  if (arg_count == 5)
+  {
     arg_p5 = arg_p4->next;
     if (arg_p5->value_decl != CCM_DECL_FLOAT)
       return CCM__ARGMISM;
     scale_y = 1;
-    y2 = arg_p5->value_float;    
+    y2 = arg_p5->value_float;
   }
   else
     scale_y = 0;
 
-
   graph_get_stored_graph(&graph);
 
   sprintf(name, "O%d", grow_IncrNextObjectNameNumber(graph->grow->ctx));
-  
+
   grow_CreateGrowImage(graph->grow->ctx, name, arg_list->value_string, x1, y1, NULL, &n1);
 
-  if (scale_x || scale_y) {
+  if (scale_x || scale_y)
+  {
     grow_MeasureNode(n1, &ll_x, &ll_y, &ur_x, &ur_y);
     if (scale_x)
       sx = (x2 - x1) / (ur_x - ll_x);
@@ -3544,16 +3535,15 @@ static int graph_createimage_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_createobject_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_createobject_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                   ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
   ccm_sArg* arg_p3;
   ccm_sArg* arg_p4;
   ccm_sArg* arg_p5;
-  
+
   double x1, y1, x2, y2;
   char name[80];
   grow_tNodeClass nc;
@@ -3562,7 +3552,7 @@ static int graph_createobject_func(void* filectx, ccm_sArg* arg_list,
   double sx, sy;
   double ll_x, ll_y, ur_x, ur_y;
   int sts;
-    
+
   if (arg_count < 3 || arg_count > 5)
     return CCM__ARGMISM;
 
@@ -3579,7 +3569,8 @@ static int graph_createobject_func(void* filectx, ccm_sArg* arg_list,
   x1 = arg_p2->value_float;
   y1 = arg_p3->value_float;
 
-  if (arg_count >= 4) {
+  if (arg_count >= 4)
+  {
     arg_p4 = arg_p3->next;
     if (arg_p4->value_decl != CCM_DECL_FLOAT)
       return CCM__ARGMISM;
@@ -3589,26 +3580,28 @@ static int graph_createobject_func(void* filectx, ccm_sArg* arg_list,
   else
     scale_x = 0;
 
-  if (arg_count == 5) {
+  if (arg_count == 5)
+  {
     arg_p5 = arg_p4->next;
     if (arg_p5->value_decl != CCM_DECL_FLOAT)
       return CCM__ARGMISM;
     scale_y = 1;
-    y2 = arg_p5->value_float;    
+    y2 = arg_p5->value_float;
   }
   else
     scale_y = 0;
 
-
   graph_get_stored_graph(&graph);
 
   sts = grow_FindNodeClassByName(graph->grow->ctx, arg_list->value_string, &nc);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     // Load the subgraph
     grow_OpenSubGraphFromName(graph->grow->ctx, arg_list->value_string);
     sts = grow_FindNodeClassByName(graph->grow->ctx, arg_list->value_string, &nc);
   }
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     *return_int = 0;
     *return_decl = CCM_DECL_INT;
     return 1;
@@ -3626,7 +3619,8 @@ static int graph_createobject_func(void* filectx, ccm_sArg* arg_list,
 
   grow_MoveNode(n1, x1, y1);
   grow_StoreTransform(n1);
-  if (scale_x || scale_y) {
+  if (scale_x || scale_y)
+  {
     grow_MeasureNode(n1, &ll_x, &ll_y, &ur_x, &ur_y);
     if (scale_x)
       sx = (x2 - x1) / (ur_x - ll_x);
@@ -3650,9 +3644,8 @@ static int graph_createobject_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_createbar_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_createbar_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
@@ -3660,7 +3653,7 @@ static int graph_createbar_func(void* filectx, ccm_sArg* arg_list,
   ccm_sArg* arg_p4;
   ccm_sArg* arg_p5;
   ccm_sArg* arg_p6;
-  
+
   double x1, y1, x2, y2;
   grow_tNode n1;
   int scale_x, scale_y;
@@ -3668,13 +3661,13 @@ static int graph_createbar_func(void* filectx, ccm_sArg* arg_list,
   double ll_x, ll_y, ur_x, ur_y;
   int colortheme;
   glow_eDirection direction;
-    
+
   if (arg_count < 2 || arg_count > 6)
     return CCM__ARGMISM;
 
   arg_p2 = arg_list->next;
 
-  if (arg_list->value_decl != CCM_DECL_FLOAT )
+  if (arg_list->value_decl != CCM_DECL_FLOAT)
     return CCM__ARGMISM;
   if (arg_p2->value_decl != CCM_DECL_FLOAT)
     return CCM__ARGMISM;
@@ -3682,7 +3675,8 @@ static int graph_createbar_func(void* filectx, ccm_sArg* arg_list,
   x1 = arg_list->value_float;
   y1 = arg_p2->value_float;
 
-  if (arg_count >= 3) {
+  if (arg_count >= 3)
+  {
     arg_p3 = arg_p2->next;
     if (arg_p3->value_decl != CCM_DECL_FLOAT)
       return CCM__ARGMISM;
@@ -3692,17 +3686,19 @@ static int graph_createbar_func(void* filectx, ccm_sArg* arg_list,
   else
     scale_x = 0;
 
-  if (arg_count >= 4) {
+  if (arg_count >= 4)
+  {
     arg_p4 = arg_p3->next;
     if (arg_p4->value_decl != CCM_DECL_FLOAT)
       return CCM__ARGMISM;
     scale_y = 1;
-    y2 = arg_p4->value_float;    
+    y2 = arg_p4->value_float;
   }
   else
     scale_y = 0;
 
-  if (arg_count >= 5) {
+  if (arg_count >= 5)
+  {
     arg_p5 = arg_p4->next;
     if (arg_p5->value_decl != CCM_DECL_INT)
       return CCM__ARGMISM;
@@ -3711,7 +3707,8 @@ static int graph_createbar_func(void* filectx, ccm_sArg* arg_list,
   else
     colortheme = 0;
 
-  if (arg_count == 6) {
+  if (arg_count == 6)
+  {
     arg_p6 = arg_p5->next;
     if (arg_p6->value_decl != CCM_DECL_INT)
       return CCM__ARGMISM;
@@ -3720,10 +3717,10 @@ static int graph_createbar_func(void* filectx, ccm_sArg* arg_list,
   else
     direction = glow_eDirection_Up;
 
-
   graph_get_stored_graph(&graph);
 
-  switch (direction) {
+  switch (direction)
+  {
   case glow_eDirection_Up:
     graph->create_bar(&n1, x1, y1, colortheme);
     break;
@@ -3756,7 +3753,8 @@ static int graph_createbar_func(void* filectx, ccm_sArg* arg_list,
     break;
   }
 
-  if (scale_x || scale_y) {
+  if (scale_x || scale_y)
+  {
     grow_MeasureNode(n1, &ll_x, &ll_y, &ur_x, &ur_y);
     if (scale_x)
       sx = (x2 - x1) / (ur_x - ll_x);
@@ -3778,29 +3776,28 @@ static int graph_createbar_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_createbararc_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_createbararc_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                   ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
   ccm_sArg* arg_p3;
   ccm_sArg* arg_p4;
   ccm_sArg* arg_p5;
-  
+
   double x1, y1, x2, y2;
   grow_tNode n1;
   int scale_x, scale_y;
   double sx, sy;
   double ll_x, ll_y, ur_x, ur_y;
   int colortheme;
-    
+
   if (arg_count < 2 || arg_count > 5)
     return CCM__ARGMISM;
 
   arg_p2 = arg_list->next;
 
-  if (arg_list->value_decl != CCM_DECL_FLOAT )
+  if (arg_list->value_decl != CCM_DECL_FLOAT)
     return CCM__ARGMISM;
   if (arg_p2->value_decl != CCM_DECL_FLOAT)
     return CCM__ARGMISM;
@@ -3808,7 +3805,8 @@ static int graph_createbararc_func(void* filectx, ccm_sArg* arg_list,
   x1 = arg_list->value_float;
   y1 = arg_p2->value_float;
 
-  if (arg_count >= 3) {
+  if (arg_count >= 3)
+  {
     arg_p3 = arg_p2->next;
     if (arg_p3->value_decl != CCM_DECL_FLOAT)
       return CCM__ARGMISM;
@@ -3818,17 +3816,19 @@ static int graph_createbararc_func(void* filectx, ccm_sArg* arg_list,
   else
     scale_x = 0;
 
-  if (arg_count >= 4) {
+  if (arg_count >= 4)
+  {
     arg_p4 = arg_p3->next;
     if (arg_p4->value_decl != CCM_DECL_FLOAT)
       return CCM__ARGMISM;
     scale_y = 1;
-    y2 = arg_p4->value_float;    
+    y2 = arg_p4->value_float;
   }
   else
     scale_y = 0;
 
-  if (arg_count >= 5) {
+  if (arg_count >= 5)
+  {
     arg_p5 = arg_p4->next;
     if (arg_p5->value_decl != CCM_DECL_INT)
       return CCM__ARGMISM;
@@ -3841,7 +3841,8 @@ static int graph_createbararc_func(void* filectx, ccm_sArg* arg_list,
 
   graph->create_bararc(&n1, x1, y1, colortheme);
 
-  if (scale_x || scale_y) {
+  if (scale_x || scale_y)
+  {
     grow_MeasureNode(n1, &ll_x, &ll_y, &ur_x, &ur_y);
     if (scale_x)
       sx = (x2 - x1) / (ur_x - ll_x);
@@ -3863,9 +3864,8 @@ static int graph_createbararc_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_createaxis_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_createaxis_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                 ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
@@ -3874,7 +3874,7 @@ static int graph_createaxis_func(void* filectx, ccm_sArg* arg_list,
   ccm_sArg* arg_p5;
   ccm_sArg* arg_p6;
   ccm_sArg* arg_p7;
-  
+
   double x1, y1, x2, y2;
   grow_tNode n1;
   int scale_x, scale_y;
@@ -3883,13 +3883,13 @@ static int graph_createaxis_func(void* filectx, ccm_sArg* arg_list,
   int colortheme;
   int dynamic;
   glow_eDirection direction;
-    
+
   if (arg_count < 2 || arg_count > 7)
     return CCM__ARGMISM;
 
   arg_p2 = arg_list->next;
 
-  if (arg_list->value_decl != CCM_DECL_FLOAT )
+  if (arg_list->value_decl != CCM_DECL_FLOAT)
     return CCM__ARGMISM;
   if (arg_p2->value_decl != CCM_DECL_FLOAT)
     return CCM__ARGMISM;
@@ -3897,7 +3897,8 @@ static int graph_createaxis_func(void* filectx, ccm_sArg* arg_list,
   x1 = arg_list->value_float;
   y1 = arg_p2->value_float;
 
-  if (arg_count >= 3) {
+  if (arg_count >= 3)
+  {
     arg_p3 = arg_p2->next;
     if (arg_p3->value_decl != CCM_DECL_FLOAT)
       return CCM__ARGMISM;
@@ -3907,17 +3908,19 @@ static int graph_createaxis_func(void* filectx, ccm_sArg* arg_list,
   else
     scale_x = 0;
 
-  if (arg_count >= 4) {
+  if (arg_count >= 4)
+  {
     arg_p4 = arg_p3->next;
     if (arg_p4->value_decl != CCM_DECL_FLOAT)
       return CCM__ARGMISM;
     scale_y = 1;
-    y2 = arg_p4->value_float;    
+    y2 = arg_p4->value_float;
   }
   else
     scale_y = 0;
 
-  if (arg_count >= 5) {
+  if (arg_count >= 5)
+  {
     arg_p5 = arg_p4->next;
     if (arg_p5->value_decl != CCM_DECL_INT)
       return CCM__ARGMISM;
@@ -3926,7 +3929,8 @@ static int graph_createaxis_func(void* filectx, ccm_sArg* arg_list,
   else
     colortheme = 0;
 
-  if (arg_count >= 6) {
+  if (arg_count >= 6)
+  {
     arg_p6 = arg_p5->next;
     if (arg_p6->value_decl != CCM_DECL_INT)
       return CCM__ARGMISM;
@@ -3935,7 +3939,8 @@ static int graph_createaxis_func(void* filectx, ccm_sArg* arg_list,
   else
     dynamic = 0;
 
-  if (arg_count >= 7) {
+  if (arg_count >= 7)
+  {
     arg_p7 = arg_p6->next;
     if (arg_p7->value_decl != CCM_DECL_INT)
       return CCM__ARGMISM;
@@ -3944,10 +3949,10 @@ static int graph_createaxis_func(void* filectx, ccm_sArg* arg_list,
   else
     direction = glow_eDirection_Up;
 
-
   graph_get_stored_graph(&graph);
 
-  switch (direction) {
+  switch (direction)
+  {
   case glow_eDirection_Left:
     graph->create_axis(&n1, x1, y1, dynamic, colortheme);
     break;
@@ -3980,7 +3985,8 @@ static int graph_createaxis_func(void* filectx, ccm_sArg* arg_list,
     break;
   }
 
-  if (scale_x || scale_y) {
+  if (scale_x || scale_y)
+  {
     grow_MeasureNode(n1, &ll_x, &ll_y, &ur_x, &ur_y);
     if (scale_x)
       sx = (x2 - x1) / (ur_x - ll_x);
@@ -4002,9 +4008,8 @@ static int graph_createaxis_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_createaxisarc_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_createaxisarc_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
@@ -4012,7 +4017,7 @@ static int graph_createaxisarc_func(void* filectx, ccm_sArg* arg_list,
   ccm_sArg* arg_p4;
   ccm_sArg* arg_p5;
   ccm_sArg* arg_p6;
-  
+
   double x1, y1, x2, y2;
   grow_tNode n1;
   int scale_x, scale_y;
@@ -4020,13 +4025,13 @@ static int graph_createaxisarc_func(void* filectx, ccm_sArg* arg_list,
   double ll_x, ll_y, ur_x, ur_y;
   int colortheme;
   int dynamic;
-    
+
   if (arg_count < 2 || arg_count > 6)
     return CCM__ARGMISM;
 
   arg_p2 = arg_list->next;
 
-  if (arg_list->value_decl != CCM_DECL_FLOAT )
+  if (arg_list->value_decl != CCM_DECL_FLOAT)
     return CCM__ARGMISM;
   if (arg_p2->value_decl != CCM_DECL_FLOAT)
     return CCM__ARGMISM;
@@ -4034,7 +4039,8 @@ static int graph_createaxisarc_func(void* filectx, ccm_sArg* arg_list,
   x1 = arg_list->value_float;
   y1 = arg_p2->value_float;
 
-  if (arg_count >= 3) {
+  if (arg_count >= 3)
+  {
     arg_p3 = arg_p2->next;
     if (arg_p3->value_decl != CCM_DECL_FLOAT)
       return CCM__ARGMISM;
@@ -4044,17 +4050,19 @@ static int graph_createaxisarc_func(void* filectx, ccm_sArg* arg_list,
   else
     scale_x = 0;
 
-  if (arg_count >= 4) {
+  if (arg_count >= 4)
+  {
     arg_p4 = arg_p3->next;
     if (arg_p4->value_decl != CCM_DECL_FLOAT)
       return CCM__ARGMISM;
     scale_y = 1;
-    y2 = arg_p4->value_float;    
+    y2 = arg_p4->value_float;
   }
   else
     scale_y = 0;
 
-  if (arg_count >= 5) {
+  if (arg_count >= 5)
+  {
     arg_p5 = arg_p4->next;
     if (arg_p5->value_decl != CCM_DECL_INT)
       return CCM__ARGMISM;
@@ -4063,7 +4071,8 @@ static int graph_createaxisarc_func(void* filectx, ccm_sArg* arg_list,
   else
     colortheme = 0;
 
-  if (arg_count >= 6) {
+  if (arg_count >= 6)
+  {
     arg_p6 = arg_p5->next;
     if (arg_p6->value_decl != CCM_DECL_INT)
       return CCM__ARGMISM;
@@ -4072,12 +4081,12 @@ static int graph_createaxisarc_func(void* filectx, ccm_sArg* arg_list,
   else
     dynamic = 0;
 
-
   graph_get_stored_graph(&graph);
 
   graph->create_axisarc(&n1, x1, y1, dynamic, colortheme);
 
-  if (scale_x || scale_y) {
+  if (scale_x || scale_y)
+  {
     grow_MeasureNode(n1, &ll_x, &ll_y, &ur_x, &ur_y);
     if (scale_x)
       sx = (x2 - x1) / (ur_x - ll_x);
@@ -4099,29 +4108,28 @@ static int graph_createaxisarc_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_createpie_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_createpie_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
   ccm_sArg* arg_p3;
   ccm_sArg* arg_p4;
   ccm_sArg* arg_p5;
-  
+
   double x1, y1, x2, y2;
   grow_tNode n1;
   int scale_x, scale_y;
   double sx, sy;
   double ll_x, ll_y, ur_x, ur_y;
   int colortheme;
-    
+
   if (arg_count < 2 || arg_count > 5)
     return CCM__ARGMISM;
 
   arg_p2 = arg_list->next;
 
-  if (arg_list->value_decl != CCM_DECL_FLOAT )
+  if (arg_list->value_decl != CCM_DECL_FLOAT)
     return CCM__ARGMISM;
   if (arg_p2->value_decl != CCM_DECL_FLOAT)
     return CCM__ARGMISM;
@@ -4129,7 +4137,8 @@ static int graph_createpie_func(void* filectx, ccm_sArg* arg_list,
   x1 = arg_list->value_float;
   y1 = arg_p2->value_float;
 
-  if (arg_count >= 3) {
+  if (arg_count >= 3)
+  {
     arg_p3 = arg_p2->next;
     if (arg_p3->value_decl != CCM_DECL_FLOAT)
       return CCM__ARGMISM;
@@ -4139,17 +4148,19 @@ static int graph_createpie_func(void* filectx, ccm_sArg* arg_list,
   else
     scale_x = 0;
 
-  if (arg_count >= 4) {
+  if (arg_count >= 4)
+  {
     arg_p4 = arg_p3->next;
     if (arg_p4->value_decl != CCM_DECL_FLOAT)
       return CCM__ARGMISM;
     scale_y = 1;
-    y2 = arg_p4->value_float;    
+    y2 = arg_p4->value_float;
   }
   else
     scale_y = 0;
 
-  if (arg_count >= 5) {
+  if (arg_count >= 5)
+  {
     arg_p5 = arg_p4->next;
     if (arg_p5->value_decl != CCM_DECL_INT)
       return CCM__ARGMISM;
@@ -4162,7 +4173,8 @@ static int graph_createpie_func(void* filectx, ccm_sArg* arg_list,
 
   graph->create_pie(&n1, x1, y1, colortheme);
 
-  if (scale_x || scale_y) {
+  if (scale_x || scale_y)
+  {
     grow_MeasureNode(n1, &ll_x, &ll_y, &ur_x, &ur_y);
     if (scale_x)
       sx = (x2 - x1) / (ur_x - ll_x);
@@ -4186,31 +4198,30 @@ static int graph_createpie_func(void* filectx, ccm_sArg* arg_list,
 
 // Common for trend, dstrend, dstrendcurve and fastcurve
 
-static int graph_createtrend(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string, unsigned int dyntype1, 
-    unsigned int dyntype2)
+static int graph_createtrend(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                             ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string,
+                             unsigned int dyntype1, unsigned int dyntype2)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
   ccm_sArg* arg_p3;
   ccm_sArg* arg_p4;
   ccm_sArg* arg_p5;
-  
+
   double x1, y1, x2, y2;
   grow_tNode n1;
   int scale_x, scale_y;
   double sx, sy;
   double ll_x, ll_y, ur_x, ur_y;
   int colortheme;
-    
+
   if (arg_count < 2 || arg_count > 5)
     return CCM__ARGMISM;
 
   arg_p2 = arg_list->next;
   arg_p3 = arg_p2->next;
 
-  if (arg_list->value_decl != CCM_DECL_FLOAT )
+  if (arg_list->value_decl != CCM_DECL_FLOAT)
     return CCM__ARGMISM;
   if (arg_p2->value_decl != CCM_DECL_FLOAT)
     return CCM__ARGMISM;
@@ -4218,7 +4229,8 @@ static int graph_createtrend(void* filectx, ccm_sArg* arg_list,
   x1 = arg_list->value_float;
   y1 = arg_p2->value_float;
 
-  if (arg_count >= 3) {
+  if (arg_count >= 3)
+  {
     arg_p3 = arg_p2->next;
     if (arg_p3->value_decl != CCM_DECL_FLOAT)
       return CCM__ARGMISM;
@@ -4228,17 +4240,19 @@ static int graph_createtrend(void* filectx, ccm_sArg* arg_list,
   else
     scale_x = 0;
 
-  if (arg_count >= 4) {
+  if (arg_count >= 4)
+  {
     arg_p4 = arg_p3->next;
     if (arg_p4->value_decl != CCM_DECL_FLOAT)
       return CCM__ARGMISM;
     scale_y = 1;
-    y2 = arg_p4->value_float;    
+    y2 = arg_p4->value_float;
   }
   else
     scale_y = 0;
 
-  if (arg_count == 5) {
+  if (arg_count == 5)
+  {
     arg_p5 = arg_p4->next;
     if (arg_p5->value_decl != CCM_DECL_INT)
       return CCM__ARGMISM;
@@ -4246,13 +4260,13 @@ static int graph_createtrend(void* filectx, ccm_sArg* arg_list,
   }
   else
     colortheme = 0;
-
 
   graph_get_stored_graph(&graph);
 
   graph->create_trend(&n1, x1, y1, dyntype1, dyntype2, colortheme);
 
-  if (scale_x || scale_y) {
+  if (scale_x || scale_y)
+  {
     grow_MeasureNode(n1, &ll_x, &ll_y, &ur_x, &ur_y);
     if (scale_x)
       sx = (x2 - x1) / (ur_x - ll_x);
@@ -4274,65 +4288,60 @@ static int graph_createtrend(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_createtrend_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_createtrend_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                  ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
-  return graph_createtrend(filectx, arg_list, arg_count, return_decl, return_float,
-      return_int, return_string, ge_mDynType1_Trend, 0);
+  return graph_createtrend(filectx, arg_list, arg_count, return_decl, return_float, return_int, return_string,
+                           ge_mDynType1_Trend, 0);
 }
 
-static int graph_createdstrend_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_createdstrend_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
-  return graph_createtrend(filectx, arg_list, arg_count, return_decl, return_float,
-      return_int, return_string, 0, ge_mDynType2_DsTrend);
+  return graph_createtrend(filectx, arg_list, arg_count, return_decl, return_float, return_int, return_string,
+                           0, ge_mDynType2_DsTrend);
 }
 
-static int graph_createdstrendcurve_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_createdstrendcurve_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                         ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
-  return graph_createtrend(filectx, arg_list, arg_count, return_decl, return_float,
-      return_int, return_string, 0, ge_mDynType2_DsTrendCurve);
+  return graph_createtrend(filectx, arg_list, arg_count, return_decl, return_float, return_int, return_string,
+                           0, ge_mDynType2_DsTrendCurve);
 }
 
-static int graph_createfastcurve_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_createfastcurve_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                      ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
-  return graph_createtrend(filectx, arg_list, arg_count, return_decl, return_float,
-      return_int, return_string, ge_mDynType1_FastCurve, 0);
+  return graph_createtrend(filectx, arg_list, arg_count, return_decl, return_float, return_int, return_string,
+                           ge_mDynType1_FastCurve, 0);
 }
 
 // Common for xycurve and sevhist
 
-static int graph_createxycurve(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string, unsigned int dyntype1, 
-    unsigned int dyntype2)
+static int graph_createxycurve(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                               ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string,
+                               unsigned int dyntype1, unsigned int dyntype2)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
   ccm_sArg* arg_p3;
   ccm_sArg* arg_p4;
   ccm_sArg* arg_p5;
-  
+
   double x1, y1, x2, y2;
   grow_tNode n1;
   int scale_x, scale_y;
   double sx, sy;
   double ll_x, ll_y, ur_x, ur_y;
   int colortheme;
-    
+
   if (arg_count < 2 || arg_count > 5)
     return CCM__ARGMISM;
 
   arg_p2 = arg_list->next;
   arg_p3 = arg_p2->next;
 
-  if (arg_list->value_decl != CCM_DECL_FLOAT )
+  if (arg_list->value_decl != CCM_DECL_FLOAT)
     return CCM__ARGMISM;
   if (arg_p2->value_decl != CCM_DECL_FLOAT)
     return CCM__ARGMISM;
@@ -4340,7 +4349,8 @@ static int graph_createxycurve(void* filectx, ccm_sArg* arg_list,
   x1 = arg_list->value_float;
   y1 = arg_p2->value_float;
 
-  if (arg_count >= 3) {
+  if (arg_count >= 3)
+  {
     arg_p3 = arg_p2->next;
     if (arg_p3->value_decl != CCM_DECL_FLOAT)
       return CCM__ARGMISM;
@@ -4350,17 +4360,19 @@ static int graph_createxycurve(void* filectx, ccm_sArg* arg_list,
   else
     scale_x = 0;
 
-  if (arg_count >= 4) {
+  if (arg_count >= 4)
+  {
     arg_p4 = arg_p3->next;
     if (arg_p4->value_decl != CCM_DECL_FLOAT)
       return CCM__ARGMISM;
     scale_y = 1;
-    y2 = arg_p4->value_float;    
+    y2 = arg_p4->value_float;
   }
   else
     scale_y = 0;
 
-  if (arg_count == 5) {
+  if (arg_count == 5)
+  {
     arg_p5 = arg_p4->next;
     if (arg_p5->value_decl != CCM_DECL_INT)
       return CCM__ARGMISM;
@@ -4368,13 +4380,13 @@ static int graph_createxycurve(void* filectx, ccm_sArg* arg_list,
   }
   else
     colortheme = 0;
-
 
   graph_get_stored_graph(&graph);
 
   graph->create_xycurve(&n1, x1, y1, dyntype1, dyntype2, colortheme);
 
-  if (scale_x || scale_y) {
+  if (scale_x || scale_y)
+  {
     grow_MeasureNode(n1, &ll_x, &ll_y, &ur_x, &ur_y);
     if (scale_x)
       sx = (x2 - x1) / (ur_x - ll_x);
@@ -4396,46 +4408,43 @@ static int graph_createxycurve(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_createxycurve_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_createxycurve_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
-  return graph_createxycurve(filectx, arg_list, arg_count, return_decl, return_float,
-      return_int, return_string, ge_mDynType1_XY_Curve, 0);
+  return graph_createxycurve(filectx, arg_list, arg_count, return_decl, return_float, return_int,
+                             return_string, ge_mDynType1_XY_Curve, 0);
 }
 
-static int graph_createsevhist_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_createsevhist_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
-  return graph_createxycurve(filectx, arg_list, arg_count, return_decl, return_float,
-      return_int, return_string, 0, ge_mDynType2_SevHist);
+  return graph_createxycurve(filectx, arg_list, arg_count, return_decl, return_float, return_int,
+                             return_string, 0, ge_mDynType2_SevHist);
 }
 
-static int graph_createwindow_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_createwindow_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                   ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
   ccm_sArg* arg_p3;
   ccm_sArg* arg_p4;
   ccm_sArg* arg_p5;
-  
+
   double x1, y1, x2, y2;
   grow_tNode n1;
   int scale_x, scale_y;
   double sx, sy;
   double ll_x, ll_y, ur_x, ur_y;
   int colortheme;
-    
+
   if (arg_count < 2 || arg_count > 5)
     return CCM__ARGMISM;
 
   arg_p2 = arg_list->next;
   arg_p3 = arg_p2->next;
 
-  if (arg_list->value_decl != CCM_DECL_FLOAT )
+  if (arg_list->value_decl != CCM_DECL_FLOAT)
     return CCM__ARGMISM;
   if (arg_p2->value_decl != CCM_DECL_FLOAT)
     return CCM__ARGMISM;
@@ -4443,7 +4452,8 @@ static int graph_createwindow_func(void* filectx, ccm_sArg* arg_list,
   x1 = arg_list->value_float;
   y1 = arg_p2->value_float;
 
-  if (arg_count >= 3) {
+  if (arg_count >= 3)
+  {
     arg_p3 = arg_p2->next;
     if (arg_p3->value_decl != CCM_DECL_FLOAT)
       return CCM__ARGMISM;
@@ -4453,17 +4463,19 @@ static int graph_createwindow_func(void* filectx, ccm_sArg* arg_list,
   else
     scale_x = 0;
 
-  if (arg_count >= 4) {
+  if (arg_count >= 4)
+  {
     arg_p4 = arg_p3->next;
     if (arg_p4->value_decl != CCM_DECL_FLOAT)
       return CCM__ARGMISM;
     scale_y = 1;
-    y2 = arg_p4->value_float;    
+    y2 = arg_p4->value_float;
   }
   else
     scale_y = 0;
 
-  if (arg_count == 5) {
+  if (arg_count == 5)
+  {
     arg_p5 = arg_p4->next;
     if (arg_p5->value_decl != CCM_DECL_INT)
       return CCM__ARGMISM;
@@ -4472,12 +4484,12 @@ static int graph_createwindow_func(void* filectx, ccm_sArg* arg_list,
   else
     colortheme = 0;
 
-
   graph_get_stored_graph(&graph);
 
   graph->create_window(&n1, x1, y1, colortheme);
 
-  if (scale_x || scale_y) {
+  if (scale_x || scale_y)
+  {
     grow_MeasureNode(n1, &ll_x, &ll_y, &ur_x, &ur_y);
     if (scale_x)
       sx = (x2 - x1) / (ur_x - ll_x);
@@ -4499,22 +4511,21 @@ static int graph_createwindow_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_createtoolbar_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_createtoolbar_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
   ccm_sArg* arg_p3;
   ccm_sArg* arg_p4;
   ccm_sArg* arg_p5;
-  
+
   double x1, y1, x2, y2;
   grow_tNode n1;
   int scale_x, scale_y;
   double sx, sy;
   double ll_x, ll_y, ur_x, ur_y;
-    
+
   if (arg_count < 3 || arg_count > 5)
     return CCM__ARGMISM;
 
@@ -4531,7 +4542,8 @@ static int graph_createtoolbar_func(void* filectx, ccm_sArg* arg_list,
   x1 = arg_p2->value_float;
   y1 = arg_p3->value_float;
 
-  if (arg_count >= 4) {
+  if (arg_count >= 4)
+  {
     arg_p4 = arg_p3->next;
     if (arg_p4->value_decl != CCM_DECL_FLOAT)
       return CCM__ARGMISM;
@@ -4541,22 +4553,22 @@ static int graph_createtoolbar_func(void* filectx, ccm_sArg* arg_list,
   else
     scale_x = 0;
 
-  if (arg_count == 5) {
+  if (arg_count == 5)
+  {
     arg_p5 = arg_p4->next;
     if (arg_p5->value_decl != CCM_DECL_FLOAT)
       return CCM__ARGMISM;
     scale_y = 1;
-    y2 = arg_p5->value_float;    
+    y2 = arg_p5->value_float;
   }
   else
     scale_y = 0;
 
-
   graph_get_stored_graph(&graph);
 
   grow_CreateGrowToolbar(graph->grow->ctx, arg_list->value_string, arg_list->value_string,
-      (char*)GeMethods::op_subgraph, (char*)GeMethods::mnt_subgraph,
-      GeMethods::opmeth_size, GeMethods::mntmeth_size, x1, y1, NULL, &n1);
+                         (char*)GeMethods::op_subgraph, (char*)GeMethods::mnt_subgraph,
+                         GeMethods::opmeth_size, GeMethods::mntmeth_size, x1, y1, NULL, &n1);
 
   GeDyn* dyn = new GeDyn(graph);
   dyn->action_type1 = dyn->total_action_type1 = ge_mActionType1_MethodToolbar;
@@ -4565,7 +4577,8 @@ static int graph_createtoolbar_func(void* filectx, ccm_sArg* arg_list,
 
   grow_MoveNode(n1, x1, y1);
   grow_StoreTransform(n1);
-  if (scale_x || scale_y) {
+  if (scale_x || scale_y)
+  {
     grow_MeasureNode(n1, &ll_x, &ll_y, &ur_x, &ur_y);
     if (scale_x)
       sx = (x2 - x1) / (ur_x - ll_x);
@@ -4587,9 +4600,8 @@ static int graph_createtoolbar_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_createtable_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_createtable_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                  ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
@@ -4597,14 +4609,14 @@ static int graph_createtable_func(void* filectx, ccm_sArg* arg_list,
   ccm_sArg* arg_p4;
   ccm_sArg* arg_p5;
   ccm_sArg* arg_p6;
-  
+
   double x1, y1, x2, y2;
   grow_tNode n1;
   int scale_x, scale_y;
   double sx, sy;
   double ll_x, ll_y, ur_x, ur_y;
   int colortheme;
-    
+
   if (arg_count < 3 || arg_count > 6)
     return CCM__ARGMISM;
 
@@ -4621,7 +4633,8 @@ static int graph_createtable_func(void* filectx, ccm_sArg* arg_list,
   x1 = arg_p2->value_float;
   y1 = arg_p3->value_float;
 
-  if (arg_count >= 4) {
+  if (arg_count >= 4)
+  {
     arg_p4 = arg_p3->next;
     if (arg_p4->value_decl != CCM_DECL_FLOAT)
       return CCM__ARGMISM;
@@ -4631,17 +4644,19 @@ static int graph_createtable_func(void* filectx, ccm_sArg* arg_list,
   else
     scale_x = 0;
 
-  if (arg_count >= 5) {
+  if (arg_count >= 5)
+  {
     arg_p5 = arg_p4->next;
     if (arg_p5->value_decl != CCM_DECL_FLOAT)
       return CCM__ARGMISM;
     scale_y = 1;
-    y2 = arg_p5->value_float;    
+    y2 = arg_p5->value_float;
   }
   else
     scale_y = 0;
 
-  if (arg_count >= 6) {
+  if (arg_count >= 6)
+  {
     arg_p6 = arg_p5->next;
     if (arg_p6->value_decl != CCM_DECL_INT)
       return CCM__ARGMISM;
@@ -4654,7 +4669,8 @@ static int graph_createtable_func(void* filectx, ccm_sArg* arg_list,
 
   graph->create_table(&n1, x1, y1, colortheme);
 
-  if (scale_x || scale_y) {
+  if (scale_x || scale_y)
+  {
     grow_MeasureNode(n1, &ll_x, &ll_y, &ur_x, &ur_y);
     if (scale_x)
       sx = (x2 - x1) / (ur_x - ll_x);
@@ -4676,14 +4692,13 @@ static int graph_createtable_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_createlayer_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_createlayer_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                  ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   char name[80];
   grow_tObject layer;
-    
+
   if (arg_count != 0)
     return CCM__ARGMISM;
 
@@ -4705,9 +4720,8 @@ static int graph_createlayer_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_getgraphname_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_getgraphname_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                   ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
 
@@ -4721,14 +4735,13 @@ static int graph_getgraphname_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_setgraphname_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_setgraphname_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                   ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   char graphname[80];
   char oldname[80];
-  char *s;
+  char* s;
 
   if (arg_count != 1)
     return CCM__ARGMISM;
@@ -4751,13 +4764,12 @@ static int graph_setgraphname_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_getinstanceobject_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_getinstanceobject_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                        ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
 
-  if (arg_count !=  0)
+  if (arg_count != 0)
     return CCM__ARGMISM;
 
   graph_get_stored_graph(&graph);
@@ -4768,15 +4780,14 @@ static int graph_getinstanceobject_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_getwindowsize_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_getwindowsize_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
   int width, height;
 
-  if (arg_count !=  2)
+  if (arg_count != 2)
     return CCM__ARGMISM;
 
   arg_p2 = arg_list->next;
@@ -4797,16 +4808,15 @@ static int graph_getwindowsize_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_getwindowdimension_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_getwindowdimension_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                         ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   ccm_sArg* arg_p2;
   int width, height;
   grow_sAttributes attr;
 
-  if (arg_count !=  2)
+  if (arg_count != 2)
     return CCM__ARGMISM;
 
   arg_p2 = arg_list->next;
@@ -4827,36 +4837,35 @@ static int graph_getwindowdimension_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_getui_env_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_getui_env_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
-  if (arg_count !=  0)
+  if (arg_count != 0)
     return CCM__ARGMISM;
 
   if (gdh_IsInitialized())
     *return_int = glow_eUI_Env_Xtt;
   else
-    *return_int = glow_eUI_Env_Development;    
+    *return_int = glow_eUI_Env_Development;
   *return_decl = CCM_DECL_INT;
   return 1;
 }
 
-static int graph_getgraphconfig_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_getgraphconfig_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                     ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   pwr_tAName aname;
   pwr_tInt32 value = 0;
   pwr_tStatus sts;
 
-  if (arg_count !=  0)
+  if (arg_count != 0)
     return CCM__ARGMISM;
 
   graph_get_stored_graph(&graph);
 
-  if (gdh_IsInitialized()) {
+  if (gdh_IsInitialized())
+  {
     strcpy(aname, graph->object_name[0]);
     strcat(aname, ".GraphConfiguration");
     sts = gdh_GetObjectInfo(aname, &value, sizeof(value));
@@ -4871,9 +4880,8 @@ static int graph_getgraphconfig_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_setdefaultfill_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_setdefaultfill_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                     ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
 
@@ -4890,9 +4898,8 @@ static int graph_setdefaultfill_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_setdefaultborder_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_setdefaultborder_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                       ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
 
@@ -4909,9 +4916,8 @@ static int graph_setdefaultborder_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_setdefaultshadow_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_setdefaultshadow_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                       ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
 
@@ -4928,9 +4934,8 @@ static int graph_setdefaultshadow_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_setdefaultfillcolor_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_setdefaultfillcolor_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                          ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   glow_eDrawType fill_color, border_color, text_color;
@@ -4943,7 +4948,8 @@ static int graph_setdefaultfillcolor_func(void* filectx, ccm_sArg* arg_list,
   if (arg_list->value_decl != CCM_DECL_INT)
     return CCM__ARGMISM;
 
-  if (graph->get_current_colors_cb && graph->set_current_colors_cb) {
+  if (graph->get_current_colors_cb && graph->set_current_colors_cb)
+  {
     graph->get_current_colors_cb(graph->parent_ctx, &fill_color, &border_color, &text_color);
     fill_color = (glow_eDrawType)arg_list->value_int;
     graph->set_current_colors_cb(graph->parent_ctx, fill_color, border_color, text_color);
@@ -4952,9 +4958,9 @@ static int graph_setdefaultfillcolor_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_setdefaultbordercolor_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_setdefaultbordercolor_func(void* filectx, ccm_sArg* arg_list, int arg_count,
+                                            int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
+                                            char* return_string)
 {
   Graph* graph;
   glow_eDrawType fill_color, border_color, text_color;
@@ -4967,7 +4973,8 @@ static int graph_setdefaultbordercolor_func(void* filectx, ccm_sArg* arg_list,
   if (arg_list->value_decl != CCM_DECL_INT)
     return CCM__ARGMISM;
 
-  if (graph->get_current_colors_cb && graph->set_current_colors_cb) {
+  if (graph->get_current_colors_cb && graph->set_current_colors_cb)
+  {
     graph->get_current_colors_cb(graph->parent_ctx, &fill_color, &border_color, &text_color);
     border_color = (glow_eDrawType)arg_list->value_int;
     graph->set_current_colors_cb(graph->parent_ctx, fill_color, border_color, text_color);
@@ -4976,9 +4983,8 @@ static int graph_setdefaultbordercolor_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_setdefaulttextcolor_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_setdefaulttextcolor_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                          ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
   glow_eDrawType fill_color, border_color, text_color;
@@ -4991,7 +4997,8 @@ static int graph_setdefaulttextcolor_func(void* filectx, ccm_sArg* arg_list,
   if (arg_list->value_decl != CCM_DECL_INT)
     return CCM__ARGMISM;
 
-  if (graph->get_current_colors_cb && graph->set_current_colors_cb) {
+  if (graph->get_current_colors_cb && graph->set_current_colors_cb)
+  {
     graph->get_current_colors_cb(graph->parent_ctx, &fill_color, &border_color, &text_color);
     text_color = (glow_eDrawType)arg_list->value_int;
     graph->set_current_colors_cb(graph->parent_ctx, fill_color, border_color, text_color);
@@ -5000,9 +5007,8 @@ static int graph_setdefaulttextcolor_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_translateobjectname_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_translateobjectname_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                          ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   ccm_sArg* arg_p2;
   int inverted, type, size, elem;
@@ -5021,46 +5027,45 @@ static int graph_translateobjectname_func(void* filectx, ccm_sArg* arg_list,
 
   graph_get_stored_graph(&graph);
 
-  graph->parse_attr_name(arg_list->value_string, arg_p2->value_string, 
-      &inverted, &type, &size, &elem, options);
+  graph->parse_attr_name(arg_list->value_string, arg_p2->value_string, &inverted, &type, &size, &elem,
+                         options);
   arg_p2->value_returned = 1;
 
   return 1;
 }
 
-static int graph_layout_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_layout_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                             ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
-  ccm_sArg* arg_p2; // Window height
-  ccm_sArg* arg_p3; // Prio array
-  ccm_sArg* arg_p4; // Top neighbour array
-  ccm_sArg* arg_p5; // Down neighbour array
-  ccm_sArg* arg_p6; // Left neighbour array
-  ccm_sArg* arg_p7; // Right neighbour array
-  ccm_sArg* arg_p8; // Preferred width
-  ccm_sArg* arg_p9; // Preferred height
+  ccm_sArg* arg_p2;  // Window height
+  ccm_sArg* arg_p3;  // Prio array
+  ccm_sArg* arg_p4;  // Top neighbour array
+  ccm_sArg* arg_p5;  // Down neighbour array
+  ccm_sArg* arg_p6;  // Left neighbour array
+  ccm_sArg* arg_p7;  // Right neighbour array
+  ccm_sArg* arg_p8;  // Preferred width
+  ccm_sArg* arg_p9;  // Preferred height
   ccm_sArg* arg_p10; // Fix width
   ccm_sArg* arg_p11; // Fix height
   ccm_sArg* arg_p12; // Calculated x coordinate
   ccm_sArg* arg_p13; // Calculated y coordinate
   ccm_sArg* arg_p14; // Calculated width
   ccm_sArg* arg_p15; // Calculated height
-  //Graph* graph;
+  // Graph* graph;
   int decl, array, elements;
-  ccm_tInt *valp3;
-  ccm_tInt *valp4;
-  ccm_tInt *valp5;
-  ccm_tInt *valp6;
-  ccm_tInt *valp7;
-  ccm_tFloat *valp8;
-  ccm_tFloat *valp9;
-  ccm_tInt *valp10;
-  ccm_tInt *valp11;
-  ccm_tFloat *valp12;
-  ccm_tFloat *valp13;
-  ccm_tFloat *valp14;
-  ccm_tFloat *valp15;
+  ccm_tInt* valp3;
+  ccm_tInt* valp4;
+  ccm_tInt* valp5;
+  ccm_tInt* valp6;
+  ccm_tInt* valp7;
+  ccm_tFloat* valp8;
+  ccm_tFloat* valp9;
+  ccm_tInt* valp10;
+  ccm_tInt* valp11;
+  ccm_tFloat* valp12;
+  ccm_tFloat* valp13;
+  ccm_tFloat* valp14;
+  ccm_tFloat* valp15;
   pwr_tStatus sts;
   float wwidth, wheight;
   Graph* graph;
@@ -5113,89 +5118,87 @@ static int graph_layout_func(void* filectx, ccm_sArg* arg_list,
 
   graph_get_stored_graph(&graph);
 
-  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p3->value_name, 
-      (void **)&valp3, &decl, &array, &elements);
+  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p3->value_name, (void**)&valp3, &decl,
+                    &array, &elements);
   if (EVEN(sts))
     return sts;
   if (decl != CCM_DECL_INT || !array)
     return CCM__ARGMISM;
-  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p4->value_name, 
-      (void **)&valp4, &decl, &array, &elements);
+  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p4->value_name, (void**)&valp4, &decl,
+                    &array, &elements);
   if (EVEN(sts))
     return sts;
   if (decl != CCM_DECL_INT || !array)
     return CCM__ARGMISM;
-  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p5->value_name, 
-      (void **)&valp5, &decl, &array, &elements);
+  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p5->value_name, (void**)&valp5, &decl,
+                    &array, &elements);
   if (EVEN(sts))
     return sts;
   if (decl != CCM_DECL_INT || !array)
     return CCM__ARGMISM;
-  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p6->value_name, 
-      (void **)&valp6, &decl, &array, &elements);
+  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p6->value_name, (void**)&valp6, &decl,
+                    &array, &elements);
   if (EVEN(sts))
     return sts;
   if (decl != CCM_DECL_INT || !array)
     return CCM__ARGMISM;
-  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p7->value_name, 
-      (void **)&valp7, &decl, &array, &elements);
+  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p7->value_name, (void**)&valp7, &decl,
+                    &array, &elements);
   if (EVEN(sts))
     return sts;
   if (decl != CCM_DECL_INT || !array)
     return CCM__ARGMISM;
-  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p8->value_name, 
-      (void **)&valp8, &decl, &array, &elements);
+  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p8->value_name, (void**)&valp8, &decl,
+                    &array, &elements);
   if (EVEN(sts))
     return sts;
   if (decl != CCM_DECL_FLOAT || !array)
     return CCM__ARGMISM;
-  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p9->value_name, 
-      (void **)&valp9, &decl, &array, &elements);
+  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p9->value_name, (void**)&valp9, &decl,
+                    &array, &elements);
   if (EVEN(sts))
     return sts;
   if (decl != CCM_DECL_FLOAT || !array)
     return CCM__ARGMISM;
-  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p10->value_name, 
-      (void **)&valp10, &decl, &array, &elements);
+  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p10->value_name, (void**)&valp10,
+                    &decl, &array, &elements);
   if (EVEN(sts))
     return sts;
   if (decl != CCM_DECL_INT || !array)
     return CCM__ARGMISM;
-  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p11->value_name, 
-      (void **)&valp11, &decl, &array, &elements);
+  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p11->value_name, (void**)&valp11,
+                    &decl, &array, &elements);
   if (EVEN(sts))
     return sts;
   if (decl != CCM_DECL_INT || !array)
     return CCM__ARGMISM;
-  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p12->value_name, 
-      (void **)&valp12, &decl, &array, &elements);
+  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p12->value_name, (void**)&valp12,
+                    &decl, &array, &elements);
   if (EVEN(sts))
     return sts;
   if (decl != CCM_DECL_FLOAT || !array)
     return CCM__ARGMISM;
-  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p13->value_name, 
-      (void **)&valp13, &decl, &array, &elements);
+  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p13->value_name, (void**)&valp13,
+                    &decl, &array, &elements);
   if (EVEN(sts))
     return sts;
   if (decl != CCM_DECL_FLOAT || !array)
     return CCM__ARGMISM;
-  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p14->value_name, 
-      (void **)&valp14, &decl, &array, &elements);
+  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p14->value_name, (void**)&valp14,
+                    &decl, &array, &elements);
   if (EVEN(sts))
     return sts;
   if (decl != CCM_DECL_FLOAT || !array)
     return CCM__ARGMISM;
-  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p15->value_name, 
-      (void **)&valp15, &decl, &array, &elements);
+  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p15->value_name, (void**)&valp15,
+                    &decl, &array, &elements);
   if (EVEN(sts))
     return sts;
   if (decl != CCM_DECL_FLOAT || !array)
     return CCM__ARGMISM;
 
-  sts = graph_layout(graph, elements, arg_list->value_float, arg_p2->value_float, 
-      valp3, 
-      valp4, valp5, valp6, valp7, valp8, valp9, valp10, valp11, valp12, valp13, valp14, 
-      valp15, &wwidth, &wheight);
+  sts = graph_layout(graph, elements, arg_list->value_float, arg_p2->value_float, valp3, valp4, valp5, valp6,
+                     valp7, valp8, valp9, valp10, valp11, valp12, valp13, valp14, valp15, &wwidth, &wheight);
 
   arg_list->value_float = wwidth;
   arg_list->value_returned = 1;
@@ -5204,9 +5207,8 @@ static int graph_layout_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_setgraphoptions_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_setgraphoptions_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                      ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
 
@@ -5222,9 +5224,8 @@ static int graph_setgraphoptions_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_layersetactive_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_layersetactive_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                     ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   ccm_sArg* arg_p2;
   arg_p2 = arg_list->next;
@@ -5243,9 +5244,8 @@ static int graph_layersetactive_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_layerresetactiveall_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_layerresetactiveall_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                          ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
 
@@ -5259,9 +5259,8 @@ static int graph_layerresetactiveall_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_layergetfirstobject_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_layergetfirstobject_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                          ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   grow_tObject first;
   int sts;
@@ -5282,9 +5281,8 @@ static int graph_layergetfirstobject_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_layergetnextobject_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_layergetnextobject_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                         ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   grow_tObject next;
   int sts;
@@ -5300,8 +5298,7 @@ static int graph_layergetnextobject_func(void* filectx, ccm_sArg* arg_list,
   if (arg_p2->value_decl != CCM_DECL_INT)
     return CCM__ARGMISM;
 
-  sts = grow_LayerGetNextObject((grow_tObject)arg_list->value_int,
-      (grow_tObject)arg_p2->value_int, &next);
+  sts = grow_LayerGetNextObject((grow_tObject)arg_list->value_int, (grow_tObject)arg_p2->value_int, &next);
   if (ODD(sts))
     *return_int = (long int)next;
   else
@@ -5311,9 +5308,8 @@ static int graph_layergetnextobject_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_mergevisiblelayers_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_mergevisiblelayers_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                         ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
 
@@ -5326,9 +5322,8 @@ static int graph_mergevisiblelayers_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_mergealllayers_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_mergealllayers_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                     ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
 
@@ -5341,9 +5336,8 @@ static int graph_mergealllayers_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_moveselecttolayer_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_moveselecttolayer_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                        ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
 
@@ -5356,9 +5350,8 @@ static int graph_moveselecttolayer_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int graph_getmodified_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int graph_getmodified_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                  ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
 
@@ -5375,7 +5368,6 @@ static int graph_getmodified_func(void* filectx, ccm_sArg* arg_list,
 
   return 1;
 }
-
 
 int Graph::script_func_register(void)
 {
@@ -5399,12 +5391,10 @@ int Graph::script_func_register(void)
   sts = ccm_register_function("Ge", "SetDefaultTextColor", graph_setdefaulttextcolor_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-     "Ge", "GetTextExtent", graph_gettextextent_func);
+  sts = ccm_register_function("Ge", "GetTextExtent", graph_gettextextent_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-        "Ge", "GetCurrentObject", graph_getcurrentobject_func);
+  sts = ccm_register_function("Ge", "GetCurrentObject", graph_getcurrentobject_func);
   if (EVEN(sts))
     return sts;
   sts = ccm_register_function("Ge", "SelectAdd", graph_selectadd_func);
@@ -5434,160 +5424,121 @@ int Graph::script_func_register(void)
   sts = ccm_register_function("Ge", "IsW2", graph_false_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "GetFirstObject", graph_getfirstobject_func);
+  sts = ccm_register_function("Ge", "GetFirstObject", graph_getfirstobject_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "GetNextObject", graph_getnextobject_func);
+  sts = ccm_register_function("Ge", "GetNextObject", graph_getnextobject_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "GroupGetFirstObject", graph_groupgetfirstobject_func);
+  sts = ccm_register_function("Ge", "GroupGetFirstObject", graph_groupgetfirstobject_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "GroupGetNextObject", graph_groupgetnextobject_func);
+  sts = ccm_register_function("Ge", "GroupGetNextObject", graph_groupgetnextobject_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "DashInsertObject", graph_dashinsertobject_func);
+  sts = ccm_register_function("Ge", "DashInsertObject", graph_dashinsertobject_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "GroupSelected", graph_groupselected_func);
+  sts = ccm_register_function("Ge", "GroupSelected", graph_groupselected_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "GetObjectType", graph_getobjecttype_func);
+  sts = ccm_register_function("Ge", "GetObjectType", graph_getobjecttype_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "GetObjectClass", graph_getobjectclass_func);
+  sts = ccm_register_function("Ge", "GetObjectClass", graph_getobjectclass_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "GetObjectFill", graph_getobjectfill_func);
+  sts = ccm_register_function("Ge", "GetObjectFill", graph_getobjectfill_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "SetObjectFill", graph_setobjectfill_func);
+  sts = ccm_register_function("Ge", "SetObjectFill", graph_setobjectfill_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "GetObjectBorder", graph_getobjectborder_func);
+  sts = ccm_register_function("Ge", "GetObjectBorder", graph_getobjectborder_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "SetObjectBorder", graph_setobjectborder_func);
+  sts = ccm_register_function("Ge", "SetObjectBorder", graph_setobjectborder_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "GetObjectGradient", graph_getobjectgradient_func);
+  sts = ccm_register_function("Ge", "GetObjectGradient", graph_getobjectgradient_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "SetObjectGradient", graph_setobjectgradient_func);
+  sts = ccm_register_function("Ge", "SetObjectGradient", graph_setobjectgradient_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "GetObjectTransparency", graph_getobjecttransparency_func);
+  sts = ccm_register_function("Ge", "GetObjectTransparency", graph_getobjecttransparency_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "SetObjectTransparency", graph_setobjecttransparency_func);
+  sts = ccm_register_function("Ge", "SetObjectTransparency", graph_setobjecttransparency_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "GetObjectFillColor", graph_getobjectfillcolor_func);
+  sts = ccm_register_function("Ge", "GetObjectFillColor", graph_getobjectfillcolor_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "SetObjectFillColor", graph_setobjectfillcolor_func);
+  sts = ccm_register_function("Ge", "SetObjectFillColor", graph_setobjectfillcolor_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "GetObjectBorderColor", graph_getobjectbordercolor_func);
+  sts = ccm_register_function("Ge", "GetObjectBorderColor", graph_getobjectbordercolor_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "SetObjectBorderColor", graph_setobjectbordercolor_func);
+  sts = ccm_register_function("Ge", "SetObjectBorderColor", graph_setobjectbordercolor_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "GetObjectTextColor", graph_getobjecttextcolor_func);
+  sts = ccm_register_function("Ge", "GetObjectTextColor", graph_getobjecttextcolor_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "SetObjectTextColor", graph_setobjecttextcolor_func);
+  sts = ccm_register_function("Ge", "SetObjectTextColor", graph_setobjecttextcolor_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "SetObjectTransform", graph_setobjecttransform_func);
+  sts = ccm_register_function("Ge", "SetObjectTransform", graph_setobjecttransform_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "SetObjectBackgroundColor", graph_setobjectbackgroundcolor_func);
+  sts = ccm_register_function("Ge", "SetObjectBackgroundColor", graph_setobjectbackgroundcolor_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "SetObjectLineWidth", graph_setobjectlinewidth_func);
+  sts = ccm_register_function("Ge", "SetObjectLineWidth", graph_setobjectlinewidth_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "SetObjectLineType", graph_setobjectlinetype_func);
+  sts = ccm_register_function("Ge", "SetObjectLineType", graph_setobjectlinetype_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "GetObjectShadow", graph_getobjectshadow_func);
+  sts = ccm_register_function("Ge", "GetObjectShadow", graph_getobjectshadow_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "SetObjectShadow", graph_setobjectshadow_func);
+  sts = ccm_register_function("Ge", "SetObjectShadow", graph_setobjectshadow_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "SetObjectTextSize", graph_setobjecttextsize_func);
+  sts = ccm_register_function("Ge", "SetObjectTextSize", graph_setobjecttextsize_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "SetObjectTextBold", graph_setobjecttextbold_func);
+  sts = ccm_register_function("Ge", "SetObjectTextBold", graph_setobjecttextbold_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "SetObjectTextFont", graph_setobjecttextfont_func);
+  sts = ccm_register_function("Ge", "SetObjectTextFont", graph_setobjecttextfont_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "SetCurrentObject", graph_setcurrentobject_func);
+  sts = ccm_register_function("Ge", "SetCurrentObject", graph_setcurrentobject_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "GetObjectName", graph_getobjectname_func);
+  sts = ccm_register_function("Ge", "GetObjectName", graph_getobjectname_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "SetObjectName", graph_setobjectname_func);
+  sts = ccm_register_function("Ge", "SetObjectName", graph_setobjectname_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "GetObjectDynType", graph_getobjectdyntype_func);
+  sts = ccm_register_function("Ge", "GetObjectDynType", graph_getobjectdyntype_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "GetObjectText", graph_getobjecttext_func);
+  sts = ccm_register_function("Ge", "GetObjectText", graph_getobjecttext_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "SetObjectText", graph_setobjecttext_func);
+  sts = ccm_register_function("Ge", "SetObjectText", graph_setobjecttext_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "SetObjectVisibility", graph_setobjectvisibility_func);
+  sts = ccm_register_function("Ge", "SetObjectVisibility", graph_setobjectvisibility_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "FindObjectByName", graph_findobjectbyname_func);
+  sts = ccm_register_function("Ge", "FindObjectByName", graph_findobjectbyname_func);
   if (EVEN(sts))
     return sts;
   sts = ccm_register_function("Ge", "Reload", graph_reload_func);
@@ -5605,20 +5556,16 @@ int Graph::script_func_register(void)
   sts = ccm_register_function("Ge", "SetSelectTextBold", graph_setselecttextbold_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "SetObjectAttribute", graph_setobjectattribute_func);
+  sts = ccm_register_function("Ge", "SetObjectAttribute", graph_setobjectattribute_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "GetGraphAttribute", graph_getgraphattribute_func);
+  sts = ccm_register_function("Ge", "GetGraphAttribute", graph_getgraphattribute_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "SetGraphAttribute", graph_setgraphattribute_func);
+  sts = ccm_register_function("Ge", "SetGraphAttribute", graph_setgraphattribute_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "GetObjectAttribute", graph_getobjectattribute_func);
+  sts = ccm_register_function("Ge", "GetObjectAttribute", graph_getobjectattribute_func);
   if (EVEN(sts))
     return sts;
   sts = ccm_register_function("Ge", "GetRgbColor", graph_getrgbcolor_func);
@@ -5627,15 +5574,13 @@ int Graph::script_func_register(void)
   sts = ccm_register_function("Ge", "SetRgbColor", graph_setrgbcolor_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "MeasureObject", graph_measureobject_func);
+  sts = ccm_register_function("Ge", "MeasureObject", graph_measureobject_func);
   if (EVEN(sts))
     return sts;
   sts = ccm_register_function("Ge", "DeleteObject", graph_deleteobject_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "SetObjectClass", graph_setobjectclass_func);
+  sts = ccm_register_function("Ge", "SetObjectClass", graph_setobjectclass_func);
   if (EVEN(sts))
     return sts;
   sts = ccm_register_function("Ge", "ScaleObject", graph_scaleobject_func);
@@ -5643,9 +5588,8 @@ int Graph::script_func_register(void)
     return sts;
   sts = ccm_register_function("Ge", "MoveObject", graph_moveobject_func);
   if (EVEN(sts))
-      return sts;
-  sts = ccm_register_function(
-      "Ge", "MoveAbsObject", graph_moveabsobject_func);
+    return sts;
+  sts = ccm_register_function("Ge", "MoveAbsObject", graph_moveabsobject_func);
   if (EVEN(sts))
     return sts;
   sts = ccm_register_function("Ge", "GetGraphName", graph_getgraphname_func);
@@ -5744,16 +5688,13 @@ int Graph::script_func_register(void)
   sts = ccm_register_function("Ge", "CreateLayer", graph_createlayer_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "GetInstanceObject", graph_getinstanceobject_func);
+  sts = ccm_register_function("Ge", "GetInstanceObject", graph_getinstanceobject_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "GetWindowSize", graph_getwindowsize_func);
+  sts = ccm_register_function("Ge", "GetWindowSize", graph_getwindowsize_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "GetWindowDimension", graph_getwindowdimension_func);
+  sts = ccm_register_function("Ge", "GetWindowDimension", graph_getwindowdimension_func);
   if (EVEN(sts))
     return sts;
   sts = ccm_register_function("Ge", "GetUI_Env", graph_getui_env_func);
@@ -5786,343 +5727,199 @@ int Graph::script_func_register(void)
   sts = ccm_register_function("Ge", "MoveSelectToLayer", graph_moveselecttolayer_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "LayerGetFirstObject", graph_layergetfirstobject_func);
+  sts = ccm_register_function("Ge", "LayerGetFirstObject", graph_layergetfirstobject_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "LayerGetNextObject", graph_layergetnextobject_func);
+  sts = ccm_register_function("Ge", "LayerGetNextObject", graph_layergetnextobject_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "GetModified", graph_getmodified_func);
+  sts = ccm_register_function("Ge", "GetModified", graph_getmodified_func);
   if (EVEN(sts))
     return sts;
-  
-  sts = ccm_create_external_var(
-      "eUI_Env_Web", CCM_DECL_INT, 0, glow_eUI_Env_Web, 0);
-  sts = ccm_create_external_var(
-      "eUI_Env_Xtt", CCM_DECL_INT, 0, glow_eUI_Env_Xtt, 0);
-  sts = ccm_create_external_var(
-      "eUI_Env_Development", CCM_DECL_INT, 0, glow_eUI_Env_Development, 0);
 
-  sts = ccm_create_external_var(
-      "eObjectType_Rect", CCM_DECL_INT, 0, glow_eObjectType_GrowRect, 0);
-  sts = ccm_create_external_var(
-      "eObjectType_Line", CCM_DECL_INT, 0, glow_eObjectType_GrowLine, 0);
-  sts = ccm_create_external_var(
-      "eObjectType_Arc", CCM_DECL_INT, 0, glow_eObjectType_GrowArc, 0);
-  sts = ccm_create_external_var("eObjectType_ConPoint", CCM_DECL_INT, 0,
-       glow_eObjectType_GrowConPoint, 0);
-  sts = ccm_create_external_var(
-      "eObjectType_Annot", CCM_DECL_INT, 0, glow_eObjectType_GrowSubAnnot, 0);
-  sts = ccm_create_external_var("eObjectType_PolyLine", CCM_DECL_INT, 0,
-      glow_eObjectType_GrowPolyLine, 0);
-  sts = ccm_create_external_var(
-      "eObjectType_SubGraph", CCM_DECL_INT, 0, glow_eObjectType_GrowNode, 0);
-  sts = ccm_create_external_var(
-      "eObjectType_Text", CCM_DECL_INT, 0, glow_eObjectType_GrowText, 0);
-  sts = ccm_create_external_var(
-      "eObjectType_Bar", CCM_DECL_INT, 0, glow_eObjectType_GrowBar, 0);
-  sts = ccm_create_external_var(
-      "eObjectType_Trend", CCM_DECL_INT, 0, glow_eObjectType_GrowTrend, 0);
-  sts = ccm_create_external_var(
-      "eObjectType_Slider", CCM_DECL_INT, 0, glow_eObjectType_GrowSlider, 0);
-  sts = ccm_create_external_var(
-      "eObjectType_Image", CCM_DECL_INT, 0, glow_eObjectType_GrowImage, 0);
-  sts = ccm_create_external_var(
-      "eObjectType_Group", CCM_DECL_INT, 0, glow_eObjectType_GrowGroup, 0);
-  sts = ccm_create_external_var(
-      "eObjectType_Axis", CCM_DECL_INT, 0, glow_eObjectType_GrowAxis, 0);
-  sts = ccm_create_external_var("eObjectType_RectRounded", CCM_DECL_INT, 0,
-      glow_eObjectType_GrowRectRounded, 0);
-  sts = ccm_create_external_var("eObjectType_ConGlue", CCM_DECL_INT, 0,
-      glow_eObjectType_GrowConGlue, 0);
-  sts = ccm_create_external_var(
-      "eObjectType_Menu", CCM_DECL_INT, 0, glow_eObjectType_GrowMenu, 0);
-  sts = ccm_create_external_var(
-      "eObjectType_Window", CCM_DECL_INT, 0, glow_eObjectType_GrowWindow, 0);
-  sts = ccm_create_external_var(
-      "eObjectType_Table", CCM_DECL_INT, 0, glow_eObjectType_GrowTable, 0);
-  sts = ccm_create_external_var(
-      "eObjectType_Folder", CCM_DECL_INT, 0, glow_eObjectType_GrowFolder, 0);
-  sts = ccm_create_external_var("eObjectType_XYCurve", CCM_DECL_INT, 0,
-      glow_eObjectType_GrowXYCurve, 0);
-  sts = ccm_create_external_var("eObjectType_AxisArc", CCM_DECL_INT, 0,
-      glow_eObjectType_GrowAxisArc, 0);
-  sts = ccm_create_external_var(
-      "eObjectType_Pie", CCM_DECL_INT, 0, glow_eObjectType_GrowPie, 0);
-  sts = ccm_create_external_var("eObjectType_BarChart", CCM_DECL_INT, 0,
-      glow_eObjectType_GrowBarChart, 0);
-  sts = ccm_create_external_var("eObjectType_Toolbar", CCM_DECL_INT, 0,
-      glow_eObjectType_GrowToolbar, 0);
-  sts = ccm_create_external_var("eObjectType_Layer", CCM_DECL_INT, 0,
-      glow_eObjectType_GrowLayer, 0);
+  sts = ccm_create_external_var("eUI_Env_Web", CCM_DECL_INT, 0, glow_eUI_Env_Web, 0);
+  sts = ccm_create_external_var("eUI_Env_Xtt", CCM_DECL_INT, 0, glow_eUI_Env_Xtt, 0);
+  sts = ccm_create_external_var("eUI_Env_Development", CCM_DECL_INT, 0, glow_eUI_Env_Development, 0);
 
-  sts = ccm_create_external_var(
-      "mDynType1_No", CCM_DECL_INT, 0, ge_mDynType1_No, 0);
-  sts = ccm_create_external_var(
-      "mDynType1_Inherit", CCM_DECL_INT, 0, ge_mDynType1_Inherit, 0);
-  sts = ccm_create_external_var(
-      "mDynType1_Tone", CCM_DECL_INT, 0, ge_mDynType1_Tone, 0);
-  sts = ccm_create_external_var(
-      "mDynType1_DigLowColor", CCM_DECL_INT, 0, ge_mDynType1_DigLowColor, 0);
-  sts = ccm_create_external_var(
-      "mDynType1_DigColor", CCM_DECL_INT, 0, ge_mDynType1_DigColor, 0);
-  sts = ccm_create_external_var(
-      "mDynType1_DigError", CCM_DECL_INT, 0, ge_mDynType1_DigError, 0);
-  sts = ccm_create_external_var(
-      "mDynType1_DigWarning", CCM_DECL_INT, 0, ge_mDynType1_DigWarning, 0);
-  sts = ccm_create_external_var(
-      "mDynType1_DigFlash", CCM_DECL_INT, 0, ge_mDynType1_DigFlash, 0);
-  sts = ccm_create_external_var(
-      "mDynType1_Invisible", CCM_DECL_INT, 0, ge_mDynType1_Invisible, 0);
-  sts = ccm_create_external_var(
-      "mDynType1_DigBorder", CCM_DECL_INT, 0, ge_mDynType1_DigBorder, 0);
-  sts = ccm_create_external_var(
-      "mDynType1_DigText", CCM_DECL_INT, 0, ge_mDynType1_DigText, 0);
-  sts = ccm_create_external_var(
-      "mDynType1_Value", CCM_DECL_INT, 0, ge_mDynType1_Value, 0);
-  sts = ccm_create_external_var(
-      "mDynType1_AnalogColor", CCM_DECL_INT, 0, ge_mDynType1_AnalogColor, 0);
-  sts = ccm_create_external_var(
-      "mDynType1_Rotate", CCM_DECL_INT, 0, ge_mDynType1_Rotate, 0);
-  sts = ccm_create_external_var(
-      "mDynType1_Move", CCM_DECL_INT, 0, ge_mDynType1_Move, 0);
-  sts = ccm_create_external_var(
-      "mDynType1_AnalogShift", CCM_DECL_INT, 0, ge_mDynType1_AnalogShift, 0);
-  sts = ccm_create_external_var(
-      "mDynType1_DigShift", CCM_DECL_INT, 0, ge_mDynType1_DigShift, 0);
-  sts = ccm_create_external_var(
-      "mDynType1_Animation", CCM_DECL_INT, 0, ge_mDynType1_Animation, 0);
-  sts = ccm_create_external_var(
-      "mDynType1_Bar", CCM_DECL_INT, 0, ge_mDynType1_Bar, 0);
-  sts = ccm_create_external_var(
-      "mDynType1_Trend", CCM_DECL_INT, 0, ge_mDynType1_Trend, 0);
-  sts = ccm_create_external_var("mDynType1_SliderBackground", CCM_DECL_INT, 0,
-      ge_mDynType1_SliderBackground, 0);
-  sts = ccm_create_external_var(
-      "mDynType1_Video", CCM_DECL_INT, 0, ge_mDynType1_Video, 0);
-  sts = ccm_create_external_var(
-      "mDynType1_FillLevel", CCM_DECL_INT, 0, ge_mDynType1_FillLevel, 0);
-  sts = ccm_create_external_var(
-      "mDynType1_FastCurve", CCM_DECL_INT, 0, ge_mDynType1_FastCurve, 0);
-  sts = ccm_create_external_var(
-      "mDynType1_AnalogText", CCM_DECL_INT, 0, ge_mDynType1_AnalogText, 0);
-  sts = ccm_create_external_var(
-      "mDynType1_Table", CCM_DECL_INT, 0, ge_mDynType1_Table, 0);
-  sts = ccm_create_external_var(
-      "mDynType1_StatusColor", CCM_DECL_INT, 0, ge_mDynType1_StatusColor, 0);
-  sts = ccm_create_external_var(
-      "mDynType1_HostObject", CCM_DECL_INT, 0, ge_mDynType1_HostObject, 0);
-  sts = ccm_create_external_var(
-      "mDynType1_DigSound", CCM_DECL_INT, 0, ge_mDynType1_DigSound, 0);
-  sts = ccm_create_external_var(
-      "mDynType1_XY_Curve", CCM_DECL_INT, 0, ge_mDynType1_XY_Curve, 0);
-  sts = ccm_create_external_var(
-      "mDynType1_DigCommand", CCM_DECL_INT, 0, ge_mDynType1_DigCommand, 0);
-  sts = ccm_create_external_var(
-      "mDynType1_Pie", CCM_DECL_INT, 0, ge_mDynType1_Pie, 0);
-  sts = ccm_create_external_var(
-      "mDynType1_BarChart", CCM_DECL_INT, 0, ge_mDynType1_BarChart, 0);
+  sts = ccm_create_external_var("eObjectType_Rect", CCM_DECL_INT, 0, glow_eObjectType_GrowRect, 0);
+  sts = ccm_create_external_var("eObjectType_Line", CCM_DECL_INT, 0, glow_eObjectType_GrowLine, 0);
+  sts = ccm_create_external_var("eObjectType_Arc", CCM_DECL_INT, 0, glow_eObjectType_GrowArc, 0);
+  sts = ccm_create_external_var("eObjectType_ConPoint", CCM_DECL_INT, 0, glow_eObjectType_GrowConPoint, 0);
+  sts = ccm_create_external_var("eObjectType_Annot", CCM_DECL_INT, 0, glow_eObjectType_GrowSubAnnot, 0);
+  sts = ccm_create_external_var("eObjectType_PolyLine", CCM_DECL_INT, 0, glow_eObjectType_GrowPolyLine, 0);
+  sts = ccm_create_external_var("eObjectType_SubGraph", CCM_DECL_INT, 0, glow_eObjectType_GrowNode, 0);
+  sts = ccm_create_external_var("eObjectType_Text", CCM_DECL_INT, 0, glow_eObjectType_GrowText, 0);
+  sts = ccm_create_external_var("eObjectType_Bar", CCM_DECL_INT, 0, glow_eObjectType_GrowBar, 0);
+  sts = ccm_create_external_var("eObjectType_Trend", CCM_DECL_INT, 0, glow_eObjectType_GrowTrend, 0);
+  sts = ccm_create_external_var("eObjectType_Slider", CCM_DECL_INT, 0, glow_eObjectType_GrowSlider, 0);
+  sts = ccm_create_external_var("eObjectType_Image", CCM_DECL_INT, 0, glow_eObjectType_GrowImage, 0);
+  sts = ccm_create_external_var("eObjectType_Group", CCM_DECL_INT, 0, glow_eObjectType_GrowGroup, 0);
+  sts = ccm_create_external_var("eObjectType_Axis", CCM_DECL_INT, 0, glow_eObjectType_GrowAxis, 0);
+  sts = ccm_create_external_var("eObjectType_RectRounded", CCM_DECL_INT, 0, glow_eObjectType_GrowRectRounded,
+                                0);
+  sts = ccm_create_external_var("eObjectType_ConGlue", CCM_DECL_INT, 0, glow_eObjectType_GrowConGlue, 0);
+  sts = ccm_create_external_var("eObjectType_Menu", CCM_DECL_INT, 0, glow_eObjectType_GrowMenu, 0);
+  sts = ccm_create_external_var("eObjectType_Window", CCM_DECL_INT, 0, glow_eObjectType_GrowWindow, 0);
+  sts = ccm_create_external_var("eObjectType_Table", CCM_DECL_INT, 0, glow_eObjectType_GrowTable, 0);
+  sts = ccm_create_external_var("eObjectType_Folder", CCM_DECL_INT, 0, glow_eObjectType_GrowFolder, 0);
+  sts = ccm_create_external_var("eObjectType_XYCurve", CCM_DECL_INT, 0, glow_eObjectType_GrowXYCurve, 0);
+  sts = ccm_create_external_var("eObjectType_AxisArc", CCM_DECL_INT, 0, glow_eObjectType_GrowAxisArc, 0);
+  sts = ccm_create_external_var("eObjectType_Pie", CCM_DECL_INT, 0, glow_eObjectType_GrowPie, 0);
+  sts = ccm_create_external_var("eObjectType_BarChart", CCM_DECL_INT, 0, glow_eObjectType_GrowBarChart, 0);
+  sts = ccm_create_external_var("eObjectType_Toolbar", CCM_DECL_INT, 0, glow_eObjectType_GrowToolbar, 0);
+  sts = ccm_create_external_var("eObjectType_Layer", CCM_DECL_INT, 0, glow_eObjectType_GrowLayer, 0);
 
-  sts = ccm_create_external_var(
-      "mDynType2_No", CCM_DECL_INT, 0, ge_mDynType2_No, 0);
-  sts = ccm_create_external_var(
-      "mDynType2_Axis", CCM_DECL_INT, 0, ge_mDynType2_Axis, 0);
-  sts = ccm_create_external_var("mDynType2_DigTextColor", CCM_DECL_INT, 0,
-      ge_mDynType2_DigTextColor, 0);
-  sts = ccm_create_external_var("mDynType2_TimeoutColor", CCM_DECL_INT, 0,
-      ge_mDynType2_TimeoutColor, 0);
-  sts = ccm_create_external_var("mDynType2_DigFourShift", CCM_DECL_INT, 0,
-      ge_mDynType2_DigFourShift, 0);
-  sts = ccm_create_external_var("mDynType2_ScrollingText", CCM_DECL_INT, 0,
-      ge_mDynType2_ScrollingText, 0);
-  sts = ccm_create_external_var("mDynType2_ColorThemeLightness", CCM_DECL_INT,
-      0, ge_mDynType2_ColorThemeLightness, 0);
-  sts = ccm_create_external_var("mDynType2_DigBackgroundColor", CCM_DECL_INT,
-      0, ge_mDynType2_DigBackgroundColor, 0);
-  sts = ccm_create_external_var("mDynType2_DigSwap", CCM_DECL_INT,
-      0, ge_mDynType2_DigSwap, 0);
-  sts = ccm_create_external_var("mDynType2_DigScript", CCM_DECL_INT,
-      0, ge_mDynType2_DigScript, 0);
-  sts = ccm_create_external_var("mDynType2_RefUpdate", CCM_DECL_INT,
-      0, ge_mDynType2_RefUpdate, 0);
+  sts = ccm_create_external_var("mDynType1_No", CCM_DECL_INT, 0, ge_mDynType1_No, 0);
+  sts = ccm_create_external_var("mDynType1_Inherit", CCM_DECL_INT, 0, ge_mDynType1_Inherit, 0);
+  sts = ccm_create_external_var("mDynType1_Tone", CCM_DECL_INT, 0, ge_mDynType1_Tone, 0);
+  sts = ccm_create_external_var("mDynType1_DigLowColor", CCM_DECL_INT, 0, ge_mDynType1_DigLowColor, 0);
+  sts = ccm_create_external_var("mDynType1_DigColor", CCM_DECL_INT, 0, ge_mDynType1_DigColor, 0);
+  sts = ccm_create_external_var("mDynType1_DigError", CCM_DECL_INT, 0, ge_mDynType1_DigError, 0);
+  sts = ccm_create_external_var("mDynType1_DigWarning", CCM_DECL_INT, 0, ge_mDynType1_DigWarning, 0);
+  sts = ccm_create_external_var("mDynType1_DigFlash", CCM_DECL_INT, 0, ge_mDynType1_DigFlash, 0);
+  sts = ccm_create_external_var("mDynType1_Invisible", CCM_DECL_INT, 0, ge_mDynType1_Invisible, 0);
+  sts = ccm_create_external_var("mDynType1_DigBorder", CCM_DECL_INT, 0, ge_mDynType1_DigBorder, 0);
+  sts = ccm_create_external_var("mDynType1_DigText", CCM_DECL_INT, 0, ge_mDynType1_DigText, 0);
+  sts = ccm_create_external_var("mDynType1_Value", CCM_DECL_INT, 0, ge_mDynType1_Value, 0);
+  sts = ccm_create_external_var("mDynType1_AnalogColor", CCM_DECL_INT, 0, ge_mDynType1_AnalogColor, 0);
+  sts = ccm_create_external_var("mDynType1_Rotate", CCM_DECL_INT, 0, ge_mDynType1_Rotate, 0);
+  sts = ccm_create_external_var("mDynType1_Move", CCM_DECL_INT, 0, ge_mDynType1_Move, 0);
+  sts = ccm_create_external_var("mDynType1_AnalogShift", CCM_DECL_INT, 0, ge_mDynType1_AnalogShift, 0);
+  sts = ccm_create_external_var("mDynType1_DigShift", CCM_DECL_INT, 0, ge_mDynType1_DigShift, 0);
+  sts = ccm_create_external_var("mDynType1_Animation", CCM_DECL_INT, 0, ge_mDynType1_Animation, 0);
+  sts = ccm_create_external_var("mDynType1_Bar", CCM_DECL_INT, 0, ge_mDynType1_Bar, 0);
+  sts = ccm_create_external_var("mDynType1_Trend", CCM_DECL_INT, 0, ge_mDynType1_Trend, 0);
+  sts = ccm_create_external_var("mDynType1_SliderBackground", CCM_DECL_INT, 0, ge_mDynType1_SliderBackground,
+                                0);
+  sts = ccm_create_external_var("mDynType1_Video", CCM_DECL_INT, 0, ge_mDynType1_Video, 0);
+  sts = ccm_create_external_var("mDynType1_FillLevel", CCM_DECL_INT, 0, ge_mDynType1_FillLevel, 0);
+  sts = ccm_create_external_var("mDynType1_FastCurve", CCM_DECL_INT, 0, ge_mDynType1_FastCurve, 0);
+  sts = ccm_create_external_var("mDynType1_AnalogText", CCM_DECL_INT, 0, ge_mDynType1_AnalogText, 0);
+  sts = ccm_create_external_var("mDynType1_Table", CCM_DECL_INT, 0, ge_mDynType1_Table, 0);
+  sts = ccm_create_external_var("mDynType1_StatusColor", CCM_DECL_INT, 0, ge_mDynType1_StatusColor, 0);
+  sts = ccm_create_external_var("mDynType1_HostObject", CCM_DECL_INT, 0, ge_mDynType1_HostObject, 0);
+  sts = ccm_create_external_var("mDynType1_DigSound", CCM_DECL_INT, 0, ge_mDynType1_DigSound, 0);
+  sts = ccm_create_external_var("mDynType1_XY_Curve", CCM_DECL_INT, 0, ge_mDynType1_XY_Curve, 0);
+  sts = ccm_create_external_var("mDynType1_DigCommand", CCM_DECL_INT, 0, ge_mDynType1_DigCommand, 0);
+  sts = ccm_create_external_var("mDynType1_Pie", CCM_DECL_INT, 0, ge_mDynType1_Pie, 0);
+  sts = ccm_create_external_var("mDynType1_BarChart", CCM_DECL_INT, 0, ge_mDynType1_BarChart, 0);
 
-  sts = ccm_create_external_var(
-      "mActionType1_No", CCM_DECL_INT, 0, ge_mActionType1_No, 0);
-  sts = ccm_create_external_var(
-      "mActionType1_Inherit", CCM_DECL_INT, 0, ge_mActionType1_Inherit, 0);
-  sts = ccm_create_external_var("mActionType1_PopupMenu", CCM_DECL_INT, 0,
-      ge_mActionType1_PopupMenu, 0);
-  sts = ccm_create_external_var(
-      "mActionType1_SetDig", CCM_DECL_INT, 0, ge_mActionType1_SetDig, 0);
-  sts = ccm_create_external_var(
-      "mActionType1_ResetDig", CCM_DECL_INT, 0, ge_mActionType1_ResetDig, 0);
-  sts = ccm_create_external_var("mActionType1_ToggleDig", CCM_DECL_INT, 0,
-      ge_mActionType1_ToggleDig, 0);
-  sts = ccm_create_external_var(
-      "mActionType1_StoDig", CCM_DECL_INT, 0, ge_mActionType1_StoDig, 0);
-  sts = ccm_create_external_var(
-      "mActionType1_Command", CCM_DECL_INT, 0, ge_mActionType1_Command, 0);
-  sts = ccm_create_external_var("mActionType1_CommandDoubleClick",
-      CCM_DECL_INT, 0, ge_mActionType1_CommandDoubleClick, 0);
-  sts = ccm_create_external_var(
-      "mActionType1_Confirm", CCM_DECL_INT, 0, ge_mActionType1_Confirm, 0);
-  sts = ccm_create_external_var("mActionType1_IncrAnalog", CCM_DECL_INT, 0,
-      ge_mActionType1_IncrAnalog, 0);
-  sts = ccm_create_external_var("mActionType1_RadioButton", CCM_DECL_INT, 0,
-      ge_mActionType1_RadioButton, 0);
-  sts = ccm_create_external_var(
-      "mActionType1_Slider", CCM_DECL_INT, 0, ge_mActionType1_Slider, 0);
-  sts = ccm_create_external_var("mActionType1_ValueInput", CCM_DECL_INT, 0,
-       ge_mActionType1_ValueInput, 0);
-  sts = ccm_create_external_var(
-      "mActionType1_TipText", CCM_DECL_INT, 0, ge_mActionType1_TipText, 0);
-  sts = ccm_create_external_var(
-      "mActionType1_Help", CCM_DECL_INT, 0, ge_mActionType1_Help, 0);
-  sts = ccm_create_external_var("mActionType1_OpenGraph", CCM_DECL_INT, 0,
-      ge_mActionType1_OpenGraph, 0);
-  sts = ccm_create_external_var(
-      "mActionType1_OpenURL", CCM_DECL_INT, 0, ge_mActionType1_OpenURL, 0);
-  sts = ccm_create_external_var("mActionType1_InputFocus", CCM_DECL_INT, 0,
-      ge_mActionType1_InputFocus, 0);
-  sts = ccm_create_external_var("mActionType1_CloseGraph", CCM_DECL_INT, 0,
-     ge_mActionType1_CloseGraph, 0);
-  sts = ccm_create_external_var("mActionType1_PulldownMenu", CCM_DECL_INT, 0,
-      ge_mActionType1_PulldownMenu, 0);
-  sts = ccm_create_external_var("mActionType1_OptionMenu", CCM_DECL_INT, 0,
-      ge_mActionType1_OptionMenu, 0);
-  sts = ccm_create_external_var(
-      "mActionType1_SetValue", CCM_DECL_INT, 0, ge_mActionType1_SetValue, 0);
-  sts = ccm_create_external_var("mActionType1_MethodToolbar", CCM_DECL_INT, 0,
-      ge_mActionType1_MethodToolbar, 0);
-  sts = ccm_create_external_var("mActionType1_MethodPulldownMenu",
-       CCM_DECL_INT, 0, ge_mActionType1_MethodPulldownMenu, 0);
-  sts = ccm_create_external_var(
-      "mActionType1_Script", CCM_DECL_INT, 0, ge_mActionType1_Script, 0);
-  sts = ccm_create_external_var(
-      "mActionType1_CatchSignal", CCM_DECL_INT, 0, ge_mActionType1_CatchSignal, 0);
-  sts = ccm_create_external_var(
-      "mActionType1_EmitSignal", CCM_DECL_INT, 0, ge_mActionType1_EmitSignal, 0);
+  sts = ccm_create_external_var("mDynType2_No", CCM_DECL_INT, 0, ge_mDynType2_No, 0);
+  sts = ccm_create_external_var("mDynType2_Axis", CCM_DECL_INT, 0, ge_mDynType2_Axis, 0);
+  sts = ccm_create_external_var("mDynType2_DigTextColor", CCM_DECL_INT, 0, ge_mDynType2_DigTextColor, 0);
+  sts = ccm_create_external_var("mDynType2_TimeoutColor", CCM_DECL_INT, 0, ge_mDynType2_TimeoutColor, 0);
+  sts = ccm_create_external_var("mDynType2_DigFourShift", CCM_DECL_INT, 0, ge_mDynType2_DigFourShift, 0);
+  sts = ccm_create_external_var("mDynType2_ScrollingText", CCM_DECL_INT, 0, ge_mDynType2_ScrollingText, 0);
+  sts = ccm_create_external_var("mDynType2_ColorThemeLightness", CCM_DECL_INT, 0,
+                                ge_mDynType2_ColorThemeLightness, 0);
+  sts = ccm_create_external_var("mDynType2_DigBackgroundColor", CCM_DECL_INT, 0,
+                                ge_mDynType2_DigBackgroundColor, 0);
+  sts = ccm_create_external_var("mDynType2_DigSwap", CCM_DECL_INT, 0, ge_mDynType2_DigSwap, 0);
+  sts = ccm_create_external_var("mDynType2_DigScript", CCM_DECL_INT, 0, ge_mDynType2_DigScript, 0);
+  sts = ccm_create_external_var("mDynType2_RefUpdate", CCM_DECL_INT, 0, ge_mDynType2_RefUpdate, 0);
+
+  sts = ccm_create_external_var("mActionType1_No", CCM_DECL_INT, 0, ge_mActionType1_No, 0);
+  sts = ccm_create_external_var("mActionType1_Inherit", CCM_DECL_INT, 0, ge_mActionType1_Inherit, 0);
+  sts = ccm_create_external_var("mActionType1_PopupMenu", CCM_DECL_INT, 0, ge_mActionType1_PopupMenu, 0);
+  sts = ccm_create_external_var("mActionType1_SetDig", CCM_DECL_INT, 0, ge_mActionType1_SetDig, 0);
+  sts = ccm_create_external_var("mActionType1_ResetDig", CCM_DECL_INT, 0, ge_mActionType1_ResetDig, 0);
+  sts = ccm_create_external_var("mActionType1_ToggleDig", CCM_DECL_INT, 0, ge_mActionType1_ToggleDig, 0);
+  sts = ccm_create_external_var("mActionType1_StoDig", CCM_DECL_INT, 0, ge_mActionType1_StoDig, 0);
+  sts = ccm_create_external_var("mActionType1_Command", CCM_DECL_INT, 0, ge_mActionType1_Command, 0);
+  sts = ccm_create_external_var("mActionType1_CommandDoubleClick", CCM_DECL_INT, 0,
+                                ge_mActionType1_CommandDoubleClick, 0);
+  sts = ccm_create_external_var("mActionType1_Confirm", CCM_DECL_INT, 0, ge_mActionType1_Confirm, 0);
+  sts = ccm_create_external_var("mActionType1_IncrAnalog", CCM_DECL_INT, 0, ge_mActionType1_IncrAnalog, 0);
+  sts = ccm_create_external_var("mActionType1_RadioButton", CCM_DECL_INT, 0, ge_mActionType1_RadioButton, 0);
+  sts = ccm_create_external_var("mActionType1_Slider", CCM_DECL_INT, 0, ge_mActionType1_Slider, 0);
+  sts = ccm_create_external_var("mActionType1_ValueInput", CCM_DECL_INT, 0, ge_mActionType1_ValueInput, 0);
+  sts = ccm_create_external_var("mActionType1_TipText", CCM_DECL_INT, 0, ge_mActionType1_TipText, 0);
+  sts = ccm_create_external_var("mActionType1_Help", CCM_DECL_INT, 0, ge_mActionType1_Help, 0);
+  sts = ccm_create_external_var("mActionType1_OpenGraph", CCM_DECL_INT, 0, ge_mActionType1_OpenGraph, 0);
+  sts = ccm_create_external_var("mActionType1_OpenURL", CCM_DECL_INT, 0, ge_mActionType1_OpenURL, 0);
+  sts = ccm_create_external_var("mActionType1_InputFocus", CCM_DECL_INT, 0, ge_mActionType1_InputFocus, 0);
+  sts = ccm_create_external_var("mActionType1_CloseGraph", CCM_DECL_INT, 0, ge_mActionType1_CloseGraph, 0);
+  sts =
+      ccm_create_external_var("mActionType1_PulldownMenu", CCM_DECL_INT, 0, ge_mActionType1_PulldownMenu, 0);
+  sts = ccm_create_external_var("mActionType1_OptionMenu", CCM_DECL_INT, 0, ge_mActionType1_OptionMenu, 0);
+  sts = ccm_create_external_var("mActionType1_SetValue", CCM_DECL_INT, 0, ge_mActionType1_SetValue, 0);
+  sts = ccm_create_external_var("mActionType1_MethodToolbar", CCM_DECL_INT, 0, ge_mActionType1_MethodToolbar,
+                                0);
+  sts = ccm_create_external_var("mActionType1_MethodPulldownMenu", CCM_DECL_INT, 0,
+                                ge_mActionType1_MethodPulldownMenu, 0);
+  sts = ccm_create_external_var("mActionType1_Script", CCM_DECL_INT, 0, ge_mActionType1_Script, 0);
+  sts = ccm_create_external_var("mActionType1_CatchSignal", CCM_DECL_INT, 0, ge_mActionType1_CatchSignal, 0);
+  sts = ccm_create_external_var("mActionType1_EmitSignal", CCM_DECL_INT, 0, ge_mActionType1_EmitSignal, 0);
 
   char varname[40];
-  for (int i = 1; i <= 300; i++) {
+  for (int i = 1; i <= 300; i++)
+  {
     sprintf(varname, "eDrawType_Color%d", i);
     sts = ccm_create_external_var(varname, CCM_DECL_INT, 0, i - 1, 0);
   }
-  sts = ccm_create_external_var(
-      "eDrawType_LineErase", CCM_DECL_INT, 0, 300, 0);
-  for (int i = 1; i <= 90; i++) {
+  sts = ccm_create_external_var("eDrawType_LineErase", CCM_DECL_INT, 0, 300, 0);
+  for (int i = 1; i <= 90; i++)
+  {
     sprintf(varname, "eDrawType_CustomColor%d", i);
-    sts = ccm_create_external_var(
-        varname, CCM_DECL_INT, 0, 310 + 4 * (i - 1), 0);
+    sts = ccm_create_external_var(varname, CCM_DECL_INT, 0, 310 + 4 * (i - 1), 0);
   }
 
-  sts = ccm_create_external_var("mAccess_RtRead", CCM_DECL_INT, 0,
-      pwr_mAccess_RtRead, 0);
-  sts = ccm_create_external_var("mAccess_RtWrite", CCM_DECL_INT, 0,
-      pwr_mAccess_RtWrite, 0);
-  sts = ccm_create_external_var("mAccess_System", CCM_DECL_INT, 0,
-      pwr_mAccess_System, 0);
-  sts = ccm_create_external_var("mAccess_Maintenance", CCM_DECL_INT, 0,
-      pwr_mAccess_Maintenance, 0);
-  sts = ccm_create_external_var("mAccess_Process", CCM_DECL_INT, 0,
-      pwr_mAccess_Process, 0);
-  sts = ccm_create_external_var("mAccess_Instrument", CCM_DECL_INT, 0,
-      pwr_mAccess_Instrument, 0);
-  sts = ccm_create_external_var("mAccess_Operator1", CCM_DECL_INT, 0,
-      pwr_mAccess_Operator1, 0);
-  sts = ccm_create_external_var("mAccess_Operator2", CCM_DECL_INT, 0,
-      pwr_mAccess_Operator2, 0);
-  sts = ccm_create_external_var("mAccess_Operator3", CCM_DECL_INT, 0,
-      pwr_mAccess_Operator3, 0);
-  sts = ccm_create_external_var("mAccess_Operator4", CCM_DECL_INT, 0,
-      pwr_mAccess_Operator4, 0);
-  sts = ccm_create_external_var("mAccess_Operator5", CCM_DECL_INT, 0,
-      pwr_mAccess_Operator5, 0);
-  sts = ccm_create_external_var("mAccess_Operator6", CCM_DECL_INT, 0,
-      pwr_mAccess_Operator6, 0);
-  sts = ccm_create_external_var("mAccess_Operator7", CCM_DECL_INT, 0,
-      pwr_mAccess_Operator7, 0);
-  sts = ccm_create_external_var("mAccess_Operator8", CCM_DECL_INT, 0,
-      pwr_mAccess_Operator8, 0);
-  sts = ccm_create_external_var("mAccess_Operator9", CCM_DECL_INT, 0,
-      pwr_mAccess_Operator9, 0);
-  sts = ccm_create_external_var("mAccess_Operator10", CCM_DECL_INT, 0,
-      pwr_mAccess_Operator10, 0);
-  sts = ccm_create_external_var("mAccess_RtEventsAck", CCM_DECL_INT, 0,
-      pwr_mAccess_RtEventsAck, 0);
-  sts = ccm_create_external_var("mAccess_RtPlc", CCM_DECL_INT, 0,
-      pwr_mAccess_RtPlc, 0);
-  sts = ccm_create_external_var("mAccess_RtNavigator", CCM_DECL_INT, 0,
-      pwr_mAccess_RtNavigator, 0);
-  sts = ccm_create_external_var("mAccess_DevRead", CCM_DECL_INT, 0,
-      pwr_mAccess_DevRead, 0);
-  sts = ccm_create_external_var("mAccess_DevPlc", CCM_DECL_INT, 0,
-      pwr_mAccess_DevPlc, 0);
-  sts = ccm_create_external_var("mAccess_DevConfig", CCM_DECL_INT, 0,
-      pwr_mAccess_DevConfig, 0);
-  sts = ccm_create_external_var("mAccess_DevClass", CCM_DECL_INT, 0,
-      pwr_mAccess_DevClass, 0);
-  sts = ccm_create_external_var("mAccess_RtEventsBlock", CCM_DECL_INT, 0,
-      pwr_mAccess_RtEventsBlock, 0);
-  sts = ccm_create_external_var("mAccess_Administrator", CCM_DECL_INT, 0,
-      pwr_mAccess_Administrator, 0);
-  sts = ccm_create_external_var("mAccess_SevRead", CCM_DECL_INT, 0,
-      pwr_mAccess_SevRead, 0);
-  sts = ccm_create_external_var("mAccess_SevAdmin", CCM_DECL_INT, 0,
-      pwr_mAccess_SevAdmin, 0);
-  sts = ccm_create_external_var("mAccess_AllRt", CCM_DECL_INT, 0,
-      pwr_mAccess_AllRt, 0);
-  sts = ccm_create_external_var("mAccess_RtDefault", CCM_DECL_INT, 0,
-      pwr_mAccess_RtDefault, 0);
-  sts = ccm_create_external_var("mAccess_AllOperators", CCM_DECL_INT, 0,
-      pwr_mAccess_AllOperators, 0);
-  sts = ccm_create_external_var("mAccess_AllSev", CCM_DECL_INT, 0,
-      pwr_mAccess_AllSev, 0);
-  sts = ccm_create_external_var("mAccess_AllPwr", CCM_DECL_INT, 0,
-      pwr_mAccess_AllPwr, 0);
-  sts = ccm_create_external_var("mAccess_Default", CCM_DECL_INT, 0,
-      pwr_mAccess_Default, 0);
+  sts = ccm_create_external_var("mAccess_RtRead", CCM_DECL_INT, 0, pwr_mAccess_RtRead, 0);
+  sts = ccm_create_external_var("mAccess_RtWrite", CCM_DECL_INT, 0, pwr_mAccess_RtWrite, 0);
+  sts = ccm_create_external_var("mAccess_System", CCM_DECL_INT, 0, pwr_mAccess_System, 0);
+  sts = ccm_create_external_var("mAccess_Maintenance", CCM_DECL_INT, 0, pwr_mAccess_Maintenance, 0);
+  sts = ccm_create_external_var("mAccess_Process", CCM_DECL_INT, 0, pwr_mAccess_Process, 0);
+  sts = ccm_create_external_var("mAccess_Instrument", CCM_DECL_INT, 0, pwr_mAccess_Instrument, 0);
+  sts = ccm_create_external_var("mAccess_Operator1", CCM_DECL_INT, 0, pwr_mAccess_Operator1, 0);
+  sts = ccm_create_external_var("mAccess_Operator2", CCM_DECL_INT, 0, pwr_mAccess_Operator2, 0);
+  sts = ccm_create_external_var("mAccess_Operator3", CCM_DECL_INT, 0, pwr_mAccess_Operator3, 0);
+  sts = ccm_create_external_var("mAccess_Operator4", CCM_DECL_INT, 0, pwr_mAccess_Operator4, 0);
+  sts = ccm_create_external_var("mAccess_Operator5", CCM_DECL_INT, 0, pwr_mAccess_Operator5, 0);
+  sts = ccm_create_external_var("mAccess_Operator6", CCM_DECL_INT, 0, pwr_mAccess_Operator6, 0);
+  sts = ccm_create_external_var("mAccess_Operator7", CCM_DECL_INT, 0, pwr_mAccess_Operator7, 0);
+  sts = ccm_create_external_var("mAccess_Operator8", CCM_DECL_INT, 0, pwr_mAccess_Operator8, 0);
+  sts = ccm_create_external_var("mAccess_Operator9", CCM_DECL_INT, 0, pwr_mAccess_Operator9, 0);
+  sts = ccm_create_external_var("mAccess_Operator10", CCM_DECL_INT, 0, pwr_mAccess_Operator10, 0);
+  sts = ccm_create_external_var("mAccess_RtEventsAck", CCM_DECL_INT, 0, pwr_mAccess_RtEventsAck, 0);
+  sts = ccm_create_external_var("mAccess_RtPlc", CCM_DECL_INT, 0, pwr_mAccess_RtPlc, 0);
+  sts = ccm_create_external_var("mAccess_RtNavigator", CCM_DECL_INT, 0, pwr_mAccess_RtNavigator, 0);
+  sts = ccm_create_external_var("mAccess_DevRead", CCM_DECL_INT, 0, pwr_mAccess_DevRead, 0);
+  sts = ccm_create_external_var("mAccess_DevPlc", CCM_DECL_INT, 0, pwr_mAccess_DevPlc, 0);
+  sts = ccm_create_external_var("mAccess_DevConfig", CCM_DECL_INT, 0, pwr_mAccess_DevConfig, 0);
+  sts = ccm_create_external_var("mAccess_DevClass", CCM_DECL_INT, 0, pwr_mAccess_DevClass, 0);
+  sts = ccm_create_external_var("mAccess_RtEventsBlock", CCM_DECL_INT, 0, pwr_mAccess_RtEventsBlock, 0);
+  sts = ccm_create_external_var("mAccess_Administrator", CCM_DECL_INT, 0, pwr_mAccess_Administrator, 0);
+  sts = ccm_create_external_var("mAccess_SevRead", CCM_DECL_INT, 0, pwr_mAccess_SevRead, 0);
+  sts = ccm_create_external_var("mAccess_SevAdmin", CCM_DECL_INT, 0, pwr_mAccess_SevAdmin, 0);
+  sts = ccm_create_external_var("mAccess_AllRt", CCM_DECL_INT, 0, pwr_mAccess_AllRt, 0);
+  sts = ccm_create_external_var("mAccess_RtDefault", CCM_DECL_INT, 0, pwr_mAccess_RtDefault, 0);
+  sts = ccm_create_external_var("mAccess_AllOperators", CCM_DECL_INT, 0, pwr_mAccess_AllOperators, 0);
+  sts = ccm_create_external_var("mAccess_AllSev", CCM_DECL_INT, 0, pwr_mAccess_AllSev, 0);
+  sts = ccm_create_external_var("mAccess_AllPwr", CCM_DECL_INT, 0, pwr_mAccess_AllPwr, 0);
+  sts = ccm_create_external_var("mAccess_Default", CCM_DECL_INT, 0, pwr_mAccess_Default, 0);
 
-  sts = ccm_create_external_var("eFont_Helvetica", CCM_DECL_INT, 0,
-      glow_eFont_Helvetica, 0);
-  sts = ccm_create_external_var("eFont_Times", CCM_DECL_INT, 0,
-      glow_eFont_Times, 0);
+  sts = ccm_create_external_var("eFont_Helvetica", CCM_DECL_INT, 0, glow_eFont_Helvetica, 0);
+  sts = ccm_create_external_var("eFont_Times", CCM_DECL_INT, 0, glow_eFont_Times, 0);
   sts = ccm_create_external_var("eFont_NewCenturySchoolbook", CCM_DECL_INT, 0,
-      glow_eFont_NewCenturySchoolbook, 0);
-  sts = ccm_create_external_var("eFont_Courier", CCM_DECL_INT, 0,
-      glow_eFont_Courier, 0);
-  sts = ccm_create_external_var("eFont_LucidaSans", CCM_DECL_INT, 0,
-      glow_eFont_LucidaSans, 0);
+                                glow_eFont_NewCenturySchoolbook, 0);
+  sts = ccm_create_external_var("eFont_Courier", CCM_DECL_INT, 0, glow_eFont_Courier, 0);
 
-  sts = ccm_create_external_var("eDirection_Center", CCM_DECL_INT, 0,
-      glow_eDirection_Center, 0);
-  sts = ccm_create_external_var("eDirection_Right", CCM_DECL_INT, 0,
-      glow_eDirection_Right, 0);
-  sts = ccm_create_external_var("eDirection_Left", CCM_DECL_INT, 0,
-      glow_eDirection_Left, 0);
-  sts = ccm_create_external_var("eDirection_Up", CCM_DECL_INT, 0,
-      glow_eDirection_Up, 0);
-  sts = ccm_create_external_var("eDirection_Down", CCM_DECL_INT, 0,
-      glow_eDirection_Down, 0);
+  sts = ccm_create_external_var("eDirection_Center", CCM_DECL_INT, 0, glow_eDirection_Center, 0);
+  sts = ccm_create_external_var("eDirection_Right", CCM_DECL_INT, 0, glow_eDirection_Right, 0);
+  sts = ccm_create_external_var("eDirection_Left", CCM_DECL_INT, 0, glow_eDirection_Left, 0);
+  sts = ccm_create_external_var("eDirection_Up", CCM_DECL_INT, 0, glow_eDirection_Up, 0);
+  sts = ccm_create_external_var("eDirection_Down", CCM_DECL_INT, 0, glow_eDirection_Down, 0);
 
-  sts = ccm_create_external_var("eVis_Visible", CCM_DECL_INT, 0,
-      glow_eVis_Visible, 0);
-  sts = ccm_create_external_var("eVis_Invisible", CCM_DECL_INT, 0,
-      glow_eVis_Invisible, 0);
-  sts = ccm_create_external_var("eVis_Dimmed", CCM_DECL_INT, 0,
-      glow_eVis_Dimmed, 0);
+  sts = ccm_create_external_var("eVis_Visible", CCM_DECL_INT, 0, glow_eVis_Visible, 0);
+  sts = ccm_create_external_var("eVis_Invisible", CCM_DECL_INT, 0, glow_eVis_Invisible, 0);
+  sts = ccm_create_external_var("eVis_Dimmed", CCM_DECL_INT, 0, glow_eVis_Dimmed, 0);
 
-  sts = ccm_create_external_var("BORDER", CCM_DECL_INT, 0,
-      -1, 0);
+  sts = ccm_create_external_var("BORDER", CCM_DECL_INT, 0, -1, 0);
 
   return 1;
 }
 
-static int ccm_deffilename_func(
-    char* outfile, char* infile, void* client_data)
+static int ccm_deffilename_func(char* outfile, char* infile, void* client_data)
 {
   char path[2][40] = {"$pwrp_exe/", "$pwr_exe/"};
   pwr_tFileName fname;
@@ -6130,22 +5927,26 @@ static int ccm_deffilename_func(
   pwr_tStatus sts;
   int found = 0;
 
-  //dcli_get_defaultfilename(infile, outfile, ".ge_com");
-  if (strchr(infile, '/') == 0) {
-    for (int i = 0; i < sizeof(path)/sizeof(path[0]); i++) {
+  // dcli_get_defaultfilename(infile, outfile, ".ge_com");
+  if (strchr(infile, '/') == 0)
+  {
+    for (int i = 0; i < sizeof(path) / sizeof(path[0]); i++)
+    {
       strcpy(fname, path[i]);
       strcat(fname, infile);
       if (strchr(fname, '.') == 0)
-	strcat(fname, ".ge_com");
+        strcat(fname, ".ge_com");
       dcli_translate_filename(fname, fname);
       sts = dcli_file_time(fname, &t);
-      if (ODD(sts)) {
-	found = 1;
-	break;
-      }	
+      if (ODD(sts))
+      {
+        found = 1;
+        break;
+      }
     }
   }
-  if (!found) {
+  if (!found)
+  {
     strcpy(fname, infile);
     if (strchr(fname, '.') == 0)
       strcat(fname, ".ge_com");
@@ -6155,10 +5956,10 @@ static int ccm_deffilename_func(
   return 1;
 }
 
-static int ccm_errormessage_func(
-    char* msg, int severity, void* client_data)
+static int ccm_errormessage_func(char* msg, int severity, void* client_data)
 {
-  switch(severity) {
+  switch (severity)
+  {
   case msg_eSeverity_Info:
   case msg_eSeverity_Success:
     printf("I %s\n", msg);
@@ -6186,7 +5987,8 @@ int Graph::read_scriptfile(char* incommand)
   int sts;
   int appl_sts;
 
-  if (!ccm_func_registred) {
+  if (!ccm_func_registred)
+  {
     ccm_func_registred = 1;
 
     script_func_register();
@@ -6195,21 +5997,21 @@ int Graph::read_scriptfile(char* incommand)
   str_trim(input_str, incommand);
   script_store_graph();
   // Read and execute the script file
-  sts = ccm_file_exec(input_str, ccm_externcmd_func,
-      ccm_deffilename_func, ccm_errormessage_func, &appl_sts,
-      verify, 0, NULL, 0, 0, NULL, (void*)this);
+  sts = ccm_file_exec(input_str, ccm_externcmd_func, ccm_deffilename_func, ccm_errormessage_func, &appl_sts,
+                      verify, 0, NULL, 0, 0, NULL, (void*)this);
   if (EVEN(sts))
     return sts;
 
   return 1;
 }
 
-int Graph::script_buffer_exec(char *script)
+int Graph::script_buffer_exec(char* script)
 {
   int sts;
   int appl_sts;
 
-  if (!ccm_func_registred) {
+  if (!ccm_func_registred)
+  {
     ccm_func_registred = 1;
 
     script_func_register();
@@ -6221,27 +6023,24 @@ int Graph::script_buffer_exec(char *script)
   script_store_graph();
 
   // Read and execute the command file
-  sts = ccm_buffer_exec(script, 0, ccm_externcmd_func,
-      ccm_deffilename_func, ccm_errormessage_func, &appl_sts, verify,
-      0, NULL, 0, NULL, (void *)this);
+  sts = ccm_buffer_exec(script, 0, ccm_externcmd_func, ccm_deffilename_func, ccm_errormessage_func, &appl_sts,
+                        verify, 0, NULL, 0, NULL, (void*)this);
   if (EVEN(sts))
     return sts;
   return 1;
 }
 
-
 //
 // Analogous c interface
 //
 
-void gsc_MeasureObject(Graph* graph, grow_tObject id, double* ll_x, double* ll_y, 
-    double* ur_x, double *ur_y)
+void gsc_MeasureObject(Graph* graph, grow_tObject id, double* ll_x, double* ll_y, double* ur_x, double* ur_y)
 {
   grow_MeasureNode(id, ll_x, ll_y, ur_x, ur_y);
-} 
+}
 
-void gsc_GetTextExtent(Graph* graph, char* text, int size, glow_eFont font, int bold,
-    double *width, double *height, double *descent)
+void gsc_GetTextExtent(Graph* graph, char* text, int size, glow_eFont font, int bold, double* width,
+                       double* height, double* descent)
 {
   glow_eDrawType draw_type;
   int textsize;
@@ -6251,7 +6050,8 @@ void gsc_GetTextExtent(Graph* graph, char* text, int size, glow_eFont font, int 
   else
     draw_type = glow_eDrawType_TextHelvetica;
 
-  switch (size) {
+  switch (size)
+  {
   case 0:
     textsize = 0;
     break;
@@ -6274,12 +6074,11 @@ void gsc_GetTextExtent(Graph* graph, char* text, int size, glow_eFont font, int 
     textsize = 8;
   }
 
-  grow_GetTextExtent(graph->grow->ctx, text, strlen(text), draw_type, 
-      textsize, font, width, height, descent);
+  grow_GetTextExtent(graph->grow->ctx, text, strlen(text), draw_type, textsize, font, width, height, descent);
 }
 
-grow_tObject gsc_CreateText(Graph* graph, char *text, double x, double y, int size, 
-    glow_eFont font, int bold, glow_eDrawType color)
+grow_tObject gsc_CreateText(Graph* graph, char* text, double x, double y, int size, glow_eFont font, int bold,
+                            glow_eDrawType color)
 {
   glow_eDrawType drawtype;
   int textsize;
@@ -6289,7 +6088,8 @@ grow_tObject gsc_CreateText(Graph* graph, char *text, double x, double y, int si
   else
     drawtype = glow_eDrawType_TextHelvetica;
 
-  switch (size) {
+  switch (size)
+  {
   case 0:
     textsize = 0;
     break;
@@ -6312,9 +6112,8 @@ grow_tObject gsc_CreateText(Graph* graph, char *text, double x, double y, int si
     textsize = 8;
   }
 
-  grow_CreateGrowText(graph->grow->ctx, "", text, x, y, drawtype,
-      color, textsize, font, glow_mDisplayLevel_1, NULL,
-      &graph->current_cmd_object);
+  grow_CreateGrowText(graph->grow->ctx, "", text, x, y, drawtype, color, textsize, font, glow_mDisplayLevel_1,
+                      NULL, &graph->current_cmd_object);
   grow_SetModified(graph->grow->ctx, 1);
 
   return graph->current_cmd_object;
@@ -6325,15 +6124,16 @@ int gsc_DashInsertObject(Graph* graph, grow_tObject dash, grow_tObject id)
   return grow_DashInsertObject(dash, id);
 }
 
-grow_tObject gsc_CreateBar(Graph* graph, double x1, double y1, double x2, double y2, 
-    int colortheme, glow_eDirection direction)
+grow_tObject gsc_CreateBar(Graph* graph, double x1, double y1, double x2, double y2, int colortheme,
+                           glow_eDirection direction)
 {
   grow_tNode n1;
   int scale_x, scale_y;
   double sx, sy;
   double ll_x, ll_y, ur_x, ur_y;
 
-  switch (direction) {
+  switch (direction)
+  {
   case glow_eDirection_Up:
     graph->create_bar(&n1, x1, y1, colortheme);
     break;
@@ -6371,7 +6171,8 @@ grow_tObject gsc_CreateBar(Graph* graph, double x1, double y1, double x2, double
   else
     scale_x = scale_y = 1;
 
-  if (scale_x || scale_y) {
+  if (scale_x || scale_y)
+  {
     grow_MeasureNode(n1, &ll_x, &ll_y, &ur_x, &ur_y);
     if (scale_x)
       sx = (x2 - x1) / (ur_x - ll_x);
@@ -6391,14 +6192,13 @@ grow_tObject gsc_CreateBar(Graph* graph, double x1, double y1, double x2, double
   return graph->current_cmd_object;
 }
 
-grow_tObject gsc_CreateBarArc(Graph* graph, double x1, double y1, double x2, double y2, 
-    int colortheme)
+grow_tObject gsc_CreateBarArc(Graph* graph, double x1, double y1, double x2, double y2, int colortheme)
 {
   grow_tNode n1;
   int scale_x, scale_y;
   double sx, sy;
   double ll_x, ll_y, ur_x, ur_y;
-    
+
   graph->create_bararc(&n1, x1, y1, colortheme);
 
   if (x2 == 0 && y2 == 0)
@@ -6406,7 +6206,8 @@ grow_tObject gsc_CreateBarArc(Graph* graph, double x1, double y1, double x2, dou
   else
     scale_x = scale_y = 1;
 
-  if (scale_x || scale_y) {
+  if (scale_x || scale_y)
+  {
     grow_MeasureNode(n1, &ll_x, &ll_y, &ur_x, &ur_y);
     if (scale_x)
       sx = (x2 - x1) / (ur_x - ll_x);
@@ -6426,14 +6227,13 @@ grow_tObject gsc_CreateBarArc(Graph* graph, double x1, double y1, double x2, dou
   return graph->current_cmd_object;
 }
 
-grow_tObject gsc_CreatePie(Graph* graph, double x1, double y1, double x2, double y2, 
-    int colortheme)
+grow_tObject gsc_CreatePie(Graph* graph, double x1, double y1, double x2, double y2, int colortheme)
 {
   grow_tNode n1;
   int scale_x, scale_y;
   double sx, sy;
   double ll_x, ll_y, ur_x, ur_y;
-    
+
   graph->create_pie(&n1, x1, y1, colortheme);
 
   if (x2 == 0 && y2 == 0)
@@ -6441,7 +6241,8 @@ grow_tObject gsc_CreatePie(Graph* graph, double x1, double y1, double x2, double
   else
     scale_x = scale_y = 1;
 
-  if (scale_x || scale_y) {
+  if (scale_x || scale_y)
+  {
     grow_MeasureNode(n1, &ll_x, &ll_y, &ur_x, &ur_y);
     if (scale_x)
       sx = (x2 - x1) / (ur_x - ll_x);
@@ -6461,35 +6262,24 @@ grow_tObject gsc_CreatePie(Graph* graph, double x1, double y1, double x2, double
   return graph->current_cmd_object;
 }
 
-int gsc_SetObjectAttribute(Graph* graph, grow_tObject id, const char* aname, void* buff, 
-    int btype)
+int gsc_SetObjectAttribute(Graph* graph, grow_tObject id, const char* aname, void* buff, int btype)
 {
   int type;
-  
+
   type = grow_GetObjectType(id);
-  if (type == glow_eObjectType_GrowNode 
-      || type == glow_eObjectType_GrowSlider
-      || type == glow_eObjectType_GrowGroup
-      || type == glow_eObjectType_GrowLayer
-      || type == glow_eObjectType_GrowToolbar
-      || type == glow_eObjectType_GrowTable
-      || type == glow_eObjectType_GrowWindow
-      || type == glow_eObjectType_GrowFolder 
-      || type == glow_eObjectType_GrowBar
-      || type == glow_eObjectType_GrowBarArc
-      || type == glow_eObjectType_GrowXYCurve
-      || type == glow_eObjectType_GrowPie
-      || type == glow_eObjectType_GrowBarChart
-      || type == glow_eObjectType_GrowAxis
-      || type == glow_eObjectType_GrowAxisArc
-      || type == glow_eObjectType_GrowTrend 
-      || type == glow_eObjectType_GrowRect
-      || type == glow_eObjectType_GrowRectRounded
-      || type == glow_eObjectType_GrowArc
-      || type == glow_eObjectType_GrowLine
-      || type == glow_eObjectType_GrowPolyLine
-      || type == glow_eObjectType_GrowText
-      || type == glow_eObjectType_GrowImage) {
+  if (type == glow_eObjectType_GrowNode || type == glow_eObjectType_GrowSlider ||
+      type == glow_eObjectType_GrowGroup || type == glow_eObjectType_GrowLayer ||
+      type == glow_eObjectType_GrowToolbar || type == glow_eObjectType_GrowTable ||
+      type == glow_eObjectType_GrowWindow || type == glow_eObjectType_GrowFolder ||
+      type == glow_eObjectType_GrowBar || type == glow_eObjectType_GrowBarArc ||
+      type == glow_eObjectType_GrowXYCurve || type == glow_eObjectType_GrowPie ||
+      type == glow_eObjectType_GrowBarChart || type == glow_eObjectType_GrowAxis ||
+      type == glow_eObjectType_GrowAxisArc || type == glow_eObjectType_GrowTrend ||
+      type == glow_eObjectType_GrowRect || type == glow_eObjectType_GrowRectRounded ||
+      type == glow_eObjectType_GrowArc || type == glow_eObjectType_GrowLine ||
+      type == glow_eObjectType_GrowPolyLine || type == glow_eObjectType_GrowText ||
+      type == glow_eObjectType_GrowImage)
+  {
     attr_sItem* itemlist;
     attr_sItem* item_p;
     int item_cnt;
@@ -6507,20 +6297,24 @@ int gsc_SetObjectAttribute(Graph* graph, grow_tObject id, const char* aname, voi
 
     found = 0;
     item_p = itemlist;
-    for (i = 0; i < item_cnt; i++) {
+    for (i = 0; i < item_cnt; i++)
+    {
       strcpy(attr_name, item_p->name);
-      if (item_p->type == ge_eAttrType_Dyn) {
-	if (str_NoCaseStrncmp(aname, attr_name, strlen(attr_name)) == 0 &&
-	    aname[strlen(attr_name)] == '.') {
-	  found = 1;
-	  break;
-	}
+      if (item_p->type == ge_eAttrType_Dyn)
+      {
+        if (str_NoCaseStrncmp(aname, attr_name, strlen(attr_name)) == 0 && aname[strlen(attr_name)] == '.')
+        {
+          found = 1;
+          break;
+        }
       }
-      else {
-	if (str_NoCaseStrcmp(aname, attr_name) == 0) {
-	  found = 1;
-	  break;
-	}
+      else
+      {
+        if (str_NoCaseStrcmp(aname, attr_name) == 0)
+        {
+          found = 1;
+          break;
+        }
       }
       item_p++;
     }
@@ -6528,25 +6322,27 @@ int gsc_SetObjectAttribute(Graph* graph, grow_tObject id, const char* aname, voi
     if (!found)
       return GE__NOATTR;
 
-    switch (item_p->type) {
+    switch (item_p->type)
+    {
     case glow_eType_Int:
     case glow_eType_TraceColor:
     case glow_eType_Boolean:
-      i_value = *(int *)buff;
+      i_value = *(int*)buff;
       memcpy(item_p->value, (char*)&i_value, sizeof(i_value));
       break;
     case glow_eType_Float:
-      f_value = *(float *)buff;
+      f_value = *(float*)buff;
       memcpy(item_p->value, (char*)&f_value, sizeof(f_value));
       break;
     case glow_eType_Double:
-      d_value = *(double *)buff;
+      d_value = *(double*)buff;
       memcpy(item_p->value, (char*)&d_value, sizeof(d_value));
       break;
-    case glow_eType_String: {
+    case glow_eType_String:
+    {
       char str[K_STRING_SIZE];
 
-      trim_script(str, (char *)buff);
+      trim_script(str, (char*)buff);
       strncpy((char*)item_p->value, str, item_p->size);
       break;
     }
@@ -6562,7 +6358,7 @@ int gsc_SetObjectAttribute(Graph* graph, grow_tObject id, const char* aname, voi
     case glow_eType_MB3Action:
     case glow_eType_InputFocusMark:
     case glow_eType_Relief:
-    //case glow_eType_TextSize:
+    // case glow_eType_TextSize:
     case glow_eType_Gradient:
     case glow_eType_HotIndication:
     case glow_eType_AppMotion:
@@ -6573,27 +6369,32 @@ int gsc_SetObjectAttribute(Graph* graph, grow_tObject id, const char* aname, voi
     case ge_eAttrType_OptionMenuType:
     case ge_eAttrType_MethodsMenuType:
     case ge_eAttrType_MethodToolbarType:
-    case ge_eAttrType_KeyboardType: {
+    case ge_eAttrType_KeyboardType:
+    {
       int value;
 
-      if (btype == CCM_DECL_INT) {
-        value = *(int *)buff;
-      } else {
-       sts = AttrNav::string_to_enum(item_p->type, (char *)buff, &value);
-       if (EVEN(sts))
-	 return GE__SYNTAX;
+      if (btype == CCM_DECL_INT)
+      {
+        value = *(int*)buff;
+      }
+      else
+      {
+        sts = AttrNav::string_to_enum(item_p->type, (char*)buff, &value);
+        if (EVEN(sts))
+          return GE__SYNTAX;
       }
       memcpy(item_p->value, (char*)&value, sizeof(value));
       break;
     }
-    case glow_eType_TextSize: {
+    case glow_eType_TextSize:
+    {
       int value;
       char str[40];
 
       if (btype == CCM_DECL_INT)
-        sprintf(str, "%d", *(int *)buff);
+        sprintf(str, "%d", *(int*)buff);
       else
-	sprintf(str, "%d", *(int *)buff);
+        sprintf(str, "%d", *(int*)buff);
 
       sts = AttrNav::string_to_enum(item_p->type, str, &value);
       if (EVEN(sts))
@@ -6608,133 +6409,152 @@ int gsc_SetObjectAttribute(Graph* graph, grow_tObject id, const char* aname, voi
     case ge_eAttrType_ActionType1:
     case ge_eAttrType_ActionType2:
     case ge_eAttrType_InstanceMask:
-    case ge_eAttrType_InputFocus: {
+    case ge_eAttrType_InputFocus:
+    {
       unsigned int value;
 
       if (btype == CCM_DECL_INT)
-	value = *(int *)buff;
-      else {
-        sts = AttrNav::string_to_mask(item_p->type, (char *)buff, &value);
+        value = *(int*)buff;
+      else
+      {
+        sts = AttrNav::string_to_mask(item_p->type, (char*)buff, &value);
         if (EVEN(sts))
           return GE__SYNTAX;
       }
       memcpy(item_p->value, (char*)&value, sizeof(value));
-      if (item_p->type == ge_eAttrType_DynType1
-          || item_p->type == ge_eAttrType_DynType2
-          || item_p->type == ge_eAttrType_ActionType1
-          || item_p->type == ge_eAttrType_ActionType2) {
+      if (item_p->type == ge_eAttrType_DynType1 || item_p->type == ge_eAttrType_DynType2 ||
+          item_p->type == ge_eAttrType_ActionType1 || item_p->type == ge_eAttrType_ActionType2)
+      {
         grow_GetUserData(id, (void**)&dyn);
-	dyn->update_dyntype(id);
+        dyn->update_dyntype(id);
         dyn->update_elements();
       }
       break;
     }
-    case ge_eAttrType_Dyn: {
+    case ge_eAttrType_Dyn:
+    {
       attr_sItem dyn_itemlist[100];
-      attr_sItem *dyn_item_p;
+      attr_sItem* dyn_item_p;
       int dyn_itemlist_cnt = 0;
       int j;
-      char *dyn_attr_name;
+      char* dyn_attr_name;
       int dyn_found;
 
-      dyn = (GeDyn *)item_p->value;
-      if (!dyn) {
-	dyn = new GeDyn(graph);
-	item_p->value = &dyn;
+      dyn = (GeDyn*)item_p->value;
+      if (!dyn)
+      {
+        dyn = new GeDyn(graph);
+        item_p->value = &dyn;
       }
       dyn->get_attributes(0, dyn_itemlist, &dyn_itemlist_cnt);
       dyn_found = 0;
-      dyn_attr_name = (char *)&aname[strlen(attr_name)+1];
+      dyn_attr_name = (char*)&aname[strlen(attr_name) + 1];
       dyn_item_p = dyn_itemlist;
-      for (j = 0; j < dyn_itemlist_cnt; j++) {
-	if (str_NoCaseStrcmp(dyn_attr_name, dyn_item_p->name) == 0) {
-	  dyn_found = 1;
-	  break;
-	}
-	dyn_item_p++;
+      for (j = 0; j < dyn_itemlist_cnt; j++)
+      {
+        if (str_NoCaseStrcmp(dyn_attr_name, dyn_item_p->name) == 0)
+        {
+          dyn_found = 1;
+          break;
+        }
+        dyn_item_p++;
       }
-      if (dyn_found) {
-	if (btype == CCM_DECL_INT) {
-	  int value;
-	  value = *(int *)buff;
-	  memcpy(dyn_item_p->value, (char*)&value, sizeof(value));
-	  if (dyn_item_p->type == ge_eAttrType_DynType1
-	      || dyn_item_p->type == ge_eAttrType_DynType2
-	      || dyn_item_p->type == ge_eAttrType_ActionType1
-	      || dyn_item_p->type == ge_eAttrType_ActionType2)
-	    dyn->update_elements();
-	}
-	else if (btype == CCM_DECL_FLOAT) {
-	  float fvalue = *(float *)buff;
-	  memcpy(dyn_item_p->value, (char*)&fvalue, sizeof(fvalue));
-	}
-	else if (btype == CCM_DECL_STRING) {
-	  char str[K_STRING_SIZE];
+      if (dyn_found)
+      {
+        if (btype == CCM_DECL_INT)
+        {
+          int value;
+          value = *(int*)buff;
+          memcpy(dyn_item_p->value, (char*)&value, sizeof(value));
+          if (dyn_item_p->type == ge_eAttrType_DynType1 || dyn_item_p->type == ge_eAttrType_DynType2 ||
+              dyn_item_p->type == ge_eAttrType_ActionType1 || dyn_item_p->type == ge_eAttrType_ActionType2)
+            dyn->update_elements();
+        }
+        else if (btype == CCM_DECL_FLOAT)
+        {
+          float fvalue = *(float*)buff;
+          memcpy(dyn_item_p->value, (char*)&fvalue, sizeof(fvalue));
+        }
+        else if (btype == CCM_DECL_STRING)
+        {
+          char str[K_STRING_SIZE];
 
-	  trim_script(str, (char *)buff);
-	  strncpy((char *)dyn_item_p->value, str, dyn_item_p->size);
-	}
+          trim_script(str, (char*)buff);
+          strncpy((char*)dyn_item_p->value, str, dyn_item_p->size);
+        }
       }
-      else {
-	dyn_item_p = dyn_itemlist;
-	for (j = 0; j < dyn_itemlist_cnt; j++) {
-	  if (str_NoCaseStrncmp(dyn_attr_name, dyn_item_p->name, strlen(dyn_item_p->name)) == 0 &&
-	    dyn_attr_name[strlen(dyn_item_p->name)] == '.') {
-	    dyn_found = 1;
-	    break;
-	  }
-	  dyn_item_p++;
-	}
+      else
+      {
+        dyn_item_p = dyn_itemlist;
+        for (j = 0; j < dyn_itemlist_cnt; j++)
+        {
+          if (str_NoCaseStrncmp(dyn_attr_name, dyn_item_p->name, strlen(dyn_item_p->name)) == 0 &&
+              dyn_attr_name[strlen(dyn_item_p->name)] == '.')
+          {
+            dyn_found = 1;
+            break;
+          }
+          dyn_item_p++;
+        }
 
-	if (dyn_found) {
-	  if (dyn_item_p->type == ge_eAttrType_Dyn) {
-	    attr_sItem dyn2_itemlist[100];
-	    attr_sItem *dyn2_item_p;
-	    int dyn2_itemlist_cnt = 0;
-	    int j;
-	    char *dyn2_attr_name;
-	    int dyn2_found;
-	    
-	    dyn = (GeDyn *)dyn_item_p->value;
-	    if (!dyn) {
-	      dyn = new GeDyn(graph);
-	      dyn_item_p->value = &dyn;
-	    }
-	    dyn->get_attributes(0, dyn2_itemlist, &dyn2_itemlist_cnt);
-	    dyn2_found = 0;
-	    dyn2_attr_name = &dyn_attr_name[strlen(dyn_item_p->name)+1];
-	    dyn2_item_p = dyn2_itemlist;
-	    for (j = 0; j < dyn2_itemlist_cnt; j++) {
-	      if (str_NoCaseStrcmp(dyn2_attr_name, dyn2_item_p->name) == 0) {
-		dyn2_found = 1;
-		break;
-	      }
-	      dyn2_item_p++;
-	    }
-	    if (dyn2_found) {
-	      if (btype == CCM_DECL_INT) {
-		int value;
-		value = *(int *)buff;
-		memcpy(dyn2_item_p->value, (char*)&value, sizeof(value));
-		if (dyn2_item_p->type == ge_eAttrType_DynType1
-		    || dyn2_item_p->type == ge_eAttrType_DynType2
-		    || dyn2_item_p->type == ge_eAttrType_ActionType1
-		    || dyn2_item_p->type == ge_eAttrType_ActionType2)
-		  dyn->update_elements();
-	      }
-	      else if (btype == CCM_DECL_FLOAT) {
-		float fvalue = *(float *)buff;
-		memcpy(dyn2_item_p->value, (char*)&fvalue, sizeof(fvalue));
-	      }
-	      else if (btype == CCM_DECL_STRING) {
-		char str[K_STRING_SIZE];
-		
-		trim_script(str, (char *)buff);
-		strncpy((char *)dyn2_item_p->value, str, dyn2_item_p->size);
-	      }
-	    }
-	  }
-	}
+        if (dyn_found)
+        {
+          if (dyn_item_p->type == ge_eAttrType_Dyn)
+          {
+            attr_sItem dyn2_itemlist[100];
+            attr_sItem* dyn2_item_p;
+            int dyn2_itemlist_cnt = 0;
+            int j;
+            char* dyn2_attr_name;
+            int dyn2_found;
+
+            dyn = (GeDyn*)dyn_item_p->value;
+            if (!dyn)
+            {
+              dyn = new GeDyn(graph);
+              dyn_item_p->value = &dyn;
+            }
+            dyn->get_attributes(0, dyn2_itemlist, &dyn2_itemlist_cnt);
+            dyn2_found = 0;
+            dyn2_attr_name = &dyn_attr_name[strlen(dyn_item_p->name) + 1];
+            dyn2_item_p = dyn2_itemlist;
+            for (j = 0; j < dyn2_itemlist_cnt; j++)
+            {
+              if (str_NoCaseStrcmp(dyn2_attr_name, dyn2_item_p->name) == 0)
+              {
+                dyn2_found = 1;
+                break;
+              }
+              dyn2_item_p++;
+            }
+            if (dyn2_found)
+            {
+              if (btype == CCM_DECL_INT)
+              {
+                int value;
+                value = *(int*)buff;
+                memcpy(dyn2_item_p->value, (char*)&value, sizeof(value));
+                if (dyn2_item_p->type == ge_eAttrType_DynType1 ||
+                    dyn2_item_p->type == ge_eAttrType_DynType2 ||
+                    dyn2_item_p->type == ge_eAttrType_ActionType1 ||
+                    dyn2_item_p->type == ge_eAttrType_ActionType2)
+                  dyn->update_elements();
+              }
+              else if (btype == CCM_DECL_FLOAT)
+              {
+                float fvalue = *(float*)buff;
+                memcpy(dyn2_item_p->value, (char*)&fvalue, sizeof(fvalue));
+              }
+              else if (btype == CCM_DECL_STRING)
+              {
+                char str[K_STRING_SIZE];
+
+                trim_script(str, (char*)buff);
+                strncpy((char*)dyn2_item_p->value, str, dyn2_item_p->size);
+              }
+            }
+          }
+        }
       }
     }
     default:;
@@ -6745,36 +6565,24 @@ int gsc_SetObjectAttribute(Graph* graph, grow_tObject id, const char* aname, voi
   return 1;
 }
 
-int gsc_GetObjectAttribute(Graph* graph, grow_tObject id, const char* aname, void* buff, 
-    int bsize, int btype)
+int gsc_GetObjectAttribute(Graph* graph, grow_tObject id, const char* aname, void* buff, int bsize, int btype)
 {
   int type;
 
   type = grow_GetObjectType(id);
-  if (type == glow_eObjectType_GrowNode 
-      || type == glow_eObjectType_GrowSlider
-      || type == glow_eObjectType_GrowGroup
-      || type == glow_eObjectType_GrowLayer
-      || type == glow_eObjectType_GrowToolbar
-      || type == glow_eObjectType_GrowTable
-      || type == glow_eObjectType_GrowWindow
-      || type == glow_eObjectType_GrowFolder 
-      || type == glow_eObjectType_GrowBar
-      || type == glow_eObjectType_GrowBarArc
-      || type == glow_eObjectType_GrowXYCurve
-      || type == glow_eObjectType_GrowPie
-      || type == glow_eObjectType_GrowBarChart
-      || type == glow_eObjectType_GrowAxis
-      || type == glow_eObjectType_GrowAxisArc
-      || type == glow_eObjectType_GrowTrend 
-      || type == glow_eObjectType_GrowRect
-      || type == glow_eObjectType_GrowRectRounded
-      || type == glow_eObjectType_GrowArc
-      || type == glow_eObjectType_GrowLine
-      || type == glow_eObjectType_GrowPolyLine
-      || type == glow_eObjectType_GrowText
-      || type == glow_eObjectType_GrowImage
-      || type == glow_eObjectType_GrowDashCell) {
+  if (type == glow_eObjectType_GrowNode || type == glow_eObjectType_GrowSlider ||
+      type == glow_eObjectType_GrowGroup || type == glow_eObjectType_GrowLayer ||
+      type == glow_eObjectType_GrowToolbar || type == glow_eObjectType_GrowTable ||
+      type == glow_eObjectType_GrowWindow || type == glow_eObjectType_GrowFolder ||
+      type == glow_eObjectType_GrowBar || type == glow_eObjectType_GrowBarArc ||
+      type == glow_eObjectType_GrowXYCurve || type == glow_eObjectType_GrowPie ||
+      type == glow_eObjectType_GrowBarChart || type == glow_eObjectType_GrowAxis ||
+      type == glow_eObjectType_GrowAxisArc || type == glow_eObjectType_GrowTrend ||
+      type == glow_eObjectType_GrowRect || type == glow_eObjectType_GrowRectRounded ||
+      type == glow_eObjectType_GrowArc || type == glow_eObjectType_GrowLine ||
+      type == glow_eObjectType_GrowPolyLine || type == glow_eObjectType_GrowText ||
+      type == glow_eObjectType_GrowImage || type == glow_eObjectType_GrowDashCell)
+  {
     attr_sItem* itemlist;
     attr_sItem* item_p;
     int item_cnt;
@@ -6792,19 +6600,24 @@ int gsc_GetObjectAttribute(Graph* graph, grow_tObject id, const char* aname, voi
 
     found = 0;
     item_p = itemlist;
-    for (i = 0; i < item_cnt; i++) {
+    for (i = 0; i < item_cnt; i++)
+    {
       strcpy(attr_name, item_p->name);
-      if (item_p->type == ge_eAttrType_Dyn) {
-	if (str_NoCaseStrncmp(aname, attr_name, strlen(attr_name)) == 0) {
-	  found = 1;
-	  break;
-	}
+      if (item_p->type == ge_eAttrType_Dyn)
+      {
+        if (str_NoCaseStrncmp(aname, attr_name, strlen(attr_name)) == 0)
+        {
+          found = 1;
+          break;
+        }
       }
-      else {
-	if (str_NoCaseStrcmp(aname, attr_name) == 0) {
-	  found = 1;
-	  break;
-	}
+      else
+      {
+        if (str_NoCaseStrcmp(aname, attr_name) == 0)
+        {
+          found = 1;
+          break;
+        }
       }
       item_p++;
     }
@@ -6812,30 +6625,35 @@ int gsc_GetObjectAttribute(Graph* graph, grow_tObject id, const char* aname, voi
     if (!found)
       return GE__NOATTR;
 
-    switch (item_p->type) {
+    switch (item_p->type)
+    {
     case glow_eType_Int:
     case glow_eType_TraceColor:
     case glow_eType_Boolean:
       if (btype != CCM_DECL_INT)
         return CCM__ARGMISM;
 
-      if (item_p->size == 4) {
-	if (bsize == 4)
-	  memcpy(buff, item_p->value, bsize);
-	else if (bsize == 8) {
-	  memcpy(&i32_value, item_p->value, sizeof(i32_value));
-	  i64_value = i32_value;
-	  memcpy(buff, &i64_value, bsize);
-	}
+      if (item_p->size == 4)
+      {
+        if (bsize == 4)
+          memcpy(buff, item_p->value, bsize);
+        else if (bsize == 8)
+        {
+          memcpy(&i32_value, item_p->value, sizeof(i32_value));
+          i64_value = i32_value;
+          memcpy(buff, &i64_value, bsize);
+        }
       }
-      else {
-	if (bsize == 8)
-	  memcpy(buff, item_p->value, bsize);
-	else if (bsize == 4) {
-	  memcpy(&i64_value, item_p->value, sizeof(i64_value));
-	  i32_value = i64_value;
-	  memcpy(buff, &i32_value, bsize);
-	}
+      else
+      {
+        if (bsize == 8)
+          memcpy(buff, item_p->value, bsize);
+        else if (bsize == 4)
+        {
+          memcpy(&i64_value, item_p->value, sizeof(i64_value));
+          i32_value = i64_value;
+          memcpy(buff, &i32_value, bsize);
+        }
       }
       break;
     case glow_eType_Float:
@@ -6843,11 +6661,12 @@ int gsc_GetObjectAttribute(Graph* graph, grow_tObject id, const char* aname, voi
         return CCM__ARGMISM;
 
       if (bsize == 4)
-	memcpy(buff, item_p->value, bsize);
-      else if (bsize == 8) {
-	memcpy(&f_value, item_p->value, sizeof(f_value));
-	d_value = f_value;
-	memcpy(buff, &d_value, bsize);
+        memcpy(buff, item_p->value, bsize);
+      else if (bsize == 8)
+      {
+        memcpy(&f_value, item_p->value, sizeof(f_value));
+        d_value = f_value;
+        memcpy(buff, &d_value, bsize);
       }
       break;
     case glow_eType_Double:
@@ -6855,18 +6674,18 @@ int gsc_GetObjectAttribute(Graph* graph, grow_tObject id, const char* aname, voi
         return CCM__ARGMISM;
 
       if (bsize == 8)
-	memcpy(buff, item_p->value, bsize);
-      else if (bsize == 4) {
-	memcpy(&d_value, item_p->value, sizeof(d_value));
-	f_value = d_value;
-	memcpy(buff, &f_value, bsize);
+        memcpy(buff, item_p->value, bsize);
+      else if (bsize == 4)
+      {
+        memcpy(&d_value, item_p->value, sizeof(d_value));
+        f_value = d_value;
+        memcpy(buff, &f_value, bsize);
       }
       break;
     case glow_eType_String:
       if (btype != CCM_DECL_STRING)
         return CCM__ARGMISM;
-      strncpy((char *)buff, (char*)item_p->value,
-          MIN(item_p->size, bsize));
+      strncpy((char*)buff, (char*)item_p->value, MIN(item_p->size, bsize));
       break;
     case glow_eType_Direction:
     case glow_eType_HorizDirection:
@@ -6891,30 +6710,33 @@ int gsc_GetObjectAttribute(Graph* graph, grow_tObject id, const char* aname, voi
     case ge_eAttrType_OptionMenuType:
     case ge_eAttrType_MethodsMenuType:
     case ge_eAttrType_MethodToolbarType:
-    case ge_eAttrType_KeyboardType: {
+    case ge_eAttrType_KeyboardType:
+    {
       int value;
 
-      if (!(btype == CCM_DECL_INT
-              || btype == CCM_DECL_STRING))
+      if (!(btype == CCM_DECL_INT || btype == CCM_DECL_STRING))
         return CCM__ARGMISM;
 
       memcpy((char*)&value, item_p->value, sizeof(value));
 
-      if (btype == CCM_DECL_INT) {
-	memcpy(buff, &value, bsize);
-      } else {
-        sts = AttrNav::enum_to_string(item_p->type, value, (char *)buff, bsize);
+      if (btype == CCM_DECL_INT)
+      {
+        memcpy(buff, &value, bsize);
+      }
+      else
+      {
+        sts = AttrNav::enum_to_string(item_p->type, value, (char*)buff, bsize);
         if (EVEN(sts))
           return GE__SYNTAX;
       }
       break;
     }
-    case glow_eType_TextSize: {
+    case glow_eType_TextSize:
+    {
       int value;
       char str[40];
 
-      if (!(btype == CCM_DECL_INT
-              || btype == CCM_DECL_STRING))
+      if (!(btype == CCM_DECL_INT || btype == CCM_DECL_STRING))
         return CCM__ARGMISM;
 
       memcpy((char*)&value, item_p->value, sizeof(value));
@@ -6925,7 +6747,7 @@ int gsc_GetObjectAttribute(Graph* graph, grow_tObject id, const char* aname, voi
       if (btype == CCM_DECL_INT)
         sscanf(str, "%d", (int*)buff);
       else
-        strncpy((char *)buff, str, bsize);
+        strncpy((char*)buff, str, bsize);
       break;
     }
     case glow_eType_Access:
@@ -6934,99 +6756,111 @@ int gsc_GetObjectAttribute(Graph* graph, grow_tObject id, const char* aname, voi
     case ge_eAttrType_ActionType1:
     case ge_eAttrType_ActionType2:
     case ge_eAttrType_InstanceMask:
-    case ge_eAttrType_InputFocus: {
+    case ge_eAttrType_InputFocus:
+    {
       if (btype != CCM_DECL_INT)
         return CCM__ARGMISM;
 
       memcpy((char*)buff, item_p->value, bsize);
       break;
     }
-    case ge_eAttrType_Dyn: {
+    case ge_eAttrType_Dyn:
+    {
       attr_sItem dyn_itemlist[100];
-      attr_sItem *dyn_item_p;
+      attr_sItem* dyn_item_p;
       int dyn_itemlist_cnt = 0;
       int j;
-      char *dyn_attr_name;
+      char* dyn_attr_name;
       int dyn_found;
-      GeDyn *dyn;
+      GeDyn* dyn;
 
-      dyn = (GeDyn *)item_p->value;
-      if (!dyn) {
-	dyn = new GeDyn(graph);
-	item_p->value = &dyn;
+      dyn = (GeDyn*)item_p->value;
+      if (!dyn)
+      {
+        dyn = new GeDyn(graph);
+        item_p->value = &dyn;
       }
       dyn->get_attributes(0, dyn_itemlist, &dyn_itemlist_cnt);
       dyn_found = 0;
-      dyn_attr_name = (char *)&aname[strlen(attr_name)+1];
+      dyn_attr_name = (char*)&aname[strlen(attr_name) + 1];
       dyn_item_p = dyn_itemlist;
-      for (j = 0; j < dyn_itemlist_cnt; j++) {
-	if (str_NoCaseStrcmp(dyn_attr_name, dyn_item_p->name) == 0) {
-	  dyn_found = 1;
-	  break;
-	}
-	dyn_item_p++;
+      for (j = 0; j < dyn_itemlist_cnt; j++)
+      {
+        if (str_NoCaseStrcmp(dyn_attr_name, dyn_item_p->name) == 0)
+        {
+          dyn_found = 1;
+          break;
+        }
+        dyn_item_p++;
       }
-      if (dyn_found) {
-	switch (dyn_item_p->type) {
-	case glow_eType_Int:
-	case glow_eType_TraceColor:
-	case glow_eType_Boolean:
-	case glow_eType_DynType1:
-	case glow_eType_DynType2:
-	case glow_eType_ActionType1:
-	case glow_eType_ActionType2:
-	  if (btype != CCM_DECL_INT)
-	    return CCM__ARGMISM;
+      if (dyn_found)
+      {
+        switch (dyn_item_p->type)
+        {
+        case glow_eType_Int:
+        case glow_eType_TraceColor:
+        case glow_eType_Boolean:
+        case glow_eType_DynType1:
+        case glow_eType_DynType2:
+        case glow_eType_ActionType1:
+        case glow_eType_ActionType2:
+          if (btype != CCM_DECL_INT)
+            return CCM__ARGMISM;
 
-	  if (dyn_item_p->size == 4) {
-	    if (bsize == 4)
-	      memcpy(buff, dyn_item_p->value, bsize);
-	    else if (bsize == 8) {
-	      memcpy(&i32_value, dyn_item_p->value, sizeof(i32_value));
-	      i64_value = i32_value;
-	      memcpy(buff, &i64_value, bsize);
-	    }
-	  }
-	  else {
-	    if (bsize == 8)
-	      memcpy(buff, dyn_item_p->value, bsize);
-	    else if (bsize == 4) {
-	      memcpy(&i64_value, dyn_item_p->value, sizeof(i64_value));
-	      i32_value = i64_value;
-	      memcpy(buff, &i32_value, bsize);
-	    }
-	  }
-	  break;
-	case glow_eType_Float:
-	  if (btype != CCM_DECL_FLOAT)
-	    return CCM__ARGMISM;
-	  
-	  if (bsize == 4)
-	    memcpy(buff, dyn_item_p->value, bsize);
-	  else if (bsize == 8) {
-	    memcpy(&f_value, dyn_item_p->value, sizeof(f_value));
-	    d_value = f_value;
-	    memcpy(buff, &d_value, bsize);
-	  }
-	  break;
-	case glow_eType_Double:
-	  if (btype != CCM_DECL_FLOAT)
-	    return CCM__ARGMISM;
-	  
-	  if (bsize == 8)
-	    memcpy(buff, dyn_item_p->value, bsize);
-	  else if (bsize == 4) {
-	    memcpy(&d_value, dyn_item_p->value, sizeof(d_value));
-	    f_value = d_value;
-	    memcpy(buff, &f_value, bsize);
-	  }
-	  break;
-	case glow_eType_String:
-	  if (btype != CCM_DECL_STRING)
-	    return CCM__ARGMISM;
-	  strncpy((char *)buff, (char*)dyn_item_p->value,
-		  MIN(dyn_item_p->size, bsize));
-	}
+          if (dyn_item_p->size == 4)
+          {
+            if (bsize == 4)
+              memcpy(buff, dyn_item_p->value, bsize);
+            else if (bsize == 8)
+            {
+              memcpy(&i32_value, dyn_item_p->value, sizeof(i32_value));
+              i64_value = i32_value;
+              memcpy(buff, &i64_value, bsize);
+            }
+          }
+          else
+          {
+            if (bsize == 8)
+              memcpy(buff, dyn_item_p->value, bsize);
+            else if (bsize == 4)
+            {
+              memcpy(&i64_value, dyn_item_p->value, sizeof(i64_value));
+              i32_value = i64_value;
+              memcpy(buff, &i32_value, bsize);
+            }
+          }
+          break;
+        case glow_eType_Float:
+          if (btype != CCM_DECL_FLOAT)
+            return CCM__ARGMISM;
+
+          if (bsize == 4)
+            memcpy(buff, dyn_item_p->value, bsize);
+          else if (bsize == 8)
+          {
+            memcpy(&f_value, dyn_item_p->value, sizeof(f_value));
+            d_value = f_value;
+            memcpy(buff, &d_value, bsize);
+          }
+          break;
+        case glow_eType_Double:
+          if (btype != CCM_DECL_FLOAT)
+            return CCM__ARGMISM;
+
+          if (bsize == 8)
+            memcpy(buff, dyn_item_p->value, bsize);
+          else if (bsize == 4)
+          {
+            memcpy(&d_value, dyn_item_p->value, sizeof(d_value));
+            f_value = d_value;
+            memcpy(buff, &f_value, bsize);
+          }
+          break;
+        case glow_eType_String:
+          if (btype != CCM_DECL_STRING)
+            return CCM__ARGMISM;
+          strncpy((char*)buff, (char*)dyn_item_p->value, MIN(dyn_item_p->size, bsize));
+        }
       }
     }
     default:;
@@ -7036,9 +6870,7 @@ int gsc_GetObjectAttribute(Graph* graph, grow_tObject id, const char* aname, voi
   return 1;
 }
 
-
-grow_tObject gsc_CreateObject(Graph* graph, const char *nodeclass, double x1, double y1, 
-    double x2, double y2)
+grow_tObject gsc_CreateObject(Graph* graph, const char* nodeclass, double x1, double y1, double x2, double y2)
 {
   char name[80];
   grow_tNodeClass nc;
@@ -7054,7 +6886,8 @@ grow_tObject gsc_CreateObject(Graph* graph, const char *nodeclass, double x1, do
     scale_x = scale_y = 1;
 
   sts = grow_FindNodeClassByName(graph->grow->ctx, nodeclass, &nc);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     // Load the subgraph
     grow_OpenSubGraphFromName(graph->grow->ctx, nodeclass);
     sts = grow_FindNodeClassByName(graph->grow->ctx, nodeclass, &nc);
@@ -7074,7 +6907,8 @@ grow_tObject gsc_CreateObject(Graph* graph, const char *nodeclass, double x1, do
 
   grow_MoveNode(n1, x1, y1);
   grow_StoreTransform(n1);
-  if (scale_x || scale_y) {
+  if (scale_x || scale_y)
+  {
     grow_MeasureNode(n1, &ll_x, &ll_y, &ur_x, &ur_y);
     if (scale_x)
       sx = (x2 - x1) / (ur_x - ll_x);
@@ -7099,10 +6933,7 @@ void gsc_SetObjectGradient(Graph* graph, grow_tObject id, glow_eGradient gradien
   grow_SetObjectGradient(id, gradient);
 }
 
-void gsc_SetObjectShadow(Graph* graph, grow_tObject id, int shadow)
-{
-  grow_SetObjectShadow(id, shadow);
-}
+void gsc_SetObjectShadow(Graph* graph, grow_tObject id, int shadow) { grow_SetObjectShadow(id, shadow); }
 
 void gsc_SetObjectFillColor(Graph* graph, grow_tObject id, glow_eDrawType color)
 {
@@ -7119,50 +6950,36 @@ void gsc_SetObjectTextColor(Graph* graph, grow_tObject id, glow_eDrawType color)
   grow_SetObjectOriginalTextColor(id, color);
 }
 
-void gsc_SetObjectFill(Graph* graph, grow_tObject id, int fill)
-{
-  grow_SetObjectFill(id, fill);
-}
+void gsc_SetObjectFill(Graph* graph, grow_tObject id, int fill) { grow_SetObjectFill(id, fill); }
 
-void gsc_SetObjectBorder(Graph* graph, grow_tObject id, int border)
-{
-  grow_SetObjectBorder(id, border);
-}
+void gsc_SetObjectBorder(Graph* graph, grow_tObject id, int border) { grow_SetObjectBorder(id, border); }
 
-void gsc_SelectAdd(Graph* graph, grow_tObject id)
-{
-  grow_SelectInsert(graph->grow->ctx, id);
-}
+void gsc_SelectAdd(Graph* graph, grow_tObject id) { grow_SelectInsert(graph->grow->ctx, id); }
 
-void gsc_SelectClear(Graph* graph)
-{
-  grow_SelectClear(graph->grow->ctx);
-}
+void gsc_SelectClear(Graph* graph) { grow_SelectClear(graph->grow->ctx); }
 
-void gsc_SetSelectTextSize(Graph *graph, int size)
-{
-  grow_SetSelectTextSize(graph->grow->ctx, size);
-}
+void gsc_SetSelectTextSize(Graph* graph, int size) { grow_SetSelectTextSize(graph->grow->ctx, size); }
 
-void gsc_RotateSelected(Graph *graph, int angle, int rotation_point)
+void gsc_RotateSelected(Graph* graph, int angle, int rotation_point)
 {
   grow_RotateSelectedObjects(graph->grow->ctx, angle, (glow_eRotationPoint)rotation_point);
 }
 
-grow_tObject gsc_CreateAxis(Graph *graph, double x1, double y1, double x2, double y2,
-    int colortheme, int dynamic, glow_eDirection direction)
+grow_tObject gsc_CreateAxis(Graph* graph, double x1, double y1, double x2, double y2, int colortheme,
+                            int dynamic, glow_eDirection direction)
 {
   grow_tNode n1;
   int scale_x, scale_y;
   double sx, sy;
   double ll_x, ll_y, ur_x, ur_y;
-    
+
   if (x2 == 0 && y2 == 0)
     scale_x = scale_y = 0;
   else
     scale_x = scale_y = 1;
 
-  switch (direction) {
+  switch (direction)
+  {
   case glow_eDirection_Left:
     graph->create_axis(&n1, x1, y1, dynamic, colortheme);
     break;
@@ -7195,7 +7012,8 @@ grow_tObject gsc_CreateAxis(Graph *graph, double x1, double y1, double x2, doubl
     break;
   }
 
-  if (scale_x || scale_y) {
+  if (scale_x || scale_y)
+  {
     grow_MeasureNode(n1, &ll_x, &ll_y, &ur_x, &ur_y);
     if (scale_x)
       sx = (x2 - x1) / (ur_x - ll_x);
@@ -7215,14 +7033,14 @@ grow_tObject gsc_CreateAxis(Graph *graph, double x1, double y1, double x2, doubl
   return graph->current_cmd_object;
 }
 
-grow_tObject gsc_CreateAxisArc(Graph *graph, double x1, double y1, double x2, double y2,
-    int colortheme, int dynamic)
+grow_tObject gsc_CreateAxisArc(Graph* graph, double x1, double y1, double x2, double y2, int colortheme,
+                               int dynamic)
 {
   grow_tNode n1;
   int scale_x, scale_y;
   double sx, sy;
   double ll_x, ll_y, ur_x, ur_y;
-    
+
   if (x2 == 0 && y2 == 0)
     scale_x = scale_y = 0;
   else
@@ -7230,7 +7048,8 @@ grow_tObject gsc_CreateAxisArc(Graph *graph, double x1, double y1, double x2, do
 
   graph->create_axisarc(&n1, x1, y1, dynamic, colortheme);
 
-  if (scale_x || scale_y) {
+  if (scale_x || scale_y)
+  {
     grow_MeasureNode(n1, &ll_x, &ll_y, &ur_x, &ur_y);
     if (scale_x)
       sx = (x2 - x1) / (ur_x - ll_x);
@@ -7250,14 +7069,13 @@ grow_tObject gsc_CreateAxisArc(Graph *graph, double x1, double y1, double x2, do
   return graph->current_cmd_object;
 }
 
-grow_tObject gsc_CreateTrend(Graph *graph, double x1, double y1, double x2, double y2,
-    int colortheme)
+grow_tObject gsc_CreateTrend(Graph* graph, double x1, double y1, double x2, double y2, int colortheme)
 {
   grow_tNode n1;
   int scale_x, scale_y;
   double sx, sy;
   double ll_x, ll_y, ur_x, ur_y;
-    
+
   graph->create_trend(&n1, x1, y1, ge_mDynType1_Trend, 0, colortheme);
 
   if (x2 == 0 && y2 == 0)
@@ -7265,7 +7083,8 @@ grow_tObject gsc_CreateTrend(Graph *graph, double x1, double y1, double x2, doub
   else
     scale_x = scale_y = 1;
 
-  if (scale_x || scale_y) {
+  if (scale_x || scale_y)
+  {
     grow_MeasureNode(n1, &ll_x, &ll_y, &ur_x, &ur_y);
     if (scale_x)
       sx = (x2 - x1) / (ur_x - ll_x);
@@ -7285,7 +7104,7 @@ grow_tObject gsc_CreateTrend(Graph *graph, double x1, double y1, double x2, doub
   return graph->current_cmd_object;
 }
 
-grow_tObject gsc_CreatePolyLine(Graph *graph, double x1, double y1, double x2, double y2)
+grow_tObject gsc_CreatePolyLine(Graph* graph, double x1, double y1, double x2, double y2)
 {
   glow_sPoint points[2];
   int point_cnt;
@@ -7295,16 +7114,15 @@ grow_tObject gsc_CreatePolyLine(Graph *graph, double x1, double y1, double x2, d
   points[1].x = x2;
   points[1].y = y2;
   point_cnt = 2;
-  grow_CreateGrowPolyLine(graph->grow->ctx, "", (glow_sPoint*)&points,
-			  point_cnt, graph->get_border_drawtype(), graph->linewidth, 0,
-			  graph->fill, graph->border, graph->shadow, graph->get_fill_drawtype(),
-			  0, NULL, &graph->current_cmd_object);
+  grow_CreateGrowPolyLine(graph->grow->ctx, "", (glow_sPoint*)&points, point_cnt,
+                          graph->get_border_drawtype(), graph->linewidth, 0, graph->fill, graph->border,
+                          graph->shadow, graph->get_fill_drawtype(), 0, NULL, &graph->current_cmd_object);
   grow_SetModified(graph->grow->ctx, 1);
 
   return graph->current_cmd_object;
 }
 
-void gsc_PolyLineAdd(Graph *graph, grow_tObject oid, double x, double y)
+void gsc_PolyLineAdd(Graph* graph, grow_tObject oid, double x, double y)
 {
   glow_sPoint points[2];
   int point_cnt;
@@ -7316,37 +7134,31 @@ void gsc_PolyLineAdd(Graph *graph, grow_tObject oid, double x, double y)
   grow_SetModified(graph->grow->ctx, 1);
 }
 
-grow_tObject gsc_CreateArc(Graph *graph, double x1, double y1, double x2, double y2,
-    int angle1, int angle2)
+grow_tObject gsc_CreateArc(Graph* graph, double x1, double y1, double x2, double y2, int angle1, int angle2)
 {
-  grow_CreateGrowArc(graph->grow->ctx, "", x1, y1, x2, y2, angle1, angle2,
-		     graph->get_border_drawtype(), graph->linewidth, graph->fill,
-		     graph->border, graph->shadow, graph->get_fill_drawtype(), NULL,
-		     &graph->current_cmd_object);
+  grow_CreateGrowArc(graph->grow->ctx, "", x1, y1, x2, y2, angle1, angle2, graph->get_border_drawtype(),
+                     graph->linewidth, graph->fill, graph->border, graph->shadow, graph->get_fill_drawtype(),
+                     NULL, &graph->current_cmd_object);
   grow_SetModified(graph->grow->ctx, 1);
 
   return graph->current_cmd_object;
 }
 
-grow_tObject gsc_CreateRectangle(Graph *graph, double x1, double y1, double w, double h)
+grow_tObject gsc_CreateRectangle(Graph* graph, double x1, double y1, double w, double h)
 {
-  grow_CreateGrowRect(graph->grow->ctx, "", x1, y1, w, h,
-		      graph->get_border_drawtype(), graph->linewidth, 0, glow_mDisplayLevel_1,
-		      graph->fill,
-		      graph->border, graph->shadow, graph->get_fill_drawtype(), NULL,
-		      &graph->current_cmd_object);
+  grow_CreateGrowRect(graph->grow->ctx, "", x1, y1, w, h, graph->get_border_drawtype(), graph->linewidth, 0,
+                      glow_mDisplayLevel_1, graph->fill, graph->border, graph->shadow,
+                      graph->get_fill_drawtype(), NULL, &graph->current_cmd_object);
   grow_SetModified(graph->grow->ctx, 1);
 
   return graph->current_cmd_object;
 }
 
-grow_tObject gsc_CreateLine(Graph *graph, double x1, double y1, double x2, double y2)
+grow_tObject gsc_CreateLine(Graph* graph, double x1, double y1, double x2, double y2)
 {
-  grow_CreateGrowLine(graph->grow->ctx, "", x1, y1, x2, y2,
-		      graph->get_border_drawtype(), graph->linewidth, 0, NULL,
-		      &graph->current_cmd_object);
+  grow_CreateGrowLine(graph->grow->ctx, "", x1, y1, x2, y2, graph->get_border_drawtype(), graph->linewidth, 0,
+                      NULL, &graph->current_cmd_object);
   grow_SetModified(graph->grow->ctx, 1);
 
   return graph->current_cmd_object;
 }
-

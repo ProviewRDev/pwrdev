@@ -43,13 +43,13 @@ main()
 
   xm = x0 + 1;
   ym = y0 + 1;
-  id = CreateText("StoDig", xm, ym, 4, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("StoDig", xm, ym, 4, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # Button
   ym += 1.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Press to store", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Press to store", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   ym += 0.0;
   x1 = xm;

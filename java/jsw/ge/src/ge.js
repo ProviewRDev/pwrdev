@@ -15901,7 +15901,7 @@ function DynPulldownMenu( dyn) {
 	if ( (sts & 1) == 0) {
 	  text_size = 3;
 	  text_drawtype = Glow.eDrawType_TextHelvetica;
-	  text_font = Glow.eFont_LucidaSans;
+	  text_font = Glow.eFont_Helvetica;
 	  text_color = Glow.eDrawType_Line;
 	  bg_color = Glow.eDrawType_LightGray;
 	}
@@ -17891,7 +17891,7 @@ function DynMethodPulldownMenu( dyn) {
     if ( (sts & 1) == 0) {
       text_size = 3;
       text_drawtype = Glow.eDrawType_TextHelvetica;
-      text_font = Glow.eFont_LucidaSans;
+      text_font = Glow.eFont_Helvetica;
       text_color = Glow.eDrawType_Line;
       bg_color = Glow.eDrawType_LightGray;
     }

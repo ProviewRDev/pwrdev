@@ -600,7 +600,7 @@ reload_continue()
 {
   echo
   echo "----------------------------------------------------------------------------------------"
-  echo " $1"
+  echo -e "$1"
   echo "----------------------------------------------------------------------------------------"
   if [ $go -eq 1 ]; then
     return
@@ -677,9 +677,28 @@ reload_convert_pn_xml()
   reload_status=$reload__success
 }
 
+# Remove Lucida Sans font from all pwgs all pwg's and pwsg 
+# Reason is that this is a licensed font
+reload_remove_lucida_sans()
+{
+  reload_checkpass "remove_lucida_sans" $start_pass
+  if [ $pass_status -ne $pass__execute ]; then
+    reload_status=$reload__success
+    return
+  fi
+
+  reload_continue "Pass replace lucida sans from all graphs\nThis pass will replace all occurences of the Lucida Sans \
+font with Helvetica.\nReason being that the Lucida Sans is (and has been) a licensed font.\nYou should check and see \
+if the fonts look okay, but they should be close to one\nanother, perhaps the Helvetica font isn't as wide as Lucida Sans."
+   
+  find $pwrp_root -type f \( -name "*.pwg" -o -name "*.pwsg" \) -exec echo "-- Processing graph {}" \; -exec sed -i -E 's/^(2729|4223|3010|2245|1307) 4/\1 0/g' {} \;    
+  
+  reload_status=$reload__success
+}
+
 #passes="savedirectory classvolumes renamedb loaddb compile createload buildnodes createpackage"
-passes=(classvolumes updateclasses convert_volume_objects convert_pn_xml)
-passes_desc=("Create loadfiles for classvolumes" "Update classes" "Convert objects in volumes" "Convert profinet runtime xml files")
+passes=(savedirectory classvolumes renamedb loaddb updateclasses convert_volume_objects convert_pn_xml remove_lucida_sans)
+passes_desc=("Save directory volume" "Create loadfiles for classvolumes" "Rename old databases under $pwrp_db" "Create databases and load the dump files into them" "Update classes" "Convert objects in volumes" "Convert profinet runtime xml files" "Replace the licensed font Lucida Sans with Helvetica in all graphs")
 
 usage()
 {
@@ -707,7 +726,6 @@ if [ "$1" = "help" ] || [ "$1" = "-h" ]; then
   usage
   exit
 fi
-
 
 let reload_status=$reload__success
 let check_status=0

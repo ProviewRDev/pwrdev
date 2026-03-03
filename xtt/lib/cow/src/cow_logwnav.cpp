@@ -81,15 +81,15 @@ void CoLogWNavBrow::create_nodeclasses()
 
   brow_CreateNodeClass(ctx, "LogDefault", flow_eNodeGroup_Common, &nc_log);
   brow_AddAnnotPixmap(nc_log, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_log, 1.4, 0.6, 0, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_log, 1.4, 0.6, 0, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_log, 8, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_log, 8, 0.6, 1, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_log, 13, 0.6, 2, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_log, 13, 0.6, 2, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_log, 18, 0.6, 3, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_log, 18, 0.6, 3, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_log, 35, 0.6, 4, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_log, 35, 0.6, 4, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_log, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 }

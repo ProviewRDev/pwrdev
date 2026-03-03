@@ -54,6 +54,9 @@ extern "C"
 
 #define FSPACE " "
 
+#define FONT_NAME_HELVETICA "Helvetica"
+#define FONT_NAME_ROBOTO "Roboto"
+
   typedef char flow_tTraceObj[200];
   typedef char flow_tTraceAttr[200];
   typedef char flow_tName[80];
@@ -175,6 +178,10 @@ extern "C"
     flow_eDrawType_TextHelveticaBold,
     flow_eDrawType_TextHelveticaErase,
     flow_eDrawType_TextHelveticaEraseBold,
+    flow_eDrawType_TextRoboto,
+    flow_eDrawType_TextRobotoBold,
+    flow_eDrawType_TextRobotoErase,
+    flow_eDrawType_TextRobotoEraseBold,
     flow_eDrawType__,
     flow_eDrawType_Green,
     flow_eDrawType_Yellow,
@@ -201,6 +208,8 @@ extern "C"
   {
     draw_eFont_HelveticaBold,
     draw_eFont_Helvetica,
+    draw_eFont_RobotoBold,
+    draw_eFont_Roboto,
     draw_eFont__
   } draw_eFont;
 
