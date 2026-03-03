@@ -191,8 +191,11 @@ fi
 VER_MAJOR="${BASH_REMATCH[1]}"
 VER_MINOR="${BASH_REMATCH[2]}"
 VER_PATCH="${BASH_REMATCH[3]}"
-VER_SHORT="V${VER_MAJOR}${VER_MINOR}"  # e.g. V62 (for pwr_version.h)
-PKG_SHORT="${VER_MAJOR}${VER_MINOR}"    # e.g. 62  (for package names)
+VER_SHORT="V${VER_MAJOR}"    # e.g. V7 (for pwr_version.h / wbdb paths)
+PKG_SHORT="${VER_MAJOR}"      # e.g. 7  (for package names: pwr_7, pwrdemo_7)
+
+# Known versioned package base names (longest first to avoid partial matches)
+PKG_BASES="pwrrpi64 pwrdemo pwrrpi pwr"
 
 # Read current version from pwr_version.h
 CUR_VERSION=$(grep 'pwrv_cPwrVersionStr' "$VERSION_H" | head -1 | sed 's/.*"\(V[^"]*\)".*/\1/')
@@ -200,18 +203,22 @@ if [ -z "$CUR_VERSION" ]; then
   error "Could not read current version from $VERSION_H"
 fi
 
-# Extract old major.minor for upgrade.sh and packaging
+# Read OLD_SHORT from the actual pwr_version.h short string (handles
+# both legacy "V61" format and new "V7" major-only format).
+OLD_SHORT_RAW=$(grep 'pwrv_cWbdbVersionShortStr' "$VERSION_H" | head -1 | sed 's/.*"\(V[^"]*\)".*/\1/')
+OLD_SHORT="${OLD_SHORT_RAW#V}"  # strip V prefix -> e.g. "61" or "7"
+
+# Extract old major.minor for upgrade.sh
 if [[ "$CUR_VERSION" =~ ^V([0-9]+)\.([0-9]+) ]]; then
   OLD_MAJMIN="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}"
-  OLD_SHORT="${BASH_REMATCH[1]}${BASH_REMATCH[2]}"  # e.g. 61
 else
   error "Cannot parse current version: $CUR_VERSION"
 fi
 NEW_MAJMIN="${VER_MAJOR}.${VER_MINOR}"
 
-MAJMIN_CHANGED=0
+PKG_CHANGED=0
 if [ "$OLD_SHORT" != "$PKG_SHORT" ]; then
-  MAJMIN_CHANGED=1
+  PKG_CHANGED=1
 fi
 
 # Upstream version for packaging (no V prefix, no deb revision)
@@ -233,8 +240,8 @@ echo "  Repository root : $ROOT"
 echo "  Current version : $CUR_VERSION"
 echo "  New version     : $NEW_VERSION"
 echo "  Pkg short       : $OLD_SHORT -> $PKG_SHORT"
-if [ "$MAJMIN_CHANGED" -eq 1 ]; then
-  echo "  Major.minor     : CHANGED (package names will be updated)"
+if [ "$PKG_CHANGED" -eq 1 ]; then
+  echo "  Major version   : CHANGED (package names will be updated)"
 fi
 echo "  Copyright year  : $YEAR"
 echo "  Release date    : $RELEASE_DATE"
@@ -357,50 +364,56 @@ while IFS= read -r ctrl; do
     "s|^ [0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*-[0-9][0-9]* | ${DEB_VER} |" \
     "$ctrl"
 
-  if [ "$MAJMIN_CHANGED" -eq 1 ]; then
-    # 3) Update Package: name if it contains the old short version
-    if [[ "$orig_pkg" == *"$OLD_SHORT"* ]]; then
-      new_pkg="${orig_pkg/$OLD_SHORT/$PKG_SHORT}"
+  if [ "$PKG_CHANGED" -eq 1 ]; then
+    # 3) Update Package: name — strip old version suffix, add _<new>
+    #    Handles both legacy (pwr61) and new (pwr_7) format
+    if [[ "$orig_pkg" == *"$OLD_SHORT" ]]; then
+      base_pkg="${orig_pkg%"$OLD_SHORT"}"   # strip version: pwr61->pwr, pwr_7->pwr_
+      base_pkg="${base_pkg%_}"              # strip trailing underscore if present
+      new_pkg="${base_pkg}_${PKG_SHORT}"    # pwr_7, pwrdemo_7, pwrrpi64_7
       do_sed "$relpath: Package $orig_pkg -> $new_pkg" \
         "s|^Package: ${orig_pkg}$|Package: ${new_pkg}|" \
         "$ctrl"
     fi
 
-    # 4) Update Depends: references to ProviewR packages
-    #    e.g. "pwr61 (>= 6.1.3-1)" -> "pwr70 (>= 7.0.0-1)"
-    if grep -q "${OLD_SHORT}" "$ctrl" 2>/dev/null; then
-      # Replace package name references (pwr61, pwrdemo61, pwrrpi61, etc.)
-      do_sed "$relpath: Depends pkg refs $OLD_SHORT -> $PKG_SHORT" \
-        "s|\(pwr[a-z0-9]*\)${OLD_SHORT}|\1${PKG_SHORT}|g" \
-        "$ctrl"
-    fi
+    # 4) Update all pwr* package name references in Depends/Replaces
+    #    Uses explicit base name list to avoid regex ambiguity (e.g. pwrrpi6461)
+    for base in $PKG_BASES; do
+      old_legacy="${base}${OLD_SHORT}"       # legacy format: pwr61, pwrrpi6461
+      old_uscore="${base}_${OLD_SHORT}"      # underscore format: pwr_7, pwrrpi64_7
+      new_name="${base}_${PKG_SHORT}"        # target: pwr_8, pwrrpi64_8
+
+      if grep -q "${old_uscore}\|${old_legacy}" "$ctrl" 2>/dev/null; then
+        # Replace underscore format first (more specific), then legacy
+        do_sed "$relpath: ${old_uscore} -> ${new_name}" \
+          "s|${old_uscore}|${new_name}|g" \
+          "$ctrl"
+        do_sed "$relpath: ${old_legacy} -> ${new_name}" \
+          "s|${old_legacy}|${new_name}|g" \
+          "$ctrl"
+      fi
+    done
+
     # Update ProviewR version constraints in Depends
     # Match patterns like "(>= 6.1.3-1)" after a pwr* package name
     if grep -q "pwr.*>= [0-9]" "$ctrl" 2>/dev/null; then
       do_sed "$relpath: Depends version constraint -> $DEB_VER" \
-        "s|\(pwr[a-z0-9]* (>= \)[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*-[0-9][0-9]*|\1${DEB_VER}|g" \
+        "s|\(pwr[a-z0-9_]* (>= \)[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*-[0-9][0-9]*|\1${DEB_VER}|g" \
         "$ctrl"
     fi
 
-    # 5) Update Replaces: list
+    # 5) Update Replaces: list — add old package name for upgrade path
     if grep -q '^Replaces:' "$ctrl"; then
       if [ "$orig_pkg" = "pwrrt" ] || [ "$orig_pkg" = "pwrsev" ]; then
-        # Version-less packages: add the new dev package name so they
-        # can replace it (pwr70 etc.)
-        do_sed "$relpath: Replaces += pwr${PKG_SHORT}" \
-          "s|^\(Replaces:.*\)|\1,pwr${PKG_SHORT}|" \
+        # Version-less packages: add the new dev package name
+        do_sed "$relpath: Replaces += pwr_${PKG_SHORT}" \
+          "s|^\(Replaces:.*\)|\1,pwr_${PKG_SHORT}|" \
           "$ctrl"
-      elif [ "$orig_pkg" = "pwr${OLD_SHORT}" ]; then
-        # Dev package (pwr61 -> Replaces already has pwr50..pwr60):
-        # add the old name (pwr61) since it's being renamed to pwr70
-        do_sed "$relpath: Replaces += pwr${OLD_SHORT}" \
-          "s|^\(Replaces:.*\)|\1,pwr${OLD_SHORT}|" \
+      elif [[ "$orig_pkg" == *"$OLD_SHORT" ]]; then
+        # Versioned dev package being renamed: add old name to Replaces
+        do_sed "$relpath: Replaces += ${orig_pkg}" \
+          "s|^\(Replaces:.*\)|\1,${orig_pkg}|" \
           "$ctrl"
-      elif [[ "$orig_pkg" == pwrrpi*"$OLD_SHORT" ]]; then
-        # Pi packages: their Replaces references the dev package;
-        # update from old to new (already handled by step 4 above
-        # which replaced all OLD_SHORT occurrences).
-        :
       fi
     fi
   fi
@@ -422,15 +435,32 @@ while IFS= read -r spec; do
     "s|^Release:.*|Release: 1|" \
     "$spec"
 
-  if [ "$MAJMIN_CHANGED" -eq 1 ]; then
-    # 2) Update Name: if it contains the old short version
+  if [ "$PKG_CHANGED" -eq 1 ]; then
+    # 2) Update Name: — same underscore logic as deb
     orig_name=$(grep '^Name:' "$spec" | head -1 | awk '{print $2}')
-    if [[ "$orig_name" == *"$OLD_SHORT"* ]]; then
-      new_name="${orig_name/$OLD_SHORT/$PKG_SHORT}"
+    if [[ "$orig_name" == *"$OLD_SHORT" ]]; then
+      base_name="${orig_name%"$OLD_SHORT"}"
+      base_name="${base_name%_}"
+      new_name="${base_name}_${PKG_SHORT}"
       do_sed "$relpath: Name $orig_name -> $new_name" \
         "s|^Name: ${orig_name}$|Name: ${new_name}|" \
         "$spec"
     fi
+
+    # 3) Update Requires: references
+    for base in $PKG_BASES; do
+      old_legacy="${base}${OLD_SHORT}"
+      old_uscore="${base}_${OLD_SHORT}"
+      new_name="${base}_${PKG_SHORT}"
+      if grep -q "${old_uscore}\|${old_legacy}" "$spec" 2>/dev/null; then
+        do_sed "$relpath: ${old_uscore} -> ${new_name}" \
+          "s|${old_uscore}|${new_name}|g" \
+          "$spec"
+        do_sed "$relpath: ${old_legacy} -> ${new_name}" \
+          "s|${old_legacy}|${new_name}|g" \
+          "$spec"
+      fi
+    done
   fi
 done < <(find "$PKG_DIR" -name '*.spec' 2>/dev/null | sort)
 echo ""
