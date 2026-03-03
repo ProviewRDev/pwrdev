@@ -53,9 +53,8 @@
 #include "rt_ini_event.h"
 #include "rt_pwr_msg.h"
 
-static pwr_sClass_IOHandler* init(qcom_sQid* qid, lst_sEntry** csup_lh,
-    pwr_sNode** nodep, io_mProcess process, errh_eAnix errh_anix, char* oname,
-    float* cycletime);
+static pwr_sClass_IOHandler* init(qcom_sQid* qid, lst_sEntry** csup_lh, pwr_sNode** nodep,
+                                  io_mProcess process, errh_eAnix errh_anix, char* oname, float* cycletime);
 
 static void usage()
 {
@@ -96,16 +95,24 @@ int main(int argc, char** argv)
   pwr_tOName oname = "";
   int i;
   float cycletime = 0;
+  pwr_tObjid delayed_cyclesup_objid;
 
-  for (i = 1; i < argc; i++) {
-    if (streq(argv[i], "-m")) {
+  for (i = 1; i < argc; i++)
+  {
+    if (streq(argv[i], "-m"))
+    {
       io_methods_print();
       exit(0);
-    } else if (streq(argv[i], "-h")) {
+    }
+    else if (streq(argv[i], "-h"))
+    {
       usage();
       exit(0);
-    } else if (streq(argv[i], "-p")) {
-      if (argc <= i + 1) {
+    }
+    else if (streq(argv[i], "-p"))
+    {
+      if (argc <= i + 1)
+      {
         usage();
         exit(0);
       }
@@ -119,36 +126,47 @@ int main(int argc, char** argv)
         process = io_mProcess_User3;
       else if (str_NoCaseStrcmp(argv[i + 1], "user4") == 0)
         process = io_mProcess_User4;
-      else {
+      else
+      {
         usage();
         exit(0);
       }
       i++;
-    } else if (streq(argv[i], "-a")) {
-      if (argc <= i + 1) {
+    }
+    else if (streq(argv[i], "-a"))
+    {
+      if (argc <= i + 1)
+      {
         usage();
         exit(0);
       }
       sts = sscanf(argv[i + 1], "%d", (int*)&errh_anix);
-      if (sts != 1 || errh_anix < errh_eAnix_appl1
-          || errh_anix > errh_eAnix_appl20) {
+      if (sts != 1 || errh_anix < errh_eAnix_appl1 || errh_anix > errh_eAnix_appl20)
+      {
         usage();
         exit(0);
       }
       i++;
-    } else if (streq(argv[i], "-c")) {
-      if (argc <= i + 1) {
+    }
+    else if (streq(argv[i], "-c"))
+    {
+      if (argc <= i + 1)
+      {
         usage();
         exit(0);
       }
       sts = sscanf(argv[i + 1], "%f", &cycletime);
-      if (sts != 1) {
+      if (sts != 1)
+      {
         usage();
         exit(0);
       }
       i++;
-    } else if (streq(argv[i], "-o")) {
-      if (argc <= i + 1) {
+    }
+    else if (streq(argv[i], "-o"))
+    {
+      if (argc <= i + 1)
+      {
         usage();
         exit(0);
       }
@@ -164,8 +182,10 @@ int main(int argc, char** argv)
   /* Prepare the swap context */
   sts = io_init_swap(process, pwr_cNObjid, &io_ctx_swap, 1, cycletime);
 
-  for (close_io = swap_io = 0, init_io = 1;;) {
-    if (init_io) {
+  for (close_io = swap_io = 0, init_io = 1;;)
+  {
+    if (init_io)
+    {
       double f;
 
       sts = io_init(process, pwr_cNObjid, &io_ctx, 1, cycletime);
@@ -184,17 +204,20 @@ int main(int argc, char** argv)
     get.maxSize = sizeof(mp);
     get.data = mp;
     qcom_Get(&sts, &qid, &get, tmo);
-    if (sts == QCOM__TMO || sts == QCOM__QEMPTY) {
+    if (sts == QCOM__TMO || sts == QCOM__QEMPTY)
+    {
       if (nodep->EmergBreakTrue && !old_emergency_break)
         sts = io_swap(io_ctx_swap, io_eEvent_IoCommEmergencyBreak);
 
       sts = io_read(io_ctx);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         ihp->IOReadWriteFlag = FALSE;
         errh_Error("IO read, %m", sts);
       }
       sts = io_write(io_ctx);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         ihp->IOReadWriteFlag = FALSE;
         errh_Error("IO write, %m", sts);
       }
@@ -203,7 +226,8 @@ int main(int argc, char** argv)
         sts = io_swap(io_ctx, io_eEvent_EmergencyBreak);
       old_emergency_break = nodep->EmergBreakTrue;
 
-      if (swap_io) {
+      if (swap_io)
+      {
         sts = io_swap(io_ctx_swap, io_eEvent_IoCommSwap);
       }
       io_ScanSupLst(io_ctx->SupCtx);
@@ -212,28 +236,36 @@ int main(int argc, char** argv)
       time_GetTimeMonotonic(&after);
       next = after;
       time_Aadd(NULL, &next, &cycle);
-      delay_action = csup_Exec(
-          &sts, csup_lh, (pwr_tDeltaTime*)&next, (pwr_tDeltaTime*)&after, &now);
-      if (delay_action == 2)
+      delay_action = csup_Exec(&sts, csup_lh, (pwr_tDeltaTime*)&next, (pwr_tDeltaTime*)&after, &now,
+                               &delayed_cyclesup_objid);
+      if (delay_action == pwr_eSupDelayActionEnum_EmergencyBreak)
         ihp->IOReadWriteFlag = FALSE;
 
       aproc_TimeStamp(cycletime, 5);
-    } else {
+    }
+    else
+    {
       ini_mEvent new_event;
       qcom_sEvent* ep = (qcom_sEvent*)get.data;
 
       new_event.m = ep->mask;
-      if (new_event.b.oldPlcStop && !swap_io) {
+      if (new_event.b.oldPlcStop && !swap_io)
+      {
         swap_io = 1;
         close_io = 1;
         errh_SetStatus(PWR__SRVRESTART);
-      } else if (new_event.b.swapDone && swap_io) {
+      }
+      else if (new_event.b.swapDone && swap_io)
+      {
         swap_io = 0;
         init_io = 1;
-      } else if (new_event.b.terminate) {
+      }
+      else if (new_event.b.terminate)
+      {
         exit(0);
       }
-      if (close_io) {
+      if (close_io)
+      {
         io_close(io_ctx);
         close_io = 0;
       }
@@ -241,9 +273,8 @@ int main(int argc, char** argv)
   }
 }
 
-static pwr_sClass_IOHandler* init(qcom_sQid* qid, lst_sEntry** csup_lh,
-    pwr_sNode** nodep, io_mProcess process, errh_eAnix errh_anix, char* oname,
-    float* cycletime)
+static pwr_sClass_IOHandler* init(qcom_sQid* qid, lst_sEntry** csup_lh, pwr_sNode** nodep,
+                                  io_mProcess process, errh_eAnix errh_anix, char* oname, float* cycletime)
 {
   pwr_tStatus sts = 1;
   pwr_sClass_IOHandler* ihp;
@@ -253,7 +284,8 @@ static pwr_sClass_IOHandler* init(qcom_sQid* qid, lst_sEntry** csup_lh,
   pwr_tOid node_oid;
   char pname[20];
 
-  switch (process) {
+  switch (process)
+  {
   case io_mProcess_User:
     strcpy(pname, "pwr_io_user");
     break;
@@ -272,52 +304,61 @@ static pwr_sClass_IOHandler* init(qcom_sQid* qid, lst_sEntry** csup_lh,
 
   errh_Init(pname, errh_anix);
 
-  if (!qcom_Init(&sts, 0, pname)) {
+  if (!qcom_Init(&sts, 0, pname))
+  {
     errh_Fatal("qcom_Init, %m", sts);
     exit(sts);
   }
 
   qAttr.type = qcom_eQtype_private;
   qAttr.quota = 100;
-  if (!qcom_CreateQ(&sts, qid, &qAttr, "events")) {
+  if (!qcom_CreateQ(&sts, qid, &qAttr, "events"))
+  {
     errh_Fatal("qcom_CreateQ, %m", sts);
     exit(sts);
   }
 
   qini = qcom_cQini;
-  if (!qcom_Bind(&sts, qid, &qini)) {
+  if (!qcom_Bind(&sts, qid, &qini))
+  {
     errh_Fatal("qcom_Bind(Qini), %m", sts);
     exit(-1);
   }
 
   sts = gdh_Init(pname);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("rt_io_comm aborted\n%m", sts);
     exit(sts);
   }
 
   sts = io_get_iohandler_object(&ihp, &oid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("rt_io_comm aborted, no IoHandler object found\n%m", sts);
     exit(sts);
   }
 
   sts = gdh_GetNodeObject(0, &node_oid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("rt_io_comm aborted, no node object found\n%m", sts);
     exit(sts);
   }
 
   sts = gdh_ObjidToPointer(node_oid, (void**)nodep);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("rt_io_comm aborted, no node object found\n%m", sts);
     exit(sts);
   }
 
-  if (!streq(oname, "")) {
+  if (!streq(oname, ""))
+  {
     /* Register this object instead of IoHandler */
     sts = gdh_NameToObjid(oname, &oid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       errh_Fatal("rt_io_comm aborted, application object not found\n%m", sts);
       exit(sts);
     }

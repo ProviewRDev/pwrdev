@@ -229,7 +229,7 @@ int XttAudio::beep(pwr_tAttrRef* arp)
             || str_StartsWith(sound.Source, "Square")) {
           asize = size = 2 * int(sound.Length * srate);
           size = ((size - 1) / (hw_buff_size) + 1) * hw_buff_size;
-          buffer = (short*)calloc(sizeof(short), size);
+          buffer = (short*)calloc(size, sizeof(short));
           if (!buffer)
             return XNAV__NOMEMORY;
 
@@ -303,7 +303,7 @@ int XttAudio::beep(pwr_tAttrRef* arp)
             if (chunk.wChannels == 1) {
               size = chunk.dataSize * 2;
               size = ((size - 1) / (hw_buff_size) + 1) * hw_buff_size;
-              buffer = (short*)calloc(sizeof(short), size);
+              buffer = (short*)calloc(size, sizeof(short));
               if (!buffer) {
                 free(buf8);
                 return XNAV__NOMEMORY;
@@ -318,7 +318,7 @@ int XttAudio::beep(pwr_tAttrRef* arp)
               // wChannels == 2
               size = chunk.dataSize;
               size = ((size - 1) / (hw_buff_size) + 1) * hw_buff_size;
-              buffer = (short*)calloc(sizeof(short), size);
+              buffer = (short*)calloc(size, sizeof(short));
               if (!buffer) {
                 free(buf8);
                 return XNAV__NOMEMORY;
@@ -345,7 +345,7 @@ int XttAudio::beep(pwr_tAttrRef* arp)
 
               size = chunk.dataSize * 2;
               size = ((size - 1) / (hw_buff_size) + 1) * hw_buff_size;
-              buffer = (short*)calloc(sizeof(short), size);
+              buffer = (short*)calloc(size, sizeof(short));
               if (!buffer) {
                 free(buf16);
                 return XNAV__NOMEMORY;
@@ -360,7 +360,7 @@ int XttAudio::beep(pwr_tAttrRef* arp)
               // wChannels == 2
               size = chunk.dataSize;
               size = ((size - 1) / (hw_buff_size) + 1) * hw_buff_size;
-              buffer = (short*)calloc(sizeof(short), size);
+              buffer = (short*)calloc(size, sizeof(short));
               if (!buffer)
                 return XNAV__NOMEMORY;
 
@@ -396,7 +396,7 @@ int XttAudio::beep(pwr_tAttrRef* arp)
 
         size = 2 * int(seq.Length * srate);
         size = ((size - 1) / (hw_buff_size) + 1) * hw_buff_size;
-        buffer = (short*)calloc(sizeof(short), size);
+        buffer = (short*)calloc(size, sizeof(short));
         if (!buffer)
           return XNAV__NOMEMORY;
 
@@ -473,7 +473,7 @@ int XttAudio::beep(pwr_tAttrRef* arp)
     // Standard beep
     size = 2 * int(0.3 * srate);
     size = ((size - 1) / (hw_buff_size) + 1) * hw_buff_size;
-    buffer = (short*)calloc(sizeof(short), size);
+    buffer = (short*)calloc(size, sizeof(short));
     if (!buffer)
       return XNAV__NOMEMORY;
 

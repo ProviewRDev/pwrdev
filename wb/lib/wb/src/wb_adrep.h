@@ -45,22 +45,79 @@ class wb_orep;
 class wb_vrep;
 class wb_bdrep;
 
-class wb_adrep {
+/**
+ * @class wb_adrep
+ * @brief Attribute Definition Representation - metadata for an attribute
+ *
+ * Represents the definition (metadata) of an attribute as defined in a class.
+ * This is loaded from .dbs files (compiled class definitions) and describes
+ * the structure and properties of an attribute without holding actual data.
+ *
+ * The adrep is created from class definitions and provides:
+ * - Type information (size, type, tid)
+ * - Layout information (offset within object body)
+ * - Array dimensions and indexing
+ * - Flags indicating special properties (pointer, array, class, etc.)
+ *
+ * @section class_source Class Definition Source
+ * Class definitions flow through this pipeline:
+ * @code
+ * .wb_load (source) → [wb_cmd build] → .dbs (compiled) → wb_adrep (in memory)
+ * @endcode
+ *
+ * @section body_structure Body Structure
+ * Objects have two bodies (pwr_eBix_rt and pwr_eBix_dev):
+ * - RtBody (runtime): Attributes needed at runtime in PLC/SCADA
+ * - DevBody (development): Additional attributes for development tools
+ *
+ * Each attribute has an offset within its body, stored in m_offset.
+ * For subclass attributes, m_suboffset gives the offset within the subclass body.
+ */
+class wb_adrep
+{
+  /** @brief Reference count for memory management */
   int m_nRef;
+
+  /** @brief Object this attribute belongs to */
   wb_orep* m_orep;
+
+  /** @brief Status of last operation */
   pwr_tStatus m_sts;
 
+  /** @brief Total size of attribute in bytes (element_size × elements) */
   size_t m_size;
+
+  /** @brief Base type (Int32, Float32, String, etc.) */
   pwr_eType m_type;
+
+  /** @brief Byte offset of attribute within object body */
   int m_offset;
+
+  /** @brief Offset within subclass body (for inherited attributes) */
   int m_suboffset;
+
+  /** @brief Number of array elements (1 for scalar) */
   int m_elements;
+
+  /** @brief Parameter index / attribute index in class definition */
   int m_paramindex;
+
+  /** @brief Attribute flags (PWR_MASK_CLASS, PWR_MASK_ARRAY, PWR_MASK_POINTER, etc.) */
   int m_flags;
+
+  /** @brief Type identifier - unique ID for this type in type hierarchy */
   pwr_tTid m_tid;
+
+  /** @brief Program name of attribute (for code generation) */
   pwr_tPgmName m_pgmname;
+
+  /** @brief If attribute is a class/struct, its class ID */
   pwr_tCid m_subClass;
+
+  /** @brief If attribute is a class/struct, its class name */
   pwr_tOName m_subName;
+
+  /** @brief True if this is a sub-attribute within a class attribute */
   bool m_isSubattr;
 
   friend class wb_bdrep;
@@ -79,10 +136,7 @@ public:
   wb_cdrep* cdrep();
 
   pwr_sAttrRef aref();
-  size_t size()
-  {
-    return m_size;
-  }
+  size_t size() { return m_size; }
   size_t rsize()
   {
     if (m_flags & PWR_MASK_POINTER)
@@ -90,56 +144,23 @@ public:
     else
       return m_size;
   }
-  int offset()
-  {
-    return m_offset;
-  }
-  pwr_eType type() const
-  {
-    return m_type;
-  }
-  pwr_tTid tid()
-  {
-    return m_tid;
-  }
-  int nElement()
-  {
-    return m_elements;
-  }
-  int index()
-  {
-    return m_paramindex;
-  }
+  int offset() { return m_offset; }
+  pwr_eType type() const { return m_type; }
+  pwr_tTid tid() { return m_tid; }
+  int nElement() { return m_elements; }
+  int index() { return m_paramindex; }
   pwr_tOid aoid();
   int aix();
   pwr_tCid cid();
   pwr_eBix bix();
-  int flags()
-  {
-    return m_flags;
-  }
+  int flags() { return m_flags; }
   pwr_tOid boid();
-  pwr_tCid subClass()
-  {
-    return m_subClass;
-  }
-  bool isClass() const
-  {
-    return (m_flags & PWR_MASK_CLASS || m_flags & PWR_MASK_BUFFER);
-  }
-  bool isSuperClass() const
-  {
-    return (m_flags & PWR_MASK_CLASS && m_flags & PWR_MASK_SUPERCLASS);
-  }
-  bool isArray() const
-  {
-    return (m_flags & PWR_MASK_ARRAY);
-  }
+  pwr_tCid subClass() { return m_subClass; }
+  bool isClass() const { return (m_flags & PWR_MASK_CLASS || m_flags & PWR_MASK_BUFFER); }
+  bool isSuperClass() const { return (m_flags & PWR_MASK_CLASS && m_flags & PWR_MASK_SUPERCLASS); }
+  bool isArray() const { return (m_flags & PWR_MASK_ARRAY); }
   void add(wb_adrep* ad, int idx = 0);
-  bool isSubattr()
-  {
-    return m_isSubattr;
-  }
+  bool isSubattr() { return m_isSubattr; }
 
   const char* name() const;
   const char* subName() const;

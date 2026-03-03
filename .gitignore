@@ -32,3 +32,6 @@ project/pwrtest03/src/login/initvol.pwr_com
 *.egg-info/
 
 .env
+/**/__pycache__/
+.gitlab/
+.pytest_cache/

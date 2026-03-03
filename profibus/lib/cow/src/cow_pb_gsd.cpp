@@ -48,7 +48,8 @@
 
 #include "cow_pb_gsd.h"
 
-typedef enum {
+typedef enum
+{
   gsd_M,
   gsd_O,
   gsd_D,
@@ -57,7 +58,8 @@ typedef enum {
   gsd_OD  // Optional with depencency
 } gsd_eOpt;
 
-typedef enum {
+typedef enum
+{
   gsd_mSts_Profibus_DP = 1 << 0,
   gsd_mSts_Module = 1 << 1,
   gsd_mSts_Area = 1 << 2,
@@ -111,14 +113,10 @@ gsd_sKeyword pb_gsd::keywordlist[] = {
     {"Physical_Interface", "", gsd_O, gsd_Unsigned8, 0},
     {"Transmission_Delay_9.6", "Transmission_Delay", gsd_G, gsd_Unsigned16, 0},
     {"Transmission_Delay_19.2", "Transmission_Delay", gsd_G, gsd_Unsigned16, 0},
-    {"Transmission_Delay_31.25", "Transmission_Delay", gsd_G, gsd_Unsigned16,
-     0},
-    {"Transmission_Delay_45.45", "Transmission_Delay", gsd_G, gsd_Unsigned16,
-     0},
-    {"Transmission_Delay_93.75", "Transmission_Delay", gsd_G, gsd_Unsigned16,
-     0},
-    {"Transmission_Delay_187.5", "Transmission_Delay", gsd_G, gsd_Unsigned16,
-     0},
+    {"Transmission_Delay_31.25", "Transmission_Delay", gsd_G, gsd_Unsigned16, 0},
+    {"Transmission_Delay_45.45", "Transmission_Delay", gsd_G, gsd_Unsigned16, 0},
+    {"Transmission_Delay_93.75", "Transmission_Delay", gsd_G, gsd_Unsigned16, 0},
+    {"Transmission_Delay_187.5", "Transmission_Delay", gsd_G, gsd_Unsigned16, 0},
     {"Transmission_Delay_500", "Transmission_Delay", gsd_G, gsd_Unsigned16, 0},
     {"Transmission_Delay_1.5M", "Transmission_Delay", gsd_G, gsd_Unsigned16, 0},
     {"Transmission_Delay_3M", "Transmission_Delay", gsd_G, gsd_Unsigned16, 0},
@@ -200,24 +198,15 @@ gsd_sKeyword pb_gsd::keywordlist[] = {
     {"DPV1_Conformance_Class", "", gsd_O, gsd_Unsigned8, 0},
     {"C1_Master_Read_Write_supp", "", gsd_D, gsd_Boolean, 0},
     {"Master_DPV1_Alarm_supp", "", gsd_D, gsd_Boolean, 0},
-    {"Master_Diagnostic_Alarm_supp", "Master_DPV1_Alarm_Supp", gsd_G,
-     gsd_Boolean, 0},
-    {"Master_Process_Alarm_supp", "Master_DPV1_Alarm_Supp", gsd_G, gsd_Boolean,
-     0},
-    {"Master_Pull_Plug_Alarm_supp", "Master_DPV1_Alarm_Supp", gsd_G,
-     gsd_Boolean, 0},
-    {"Master_Status_Alarm_supp", "Master_DPV1_Alarm_Supp", gsd_G, gsd_Boolean,
-     0},
-    {"Master_Update_Alarm_supp", "Master_DPV1_Alarm_Supp", gsd_G, gsd_Boolean,
-     0},
-    {"Master_Manufacturer_Alarm_supp", "Master_DPV1_Alarm_Supp", gsd_G,
-     gsd_Boolean, 0},
-    {"Master_Extra_Alarm_SAP_supp", "Master_DPV1_Alarm_Supp", gsd_MD,
-     gsd_Boolean, 0},
-    {"Master_Alarm_Sequence_Mode", "Master_DPV1_Alarm_Supp", gsd_MD,
-     gsd_Unsigned8, 0},
-    {"Master_Alarm_Type_Mode_supp", "Master_DPV1_Alarm_Supp", gsd_MD,
-     gsd_Boolean, 0},
+    {"Master_Diagnostic_Alarm_supp", "Master_DPV1_Alarm_Supp", gsd_G, gsd_Boolean, 0},
+    {"Master_Process_Alarm_supp", "Master_DPV1_Alarm_Supp", gsd_G, gsd_Boolean, 0},
+    {"Master_Pull_Plug_Alarm_supp", "Master_DPV1_Alarm_Supp", gsd_G, gsd_Boolean, 0},
+    {"Master_Status_Alarm_supp", "Master_DPV1_Alarm_Supp", gsd_G, gsd_Boolean, 0},
+    {"Master_Update_Alarm_supp", "Master_DPV1_Alarm_Supp", gsd_G, gsd_Boolean, 0},
+    {"Master_Manufacturer_Alarm_supp", "Master_DPV1_Alarm_Supp", gsd_G, gsd_Boolean, 0},
+    {"Master_Extra_Alarm_SAP_supp", "Master_DPV1_Alarm_Supp", gsd_MD, gsd_Boolean, 0},
+    {"Master_Alarm_Sequence_Mode", "Master_DPV1_Alarm_Supp", gsd_MD, gsd_Unsigned8, 0},
+    {"Master_Alarm_Type_Mode_supp", "Master_DPV1_Alarm_Supp", gsd_MD, gsd_Boolean, 0},
     // Master DP-V2
     {"Isochron_Mode_Synchronised", "", gsd_D, gsd_Unsigned8, 0},
     {"DXB_Master_supp", "", gsd_D, gsd_Boolean, 0},
@@ -314,31 +303,51 @@ gsd_sKeyword pb_gsd::keywordlist[] = {
     {"Update_Alarm_required", "", gsd_D, gsd_Boolean, 0},
     {"Manufacturer_Specific_Alarm_required", "", gsd_D, gsd_Boolean, 0},
     {"DPV1_Data_Types", "", gsd_O, gsd_Boolean, 0},
-    {"WB_Base_1ms_supp", "", gsd_D, gsd_Boolean, 0},
+    {"WD_Base_1ms_supp", "", gsd_D, gsd_Boolean, 0},
     {"Check_Cfg_Mode", "", gsd_D, gsd_Boolean, 0},
+    {"Publisher_supp", "", gsd_D, gsd_Boolean, 0},
+    {"PrmCmd_supp", "", gsd_D, gsd_Boolean, 0},
+    {"Slave_Redundancy_supp", "", gsd_D, gsd_Boolean, 0},
+    {"Ident_Maintenance_supp", "", gsd_D, gsd_Boolean, 0},
+    {"Firmware_Download_supp", "", gsd_D, gsd_Boolean, 0},
+    {"Version_Firmware_Download", "", gsd_O, gsd_VersionFirmware, 0},
+    {"Version_Name", "Version_Firmware_Download", gsd_O, gsd_VString256, 0},
+    {"End_Version_Firmware_Download", "", gsd_O, gsd_EndVersionFirmware, 0},
+
+    // Extended Unit Diagnostics (UnitDiagType)
+    {"UnitDiagType", "", gsd_O, gsd_UnitDiagType, 0},
+    {"X_Unit_Diag_Area", "UnitDiagType", gsd_O, gsd_DiagArea, 0},
+    {"X_Unit_Diag_Area_End", "UnitDiagType", gsd_O, gsd_DiagAreaEnd, 0},
+    {"X_Value", "UnitDiagType", gsd_O, gsd_XValue, 0},
+    {"EndUnitDiagType", "", gsd_O, gsd_EndUnitDiagType, 0},
+
+    // Prm_Block_Structure and Jokerblock support (GSD Revision 4/5)
+    {"Prm_Block_Structure_supp", "", gsd_D, gsd_Boolean, 0},
+    {"Prm_Block_Structure_req", "", gsd_D, gsd_Boolean, 0},
+    {"Jokerblock_supp", "", gsd_D, gsd_Boolean, 0},
+    {"Jokerblock_Type", "", gsd_O, gsd_JokerblockType, 0},
+    {"Jokerblock_Slot", "Jokerblock_Type", gsd_M, gsd_Unsigned8, 0},
+    {"Jokerblock_Location", "Jokerblock_Type", gsd_D, gsd_Unsigned8, 0},
+    {"End_Jokerblock_Type", "", gsd_O, gsd_EndJokerblockType, 0},
 
     {"", "", 0, gsd_End, 0}};
 
 pb_gsd::pb_gsd()
-    : dptype(0), modular_station(0), max_module(0), user_prm_data_len(0),
-      max_user_prm_data_len(0), items_user_prm_data_len(0), status(0),
-      address(0), datalist(0), modulelist(0), prm_textlist(0),
-      extuserprmdatalist(0), extuserprmdatareflist(0), current_module(0),
-      current_area(0), current_prm_text(0), current_extuserprmdata(0),
-      extuserprmdataconst(0), prm_dataitems(0), module_conf(0),
-      module_conf_cnt(0), module_classlist(0), copy_buff(0), modified(0),
-      byte_order(0)
+    : dptype(0), modular_station(0), max_module(0), user_prm_data_len(0), max_user_prm_data_len(0),
+      items_user_prm_data_len(0), status(0), address(0), datalist(0), modulelist(0), prm_textlist(0),
+      extuserprmdatalist(0), extuserprmdatareflist(0), current_module(0), current_area(0),
+      current_prm_text(0), current_extuserprmdata(0), extuserprmdataconst(0), prm_dataitems(0),
+      module_conf(0), module_conf_cnt(0), module_classlist(0), copy_buff(0), modified(0), byte_order(0),
+      jokerblock_supp(0), prm_block_structure_supp(0), jokerblock_list(0), current_jokerblock(0)
 {
-  datalist = (gsd_sData*)calloc(sizeof(keywordlist) / sizeof(keywordlist[0]),
-                                sizeof(gsd_sData));
+  datalist = (gsd_sData*)calloc(sizeof(keywordlist) / sizeof(keywordlist[0]), sizeof(gsd_sData));
 }
 
 pb_gsd::~pb_gsd()
 {
   if (datalist)
   {
-    for (int i = 0; i < (int)(sizeof(keywordlist) / sizeof(keywordlist[0]));
-         i++)
+    for (int i = 0; i < (int)(sizeof(keywordlist) / sizeof(keywordlist[0])); i++)
     {
       if (datalist[i].data)
         free(datalist[i].data);
@@ -406,11 +415,19 @@ pb_gsd::~pb_gsd()
       free((char*)copy_buff->prm_dataitems);
     free(copy_buff);
   }
+
+  // Free Jokerblock list
+  gsd_sJokerblockDef *jbp, *jbnext;
+  for (jbp = jokerblock_list; jbp; jbp = jbnext)
+  {
+    jbnext = jbp->next;
+    free((char*)jbp);
+  }
 }
 
 int pb_gsd::read(char* filename)
 {
-  pwr_tFileName fname;  
+  pwr_tFileName fname;
   char line[2000];
   gsd_sKeyword* keyp;
   gsd_sData* datap;
@@ -447,16 +464,14 @@ int pb_gsd::read(char* filename)
 
     str_trim(line, line);
     compress(line);
-    part_cnt = dcli_parse(line, " 	=", "", (char*)line_part,
-                          sizeof(line_part) / sizeof(line_part[0]),
+    part_cnt = dcli_parse(line, " 	=", "", (char*)line_part, sizeof(line_part) / sizeof(line_part[0]),
                           sizeof(line_part[0]), 0);
 
     has_idx = 0;
     if (strchr(line_part[0], '(') != 0)
     {
       idxpart_cnt = dcli_parse(line_part[0], " 	()", "", (char*)idxline_part,
-                               sizeof(idxline_part) / sizeof(idxline_part[0]),
-                               sizeof(idxline_part[0]), 0);
+                               sizeof(idxline_part) / sizeof(idxline_part[0]), sizeof(idxline_part[0]), 0);
       if (idxpart_cnt == 2)
       {
         strcpy(line_part[0], idxline_part[0]);
@@ -497,8 +512,7 @@ int pb_gsd::read(char* filename)
       else
         sts = sscanf(line_part[1], "%d", &datap->value);
       if (sts != 1)
-        printf("Syntax error, line %d %d (%s) (%s)\n", line_cnt, sts,
-               line_part[0], line_part[1]);
+        printf("Syntax error, line %d %d (%s) (%s)\n", line_cnt, sts, line_part[0], line_part[1]);
       datap->found = 1;
       if (keyp->type == gsd_UserPrmDataLen)
         user_prm_data_len = datap->value;
@@ -550,8 +564,7 @@ int pb_gsd::read(char* filename)
         // Insert in area data
         if (!current_extuserprmdata)
         {
-          printf("Prm data keyword outside ExtUserPrmData, line %d\n",
-                 line_cnt);
+          printf("Prm data keyword outside ExtUserPrmData, line %d\n", line_cnt);
           break;
         }
         if (streq(keyp->name, "Prm_Text_Ref"))
@@ -574,6 +587,27 @@ int pb_gsd::read(char* filename)
       else if (streq(keyp->name, "Max_MPS_Length"))
       {
         dptype = gsd_DpMaster;
+      }
+      else if (streq(keyp->group, "Jokerblock_Type"))
+      {
+        // Insert in Jokerblock data
+        if (!current_jokerblock)
+        {
+          printf("Jokerblock keyword outside Jokerblock_Type, line %d\n", line_cnt);
+          break;
+        }
+        if (streq(keyp->name, "Jokerblock_Slot"))
+          current_jokerblock->Slot_Number = datap->value;
+        else if (streq(keyp->name, "Jokerblock_Location"))
+          current_jokerblock->Location = datap->value;
+      }
+      else if (streq(keyp->name, "Jokerblock_supp"))
+      {
+        jokerblock_supp = datap->value;
+      }
+      else if (streq(keyp->name, "Prm_Block_Structure_supp"))
+      {
+        prm_block_structure_supp = datap->value;
       }
       break;
     case gsd_VString8:
@@ -620,8 +654,7 @@ int pb_gsd::read(char* filename)
           strcat(s, tmp);
 
           part_cnt = dcli_parse(line, " 	=", "", (char*)line_part,
-                                sizeof(line_part) / sizeof(line_part[0]),
-                                sizeof(line_part[0]), 0);
+                                sizeof(line_part) / sizeof(line_part[0]), sizeof(line_part[0]), 0);
           strncpy(m->Mod_Name, line_part[1], sizeof(m->Mod_Name));
         }
       }
@@ -694,8 +727,7 @@ int pb_gsd::read(char* filename)
       p = (gsd_sPrmText*)calloc(1, sizeof(gsd_sPrmText));
       sts = sscanf(line_part[1], "%d", &p->Reference_Number);
       if (sts != 1)
-        printf("Syntax error, line %d %d (%s) (%s)\n", line_cnt, sts,
-               line_part[0], line_part[1]);
+        printf("Syntax error, line %d %d (%s) (%s)\n", line_cnt, sts, line_part[0], line_part[1]);
       if (!prm_textlist)
         prm_textlist = p;
       else
@@ -758,20 +790,17 @@ int pb_gsd::read(char* filename)
       if (sts != 1)
         printf("Syntax error, line %d (%s)\n", line_cnt, line);
       if (part_cnt > 2)
-        strncpy(e->Ext_User_Prm_Data_Name, line_part[2],
-                sizeof(e->Ext_User_Prm_Data_Name));
+        strncpy(e->Ext_User_Prm_Data_Name, line_part[2], sizeof(e->Ext_User_Prm_Data_Name));
 
       // Read Data_Type
       sts = read_line(line, sizeof(line), fp);
       if (!sts)
         break;
 
-      part_cnt = dcli_parse(line, " 	=", "", (char*)line_part,
-                            sizeof(line_part) / sizeof(line_part[0]),
+      part_cnt = dcli_parse(line, " 	=", "", (char*)line_part, sizeof(line_part) / sizeof(line_part[0]),
                             sizeof(line_part[0]), 0);
 
-      if ((str_NoCaseStrcmp(line_part[0], "Bit") == 0 ||
-           str_NoCaseStrcmp(line_part[0], "BitArea") == 0) &&
+      if ((str_NoCaseStrcmp(line_part[0], "Bit") == 0 || str_NoCaseStrcmp(line_part[0], "BitArea") == 0) &&
           line_part[1][0] == '(')
       {
         // Space befor index part, concatenate part 0 and 1
@@ -783,10 +812,8 @@ int pb_gsd::read(char* filename)
 
       if (strchr(line_part[0], '(') != 0)
       {
-        idxpart_cnt =
-            dcli_parse(line_part[0], " 	()", "", (char*)idxline_part,
-                       sizeof(idxline_part) / sizeof(idxline_part[0]),
-                       sizeof(idxline_part[0]), 0);
+        idxpart_cnt = dcli_parse(line_part[0], " 	()", "", (char*)idxline_part,
+                                 sizeof(idxline_part) / sizeof(idxline_part[0]), sizeof(idxline_part[0]), 0);
         if (idxpart_cnt == 2)
         {
           strcpy(line_part[0], idxline_part[0]);
@@ -825,7 +852,7 @@ int pb_gsd::read(char* filename)
       {
         sts = sscanf(line_part[1], "%d", &e->Default_Value);
         if (sts != 1)
-          printf("Syntax error, line %d (%s)\n", line_cnt, line);
+          printf("Syntax error parsing default value, line %d (%s)\n", line_cnt, line);
       }
       if (part_cnt > 2)
       {
@@ -849,10 +876,9 @@ int pb_gsd::read(char* filename)
           int all_cnt;
 
           for (int i = 3; i < part_cnt; i++)
-            strncat(line_part[2], line_part[i], sizeof(line_part[2]-1));
+            strncat(line_part[2], line_part[i], sizeof(line_part[2] - 1));
 
-          all_cnt = dcli_parse(line_part[2], " 	,", "", (char*)allstr,
-                               sizeof(allstr) / sizeof(allstr[0]),
+          all_cnt = dcli_parse(line_part[2], " 	,", "", (char*)allstr, sizeof(allstr) / sizeof(allstr[0]),
                                sizeof(allstr[0]), 0);
           for (int i = 0; i < all_cnt; i++)
           {
@@ -881,6 +907,48 @@ int pb_gsd::read(char* filename)
     {
       status &= ~gsd_mSts_ExtUserPrmData;
       current_extuserprmdata = 0;
+      break;
+    }
+    case gsd_JokerblockType:
+    {
+      gsd_sJokerblockDef *jb, *jbp;
+
+      jb = (gsd_sJokerblockDef*)calloc(1, sizeof(gsd_sJokerblockDef));
+      sts = sscanf(line_part[1], "%d", &jb->Structure_Type);
+      if (sts != 1)
+        printf("Syntax error, line %d (%s)\n", line_cnt, line);
+
+      // Default values
+      jb->Slot_Number = 0;
+      jb->Location = 0;
+
+      if (!jokerblock_list)
+        jokerblock_list = jb;
+      else
+      {
+        jbp = jokerblock_list;
+        while (jbp->next)
+          jbp = jbp->next;
+        jbp->next = jb;
+      }
+      current_jokerblock = jb;
+      datap->found = 1;
+      break;
+    }
+    case gsd_EndJokerblockType:
+    {
+      current_jokerblock = 0;
+      datap->found = 1;
+      break;
+    }
+    case gsd_VersionFirmware:
+    case gsd_EndVersionFirmware:
+    case gsd_UnitDiagType:
+    case gsd_EndUnitDiagType:
+    case gsd_XValue:
+    {
+      // These are informational keywords - acknowledge but don't process
+      datap->found = 1;
       break;
     }
     case gsd_ExtUserPrmDataRef:
@@ -953,8 +1021,7 @@ int pb_gsd::read(char* filename)
       }
 
       if (new_data)
-        e = (gsd_sExtUserPrmDataConst*)calloc(1,
-                                              sizeof(gsd_sExtUserPrmDataConst));
+        e = (gsd_sExtUserPrmDataConst*)calloc(1, sizeof(gsd_sExtUserPrmDataConst));
 
       str_trim(idx_str, idx_str);
       if (idx_str[0] == '0' && idx_str[1] == 'x')
@@ -972,8 +1039,7 @@ int pb_gsd::read(char* filename)
         {
           str_to_ostring(&t, s + 1, sizeof(e->Const_Prm_Data), &e->len);
           if (e->len + e->Const_Offset > (int)sizeof(e->Const_Prm_Data))
-            printf("Const length too large, line %d (%s)\n", line_cnt,
-                   line_part[0]);
+            printf("Const length too large, line %d (%s)\n", line_cnt, line_part[0]);
           memcpy((char*)e->Const_Prm_Data + e->Const_Offset, (char*)t,
                  sizeof(e->Const_Prm_Data) - e->Const_Offset);
           free(t);
@@ -987,8 +1053,7 @@ int pb_gsd::read(char* filename)
           memcpy((char*)e->Const_Prm_Data + const_offset, (char*)t, data_len);
           e->len = const_offset + data_len - e->Const_Offset;
           if (e->len + e->Const_Offset > (int)sizeof(e->Const_Prm_Data))
-            printf("Const length too large, line %d (%s)\n", line_cnt,
-                   line_part[0]);
+            printf("Const length too large, line %d (%s)\n", line_cnt, line_part[0]);
           free(t);
         }
       }
@@ -1010,8 +1075,7 @@ int pb_gsd::read(char* filename)
       int family;
 
       fam_cnt = dcli_parse(line_part[1], " 	@", "", (char*)fam_part,
-                           sizeof(fam_part) / sizeof(fam_part[0]),
-                           sizeof(fam_part[0]), 0);
+                           sizeof(fam_part) / sizeof(fam_part[0]), sizeof(fam_part[0]), 0);
       if (fam_cnt < 1)
       {
         printf("Syntax error, line %d (%s)\n", line_cnt, line);
@@ -1140,8 +1204,8 @@ int pb_gsd::build()
     else if (str_NoCaseStrcmp(dp->Data_Type_Name, "Signed32") == 0)
       dp->data_type = gsd_Signed32;
     else
-      printf("** Unknown Data_Type_Name \"%s\" in ExtUserPrmData %s\n",
-             dp->Data_Type_Name, dp->Ext_User_Prm_Data_Name);
+      printf("** Unknown Data_Type_Name \"%s\" in ExtUserPrmData %s\n", dp->Data_Type_Name,
+             dp->Ext_User_Prm_Data_Name);
   }
 
   // Link ExtUserPrmDataRef to ExtUserPrmData
@@ -1156,8 +1220,7 @@ int pb_gsd::build()
       }
     }
     if (!ep->prm_data)
-      printf("** Referenced ExtUserPrmData not found %d\n",
-             ep->Reference_Number);
+      printf("** Referenced ExtUserPrmData not found %d\n", ep->Reference_Number);
   }
 
   // Create data items for slave ExtPrmData
@@ -1165,8 +1228,7 @@ int pb_gsd::build()
   for (gsd_sExtUserPrmDataRef* ep = extuserprmdatareflist; ep; ep = ep->next)
     prm_dataitems_cnt++;
 
-  prm_dataitems =
-      (gsd_sPrmDataItem*)calloc(prm_dataitems_cnt, sizeof(gsd_sPrmDataItem));
+  prm_dataitems = (gsd_sPrmDataItem*)calloc(prm_dataitems_cnt, sizeof(gsd_sPrmDataItem));
   int i = 0;
   for (gsd_sExtUserPrmDataRef* ep = extuserprmdatareflist; ep; ep = ep->next)
   {
@@ -1177,8 +1239,7 @@ int pb_gsd::build()
   // Link Module UserPrmDataRef to ExtUserPrmData
   for (gsd_sModule* mp = modulelist; mp; mp = mp->next)
   {
-    for (gsd_sExtUserPrmDataRef* ep = mp->extuserprmdatareflist; ep;
-         ep = ep->next)
+    for (gsd_sExtUserPrmDataRef* ep = mp->extuserprmdatareflist; ep; ep = ep->next)
     {
       for (gsd_sExtUserPrmData* dp = extuserprmdatalist; dp; dp = dp->next)
       {
@@ -1189,8 +1250,7 @@ int pb_gsd::build()
         }
       }
       if (!ep->prm_data)
-        printf("** Referenced ExtUserPrmData not found %d\n",
-               ep->Reference_Number);
+        printf("** Referenced ExtUserPrmData not found %d\n", ep->Reference_Number);
     }
   }
 
@@ -1199,18 +1259,14 @@ int pb_gsd::build()
 
   if (extuserprmdataconst)
   {
-    if (items_user_prm_data_len <
-        extuserprmdataconst->len + extuserprmdataconst->Const_Offset)
-      items_user_prm_data_len =
-          extuserprmdataconst->len + extuserprmdataconst->Const_Offset;
+    if (items_user_prm_data_len < extuserprmdataconst->len + extuserprmdataconst->Const_Offset)
+      items_user_prm_data_len = extuserprmdataconst->len + extuserprmdataconst->Const_Offset;
   }
   if (max_user_prm_data_len)
   {
     if (extuserprmdataconst &&
-        max_user_prm_data_len <
-            extuserprmdataconst->len + extuserprmdataconst->Const_Offset)
-      printf("ExtUserPrmDataConst exceeds Max_User_Prm_Data_Len, line %d\n",
-             line_cnt);
+        max_user_prm_data_len < extuserprmdataconst->len + extuserprmdataconst->Const_Offset)
+      printf("ExtUserPrmDataConst exceeds Max_User_Prm_Data_Len, line %d\n", line_cnt);
   }
 
   // Check Module UserPrmDataLen
@@ -1218,21 +1274,17 @@ int pb_gsd::build()
   {
     if (mp->Ext_Module_Prm_Data_Len > 0 && !mp->extuserprmdataconst)
     {
-      mp->extuserprmdataconst = (gsd_sExtUserPrmDataConst*)calloc(
-          1, sizeof(gsd_sExtUserPrmDataConst));
+      mp->extuserprmdataconst = (gsd_sExtUserPrmDataConst*)calloc(1, sizeof(gsd_sExtUserPrmDataConst));
       mp->extuserprmdataconst->len = mp->Ext_Module_Prm_Data_Len;
     }
     if (mp->Ext_Module_Prm_Data_Len == 0 && mp->extuserprmdataconst)
-      mp->Ext_Module_Prm_Data_Len =
-          mp->extuserprmdataconst->len + mp->extuserprmdataconst->Const_Offset;
+      mp->Ext_Module_Prm_Data_Len = mp->extuserprmdataconst->len + mp->extuserprmdataconst->Const_Offset;
     else if (mp->extuserprmdataconst &&
              mp->Ext_Module_Prm_Data_Len <
-                 mp->extuserprmdataconst->len +
-                     mp->extuserprmdataconst->Const_Offset)
+                 mp->extuserprmdataconst->len + mp->extuserprmdataconst->Const_Offset)
     {
-      printf("** ExtUserPrmDataLen differs (%d) (%d), Module %s\n",
-             mp->Ext_Module_Prm_Data_Len, mp->extuserprmdataconst->len,
-             mp->Mod_Name);
+      printf("** ExtUserPrmDataLen differs (%d) (%d), Module %s\n", mp->Ext_Module_Prm_Data_Len,
+             mp->extuserprmdataconst->len, mp->Mod_Name);
     }
   }
 
@@ -1243,13 +1295,11 @@ int pb_gsd::build()
       module_conf_cnt = 1;
     else
       module_conf_cnt = max_module;
-    module_conf =
-        (gsd_sModuleConf*)calloc(module_conf_cnt, sizeof(gsd_sModuleConf));
+    module_conf = (gsd_sModuleConf*)calloc(module_conf_cnt, sizeof(gsd_sModuleConf));
   }
 
   if (!extuserprmdataconst)
-    extuserprmdataconst =
-        (gsd_sExtUserPrmDataConst*)calloc(1, sizeof(gsd_sExtUserPrmDataConst));
+    extuserprmdataconst = (gsd_sExtUserPrmDataConst*)calloc(1, sizeof(gsd_sExtUserPrmDataConst));
 
   // Set default values to items
   prm_items_set_default_data(prm_dataitems, prm_dataitems_cnt);
@@ -1318,8 +1368,7 @@ int pb_gsd::prm_items_set_default_data(gsd_sPrmDataItem* item, int item_size)
   return 1;
 }
 
-int pb_gsd::prm_items_to_data(gsd_sPrmDataItem* item, int item_size,
-                              unsigned char* data, int data_size)
+int pb_gsd::prm_items_to_data(gsd_sPrmDataItem* item, int item_size, unsigned char* data, int data_size)
 {
   gsd_sExtUserPrmData* pd;
 
@@ -1331,13 +1380,11 @@ int pb_gsd::prm_items_to_data(gsd_sPrmDataItem* item, int item_size,
     if (pd->allowed_cnt == 0)
     {
       if (item[i].value < pd->Min_Value)
-        printf("** Value too low \"%s\" %d (%d-%d)\n",
-               pd->Ext_User_Prm_Data_Name, item[i].value, pd->Min_Value,
-               pd->Max_Value);
+        printf("** Value too low \"%s\" %d (%d-%d)\n", pd->Ext_User_Prm_Data_Name, item[i].value,
+               pd->Min_Value, pd->Max_Value);
       else if (item[i].value > pd->Max_Value)
-        printf("** Value too high \"%s\" %d (%d-%d)\n",
-               pd->Ext_User_Prm_Data_Name, item[i].value, pd->Min_Value,
-               pd->Max_Value);
+        printf("** Value too high \"%s\" %d (%d-%d)\n", pd->Ext_User_Prm_Data_Name, item[i].value,
+               pd->Min_Value, pd->Max_Value);
     }
     else
     {
@@ -1351,7 +1398,32 @@ int pb_gsd::prm_items_to_data(gsd_sPrmDataItem* item, int item_size,
         }
       }
       if (!found)
-        printf("** Value not allowed\n");
+      {
+        // Check if default value is in allowed list
+        int default_allowed = 0;
+        for (int j = 0; j < pd->allowed_cnt; j++)
+        {
+          if (pd->Allowed_Values[j] == pd->Default_Value)
+          {
+            default_allowed = 1;
+            break;
+          }
+        }
+        if (default_allowed)
+        {
+          printf("** Value not allowed \"%s\" (ref=%d) value=%d, auto-correcting to default=%d\n",
+                 pd->Ext_User_Prm_Data_Name, item[i].ref->Reference_Number, item[i].value, pd->Default_Value);
+          item[i].value = pd->Default_Value;
+        }
+        else
+        {
+          printf("** Value not allowed \"%s\" (ref=%d) value=%d, allowed: ", pd->Ext_User_Prm_Data_Name,
+                 item[i].ref->Reference_Number, item[i].value);
+          for (int j = 0; j < pd->allowed_cnt; j++)
+            printf("%d%s", pd->Allowed_Values[j], j < pd->allowed_cnt - 1 ? "," : "");
+          printf("\n");
+        }
+      }
     }
     switch (pd->data_type)
     {
@@ -1564,8 +1636,7 @@ int pb_gsd::prm_items_to_data(gsd_sPrmDataItem* item, int item_size,
   return 1;
 }
 
-int pb_gsd::prm_data_to_items(gsd_sPrmDataItem* item, int item_size,
-                              unsigned char* data, int data_size,
+int pb_gsd::prm_data_to_items(gsd_sPrmDataItem* item, int item_size, unsigned char* data, int data_size,
                               int set_default)
 {
   gsd_sExtUserPrmData* pd;
@@ -1777,8 +1848,7 @@ int pb_gsd::get_svalue(const char* key, char* value, int size)
   gsd_sKeyword* keyp;
   gsd_sData* datap;
 
-  for (keyp = keywordlist, datap = datalist; keyp->type != gsd_End;
-       keyp++, datap++)
+  for (keyp = keywordlist, datap = datalist; keyp->type != gsd_End; keyp++, datap++)
   {
     if (str_NoCaseStrcmp(key, keyp->name) == 0)
     {
@@ -1812,8 +1882,7 @@ int pb_gsd::get_ivalue(const char* key, int* value)
   gsd_sKeyword* keyp;
   gsd_sData* datap;
 
-  for (keyp = keywordlist, datap = datalist; keyp->type != gsd_End;
-       keyp++, datap++)
+  for (keyp = keywordlist, datap = datalist; keyp->type != gsd_End; keyp++, datap++)
   {
     if (str_NoCaseStrcmp(key, keyp->name) == 0)
     {
@@ -1844,8 +1913,7 @@ int pb_gsd::print()
   gsd_sData* datap;
   unsigned int val;
 
-  for (keyp = keywordlist, datap = datalist; keyp->type != gsd_End;
-       keyp++, datap++)
+  for (keyp = keywordlist, datap = datalist; keyp->type != gsd_End; keyp++, datap++)
   {
     if (datap->found)
     {
@@ -1914,18 +1982,15 @@ int pb_gsd::print()
     printf("  Module_Reference %d\n", mp->Module_Reference);
 
     // Print ExtUserPrmDataRef
-    for (gsd_sExtUserPrmDataRef* ep = mp->extuserprmdatareflist; ep;
-         ep = ep->next)
+    for (gsd_sExtUserPrmDataRef* ep = mp->extuserprmdatareflist; ep; ep = ep->next)
     {
-      printf("  ExtUserPrmDataRef %d %d\n", ep->Reference_Offset,
-             ep->Reference_Number);
+      printf("  ExtUserPrmDataRef %d %d\n", ep->Reference_Offset, ep->Reference_Number);
     }
 
     printf("  Ext_Module_Prm_Data_Len %d\n", mp->Ext_Module_Prm_Data_Len);
     if (mp->extuserprmdataconst)
     {
-      printf("  ExtUserPrmDataConst %d   ",
-             mp->extuserprmdataconst->Const_Offset);
+      printf("  ExtUserPrmDataConst %d   ", mp->extuserprmdataconst->Const_Offset);
       for (int i = 0; i < mp->extuserprmdataconst->len; i++)
         printf("%d,", mp->extuserprmdataconst->Const_Prm_Data[i]);
       printf("\n");
@@ -1960,8 +2025,7 @@ int pb_gsd::print()
   // Print ExtUserPrmData
   for (gsd_sExtUserPrmData* ep = extuserprmdatalist; ep; ep = ep->next)
   {
-    printf("ExtPrmUserData %d \"%s\"\n", ep->Reference_Number,
-           ep->Ext_User_Prm_Data_Name);
+    printf("ExtPrmUserData %d \"%s\"\n", ep->Reference_Number, ep->Ext_User_Prm_Data_Name);
     printf("  Data_Type_Name %s", ep->Data_Type_Name);
     if (str_NoCaseStrcmp(ep->Data_Type_Name, "Bit") == 0)
       printf(" %d\n", ep->bit_num);
@@ -1986,8 +2050,7 @@ int pb_gsd::print()
   // Print ExtUserPrmRef
   for (gsd_sExtUserPrmDataRef* ep = extuserprmdatareflist; ep; ep = ep->next)
   {
-    printf("ExtUserPrmDataRef %d %d\n", ep->Reference_Offset,
-           ep->Reference_Number);
+    printf("ExtUserPrmDataRef %d %d\n", ep->Reference_Offset, ep->Reference_Number);
   }
 
   if (extuserprmdataconst)
@@ -2001,8 +2064,7 @@ int pb_gsd::print()
   return 1;
 }
 
-int pb_gsd::str_to_ostring(unsigned char** data, char* str, int size,
-                           int* rsize)
+int pb_gsd::str_to_ostring(unsigned char** data, char* str, int size, int* rsize)
 {
   char valstr[200];
   int valcnt;
@@ -2077,29 +2139,58 @@ int pb_gsd::read_line(char* line, int lsize, FILE* fp)
       if (streq(line, "") || (line[0] == '\r' && line[1] == '\0'))
         continue;
 
+      // Track if we're inside a quoted string for continuation handling
+      int continuation_in_string = 0;
+      for (s = line; *s; s++)
+      {
+        if (*s == '"')
+          continuation_in_string = !continuation_in_string;
+      }
+
       while (1)
       {
-        if (line[strlen(line) - 1] == '\\' || line[strlen(line) - 2] == '\\')
+        int linelen = strlen(line);
+        if (linelen > 0 && (line[linelen - 1] == '\\' || (linelen > 1 && line[linelen - 2] == '\\')))
         {
           char line2[500];
 
           // Add next line
-          sts = dcli_read_line(line2, lsize - strlen(line2), fp);
+          sts = dcli_read_line(line2, sizeof(line2), fp);
           if (!sts)
             break;
           line_cnt++;
 
-          // Remove comments
-          in_string = 0;
-          for (s = line2; *s; s++)
+          // Always remove trailing CR from continuation line
+          int len2 = strlen(line2);
+          if (len2 > 0 && line2[len2 - 1] == '\r')
+            line2[--len2] = 0;
+
+          // Remove comments only if not inside a string from original line
+          if (!continuation_in_string)
           {
-            if (*s == '"')
-              in_string = !in_string;
-            if (*s == ';' && !in_string)
-              *s = 0;
-          }
-          if (!in_string)
+            in_string = 0;
+            for (s = line2; *s; s++)
+            {
+              if (*s == '"')
+                in_string = !in_string;
+              if (*s == ';' && !in_string)
+              {
+                *s = 0;
+                break;
+              }
+            }
             str_trim(line2, line2);
+          }
+          else
+          {
+            // Update string state based on line2 content
+            for (s = line2; *s; s++)
+            {
+              if (*s == '"')
+                continuation_in_string = !continuation_in_string;
+            }
+          }
+
           if (strlen(line) + strlen(line2) > (unsigned int)lsize)
           {
             printf("** Line to long, line %d\n", line_cnt);
@@ -2119,8 +2210,7 @@ int pb_gsd::read_line(char* line, int lsize, FILE* fp)
   return sts;
 }
 
-int pb_gsd::add_module_conf(pwr_tCid cid, pwr_tOid oid, char* name,
-                            char* module_name)
+int pb_gsd::add_module_conf(pwr_tCid cid, pwr_tOid oid, char* name, char* module_name)
 {
   int idx;
   gsd_sModule* mp;
@@ -2172,8 +2262,7 @@ int pb_gsd::move_module_conf(gsd_sModuleConf* src, gsd_sModuleConf* dest)
   if (src_idx == dest_idx)
     return 1;
 
-  if (src_idx < 0 || src_idx >= module_conf_cnt || dest_idx < 0 ||
-      dest_idx >= module_conf_cnt)
+  if (src_idx < 0 || src_idx >= module_conf_cnt || dest_idx < 0 || dest_idx >= module_conf_cnt)
     return 0;
 
   gsd_sModuleConf tmp = module_conf[src_idx];
@@ -2211,10 +2300,8 @@ int pb_gsd::copy_module_conf(gsd_sModuleConf* m)
   copy_buff->oid = pwr_cNOid;
   if (m->prm_dataitems)
   {
-    copy_buff->prm_dataitems = (gsd_sPrmDataItem*)calloc(
-        m->prm_dataitems_cnt, sizeof(gsd_sPrmDataItem));
-    memcpy(copy_buff->prm_dataitems, m->prm_dataitems,
-           m->prm_dataitems_cnt * sizeof(gsd_sPrmDataItem));
+    copy_buff->prm_dataitems = (gsd_sPrmDataItem*)calloc(m->prm_dataitems_cnt, sizeof(gsd_sPrmDataItem));
+    memcpy(copy_buff->prm_dataitems, m->prm_dataitems, m->prm_dataitems_cnt * sizeof(gsd_sPrmDataItem));
   }
   return 1;
 }
@@ -2263,8 +2350,8 @@ int pb_gsd::paste_module_conf(gsd_sModuleConf* m)
   module_conf[idx] = *copy_buff;
   if (copy_buff->prm_dataitems)
   {
-    module_conf[idx].prm_dataitems = (gsd_sPrmDataItem*)calloc(
-        module_conf[idx].prm_dataitems_cnt, sizeof(gsd_sPrmDataItem));
+    module_conf[idx].prm_dataitems =
+        (gsd_sPrmDataItem*)calloc(module_conf[idx].prm_dataitems_cnt, sizeof(gsd_sPrmDataItem));
     memcpy(module_conf[idx].prm_dataitems, copy_buff->prm_dataitems,
            module_conf[idx].prm_dataitems_cnt * sizeof(gsd_sPrmDataItem));
   }
@@ -2329,19 +2416,20 @@ int pb_gsd::configure_module(gsd_sModuleConf* m)
 
       // Create data items for module ExtPrmData
       m->prm_dataitems_cnt = 0;
-      for (gsd_sExtUserPrmDataRef* ep = mp->extuserprmdatareflist; ep;
-           ep = ep->next)
+      for (gsd_sExtUserPrmDataRef* ep = mp->extuserprmdatareflist; ep; ep = ep->next)
         m->prm_dataitems_cnt++;
 
-      m->prm_dataitems = (gsd_sPrmDataItem*)calloc(m->prm_dataitems_cnt,
-                                                   sizeof(gsd_sPrmDataItem));
+      m->prm_dataitems = (gsd_sPrmDataItem*)calloc(m->prm_dataitems_cnt, sizeof(gsd_sPrmDataItem));
       int i = 0;
-      for (gsd_sExtUserPrmDataRef* ep = mp->extuserprmdatareflist; ep;
-           ep = ep->next)
+      for (gsd_sExtUserPrmDataRef* ep = mp->extuserprmdatareflist; ep; ep = ep->next)
       {
         m->prm_dataitems[i].ref = ep;
         i++;
       }
+
+      // Set default values for module prm items from ExtUserPrmData Default_Value
+      prm_items_set_default_data(m->prm_dataitems, m->prm_dataitems_cnt);
+
       if (m->module->extuserprmdataconst)
       {
         memcpy(m->prm_data, m->module->extuserprmdataconst->Const_Prm_Data,
@@ -2380,8 +2468,7 @@ void pb_gsd::pack_config(char* config, int* len)
     if (!module_conf[i].module || !module_conf[i].module->Config)
       continue;
 
-    memcpy(&config[conf_idx], module_conf[i].module->Config,
-           module_conf[i].module->config_size);
+    memcpy(&config[conf_idx], module_conf[i].module->Config, module_conf[i].module->config_size);
     conf_idx += module_conf[i].module->config_size;
   }
 
@@ -2391,19 +2478,37 @@ void pb_gsd::pack_config(char* config, int* len)
   *len = conf_idx;
 }
 
-void pb_gsd::pack_ext_user_prm_data(char* data, int* len)
+void pb_gsd::pack_ext_user_prm_data(char* data, int* len, int include_jokerblocks)
 {
   int i;
   short data_idx;
 
-  prm_items_to_data(prm_dataitems, prm_dataitems_cnt,
-                    extuserprmdataconst->Const_Prm_Data,
+  prm_items_to_data(prm_dataitems, prm_dataitems_cnt, extuserprmdataconst->Const_Prm_Data,
                     items_user_prm_data_len);
 
   data_idx = 0;
-  memcpy(&data[data_idx], extuserprmdataconst->Const_Prm_Data,
-         items_user_prm_data_len);
+  memcpy(&data[data_idx], extuserprmdataconst->Const_Prm_Data, items_user_prm_data_len);
   data_idx += items_user_prm_data_len;
+
+  // Insert Jokerblock for slot 0 (interface module) after device-level prm data
+  // Block header format per IEC 61158 / GSD Spec:
+  //   Byte 1: Length (255 = 0xFF signals Jokerblock "accept any length")
+  //   Byte 2: Structure_Type (32-128: manufacturer specific, 129: User_Prm_Data)
+  //   Byte 3: Slot_Number
+  //   Byte 4: Index (0 for User_Prm_Data)
+  if (include_jokerblocks && jokerblock_supp && jokerblock_list)
+  {
+    for (gsd_sJokerblockDef* jb = jokerblock_list; jb; jb = jb->next)
+    {
+      if (jb->Slot_Number == 0 && jb->Location <= 1)
+      {
+        data[data_idx++] = 0xFF;                              // Length = 255 signals Jokerblock
+        data[data_idx++] = (unsigned char)jb->Structure_Type; // Structure_Type
+        data[data_idx++] = (unsigned char)jb->Slot_Number;    // Slot_Number
+        data[data_idx++] = 0x00;                              // Index = 0 for User_Prm_Data
+      }
+    }
+  }
 
   for (i = 0; i < module_conf_cnt; i++)
   {
@@ -2411,17 +2516,31 @@ void pb_gsd::pack_ext_user_prm_data(char* data, int* len)
       continue;
 
     if (module_conf[i].module->extuserprmdataconst)
-      memcpy(module_conf[i].prm_data +
-                 module_conf[i].module->extuserprmdataconst->Const_Offset,
+      memcpy(module_conf[i].prm_data + module_conf[i].module->extuserprmdataconst->Const_Offset,
              module_conf[i].module->extuserprmdataconst->Const_Prm_Data,
              module_conf[i].module->extuserprmdataconst->len);
-    prm_items_to_data(module_conf[i].prm_dataitems,
-                      module_conf[i].prm_dataitems_cnt, module_conf[i].prm_data,
+    prm_items_to_data(module_conf[i].prm_dataitems, module_conf[i].prm_dataitems_cnt, module_conf[i].prm_data,
                       module_conf[i].module->Ext_Module_Prm_Data_Len);
-    memcpy(&data[data_idx], module_conf[i].prm_data,
-           module_conf[i].module->Ext_Module_Prm_Data_Len);
+    memcpy(&data[data_idx], module_conf[i].prm_data, module_conf[i].module->Ext_Module_Prm_Data_Len);
     data_idx += module_conf[i].module->Ext_Module_Prm_Data_Len;
+
+    // Insert Jokerblock for this slot immediately after its prm data
+    if (include_jokerblocks && jokerblock_supp && jokerblock_list)
+    {
+      for (gsd_sJokerblockDef* jb = jokerblock_list; jb; jb = jb->next)
+      {
+        // Slot index in module_conf is 1-based, matching Jokerblock_Slot
+        if (jb->Slot_Number == module_conf[i].idx && jb->Location <= 1)
+        {
+          data[data_idx++] = 0xFF;                              // Length = 255 signals Jokerblock
+          data[data_idx++] = (unsigned char)jb->Structure_Type; // Structure_Type
+          data[data_idx++] = (unsigned char)jb->Slot_Number;    // Slot_Number
+          data[data_idx++] = 0x00;                              // Index = 0 for User_Prm_Data
+        }
+      }
+    }
   }
+
   *len = data_idx;
 }
 
@@ -2452,26 +2571,34 @@ int pb_gsd::unpack_ext_user_prm_data(char* data, int len)
   short data_idx;
 
   data_idx = 0;
-  memcpy(extuserprmdataconst->Const_Prm_Data, &data[data_idx],
-         items_user_prm_data_len);
+  memcpy(extuserprmdataconst->Const_Prm_Data, &data[data_idx], items_user_prm_data_len);
   data_idx += items_user_prm_data_len;
 
-  prm_data_to_items(prm_dataitems, prm_dataitems_cnt,
-                    extuserprmdataconst->Const_Prm_Data,
+  prm_data_to_items(prm_dataitems, prm_dataitems_cnt, extuserprmdataconst->Const_Prm_Data,
                     items_user_prm_data_len);
+
+  // Skip Jokerblock for slot 0 if present (Length=255, Structure_Type, Slot=0, Index)
+  if (jokerblock_supp && data_idx + 4 <= len && (unsigned char)data[data_idx] == 0xFF)
+  {
+    data_idx += 4;
+  }
 
   for (i = 0; i < module_conf_cnt; i++)
   {
     if (!module_conf[i].module || !module_conf[i].module->extuserprmdataconst)
       continue;
 
-    memcpy(module_conf[i].prm_data, &data[data_idx],
-           module_conf[i].module->Ext_Module_Prm_Data_Len);
+    memcpy(module_conf[i].prm_data, &data[data_idx], module_conf[i].module->Ext_Module_Prm_Data_Len);
     data_idx += module_conf[i].module->Ext_Module_Prm_Data_Len;
 
-    prm_data_to_items(module_conf[i].prm_dataitems,
-                      module_conf[i].prm_dataitems_cnt, module_conf[i].prm_data,
+    prm_data_to_items(module_conf[i].prm_dataitems, module_conf[i].prm_dataitems_cnt, module_conf[i].prm_data,
                       module_conf[i].module->Ext_Module_Prm_Data_Len);
+
+    // Skip Jokerblock for this slot if present (Length=255, Structure_Type, Slot, Index)
+    if (jokerblock_supp && data_idx + 4 <= len && (unsigned char)data[data_idx] == 0xFF)
+    {
+      data_idx += 4;
+    }
   }
 
   if (len != data_idx)
@@ -2534,8 +2661,7 @@ int pb_gsd::syntax_check(int* idx)
       // Check that name is unique
       for (int j = 0; j < module_conf_cnt; j++)
       {
-        if (i != j &&
-            str_NoCaseStrcmp(module_conf[i].name, module_conf[j].name) == 0)
+        if (i != j && str_NoCaseStrcmp(module_conf[i].name, module_conf[j].name) == 0)
         {
           *idx = i;
           return PB__DUPLMODULENAME;

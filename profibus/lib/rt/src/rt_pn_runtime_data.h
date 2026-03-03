@@ -44,10 +44,11 @@
 #include <memory>
 #include <map>
 #include <iostream>
+#include <functional>
 
 #include "pwr.h"
 #include "co_pugixml.hpp"
-#include "rt_profinet.h"
+#include "profinet.h"
 
 // Increment this whenever the runtime xml changes (pwr_pn_XXXXXXXXXXXXXXX.xml files that is)
 #define PWR_SCHEMA_VERSION 1
@@ -109,7 +110,7 @@ public:
   // Stack Runtime specifics
   unsigned short m_rt_identifier;
   unsigned short m_rt_io_data_length;
-  unsigned char* m_rt_io_data;
+  PN_U8 m_rt_io_data[PROFINET_IO_DATA_MAX_LENGTH];
   unsigned short m_rt_clean_io_data_length;
   unsigned char* m_rt_clean_io_data;
   uint m_rt_properties = 0;
@@ -300,7 +301,7 @@ public:
 
   // Elements
   ProfinetNetworkSettings m_NetworkSettings;
-  std::vector<ProfinetSlot> m_slot_list;
+  std::map<uint, ProfinetSlot> m_slot_map;
   std::map<uint, ProfinetAPI> m_API_map;                            // <api, ProfinetAPI>
   std::map<uint, ProfinetIOCR> m_IOCR_map;                          // <iocr type, ProfinetIOCR>
   std::unordered_map<uint, ProfinetChannelDiag> m_channel_diag_map; // <ErrorType, xxxxxxxxxxxxxxxxxxx>
@@ -308,6 +309,8 @@ public:
       m_unit_diag_type_map; // <UserStructureIdentifier, xxxxxxxxxxxxxxxxxx>
 
   // Runtime specifics
+  std::map<uint, std::reference_wrapper<ProfinetSlot>>
+      m_rt_plugged_slots_map; // This is a map of references (slots with modules plugged into them)
   unsigned short m_rt_device_state;
   unsigned short m_rt_device_ref;
   unsigned short m_rt_alarm_ref;
@@ -319,6 +322,7 @@ public:
   unsigned char m_rt_macaddress[6];
   std::string m_rt_interface_name;  // Used by the controller. Ignored by other devices...
   std::string m_rt_version = "1.0"; // Who knows? According to manual set this to "1.0"
+  bool m_rt_im0_read = false;       // Flag to indicate whether IM0 has been read
 };
 
 class ProfinetRuntimeData

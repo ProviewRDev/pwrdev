@@ -37,7 +37,7 @@
 #include <ctype.h>
 
 #include "co_string.h"
-
+#include <stdlib.h>
 char* str_ToLower(char* dst, const char* src)
 {
   char* rs = dst;
@@ -46,9 +46,9 @@ char* str_ToLower(char* dst, const char* src)
     return NULL;
   if (src == NULL)
     src = dst;
-  
+
   while (*src)
-    if ((*src >= 65 && *src <= 90) || (((unsigned char) *src) >= 192 && ((unsigned char) *src) <= 222))
+    if ((*src >= 65 && *src <= 90) || (((unsigned char)*src) >= 192 && ((unsigned char)*src) <= 222))
       *dst++ = (*src++) + 32;
     else
       *dst++ = *src++;
@@ -68,7 +68,7 @@ char* str_ToUpper(char* dst, const char* src)
     src = dst;
 
   while (*src)
-    if ((*src >= 97 && *src <= 122) || (((unsigned char) *src) >= 224 && ((unsigned char) *src) <= 254))
+    if ((*src >= 97 && *src <= 122) || (((unsigned char)*src) >= 224 && ((unsigned char)*src) <= 254))
       *dst++ = (*src++) - 32;
     else
       *dst++ = *src++;
@@ -83,8 +83,7 @@ int str_NoCaseStrcmp(const char* s, const char* t)
   while (*s && *t && !(((*s) ^ (*t)) & ~(1 << 5)))
     s++, t++;
 
-  return (isalpha(*s) ? ((*s) & ~(1 << 5)) : *s)
-      - (isalpha(*t) ? ((*t) & ~(1 << 5)) : *t);
+  return (isalpha(*s) ? ((*s) & ~(1 << 5)) : *s) - (isalpha(*t) ? ((*t) & ~(1 << 5)) : *t);
 }
 
 int str_NoCaseStrncmp(const char* s, const char* t, size_t n)
@@ -96,9 +95,8 @@ int str_NoCaseStrncmp(const char* s, const char* t, size_t n)
 
   if (n == i)
     return 0;
-  
-  return (isalpha(*s) ? ((*s) & ~(1 << 5)) : *s)
-      - (isalpha(*t) ? ((*t) & ~(1 << 5)) : *t);
+
+  return (isalpha(*s) ? ((*s) & ~(1 << 5)) : *s) - (isalpha(*t) ? ((*t) & ~(1 << 5)) : *t);
 }
 
 char* str_Strcpy(char* dest, const char* src)
@@ -129,22 +127,28 @@ char* str_Strncpy(char* dest, const char* src, size_t n)
 
 int str_StrncpyCutOff(char* t, const char* s, size_t n, int cutleft)
 {
-  if (strlen(s) < n) {
+  if (strlen(s) < n)
+  {
     str_Strcpy(t, s);
     return 0;
   }
 
-  if (cutleft) {
+  if (cutleft)
+  {
     str_Strcpy(t, s + strlen(s) - n + 1);
-    if (n > 5) {
+    if (n > 5)
+    {
       t[0] = '.';
       t[1] = '.';
       t[2] = '.';
     }
-  } else {
+  }
+  else
+  {
     str_Strncpy(t, s, n);
     t[n - 1] = 0;
-    if (n > 5) {
+    if (n > 5)
+    {
       t[n - 2] = '.';
       t[n - 3] = '.';
       t[n - 4] = '.';
@@ -153,18 +157,56 @@ int str_StrncpyCutOff(char* t, const char* s, size_t n, int cutleft)
   return 1;
 }
 
-void str_trim(char *out, const char *in)
+void str_trim(char* out, const char* in)
 {
   // skip leading whitespace
-  while (isspace((unsigned char) *in))
+  while (isspace((unsigned char)*in))
     in++;
-  
+
   // Skip trailing whitespace
-  const char *end = in + strlen(in) - 1;
-  while (end > in && isspace((unsigned char) *end)) end--;
+  const char* end = in + strlen(in) - 1;
+  while (end > in && isspace((unsigned char)*end))
+    end--;
   end++;
 
   int length = end - in;
   str_Strncpy(out, in, length);
   out[length] = 0;
+}
+
+/*************************************************************************
+ *
+ * Name:	str_trim_rtn(const char* in)
+ *
+ * Type		const char*
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Trims given string and returns it.
+ *
+ **************************************************************************/
+const char* str_trim_rtn(const char* in)
+{
+  // Skip leading whitespace
+  while (isspace((unsigned char)*in))
+  {
+    in++;
+  }
+
+  // Skip trailing whitespace
+  const char* end = in + strlen(in) - 1;
+  while (end > in && isspace((unsigned char)*end))
+  {
+    end--;
+  }
+  end++;
+
+  size_t inLength = strlen(in);
+  char* out = malloc(inLength + 1);
+  int length = end - in;
+  out = str_Strncpy(out, in, length);
+  out[length] = 0;
+
+  return out;
 }

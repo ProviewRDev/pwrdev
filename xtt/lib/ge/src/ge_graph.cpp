@@ -3839,7 +3839,7 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
   }
   case glow_eEvent_Translate:
   {
-    char new_text[200];
+    static char new_text[200];
     int sts;
 
     sts = Lng::translate(event->translate.text, new_text);
@@ -5134,7 +5134,7 @@ static int graph_trace_grow_cb(GlowCtx* ctx, glow_tEvent event)
 
   case glow_eEvent_Translate:
   {
-    char new_text[200];
+    static char new_text[200];
     int sts;
 
     sts = Lng::translate(event->translate.text, new_text);
@@ -7034,7 +7034,7 @@ void Graph::create_axis(grow_tObject* object, double x, double y, int dynamic, i
   if (colortheme)
   {
     grow_SetObjectOriginalTextColor(*object, glow_eCtColor_BackgroundTextAndLines);
-    // grow_SetObjectTextFont( *object, glow_eFont_Helvetica);
+    // grow_SetObjectTextFont( *object, glow_eFont_LucidaSans);
   }
 }
 
@@ -7075,7 +7075,7 @@ void Graph::create_axisarc(grow_tObject* object, double x, double y, int dynamic
   if (colortheme)
   {
     grow_SetObjectOriginalTextColor(*object, glow_eCtColor_BackgroundTextAndLines);
-    // grow_SetObjectTextFont( *object, glow_eFont_Helvetica);
+    // grow_SetObjectTextFont( *object, glow_eFont_LucidaSans);
   }
 }
 

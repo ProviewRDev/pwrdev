@@ -34,7 +34,7 @@
  * General Public License plus this exception.
  */
 
-/* profinet_viewer.cpp Profinet viewer */
+/* profinet_viewer2.cpp -- PROFINET DCP Tool main launcher */
 
 #include "co_dcli.h"
 #include "co_string.h"
@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
     {
       if (i + 1 >= argc)
       {
-        printf("\nUsage: profinet_viewer [-f windowmgr]");
+        printf("\nUsage: profinet_viewer2 [-f windowmgr]");
         exit(0);
       }
       dcli_execute_flavour_if_exists(argv, argv[i + 1]);

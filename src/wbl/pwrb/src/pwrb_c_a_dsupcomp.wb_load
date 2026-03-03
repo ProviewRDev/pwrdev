@@ -207,6 +207,18 @@ SObject pwrb:Class
           Attr Flags |= PWR_MASK_REDUTRANSFER
         EndBody
       EndObject
+      !/**
+      !  Derived output for when Action is high and Acked is low.
+      !*/
+      Object ActiveNotAcked $Attribute 42 
+        Body SysBody
+          Attr PgmName = "ActiveNotAcked"
+          Attr TypeRef = "pwrs:Type-$Boolean"
+          Attr Flags |= PWR_MASK_STATE 
+          Attr Flags |= PWR_MASK_NOEDIT 
+          Attr Flags |= PWR_MASK_REDUTRANSFER
+        EndBody
+      EndObject
       ! ++
       ! Sup struct
       !

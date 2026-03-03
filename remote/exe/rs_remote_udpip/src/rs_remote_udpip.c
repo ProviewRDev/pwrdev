@@ -35,27 +35,27 @@
  */
 
 /*************************************************************************
-*		===============
-*                P r o v i e w
-*               ===============
-**************************************************************************
-*
-* Filename:             rs_remote_udpip.c
-*
-*                       Date    Pgm.    Read.   Remark
-* Modified              000301  CJu
-*			000330	CJu		v3.0
-*			040504	CJu		v4.0.0
-*
-* Description:		Remote transport process UDP/IP
-*			Implements transport protocol UDP/IP, connectionless
-*			datagram protocol on the IP-stack. The major difference
-*			between TCP and UDP is that TCP uses connected
-*			sockets while UDP sends datagrams to any unconnected
-*			socket.
-*
-**************************************************************************
-**************************************************************************/
+ *		===============
+ *                P r o v i e w
+ *               ===============
+ **************************************************************************
+ *
+ * Filename:             rs_remote_udpip.c
+ *
+ *                       Date    Pgm.    Read.   Remark
+ * Modified              000301  CJu
+ *			000330	CJu		v3.0
+ *			040504	CJu		v4.0.0
+ *
+ * Description:		Remote transport process UDP/IP
+ *			Implements transport protocol UDP/IP, connectionless
+ *			datagram protocol on the IP-stack. The major difference
+ *			between TCP and UDP is that TCP uses connected
+ *			sockets while UDP sends datagrams to any unconnected
+ *			socket.
+ *
+ **************************************************************************
+ **************************************************************************/
 
 /*_Include files_________________________________________________________*/
 #include <stdio.h>
@@ -84,12 +84,13 @@
 #define ETB 15
 #define ENQ 5
 #define ACK 6
-#define UDP_MAX_SIZE 32768
+#define UDP_MAX_SIZE 65507
 #define TIME_INCR 0.02
 
 fd_set fds; /* For select call */
 
-typedef struct {
+typedef struct
+{
   unsigned char protocol_id[2];
   unsigned short int msg_size;
   unsigned short int msg_id[2];
@@ -102,10 +103,10 @@ float time_since_scan;
 float time_since_rcv;
 float time_since_keepalive;
 
-int my_socket; /* My socket */
-struct sockaddr_in my_addr; /* My named socket description */
+int my_socket;                 /* My socket */
+struct sockaddr_in my_addr;    /* My named socket description */
 struct sockaddr_in their_addr; /* Remote socket description */
-struct sockaddr_in dual_addr; /* Maybe a dual socket description */
+struct sockaddr_in dual_addr;  /* Maybe a dual socket description */
 
 /*************************************************************************
 **************************************************************************
@@ -145,8 +146,8 @@ void SendAck(unsigned short int id0, unsigned short int id1)
   header.msg_id[0] = htons(id0);
   header.msg_id[1] = htons(id1);
 
-  status = sendto(my_socket, &header, sizeof(header), 0,
-      (struct sockaddr*)&their_addr, sizeof(struct sockaddr));
+  status =
+      sendto(my_socket, &header, sizeof(header), 0, (struct sockaddr*)&their_addr, sizeof(struct sockaddr));
 
   return;
 }
@@ -180,10 +181,10 @@ short int Receive()
 
   fromlen = sizeof(struct sockaddr);
 
-  size = recvfrom(
-      my_socket, &buf, sizeof(buf), 0, (struct sockaddr*)&from, &fromlen);
+  size = recvfrom(my_socket, &buf, sizeof(buf), 0, (struct sockaddr*)&from, &fromlen);
 
-  if (size < 0) { /* Definitly error */
+  if (size < 0)
+  { /* Definitly error */
     errh_Info("UDP Receive fail %s", rn_udp->RemoteHostname);
     rn_udp->ErrCount++;
     return (-1);
@@ -192,8 +193,8 @@ short int Receive()
   if (rn_udp->Disable)
     return (1);
 
-  if (memcmp(&from.sin_addr, &their_addr.sin_addr, sizeof(struct in_addr))
-      != 0) { /*from.sin_port != their_addr.sin_port*/
+  if (memcmp(&from.sin_addr, &their_addr.sin_addr, sizeof(struct in_addr)) != 0)
+  { /*from.sin_port != their_addr.sin_port*/
     memcpy(&badr, &from.sin_addr, 4);
     sprintf(unknown, "%d.%d.%d.%d", badr[0], badr[1], badr[2], badr[3]);
     errh_Info("UDP Receive from unknown source %s", unknown);
@@ -204,32 +205,38 @@ short int Receive()
   /* Set link up */
 
   time_since_rcv = 0;
-  if (rn_udp->LinkUp == 0) {
+  if (rn_udp->LinkUp == 0)
+  {
     errh_Info("UDP link up %s", rn_udp->RemoteHostname);
     rn_udp->LinkUp = 1;
   }
 
-  if (size > 0 && rn_udp->DisableHeader) {
+  if (size > 0 && rn_udp->DisableHeader)
+  {
     /* Header disabled, take the first receive remtrans object */
 
     remtrans = rn.remtrans;
     search_remtrans = true;
 
-    while (remtrans && search_remtrans) {
+    while (remtrans && search_remtrans)
+    {
       /* Match? */
-      if (remtrans->objp->Direction == REMTRANS_IN) {
+      if (remtrans->objp->Direction == REMTRANS_IN)
+      {
         search_remtrans = false;
         sts = RemTrans_Receive(remtrans, buf, size);
       }
       remtrans = (remtrans_item*)remtrans->next;
     }
-    if (search_remtrans) {
+    if (search_remtrans)
+    {
       rn_udp->ErrCount++;
       errh_Info("UDP Receive no remtrans %s", rn_udp->RemoteHostname);
     }
   }
 
-  else if (size >= 8) {
+  else if (size >= 8)
+  {
     memcpy(&header, &buf, sizeof(remote_udp_header));
 
     /* Convert the header to host byte order */
@@ -237,45 +244,55 @@ short int Receive()
     header.msg_id[0] = ntohs(header.msg_id[0]);
     header.msg_id[1] = ntohs(header.msg_id[1]);
 
-    if (header.protocol_id[0] == STX && size == header.msg_size) {
+    if (header.protocol_id[0] == STX && size == header.msg_size)
+    {
       /* This is a valid remtrans */
-      if (header.protocol_id[1] == ETB || header.protocol_id[1] == ENQ) {
-        if (header.msg_id[0] == 0 && header.msg_id[1] == 0) {
+      if (header.protocol_id[1] == ETB || header.protocol_id[1] == ENQ)
+      {
+        if (header.msg_id[0] == 0 && header.msg_id[1] == 0)
+        {
           /* Keepalive */
           rn_udp->KeepaliveDiff--;
-        } else {
+        }
+        else
+        {
           /* Data */
           remtrans = (remtrans_item*)rn.remtrans;
           search_remtrans = true;
-          while (remtrans && search_remtrans) {
+          while (remtrans && search_remtrans)
+          {
             /* Match? */
-            if (remtrans->objp->Address[0] == header.msg_id[0]
-                && remtrans->objp->Address[1] == header.msg_id[1]
-                && remtrans->objp->Direction == REMTRANS_IN) {
+            if (remtrans->objp->Address[0] == header.msg_id[0] &&
+                remtrans->objp->Address[1] == header.msg_id[1] && remtrans->objp->Direction == REMTRANS_IN)
+            {
               search_remtrans = false;
               pos = ((char*)&buf) + sizeof(remote_udp_header);
-              sts = RemTrans_Receive(
-                  remtrans, pos, header.msg_size - sizeof(remote_udp_header));
-              if (header.protocol_id[1] == ENQ) {
+              sts = RemTrans_Receive(remtrans, pos, header.msg_size - sizeof(remote_udp_header));
+              if (header.protocol_id[1] == ENQ)
+              {
                 SendAck(header.msg_id[0], header.msg_id[1]);
               }
             }
             remtrans = (remtrans_item*)remtrans->next;
           }
-          if (search_remtrans) {
+          if (search_remtrans)
+          {
             rn_udp->ErrCount++;
             errh_Info("UDP Receive no remtrans %s", rn_udp->RemoteHostname);
           }
         }
-      } else if (header.protocol_id[1] == ACK) {
+      }
+      else if (header.protocol_id[1] == ACK)
+      {
         /* Acknowledge message */
         transbuff = (rem_t_transbuff*)rn.transbuff;
         transbuff_behind = (rem_t_transbuff*)rn.transbuff;
 
-        while (transbuff) {
+        while (transbuff)
+        {
           transp = (remtrans_item*)transbuff->remtrans;
-          if (header.msg_id[0] == transp->objp->Address[0]
-              && header.msg_id[1] == transp->objp->Address[1]) {
+          if (header.msg_id[0] == transp->objp->Address[0] && header.msg_id[1] == transp->objp->Address[1])
+          {
             /* This is it, unlink the transbuff */
             if (transbuff == transbuff_behind)
               rn.transbuff = (rem_t_transbuff*)transbuff->next;
@@ -291,26 +308,28 @@ short int Receive()
           transbuff_behind = transbuff;
           transbuff = (rem_t_transbuff*)transbuff->next;
         }
-      } else {
+      }
+      else
+      {
         /* Weird header */
         rn_udp->ErrCount++;
-        errh_Info("UDP receive weird header %s, %02x %02x %04x %04x %04x",
-            rn_udp->RemoteHostname, header.protocol_id[0],
-            header.protocol_id[1], header.msg_size, header.msg_id[0],
-            header.msg_id[1]);
+        errh_Info("UDP receive weird header %s, %02x %02x %04x %04x %04x", rn_udp->RemoteHostname,
+                  header.protocol_id[0], header.protocol_id[1], header.msg_size, header.msg_id[0],
+                  header.msg_id[1]);
       }
     }
-
-    else {
+    else
+    {
       /* Weird header */
       rn_udp->ErrCount++;
-      errh_Info("UDP receive weird header %s, %02x %02x %04x %04x %04x",
-          rn_udp->RemoteHostname, header.protocol_id[0], header.protocol_id[1],
-          header.msg_size, header.msg_id[0], header.msg_id[1]);
+      errh_Info("UDP receive weird header %s (wrong size?), %02x %02x %04x %04x %04x", rn_udp->RemoteHostname,
+                header.protocol_id[0], header.protocol_id[1], header.msg_size, header.msg_id[0],
+                header.msg_id[1]);
     }
   }
 
-  else {
+  else
+  {
     /* Not a remtrans UPD message */
     rn_udp->ErrCount++;
     errh_Info("UDP receive weird message %s", rn_udp->RemoteHostname);
@@ -340,8 +359,7 @@ int SendKeepalive(void)
   header.msg_id[0] = 0;
   header.msg_id[1] = 0;
 
-  sts = sendto(my_socket, &header, sizeof(header), 0,
-      (struct sockaddr*)&their_addr, sizeof(struct sockaddr));
+  sts = sendto(my_socket, &header, sizeof(header), 0, (struct sockaddr*)&their_addr, sizeof(struct sockaddr));
 
   if (sts >= 0)
     rn_udp->KeepaliveDiff++;
@@ -361,7 +379,7 @@ void CreateSocket()
 {
   int sts;
   unsigned char badr[4];
-  int iadr[4] = { -1, -1, -1, -1 };
+  int iadr[4] = {-1, -1, -1, -1};
   struct hostent* he;
   struct sockaddr_in address;
   socklen_t address_len = sizeof(struct sockaddr_in);
@@ -369,25 +387,30 @@ void CreateSocket()
   /* Create a socket for UDP */
 
   my_socket = socket(AF_INET, SOCK_DGRAM, 0);
-  if (my_socket < 0) {
+  if (my_socket < 0)
+  {
     errh_Error("Socket, %d", my_socket);
     errh_SetStatus(PWR__SRVTERM);
     exit(0);
   }
 
-  if (rn_udp->LocalPort != 0) {
+  if (rn_udp->LocalPort != 0)
+  {
     /* Set local port */
     my_addr.sin_family = AF_INET;
     my_addr.sin_port = htons(rn_udp->LocalPort);
 
     /* Bind the created socket */
     sts = bind(my_socket, (struct sockaddr*)&my_addr, sizeof(my_addr));
-    if (sts != 0) {
+    if (sts != 0)
+    {
       errh_Error("Bind, %d", sts);
       errh_SetStatus(PWR__SRVTERM);
       exit(0);
     }
-  } else {
+  }
+  else
+  {
     getsockname(my_socket, (struct sockaddr*)&address, &address_len);
     rn_udp->LocalPort = ntohs(address.sin_port);
   }
@@ -404,24 +427,29 @@ void CreateSocket()
 
   their_addr.sin_family = AF_INET;
   their_addr.sin_port = htons(rn_udp->RemotePort);
-  sscanf((char*)&(rn_udp->RemoteAddress), "%d.%d.%d.%d", &iadr[0], &iadr[1],
-      &iadr[2], &iadr[3]);
+  sscanf((char*)&(rn_udp->RemoteAddress), "%d.%d.%d.%d", &iadr[0], &iadr[1], &iadr[2], &iadr[3]);
 
   /* If none or invalid ip-address is given, use hostname to get hostent struct,
      otherwise use the given ip address directly */
 
-  if ((iadr[0] < 0 || iadr[0] > 255) || (iadr[1] < 0 || iadr[1] > 255)
-      || (iadr[2] < 0 || iadr[2] > 255) || (iadr[3] < 0 || iadr[3] > 255)) {
+  if ((iadr[0] < 0 || iadr[0] > 255) || (iadr[1] < 0 || iadr[1] > 255) || (iadr[2] < 0 || iadr[2] > 255) ||
+      (iadr[3] < 0 || iadr[3] > 255))
+  {
     he = gethostbyname(rn_udp->RemoteHostname);
-    if (he) {
+    if (he)
+    {
       memcpy(&their_addr.sin_addr, he->h_addr, 4);
       sprintf(rn_udp->RemoteAddress, "%s", inet_ntoa(their_addr.sin_addr));
-    } else {
+    }
+    else
+    {
       errh_Error("Unknown host, %s", rn_udp->RemoteHostname);
       errh_SetStatus(PWR__SRVTERM);
       exit(0);
     }
-  } else {
+  }
+  else
+  {
     badr[0] = (unsigned char)iadr[0];
     badr[1] = (unsigned char)iadr[1];
     badr[2] = (unsigned char)iadr[2];
@@ -432,7 +460,8 @@ void CreateSocket()
   /* If there is a multicast address configured, create a socket for a dual
    * remote node */
 
-  if (rn.multicast) {
+  if (rn.multicast)
+  {
     dual_addr.sin_family = AF_INET;
     dual_addr.sin_port = htons(rn_udp->RemotePort);
 
@@ -459,14 +488,14 @@ void CreateSocket()
 **************************************************************************
 **************************************************************************/
 
-unsigned int RemnodeSend(remnode_item* remnode, pwr_sClass_RemTrans* remtrans,
-    char* buf, int buf_size)
+unsigned int RemnodeSend(remnode_item* remnode, pwr_sClass_RemTrans* remtrans, char* buf, int buf_size)
 
 {
   int status;
   int want_ack;
 
-  static struct message_s {
+  static struct message_s
+  {
     remote_udp_header header;
     char data[UDP_MAX_SIZE];
   } message;
@@ -477,10 +506,12 @@ unsigned int RemnodeSend(remnode_item* remnode, pwr_sClass_RemTrans* remtrans,
 
   want_ack = 0;
 
-  if (remtrans->MaxBuffers > 0) {
+  if (remtrans->MaxBuffers > 0)
+  {
     message.header.protocol_id[1] = ENQ;
     want_ack = 1;
-  } else
+  }
+  else
     message.header.protocol_id[1] = ETB;
 
   message.header.msg_size = htons(buf_size + sizeof(remote_udp_header));
@@ -490,22 +521,23 @@ unsigned int RemnodeSend(remnode_item* remnode, pwr_sClass_RemTrans* remtrans,
   memcpy(&message.data, buf, buf_size);
 
   if (rn_udp->DisableHeader)
-    status = sendto(my_socket, &message.data, buf_size, 0,
-        (struct sockaddr*)&their_addr, sizeof(struct sockaddr));
+    status =
+        sendto(my_socket, &message.data, buf_size, 0, (struct sockaddr*)&their_addr, sizeof(struct sockaddr));
   else
-    status = sendto(my_socket, &message, buf_size + sizeof(remote_udp_header),
-        0, (struct sockaddr*)&their_addr, sizeof(struct sockaddr));
+    status = sendto(my_socket, &message, buf_size + sizeof(remote_udp_header), 0,
+                    (struct sockaddr*)&their_addr, sizeof(struct sockaddr));
 
   /* Send to dual node aswell if this is configured, we never want ack on this
    * though */
-  if (rn.multicast && remtrans->Address[3] & 1) {
+  if (rn.multicast && remtrans->Address[3] & 1)
+  {
     message.header.protocol_id[1] = ETB;
     if (rn_udp->DisableHeader)
-      status = sendto(my_socket, &message.data, buf_size, 0,
-          (struct sockaddr*)&dual_addr, sizeof(struct sockaddr));
+      status = sendto(my_socket, &message.data, buf_size, 0, (struct sockaddr*)&dual_addr,
+                      sizeof(struct sockaddr));
     else
-      status = sendto(my_socket, &message, buf_size + sizeof(remote_udp_header),
-          0, (struct sockaddr*)&dual_addr, sizeof(struct sockaddr));
+      status = sendto(my_socket, &message, buf_size + sizeof(remote_udp_header), 0,
+                      (struct sockaddr*)&dual_addr, sizeof(struct sockaddr));
   }
 
   if (want_ack)
@@ -551,7 +583,8 @@ int main(int argc, char* argv[])
   /* Init of gdh */
 
   sts = gdh_Init(pname);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Error("gdh_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -563,7 +596,8 @@ int main(int argc, char* argv[])
   sts = 0;
   if (argc >= 3)
     sts = cdh_StringToObjid(argv[2], &rn.objid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Error("cdh_StringToObjid, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -572,7 +606,8 @@ int main(int argc, char* argv[])
   /* Get pointer to RemnodeUDP object and store locally */
 
   sts = gdh_ObjidToPointer(rn.objid, (pwr_tAddress*)&rn_udp);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Error("cdh_ObjidToPointer, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -589,13 +624,14 @@ int main(int argc, char* argv[])
 
   /* Log that we will multicast */
 
-  if (rn.multicast) {
-    errh_Info("Will send to dual address: %d.%d.%d.%d",
-        rn.multicast->Address[0], rn.multicast->Address[1],
-        rn.multicast->Address[2], rn.multicast->Address[3]);
+  if (rn.multicast)
+  {
+    errh_Info("Will send to dual address: %d.%d.%d.%d", rn.multicast->Address[0], rn.multicast->Address[1],
+              rn.multicast->Address[2], rn.multicast->Address[3]);
   }
 
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Error("RemTrans_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -604,10 +640,10 @@ int main(int argc, char* argv[])
   /* Store remtrans objects objid in remnode_udp object */
   remtrans = rn.remtrans;
   i = 0;
-  while (remtrans) {
+  while (remtrans)
+  {
     rn_udp->RemTransObjects[i++] = remtrans->objid;
-    if (i >= (int)(sizeof(rn_udp->RemTransObjects)
-                 / sizeof(rn_udp->RemTransObjects[0])))
+    if (i >= (int)(sizeof(rn_udp->RemTransObjects) / sizeof(rn_udp->RemTransObjects[0])))
       break;
     remtrans = (remtrans_item*)remtrans->next;
   }
@@ -635,10 +671,12 @@ int main(int argc, char* argv[])
 
   /* Loop forever */
 
-  while (!doomsday) {
+  while (!doomsday)
+  {
     /* Check disable flag */
 
-    if (rn_udp->Disable == 1) {
+    if (rn_udp->Disable == 1)
+    {
       errh_Fatal("Disabled, exiting");
       errh_SetStatus(PWR__SRVTERM);
       exit(0);
@@ -656,8 +694,7 @@ int main(int argc, char* argv[])
     time_since_keepalive += TIME_INCR;
     time_since_rcv += TIME_INCR;
     time_since_scan = MIN(time_since_scan, rn_udp->ScanTime + 1.0);
-    time_since_keepalive
-        = MIN(time_since_keepalive, rn_udp->KeepaliveTime + 1.0);
+    time_since_keepalive = MIN(time_since_keepalive, rn_udp->KeepaliveTime + 1.0);
     time_since_rcv = MIN(time_since_rcv, rn_udp->LinkTimeout + 1.0);
 
     /* Update retransmit time, could have been changed */
@@ -665,11 +702,11 @@ int main(int argc, char* argv[])
     rn.retransmit_time = rn_udp->RetransmitTime;
 
     remtrans = rn.remtrans;
-    while (remtrans) {
+    while (remtrans)
+    {
       remtrans->time_since_send += TIME_INCR;
       /* Prevent big counter */
-      remtrans->time_since_send
-          = MIN(remtrans->time_since_send, rn.retransmit_time + 1.0);
+      remtrans->time_since_send = MIN(remtrans->time_since_send, rn.retransmit_time + 1.0);
       remtrans = (remtrans_item*)remtrans->next;
     }
 
@@ -683,26 +720,31 @@ int main(int argc, char* argv[])
     if (sts > 0)
       Receive();
 
-    if (sts < 0) {
+    if (sts < 0)
+    {
       errh_Error("Select, %d", sts);
       errh_SetStatus(PWR__SRVTERM);
       exit(0);
     }
 
-    if (time_since_scan >= rn_udp->ScanTime) {
+    if (time_since_scan >= rn_udp->ScanTime)
+    {
       if (!rn_udp->Disable)
         RemTrans_Cyclic(&rn, &RemnodeSend);
       time_since_scan = 0;
     }
 
-    if (time_since_keepalive >= rn_udp->KeepaliveTime) {
+    if (time_since_keepalive >= rn_udp->KeepaliveTime)
+    {
       if (!rn_udp->Disable && rn_udp->UseKeepalive)
         SendKeepalive();
       time_since_keepalive = 0;
     }
 
-    if (time_since_rcv >= rn_udp->LinkTimeout && rn_udp->LinkTimeout > 0) {
-      if (rn_udp->LinkUp) {
+    if (time_since_rcv >= rn_udp->LinkTimeout && rn_udp->LinkTimeout > 0)
+    {
+      if (rn_udp->LinkUp)
+      {
         errh_Info("UDP link down %s", rn_udp->RemoteHostname);
         rn_udp->LinkUp = 0;
       }

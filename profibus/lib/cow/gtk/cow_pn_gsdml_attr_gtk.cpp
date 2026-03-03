@@ -269,7 +269,7 @@ void GsdmlAttrGtk::activate_cmd_ca(GtkWidget* w, gpointer data)
 void GsdmlAttrGtk::activate_cmd_input(GtkWidget* w, gpointer data)
 {
   char* text;
-  GsdmlAttrGtk* attr = (GsdmlAttrGtk*)data;  
+  GsdmlAttrGtk* attr = (GsdmlAttrGtk*)data;
 
   g_object_set(attr->cmd_prompt, "visible", FALSE, NULL);
   g_object_set(attr->cmd_input, "visible", FALSE, NULL);
@@ -544,4 +544,14 @@ GsdmlAttrGtk::GsdmlAttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx, void* a_
   }
 
   wow = new CoWowGtk(toplevel);
+
+  // Process pending events to ensure the parent is realized
+  // We do this to ensure that any windows/dialogs that may popup
+  // well be able to use the metrics of the parent, to use for centering
+  // it over the parent instead of it popping up on another screen which is
+  // obviously annoying for a modal dialog...
+  while (gtk_events_pending())
+  {
+    gtk_main_iteration();
+  }
 }

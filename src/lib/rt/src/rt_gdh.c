@@ -64,11 +64,11 @@
 #include "pwr_baseclasses.h"
 
 #if defined(OS_LINUX) || defined OS_MACOS
-#define gdh_Lock                                                               \
-  pthread_mutex_lock(&gdbroot->thread_lock);                                   \
+#define gdh_Lock                                                                                             \
+  pthread_mutex_lock(&gdbroot->thread_lock);                                                                 \
   gdb_Lock
-#define gdh_Unlock                                                             \
-  gdb_Unlock;                                                                  \
+#define gdh_Unlock                                                                                           \
+  gdb_Unlock;                                                                                                \
   pthread_mutex_unlock(&gdbroot->thread_lock)
 
 #else
@@ -76,23 +76,23 @@
 #define gdh_Unlock gdb_Unlock
 #endif
 
-#define gdh_ScopeLock                                                          \
-  gdh_Lock;                                                                    \
+#define gdh_ScopeLock                                                                                        \
+  gdh_Lock;                                                                                                  \
   do
-#define gdh_ScopeUnlock                                                        \
-  while (0)                                                                    \
-    ;                                                                          \
+#define gdh_ScopeUnlock                                                                                      \
+  while (0)                                                                                                  \
+    ;                                                                                                        \
   gdh_Unlock
 
-#define touchObject(op)                                                        \
-  if (op != NULL && op->l.flags.b.isCached)                                    \
+#define touchObject(op)                                                                                      \
+  if (op != NULL && op->l.flags.b.isCached)                                                                  \
   cvolc_TouchObject(op)
 
 #define STS_M_SEVERITY 0x7
-//#define STS_K_WARNING 0 /**< WARNING                          */
-//#define STS_K_SUCCESS 1 /**< SUCCESSFUL COMPLETION            */
+// #define STS_K_WARNING 0 /**< WARNING                          */
+// #define STS_K_SUCCESS 1 /**< SUCCESSFUL COMPLETION            */
 #define STS_K_ERROR 2 /**< ERROR                            */
-#define STS_K_INFO 3 /**< INFORMATION                      */
+#define STS_K_INFO 3  /**< INFORMATION                      */
 
 static void (*gdh_log_cb)(char*, void*, unsigned int) = 0;
 
@@ -104,16 +104,17 @@ static void (*gdh_log_cb)(char*, void*, unsigned int) = 0;
  * maximizes the blocking levels.
  */
 static void getAlarmVisibility(pwr_tStatus* status, /**< Status */
-    gdb_sObject* op, /**< Object */
-    pwr_tUInt32* avis /**< The alarm block level */
-    )
+                               gdb_sObject* op,     /**< Object */
+                               pwr_tUInt32* avis    /**< The alarm block level */
+)
 {
   gdb_sObject* pop;
   pwr_dStatus(sts, status, GDH__SUCCESS);
 
   *avis = op->l.al.b;
   pop = op;
-  while (pop->l.por != pool_cNRef) {
+  while (pop->l.por != pool_cNRef)
+  {
     pop = pool_Address(sts, gdbroot->pool, pop->l.por);
     if (EVEN(*sts))
       return;
@@ -125,12 +126,11 @@ static void getAlarmVisibility(pwr_tStatus* status, /**< Status */
  * @brief Translate an attribute referece to a name.
  * @return pwr_tStatus
  */
-pwr_tStatus gdh_AttrrefToName(
-    pwr_sAttrRef* arp, /**< Pointer to the attribute reference. */
-    char* name, /**< Name buffer supplied by the user, where name is written. */
-    unsigned int size, /**< Size of the name buffer */
-    pwr_tBitMask nametype /**< Mask of type cdh_mName.  */
-    )
+pwr_tStatus gdh_AttrrefToName(pwr_sAttrRef* arp, /**< Pointer to the attribute reference. */
+                              char* name, /**< Name buffer supplied by the user, where name is written. */
+                              unsigned int size,    /**< Size of the name buffer */
+                              pwr_tBitMask nametype /**< Mask of type cdh_mName.  */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   mvol_sAttribute Attribute;
@@ -157,8 +157,7 @@ pwr_tStatus gdh_AttrrefToName(
 
   gdh_ScopeLock
   {
-    ap = vol_ArefToAttribute(
-        &sts, &Attribute, arp, gdb_mLo_global, vol_mTrans_all);
+    ap = vol_ArefToAttribute(&sts, &Attribute, arp, gdb_mLo_global, vol_mTrans_all);
     if (ap == NULL)
       break;
 
@@ -167,13 +166,15 @@ pwr_tStatus gdh_AttrrefToName(
   }
   gdh_ScopeUnlock;
 
-  if (ap == NULL && lnametype.b.fallback != cdh_mName_eFallback_strict) {
+  if (ap == NULL && lnametype.b.fallback != cdh_mName_eFallback_strict)
+  {
     sts = GDH__SUCCESS;
     cdh_ArefToString(string, sizeof(string), arp, 1);
     s = string;
   }
 
-  if (s != NULL) {
+  if (s != NULL)
+  {
     lsize = strlen(s);
     if (lsize >= size)
       sts = GDH__NAMEBUF;
@@ -189,11 +190,10 @@ pwr_tStatus gdh_AttrrefToName(
  *
  * @return pwr_tStatus
  */
-pwr_tStatus gdh_ArefANameToAref(
-    pwr_sAttrRef* arp, /**< Pointer to object attribute reference */
-    const char* aname, /**< Attribute name string */
-    pwr_sAttrRef* oarp /**< Receives the  attribute reference. */
-    )
+pwr_tStatus gdh_ArefANameToAref(pwr_sAttrRef* arp, /**< Pointer to object attribute reference */
+                                const char* aname, /**< Attribute name string */
+                                pwr_sAttrRef* oarp /**< Receives the  attribute reference. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   mvol_sAttribute Attribute;
@@ -208,17 +208,18 @@ pwr_tStatus gdh_ArefANameToAref(
   {
     memset(&Attribute, 0, sizeof(Attribute));
 
-    if (arp->Flags.b.Object) {
-      op = vol_OidToObject(
-          &sts, arp->Objid, gdb_mLo_global, vol_mTrans_none, cvol_eHint_none);
+    if (arp->Flags.b.Object)
+    {
+      op = vol_OidToObject(&sts, arp->Objid, gdb_mLo_global, vol_mTrans_none, cvol_eHint_none);
       if (op == NULL)
         break;
 
       touchObject(op);
       s = vol_ObjectToName(&sts, op, cdh_mName_volumeStrict, string);
-    } else {
-      ap = vol_ArefToAttribute(
-          &sts, &Attribute, arp, gdb_mLo_global, vol_mTrans_all);
+    }
+    else
+    {
+      ap = vol_ArefToAttribute(&sts, &Attribute, arp, gdb_mLo_global, vol_mTrans_all);
       if (ap == NULL)
         break;
 
@@ -234,8 +235,7 @@ pwr_tStatus gdh_ArefANameToAref(
 
     memset(&Attribute, 0, sizeof(Attribute));
 
-    ap = vol_NameToAttribute(
-        &sts, &Attribute, pn, gdb_mLo_global, vol_mTrans_all);
+    ap = vol_NameToAttribute(&sts, &Attribute, pn, gdb_mLo_global, vol_mTrans_all);
     if (ap == NULL)
       break;
 
@@ -254,11 +254,10 @@ pwr_tStatus gdh_ArefANameToAref(
  *
  * @return pwr_tStatus
  */
-pwr_tStatus gdh_AttrArefToObjectAref(
-    pwr_sAttrRef* arp, /**< Attribute reference to the attribute. */
-    pwr_sAttrRef* oarp /**< Returned attribute reference to the object or
-                          attribute object.*/
-    )
+pwr_tStatus gdh_AttrArefToObjectAref(pwr_sAttrRef* arp, /**< Attribute reference to the attribute. */
+                                     pwr_sAttrRef* oarp /**< Returned attribute reference to the object or
+                                                           attribute object.*/
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   mvol_sAttribute Attribute;
@@ -276,8 +275,7 @@ pwr_tStatus gdh_AttrArefToObjectAref(
   {
     memset(&Attribute, 0, sizeof(Attribute));
 
-    ap = vol_ArefToAttribute(
-        &sts, &Attribute, arp, gdb_mLo_global, vol_mTrans_all);
+    ap = vol_ArefToAttribute(&sts, &Attribute, arp, gdb_mLo_global, vol_mTrans_all);
     if (ap == NULL)
       break;
 
@@ -285,7 +283,8 @@ pwr_tStatus gdh_AttrArefToObjectAref(
     s = vol_AttributeToName(&sts, ap, cdh_mName_volumeStrict, string);
 
     t = strrchr(string, '.');
-    if (!t) {
+    if (!t)
+    {
       sts = GDH__NOATTR;
       break;
     }
@@ -297,8 +296,7 @@ pwr_tStatus gdh_AttrArefToObjectAref(
 
     memset(&Attribute, 0, sizeof(Attribute));
 
-    ap = vol_NameToAttribute(
-        &sts, &Attribute, pn, gdb_mLo_global, vol_mTrans_all);
+    ap = vol_NameToAttribute(&sts, &Attribute, pn, gdb_mLo_global, vol_mTrans_all);
     if (ap == NULL)
       break;
 
@@ -316,12 +314,11 @@ pwr_tStatus gdh_AttrArefToObjectAref(
  * @return pwr_tStatus
  */
 
-pwr_tStatus gdh_ClassAttrToAttrref(
-    pwr_tClassId
-        cid, /**< The class identity whose attribute we want to examin */
-    const char* name, /**< The name of the attribute we want */
-    pwr_sAttrRef* arp /**< Receives the attribute description. */
-    )
+pwr_tStatus
+gdh_ClassAttrToAttrref(pwr_tClassId cid, /**< The class identity whose attribute we want to examin */
+                       const char* name, /**< The name of the attribute we want */
+                       pwr_sAttrRef* arp /**< Receives the attribute description. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   mvol_sAttribute Attribute;
@@ -335,9 +332,11 @@ pwr_tStatus gdh_ClassAttrToAttrref(
 
   /* If no attribute name is given, Assume whole body.  */
 
-  if (name != NULL && *name != '\0') {
+  if (name != NULL && *name != '\0')
+  {
     pn = cdh_ParseName(&sts, &ParseName, pwr_cNObjid, name, 0);
-    if (pn == NULL || pn->nAttribute == 0) {
+    if (pn == NULL || pn->nAttribute == 0)
+    {
       strcat(buff, name);
       pn = cdh_ParseName(&sts, &ParseName, pwr_cNObjid, buff, 0);
     }
@@ -366,13 +365,12 @@ pwr_tStatus gdh_ClassAttrToAttrref(
  * @return Status of the operation.
  */
 
-pwr_tStatus gdh_ClassAttrrefToAttr(
-    pwr_tClassId
-        cid, /**< The class identity whose attribute we want to examin */
-    pwr_sAttrRef* arp, /**< Attribute description. */
-    char* name, /**< The returned name of the attribute */
-    int size /**< Max size of the returned name */
-    )
+pwr_tStatus
+gdh_ClassAttrrefToAttr(pwr_tClassId cid,  /**< The class identity whose attribute we want to examin */
+                       pwr_sAttrRef* arp, /**< Attribute description. */
+                       char* name,        /**< The returned name of the attribute */
+                       int size           /**< Max size of the returned name */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   mvol_sAttribute Attribute;
@@ -385,20 +383,19 @@ pwr_tStatus gdh_ClassAttrrefToAttr(
 
   memset(&Attribute, 0, sizeof(Attribute));
 
-  gdh_ScopeLock
-  {
-    ap = mvol_ArefToAttribute(&sts, &Attribute, arp, cid);
-  }
+  gdh_ScopeLock { ap = mvol_ArefToAttribute(&sts, &Attribute, arp, cid); }
   gdh_ScopeUnlock;
 
-  if (ap != NULL) {
-    if (ap->adef && ap->adef->Info.Elements > 1
-        && ap->size < ap->adef->Info.Size) {
+  if (ap != NULL)
+  {
+    if (ap->adef && ap->adef->Info.Elements > 1 && ap->size < ap->adef->Info.Size)
+    {
       char aname[256];
 
       sprintf(aname, "%s[%d]", ap->name, ap->idx);
       strncpy(name, aname, size);
-    } else
+    }
+    else
       strncpy(name, ap->name, size);
   }
 
@@ -411,8 +408,8 @@ pwr_tStatus gdh_ClassAttrrefToAttr(
  * @return pwr_tStatus
  */
 pwr_tStatus gdh_ClassNameToId(const char* name, /**< Class name string. */
-    pwr_tClassId* cid /**< Returned class identity. */
-    )
+                              pwr_tClassId* cid /**< Returned class identity. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   gdb_sClass* cp;
@@ -450,20 +447,18 @@ pwr_tStatus gdh_ClassNameToId(const char* name, /**< Class name string. */
  * If the objid.vid != zero, then it must match the volume id indicated by
  * the name.
  * @return pwr_tStatus
-*/
+ */
 
-pwr_tStatus gdh_CreateObject(
-    char* name, /**< Object name string with path.*/
-    pwr_tClassId cid, /**< Class id for object. */
-    unsigned int size, /**< Size of object body. Only needed for objects
-                               with dynamic size, else 0. */
-    pwr_tObjid* oid, /**< Returned objid.  */
-    pwr_tObjid req_oid, /**< Requested objid. Only if any special objid is
-                                prefered, else pwr_cNOid. */
-    pwr_tBitMask flags, /**< Alias client or mount client.  */
-    pwr_tObjid
-        soid /**< Server objid. Used for ExternVolumes. Normally pwr_cNOid */
-    )
+pwr_tStatus gdh_CreateObject(char* name,         /**< Object name string with path.*/
+                             pwr_tClassId cid,   /**< Class id for object. */
+                             unsigned int size,  /**< Size of object body. Only needed for objects
+                                                         with dynamic size, else 0. */
+                             pwr_tObjid* oid,    /**< Returned objid.  */
+                             pwr_tObjid req_oid, /**< Requested objid. Only if any special objid is
+                                                         prefered, else pwr_cNOid. */
+                             pwr_tBitMask flags, /**< Alias client or mount client.  */
+                             pwr_tObjid soid /**< Server objid. Used for ExternVolumes. Normally pwr_cNOid */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   gdb_sObject* op;
@@ -481,10 +476,7 @@ pwr_tStatus gdh_CreateObject(
   if (pn->flags.b.idString)
     return GDH__NOSUCHOBJ;
 
-  gdh_ScopeLock
-  {
-    op = dvol_CreateObject(&sts, pn, cid, size, req_oid);
-  }
+  gdh_ScopeLock { op = dvol_CreateObject(&sts, pn, cid, size, req_oid); }
   gdh_ScopeUnlock;
 
   if (op != NULL)
@@ -510,19 +502,15 @@ pwr_tStatus gdh_CreateObject(
  * @return pwr_tStatus
  */
 
-pwr_tStatus gdh_DeleteObject(
-    pwr_tObjid oid /**< The identity of the object to delete. */
-    )
+pwr_tStatus gdh_DeleteObject(pwr_tObjid oid /**< The identity of the object to delete. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
 
   if (cdh_ObjidIsNull(oid))
     return GDH__NOSUCHOBJ;
 
-  gdh_ScopeLock
-  {
-    dvol_DeleteObject(&sts, oid);
-  }
+  gdh_ScopeLock { dvol_DeleteObject(&sts, oid); }
   gdh_ScopeUnlock;
 
   return sts;
@@ -545,19 +533,15 @@ pwr_tStatus gdh_DeleteObject(
  * @return pwr_tStatus
  */
 
-pwr_tStatus gdh_DeleteObjectTree(
-    pwr_tObjid oid /**< The identity of the root object of the tree. */
-    )
+pwr_tStatus gdh_DeleteObjectTree(pwr_tObjid oid /**< The identity of the root object of the tree. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
 
   if (cdh_ObjidIsNull(oid))
     return GDH__NOSUCHOBJ;
 
-  gdh_ScopeLock
-  {
-    dvol_DeleteObjectTree(&sts, oid);
-  }
+  gdh_ScopeLock { dvol_DeleteObjectTree(&sts, oid); }
   gdh_ScopeUnlock;
 
   return sts;
@@ -575,12 +559,11 @@ pwr_tStatus gdh_DeleteObjectTree(
  *
  * @return pwr_tStatus
  */
-pwr_tStatus gdh_DLRefObjectInfoAttrref(
-    pwr_sAttrRef* arp, /**< Pointer to attribute reference for object or
-                          attribute to link to.*/
-    void** infop, /**< Returnd pointer to the data. */
-    pwr_tDlid* dlid /**< Id for the direct link. Used to unlink the data.*/
-    )
+pwr_tStatus gdh_DLRefObjectInfoAttrref(pwr_sAttrRef* arp, /**< Pointer to attribute reference for object or
+                                                             attribute to link to.*/
+                                       void** infop,      /**< Returnd pointer to the data. */
+                                       pwr_tDlid* dlid /**< Id for the direct link. Used to unlink the data.*/
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   dl_sLink* dp;
@@ -595,12 +578,12 @@ pwr_tStatus gdh_DLRefObjectInfoAttrref(
 
   gdh_ScopeLock
   {
-    ap = vol_ArefToAttribute(
-        &sts, &Attribute, arp, gdb_mLo_native, vol_mTrans_all);
+    ap = vol_ArefToAttribute(&sts, &Attribute, arp, gdb_mLo_native, vol_mTrans_all);
     if (ap == NULL)
       break;
 
-    if (ap->op->u.n.lflags.b.readOnly) {
+    if (ap->op->u.n.lflags.b.readOnly)
+    {
       sts = GDH__READONLY;
       break;
     }
@@ -634,16 +617,12 @@ pwr_tStatus gdh_DLRefObjectInfoAttrref(
  * @return pwr_tStatus
  */
 
-pwr_tStatus gdh_DLUnrefObjectInfo(
-    pwr_tDlid dlid /** <The id of the direct link we want to remove */
-    )
+pwr_tStatus gdh_DLUnrefObjectInfo(pwr_tDlid dlid /** <The id of the direct link we want to remove */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
 
-  gdh_ScopeLock
-  {
-    dl_Cancel(&sts, dlid);
-  }
+  gdh_ScopeLock { dl_Cancel(&sts, dlid); }
   gdh_ScopeUnlock;
 
   return sts;
@@ -655,10 +634,7 @@ pwr_tStatus gdh_DLUnrefObjectInfo(
 
 void gdh_DLUnrefObjectInfoAll(void)
 {
-  gdh_ScopeLock
-  {
-    dl_CancelUser(gdbroot->my_pid);
-  }
+  gdh_ScopeLock { dl_CancelUser(gdbroot->my_pid); }
   gdh_ScopeUnlock;
 }
 
@@ -667,26 +643,23 @@ void gdh_DLUnrefObjectInfoAll(void)
  * @return pwr_tStatus
  */
 
-pwr_tStatus gdh_GetAlarmInfo(pwr_tObjid oid, /**< Object identity */
-    pwr_tUInt32* a, /**< Receives the alarm status. Can be NULL */
-    pwr_tUInt32*
-        maxa, /**< Receives the highest alarm level of the object. Can be NULL
-                 */
-    pwr_tUInt32*
-        b, /**< Receives the blocking level of the object. CAn be NULL */
-    pwr_tUInt32*
-        maxb, /**< Receives the highest existing blocking level of the object.
-                 Can be NULL */
-    pwr_tUInt32* alarmvisibility /**< Receives the alarm block level. */
-    )
+pwr_tStatus
+gdh_GetAlarmInfo(pwr_tObjid oid,              /**< Object identity */
+                 pwr_tUInt32* a,              /**< Receives the alarm status. Can be NULL */
+                 pwr_tUInt32* maxa,           /**< Receives the highest alarm level of the object. Can be NULL
+                                               */
+                 pwr_tUInt32* b,              /**< Receives the blocking level of the object. CAn be NULL */
+                 pwr_tUInt32* maxb,           /**< Receives the highest existing blocking level of the object.
+                                                 Can be NULL */
+                 pwr_tUInt32* alarmvisibility /**< Receives the alarm block level. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   gdb_sObject* op;
 
   gdh_ScopeLock
   {
-    op = vol_OidToObject(
-        &sts, oid, gdb_mLo_global, vol_mTrans_none, cvol_eHint_none);
+    op = vol_OidToObject(&sts, oid, gdb_mLo_global, vol_mTrans_none, cvol_eHint_none);
     if (op == NULL)
       break;
 
@@ -698,7 +671,8 @@ pwr_tStatus gdh_GetAlarmInfo(pwr_tObjid oid, /**< Object identity */
     if (a != NULL)
       *a = op->l.al.a;
 
-    if (maxa != NULL) {
+    if (maxa != NULL)
+    {
       *maxa = op->l.al.maxa;
       if (op->l.flags.b.isNative)
         *maxa = MAX(*maxa, op->u.n.ral.maxa);
@@ -707,13 +681,15 @@ pwr_tStatus gdh_GetAlarmInfo(pwr_tObjid oid, /**< Object identity */
     if (b != NULL)
       *b = op->l.al.b;
 
-    if (maxb != NULL) {
+    if (maxb != NULL)
+    {
       *maxb = op->l.al.maxb;
       if (op->l.flags.b.isNative)
         *maxb = MAX(*maxb, op->u.n.ral.maxb);
     }
 
-    if (alarmvisibility != NULL) {
+    if (alarmvisibility != NULL)
+    {
       getAlarmVisibility(&sts, op, alarmvisibility);
     }
   }
@@ -726,17 +702,13 @@ pwr_tStatus gdh_GetAlarmInfo(pwr_tObjid oid, /**< Object identity */
  * @brief Get the node identity of the local node.
  * @return pwr_tStatus
  */
-pwr_tStatus gdh_GetNodeIndex(
-    pwr_tNodeId* nid /**< Receives node index of the local node */
-    )
+pwr_tStatus gdh_GetNodeIndex(pwr_tNodeId* nid /**< Receives node index of the local node */
+)
 {
   if (nid == NULL)
     return GDH__BADARG;
 
-  gdh_ScopeLock
-  {
-    *nid = gdbroot->my_node->nid;
-  }
+  gdh_ScopeLock { *nid = gdbroot->my_node->nid; }
   gdh_ScopeUnlock;
 
   return GDH__SUCCESS;
@@ -747,9 +719,9 @@ pwr_tStatus gdh_GetNodeIndex(
  * @return pwr_tStatus
  */
 
-pwr_tStatus gdh_GetObjectNodeIndex(pwr_tObjid oid, /**< Object identity. */
-    pwr_tNodeId* nid /**< Receives the node index. */
-    )
+pwr_tStatus gdh_GetObjectNodeIndex(pwr_tObjid oid,  /**< Object identity. */
+                                   pwr_tNodeId* nid /**< Receives the node index. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   gdb_sObject* op;
@@ -760,8 +732,7 @@ pwr_tStatus gdh_GetObjectNodeIndex(pwr_tObjid oid, /**< Object identity. */
 
   gdh_ScopeLock
   {
-    op = vol_OidToObject(
-        &sts, oid, gdb_mLo_global, vol_mTrans_all, cvol_eHint_none);
+    op = vol_OidToObject(&sts, oid, gdb_mLo_global, vol_mTrans_all, cvol_eHint_none);
     if (op == NULL)
       break;
 
@@ -786,12 +757,11 @@ pwr_tStatus gdh_GetObjectNodeIndex(pwr_tObjid oid, /**< Object identity. */
  * @return pwr_tStatus
  */
 
-pwr_tStatus gdh_GetObjectInfo(
-    const char* name, /**<  Name of object or object.parameter.	 */
-    pwr_tAddress bufp, /**<  Pointer to a buffer of 'bufsize' bytes
-                             to be filled with requested information.  */
-    pwr_tUInt32 bufsize /**<  Size of the 'bufp' buffer.	*/
-    )
+pwr_tStatus gdh_GetObjectInfo(const char* name,   /**<  Name of object or object.parameter.	 */
+                              pwr_tAddress bufp,  /**<  Pointer to a buffer of 'bufsize' bytes
+                                                        to be filled with requested information.  */
+                              pwr_tUInt32 bufsize /**<  Size of the 'bufp' buffer.	*/
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   cdh_sParseName parseName;
@@ -822,9 +792,9 @@ pwr_tStatus gdh_GetObjectInfo(
 
   gdh_Lock;
 
-  do {
-    ap = vol_NameToAttribute(
-        &sts, &attribute, pn, gdb_mLo_global, vol_mTrans_all);
+  do
+  {
+    ap = vol_NameToAttribute(&sts, &attribute, pn, gdb_mLo_global, vol_mTrans_all);
     if (ap == NULL)
       break;
     if (ap->op == NULL)
@@ -833,10 +803,13 @@ pwr_tStatus gdh_GetObjectInfo(
     touchObject(ap->op);
 
     p = vol_AttributeToAddress(&sts, ap);
-    if (p != NULL) {
+    if (p != NULL)
+    {
       memcpy(bufp, p, MIN(ap->size, bufsize));
       break;
-    } else if (ap->op->l.flags.m & gdb_mLo_native) {
+    }
+    else if (ap->op->l.flags.m & gdb_mLo_native)
+    {
       break;
     }
 
@@ -853,23 +826,27 @@ pwr_tStatus gdh_GetObjectInfo(
 
     ccp = NULL;
     /* Get cached class if needed */
-    if (!ap->op->u.c.flags.b.classChecked || !ap->op->u.c.flags.b.classEqual) {
+    if (!ap->op->u.c.flags.b.classChecked || !ap->op->u.c.flags.b.classEqual)
+    {
       ccp = cmvolc_GetCachedClass(&sts, np, vp, ap, &equal, &fetched, NULL);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         np = NULL;
         break;
       }
       if (equal)
         ccp = NULL;
 
-      if (ccpLocked == NULL && ccp != NULL && !equal) {
+      if (ccpLocked == NULL && ccp != NULL && !equal)
+      {
         cmvolc_LockClass(NULL, ccp);
         ccpLocked = ccp;
       }
 
       /* If gdb has been unlocked, refresh pointers */
       /** @todo Check if we can do it more efficient, eg. vol_ArefToAttribute */
-      if (fetched) {
+      if (fetched)
+      {
         memset(&attribute, 0, sizeof(attribute));
         np = NULL;
         continue;
@@ -878,23 +855,23 @@ pwr_tStatus gdh_GetObjectInfo(
       if (equal)
         break;
 
-      rarp = ndc_NarefToRaref(
-          &sts, ap, arp, ccp, &ridx, &raref, &equal, pn, ccpLocked, vp, np);
+      rarp = ndc_NarefToRaref(&sts, ap, arp, ccp, &ridx, &raref, &equal, pn, ccpLocked, vp, np);
     }
     break;
   } while (1);
 
   gdh_Unlock;
 
-  if (np != NULL && ODD(sts)) {
+  if (np != NULL && ODD(sts))
+  {
     if (equal)
-      cvolc_GetObjectInfo(
-          &sts, np, arp, NULL, NULL, UINT_MAX, ap, bufp, bufsize);
+      cvolc_GetObjectInfo(&sts, np, arp, NULL, NULL, UINT_MAX, ap, bufp, bufsize);
     else
       cvolc_GetObjectInfo(&sts, np, arp, ccp, rarp, ridx, ap, bufp, bufsize);
   }
 
-  if (ccpLocked) {
+  if (ccpLocked)
+  {
     gdb_Lock;
     cmvolc_UnlockClass(NULL, ccpLocked);
     gdb_Unlock;
@@ -911,14 +888,13 @@ pwr_tStatus gdh_GetObjectInfo(
  * the information can be stored. If that buffer is to small
  * the information is truncated.
  * @return pwr_tStatus
-*/
+ */
 
-pwr_tStatus gdh_GetObjectInfoAttrref(
-    pwr_sAttrRef* arp, /**< Attribute reference descriptor that defines an
-                          object or an object reference */
-    void* bufp, /**< Receives the requested information */
-    unsigned int bufsize /**< The size in bytes of the data buffer */
-    )
+pwr_tStatus gdh_GetObjectInfoAttrref(pwr_sAttrRef* arp,   /**< Attribute reference descriptor that defines an
+                                                             object or an object reference */
+                                     void* bufp,          /**< Receives the requested information */
+                                     unsigned int bufsize /**< The size in bytes of the data buffer */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   gdb_sVolume* vp;
@@ -938,19 +914,22 @@ pwr_tStatus gdh_GetObjectInfoAttrref(
 
   gdh_Lock;
 
-  do {
-    ap = vol_ArefToAttribute(
-        &sts, &attribute, arp, gdb_mLo_global, vol_mTrans_all);
+  do
+  {
+    ap = vol_ArefToAttribute(&sts, &attribute, arp, gdb_mLo_global, vol_mTrans_all);
     if (ap == NULL || ap->op == NULL)
       break;
 
     touchObject(ap->op);
 
     p = vol_AttributeToAddress(&sts, ap);
-    if (p != NULL) {
+    if (p != NULL)
+    {
       memcpy(bufp, p, MIN(ap->size, bufsize));
       break;
-    } else if ((ap->op->l.flags.m & gdb_mLo_native) != 0) {
+    }
+    else if ((ap->op->l.flags.m & gdb_mLo_native) != 0)
+    {
       break;
     }
 
@@ -964,22 +943,26 @@ pwr_tStatus gdh_GetObjectInfoAttrref(
 
     ccp = NULL;
     /* Get cached class if needed */
-    if (!ap->op->u.c.flags.b.classChecked || !ap->op->u.c.flags.b.classEqual) {
+    if (!ap->op->u.c.flags.b.classChecked || !ap->op->u.c.flags.b.classEqual)
+    {
       ccp = cmvolc_GetCachedClass(&sts, np, vp, ap, &equal, &fetched, NULL);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         np = NULL;
         break;
       }
       if (equal)
         ccp = NULL;
 
-      if (ccpLocked == NULL && ccp != NULL && !equal) {
+      if (ccpLocked == NULL && ccp != NULL && !equal)
+      {
         cmvolc_LockClass(NULL, ccp);
         ccpLocked = ccp;
       }
 
       /* If gdb has been unlocked, refresh pointers */
-      if (fetched) {
+      if (fetched)
+      {
         memset(&attribute, 0, sizeof(attribute));
         np = NULL;
         continue;
@@ -988,8 +971,7 @@ pwr_tStatus gdh_GetObjectInfoAttrref(
       if (equal)
         break;
 
-      rarp = ndc_NarefToRaref(
-          &sts, ap, arp, ccp, &ridx, &raref, &equal, NULL, ccpLocked, vp, np);
+      rarp = ndc_NarefToRaref(&sts, ap, arp, ccp, &ridx, &raref, &equal, NULL, ccpLocked, vp, np);
     }
 
     break;
@@ -997,15 +979,16 @@ pwr_tStatus gdh_GetObjectInfoAttrref(
 
   gdh_Unlock;
 
-  if (np != NULL && ODD(sts)) {
+  if (np != NULL && ODD(sts))
+  {
     if (equal)
-      cvolc_GetObjectInfo(
-          &sts, np, arp, NULL, NULL, UINT_MAX, ap, bufp, bufsize);
+      cvolc_GetObjectInfo(&sts, np, arp, NULL, NULL, UINT_MAX, ap, bufp, bufsize);
     else
       cvolc_GetObjectInfo(&sts, np, arp, ccp, rarp, ridx, ap, bufp, bufsize);
   }
 
-  if (ccpLocked) {
+  if (ccpLocked)
+  {
     gdb_Lock;
     cmvolc_UnlockClass(NULL, ccpLocked);
     gdb_Unlock;
@@ -1022,9 +1005,9 @@ pwr_tStatus gdh_GetObjectInfoAttrref(
  * @return pwr_tStatus
  */
 
-pwr_tStatus gdh_GetObjectSize(pwr_tObjid oid, /**< The object identity. */
-    pwr_tUInt32* size /**< Receives the size in bytes of the object. */
-    )
+pwr_tStatus gdh_GetObjectSize(pwr_tObjid oid,   /**< The object identity. */
+                              pwr_tUInt32* size /**< Receives the size in bytes of the object. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   gdb_sObject* op;
@@ -1034,9 +1017,9 @@ pwr_tStatus gdh_GetObjectSize(pwr_tObjid oid, /**< The object identity. */
 
   gdh_ScopeLock
   {
-    op = vol_OidToObject(
-        &sts, oid, gdb_mLo_global, vol_mTrans_none, cvol_eHint_none);
-    if (op != NULL) {
+    op = vol_OidToObject(&sts, oid, gdb_mLo_global, vol_mTrans_none, cvol_eHint_none);
+    if (op != NULL)
+    {
       touchObject(op);
       *size = op->g.size;
     }
@@ -1052,10 +1035,10 @@ pwr_tStatus gdh_GetObjectSize(pwr_tObjid oid, /**< The object identity. */
  * @return pwr_tStatus
  */
 
-pwr_tStatus gdh_GetDynamicAttrSize(pwr_tObjid oid, /**< The object identity. */
-    char* name, /**< Attribute name with leading point, eg ".Length". */
-    pwr_tUInt32* size /**< Receives the size in bytes of the object. */
-    )
+pwr_tStatus gdh_GetDynamicAttrSize(pwr_tObjid oid,   /**< The object identity. */
+                                   char* name,       /**< Attribute name with leading point, eg ".Length". */
+                                   pwr_tUInt32* size /**< Receives the size in bytes of the object. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   gdb_sObject* op;
@@ -1067,20 +1050,22 @@ pwr_tStatus gdh_GetDynamicAttrSize(pwr_tObjid oid, /**< The object identity. */
   if (size == NULL)
     return GDH__BADARG;
 
-  if (name != NULL && *name != '\0') {
+  if (name != NULL && *name != '\0')
+  {
     pn = cdh_ParseName(&sts, &ParseName, pwr_cNObjid, name, 0);
     if (pn == NULL)
       return GDH__BADNAME;
-  } else
+  }
+  else
     return GDH__BADNAME;
 
   memset(&Attribute, 0, sizeof(Attribute));
 
   gdh_ScopeLock
   {
-    op = vol_OidToObject(
-        &sts, oid, gdb_mLo_global, vol_mTrans_none, cvol_eHint_none);
-    if (op != NULL) {
+    op = vol_OidToObject(&sts, oid, gdb_mLo_global, vol_mTrans_none, cvol_eHint_none);
+    if (op != NULL)
+    {
       touchObject(op);
       *size = op->g.size;
     }
@@ -1104,10 +1089,9 @@ pwr_tStatus gdh_GetDynamicAttrSize(pwr_tObjid oid, /**< The object identity. */
  * can be retrieved both for local and remote objects.
  * @return pwr_tStatus
  */
-pwr_tStatus gdh_GetObjectClass(
-    pwr_tObjid oid, /**< The identity of the object. */
-    pwr_tClassId* cid /**< Receives the object class identity. */
-    )
+pwr_tStatus gdh_GetObjectClass(pwr_tObjid oid,   /**< The identity of the object. */
+                               pwr_tClassId* cid /**< Receives the object class identity. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   gdb_sObject* op;
@@ -1119,15 +1103,17 @@ pwr_tStatus gdh_GetObjectClass(
 
   gdh_ScopeLock
   {
-    op = vol_OidToObject(
-        &sts, oid, gdb_mLo_global, vol_mTrans_all, cvol_eHint_none);
-    if (op != NULL) {
+    op = vol_OidToObject(&sts, oid, gdb_mLo_global, vol_mTrans_all, cvol_eHint_none);
+    if (op != NULL)
+    {
       touchObject(op);
       *cid = op->g.cid;
 
-      if (op->l.flags.b.isCached) {
+      if (op->l.flags.b.isCached)
+      {
         cp = hash_Search(&lsts, gdbroot->cid_ht, cid);
-        if (cp == NULL) {
+        if (cp == NULL)
+        {
           cmvolc_GetNonExistingClass(&lsts, op, *cid);
         }
       }
@@ -1142,65 +1128,75 @@ pwr_tStatus gdh_GetObjectClass(
  * @brief Get the type or class identifier of an attribute reference.
  * @return pwr_tStatus
  */
-pwr_tStatus gdh_GetAttrRefTid(
-    pwr_sAttrRef* arp, /**< The attribute reference. */
-    pwr_tTid* tid /**< Receives the aref type or class identity. */
-    )
+pwr_tStatus gdh_GetAttrRefTid(pwr_sAttrRef* arp, /**< The attribute reference. */
+                              pwr_tTid* tid      /**< Receives the aref type or class identity. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   mvol_sAttribute* ap;
   mvol_sAttribute attribute;
   gdb_sClass* cp;
 
-  if (arp->Flags.b.Object && arp->Body) {
+  if (arp->Flags.b.Object && arp->Body)
+  {
     *tid = arp->Body & ~7;
     return GDH__SUCCESS;
   }
-  if ((arp->Body == 0 && arp->Offset == 0)
-      || (arp->Offset == 0 && arp->Size == 0))
+  if ((arp->Body == 0 && arp->Offset == 0) || (arp->Offset == 0 && arp->Size == 0))
     return gdh_GetObjectClass(arp->Objid, tid);
 
   gdh_ScopeLock
   {
     memset(&attribute, 0, sizeof(attribute));
 
-    ap = vol_ArefToAttribute(
-        &sts, &attribute, arp, gdb_mLo_global, vol_mTrans_all);
+    ap = vol_ArefToAttribute(&sts, &attribute, arp, gdb_mLo_global, vol_mTrans_all);
     if (ap != NULL)
       touchObject(ap->op);
   }
   gdh_ScopeUnlock;
 
-  if (ap != 0 && ap->adef != 0) {
-    if (ap->adef->Info.Flags & PWR_MASK_CASTATTR) {
+  if (ap != 0 && ap->adef != 0)
+  {
+    if (ap->adef->Info.Flags & PWR_MASK_CASTATTR)
+    {
       pwr_tCastId castid;
       pwr_sAttrRef cast_aref = cdh_ArefToCastAref(arp);
 
       sts = gdh_GetObjectInfoAttrref(&cast_aref, &castid, sizeof(castid));
-      if (ODD(sts) && castid != pwr_cNCastId) {
+      if (ODD(sts) && castid != pwr_cNCastId)
+      {
         *tid = castid;
-      } else {
+      }
+      else
+      {
         *tid = ap->adef->TypeRef;
       }
-    } else {
+    }
+    else
+    {
       *tid = ap->adef->TypeRef;
     }
 
-    if (cdh_tidIsCid(*tid) && !(ap->op->l.flags.m & gdb_mLo_native)) {
+    if (cdh_tidIsCid(*tid) && !(ap->op->l.flags.m & gdb_mLo_native))
+    {
       gdh_ScopeLock
       {
         cp = hash_Search(&sts, gdbroot->cid_ht, tid);
-        if (cp == NULL) {
+        if (cp == NULL)
+        {
           cmvolc_GetNonExistingClass(&sts, ap->op, *tid);
           cp = hash_Search(&sts, gdbroot->cid_ht, tid);
-          if (cp == NULL) {
+          if (cp == NULL)
+          {
             sts = GDH__NOSUCHCLASS;
           }
         }
       }
       gdh_ScopeUnlock;
     }
-  } else if (ap != 0 && ap->adef == 0 && ODD(sts)) {
+  }
+  else if (ap != 0 && ap->adef == 0 && ODD(sts))
+  {
     *tid = ap->cp->cid;
   }
   return sts;
@@ -1216,11 +1212,10 @@ pwr_tStatus gdh_GetAttrRefTid(
  * @return pwr_tStatus
  */
 
-pwr_tStatus gdh_GetObjectLocation(
-    pwr_tObjid oid, /**< The identity of the object.*/
-    pwr_tBoolean* location /**< Receives the location.
-                                TRUE means local and FALSE remote.*/
-    )
+pwr_tStatus gdh_GetObjectLocation(pwr_tObjid oid,        /**< The identity of the object.*/
+                                  pwr_tBoolean* location /**< Receives the location.
+                                                              TRUE means local and FALSE remote.*/
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   gdb_sObject* op;
@@ -1230,9 +1225,9 @@ pwr_tStatus gdh_GetObjectLocation(
 
   gdh_ScopeLock
   {
-    op = vol_OidToObject(
-        &sts, oid, gdb_mLo_global, vol_mTrans_all, cvol_eHint_none);
-    if (op != NULL) {
+    op = vol_OidToObject(&sts, oid, gdb_mLo_global, vol_mTrans_all, cvol_eHint_none);
+    if (op != NULL)
+    {
       touchObject(op);
       *location = (op->l.flags.m & gdb_mLo_native) != 0;
     }
@@ -1248,10 +1243,10 @@ pwr_tStatus gdh_GetObjectLocation(
  * This information is can be fetched only for local objects.
  * @return pwr_tStatus
  */
-pwr_tStatus gdh_GetObjectDLCount(pwr_tObjid oid, /**< The object identity. */
-    pwr_tUInt32* count /**< Receives the value of the direct access counter of
-                          the object.*/
-    )
+pwr_tStatus gdh_GetObjectDLCount(pwr_tObjid oid,    /**< The object identity. */
+                                 pwr_tUInt32* count /**< Receives the value of the direct access counter of
+                                                       the object.*/
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   gdb_sObject* op;
@@ -1261,9 +1256,9 @@ pwr_tStatus gdh_GetObjectDLCount(pwr_tObjid oid, /**< The object identity. */
 
   gdh_ScopeLock
   {
-    op = vol_OidToObject(
-        &sts, oid, gdb_mLo_native, vol_mTrans_all, cvol_eHint_none);
-    if (op != NULL) {
+    op = vol_OidToObject(&sts, oid, gdb_mLo_native, vol_mTrans_all, cvol_eHint_none);
+    if (op != NULL)
+    {
       *count = op->u.n.dlcount;
     }
   }
@@ -1278,9 +1273,9 @@ pwr_tStatus gdh_GetObjectDLCount(pwr_tObjid oid, /**< The object identity. */
  * @return pwr_tStatus
  */
 
-pwr_tStatus gdh_GetParent(pwr_tObjid oid, /**< The identity of the object. */
-    pwr_tObjid* new_oid /**< Receives the object identity of the parent. */
-    )
+pwr_tStatus gdh_GetParent(pwr_tObjid oid,     /**< The identity of the object. */
+                          pwr_tObjid* new_oid /**< Receives the object identity of the parent. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   gdb_sObject* op;
@@ -1290,14 +1285,17 @@ pwr_tStatus gdh_GetParent(pwr_tObjid oid, /**< The identity of the object. */
 
   gdh_ScopeLock
   {
-    op = vol_OidToObject(
-        &sts, oid, gdb_mLo_global, vol_mTrans_all, cvol_eHint_none);
-    if (op != NULL) {
+    op = vol_OidToObject(&sts, oid, gdb_mLo_global, vol_mTrans_all, cvol_eHint_none);
+    if (op != NULL)
+    {
       touchObject(op);
-      if (op->g.f.poid.oix == pwr_cNObjectIx) {
+      if (op->g.f.poid.oix == pwr_cNObjectIx)
+      {
         *new_oid = pwr_cNObjid;
         sts = GDH__NO_PARENT;
-      } else {
+      }
+      else
+      {
         *new_oid = op->g.f.poid;
       }
     }
@@ -1317,10 +1315,9 @@ pwr_tStatus gdh_GetParent(pwr_tObjid oid, /**< The identity of the object. */
  * @return pwr_tStatus
  */
 
-pwr_tStatus gdh_GetLocalParent(
-    pwr_tObjid oid, /**< The identity of the object. */
-    pwr_tObjid* new_oid /**< Receives the object identity of local parent. */
-    )
+pwr_tStatus gdh_GetLocalParent(pwr_tObjid oid,     /**< The identity of the object. */
+                               pwr_tObjid* new_oid /**< Receives the object identity of local parent. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   gdb_sObject* op;
@@ -1330,14 +1327,17 @@ pwr_tStatus gdh_GetLocalParent(
 
   gdh_ScopeLock
   {
-    op = vol_OidToObject(
-        &sts, oid, gdb_mLo_global, vol_mTrans_none, cvol_eHint_none);
-    if (op != NULL) {
+    op = vol_OidToObject(&sts, oid, gdb_mLo_global, vol_mTrans_none, cvol_eHint_none);
+    if (op != NULL)
+    {
       touchObject(op);
-      if (op->g.f.poid.oix == pwr_cNObjectIx) {
+      if (op->g.f.poid.oix == pwr_cNObjectIx)
+      {
         *new_oid = pwr_cNObjid;
         sts = GDH__NO_PARENT;
-      } else {
+      }
+      else
+      {
         *new_oid = op->g.f.poid;
       }
     }
@@ -1355,15 +1355,14 @@ pwr_tStatus gdh_GetLocalParent(
  *
  * @return pwr_tStatus
  */
-pwr_tStatus gdh_GetSubscriptionOldness(
-    pwr_tSubid sid, /**<  Subscription to examine.  */
-    pwr_tBoolean* old, /**<  Pointer to where the oldness
-                             flag is stored or NULL.  */
-    pwr_tTime* lastupdate, /**<  Pointer to where the 64-bit
-                                 time value of last update is
-                                 stored or NULL.  */
-    pwr_tStatus* status /**<  Status of last data transfer.  */
-    )
+pwr_tStatus gdh_GetSubscriptionOldness(pwr_tSubid sid,        /**<  Subscription to examine.  */
+                                       pwr_tBoolean* old,     /**<  Pointer to where the oldness
+                                                                    flag is stored or NULL.  */
+                                       pwr_tTime* lastupdate, /**<  Pointer to where the 64-bit
+                                                                    time value of last update is
+                                                                    stored or NULL.  */
+                                       pwr_tStatus* status    /**<  Status of last data transfer.  */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   sub_sClient* cp;
@@ -1378,7 +1377,8 @@ pwr_tStatus gdh_GetSubscriptionOldness(
     if (p == NULL)
       break;
 
-    if (rid.r.vid_3 == cdh_eVid3_subid) {
+    if (rid.r.vid_3 == cdh_eVid3_subid)
+    {
       cp = (sub_sClient*)p;
 
       if (old != NULL)
@@ -1387,14 +1387,18 @@ pwr_tStatus gdh_GetSubscriptionOldness(
         memcpy(lastupdate, &cp->lastupdate, sizeof(cp->lastupdate));
       if (status != NULL)
         *status = cp->sts;
-    } else if (rid.r.vid_3 == cdh_eVid3_dlid) {
+    }
+    else if (rid.r.vid_3 == cdh_eVid3_dlid)
+    {
       if (old != NULL)
         *old = FALSE;
       if (lastupdate != NULL)
         time_GetTime(lastupdate);
       if (status != NULL)
         *status = GDH__SUCCESS;
-    } else {
+    }
+    else
+    {
       sts = GDH__WEIRD;
     }
   }
@@ -1427,9 +1431,9 @@ pwr_tStatus gdh_GetSubscriptionOldness(
  * @return pwr_tStatus
  */
 
-pwr_tStatus gdh_GetChild(pwr_tObjid oid, /**< The object identity. */
-    pwr_tObjid* new_oid /**< Recevies the object identity of the first child. */
-    )
+pwr_tStatus gdh_GetChild(pwr_tObjid oid,     /**< The object identity. */
+                         pwr_tObjid* new_oid /**< Recevies the object identity of the first child. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   gdb_sObject* op;
@@ -1439,13 +1443,16 @@ pwr_tStatus gdh_GetChild(pwr_tObjid oid, /**< The object identity. */
 
   gdh_ScopeLock
   {
-    op = vol_OidToObject(
-        &sts, oid, gdb_mLo_global, vol_mTrans_all, cvol_eHint_child);
-    if (op != NULL) {
+    op = vol_OidToObject(&sts, oid, gdb_mLo_global, vol_mTrans_all, cvol_eHint_child);
+    if (op != NULL)
+    {
       touchObject(op);
-      if (op->g.flags.b.isParent) {
+      if (op->g.flags.b.isParent)
+      {
         *new_oid = op->g.soid;
-      } else {
+      }
+      else
+      {
         sts = GDH__NO_CHILD;
       }
     }
@@ -1462,9 +1469,9 @@ pwr_tStatus gdh_GetChild(pwr_tObjid oid, /**< The object identity. */
  * @see gdh_GetPreviousSibling
  * @return pwr_tStatus
  */
-pwr_tStatus gdh_GetNextSibling(pwr_tObjid oid, /**< The object identity. */
-    pwr_tObjid* new_oid /** Receives the object identity of the next sibling.*/
-    )
+pwr_tStatus gdh_GetNextSibling(pwr_tObjid oid,     /**< The object identity. */
+                               pwr_tObjid* new_oid /** Receives the object identity of the next sibling.*/
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   gdb_sObject* op;
@@ -1476,9 +1483,9 @@ pwr_tStatus gdh_GetNextSibling(pwr_tObjid oid, /**< The object identity. */
 
   gdh_ScopeLock
   {
-    op = vol_OidToObject(
-        &sts, oid, gdb_mLo_global, vol_mTrans_none, cvol_eHint_next);
-    if (op != NULL) {
+    op = vol_OidToObject(&sts, oid, gdb_mLo_global, vol_mTrans_none, cvol_eHint_next);
+    if (op != NULL)
+    {
       touchObject(op);
       noid.vid = op->g.oid.vid;
       noid.oix = op->g.sib.flink;
@@ -1490,9 +1497,12 @@ pwr_tStatus gdh_GetNextSibling(pwr_tObjid oid, /**< The object identity. */
   if (op == NULL)
     return sts;
 
-  if (pop == NULL || noid.oix == pop->g.soid.oix) {
+  if (pop == NULL || noid.oix == pop->g.soid.oix)
+  {
     sts = GDH__NO_SIBLING;
-  } else {
+  }
+  else
+  {
     *new_oid = noid;
   }
 
@@ -1504,12 +1514,12 @@ pwr_tStatus gdh_GetNextSibling(pwr_tObjid oid, /**< The object identity. */
  * the previous object with the same parent).
  * @see gdh_GetNextSibling
  * @return pwr_tStatus
-*/
+ */
 
-pwr_tStatus gdh_GetPreviousSibling(pwr_tObjid oid, /**< The object identity. */
-    pwr_tObjid*
-        new_oid /**< Receievs the object identity for the previous sibling. */
-    )
+pwr_tStatus
+gdh_GetPreviousSibling(pwr_tObjid oid,     /**< The object identity. */
+                       pwr_tObjid* new_oid /**< Receievs the object identity for the previous sibling. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   gdb_sObject* op;
@@ -1521,9 +1531,9 @@ pwr_tStatus gdh_GetPreviousSibling(pwr_tObjid oid, /**< The object identity. */
 
   gdh_ScopeLock
   {
-    op = vol_OidToObject(
-        &sts, oid, gdb_mLo_global, vol_mTrans_none, cvol_eHint_prev);
-    if (op != NULL) {
+    op = vol_OidToObject(&sts, oid, gdb_mLo_global, vol_mTrans_none, cvol_eHint_prev);
+    if (op != NULL)
+    {
       touchObject(op);
       noid.vid = op->g.oid.vid;
       noid.oix = op->g.sib.blink;
@@ -1535,9 +1545,12 @@ pwr_tStatus gdh_GetPreviousSibling(pwr_tObjid oid, /**< The object identity. */
   if (op == NULL)
     return sts;
 
-  if (pop == NULL || oid.oix == pop->g.soid.oix) {
+  if (pop == NULL || oid.oix == pop->g.soid.oix)
+  {
     sts = GDH__NO_SIBLING;
-  } else {
+  }
+  else
+  {
     *new_oid = noid;
   }
 
@@ -1568,9 +1581,8 @@ pwr_tStatus gdh_GetPreviousSibling(pwr_tObjid oid, /**< The object identity. */
  * @see gdh_GetNextSibling
  * @return pwr_tStatus
  */
-pwr_tStatus gdh_GetRootList(pwr_tObjid*
-        oid /**< Receives the object identity of the first root object. */
-    )
+pwr_tStatus gdh_GetRootList(pwr_tObjid* oid /**< Receives the object identity of the first root object. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   gdb_sObject* op;
@@ -1584,10 +1596,14 @@ pwr_tStatus gdh_GetRootList(pwr_tObjid*
     /*  Get the first child of the rootvolume.  */
 
     op = hash_Search(&sts, gdbroot->oid_ht, &gdbroot->my_volume->g.oid);
-    if (op != NULL) {
-      if (op->g.flags.b.isParent) {
+    if (op != NULL)
+    {
+      if (op->g.flags.b.isParent)
+      {
         *oid = op->g.soid;
-      } else {
+      }
+      else
+      {
         sts = GDH__NOSUCHOBJ;
       }
     }
@@ -1622,11 +1638,11 @@ pwr_tStatus gdh_GetRootList(pwr_tObjid*
  * }
  * @endcode
  * @return pwr_tStatus
-*/
+ */
 
 pwr_tStatus gdh_GetClassList(pwr_tClassId cid, /**< The class identity. */
-    pwr_tObjid* oid /**< Receives the object identity. */
-    )
+                             pwr_tObjid* oid   /**< Receives the object identity. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   gdb_sObject* op = NULL;
@@ -1634,7 +1650,8 @@ pwr_tStatus gdh_GetClassList(pwr_tClassId cid, /**< The class identity. */
   gdh_ScopeLock
   {
     op = mvol_ClassList(&sts, cid, pwr_cNObjid, mvol_eList_first);
-    if (op != NULL) {
+    if (op != NULL)
+    {
       *oid = op->g.oid;
     }
   }
@@ -1656,9 +1673,9 @@ pwr_tStatus gdh_GetClassList(pwr_tClassId cid, /**< The class identity. */
  * @return pwr_tStatus
  */
 
-pwr_tStatus gdh_GetNextObject(pwr_tObjid oid, /**< The object identity. */
-    pwr_tObjid* new_oid /**< Receives the object identity */
-    )
+pwr_tStatus gdh_GetNextObject(pwr_tObjid oid,     /**< The object identity. */
+                              pwr_tObjid* new_oid /**< Receives the object identity */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   gdb_sObject* op;
@@ -1670,7 +1687,8 @@ pwr_tStatus gdh_GetNextObject(pwr_tObjid oid, /**< The object identity. */
   gdh_ScopeLock
   {
     op = mvol_ClassList(&sts, pwr_cNClassId, oid, mvol_eList_next);
-    if (op != NULL) {
+    if (op != NULL)
+    {
       *new_oid = op->g.oid;
     }
   }
@@ -1707,19 +1725,15 @@ pwr_tStatus gdh_GetNextObject(pwr_tObjid oid, /**< The object identity. */
  * @endcode
  * @see gdh_GetNextAttrRef
  * @return pwr_tStatus
-*/
+ */
 
-pwr_tStatus gdh_GetClassListAttrRef(
-    pwr_tClassId cid, /**< The class identity. */
-    pwr_sAttrRef* arp /**< Receives the attribute reference. */
-    )
+pwr_tStatus gdh_GetClassListAttrRef(pwr_tClassId cid, /**< The class identity. */
+                                    pwr_sAttrRef* arp /**< Receives the attribute reference. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
 
-  gdh_ScopeLock
-  {
-    mvol_ClassListAttrRef(&sts, cid, NULL, arp, mvol_eList_first);
-  }
+  gdh_ScopeLock { mvol_ClassListAttrRef(&sts, cid, NULL, arp, mvol_eList_first); }
   gdh_ScopeUnlock;
 
   return sts;
@@ -1739,10 +1753,10 @@ pwr_tStatus gdh_GetClassListAttrRef(
  * @return pwr_tStatus
  */
 
-pwr_tStatus gdh_GetNextAttrRef(pwr_tClassId cid, /**< The class identity. */
-    pwr_sAttrRef* arp, /**< The attribute reference. */
-    pwr_sAttrRef* new_arp /**< Receives the attribute reference */
-    )
+pwr_tStatus gdh_GetNextAttrRef(pwr_tClassId cid,     /**< The class identity. */
+                               pwr_sAttrRef* arp,    /**< The attribute reference. */
+                               pwr_sAttrRef* new_arp /**< Receives the attribute reference */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
 
@@ -1750,10 +1764,7 @@ pwr_tStatus gdh_GetNextAttrRef(pwr_tClassId cid, /**< The class identity. */
   if (new_arp == NULL)
     return GDH__BADARG;
 
-  gdh_ScopeLock
-  {
-    mvol_ClassListAttrRef(&sts, cid, arp, new_arp, mvol_eList_next);
-  }
+  gdh_ScopeLock { mvol_ClassListAttrRef(&sts, cid, arp, new_arp, mvol_eList_next); }
   gdh_ScopeUnlock;
 
   return sts;
@@ -1763,12 +1774,12 @@ pwr_tStatus gdh_GetNextAttrRef(pwr_tClassId cid, /**< The class identity. */
  * @brief Get the attribute reference of the first attribute object
  * of a specified class in the specified object.
  * @return pwr_tStatus
-*/
+ */
 
-pwr_tStatus gdh_GetObjectClassList(pwr_tCid cid, /**< The class identity. */
-    pwr_tOid oid, /**< Host object. */
-    pwr_sAttrRef* arp /**< Receives the attribute reference. */
-    )
+pwr_tStatus gdh_GetObjectClassList(pwr_tCid cid,     /**< The class identity. */
+                                   pwr_tOid oid,     /**< Host object. */
+                                   pwr_sAttrRef* arp /**< Receives the attribute reference. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   pwr_sAttrRef ar;
@@ -1789,11 +1800,10 @@ pwr_tStatus gdh_GetObjectClassList(pwr_tCid cid, /**< The class identity. */
  * @return pwr_tStatus
  */
 
-pwr_tStatus gdh_GetNextObjectAttrRef(
-    pwr_tClassId cid, /**< The class identity. */
-    pwr_sAttrRef* arp, /**< The attribute reference. */
-    pwr_sAttrRef* new_arp /**< Receives the attribute reference */
-    )
+pwr_tStatus gdh_GetNextObjectAttrRef(pwr_tClassId cid,     /**< The class identity. */
+                                     pwr_sAttrRef* arp,    /**< The attribute reference. */
+                                     pwr_sAttrRef* new_arp /**< Receives the attribute reference */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
 
@@ -1801,10 +1811,7 @@ pwr_tStatus gdh_GetNextObjectAttrRef(
   if (new_arp == NULL)
     return GDH__BADARG;
 
-  gdh_ScopeLock
-  {
-    mvol_ClassListAttrRef(&sts, cid, arp, new_arp, mvol_eList_objectnext);
-  }
+  gdh_ScopeLock { mvol_ClassListAttrRef(&sts, cid, arp, new_arp, mvol_eList_objectnext); }
   gdh_ScopeUnlock;
 
   return sts;
@@ -1820,8 +1827,8 @@ pwr_tStatus gdh_GetNextObjectAttrRef(
  */
 
 pwr_tStatus gdh_GetNodeObject(pwr_tNodeId nid, /**< The node index. */
-    pwr_tObjid* oid /**< Receive the object identity. */
-    )
+                              pwr_tObjid* oid  /**< Receive the object identity. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   gdb_sNode* np;
@@ -1831,11 +1838,15 @@ pwr_tStatus gdh_GetNodeObject(pwr_tNodeId nid, /**< The node index. */
 
   gdh_ScopeLock
   {
-    if (nid == pwr_cNNodeId) {
+    if (nid == pwr_cNNodeId)
+    {
       *oid = gdbroot->db->nod_oid;
-    } else {
+    }
+    else
+    {
       np = hash_Search(&sts, gdbroot->nid_ht, &nid);
-      if (np != NULL) {
+      if (np != NULL)
+      {
         *oid = np->nod_oid;
       }
     }
@@ -1851,9 +1862,9 @@ pwr_tStatus gdh_GetNodeObject(pwr_tNodeId nid, /**< The node index. */
  *
  * @return pwr_tStatus
  */
-pwr_tStatus gdh_GetNodeInfo(pwr_tNodeId nid, /**< The node index. */
-    gdh_sNodeInfo* ip /**< Receive the node info. */
-    )
+pwr_tStatus gdh_GetNodeInfo(pwr_tNodeId nid,  /**< The node index. */
+                            gdh_sNodeInfo* ip /**< Receive the node info. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   gdb_sNode* np;
@@ -1864,10 +1875,11 @@ pwr_tStatus gdh_GetNodeInfo(pwr_tNodeId nid, /**< The node index. */
   gdh_ScopeLock
   {
     np = hash_Search(&sts, gdbroot->nid_ht, &nid);
-    if (np != NULL) {
+    if (np != NULL)
+    {
       ip->nodidx = np->nid;
       ip->nix = np->vol_oid.vid;
-      strcpy(ip->nodename, np->name); 
+      strcpy(ip->nodename, np->name);
       ip->objid = np->nod_oid;
       ip->linkstate = 0;
       ip->upcnt = np->upcnt;
@@ -1889,19 +1901,18 @@ pwr_tStatus gdh_GetNodeInfo(pwr_tNodeId nid, /**< The node index. */
  * @return pwr_tStatus
  */
 
-pwr_tStatus gdh_GetAttributeCharacteristics(
-    char* name, /**< String containing attribute name;
-                     object.attribute or
-                     object.attribute[index].  */
-    pwr_tTypeId* tid, /**< Address to an integer where
-                           the type is stored.  */
-    pwr_tUInt32* size, /**< Address to an integer where
-                            the size is stored.  */
-    pwr_tUInt32* offs, /**< Address to an integer where
-                           the offset is stored.  */
-    pwr_tUInt32* elem /**< Address to an integer where
-                          the # of elements is stored.  */
-    )
+pwr_tStatus gdh_GetAttributeCharacteristics(char* name,        /**< String containing attribute name;
+                                                                    object.attribute or
+                                                                    object.attribute[index].  */
+                                            pwr_tTypeId* tid,  /**< Address to an integer where
+                                                                    the type is stored.  */
+                                            pwr_tUInt32* size, /**< Address to an integer where
+                                                                    the size is stored.  */
+                                            pwr_tUInt32* offs, /**< Address to an integer where
+                                                                   the offset is stored.  */
+                                            pwr_tUInt32* elem  /**< Address to an integer where
+                                                                   the # of elements is stored.  */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   cdh_sParseName parseName;
@@ -1917,14 +1928,14 @@ pwr_tStatus gdh_GetAttributeCharacteristics(
 
   gdh_ScopeLock
   {
-    ap = vol_NameToAttribute(
-        &sts, &attribute, pn, gdb_mLo_global, vol_mTrans_all);
+    ap = vol_NameToAttribute(&sts, &attribute, pn, gdb_mLo_global, vol_mTrans_all);
     if (ap != NULL)
       touchObject(ap->op);
   }
   gdh_ScopeUnlock;
 
-  if (ap != NULL) {
+  if (ap != NULL)
+  {
     if (size != NULL)
       *size = ap->size;
     if (offs != NULL)
@@ -1946,15 +1957,14 @@ pwr_tStatus gdh_GetAttributeCharacteristics(
  * @return pwr_tStatus
  */
 
-pwr_tStatus gdh_GetAttributeCharAttrref(
-    pwr_sAttrRef*
-        arp, /**< The attribute of which to fetch the charactertistics. */
-    pwr_tTypeId* tid, /**< Receives the attribute type. */
-    unsigned int* size, /**< Receives the size in bytes */
-    unsigned int* offs, /**< Receives the offset of the attribute from the
-                             beginning of the object .*/
-    unsigned int* elem /**< Receives the number of elements. */
-    )
+pwr_tStatus
+gdh_GetAttributeCharAttrref(pwr_sAttrRef* arp,  /**< The attribute of which to fetch the charactertistics. */
+                            pwr_tTypeId* tid,   /**< Receives the attribute type. */
+                            unsigned int* size, /**< Receives the size in bytes */
+                            unsigned int* offs, /**< Receives the offset of the attribute from the
+                                                     beginning of the object .*/
+                            unsigned int* elem  /**< Receives the number of elements. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   mvol_sAttribute attribute;
@@ -1964,14 +1974,14 @@ pwr_tStatus gdh_GetAttributeCharAttrref(
 
   gdh_ScopeLock
   {
-    ap = vol_ArefToAttribute(
-        &sts, &attribute, arp, gdb_mLo_global, vol_mTrans_all);
+    ap = vol_ArefToAttribute(&sts, &attribute, arp, gdb_mLo_global, vol_mTrans_all);
     if (ap != NULL)
       touchObject(ap->op);
   }
   gdh_ScopeUnlock;
 
-  if (ap != NULL) {
+  if (ap != NULL)
+  {
     if (size != NULL)
       *size = ap->size;
     if (offs != NULL)
@@ -1991,10 +2001,9 @@ pwr_tStatus gdh_GetAttributeCharAttrref(
  * @return pwr_tStatus
  */
 
-pwr_tStatus gdh_GetAttributeFlags(
-    pwr_sAttrRef* arp, /**< The attribute of which to fetch flags. */
-    unsigned int* flags /**< Receives the attribute flags. */
-    )
+pwr_tStatus gdh_GetAttributeFlags(pwr_sAttrRef* arp,  /**< The attribute of which to fetch flags. */
+                                  unsigned int* flags /**< Receives the attribute flags. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   mvol_sAttribute attribute;
@@ -2004,8 +2013,7 @@ pwr_tStatus gdh_GetAttributeFlags(
 
   gdh_ScopeLock
   {
-    ap = vol_ArefToAttribute(
-        &sts, &attribute, arp, gdb_mLo_global, vol_mTrans_all);
+    ap = vol_ArefToAttribute(&sts, &attribute, arp, gdb_mLo_global, vol_mTrans_all);
     if (ap != NULL)
       touchObject(ap->op);
   }
@@ -2028,9 +2036,9 @@ pwr_tStatus gdh_GetAttributeFlags(
  * and in shared volumes.
  * @return pwr_tStatus
  */
-pwr_tStatus gdh_GetPreviousObject(pwr_tObjid oid, /**< The object identity.*/
-    pwr_tObjid* new_oid /**< Receives the identity of the previos object.*/
-    )
+pwr_tStatus gdh_GetPreviousObject(pwr_tObjid oid,     /**< The object identity.*/
+                                  pwr_tObjid* new_oid /**< Receives the identity of the previos object.*/
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   gdb_sObject* op;
@@ -2041,7 +2049,8 @@ pwr_tStatus gdh_GetPreviousObject(pwr_tObjid oid, /**< The object identity.*/
   gdh_ScopeLock
   {
     op = mvol_ClassList(&sts, pwr_cNClassId, oid, mvol_eList_prev);
-    if (op != NULL) {
+    if (op != NULL)
+    {
       *new_oid = op->g.oid;
     }
   }
@@ -2063,7 +2072,7 @@ pwr_tStatus gdh_GetPreviousObject(pwr_tObjid oid, /**< The object identity.*/
  */
 
 pwr_tStatus gdh_Init(const char* name /**< Process name */
-    )
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
 
@@ -2080,30 +2089,29 @@ pwr_tStatus gdh_Init(const char* name /**< Process name */
  * If meta data is wanted for a class use the class parameter.
  * The output arguments can be NULL if they are not wanted.
  */
-pwr_tStatus gdh_MDAttribute(
-    pwr_tClassId cid, /* Class. Use pwr_cNClassId if meta
-                          data for an object and not for
-                          a class is wanted.  */
-    pwr_sAttrRef* arp, /* Use NULL if attrname should be used
-                           instead of the attribute reference.  */
-    char* aname, /* String containing
-                     object.attribute or
-                     object.attribute[index]
-                     If class data then name of attribute
-                     must start with a dot.  */
-    pwr_tTypeId* tid, /* Address of an type id where the
-                          attribute type will be stored
-                          or NULL if not wanted  */
-    unsigned int* size, /* Address of an integer where the
-                            attribute size will be stored
-                            or NULL if not wanted.  */
-    unsigned int* offs, /* Address of an integer where the
-                            attribute offset will be stored
-                            or NULL if not wanted.  */
-    unsigned int* elem /* Address of an integer where the
-                           number of elements will be stored
-                           or NULL if not wanted.  */
-    )
+pwr_tStatus gdh_MDAttribute(pwr_tClassId cid,   /* Class. Use pwr_cNClassId if meta
+                                                    data for an object and not for
+                                                    a class is wanted.  */
+                            pwr_sAttrRef* arp,  /* Use NULL if attrname should be used
+                                                    instead of the attribute reference.  */
+                            char* aname,        /* String containing
+                                                    object.attribute or
+                                                    object.attribute[index]
+                                                    If class data then name of attribute
+                                                    must start with a dot.  */
+                            pwr_tTypeId* tid,   /* Address of an type id where the
+                                                    attribute type will be stored
+                                                    or NULL if not wanted  */
+                            unsigned int* size, /* Address of an integer where the
+                                                    attribute size will be stored
+                                                    or NULL if not wanted.  */
+                            unsigned int* offs, /* Address of an integer where the
+                                                    attribute offset will be stored
+                                                    or NULL if not wanted.  */
+                            unsigned int* elem  /* Address of an integer where the
+                                                    number of elements will be stored
+                                                    or NULL if not wanted.  */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   cdh_sParseName parseName;
@@ -2111,7 +2119,8 @@ pwr_tStatus gdh_MDAttribute(
   mvol_sAttribute attribute;
   mvol_sAttribute* ap = NULL;
 
-  if (arp == NULL) {
+  if (arp == NULL)
+  {
     pn = cdh_ParseName(&sts, &parseName, pwr_cNObjid, aname, 0);
     if (pn == NULL)
       return sts;
@@ -2121,12 +2130,16 @@ pwr_tStatus gdh_MDAttribute(
 
   gdh_ScopeLock
   {
-    if (arp != NULL) {
-      ap = vol_ArefToAttribute(
-          &sts, &attribute, arp, gdb_mLo_global, vol_mTrans_all);
-    } else if (cid != pwr_cNClassId) {
+    if (arp != NULL)
+    {
+      ap = vol_ArefToAttribute(&sts, &attribute, arp, gdb_mLo_global, vol_mTrans_all);
+    }
+    else if (cid != pwr_cNClassId)
+    {
       ap = mvol_AnameToAttribute(&sts, ap, cid, pn, NULL);
-    } else {
+    }
+    else
+    {
       ap = vol_NameToAttribute(&sts, ap, pn, gdb_mLo_global, vol_mTrans_all);
     }
 
@@ -2135,7 +2148,8 @@ pwr_tStatus gdh_MDAttribute(
   }
   gdh_ScopeUnlock;
 
-  if (ap != NULL) {
+  if (ap != NULL)
+  {
     if (size != NULL)
       *size = ap->size;
     if (offs != NULL)
@@ -2159,10 +2173,9 @@ pwr_tStatus gdh_MDAttribute(
  * are notified about the move of this object.
  * @return pwr_tStatus
  */
-pwr_tStatus gdh_MoveObject(
-    pwr_tObjid oid, /**< The object that should be moved. */
-    pwr_tObjid poid /**< The object that should become the new parent. */
-    )
+pwr_tStatus gdh_MoveObject(pwr_tObjid oid, /**< The object that should be moved. */
+                           pwr_tObjid poid /**< The object that should become the new parent. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
 
@@ -2177,10 +2190,7 @@ pwr_tStatus gdh_MoveObject(
   if (oid.oix == poid.oix)
     return GDH__CHILDSELF;
 
-  gdh_ScopeLock
-  {
-    dvol_MoveObject(&sts, oid, poid);
-  }
+  gdh_ScopeLock { dvol_MoveObject(&sts, oid, poid); }
   gdh_ScopeUnlock;
 
   return sts;
@@ -2200,8 +2210,8 @@ pwr_tStatus gdh_MoveObject(
  * @return pwr_tStatus
  */
 pwr_tStatus gdh_NameToObjid(const char* name, /**< The object name. */
-    pwr_tObjid* oid /**< receives the identity of the object. */
-    )
+                            pwr_tObjid* oid   /**< receives the identity of the object. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   cdh_sParseName parseName;
@@ -2220,7 +2230,8 @@ pwr_tStatus gdh_NameToObjid(const char* name, /**< The object name. */
   gdh_ScopeLock
   {
     op = vol_NameToObject(&sts, pn, gdb_mLo_global, vol_mTrans_all);
-    if (op != NULL) {
+    if (op != NULL)
+    {
       touchObject(op);
       *oid = op->g.oid;
     }
@@ -2238,8 +2249,8 @@ pwr_tStatus gdh_NameToObjid(const char* name, /**< The object name. */
  * @return pwr_tStatus
  */
 pwr_tStatus gdh_NameToPointer(const char* name, /**< The name of the object. */
-    void** p /**< Receives a pointer to the object. */
-    )
+                              void** p          /**< Receives a pointer to the object. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   cdh_sParseName parseName;
@@ -2311,18 +2322,15 @@ pwr_tStatus gdh_NethandlerRunning(void)
  * @endcode
  * @return pwr_tStatus
  */
-pwr_tStatus gdh_NameToAttrref(
-    pwr_tObjid
-        poid, /**< This object is added to the Name argument to
-                   form the complete name of the object/attribute.
-                   It should be specified as pwr_cNobjid if it is not used.*/
-    const char*
-        name, /**< The argument is added to the parent to form the
-                   complete item name. If the parent argument is supplied as
-                   pwr_cNobjid, this argument is considered to describe the
-                   full name. */
-    pwr_sAttrRef* arp /**< The resulting attribute reference descriptor. */
-    )
+pwr_tStatus gdh_NameToAttrref(pwr_tObjid poid,  /**< This object is added to the Name argument to
+                                                     form the complete name of the object/attribute.
+                                                     It should be specified as pwr_cNobjid if it is not used.*/
+                              const char* name, /**< The argument is added to the parent to form the
+                                                     complete item name. If the parent argument is supplied as
+                                                     pwr_cNobjid, this argument is considered to describe the
+                                                     full name. */
+                              pwr_sAttrRef* arp /**< The resulting attribute reference descriptor. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   cdh_sParseName parseName;
@@ -2341,8 +2349,7 @@ pwr_tStatus gdh_NameToAttrref(
 
   gdh_ScopeLock
   {
-    ap = vol_NameToAttribute(
-        &sts, &attribute, pn, gdb_mLo_global, vol_mTrans_all);
+    ap = vol_NameToAttribute(&sts, &attribute, pn, gdb_mLo_global, vol_mTrans_all);
     if (ap == NULL)
       break;
 
@@ -2368,11 +2375,11 @@ pwr_tStatus gdh_NameToAttrref(
  * The caller is responsible for supplying a sufficient buffer.
  * @return pwr_tStatus
  */
-pwr_tStatus gdh_ObjidToName(pwr_tObjid oid, /**<  Object id of an object.  */
-    char* namebuf, /**<  A buffer where the name can be put.  */
-    pwr_tUInt32 size, /**<  Size of namebuf.  */
-    pwr_tBitMask nametype /**<  Mask of type cdh_mName.  */
-    )
+pwr_tStatus gdh_ObjidToName(pwr_tObjid oid,       /**<  Object id of an object.  */
+                            char* namebuf,        /**<  A buffer where the name can be put.  */
+                            pwr_tUInt32 size,     /**<  Size of namebuf.  */
+                            pwr_tBitMask nametype /**<  Mask of type cdh_mName.  */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   char name[512];
@@ -2394,8 +2401,7 @@ pwr_tStatus gdh_ObjidToName(pwr_tObjid oid, /**<  Object id of an object.  */
 
   gdh_ScopeLock
   {
-    op = vol_OidToObject(
-        &sts, oid, gdb_mLo_global, vol_mTrans_none, cvol_eHint_none);
+    op = vol_OidToObject(&sts, oid, gdb_mLo_global, vol_mTrans_none, cvol_eHint_none);
     if (op == NULL)
       break;
 
@@ -2404,13 +2410,15 @@ pwr_tStatus gdh_ObjidToName(pwr_tObjid oid, /**<  Object id of an object.  */
   }
   gdh_ScopeUnlock;
 
-  if (op == NULL && lnametype.b.fallback != cdh_mName_eFallback_strict) {
+  if (op == NULL && lnametype.b.fallback != cdh_mName_eFallback_strict)
+  {
     sts = GDH__SUCCESS;
     cdh_OidToString(name, sizeof(name), oid, 1);
     s = name;
   }
 
-  if (s != NULL) {
+  if (s != NULL)
+  {
     len = strlen(s);
     if (len >= size)
       sts = GDH__NAMEBUF;
@@ -2429,8 +2437,8 @@ pwr_tStatus gdh_ObjidToName(pwr_tObjid oid, /**<  Object id of an object.  */
  * @return pwr_tStatus
  */
 pwr_tStatus gdh_ObjidToPointer(pwr_tObjid oid, /**< The object identity. */
-    void** p /**< Reveives a pointer to the object. */
-    )
+                               void** p        /**< Reveives a pointer to the object. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   gdb_sObject* op;
@@ -2440,12 +2448,12 @@ pwr_tStatus gdh_ObjidToPointer(pwr_tObjid oid, /**< The object identity. */
 
   gdh_ScopeLock
   {
-    op = vol_OidToObject(
-        &sts, oid, gdb_mLo_native, vol_mTrans_all, cvol_eHint_none);
+    op = vol_OidToObject(&sts, oid, gdb_mLo_native, vol_mTrans_all, cvol_eHint_none);
     if (op == NULL)
       break;
 
-    if (op->u.n.lflags.b.readOnly) {
+    if (op->u.n.lflags.b.readOnly)
+    {
       sts = GDH__READONLY;
       break;
     }
@@ -2462,8 +2470,8 @@ pwr_tStatus gdh_ObjidToPointer(pwr_tObjid oid, /**< The object identity. */
  * @return pwr_tStatus
  */
 pwr_tStatus gdh_MountObjidToPointer(pwr_tObjid oid, /**< The object identity. */
-    void** p /**< Reveives a pointer to the object. */
-    )
+                                    void** p        /**< Reveives a pointer to the object. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   gdb_sObject* op;
@@ -2473,8 +2481,7 @@ pwr_tStatus gdh_MountObjidToPointer(pwr_tObjid oid, /**< The object identity. */
 
   gdh_ScopeLock
   {
-    op = vol_OidToObject(
-        &sts, oid, gdb_mLo_native, vol_mTrans_none, cvol_eHint_none);
+    op = vol_OidToObject(&sts, oid, gdb_mLo_native, vol_mTrans_none, cvol_eHint_none);
     if (op != NULL)
       *p = vol_ObjectToAddress(&sts, op);
   }
@@ -2491,8 +2498,8 @@ pwr_tStatus gdh_MountObjidToPointer(pwr_tObjid oid, /**< The object identity. */
  * @return pwr_tStatus
  */
 pwr_tStatus gdh_AttrRefToPointer(pwr_sAttrRef* arp, /**< Attribute reference. */
-    void** p /**< Reveives a pointer to the object. */
-    )
+                                 void** p           /**< Reveives a pointer to the object. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   gdb_sObject* op;
@@ -2502,12 +2509,12 @@ pwr_tStatus gdh_AttrRefToPointer(pwr_sAttrRef* arp, /**< Attribute reference. */
 
   gdh_ScopeLock
   {
-    op = vol_OidToObject(
-        &sts, arp->Objid, gdb_mLo_native, vol_mTrans_all, cvol_eHint_none);
+    op = vol_OidToObject(&sts, arp->Objid, gdb_mLo_native, vol_mTrans_all, cvol_eHint_none);
     if (op == NULL)
       break;
 
-    if (op->u.n.lflags.b.readOnly) {
+    if (op->u.n.lflags.b.readOnly)
+    {
       sts = GDH__READONLY;
       break;
     }
@@ -2531,10 +2538,9 @@ pwr_tStatus gdh_AttrRefToPointer(pwr_sAttrRef* arp, /**< Attribute reference. */
  * @return pwr_tStatus
  */
 
-pwr_tStatus gdh_RenameObject(
-    pwr_tObjid oid, /**< The object identity that should be renamed.*/
-    char* name /**< The new name. */
-    )
+pwr_tStatus gdh_RenameObject(pwr_tObjid oid, /**< The object identity that should be renamed.*/
+                             char* name      /**< The new name. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   cdh_sParseName parseName;
@@ -2547,10 +2553,7 @@ pwr_tStatus gdh_RenameObject(
   if (pn == NULL || pn->nObject != 1 || pn->flags.b.idString)
     return GDH__BADNAME;
 
-  gdh_ScopeLock
-  {
-    dvol_RenameObject(&sts, oid, pn);
-  }
+  gdh_ScopeLock { dvol_RenameObject(&sts, oid, pn); }
   gdh_ScopeUnlock;
 
   return sts;
@@ -2576,11 +2579,10 @@ pwr_tStatus gdh_RenameObject(
  * @return pwr_tStatus
  */
 
-pwr_tStatus gdh_SetObjectInfo(
-    const char* name, /**< The name of the object or object attribute.*/
-    void* bufp, /**< Pointer to the data. */
-    unsigned int bufsize /**< The size in bytes of the data buffer. */
-    )
+pwr_tStatus gdh_SetObjectInfo(const char* name,    /**< The name of the object or object attribute.*/
+                              void* bufp,          /**< Pointer to the data. */
+                              unsigned int bufsize /**< The size in bytes of the data buffer. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   cdh_sParseName parseName;
@@ -2613,24 +2615,27 @@ pwr_tStatus gdh_SetObjectInfo(
 
   gdh_Lock;
 
-  do {
-    ap = vol_NameToAttribute(
-        &sts, &attribute, pn, gdb_mLo_global, vol_mTrans_all);
+  do
+  {
+    ap = vol_NameToAttribute(&sts, &attribute, pn, gdb_mLo_global, vol_mTrans_all);
     if (ap == NULL || ap->op == NULL)
       break;
 
-    if (ap->op->u.n.lflags.b.readOnly
-        || (ap->adef && ap->adef->Info.Flags & PWR_MASK_CONST)) {
+    if (ap->op->u.n.lflags.b.readOnly || (ap->adef && ap->adef->Info.Flags & PWR_MASK_CONST))
+    {
       sts = GDH__READONLY;
       break;
     }
 
     touchObject(ap->op);
     p = vol_AttributeToAddress(&sts, ap);
-    if (p != NULL) {
+    if (p != NULL)
+    {
       memcpy(p, bufp, MIN(ap->size, bufsize));
       break;
-    } else if ((ap->op->l.flags.m & gdb_mLo_native) != 0) {
+    }
+    else if ((ap->op->l.flags.m & gdb_mLo_native) != 0)
+    {
       break;
     }
 
@@ -2648,23 +2653,27 @@ pwr_tStatus gdh_SetObjectInfo(
 
     ccp = NULL;
     /* Get cached class if needed */
-    if (!ap->op->u.c.flags.b.classChecked || !ap->op->u.c.flags.b.classEqual) {
+    if (!ap->op->u.c.flags.b.classChecked || !ap->op->u.c.flags.b.classEqual)
+    {
       ccp = cmvolc_GetCachedClass(&sts, np, vp, ap, &equal, &fetched, NULL);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         np = NULL;
         break;
       }
       if (equal)
         ccp = NULL;
 
-      if (ccpLocked == NULL && ccp != NULL && !equal) {
+      if (ccpLocked == NULL && ccp != NULL && !equal)
+      {
         cmvolc_LockClass(NULL, ccp);
         ccpLocked = ccp;
       }
 
       /* If gdb has been unlocked, refresh pointers */
       /** @todo Check if we can do it more efficient, eg. vol_ArefToAttribute */
-      if (fetched) {
+      if (fetched)
+      {
         memset(&attribute, 0, sizeof(attribute));
         np = NULL;
         continue;
@@ -2673,26 +2682,26 @@ pwr_tStatus gdh_SetObjectInfo(
       if (equal)
         break;
 
-      rarp = ndc_NarefToRaref(
-          &sts, ap, arp, ccp, &ridx, &raref, &equal, pn, ccpLocked, vp, np);
+      rarp = ndc_NarefToRaref(&sts, ap, arp, ccp, &ridx, &raref, &equal, pn, ccpLocked, vp, np);
     }
     break;
   } while (1);
 
   gdh_Unlock;
 
-  if (np != NULL && ODD(sts)) {
+  if (np != NULL && ODD(sts))
+  {
     if (equal)
-      cvolc_SetObjectInfo(
-          &sts, np, arp, NULL, NULL, UINT_MAX, ap, bufp, bufsize);
+      cvolc_SetObjectInfo(&sts, np, arp, NULL, NULL, UINT_MAX, ap, bufp, bufsize);
     else
       cvolc_SetObjectInfo(&sts, np, arp, ccp, rarp, ridx, ap, bufp, bufsize);
   }
 
   if (gdh_log_cb && ODD(sts))
-    gdh_log_cb((char *)name, bufp, bufsize);
+    gdh_log_cb((char*)name, bufp, bufsize);
 
-  if (ccpLocked) {
+  if (ccpLocked)
+  {
     gdb_Lock;
     cmvolc_UnlockClass(NULL, ccpLocked);
     gdb_Unlock;
@@ -2719,13 +2728,11 @@ pwr_tStatus gdh_SetObjectInfo(
  * @return pwr_tStatus
  */
 
-pwr_tStatus gdh_SetObjectInfoAttrref(
-    pwr_sAttrRef*
-        arp, /**< Supplies the attribute reference decriptor that defines
-                  an object or an object and attribute. */
-    void* bufp, /**< Pointer to the data. */
-    unsigned int bufsize /**< The size in bytes of the data buffer. */
-    )
+pwr_tStatus gdh_SetObjectInfoAttrref(pwr_sAttrRef* arp,   /**< Supplies the attribute reference decriptor that
+                                                             defines   an object or an object and attribute. */
+                                     void* bufp,          /**< Pointer to the data. */
+                                     unsigned int bufsize /**< The size in bytes of the data buffer. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   mvol_sAttribute attribute;
@@ -2749,24 +2756,27 @@ pwr_tStatus gdh_SetObjectInfoAttrref(
   memset(&attribute, 0, sizeof(attribute));
 
   gdh_Lock;
-  do {
-    ap = vol_ArefToAttribute(
-        &sts, &attribute, arp, gdb_mLo_global, vol_mTrans_all);
+  do
+  {
+    ap = vol_ArefToAttribute(&sts, &attribute, arp, gdb_mLo_global, vol_mTrans_all);
     if (ap == NULL || ap->op == NULL)
       break;
 
-    if (ap->op->u.n.lflags.b.readOnly
-        || (ap->adef && ap->adef->Info.Flags & PWR_MASK_CONST)) {
+    if (ap->op->u.n.lflags.b.readOnly || (ap->adef && ap->adef->Info.Flags & PWR_MASK_CONST))
+    {
       sts = GDH__READONLY;
       break;
     }
 
     touchObject(ap->op);
     p = vol_AttributeToAddress(&sts, ap);
-    if (p != NULL) {
+    if (p != NULL)
+    {
       memcpy(p, bufp, MIN(ap->size, bufsize));
       break;
-    } else if ((ap->op->l.flags.m & gdb_mLo_native) != 0) {
+    }
+    else if ((ap->op->l.flags.m & gdb_mLo_native) != 0)
+    {
       break;
     }
 
@@ -2781,22 +2791,26 @@ pwr_tStatus gdh_SetObjectInfoAttrref(
 
     ccp = NULL;
     /* Get cached class if needed */
-    if (!ap->op->u.c.flags.b.classChecked || !ap->op->u.c.flags.b.classEqual) {
+    if (!ap->op->u.c.flags.b.classChecked || !ap->op->u.c.flags.b.classEqual)
+    {
       ccp = cmvolc_GetCachedClass(&sts, np, vp, ap, &equal, &fetched, NULL);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         np = NULL;
         break;
       }
       if (equal)
         ccp = NULL;
 
-      if (ccpLocked == NULL && ccp != NULL && !equal) {
+      if (ccpLocked == NULL && ccp != NULL && !equal)
+      {
         cmvolc_LockClass(NULL, ccp);
         ccpLocked = ccp;
       }
 
       /* If gdb has been unlocked, refresh pointers */
-      if (fetched) {
+      if (fetched)
+      {
         memset(&attribute, 0, sizeof(attribute));
         np = NULL;
         continue;
@@ -2805,9 +2819,9 @@ pwr_tStatus gdh_SetObjectInfoAttrref(
       if (equal)
         break;
 
-      rarp = ndc_NarefToRaref(
-          &sts, ap, arp, ccp, &ridx, &raref, &equal, NULL, ccpLocked, vp, np);
-    } else
+      rarp = ndc_NarefToRaref(&sts, ap, arp, ccp, &ridx, &raref, &equal, NULL, ccpLocked, vp, np);
+    }
+    else
       equal = ap->op->u.c.flags.b.classEqual;
 
     break;
@@ -2816,15 +2830,16 @@ pwr_tStatus gdh_SetObjectInfoAttrref(
 
   gdh_Unlock;
 
-  if (np != NULL && ODD(sts)) {
+  if (np != NULL && ODD(sts))
+  {
     if (equal)
-      cvolc_SetObjectInfo(
-          &sts, np, arp, NULL, NULL, UINT_MAX, ap, bufp, bufsize);
+      cvolc_SetObjectInfo(&sts, np, arp, NULL, NULL, UINT_MAX, ap, bufp, bufsize);
     else
       cvolc_SetObjectInfo(&sts, np, arp, ccp, rarp, ridx, ap, bufp, bufsize);
   }
 
-  if (ccpLocked) {
+  if (ccpLocked)
+  {
     gdb_Lock;
     cmvolc_UnlockClass(NULL, ccpLocked);
     gdb_Unlock;
@@ -2841,24 +2856,23 @@ pwr_tStatus gdh_SetObjectInfoAttrref(
  * @return pwr_tStatus
  */
 
-pwr_tStatus gdh_SubRefObjectInfoList(
-    unsigned int nentries, /**< Number of entries in the object[],
-                               attrref[] and subid[] arrays.  */
+pwr_tStatus gdh_SubRefObjectInfoList(unsigned int nentries, /**< Number of entries in the object[],
+                                                                attrref[] and subid[] arrays.  */
 
-    void* object[], /**< The address of an array with
-                        either the address of a name string
-                        or the address of an pwr_sAttrRef
-                        identifying the objects or parameters
-                        to establish subscriptions for.  */
+                                     void* object[], /**< The address of an array with
+                                                         either the address of a name string
+                                                         or the address of an pwr_sAttrRef
+                                                         identifying the objects or parameters
+                                                         to establish subscriptions for.  */
 
-    pwr_tBoolean is_aref[], /**< True if the corresponding object[]
-                                entry is an attrref. Otherwise it
-                                is regarded as a name string.  */
+                                     pwr_tBoolean is_aref[], /**< True if the corresponding object[]
+                                                                 entry is an attrref. Otherwise it
+                                                                 is regarded as a name string.  */
 
-    pwr_tSubid subid[] /**< Returned handles with index matching
-                           the object argument. The array must be
-                           declared by the caller.  */
-    )
+                                     pwr_tSubid subid[] /**< Returned handles with index matching
+                                                            the object argument. The array must be
+                                                            declared by the caller.  */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   sub_sClient* cp;
@@ -2873,13 +2887,17 @@ pwr_tStatus gdh_SubRefObjectInfoList(
 
     lh = pool_Qalloc(NULL, gdbroot->pool);
 
-    for (i = 0; i < nentries; i++) {
+    for (i = 0; i < nentries; i++)
+    {
       /* Build subcli structure */
 
-      if (is_aref[i]) {
+      if (is_aref[i])
+      {
         s = NULL;
         arp = object[i];
-      } else {
+      }
+      else
+      {
         s = object[i];
         arp = NULL;
       }
@@ -2914,10 +2932,9 @@ pwr_tStatus gdh_SubRefObjectInfoList(
  * @return pwr_tStatus
  */
 
-pwr_tStatus gdh_SubRefObjectInfoAttrref(
-    pwr_sAttrRef* aref, /**< Reference to an object.attribute.  */
-    pwr_tSubid* sid /**< Returned handle.  */
-    )
+pwr_tStatus gdh_SubRefObjectInfoAttrref(pwr_sAttrRef* aref, /**< Reference to an object.attribute.  */
+                                        pwr_tSubid* sid     /**< Returned handle.  */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   pwr_tBoolean true_flag = TRUE;
@@ -2940,11 +2957,10 @@ pwr_tStatus gdh_SubRefObjectInfoAttrref(
  * Since this routine operates on a single data item, it is
  * pretty slow. For faster setup of many subscriptions in one
  * call, use gdh_SubRefObjectInfoList.
-*/
-pwr_tStatus gdh_SubRefObjectInfoName(
-    char* name, /**< Name of an object or object.attribute. */
-    pwr_tSubid* sid /**< Returned handle. */
-    )
+ */
+pwr_tStatus gdh_SubRefObjectInfoName(char* name,     /**< Name of an object or object.attribute. */
+                                     pwr_tSubid* sid /**< Returned handle. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   pwr_tBoolean false_flag = FALSE;
@@ -2967,10 +2983,9 @@ pwr_tStatus gdh_SubRefObjectInfoName(
  *
  * @return pwr_tStatus
  */
-pwr_tStatus gdh_SubUnrefObjectInfoList(
-    unsigned int nentries, /**< # of pwr_tSubids in the array.  */
-    pwr_tSubid* sid /**< Array of subscriptions to terminate.  */
-    )
+pwr_tStatus gdh_SubUnrefObjectInfoList(unsigned int nentries, /**< # of pwr_tSubids in the array.  */
+                                       pwr_tSubid* sid        /**< Array of subscriptions to terminate.  */
+)
 {
   pwr_tStatus retsts = GDH__SUCCESS;
   pwr_tStatus sts = GDH__SUCCESS;
@@ -2988,7 +3003,8 @@ pwr_tStatus gdh_SubUnrefObjectInfoList(
 
     lh = pool_Qalloc(NULL, gdbroot->pool);
 
-    for (i = 0; i < nentries; i++) {
+    for (i = 0; i < nentries; i++)
+    {
       rid.pwr = sid[i];
 
       if (rid.r.vid_3 != cdh_eVid3_subid) /* Verify Subid.  */
@@ -2996,9 +3012,12 @@ pwr_tStatus gdh_SubUnrefObjectInfoList(
       else
         cp = hash_Search(&sts, gdbroot->subc_ht, &sid[i]);
 
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         retsts = (sts & ~STS_M_SEVERITY) | STS_K_INFO;
-      } else {
+      }
+      else
+      {
         /* Move the subscription client to the temporary list.  */
 
         pool_Qremove(NULL, gdbroot->pool, &cp->subc_ll);
@@ -3030,9 +3049,8 @@ pwr_tStatus gdh_SubUnrefObjectInfoList(
  *@return pwr_tStatus
  */
 
-pwr_tStatus gdh_SubUnrefObjectInfo(
-    pwr_tSubid sid /**< Subscription to terminate.  */
-    )
+pwr_tStatus gdh_SubUnrefObjectInfo(pwr_tSubid sid /**< Subscription to terminate.  */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   pwr_tSubid sidlst = sid;
@@ -3051,21 +3069,17 @@ pwr_tStatus gdh_SubUnrefObjectInfo(
 
 void gdh_SubUnrefObjectInfoAll(void)
 {
-  gdh_ScopeLock
-  {
-    subc_CancelUser(gdbroot->my_pid);
-  }
+  gdh_ScopeLock { subc_CancelUser(gdbroot->my_pid); }
   gdh_ScopeUnlock;
 }
 
 /**
  * @brief Fetch the data associated with a subscription.
  */
-pwr_tStatus gdh_SubData(
-    pwr_tSubid sid, /**<  Subscription to fetch data from.  */
-    void* bp, /**<  User supplied buffer where data is put.  */
-    unsigned int bsize /**<  Size in bytes of user buffer.  */
-    )
+pwr_tStatus gdh_SubData(pwr_tSubid sid,    /**<  Subscription to fetch data from.  */
+                        void* bp,          /**<  User supplied buffer where data is put.  */
+                        unsigned int bsize /**<  Size in bytes of user buffer.  */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   sub_sClient* cp;
@@ -3084,26 +3098,32 @@ pwr_tStatus gdh_SubData(
     if (cp == NULL)
       break;
 
-    if (EVEN(cp->sts)) {
+    if (EVEN(cp->sts))
+    {
       sts = cp->sts;
       break;
     }
 
-    if ((cp->nid == gdbroot->db->nid) && (cp->userdata == pool_cNRef)) {
+    if ((cp->nid == gdbroot->db->nid) && (cp->userdata == pool_cNRef))
+    {
       /*  Handle local object references without user buffers.  */
 
-      ap = vol_ArefToAttribute(
-          &sts, &attribute, &cp->aref, gdb_mLo_global, vol_mTrans_all);
+      ap = vol_ArefToAttribute(&sts, &attribute, &cp->aref, gdb_mLo_global, vol_mTrans_all);
       if (ap == NULL)
         break;
 
       p = vol_AttributeToAddress(&sts, ap);
-    } else {
+    }
+    else
+    {
       /*  Handle all other object references.  */
 
-      if (cp->old) {
+      if (cp->old)
+      {
         sts = GDH__SUBOLD;
-      } else {
+      }
+      else
+      {
         dp = pool_Address(NULL, gdbroot->pool, cp->subdata);
         if (dp == NULL)
           errh_Bugcheck(GDH__WEIRD, "gdh_SubData");
@@ -3113,8 +3133,10 @@ pwr_tStatus gdh_SubData(
 
     /*  If all is fine, copy data to user buffer.  */
 
-    if (ODD(sts)) {
-      if (cp->cclass != pool_cNRef) {
+    if (ODD(sts))
+    {
+      if (cp->cclass != pool_cNRef)
+      {
         gdb_sCclass* ccp;
         ndc_sRemoteToNative* tbl;
         pwr_tUInt32 size;
@@ -3132,10 +3154,10 @@ pwr_tStatus gdh_SubData(
           errh_Bugcheck(GDH__WEIRD, "gdh_SubData, get cached class address");
 
         size = MIN(bsize, cp->aref.Size);
-        ndc_ConvertRemoteToNativeTable(&sts, ccp, tbl, &cp->raref, &cp->aref,
-            bp, p, &size, cp->aref.Offset, 0, 0, &first, cp->nid);
-
-      } else
+        ndc_ConvertRemoteToNativeTable(&sts, ccp, tbl, &cp->raref, &cp->aref, bp, p, &size, cp->aref.Offset,
+                                       0, 0, &first, cp->nid);
+      }
+      else
         memcpy(bp, p, MIN(bsize, cp->aref.Size));
     }
   }
@@ -3147,9 +3169,9 @@ pwr_tStatus gdh_SubData(
 /**
  * @brief Fetch the data size associated with a subscription.
  */
-pwr_tStatus gdh_SubSize(pwr_tSubid sid, /**<  Subscription referenced.  */
-    unsigned int* size /**<  Subscription size in bytes.  */
-    )
+pwr_tStatus gdh_SubSize(pwr_tSubid sid,    /**<  Subscription referenced.  */
+                        unsigned int* size /**<  Subscription size in bytes.  */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   sub_sClient* cp;
@@ -3163,9 +3185,12 @@ pwr_tStatus gdh_SubSize(pwr_tSubid sid, /**<  Subscription referenced.  */
     if (cp == NULL)
       break;
 
-    if (EVEN(cp->sts)) {
+    if (EVEN(cp->sts))
+    {
       sts = cp->sts;
-    } else {
+    }
+    else
+    {
       *size = cp->aref.Size;
     }
   }
@@ -3183,12 +3208,11 @@ pwr_tStatus gdh_SubSize(pwr_tSubid sid, /**<  Subscription referenced.  */
  * @return pwr_tStatus
  */
 
-pwr_tStatus gdh_SubAssociateBuffer(
-    pwr_tSubid sid, /**< Subscription referenced.  */
-    void** buffer, /**< Address of buffer that gets allocated
-                        for the caller.  */
-    unsigned int buffersize /**< Requested size in bytes of user buffer.  */
-    )
+pwr_tStatus gdh_SubAssociateBuffer(pwr_tSubid sid,         /**< Subscription referenced.  */
+                                   void** buffer,          /**< Address of buffer that gets allocated
+                                                                for the caller.  */
+                                   unsigned int buffersize /**< Requested size in bytes of user buffer.  */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   sub_sClient* cp;
@@ -3202,18 +3226,24 @@ pwr_tStatus gdh_SubAssociateBuffer(
     if (cp == NULL)
       break;
 
-    if (cp->userdata == pool_cNRef) {
+    if (cp->userdata == pool_cNRef)
+    {
       cp->userdata = pool_RefAlloc(NULL, gdbroot->rtdb, buffersize);
       cp->usersize = buffersize;
       *buffer = pool_Address(NULL, gdbroot->rtdb, cp->userdata);
-    } else {
-      if (cp->usersize >= buffersize) { /** todo !!! Try to understand this
-                                           code!, LW?
-                                           I think it shall be usersize instead
-                                           of userdata, ML.
-                                           Please verify.*/
+    }
+    else
+    {
+      if (cp->usersize >= buffersize)
+      { /** todo !!! Try to understand this
+           code!, LW?
+           I think it shall be usersize instead
+           of userdata, ML.
+           Please verify.*/
         *buffer = pool_Address(NULL, gdbroot->rtdb, cp->userdata);
-      } else {
+      }
+      else
+      {
         sts = GDH__SUBALRBUF;
       }
     } /* Previous buffer */
@@ -3231,12 +3261,11 @@ pwr_tStatus gdh_SubAssociateBuffer(
  * A value of zero resets the default values.
  */
 
-pwr_tStatus gdh_SetSubscriptionDefaults(
-    pwr_tInt32 dt, /**<  Default update time for subscription
-                       requests to come, in ms.  */
-    pwr_tInt32 tmo /**<  Default timeout (i.e. time until
-                       data gets flagged as old), in ms.  */
-    )
+pwr_tStatus gdh_SetSubscriptionDefaults(pwr_tInt32 dt, /**<  Default update time for subscription
+                                                           requests to come, in ms.  */
+                                        pwr_tInt32 tmo /**<  Default timeout (i.e. time until
+                                                           data gets flagged as old), in ms.  */
+)
 {
   subc_SetDefaults(dt, tmo);
   return GDH__SUCCESS;
@@ -3262,15 +3291,14 @@ pwr_tStatus gdh_SetSubscriptionDefaults(
  * is a Dlid, otherwise a Subid!
  */
 
-pwr_tStatus gdh_RefObjectInfoList(
-    unsigned int n, /**<  # of entries in objref and subid.  */
-    gdh_sObjRef* objref, /**<  Input:
-                               Name list: objects or object.attributes
-                               Output:
-                               Address list.  */
-    pwr_tSubid* sid /**<  Subids corresponding to objrefs.
-                          If supplied as NULL, it is ignored.  */
-    )
+pwr_tStatus gdh_RefObjectInfoList(unsigned int n,      /**<  # of entries in objref and subid.  */
+                                  gdh_sObjRef* objref, /**<  Input:
+                                                             Name list: objects or object.attributes
+                                                             Output:
+                                                             Address list.  */
+                                  pwr_tSubid* sid      /**<  Subids corresponding to objrefs.
+                                                             If supplied as NULL, it is ignored.  */
+)
 {
   pwr_tStatus sts, rsts = GDH__SUCCESS;
   pwr_tUInt32 i;
@@ -3302,47 +3330,58 @@ pwr_tStatus gdh_RefObjectInfoList(
 
   objrefp = &objref[0];
   objp = &object[0];
-  for (i = 0; i < n; i++, objrefp++) {
+  for (i = 0; i < n; i++, objrefp++)
+  {
     sts = gdh_NameToAttrref(pwr_cNObjid, objrefp->fullname, &aref);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       pwr_tAName an;
       pwr_tOid oid;
       char* s;
       pwr_tStatus lsts;
 
-      if ( sts == GDH__NODYNLOCOBJ) {
-	rsts = sts;
-	continue;
+      if (sts == GDH__NODYNLOCOBJ)
+      {
+        rsts = sts;
+        continue;
       }
-	
+
       dl = 0;
 
       /* Check if this is an erroneous local attribute */
       strcpy(an, objrefp->fullname);
-      if ((s = strchr(an, '.'))) {
+      if ((s = strchr(an, '.')))
+      {
         *s = 0;
         lsts = gdh_NameToObjid(an, &oid);
-        if (ODD(lsts)) {
+        if (ODD(lsts))
+        {
           gdh_GetObjectLocation(oid, &dl);
-          if (dl) {
+          if (dl)
+          {
             rsts = sts;
             continue;
           }
         }
       }
-    } else {
+    }
+    else
+    {
       gdh_GetObjectLocation(aref.Objid, &dl);
     }
 
     /*  If dl == TRUE, then direct link, else subscribe!  */
 
-    if (dl) {
+    if (dl)
+    {
       dlid = pwr_cNDlid;
       objrefp->adrs = NULL;
       gdh_DLRefObjectInfoAttrref(&aref, &objrefp->adrs, &dlid);
       if (sid != NULL)
         sid[i] = dlid;
-    } else {
+    }
+    else
+    {
       *objp = (char*)&objrefp->fullname;
       isattrref[nsub] = FALSE;
       xrefarr[nsub++] = i;
@@ -3352,14 +3391,17 @@ pwr_tStatus gdh_RefObjectInfoList(
 
   /* Establish subscriptions.  */
 
-  if (nsub > 0) {
+  if (nsub > 0)
+  {
     gdh_SubRefObjectInfoList(nsub, (void*)object, isattrref, subidarr);
 
     /* Associate buffers and return pwr_tSubid if requested.  */
 
-    for (i = 0; i < nsub; i++) {
+    for (i = 0; i < nsub; i++)
+    {
       objrefp = &objref[xrefarr[i]];
-      if (objrefp->bufsize == 0) {
+      if (objrefp->bufsize == 0)
+      {
         free(subidarr);
         free(xrefarr);
         free(isattrref);
@@ -3423,12 +3465,11 @@ pwr_tStatus gdh_RefObjectInfoList(
  * @see gdh_UnrefObjectInfo();
  * @return pwr_tStatus
  */
-pwr_tStatus gdh_RefObjectInfo(
-    char* name, /**<Supplies the name of an object or object and attribute.*/
-    void** infop, /**<Receives a pointer to the requested information.  */
-    pwr_tSubid* sid, /**<Receives the subscription identity. */
-    unsigned int size /**<Size of the subscribed data. */
-    )
+pwr_tStatus gdh_RefObjectInfo(char* name,       /**<Supplies the name of an object or object and attribute.*/
+                              void** infop,     /**<Receives a pointer to the requested information.  */
+                              pwr_tSubid* sid,  /**<Receives the subscription identity. */
+                              unsigned int size /**<Size of the subscribed data. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   gdh_sObjRef objref;
@@ -3467,20 +3508,24 @@ pwr_tStatus gdh_RefObjectInfo(
  * @see gdh_RefObjectInfo, gdh_DLUnrefObjectInfo, gdh_SubUnrefObjectInfo
  * @return pwr_tStatus
  */
-pwr_tStatus gdh_UnrefObjectInfo(
-    pwr_tSubid sid /**<The subscription to terminate. */
-    )
+pwr_tStatus gdh_UnrefObjectInfo(pwr_tSubid sid /**<The subscription to terminate. */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   cdh_uRefId refid;
 
   refid.pwr = sid;
 
-  if (refid.r.vid_3 == cdh_eVid3_dlid) {
+  if (refid.r.vid_3 == cdh_eVid3_dlid)
+  {
     sts = gdh_DLUnrefObjectInfo(sid);
-  } else if (refid.r.vid_3 == cdh_eVid3_subid) {
+  }
+  else if (refid.r.vid_3 == cdh_eVid3_subid)
+  {
     sts = gdh_SubUnrefObjectInfo(sid);
-  } else {
+  }
+  else
+  {
     sts = GDH__NOSUBCLI;
   }
 
@@ -3511,18 +3556,16 @@ pwr_tStatus gdh_UnrefObjectInfoAll(void)
  * @return pwr_tStatus
  */
 
-pwr_tStatus gdh_SetAlarmLevel(
-    pwr_tObjid oid, /**< Object identity for the object */
-    pwr_tUInt32 alarmlevel /**< New alarm level */
-    )
+pwr_tStatus gdh_SetAlarmLevel(pwr_tObjid oid,        /**< Object identity for the object */
+                              pwr_tUInt32 alarmlevel /**< New alarm level */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   gdb_sObject* op;
 
   gdh_ScopeLock
   {
-    op = vol_OidToObject(
-        &sts, oid, gdb_mLo_owned, vol_mTrans_none, cvol_eHint_none);
+    op = vol_OidToObject(&sts, oid, gdb_mLo_owned, vol_mTrans_none, cvol_eHint_none);
     if (op == NULL)
       break;
 
@@ -3542,18 +3585,16 @@ pwr_tStatus gdh_SetAlarmLevel(
  * long as the new alarm level is higher than the old.
  * @return pwr_tStatus
  */
-pwr_tStatus gdh_SetAlarmBlockLevel(
-    pwr_tObjid oid, /**< Object identity for the object */
-    pwr_tUInt32 blocklevel /**< New block level */
-    )
+pwr_tStatus gdh_SetAlarmBlockLevel(pwr_tObjid oid,        /**< Object identity for the object */
+                                   pwr_tUInt32 blocklevel /**< New block level */
+)
 {
   pwr_tStatus sts = GDH__SUCCESS;
   gdb_sObject* op;
 
   gdh_ScopeLock
   {
-    op = vol_OidToObject(
-        &sts, oid, gdb_mLo_owned, vol_mTrans_none, cvol_eHint_none);
+    op = vol_OidToObject(&sts, oid, gdb_mLo_owned, vol_mTrans_none, cvol_eHint_none);
     if (op == NULL)
       break;
 
@@ -3576,9 +3617,12 @@ void gdh_StoreRtdbPointer(unsigned long* rp, void* p)
   if (rp == NULL)
     return;
 
-  if (p == NULL) {
+  if (p == NULL)
+  {
     r = pool_cNRef;
-  } else {
+  }
+  else
+  {
     r = pool_Reference(NULL, gdbroot->rtdb, p);
     if (r == pool_cNRef)
       errh_Bugcheck(GDH__RTDBNULL, "gdh_StoreRtdbPointer");
@@ -3590,10 +3634,7 @@ void gdh_StoreRtdbPointer(unsigned long* rp, void* p)
  * @brief  Convert rtdb relative pointer to absolute pointer.
  * @return pwr_tStatus
  */
-void* gdh_TranslateRtdbPointer(unsigned long r)
-{
-  return pool_Address(NULL, gdbroot->rtdb, r);
-}
+void* gdh_TranslateRtdbPointer(unsigned long r) { return pool_Address(NULL, gdbroot->rtdb, r); }
 
 pwr_tStatus gdh_IsAlias(pwr_tObjid oid, pwr_tBoolean* is_alias)
 {
@@ -3605,9 +3646,9 @@ pwr_tStatus gdh_IsAlias(pwr_tObjid oid, pwr_tBoolean* is_alias)
 
   gdh_ScopeLock
   {
-    op = vol_OidToObject(
-        &sts, oid, gdb_mLo_global, vol_mTrans_none, cvol_eHint_none);
-    if (op != NULL) {
+    op = vol_OidToObject(&sts, oid, gdb_mLo_global, vol_mTrans_none, cvol_eHint_none);
+    if (op != NULL)
+    {
       touchObject(op);
       *is_alias = (pwr_tBoolean)op->g.flags.b.isAliasClient;
     }
@@ -3627,11 +3668,12 @@ pwr_tStatus gdh_IsMountClean(pwr_tObjid oid, pwr_tBoolean* is_mount_clean)
 
   gdh_ScopeLock
   {
-    op = vol_OidToObject(
-        &sts, oid, gdb_mLo_global, vol_mTrans_none, cvol_eHint_none);
-    if (op != NULL) {
+    op = vol_OidToObject(&sts, oid, gdb_mLo_global, vol_mTrans_none, cvol_eHint_none);
+    if (op != NULL)
+    {
       touchObject(op);
-      if (!op->l.flags.b.isOwned) {
+      if (!op->l.flags.b.isOwned)
+      {
         *is_mount_clean = 1;
         sts = GDH__REMOTE;
         break;
@@ -3644,10 +3686,9 @@ pwr_tStatus gdh_IsMountClean(pwr_tObjid oid, pwr_tBoolean* is_mount_clean)
   return sts;
 }
 
-pwr_tStatus gdh_SetCache(
-    pwr_tUInt32 activation_level, /*  Level when trimming starts.  */
-    pwr_tUInt32 trimmed_level /*  Trimmed cache level.  */
-    )
+pwr_tStatus gdh_SetCache(pwr_tUInt32 activation_level, /*  Level when trimming starts.  */
+                         pwr_tUInt32 trimmed_level     /*  Trimmed cache level.  */
+)
 {
   return GDH__OBSOLETE;
 }
@@ -3675,9 +3716,8 @@ pwr_tStatus gdh_SetCache(
  * @see gdh_GetNextVolume
  * @return pwr_tStatus
  */
-pwr_tStatus gdh_GetVolumeList(
-    pwr_tVid* vid /**< Recieves the volume identity for the first volume. */
-    )
+pwr_tStatus gdh_GetVolumeList(pwr_tVid* vid /**< Recieves the volume identity for the first volume. */
+)
 {
   pool_sQlink* vl;
   gdb_sVolume* vp;
@@ -3712,15 +3752,18 @@ pwr_tStatus gdh_GetNextVolume(pwr_tVid pvid, pwr_tVid* vid)
 
   gdh_ScopeLock
   {
-    for (vl = pool_Qsucc(NULL, gdbroot->pool, &gdbroot->db->vol_lh);
-         vl != &gdbroot->db->vol_lh; vl = pool_Qsucc(&sts, gdbroot->pool, vl)) {
+    for (vl = pool_Qsucc(NULL, gdbroot->pool, &gdbroot->db->vol_lh); vl != &gdbroot->db->vol_lh;
+         vl = pool_Qsucc(&sts, gdbroot->pool, vl))
+    {
       vp = pool_Qitem(vl, gdb_sVolume, l.vol_ll);
-      if (vp->g.vid == pvid) {
-        for (vl = pool_Qsucc(&sts, gdbroot->pool, vl);
-             vl != &gdbroot->db->vol_lh;
-             vl = pool_Qsucc(&sts, gdbroot->pool, vl)) {
+      if (vp->g.vid == pvid)
+      {
+        for (vl = pool_Qsucc(&sts, gdbroot->pool, vl); vl != &gdbroot->db->vol_lh;
+             vl = pool_Qsucc(&sts, gdbroot->pool, vl))
+        {
           vp = pool_Qitem(vl, gdb_sVolume, l.vol_ll);
-          if (vp->l.flags.b.isLoaded || vp->l.flags.b.isCached) {
+          if (vp->l.flags.b.isLoaded || vp->l.flags.b.isCached)
+          {
             *vid = vp->g.vid;
             rsts = GDH__SUCCESS;
             break;
@@ -3742,9 +3785,9 @@ pwr_tStatus gdh_GetNextVolume(pwr_tVid pvid, pwr_tVid* vid)
  * @return pwr_tStatus
  */
 pwr_tStatus gdh_VolumeIdToName(pwr_tVid vid, /**< Volume identity */
-    char* name, /**< Name buffer, allocated by the user */
-    int size /**< Size of name buffer */
-    )
+                               char* name,   /**< Name buffer, allocated by the user */
+                               int size      /**< Size of name buffer */
+)
 {
   gdb_sVolume* vp;
   pwr_tStatus sts;
@@ -3753,11 +3796,13 @@ pwr_tStatus gdh_VolumeIdToName(pwr_tVid vid, /**< Volume identity */
   gdh_ScopeLock
   {
     vp = hash_Search(&sts, gdbroot->vid_ht, &vid);
-    if (vp != NULL) {
+    if (vp != NULL)
+    {
       if (strlen(vp->g.name.orig) >= size)
         rsts = GDH__NAMEBUF;
       strncpy(name, vp->g.name.orig, size);
-    } else
+    }
+    else
       rsts = GDH__NOSUCHVOL;
   }
   gdh_ScopeUnlock;
@@ -3768,9 +3813,9 @@ pwr_tStatus gdh_VolumeIdToName(pwr_tVid vid, /**< Volume identity */
 /**
  * @brief Get info for a volume.
  */
-pwr_tStatus gdh_GetVolumeInfo(pwr_tVid vid, /**< Volume identity */
-    gdh_sVolumeInfo* info /**< Pointer to info area, supplied by the user */
-    )
+pwr_tStatus gdh_GetVolumeInfo(pwr_tVid vid,         /**< Volume identity */
+                              gdh_sVolumeInfo* info /**< Pointer to info area, supplied by the user */
+)
 {
   gdb_sVolume* vp;
   pwr_tStatus sts;
@@ -3779,7 +3824,8 @@ pwr_tStatus gdh_GetVolumeInfo(pwr_tVid vid, /**< Volume identity */
   gdh_ScopeLock
   {
     vp = hash_Search(&sts, gdbroot->vid_ht, &vid);
-    if (vp != NULL) {
+    if (vp != NULL)
+    {
       info->isCached = vp->l.flags.b.isCached ? 1 : 0;
       info->isLoaded = vp->l.flags.b.isLoaded ? 1 : 0;
       info->isMounted = vp->l.flags.b.isMounted ? 1 : 0;
@@ -3787,7 +3833,8 @@ pwr_tStatus gdh_GetVolumeInfo(pwr_tVid vid, /**< Volume identity */
       info->cid = vp->g.cid;
       info->nid = vp->g.nid;
       strcpy(info->name, vp->g.name.orig);
-    } else
+    }
+    else
       rsts = GDH__NOSUCHVOL;
   }
   gdh_ScopeUnlock;
@@ -3799,14 +3846,13 @@ pwr_tStatus gdh_GetVolumeInfo(pwr_tVid vid, /**< Volume identity */
  * @brief Get info for a volume.
  */
 pwr_tStatus gdh_GetRootVolume(pwr_tVid* vid /**< Volume identity */
-    )
+)
 {
   *vid = gdbroot->my_volume->g.vid;
   return GDH__SUCCESS;
 }
 
-pwr_tStatus gdh_GetObjectBodyDef(
-    pwr_tCid cid, gdh_sAttrDef** bodydef, int* rows, pwr_tOid oid)
+pwr_tStatus gdh_GetObjectBodyDef(pwr_tCid cid, gdh_sAttrDef** bodydef, int* rows, pwr_tOid oid)
 {
   gdb_sClass* cp;
   gdb_sObject* bop;
@@ -3826,13 +3872,15 @@ pwr_tStatus gdh_GetObjectBodyDef(
   gdh_ScopeLock
   {
     cp = hash_Search(&sts, gdbroot->cid_ht, &cid);
-    if (cp == 0) {
+    if (cp == 0)
+    {
       rsts = GDH__NOSUCHCLASS;
       goto error_sts;
     }
 
     bop = pool_Address(&sts, gdbroot->pool, cp->bor);
-    if (bop == NULL) {
+    if (bop == NULL)
+    {
       rsts = GDH__ATTRIBUTE;
       goto error_sts;
     }
@@ -3841,39 +3889,47 @@ pwr_tStatus gdh_GetObjectBodyDef(
     acnt += bdef->NumOfParams;
 
     /* Count attributes */
-    a_super[scnt++] = vol_OidToObject(
-        &sts, bop->g.soid, gdb_mLo_local, vol_mTrans_none, cvol_eHint_none);
-    while (a_super[scnt - 1]) {
+    a_super[scnt++] = vol_OidToObject(&sts, bop->g.soid, gdb_mLo_local, vol_mTrans_none, cvol_eHint_none);
+    while (a_super[scnt - 1])
+    {
       adef = pool_Address(NULL, gdbroot->rtdb, a_super[scnt - 1]->u.n.body);
 
-      if (streq(a_super[scnt - 1]->g.f.name.orig, "Super")
-          && cdh_tidIsCid(adef->TypeRef)) {
+      if (streq(a_super[scnt - 1]->g.f.name.orig, "Super") && cdh_tidIsCid(adef->TypeRef))
+      {
         cp = hash_Search(&sts, gdbroot->cid_ht, &adef->TypeRef);
 
-        if (cp == 0) {
-          if (!cdh_ObjidIsNull(oid)) {
-            op = vol_OidToObject(
-                &sts, oid, gdb_mLo_global, vol_mTrans_all, cvol_eHint_none);
+        if (cp == 0)
+        {
+          if (!cdh_ObjidIsNull(oid))
+          {
+            op = vol_OidToObject(&sts, oid, gdb_mLo_global, vol_mTrans_all, cvol_eHint_none);
 
-            if (!(op->l.flags.m & gdb_mLo_native)) {
+            if (!(op->l.flags.m & gdb_mLo_native))
+            {
               cmvolc_GetNonExistingClass(&sts, op, adef->TypeRef);
               cp = hash_Search(&sts, gdbroot->cid_ht, &adef->TypeRef);
-              if (cp == NULL) {
+              if (cp == NULL)
+              {
                 rsts = GDH__NOSUCHCLASS;
                 goto error_sts;
               }
-            } else {
+            }
+            else
+            {
               rsts = GDH__NOSUCHCLASS;
               goto error_sts;
             }
-          } else {
+          }
+          else
+          {
             rsts = GDH__NOSUCHCLASS;
             goto error_sts;
           }
         }
 
         bop = pool_Address(&sts, gdbroot->pool, cp->bor);
-        if (bop == NULL) {
+        if (bop == NULL)
+        {
           rsts = GDH__ATTRIBUTE;
           goto error_sts;
         }
@@ -3881,9 +3937,9 @@ pwr_tStatus gdh_GetObjectBodyDef(
         bdef = pool_Address(NULL, gdbroot->rtdb, bop->u.n.body);
         acnt += bdef->NumOfParams - 1;
 
-        a_super[scnt++] = vol_OidToObject(
-            &sts, bop->g.soid, gdb_mLo_local, vol_mTrans_none, cvol_eHint_none);
-      } else
+        a_super[scnt++] = vol_OidToObject(&sts, bop->g.soid, gdb_mLo_local, vol_mTrans_none, cvol_eHint_none);
+      }
+      else
         break;
     }
 
@@ -3891,11 +3947,14 @@ pwr_tStatus gdh_GetObjectBodyDef(
     bd = (gdh_sAttrDef*)calloc(acnt, sizeof(gdh_sAttrDef));
 
     acnt = 0;
-    for (i = scnt - 1; i >= 0; i--) {
+    for (i = scnt - 1; i >= 0; i--)
+    {
       aop = a_super[i];
-      while (aop) {
+      while (aop)
+      {
         adef = pool_Address(NULL, gdbroot->rtdb, aop->u.n.body);
-        if (!(aop == a_super[i] && streq(aop->g.f.name.orig, "Super"))) {
+        if (!(aop == a_super[i] && streq(aop->g.f.name.orig, "Super")))
+        {
           for (j = 0; j < i; j++)
             strcat(bd[acnt].attrName, "Super.");
           strcat(bd[acnt].attrName, aop->g.f.name.orig);
@@ -3907,28 +3966,31 @@ pwr_tStatus gdh_GetObjectBodyDef(
         }
         noid.vid = aop->g.oid.vid;
         noid.oix = aop->g.sib.flink;
-        aop = vol_OidToObject(
-            &sts, noid, gdb_mLo_local, vol_mTrans_none, cvol_eHint_next);
+        aop = vol_OidToObject(&sts, noid, gdb_mLo_local, vol_mTrans_none, cvol_eHint_next);
         if (aop && aop == a_super[i])
           break;
       }
     }
 
-    if (scnt > 1) {
+    if (scnt > 1)
+    {
       /* Detect shadowed attributes */
-      for (j = 0; j < acnt - 1; j++) {
+      for (j = 0; j < acnt - 1; j++)
+      {
         char* s1 = strrchr(bd[j].attrName, '.');
         if (!s1)
           s1 = bd[j].attrName;
         else
           s1++;
-        for (i = j + 1; i < acnt; i++) {
+        for (i = j + 1; i < acnt; i++)
+        {
           char* s2 = strrchr(bd[i].attrName, '.');
           if (!s2)
             s2 = bd[i].attrName;
           else
             s2++;
-          if (str_NoCaseStrcmp(s1, s2) == 0) {
+          if (str_NoCaseStrcmp(s1, s2) == 0)
+          {
             bd[j].flags |= gdh_mAttrDef_Shadowed;
             break;
           }
@@ -3938,15 +4000,15 @@ pwr_tStatus gdh_GetObjectBodyDef(
     *bodydef = bd;
     *rows = acnt;
 
-  error_sts : {
+  error_sts:
+  {
   }
   }
   gdh_ScopeUnlock;
   return rsts;
 }
 
-pwr_tStatus gdh_GetTrueObjectBodyDef(
-    pwr_tCid cid, gdh_sAttrDef** bodydef, int* rows)
+pwr_tStatus gdh_GetTrueObjectBodyDef(pwr_tCid cid, gdh_sAttrDef** bodydef, int* rows)
 {
   gdb_sClass* cp;
   gdb_sObject* bop;
@@ -3962,13 +4024,15 @@ pwr_tStatus gdh_GetTrueObjectBodyDef(
   gdh_ScopeLock
   {
     cp = hash_Search(&sts, gdbroot->cid_ht, &cid);
-    if (cp == 0) {
+    if (cp == 0)
+    {
       rsts = GDH__NOSUCHCLASS;
       goto error_sts;
     }
 
     bop = pool_Address(&sts, gdbroot->pool, cp->bor);
-    if (bop == NULL) {
+    if (bop == NULL)
+    {
       rsts = GDH__ATTRIBUTE;
       goto error_sts;
     }
@@ -3980,9 +4044,9 @@ pwr_tStatus gdh_GetTrueObjectBodyDef(
     bd = (gdh_sAttrDef*)calloc(acnt, sizeof(gdh_sAttrDef));
 
     acnt = 0;
-    aop = vol_OidToObject(
-        &sts, bop->g.soid, gdb_mLo_local, vol_mTrans_none, cvol_eHint_none);
-    while (aop) {
+    aop = vol_OidToObject(&sts, bop->g.soid, gdb_mLo_local, vol_mTrans_none, cvol_eHint_none);
+    while (aop)
+    {
       adef = pool_Address(NULL, gdbroot->rtdb, aop->u.n.body);
       strcpy(bd[acnt].attrName, aop->g.f.name.orig);
       bd[acnt].attrClass = aop->g.cid;
@@ -3991,15 +4055,15 @@ pwr_tStatus gdh_GetTrueObjectBodyDef(
 
       noid.vid = aop->g.oid.vid;
       noid.oix = aop->g.sib.flink;
-      aop = vol_OidToObject(
-          &sts, noid, gdb_mLo_local, vol_mTrans_none, cvol_eHint_next);
+      aop = vol_OidToObject(&sts, noid, gdb_mLo_local, vol_mTrans_none, cvol_eHint_next);
       if (aop->g.oid.oix == bop->g.soid.oix)
         break;
     }
     *bodydef = bd;
     *rows = acnt;
 
-  error_sts : {
+  error_sts:
+  {
   }
   }
   gdh_ScopeUnlock;
@@ -4016,11 +4080,11 @@ pwr_tStatus gdh_GetAttrRefAdef(pwr_sAttrRef* arp, gdh_sAttrDef* attrdef)
 
   gdh_ScopeLock
   {
-    ap = vol_ArefToAttribute(
-        &sts, &Attribute, arp, gdb_mLo_global, vol_mTrans_all);
+    ap = vol_ArefToAttribute(&sts, &Attribute, arp, gdb_mLo_global, vol_mTrans_all);
     if (ap == NULL)
       rsts = GDH__ATTRIBUTE;
-    else {
+    else
+    {
       touchObject(ap->op);
 
       adef = pool_Address(NULL, gdbroot->rtdb, ap->aop->u.n.body);
@@ -4051,10 +4115,10 @@ pwr_tStatus gdh_GetAttrRefAdef(pwr_sAttrRef* arp, gdh_sAttrDef* attrdef)
  * @endcode
  * @return pwr_tStatus
  */
-pwr_tStatus gdh_GetSuperClass(pwr_tCid cid, /**< Class identity. */
-    pwr_tCid* supercid, /**< Received class identity for the super class. */
-    pwr_tObjid oid /**< Object id for remote object, normally pwr_cNOid */
-    )
+pwr_tStatus gdh_GetSuperClass(pwr_tCid cid,       /**< Class identity. */
+                              pwr_tCid* supercid, /**< Received class identity for the super class. */
+                              pwr_tObjid oid      /**< Object id for remote object, normally pwr_cNOid */
+)
 {
   gdb_sClass* cp;
   gdb_sObject* op;
@@ -4064,37 +4128,46 @@ pwr_tStatus gdh_GetSuperClass(pwr_tCid cid, /**< Class identity. */
   gdh_ScopeLock
   {
     cp = hash_Search(&sts, gdbroot->cid_ht, &cid);
-    if (cp) {
+    if (cp)
+    {
       if (!(cp->attr[0].flags.m & PWR_MASK_SUPERCLASS))
         sts = GDH__NOSUCHCLASS;
-      else {
+      else
+      {
         sid = *supercid = cp->attr[0].tid;
-        if (!cdh_ObjidIsNull(oid)) {
-          op = vol_OidToObject(
-              &sts, oid, gdb_mLo_global, vol_mTrans_all, cvol_eHint_none);
-          if (!(op->l.flags.m & gdb_mLo_native)) {
+        if (!cdh_ObjidIsNull(oid))
+        {
+          op = vol_OidToObject(&sts, oid, gdb_mLo_global, vol_mTrans_all, cvol_eHint_none);
+          if (!(op->l.flags.m & gdb_mLo_native))
+          {
             cp = hash_Search(&sts, gdbroot->cid_ht, &sid);
-            if (cp == NULL) {
+            if (cp == NULL)
+            {
               cmvolc_GetNonExistingClass(&sts, op, sid);
               cp = hash_Search(&sts, gdbroot->cid_ht, &sid);
-              if (cp == NULL) {
+              if (cp == NULL)
+              {
                 sts = GDH__NOSUCHCLASS;
               }
             }
           }
         }
       }
-    } else if (!cdh_ObjidIsNull(oid)) {
-      op = vol_OidToObject(
-          &sts, oid, gdb_mLo_global, vol_mTrans_all, cvol_eHint_none);
+    }
+    else if (!cdh_ObjidIsNull(oid))
+    {
+      op = vol_OidToObject(&sts, oid, gdb_mLo_global, vol_mTrans_all, cvol_eHint_none);
       cmvolc_GetNonExistingClass(&sts, op, cid);
       cp = hash_Search(&sts, gdbroot->cid_ht, &cid);
-      if (cp) {
+      if (cp)
+      {
         if (!(cp->attr[0].flags.m & PWR_MASK_SUPERCLASS))
           sts = GDH__NOSUCHCLASS;
         else
           *supercid = cp->attr[0].tid;
-      } else {
+      }
+      else
+      {
         sts = GDH__NOSUCHCLASS;
       }
     }
@@ -4114,10 +4187,10 @@ pwr_tStatus gdh_GetSuperClass(pwr_tCid cid, /**< Class identity. */
  *
  * The data structure should be freed with a free() call.
  */
-pwr_tStatus gdh_GetEnumValueDef(pwr_tTid tid, /**< Enumeration type id */
-    gdh_sValueDef** vd, /**< Recieves a pointer to the data structure. */
-    int* rows /**< Number defined enum values */
-    )
+pwr_tStatus gdh_GetEnumValueDef(pwr_tTid tid,       /**< Enumeration type id */
+                                gdh_sValueDef** vd, /**< Recieves a pointer to the data structure. */
+                                int* rows           /**< Number defined enum values */
+)
 {
   gdb_sObject* top;
   gdb_sObject* vop;
@@ -4128,20 +4201,20 @@ pwr_tStatus gdh_GetEnumValueDef(pwr_tTid tid, /**< Enumeration type id */
 
   gdh_ScopeLock
   {
-    top = vol_OidToObject(&sts, cdh_TypeIdToObjid(tid), gdb_mLo_local,
-        vol_mTrans_none, cvol_eHint_none);
+    top = vol_OidToObject(&sts, cdh_TypeIdToObjid(tid), gdb_mLo_local, vol_mTrans_none, cvol_eHint_none);
     if (top == NULL)
       goto error_sts;
-    if (!top->g.flags.b.isParent) {
+    if (!top->g.flags.b.isParent)
+    {
       sts = GDH__NOSUCHOBJ;
       goto error_sts;
     }
 
     vcnt = 0;
     valoid = top->g.soid;
-    while (1) {
-      vop = vol_OidToObject(
-          &sts, valoid, gdb_mLo_local, vol_mTrans_none, cvol_eHint_none);
+    while (1)
+    {
+      vop = vol_OidToObject(&sts, valoid, gdb_mLo_local, vol_mTrans_none, cvol_eHint_none);
       if (vop == NULL)
         goto error_sts;
 
@@ -4161,13 +4234,14 @@ pwr_tStatus gdh_GetEnumValueDef(pwr_tTid tid, /**< Enumeration type id */
     vcnt = 0;
     valoid = top->g.soid;
 
-    while (1) {
-      vop = vol_OidToObject(
-          &sts, valoid, gdb_mLo_local, vol_mTrans_none, cvol_eHint_none);
+    while (1)
+    {
+      vop = vol_OidToObject(&sts, valoid, gdb_mLo_local, vol_mTrans_none, cvol_eHint_none);
       if (vop == NULL)
         goto error_sts;
 
-      if (vop->g.cid == pwr_eClass_Value) {
+      if (vop->g.cid == pwr_eClass_Value)
+      {
         valp = (pwr_sValue*)vol_ObjectToAddress(&sts, vop);
         if (valp == NULL)
           goto error_sts;
@@ -4182,7 +4256,8 @@ pwr_tStatus gdh_GetEnumValueDef(pwr_tTid tid, /**< Enumeration type id */
       if (valoid.oix == top->g.soid.oix)
         break;
     }
-  error_sts : {
+  error_sts:
+  {
   }
   }
   gdh_ScopeUnlock;
@@ -4200,10 +4275,10 @@ pwr_tStatus gdh_GetEnumValueDef(pwr_tTid tid, /**< Enumeration type id */
  *
  * The data structure should be freed with a free() call.
  */
-pwr_tStatus gdh_GetMaskBitDef(pwr_tTid tid, /**< Type identity for mask. */
-    gdh_sBitDef** bd, /**< Receives a pointer to the data structure. */
-    int* rows /**< Number of defined bit values. */
-    )
+pwr_tStatus gdh_GetMaskBitDef(pwr_tTid tid,     /**< Type identity for mask. */
+                              gdh_sBitDef** bd, /**< Receives a pointer to the data structure. */
+                              int* rows         /**< Number of defined bit values. */
+)
 {
   gdb_sObject* top;
   gdb_sObject* bop;
@@ -4214,11 +4289,11 @@ pwr_tStatus gdh_GetMaskBitDef(pwr_tTid tid, /**< Type identity for mask. */
 
   gdh_ScopeLock
   {
-    top = vol_OidToObject(&sts, cdh_TypeIdToObjid(tid), gdb_mLo_local,
-        vol_mTrans_none, cvol_eHint_none);
+    top = vol_OidToObject(&sts, cdh_TypeIdToObjid(tid), gdb_mLo_local, vol_mTrans_none, cvol_eHint_none);
     if (top == NULL)
       goto error_sts;
-    if (!top->g.flags.b.isParent) {
+    if (!top->g.flags.b.isParent)
+    {
       sts = GDH__NOSUCHOBJ;
       goto error_sts;
     }
@@ -4226,9 +4301,9 @@ pwr_tStatus gdh_GetMaskBitDef(pwr_tTid tid, /**< Type identity for mask. */
     bcnt = 0;
     boid = top->g.soid;
 
-    while (1) {
-      bop = vol_OidToObject(
-          &sts, boid, gdb_mLo_local, vol_mTrans_none, cvol_eHint_none);
+    while (1)
+    {
+      bop = vol_OidToObject(&sts, boid, gdb_mLo_local, vol_mTrans_none, cvol_eHint_none);
       if (bop == NULL)
         goto error_sts;
 
@@ -4247,13 +4322,14 @@ pwr_tStatus gdh_GetMaskBitDef(pwr_tTid tid, /**< Type identity for mask. */
 
     bcnt = 0;
     boid = top->g.soid;
-    while (1) {
-      bop = vol_OidToObject(
-          &sts, boid, gdb_mLo_local, vol_mTrans_none, cvol_eHint_none);
+    while (1)
+    {
+      bop = vol_OidToObject(&sts, boid, gdb_mLo_local, vol_mTrans_none, cvol_eHint_none);
       if (bop == NULL)
         goto error_sts;
 
-      if (bop->g.cid == pwr_eClass_Bit) {
+      if (bop->g.cid == pwr_eClass_Bit)
+      {
         bp = (pwr_sBit*)vol_ObjectToAddress(&sts, bop);
         if (bp == NULL)
           goto error_sts;
@@ -4268,7 +4344,8 @@ pwr_tStatus gdh_GetMaskBitDef(pwr_tTid tid, /**< Type identity for mask. */
       if (boid.oix == top->g.soid.oix)
         break;
     }
-  error_sts : {
+  error_sts:
+  {
   }
   }
   gdh_ScopeUnlock;
@@ -4280,9 +4357,9 @@ pwr_tStatus gdh_GetMaskBitDef(pwr_tTid tid, /**< Type identity for mask. */
  * @brief Check if an attribute is disabled.
  * @return pwr_tStatus
  */
-pwr_tStatus gdh_ArefDisabled(pwr_sAttrRef* arp, /**< Attribute reference */
-    pwr_tDisableAttr* disabled /**< Recives 1 if disabled else 0 */
-    )
+pwr_tStatus gdh_ArefDisabled(pwr_sAttrRef* arp,         /**< Attribute reference */
+                             pwr_tDisableAttr* disabled /**< Recives 1 if disabled else 0 */
+)
 {
   pwr_tStatus sts;
   pwr_sAttrRef daref;
@@ -4293,23 +4370,23 @@ pwr_tStatus gdh_ArefDisabled(pwr_sAttrRef* arp, /**< Attribute reference */
   {
     memset(&attribute, 0, sizeof(attribute));
 
-    ap = vol_ArefToAttribute(
-        &sts, &attribute, arp, gdb_mLo_global, vol_mTrans_all);
+    ap = vol_ArefToAttribute(&sts, &attribute, arp, gdb_mLo_global, vol_mTrans_all);
     if (ap != NULL)
       touchObject(ap->op);
   }
   gdh_ScopeUnlock;
 
-  if (ap != 0 && ap->adef != 0 && ap->adef->Info.Flags & PWR_MASK_DISABLEATTR) {
+  if (ap != 0 && ap->adef != 0 && ap->adef->Info.Flags & PWR_MASK_DISABLEATTR)
+  {
     daref = cdh_ArefToDisableAref(arp);
     sts = gdh_GetObjectInfoAttrref(&daref, disabled, sizeof(*disabled));
     return sts;
-  } else
+  }
+  else
     return GDH__NOATTR;
 }
 
-pwr_tStatus gdh_FWriteObjectR(
-    FILE* fp, char* ap, char* aname, pwr_tAttrRef* arp, pwr_tCid cid)
+pwr_tStatus gdh_FWriteObjectR(FILE* fp, char* ap, char* aname, pwr_tAttrRef* arp, pwr_tCid cid)
 {
   pwr_tOName name;
   char value_str[512];
@@ -4325,10 +4402,10 @@ pwr_tStatus gdh_FWriteObjectR(
   if (EVEN(sts))
     return sts;
 
-  for (i = 0; i < rows; i++) {
-    if (bd[i].attr->Param.Info.Flags & PWR_MASK_RTVIRTUAL
-        || (bd[i].attr->Param.Info.Flags & PWR_MASK_PRIVATE
-               && bd[i].attr->Param.Info.Flags & PWR_MASK_POINTER))
+  for (i = 0; i < rows; i++)
+  {
+    if (bd[i].attr->Param.Info.Flags & PWR_MASK_RTVIRTUAL ||
+        (bd[i].attr->Param.Info.Flags & PWR_MASK_PRIVATE && bd[i].attr->Param.Info.Flags & PWR_MASK_POINTER))
       continue;
 
     strcpy(name, aname);
@@ -4341,8 +4418,10 @@ pwr_tStatus gdh_FWriteObjectR(
     else
       elements = 1;
 
-    for (j = 0; j < elements; j++) {
-      if (bd[i].attr->Param.Info.Flags & PWR_MASK_ARRAY) {
+    for (j = 0; j < elements; j++)
+    {
+      if (bd[i].attr->Param.Info.Flags & PWR_MASK_ARRAY)
+      {
         sprintf(idx, "[%d]", j);
         strcpy(name, aname);
         strcat(name, ".");
@@ -4356,17 +4435,22 @@ pwr_tStatus gdh_FWriteObjectR(
       if (EVEN(sts))
         return sts;
 
-      if (bd[i].attr->Param.Info.Flags & PWR_MASK_CLASS) {
-        sts = gdh_FWriteObjectR(fp, ap + bd[i].attr->Param.Info.Offset
-                + j * bd[i].attr->Param.Info.Size / elements,
-            name, &aref, bd[i].attr->Param.Info.Type);
-      } else {
-        sts = gdh_AttrValueToString(bd[i].attr->Param.Info.Type,
-            bd[i].attr->Param.TypeRef, ap + bd[i].attr->Param.Info.Offset
-                + j * bd[i].attr->Param.Info.Size / elements,
-            value_str, sizeof(value_str), &len, 0);
-        if (ODD(sts)) {
-          switch (bd[i].attr->Param.Info.Type) {
+      if (bd[i].attr->Param.Info.Flags & PWR_MASK_CLASS)
+      {
+        sts = gdh_FWriteObjectR(
+            fp, ap + bd[i].attr->Param.Info.Offset + j * bd[i].attr->Param.Info.Size / elements, name, &aref,
+            bd[i].attr->Param.Info.Type);
+      }
+      else
+      {
+        sts = gdh_AttrValueToString(bd[i].attr->Param.Info.Type, bd[i].attr->Param.TypeRef,
+                                    ap + bd[i].attr->Param.Info.Offset +
+                                        j * bd[i].attr->Param.Info.Size / elements,
+                                    value_str, sizeof(value_str), &len, 0);
+        if (ODD(sts))
+        {
+          switch (bd[i].attr->Param.Info.Type)
+          {
           case pwr_eType_String:
           case pwr_eType_Text:
           case pwr_eType_Objid:
@@ -4374,14 +4458,16 @@ pwr_tStatus gdh_FWriteObjectR(
           case pwr_eType_ClassId:
           case pwr_eType_TypeId:
           case pwr_eType_CastId:
-	  case pwr_eType_Time:
+          case pwr_eType_Time:
             fprintf(fp, "%s \"%s\"\n", &name[1], value_str);
             break;
           default:
             fprintf(fp, "%s %s\n", &name[1], value_str);
             break;
           }
-        } else {
+        }
+        else
+        {
           fprintf(fp, "# %s Value could not be converted\n", &name[1]);
         }
       }
@@ -4401,9 +4487,9 @@ pwr_tStatus gdh_FWriteObjectR(
  * @see gdh_FReadObject
  * @return pwr_tStatus
  */
-pwr_tStatus gdh_FWriteObject(char* filename, /**< File specification */
-    pwr_tAttrRef* arp /**< Attribute reference to object */
-    )
+pwr_tStatus gdh_FWriteObject(char* filename,   /**< File specification */
+                             pwr_tAttrRef* arp /**< Attribute reference to object */
+)
 {
   pwr_tFileName fname;
   FILE* fp;
@@ -4418,11 +4504,13 @@ pwr_tStatus gdh_FWriteObject(char* filename, /**< File specification */
   if (!cdh_tidIsCid(tid))
     return GDH__NOOBJECT;
 
-  if (arp->Flags.b.Object && arp->Size == 0) {
+  if (arp->Flags.b.Object && arp->Size == 0)
+  {
     sts = gdh_GetObjectSize(arp->Objid, &arp->Size);
     if (EVEN(sts))
       return sts;
-  } else if (arp->Size == 0)
+  }
+  else if (arp->Size == 0)
     return GDH__BADARG;
 
   ap = calloc(1, arp->Size);
@@ -4456,9 +4544,9 @@ pwr_tStatus gdh_FWriteObject(char* filename, /**< File specification */
  * @see gdh_FWriteObject
  * @return pwr_tStatus
  */
-pwr_tStatus gdh_FReadObject(char* filename, /**< File specification */
-    pwr_tAttrRef* arp /**< Attribute reference for object */
-    )
+pwr_tStatus gdh_FReadObject(char* filename,   /**< File specification */
+                            pwr_tAttrRef* arp /**< Attribute reference for object */
+)
 {
   pwr_tFileName fname;
   FILE* fp;
@@ -4491,15 +4579,16 @@ pwr_tStatus gdh_FReadObject(char* filename, /**< File specification */
   if (!fp)
     return GDH__FILE;
 
-  while (dcli_read_line(line, sizeof(line), fp)) {
+  while (dcli_read_line(line, sizeof(line), fp))
+  {
     str_trim(line, line);
     if (line[0] == '#')
       continue;
     if (streq(line, ""))
       continue;
 
-    nr = dcli_parse(line, " 	", "", (char*)line_elem,
-        sizeof(line_elem) / sizeof(line_elem[0]), sizeof(line_elem[0]), 1);
+    nr = dcli_parse(line, " 	", "", (char*)line_elem, sizeof(line_elem) / sizeof(line_elem[0]),
+                    sizeof(line_elem[0]), 1);
     if (nr != 2)
       continue;
 
@@ -4511,7 +4600,8 @@ pwr_tStatus gdh_FReadObject(char* filename, /**< File specification */
     if (EVEN(sts))
       continue;
 
-    switch (a_tid) {
+    switch (a_tid)
+    {
     case pwr_eType_String:
     case pwr_eType_Text:
     case pwr_eType_Objid:
@@ -4520,18 +4610,16 @@ pwr_tStatus gdh_FReadObject(char* filename, /**< File specification */
     case pwr_eType_TypeId:
     case pwr_eType_CastId:
     case pwr_eType_Time:
-      if (line_elem[1][0] == '"'
-          && line_elem[1][strlen(line_elem[1]) - 1] == '"') {
+      if (line_elem[1][0] == '"' && line_elem[1][strlen(line_elem[1]) - 1] == '"')
+      {
         line_elem[1][strlen(line_elem[1]) - 1] = 0;
-        sts = gdh_AttrStringToValue(
-            a_tid, &line_elem[1][1], buffer, sizeof(buffer), a_size);
-      } else
-        sts = gdh_AttrStringToValue(
-            a_tid, line_elem[1], buffer, sizeof(buffer), a_size);
+        sts = gdh_AttrStringToValue(a_tid, &line_elem[1][1], buffer, sizeof(buffer), a_size);
+      }
+      else
+        sts = gdh_AttrStringToValue(a_tid, line_elem[1], buffer, sizeof(buffer), a_size);
       break;
     default:
-      sts = gdh_AttrStringToValue(
-          a_tid, line_elem[1], buffer, sizeof(buffer), a_size);
+      sts = gdh_AttrStringToValue(a_tid, line_elem[1], buffer, sizeof(buffer), a_size);
     }
     if (EVEN(sts))
       continue;
@@ -4547,41 +4635,50 @@ pwr_tStatus gdh_FReadObject(char* filename, /**< File specification */
  * @brief Convert a string to attribute value.
  */
 pwr_tStatus gdh_AttrValueToString(pwr_eType type_id, /**< Attribute type */
-    pwr_tTid tid, /**< Attribute type identity */
-    void* value_ptr, /**< Pointer to attribute value */
-    char* str, /**< String buffer */
-    int size, /**< Size of string buffer */
-    int* len, /**< Receives the string length */
-    char* format /**< Format for conversion in printf syntax */
-    )
+                                  pwr_tTid tid,      /**< Attribute type identity */
+                                  void* value_ptr,   /**< Pointer to attribute value */
+                                  char* str,         /**< String buffer */
+                                  int size,          /**< Size of string buffer */
+                                  int* len,          /**< Receives the string length */
+                                  char* format       /**< Format for conversion in printf syntax */
+)
 {
   int sts;
 
-  switch (type_id) {
-  case pwr_eType_Boolean: {
+  switch (type_id)
+  {
+  case pwr_eType_Boolean:
+  {
     if (!format)
       *len = sprintf(str, "%d", *(pwr_tBoolean*)value_ptr);
     else
       *len = sprintf(str, format, *(pwr_tBoolean*)value_ptr);
     break;
   }
-  case pwr_eType_Float32: {
-    if ( *(float *)value_ptr == FLT_MIN) {
-      strcpy( str, "FltMin");
+  case pwr_eType_Float32:
+  {
+    if (*(float*)value_ptr == FLT_MIN)
+    {
+      strcpy(str, "FltMin");
       *len = strlen(str);
     }
-    else if ( *(float *)value_ptr == -FLT_MIN) {
-      strcpy( str, "FltNMin");
+    else if (*(float*)value_ptr == -FLT_MIN)
+    {
+      strcpy(str, "FltNMin");
       *len = strlen(str);
     }
-    else if ( *(float *)value_ptr == FLT_MAX) {
-      strcpy( str, "FltMax");
+    else if (*(float*)value_ptr == FLT_MAX)
+    {
+      strcpy(str, "FltMax");
       *len = strlen(str);
     }
-    else if ( *(float *)value_ptr == -FLT_MAX) {
-      strcpy( str, "FltNMax");
+    else if (*(float*)value_ptr == -FLT_MAX)
+    {
+      strcpy(str, "FltNMax");
       *len = strlen(str);
-    } else {
+    }
+    else
+    {
       if (!format)
         *len = sprintf(str, "%.7g", *(float*)value_ptr);
       else
@@ -4589,42 +4686,52 @@ pwr_tStatus gdh_AttrValueToString(pwr_eType type_id, /**< Attribute type */
     }
     break;
   }
-  case pwr_eType_Float64: {
+  case pwr_eType_Float64:
+  {
     if (!format)
       *len = sprintf(str, "%.17g", *(double*)value_ptr);
     else
       *len = sprintf(str, format, *(double*)value_ptr);
     break;
   }
-  case pwr_eType_Char: {
+  case pwr_eType_Char:
+  {
     if (!format)
       *len = sprintf(str, "%c", *(char*)value_ptr);
     else
       *len = sprintf(str, format, *(char*)value_ptr);
     break;
   }
-  case pwr_eType_Int8: {
+  case pwr_eType_Int8:
+  {
     if (!format)
       *len = sprintf(str, "%d", *(char*)value_ptr);
     else
       *len = sprintf(str, format, *(char*)value_ptr);
     break;
   }
-  case pwr_eType_Int16: {
+  case pwr_eType_Int16:
+  {
     if (!format)
       *len = sprintf(str, "%hd", *(short*)value_ptr);
     else
       *len = sprintf(str, format, *(short*)value_ptr);
     break;
   }
-  case pwr_eType_Int32: {
-    if (*(int*)value_ptr == INT_MIN) {
+  case pwr_eType_Int32:
+  {
+    if (*(int*)value_ptr == INT_MIN)
+    {
       strcpy(str, "IntMin");
       *len = strlen(str);
-    } else if (*(int*)value_ptr == INT_MAX) {
+    }
+    else if (*(int*)value_ptr == INT_MAX)
+    {
       strcpy(str, "IntMax");
       *len = strlen(str);
-    } else {
+    }
+    else
+    {
       if (!format)
         *len = sprintf(str, "%d", *(int*)value_ptr);
       else
@@ -4632,21 +4739,24 @@ pwr_tStatus gdh_AttrValueToString(pwr_eType type_id, /**< Attribute type */
     }
     break;
   }
-  case pwr_eType_Int64: {
+  case pwr_eType_Int64:
+  {
     if (!format)
       *len = sprintf(str, pwr_dFormatInt64, *(pwr_tInt64*)value_ptr);
     else
       *len = sprintf(str, format, *(pwr_tInt64*)value_ptr);
     break;
   }
-  case pwr_eType_UInt8: {
+  case pwr_eType_UInt8:
+  {
     if (!format)
       *len = sprintf(str, "%u", *(unsigned char*)value_ptr);
     else
       *len = sprintf(str, format, *(unsigned char*)value_ptr);
     break;
   }
-  case pwr_eType_UInt16: {
+  case pwr_eType_UInt16:
+  {
     if (!format)
       *len = sprintf(str, "%hu", *(unsigned short*)value_ptr);
     else
@@ -4655,37 +4765,43 @@ pwr_tStatus gdh_AttrValueToString(pwr_eType type_id, /**< Attribute type */
   }
   case pwr_eType_UInt32:
   case pwr_eType_Mask:
-  case pwr_eType_DisableAttr: {
+  case pwr_eType_DisableAttr:
+  {
     if (!format)
       *len = sprintf(str, "%u", *(unsigned int*)value_ptr);
     else
       *len = sprintf(str, format, *(unsigned int*)value_ptr);
     break;
   }
-  case pwr_eType_UInt64: {
+  case pwr_eType_UInt64:
+  {
     if (!format)
       *len = sprintf(str, pwr_dFormatUInt64, *(pwr_tUInt64*)value_ptr);
     else
       *len = sprintf(str, format, *(pwr_tUInt64*)value_ptr);
     break;
   }
-  case pwr_eType_Enum: {
+  case pwr_eType_Enum:
+  {
     if (!format)
       *len = sprintf(str, "%u", *(unsigned int*)value_ptr);
     else
       *len = sprintf(str, format, *(unsigned int*)value_ptr);
     break;
   }
-  case pwr_eType_String: {
+  case pwr_eType_String:
+  {
     strncpy(str, (char*)value_ptr, size);
     str[size - 1] = 0;
     *len = strlen(str);
     break;
   }
-  case pwr_eType_Text: {
+  case pwr_eType_Text:
+  {
     char *s, *t;
 
-    for (s = (char*)value_ptr, t = str; *s != 10 && *s != 0; s++, t++) {
+    for (s = (char*)value_ptr, t = str; *s != 10 && *s != 0; s++, t++)
+    {
       if (t - str >= size - 1)
         break;
       *t = *s;
@@ -4694,17 +4810,18 @@ pwr_tStatus gdh_AttrValueToString(pwr_eType type_id, /**< Attribute type */
     *len = strlen(str);
     break;
   }
-  case pwr_eType_Objid: {
+  case pwr_eType_Objid:
+  {
     pwr_tOName hiername;
     pwr_tObjid objid;
 
     objid = *(pwr_tObjid*)value_ptr;
     if (!objid.oix)
-      sts = gdh_ObjidToName(
-          objid, hiername, sizeof(hiername), cdh_mName_volumeStrict);
+      sts = gdh_ObjidToName(objid, hiername, sizeof(hiername), cdh_mName_volumeStrict);
     else
       sts = gdh_ObjidToName(objid, hiername, sizeof(hiername), cdh_mNName);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       strcpy(str, "");
       *len = 0;
       break;
@@ -4712,13 +4829,15 @@ pwr_tStatus gdh_AttrValueToString(pwr_eType type_id, /**< Attribute type */
     *len = sprintf(str, "%s", hiername);
     break;
   }
-  case pwr_eType_AttrRef: {
+  case pwr_eType_AttrRef:
+  {
     pwr_tAName hiername;
     pwr_sAttrRef* attrref;
 
     attrref = (pwr_sAttrRef*)value_ptr;
     sts = gdh_AttrrefToName(attrref, hiername, sizeof(hiername), cdh_mNName);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       strcpy(str, "");
       *len = 0;
       break;
@@ -4726,14 +4845,15 @@ pwr_tStatus gdh_AttrValueToString(pwr_eType type_id, /**< Attribute type */
     *len = sprintf(str, "%s", hiername);
     break;
   }
-  case pwr_eType_DataRef: {
+  case pwr_eType_DataRef:
+  {
     pwr_tAName hiername;
     pwr_tDataRef* dataref;
 
     dataref = (pwr_tDataRef*)value_ptr;
-    sts = gdh_AttrrefToName(
-        &dataref->Aref, hiername, sizeof(hiername), cdh_mNName);
-    if (EVEN(sts)) {
+    sts = gdh_AttrrefToName(&dataref->Aref, hiername, sizeof(hiername), cdh_mNName);
+    if (EVEN(sts))
+    {
       strcpy(str, "");
       *len = 0;
       break;
@@ -4741,92 +4861,96 @@ pwr_tStatus gdh_AttrValueToString(pwr_eType type_id, /**< Attribute type */
     *len = sprintf(str, "%s", hiername);
     break;
   }
-  case pwr_eType_Time: {
+  case pwr_eType_Time:
+  {
     char timstr[64];
 
-    if (memcmp(value_ptr, &pwr_cAtMin, sizeof(pwr_tTime)) == 0) {
+    if (memcmp(value_ptr, &pwr_cAtMin, sizeof(pwr_tTime)) == 0)
+    {
       strcpy(timstr, "AtZero");
       sts = GDH__SUCCESS;
-    } else if (memcmp(value_ptr, &pwr_cAtMax, sizeof(pwr_tTime)) == 0) {
+    }
+    else if (memcmp(value_ptr, &pwr_cAtMax, sizeof(pwr_tTime)) == 0)
+    {
       strcpy(timstr, "AtMax");
       sts = GDH__SUCCESS;
-    } else if (format && format[0] == '%' && format[2] == 't') {
-      switch (format[1]) {
+    }
+    else if (format && format[0] == '%' && format[2] == 't')
+    {
+      switch (format[1])
+      {
       case '1':
         // Format %1t, only time, no hundredth
-        sts = time_AtoAscii(
-            (pwr_tTime*)value_ptr, time_eFormat_Time, timstr, sizeof(timstr));
+        sts = time_AtoAscii((pwr_tTime*)value_ptr, time_eFormat_Time, timstr, sizeof(timstr));
         timstr[8] = 0;
         break;
       case '2':
         // Format %2t, only time, with hundredth
-        sts = time_AtoAscii(
-            (pwr_tTime*)value_ptr, time_eFormat_Time, timstr, sizeof(timstr));
+        sts = time_AtoAscii((pwr_tTime*)value_ptr, time_eFormat_Time, timstr, sizeof(timstr));
         break;
       case '3':
         // Format %3t, compressed date and time, no hundredth
-        sts = time_AtoAscii((pwr_tTime*)value_ptr,
-            time_eFormat_ComprDateAndTime, timstr, sizeof(timstr));
+        sts = time_AtoAscii((pwr_tTime*)value_ptr, time_eFormat_ComprDateAndTime, timstr, sizeof(timstr));
         timstr[17] = 0;
         break;
       case '4':
         // Format %4t, date only
-        sts = time_AtoAscii((pwr_tTime*)value_ptr, time_eFormat_DateAndTime,
-            timstr, sizeof(timstr));
+        sts = time_AtoAscii((pwr_tTime*)value_ptr, time_eFormat_DateAndTime, timstr, sizeof(timstr));
         timstr[11] = 0;
         break;
       case '5':
         // Format %5t, compressed date only
-        sts = time_AtoAscii((pwr_tTime*)value_ptr,
-            time_eFormat_ComprDateAndTime, timstr, sizeof(timstr));
+        sts = time_AtoAscii((pwr_tTime*)value_ptr, time_eFormat_ComprDateAndTime, timstr, sizeof(timstr));
         timstr[8] = 0;
         break;
       case '6':
         // Format %6t, time before to date
-        sts = time_AtoAscii((pwr_tTime*)value_ptr, time_eFormat_TimeAndDate,
-            timstr, sizeof(timstr));
+        sts = time_AtoAscii((pwr_tTime*)value_ptr, time_eFormat_TimeAndDate, timstr, sizeof(timstr));
         timstr[17] = 0;
         break;
       default:
-        sts = time_AtoAscii((pwr_tTime*)value_ptr, time_eFormat_DateAndTime,
-            timstr, sizeof(timstr));
+        sts = time_AtoAscii((pwr_tTime*)value_ptr, time_eFormat_DateAndTime, timstr, sizeof(timstr));
       }
-    } else
-      sts = time_AtoAscii((pwr_tTime*)value_ptr, time_eFormat_DateAndTime,
-          timstr, sizeof(timstr));
+    }
+    else
+      sts = time_AtoAscii((pwr_tTime*)value_ptr, time_eFormat_DateAndTime, timstr, sizeof(timstr));
     if (EVEN(sts))
       strcpy(timstr, "-");
     *len = sprintf(str, "%s", timstr);
     break;
   }
-  case pwr_eType_DeltaTime: {
+  case pwr_eType_DeltaTime:
+  {
     char timstr[64];
 
     if (memcmp(value_ptr, &pwr_cDtMin, sizeof(pwr_tDeltaTime)) == 0)
       strcpy(timstr, "DtMin");
     else if (memcmp(value_ptr, &pwr_cDtMax, sizeof(pwr_tDeltaTime)) == 0)
       strcpy(timstr, "DtMax");
-    else {
-      sts = time_DtoAscii(
-          (pwr_tDeltaTime*)value_ptr, 1, timstr, sizeof(timstr));
+    else
+    {
+      sts = time_DtoAscii((pwr_tDeltaTime*)value_ptr, 1, timstr, sizeof(timstr));
       if (EVEN(sts))
         strcpy(timstr, "Undefined time");
     }
     *len = sprintf(str, "%s", timstr);
     break;
   }
-  case pwr_eType_ObjectIx: {
+  case pwr_eType_ObjectIx:
+  {
     cdh_ObjectIxToString(str, size, *(pwr_tObjectIx*)value_ptr, 1);
     *len = strlen(str);
     break;
   }
-  case pwr_eType_ClassId: {
+  case pwr_eType_ClassId:
+  {
     pwr_tOName hiername;
     pwr_tObjid objid;
 
     objid = cdh_ClassIdToObjid(*(pwr_tClassId*)value_ptr);
     sts = gdh_ObjidToName(objid, hiername, sizeof(hiername), cdh_mNName);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       strcpy(str, "");
       *len = 0;
       break;
@@ -4835,13 +4959,15 @@ pwr_tStatus gdh_AttrValueToString(pwr_eType type_id, /**< Attribute type */
     break;
   }
   case pwr_eType_TypeId:
-  case pwr_eType_CastId: {
+  case pwr_eType_CastId:
+  {
     pwr_tOName hiername;
     pwr_tObjid objid;
 
     objid = cdh_TypeIdToObjid(*(pwr_tTypeId*)value_ptr);
     sts = gdh_ObjidToName(objid, hiername, sizeof(hiername), cdh_mNName);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       strcpy(str, "");
       *len = 0;
       break;
@@ -4849,18 +4975,21 @@ pwr_tStatus gdh_AttrValueToString(pwr_eType type_id, /**< Attribute type */
     *len = sprintf(str, "%s", hiername);
     break;
   }
-  case pwr_eType_VolumeId: {
+  case pwr_eType_VolumeId:
+  {
     cdh_VolumeIdToString(str, size, *(pwr_tVolumeId*)value_ptr, 1, 0);
     *len = strlen(str);
     break;
   }
-  case pwr_eType_RefId: {
+  case pwr_eType_RefId:
+  {
     cdh_SubidToString(str, size, *(pwr_tSubid*)value_ptr, 1);
     *len = strlen(str);
     break;
   }
   case pwr_eType_NetStatus:
-  case pwr_eType_Status: {
+  case pwr_eType_Status:
+  {
     if (!format)
       *len = sprintf(str, "%u", *(unsigned int*)value_ptr);
     else
@@ -4876,24 +5005,27 @@ pwr_tStatus gdh_AttrValueToString(pwr_eType type_id, /**< Attribute type */
 /**
  * @brief Convert an attribute string to value
  */
-pwr_tStatus gdh_AttrStringToValue(int type_id, /**< Attribute type */
-    char* value_str, /**< String value */
-    void* buffer_ptr, /**< Value buffer */
-    int buff_size, /**< Size of value buffer */
-    int attr_size /**< Attribute size, used for String and Text attributes */
-    )
+pwr_tStatus gdh_AttrStringToValue(int type_id,      /**< Attribute type */
+                                  char* value_str,  /**< String value */
+                                  void* buffer_ptr, /**< Value buffer */
+                                  int buff_size,    /**< Size of value buffer */
+                                  int attr_size /**< Attribute size, used for String and Text attributes */
+)
 {
   int sts;
 
-  switch (type_id) {
-  case pwr_eType_Boolean: {
+  switch (type_id)
+  {
+  case pwr_eType_Boolean:
+  {
     if (sscanf(value_str, "%d", (pwr_tBoolean*)buffer_ptr) != 1)
       return GDH__CONVERT;
     if (*(pwr_tBoolean*)buffer_ptr > 1)
       return GDH__CONVERT;
     break;
   }
-  case pwr_eType_Float32: {
+  case pwr_eType_Float32:
+  {
     if (streq(value_str, "FltMin"))
       *(float*)buffer_ptr = FLT_MIN;
     else if (streq(value_str, "FltNMin"))
@@ -4906,7 +5038,8 @@ pwr_tStatus gdh_AttrStringToValue(int type_id, /**< Attribute type */
       return GDH__CONVERT;
     break;
   }
-  case pwr_eType_Float64: {
+  case pwr_eType_Float64:
+  {
     pwr_tFloat64 d;
     if (sscanf(value_str, "%lf", &d) != 1)
       return GDH__CONVERT;
@@ -4914,12 +5047,14 @@ pwr_tStatus gdh_AttrStringToValue(int type_id, /**< Attribute type */
 
     break;
   }
-  case pwr_eType_Char: {
+  case pwr_eType_Char:
+  {
     if (sscanf(value_str, "%c", (char*)buffer_ptr) != 1)
       return GDH__CONVERT;
     break;
   }
-  case pwr_eType_Int8: {
+  case pwr_eType_Int8:
+  {
     pwr_tInt8 i8;
     pwr_tInt16 i16;
     if (sscanf(value_str, "%hd", &i16) != 1)
@@ -4928,14 +5063,16 @@ pwr_tStatus gdh_AttrStringToValue(int type_id, /**< Attribute type */
     memcpy(buffer_ptr, (char*)&i8, sizeof(i8));
     break;
   }
-  case pwr_eType_Int16: {
+  case pwr_eType_Int16:
+  {
     if (sscanf(value_str, "%hd", (short*)buffer_ptr) != 1)
       return GDH__CONVERT;
     break;
   }
   case pwr_eType_Int32:
   case pwr_eType_Status:
-  case pwr_eType_NetStatus: {
+  case pwr_eType_NetStatus:
+  {
     if (streq(value_str, "IntMin"))
       *(int*)buffer_ptr = INT_MIN;
     else if (streq(value_str, "IntMax"))
@@ -4944,12 +5081,14 @@ pwr_tStatus gdh_AttrStringToValue(int type_id, /**< Attribute type */
       return GDH__CONVERT;
     break;
   }
-  case pwr_eType_Int64: {
+  case pwr_eType_Int64:
+  {
     if (sscanf(value_str, pwr_dFormatInt64, (pwr_tInt64*)buffer_ptr) != 1)
       return GDH__CONVERT;
     break;
   }
-  case pwr_eType_UInt8: {
+  case pwr_eType_UInt8:
+  {
     pwr_tUInt8 i8;
     pwr_tUInt16 i16;
     if (sscanf(value_str, "%hu", &i16) != 1)
@@ -4958,37 +5097,42 @@ pwr_tStatus gdh_AttrStringToValue(int type_id, /**< Attribute type */
     memcpy(buffer_ptr, (char*)&i8, sizeof(i8));
     break;
   }
-  case pwr_eType_UInt16: {
+  case pwr_eType_UInt16:
+  {
     if (sscanf(value_str, "%hu", (unsigned short*)buffer_ptr) != 1)
       return GDH__CONVERT;
     break;
   }
   case pwr_eType_UInt32:
   case pwr_eType_Mask:
-  case pwr_eType_DisableAttr: {
+  case pwr_eType_DisableAttr:
+  {
     if (sscanf(value_str, "%lu", (unsigned long*)buffer_ptr) != 1)
       return GDH__CONVERT;
     break;
   }
-  case pwr_eType_UInt64: {
+  case pwr_eType_UInt64:
+  {
     if (sscanf(value_str, pwr_dFormatUInt64, (pwr_tUInt64*)buffer_ptr) != 1)
       return GDH__CONVERT;
     break;
   }
   case pwr_eType_String:
-  case pwr_eType_Text: {
+  case pwr_eType_Text:
+  {
     if ((int)strlen(value_str) >= attr_size)
       return GDH__CONVERT;
-    strncpy((char*)buffer_ptr, value_str,
-        attr_size < buff_size ? attr_size : buff_size);
+    strncpy((char*)buffer_ptr, value_str, attr_size < buff_size ? attr_size : buff_size);
     break;
   }
-  case pwr_eType_Objid: {
+  case pwr_eType_Objid:
+  {
     pwr_tObjid objid;
 
     if (streq(value_str, "0"))
       objid = pwr_cNObjid;
-    else {
+    else
+    {
       sts = gdh_NameToObjid(value_str, &objid);
       if (EVEN(sts))
         return sts;
@@ -4996,7 +5140,8 @@ pwr_tStatus gdh_AttrStringToValue(int type_id, /**< Attribute type */
     memcpy(buffer_ptr, &objid, sizeof(objid));
     break;
   }
-  case pwr_eType_ClassId: {
+  case pwr_eType_ClassId:
+  {
     pwr_tClassId classid;
     pwr_tObjid objid;
 
@@ -5008,7 +5153,8 @@ pwr_tStatus gdh_AttrStringToValue(int type_id, /**< Attribute type */
     break;
   }
   case pwr_eType_TypeId:
-  case pwr_eType_CastId: {
+  case pwr_eType_CastId:
+  {
     pwr_tTypeId val_typeid;
     pwr_tObjid objid;
 
@@ -5019,7 +5165,8 @@ pwr_tStatus gdh_AttrStringToValue(int type_id, /**< Attribute type */
     memcpy(buffer_ptr, (char*)&val_typeid, sizeof(val_typeid));
     break;
   }
-  case pwr_eType_ObjectIx: {
+  case pwr_eType_ObjectIx:
+  {
     pwr_tObjectIx objectix;
 
     sts = cdh_StringToObjectIx(value_str, &objectix);
@@ -5028,7 +5175,8 @@ pwr_tStatus gdh_AttrStringToValue(int type_id, /**< Attribute type */
     memcpy(buffer_ptr, (char*)&objectix, sizeof(objectix));
     break;
   }
-  case pwr_eType_VolumeId: {
+  case pwr_eType_VolumeId:
+  {
     pwr_tVolumeId volumeid;
 
     sts = cdh_StringToVolumeId(value_str, &volumeid);
@@ -5037,7 +5185,8 @@ pwr_tStatus gdh_AttrStringToValue(int type_id, /**< Attribute type */
     memcpy(buffer_ptr, (char*)&volumeid, sizeof(volumeid));
     break;
   }
-  case pwr_eType_RefId: {
+  case pwr_eType_RefId:
+  {
     pwr_tRefId subid;
 
     sts = cdh_StringToSubid(value_str, &subid);
@@ -5046,12 +5195,14 @@ pwr_tStatus gdh_AttrStringToValue(int type_id, /**< Attribute type */
     memcpy(buffer_ptr, (char*)&subid, sizeof(subid));
     break;
   }
-  case pwr_eType_AttrRef: {
+  case pwr_eType_AttrRef:
+  {
     pwr_sAttrRef attrref;
 
     if (streq(value_str, "0"))
       attrref = pwr_cNAttrRef;
-    else {
+    else
+    {
       sts = gdh_NameToAttrref(pwr_cNObjid, value_str, &attrref);
       if (EVEN(sts))
         return sts;
@@ -5059,7 +5210,8 @@ pwr_tStatus gdh_AttrStringToValue(int type_id, /**< Attribute type */
     memcpy(buffer_ptr, &attrref, sizeof(attrref));
     break;
   }
-  case pwr_eType_DataRef: {
+  case pwr_eType_DataRef:
+  {
     pwr_tDataRef dataref;
 
     sts = gdh_NameToAttrref(pwr_cNObjid, value_str, &dataref.Aref);
@@ -5069,14 +5221,16 @@ pwr_tStatus gdh_AttrStringToValue(int type_id, /**< Attribute type */
     memcpy(buffer_ptr, &dataref, sizeof(dataref));
     break;
   }
-  case pwr_eType_Time: {
+  case pwr_eType_Time:
+  {
     pwr_tTime time;
 
     if (streq(value_str, "AtZero"))
       memcpy(buffer_ptr, &pwr_cAtMin, sizeof(pwr_tTime));
     else if (streq(value_str, "AtMax"))
       memcpy(buffer_ptr, &pwr_cAtMax, sizeof(pwr_tTime));
-    else {
+    else
+    {
       sts = time_AsciiToA(value_str, &time);
       if (EVEN(sts))
         return GDH__CONVERT;
@@ -5084,14 +5238,16 @@ pwr_tStatus gdh_AttrStringToValue(int type_id, /**< Attribute type */
     }
     break;
   }
-  case pwr_eType_DeltaTime: {
+  case pwr_eType_DeltaTime:
+  {
     pwr_tDeltaTime deltatime;
 
     if (streq(value_str, "DtMin"))
       memcpy(buffer_ptr, &pwr_cDtMin, sizeof(pwr_tDeltaTime));
     else if (streq(value_str, "DtMax"))
       memcpy(buffer_ptr, &pwr_cDtMax, sizeof(pwr_tDeltaTime));
-    else {
+    else
+    {
       sts = time_AsciiToD(value_str, &deltatime);
       if (EVEN(sts))
         return GDH__CONVERT;
@@ -5099,7 +5255,8 @@ pwr_tStatus gdh_AttrStringToValue(int type_id, /**< Attribute type */
     }
     break;
   }
-  case pwr_eType_Enum: {
+  case pwr_eType_Enum:
+  {
     if (sscanf(value_str, "%lu", (unsigned long*)buffer_ptr) != 1)
       return GDH__CONVERT;
     break;
@@ -5108,24 +5265,24 @@ pwr_tStatus gdh_AttrStringToValue(int type_id, /**< Attribute type */
   return GDH__SUCCESS;
 }
 
-pwr_tStatus gdh_SearchFile(pwr_tOid oid, char* dir, char* pattern,
-    pwr_tString40* filelist[], int* filecnt)
+pwr_tStatus gdh_SearchFile(pwr_tOid oid, char* dir, char* pattern, pwr_tString40* filelist[], int* filecnt)
 {
   pwr_tStatus sts;
   gdb_sObject* op;
   int is_cached = 0;
 
-  if (oid.vid == 0) {
+  if (oid.vid == 0)
+  {
     sts = dcli_get_files(dir, pattern, filelist, filecnt);
     return sts;
   }
 
   gdh_ScopeLock
   {
-    op = vol_OidToObject(
-        &sts, oid, gdb_mLo_global, vol_mTrans_all, cvol_eHint_none);
+    op = vol_OidToObject(&sts, oid, gdb_mLo_global, vol_mTrans_all, cvol_eHint_none);
 
-    if (op->l.flags.b.isCached) {
+    if (op->l.flags.b.isCached)
+    {
       is_cached = 1;
       cvolc_FileList(&sts, op, dir, pattern, filelist, filecnt);
     }
@@ -5144,8 +5301,7 @@ pwr_tStatus gdh_SetObjectReadOnly(pwr_tOid oid)
 
   gdh_ScopeLock
   {
-    op = vol_OidToObject(
-        &sts, oid, gdb_mLo_native, vol_mTrans_all, cvol_eHint_none);
+    op = vol_OidToObject(&sts, oid, gdb_mLo_native, vol_mTrans_all, cvol_eHint_none);
     if (op == NULL)
       break;
 
@@ -5162,9 +5318,8 @@ pwr_tStatus gdh_SetObjectReadOnly(pwr_tOid oid)
  * Returns the content of the $Securiy object of the current node.
  * @return pwr_tStatus
  */
-pwr_tStatus gdh_GetSecurityInfo(
-    pwr_sSecurity* security /**< Pointer to buffer supplied by the user */
-    )
+pwr_tStatus gdh_GetSecurityInfo(pwr_sSecurity* security /**< Pointer to buffer supplied by the user */
+)
 {
   pwr_tStatus sts;
   pwr_tAttrRef aref;
@@ -5172,8 +5327,7 @@ pwr_tStatus gdh_GetSecurityInfo(
   pwr_tCid cid;
   pwr_tOName name;
 
-  sts = gdh_ObjidToName(
-      gdbroot->db->nod_oid, name, sizeof(name), cdh_mName_volumeStrict);
+  sts = gdh_ObjidToName(gdbroot->db->nod_oid, name, sizeof(name), cdh_mName_volumeStrict);
   if (EVEN(sts))
     return sts;
   strcat(name, "-Security");
@@ -5193,18 +5347,14 @@ pwr_tStatus gdh_GetSecurityInfo(
   return gdh_GetObjectInfoAttrref(&aref, security, sizeof(*security));
 }
 
-void gdh_RegisterLogFunction(void (*func)(char*, void*, unsigned int))
-{
-  gdh_log_cb = func;
-}
+void gdh_RegisterLogFunction(void (*func)(char*, void*, unsigned int)) { gdh_log_cb = func; }
 
 pwr_tStatus gdh_GetSubClassList(pwr_tCid cid, pwr_tCid* subcid)
 {
   return gdh_GetNextSubClass(cid, 0, subcid);
 }
 
-pwr_tStatus gdh_GetNextSubClass(
-    pwr_tCid cid, pwr_tCid psubcid, pwr_tCid* subcid)
+pwr_tStatus gdh_GetNextSubClass(pwr_tCid cid, pwr_tCid psubcid, pwr_tCid* subcid)
 {
   pwr_tStatus sts;
   pwr_tOid oid;
@@ -5213,18 +5363,21 @@ pwr_tStatus gdh_GetNextSubClass(
 
   if (psubcid == 0)
     sts = gdh_GetClassList(pwr_eClass_ClassDef, &oid);
-  else {
+  else
+  {
     oid = cdh_ClassIdToObjid(psubcid);
     sts = gdh_GetNextObject(oid, &oid);
   }
-  for (; ODD(sts); sts = gdh_GetNextObject(oid, &oid)) {
+  for (; ODD(sts); sts = gdh_GetNextObject(oid, &oid))
+  {
     cd_cid = cdh_ClassObjidToId(oid);
 
     sts = gdh_GetSuperClass(cd_cid, &super_cid, pwr_cNOid);
     if (EVEN(sts))
       continue;
 
-    if (super_cid == cid) {
+    if (super_cid == cid)
+    {
       *subcid = cd_cid;
       return GDH__SUCCESS;
     }
@@ -5232,8 +5385,8 @@ pwr_tStatus gdh_GetNextSubClass(
   return GDH__NOSUCHCLASS;
 }
 
-pwr_tStatus gdh_GetGlobalClassList(int cidcnt, pwr_tCid* cid, int attrobjects,
-    pwr_tAttrRef* classlist[], int* listcnt)
+pwr_tStatus gdh_GetGlobalClassList(int cidcnt, pwr_tCid* cid, int attrobjects, pwr_tAttrRef* classlist[],
+                                   int* listcnt)
 {
   pwr_tStatus sts;
   qcom_sNode mynode, node;
@@ -5247,17 +5400,23 @@ pwr_tStatus gdh_GetGlobalClassList(int cidcnt, pwr_tCid* cid, int attrobjects,
   array_tCtx arr = array_New(sizeof(pwr_tAttrRef), 20);
 
   /* Add local objects */
-  if (attrobjects) {
-    for (i = 0; i < cidcnt; i++) {
+  if (attrobjects)
+  {
+    for (i = 0; i < cidcnt; i++)
+    {
       for (sts = gdh_GetClassListAttrRef(cid[i], &aref); ODD(sts);
-           sts = gdh_GetNextAttrRef(cid[i], &aref, &aref)) {
+           sts = gdh_GetNextAttrRef(cid[i], &aref, &aref))
+      {
         array_Push(arr, &aref);
       }
     }
-  } else {
-    for (i = 0; i < cidcnt; i++) {
-      for (sts = gdh_GetClassList(cid[i], &oid); ODD(sts);
-           sts = gdh_GetNextObject(oid, &oid)) {
+  }
+  else
+  {
+    for (i = 0; i < cidcnt; i++)
+    {
+      for (sts = gdh_GetClassList(cid[i], &oid); ODD(sts); sts = gdh_GetNextObject(oid, &oid))
+      {
         aref = cdh_ObjidToAref(oid);
         array_Push(arr, &aref);
       }
@@ -5265,7 +5424,8 @@ pwr_tStatus gdh_GetGlobalClassList(int cidcnt, pwr_tCid* cid, int attrobjects,
   }
 
   qcom_MyNode(&sts, &mynode);
-  for (nid = qcom_cNNid; qcom_NextNode(&sts, &node, nid); nid = node.nid) {
+  for (nid = qcom_cNNid; qcom_NextNode(&sts, &node, nid); nid = node.nid)
+  {
     if (node.nid == mynode.nid)
       continue;
 
@@ -5278,7 +5438,8 @@ pwr_tStatus gdh_GetGlobalClassList(int cidcnt, pwr_tCid* cid, int attrobjects,
 
   if (arr->size)
     *classlist = array_Copy(arr);
-  else {
+  else
+  {
     *classlist = 0;
     sts = GDH__NOSUCHOBJ;
   }
@@ -5288,8 +5449,8 @@ pwr_tStatus gdh_GetGlobalClassList(int cidcnt, pwr_tCid* cid, int attrobjects,
   return GDH__SUCCESS;
 }
 
-pwr_tStatus gdh_GetLocalClassList(int cidcnt, pwr_tCid* cid, int attrobjects,
-    pwr_tAttrRef* classlist[], int* listcnt)
+pwr_tStatus gdh_GetLocalClassList(int cidcnt, pwr_tCid* cid, int attrobjects, pwr_tAttrRef* classlist[],
+                                  int* listcnt)
 {
   pwr_tStatus sts;
   int i;
@@ -5299,17 +5460,23 @@ pwr_tStatus gdh_GetLocalClassList(int cidcnt, pwr_tCid* cid, int attrobjects,
   array_tCtx arr = array_New(sizeof(pwr_tAttrRef), 20);
 
   /* Add local objects */
-  if (attrobjects) {
-    for (i = 0; i < cidcnt; i++) {
+  if (attrobjects)
+  {
+    for (i = 0; i < cidcnt; i++)
+    {
       for (sts = gdh_GetClassListAttrRef(cid[i], &aref); ODD(sts);
-           sts = gdh_GetNextAttrRef(cid[i], &aref, &aref)) {
+           sts = gdh_GetNextAttrRef(cid[i], &aref, &aref))
+      {
         array_Push(arr, &aref);
       }
     }
-  } else {
-    for (i = 0; i < cidcnt; i++) {
-      for (sts = gdh_GetClassList(cid[i], &oid); ODD(sts);
-           sts = gdh_GetNextObject(oid, &oid)) {
+  }
+  else
+  {
+    for (i = 0; i < cidcnt; i++)
+    {
+      for (sts = gdh_GetClassList(cid[i], &oid); ODD(sts); sts = gdh_GetNextObject(oid, &oid))
+      {
         aref = cdh_ObjidToAref(oid);
         array_Push(arr, &aref);
       }
@@ -5318,7 +5485,8 @@ pwr_tStatus gdh_GetLocalClassList(int cidcnt, pwr_tCid* cid, int attrobjects,
 
   if (arr->size)
     *classlist = array_Copy(arr);
-  else {
+  else
+  {
     *classlist = 0;
     sts = GDH__NOSUCHOBJ;
   }
@@ -5331,32 +5499,31 @@ pwr_tStatus gdh_GetLocalClassList(int cidcnt, pwr_tCid* cid, int attrobjects,
 pwr_tStatus gdh_CheckLocalObject(pwr_tOid oid)
 {
   pwr_tStatus sts;
-  gdb_sObject *op;
+  gdb_sObject* op;
 
-  gdh_ScopeLock {
-    op = vol_OidToObject(&sts, oid, gdb_mLo_local, vol_mTrans_none, cvol_eHint_none);
-  } gdh_ScopeUnlock;
+  gdh_ScopeLock { op = vol_OidToObject(&sts, oid, gdb_mLo_local, vol_mTrans_none, cvol_eHint_none); }
+  gdh_ScopeUnlock;
 
   if (op == NULL)
     return sts;
   return GDH__SUCCESS;
 }
 
-pwr_tStatus gdh_TidToType(pwr_tTid tid, pwr_eType *type)
+pwr_tStatus gdh_TidToType(pwr_tTid tid, pwr_eType* type)
 {
   pwr_tOid oid = cdh_TypeIdToObjid(tid);
-  pwr_eType *p;
-  gdb_sObject *op;
+  pwr_eType* p;
+  gdb_sObject* op;
   pwr_tStatus sts = GDH__SUCCESS;
 
   gdh_ScopeLock
   {
-    op = vol_OidToObject(
-        &sts, oid, gdb_mLo_native, vol_mTrans_all, cvol_eHint_none);
-    if (op != NULL) {
-      p = (pwr_eType *)vol_ObjectToAddress(&sts, op);
-      if ( p != NULL)
-	*type = *p;
+    op = vol_OidToObject(&sts, oid, gdb_mLo_native, vol_mTrans_all, cvol_eHint_none);
+    if (op != NULL)
+    {
+      p = (pwr_eType*)vol_ObjectToAddress(&sts, op);
+      if (p != NULL)
+        *type = *p;
     }
   }
   gdh_ScopeUnlock;
@@ -5366,26 +5533,23 @@ pwr_tStatus gdh_TidToType(pwr_tTid tid, pwr_eType *type)
 
 pwr_tStatus gdh_MountDynClients(void)
 {
-  gdb_sObject *op;
+  gdb_sObject* op;
   pwr_tOid oid;
   pwr_tStatus sts = GDH__SUCCESS;
 
-  for (sts = gdh_GetClassList(pwr_eClass_MountDynObject, &oid); 
-       ODD(sts);
-       sts = gdh_GetNextObject(oid, &oid)) {
+  for (sts = gdh_GetClassList(pwr_eClass_MountDynObject, &oid); ODD(sts); sts = gdh_GetNextObject(oid, &oid))
+  {
 
     gdh_ScopeLock
     {
-      op = vol_OidToObject(&sts, oid, gdb_mLo_native, vol_mTrans_none, 
-			   cvol_eHint_none);
+      op = vol_OidToObject(&sts, oid, gdb_mLo_native, vol_mTrans_none, cvol_eHint_none);
       if (cdh_ObjidIsNull(op->g.soid))
-	vol_MountDynObject(&sts, op);
+        vol_MountDynObject(&sts, op);
     }
     gdh_ScopeUnlock;
   }
   return sts;
 }
-
 
 /**
  * @brief Thread save function to fetch a direct linked absolute time value.
@@ -5395,8 +5559,8 @@ pwr_tStatus gdh_MountDynClients(void)
  * lck_Create(&sts, lck_eLock_Time).
  */
 void gdh_GetTimeDL(pwr_tTime* atp, /**< Direct link to time attribute */
-    pwr_tTime* time /**< Receives the requested time */
-    )
+                   pwr_tTime* time /**< Receives the requested time */
+)
 {
   lck_Lock(lck_eLock_Time);
   *time = *atp;
@@ -5411,14 +5575,17 @@ void gdh_GetTimeDL(pwr_tTime* atp, /**< Direct link to time attribute */
  * lck_Create(&sts, lck_eLock_Time).
  */
 void gdh_SetTimeDL(pwr_tTime* atp, /**< Direct link to time attribute */
-    pwr_tTime* time /**< Time value to set */
-    )
+                   pwr_tTime* time /**< Time value to set */
+)
 {
-  if (time) {
+  if (time)
+  {
     lck_Lock(lck_eLock_Time);
     *atp = *time;
     lck_Unlock(lck_eLock_Time);
-  } else {
+  }
+  else
+  {
     /* Set current time */
     lck_Lock(lck_eLock_Time);
     time_GetTime(atp);
@@ -5433,10 +5600,9 @@ void gdh_SetTimeDL(pwr_tTime* atp, /**< Direct link to time attribute */
  * The application first has to attach the time lock with a call to
  * lck_Create(&sts, lck_eLock_Time).
  */
-void gdh_GetDeltaTimeDL(
-    pwr_tDeltaTime* dtp, /**< Direct link to time attribute */
-    pwr_tDeltaTime* time /**< Receives the requested time */
-    )
+void gdh_GetDeltaTimeDL(pwr_tDeltaTime* dtp, /**< Direct link to time attribute */
+                        pwr_tDeltaTime* time /**< Receives the requested time */
+)
 {
   lck_Lock(lck_eLock_Time);
   *time = *dtp;
@@ -5450,10 +5616,9 @@ void gdh_GetDeltaTimeDL(
  * The application first has to attach the time lock with a call to
  * lck_Create(&sts, lck_eLock_Time).
  */
-void gdh_SetDeltaTimeDL(
-    pwr_tDeltaTime* dtp, /**< Direct link to time attribute */
-    pwr_tDeltaTime* time /**< Time value to set */
-    )
+void gdh_SetDeltaTimeDL(pwr_tDeltaTime* dtp, /**< Direct link to time attribute */
+                        pwr_tDeltaTime* time /**< Time value to set */
+)
 {
   lck_Lock(lck_eLock_Time);
   *dtp = *time;
@@ -5467,10 +5632,10 @@ void gdh_SetDeltaTimeDL(
  * The application first has to attach the string lock with a call to
  * lck_Create(&sts, lck_eLock_Str).
  */
-void gdh_GetStrDL(char* sp, /**< Direct link to string attribute */
-    char* str, /**< Receives the requested string */
-    int size /**< Size of string */
-    )
+void gdh_GetStrDL(char* sp,  /**< Direct link to string attribute */
+                  char* str, /**< Receives the requested string */
+                  int size   /**< Size of string */
+)
 {
   lck_Lock(lck_eLock_Str);
   strncpy(str, sp, size);
@@ -5484,10 +5649,10 @@ void gdh_GetStrDL(char* sp, /**< Direct link to string attribute */
  * The application first has to attach the string lock with a call to
  * lck_Create(&sts, lck_eLock_Str).
  */
-void gdh_SetStrDL(char* sp, /**< Direct link to string attribute */
-    const char* str, /**< String value to set */
-    int size /**< Size of string */
-    )
+void gdh_SetStrDL(char* sp,        /**< Direct link to string attribute */
+                  const char* str, /**< String value to set */
+                  int size         /**< Size of string */
+)
 {
   lck_Lock(lck_eLock_Str);
   strncpy(sp, str, size);
@@ -5504,8 +5669,8 @@ void gdh_SetStrDL(char* sp, /**< Direct link to string attribute */
  * @return pwr_tStatus
  */
 pwr_tStatus gdh_GetObjectInfoTime(const char* name, /**< Attribute name */
-    pwr_tTime* time /**< Receives the requested time */
-    )
+                                  pwr_tTime* time   /**< Receives the requested time */
+)
 {
   pwr_tStatus sts;
 
@@ -5525,8 +5690,8 @@ pwr_tStatus gdh_GetObjectInfoTime(const char* name, /**< Attribute name */
  * @return pwr_tStatus
  */
 pwr_tStatus gdh_SetObjectInfoTime(const char* name, /**< Attribute name */
-    pwr_tTime* time /**< Time to set */
-    )
+                                  pwr_tTime* time   /**< Time to set */
+)
 {
   pwr_tStatus sts;
 
@@ -5545,9 +5710,9 @@ pwr_tStatus gdh_SetObjectInfoTime(const char* name, /**< Attribute name */
  *
  * @return pwr_tStatus
  */
-pwr_tStatus gdh_GetObjectInfoDeltaTime(const char* name, /**< Attribute name */
-    pwr_tDeltaTime* time /**< Receives the requested time */
-    )
+pwr_tStatus gdh_GetObjectInfoDeltaTime(const char* name,    /**< Attribute name */
+                                       pwr_tDeltaTime* time /**< Receives the requested time */
+)
 {
   pwr_tStatus sts;
 
@@ -5566,9 +5731,9 @@ pwr_tStatus gdh_GetObjectInfoDeltaTime(const char* name, /**< Attribute name */
  *
  * @return pwr_tStatus
  */
-pwr_tStatus gdh_SetObjectInfoDeltaTime(const char* name, /**< Attribute name */
-    pwr_tDeltaTime* time /**< Time to set */
-    )
+pwr_tStatus gdh_SetObjectInfoDeltaTime(const char* name,    /**< Attribute name */
+                                       pwr_tDeltaTime* time /**< Time to set */
+)
 {
   pwr_tStatus sts;
 
@@ -5588,9 +5753,9 @@ pwr_tStatus gdh_SetObjectInfoDeltaTime(const char* name, /**< Attribute name */
  * @return pwr_tStatus
  */
 pwr_tStatus gdh_GetObjectInfoStr(const char* name, /**< Attribute name */
-    char* str, /**< Receives the requested string */
-    int size /**< String size */
-    )
+                                 char* str,        /**< Receives the requested string */
+                                 int size          /**< String size */
+)
 {
   pwr_tStatus sts;
 
@@ -5610,9 +5775,9 @@ pwr_tStatus gdh_GetObjectInfoStr(const char* name, /**< Attribute name */
  * @return pwr_tStatus
  */
 pwr_tStatus gdh_SetObjectInfoStr(const char* name, /**< Attribute name */
-    const char* str, /**< String to set */
-    int size /**< String size */
-    )
+                                 const char* str,  /**< String to set */
+                                 int size          /**< String size */
+)
 {
   pwr_tStatus sts;
 
@@ -5628,12 +5793,12 @@ pwr_tStatus gdh_SetObjectInfoStr(const char* name, /**< Attribute name */
  *
  * @return pwr_tStatus
  */
-pwr_tStatus gdh_GetClassInfo(pwr_tCid cid, gdh_sClassInfo *info)
+pwr_tStatus gdh_GetClassInfo(pwr_tCid cid, gdh_sClassInfo* info)
 {
   gdb_sClass* cp;
-  pwr_sClassDef *cdef;
+  pwr_sClassDef* cdef;
   pwr_tStatus sts = GDH__SUCCESS;
-  
+
   gdh_ScopeLock
   {
     cp = hash_Search(&sts, gdbroot->cid_ht, &cid);
@@ -5658,7 +5823,4 @@ pwr_tStatus gdh_GetClassInfo(pwr_tCid cid, gdh_sClassInfo *info)
  *
  * @return pwr_tBoolean
  */
-pwr_tBoolean gdh_IsInitialized()
-{
-  return gdbroot == 0 ? 0 : 1;
-}
+pwr_tBoolean gdh_IsInitialized() { return gdbroot == 0 ? 0 : 1; }

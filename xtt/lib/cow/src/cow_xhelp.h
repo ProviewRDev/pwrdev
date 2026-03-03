@@ -39,7 +39,8 @@
 
 #include "cow_xhelpnav.h"
 
-class CoXHelp {
+class CoXHelp
+{
 public:
   CoXHelp(void* xa_parent_ctx, xhelp_eUtility utility, int* xa_sts);
   void* parent_ctx;
@@ -54,38 +55,30 @@ public:
 
   static CoXHelp* default_xhelp;
 
-  virtual void set_dimension(int width, int height)
-  {
-  }
+  virtual void set_dimension(int width, int height) {}
   virtual void pop();
-  virtual void print()
-  {
-  }
+  virtual void print() {}
+
+  virtual void status_message(char severity, const char* message) {};
 
   void map();
   void clear();
-  int help(const char* key, const char* help_bookmark, navh_eHelpFile file_type,
-      const char* file_name, bool strict);
+  int help(const char* key, const char* help_bookmark, navh_eHelpFile file_type, const char* file_name,
+           bool strict);
   int help_index(navh_eHelpFile file_type, const char* file_name);
   int home();
   int back();
   int next_topic();
   int previous_topic();
-  void activate_print()
-  {
-    print();
-  }
-  static void set_default(CoXHelp* xhelp)
-  {
-    default_xhelp = xhelp;
-  }
-  static int dhelp(const char* key, const char* help_bookmark,
-      navh_eHelpFile file_type, const char* file_name, bool strict);
+  void activate_print() { print(); }
+  static void set_default(CoXHelp* xhelp) { default_xhelp = xhelp; }
+  static int dhelp(const char* key, const char* help_bookmark, navh_eHelpFile file_type,
+                   const char* file_name, bool strict);
   static int dhelp_index(navh_eHelpFile file_type, const char* file_name);
 
   static void open_URL(void* ctx, char* url);
-  static void open_input_dialog(CoXHelp* xhelp, const char* text,
-      const char* title, char* init_text, void (*ok_cb)(CoXHelp*, char*));
+  static void open_input_dialog(CoXHelp* xhelp, const char* text, const char* title, char* init_text,
+                                void (*ok_cb)(CoXHelp*, char*));
   static void find_ok(CoXHelp* xhelp, char* search_str);
 
   virtual ~CoXHelp();

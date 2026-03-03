@@ -44,19 +44,22 @@
 #include <vector>
 
 #include "rt_errh.h"
+#include "co_log_parser.h"
 
 #include "flow_browapi.h"
 
-typedef enum {
+typedef enum
+{
   clognav_eItemType_Msg,
   clognav_eItemType_Restart
 } clognav_eItemType;
 
-class CLogNavFilter {
+class CLogNavFilter
+{
 public:
   CLogNavFilter()
-      : show_success(true), show_info(true), show_warning(true),
-        show_error(true), show_fatal(true), show_text(true)
+      : show_success(true), show_info(true), show_warning(true), show_error(true), show_fatal(true),
+        show_text(true)
   {
     strcpy(str, "");
   }
@@ -69,9 +72,10 @@ public:
   char str[200];
 };
 
-class CLogNavBrow {
+class CLogNavBrow
+{
 public:
-  CLogNavBrow(BrowCtx* brow_ctx, void* evl) : ctx(brow_ctx), clognav(evl){}
+  CLogNavBrow(BrowCtx* brow_ctx, void* evl) : ctx(brow_ctx), clognav(evl) {}
   ~CLogNavBrow();
 
   BrowCtx* ctx;
@@ -93,10 +97,11 @@ public:
   void brow_setup();
 };
 
-class CLogMsg {
+class CLogMsg
+{
 public:
-  CLogMsg(errh_eSeverity msg_severity, const char* msg_logger, int msg_pid,
-      pwr_tTime msg_time, char* msg_text)
+  CLogMsg(errh_eSeverity msg_severity, const char* msg_logger, int msg_pid, pwr_tTime msg_time,
+          char* msg_text)
       : severity(msg_severity), pid(msg_pid), time(msg_time)
   {
     strncpy(logger, msg_logger, sizeof(logger));
@@ -109,21 +114,17 @@ public:
   char text[200];
 };
 
-class CLogFile {
+class CLogFile
+{
 public:
-  CLogFile()
-  {
-    strcpy(name, "");
-  }
-  CLogFile(char* file_name, pwr_tTime file_time) : time(file_time)
-  {
-    strcpy(name, file_name);
-  }
+  CLogFile() { strcpy(name, ""); }
+  CLogFile(char* file_name, pwr_tTime file_time) : time(file_time) { strcpy(name, file_name); }
   char name[200];
   pwr_tTime time;
 };
 
-class CLogNav {
+class CLogNav
+{
 public:
   CLogNav(void* ev_parent_ctx);
   virtual ~CLogNav();
@@ -138,19 +139,15 @@ public:
   int current_pos_high;
   int current_pos_low;
 
-  virtual void set_input_focus()
-  {
-  }
+  virtual void set_input_focus() {}
 
   void zoom(double zoom_factor);
   void unzoom();
   void set_nodraw();
   void reset_nodraw();
   void read(int* idx_list, int idx_cnt);
-  void set_filter(bool success, bool info, bool warning, bool error, bool fatal,
-      bool text, const char* str);
-  void get_filter(bool* success, bool* info, bool* warning, bool* error,
-      bool* fatal, bool* text);
+  void set_filter(bool success, bool info, bool warning, bool error, bool fatal, bool text, const char* str);
+  void get_filter(bool* success, bool* info, bool* warning, bool* error, bool* fatal, bool* text);
   void draw();
   void get_files();
   int next_file();
@@ -161,7 +158,8 @@ public:
   static int brow_cb(FlowCtx* ctx, flow_tEvent event);
 };
 
-class ItemMsgBase {
+class ItemMsgBase
+{
 public:
   ItemMsgBase(CLogNav* item_clognav, const char* item_name, brow_tNode dest)
       : clognav(item_clognav), node(dest)
@@ -174,18 +172,19 @@ public:
   char name[40];
 };
 
-class ItemMsgRestart : public ItemMsgBase {
+class ItemMsgRestart : public ItemMsgBase
+{
 public:
-  ItemMsgRestart(CLogNav* clognav, const char* item_name, pwr_tTime item_time,
-      brow_tNode dest, flow_eDest dest_code);
+  ItemMsgRestart(CLogNav* clognav, const char* item_name, pwr_tTime item_time, brow_tNode dest,
+                 flow_eDest dest_code);
   pwr_tTime time;
 };
 
-class ItemMsg : public ItemMsgBase {
+class ItemMsg : public ItemMsgBase
+{
 public:
-  ItemMsg(CLogNav* clognav, const char* item_name, errh_eSeverity item_severity,
-      char* item_logger, int item_pid, pwr_tTime item_time, char* item_text,
-      brow_tNode dest, flow_eDest dest_code);
+  ItemMsg(CLogNav* clognav, const char* item_name, errh_eSeverity item_severity, char* item_logger,
+          int item_pid, pwr_tTime item_time, char* item_text, brow_tNode dest, flow_eDest dest_code);
   errh_eSeverity severity;
   char logger[40];
   int pid;

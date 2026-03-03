@@ -35,6 +35,7 @@
  */
 
 /* co_xhelpnav.cpp -- helptext navigator */
+#include <map>
 
 #include "co_cdh.h"
 #include "co_dcli.h"
@@ -43,13 +44,25 @@
 #include "co_time.h"
 
 #include "cow_xhelpnav.h"
+#include "rt_errh.h"
+#include "cow_msgwindow.h"
+#include <cow_xhelp_gtk.h>
 
 static int help_cmp_items(const void* node1, const void* node2);
+void doubleclick_action_helper_func(CoXHelpNav* xhelpnav, int sts, char* link, char* bookmark,
+                                    char* file_name);
+static void trim(char* str);
 
 static void xhelpnav_open_URL(CoXHelpNav* xhelpnav, char* url)
 {
   if (xhelpnav->open_URL_cb)
     (xhelpnav->open_URL_cb)(xhelpnav->parent_ctx, url);
+}
+
+static void __attribute__((unused)) xhelpnav_help_message_cb(void* ctx, char sev, char* text)
+{
+  CoXHelpNav* xhelpnav = (CoXHelpNav*)ctx;
+  xhelpnav->message(sev, text);
 }
 
 //
@@ -81,16 +94,12 @@ void CoXHelpNavBrow::create_nodeclasses()
 
   // Create common-class
 
-  brow_CreateNodeClass(
-      ctx, "NavigatorDefault", flow_eNodeGroup_Common, &nc_object);
+  brow_CreateNodeClass(ctx, "NavigatorDefault", flow_eNodeGroup_Common, &nc_object);
   brow_AddAnnotPixmap(nc_object, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_object, 1, 1.1, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_object, 2, 0.6, 0, flow_eDrawType_TextHelveticaBold, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_object, 7, 0.6, 1, flow_eDrawType_TextHelveticaBold, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_object, 11, 0.6, 2, flow_eDrawType_TextHelveticaBold, 2,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_object, 2, 0.6, 0, flow_eDrawType_TextHelveticaBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_object, 7, 0.6, 1, flow_eDrawType_TextHelveticaBold, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_object, 11, 0.6, 2, flow_eDrawType_TextHelveticaBold, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_object, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Create text
@@ -98,34 +107,25 @@ void CoXHelpNavBrow::create_nodeclasses()
   brow_CreateNodeClass(ctx, "NavigatorText", flow_eNodeGroup_Common, &nc_text);
   brow_AddAnnotPixmap(nc_text, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_text, 1, 1.1, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_text, 2, 0.6, 0, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_text, 7, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_text, 11, 0.6, 2, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_text, 2, 0.6, 0, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_text, 7, 0.6, 1, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_text, 11, 0.6, 2, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_text, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Create Header
 
-  brow_CreateNodeClass(
-      ctx, "NavigatorHead", flow_eNodeGroup_Common, &nc_header);
+  brow_CreateNodeClass(ctx, "NavigatorHead", flow_eNodeGroup_Common, &nc_header);
   brow_AddAnnotPixmap(nc_header, 0, 0.2, 0.4, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_header, 2, 1.0, 0, flow_eDrawType_TextHelveticaBold, 4,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_header, 8, 1.0, 1, flow_eDrawType_TextHelveticaBold, 4,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_header, 2, 1.0, 0, flow_eDrawType_TextHelveticaBold, 4, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_header, 8, 1.0, 1, flow_eDrawType_TextHelveticaBold, 4, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_header, 0, 0, 20, 1.4, flow_eDrawType_LineGray, -1, 1);
 
   // Create Header2
 
-  brow_CreateNodeClass(
-      ctx, "NavigatorHeadLarge", flow_eNodeGroup_Common, &nc_headerlarge);
+  brow_CreateNodeClass(ctx, "NavigatorHeadLarge", flow_eNodeGroup_Common, &nc_headerlarge);
   brow_AddAnnotPixmap(nc_headerlarge, 0, 0.2, 0.4, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_headerlarge, 2, 1.0, 0, flow_eDrawType_TextHelveticaBold, 6,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_headerlarge, 8, 1.0, 1, flow_eDrawType_TextHelveticaBold, 6,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_headerlarge, 2, 1.0, 0, flow_eDrawType_TextHelveticaBold, 6, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_headerlarge, 8, 1.0, 1, flow_eDrawType_TextHelveticaBold, 6, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_headerlarge, 0, 0, 20, 2.0, flow_eDrawType_LineGray, -1, 1);
 
   // Create Horizontal line
@@ -150,18 +150,14 @@ void CoXHelpNavBrow::brow_setup()
   brow_SetWhiteBackground(ctx);
 }
 
-void CoXHelpNav::clear()
-{
-  brow_DeleteAll(brow->ctx);
-}
+void CoXHelpNav::clear() { brow_DeleteAll(brow->ctx); }
 
 //
 // Create the navigator widget
 //
-CoXHelpNav::CoXHelpNav(void* xn_parent_ctx, char* xn_name,
-    xhelp_eUtility xn_utility, pwr_tStatus* status)
-    : parent_ctx(xn_parent_ctx), brow_cnt(0), closing_down(0), displayed(0),
-      utility(xn_utility), search_node(0), search_strict(false), open_URL_cb(0)
+CoXHelpNav::CoXHelpNav(void* xn_parent_ctx, char* xn_name, xhelp_eUtility xn_utility, pwr_tStatus* status)
+    : parent_ctx(xn_parent_ctx), brow_cnt(0), closing_down(0), displayed(0), utility(xn_utility),
+      search_node(0), search_strict(false), open_URL_cb(0)
 {
   strcpy(name, xn_name);
   strcpy(search_str, "");
@@ -171,41 +167,27 @@ CoXHelpNav::CoXHelpNav(void* xn_parent_ctx, char* xn_name,
 //
 //  Delete a nav context
 //
-CoXHelpNav::~CoXHelpNav()
-{
-}
+CoXHelpNav::~CoXHelpNav() {}
 
 //
 //  Print
 //
-void CoXHelpNav::print(char* filename)
-{
-  brow_Print(brow->ctx, filename);
-}
+void CoXHelpNav::print(char* filename) { brow_Print(brow->ctx, filename); }
 
 //
 //  Zoom
 //
-void CoXHelpNav::zoom(double zoom_factor)
-{
-  brow_Zoom(brow->ctx, zoom_factor);
-}
+void CoXHelpNav::zoom(double zoom_factor) { brow_Zoom(brow->ctx, zoom_factor); }
 
 //
 //  Return to base zoom factor
 //
-void CoXHelpNav::unzoom()
-{
-  brow_UnZoom(brow->ctx);
-}
+void CoXHelpNav::unzoom() { brow_UnZoom(brow->ctx); }
 
 //
 //  Get zoom
 //
-void CoXHelpNav::get_zoom(double* zoom_factor)
-{
-  brow_GetZoom(brow->ctx, zoom_factor);
-}
+void CoXHelpNav::get_zoom(double* zoom_factor) { brow_GetZoom(brow->ctx, zoom_factor); }
 
 //
 // Callbacks from brow
@@ -219,25 +201,32 @@ static int xhelpnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
   if (xhelpnav->closing_down)
     return 1;
 
-  switch (event->event) {
-  case flow_eEvent_Key_Up: {
+  switch (event->event)
+  {
+  case flow_eEvent_Key_Up:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
     int sts;
 
     brow_GetSelectedNodes(xhelpnav->brow->ctx, &node_list, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       sts = brow_GetLastVisible(xhelpnav->brow->ctx, &object);
       if (EVEN(sts))
         return 1;
-    } else {
-      if (!brow_IsVisible(
-              xhelpnav->brow->ctx, node_list[0], flow_eVisible_Partial)) {
+    }
+    else
+    {
+      if (!brow_IsVisible(xhelpnav->brow->ctx, node_list[0], flow_eVisible_Partial))
+      {
         sts = brow_GetLastVisible(xhelpnav->brow->ctx, &object);
         if (EVEN(sts))
           return 1;
-      } else {
+      }
+      else
+      {
         sts = brow_GetPrevious(xhelpnav->brow->ctx, node_list[0], &object);
         if (EVEN(sts))
           return 1;
@@ -252,24 +241,30 @@ static int xhelpnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
       free(node_list);
     break;
   }
-  case flow_eEvent_Key_Down: {
+  case flow_eEvent_Key_Down:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
     int sts;
 
     brow_GetSelectedNodes(xhelpnav->brow->ctx, &node_list, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       sts = brow_GetFirstVisible(xhelpnav->brow->ctx, &object);
       if (EVEN(sts))
         return 1;
-    } else {
-      if (!brow_IsVisible(
-              xhelpnav->brow->ctx, node_list[0], flow_eVisible_Partial)) {
+    }
+    else
+    {
+      if (!brow_IsVisible(xhelpnav->brow->ctx, node_list[0], flow_eVisible_Partial))
+      {
         sts = brow_GetFirstVisible(xhelpnav->brow->ctx, &object);
         if (EVEN(sts))
           return 1;
-      } else {
+      }
+      else
+      {
         sts = brow_GetNext(xhelpnav->brow->ctx, node_list[0], &object);
         if (EVEN(sts))
           return 1;
@@ -285,25 +280,30 @@ static int xhelpnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
     break;
   }
   case flow_eEvent_Key_ShiftDown:
-  case flow_eEvent_Key_PageDown: {
+  case flow_eEvent_Key_PageDown:
+  {
     brow_Page(xhelpnav->brow->ctx, 0.95);
     break;
   }
   case flow_eEvent_Key_ShiftUp:
-  case flow_eEvent_Key_PageUp: {
+  case flow_eEvent_Key_PageUp:
+  {
     brow_Page(xhelpnav->brow->ctx, -0.95);
     break;
   }
-  case flow_eEvent_ScrollDown: {
+  case flow_eEvent_ScrollDown:
+  {
     brow_Page(xhelpnav->brow->ctx, 0.10);
     break;
   }
-  case flow_eEvent_ScrollUp: {
+  case flow_eEvent_ScrollUp:
+  {
     brow_Page(xhelpnav->brow->ctx, -0.10);
     break;
   }
   case flow_eEvent_Key_Return:
-  case flow_eEvent_Key_Right: {
+  case flow_eEvent_Key_Right:
+  {
     brow_tNode* node_list;
     brow_tNode first;
     int node_count;
@@ -315,7 +315,8 @@ static int xhelpnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
     brow_GetUserData(node_list[0], (void**)&item);
 
     sts = brow_GetFirst(xhelpnav->brow->ctx, &first);
-    if (ODD(sts) && first == node_list[0]) {
+    if (ODD(sts) && first == node_list[0])
+    {
       xhelpnav->next_topic();
       free(node_list);
       break;
@@ -324,34 +325,42 @@ static int xhelpnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
     item->doubleclick_action(xhelpnav->brow, xhelpnav, 0, 0);
     break;
   }
-  case flow_eEvent_Key_ShiftRight: {
+  case flow_eEvent_Key_ShiftRight:
+  {
     xhelpnav->next_topic();
     break;
   }
-  case flow_eEvent_Key_ShiftLeft: {
+  case flow_eEvent_Key_ShiftLeft:
+  {
     xhelpnav->previous_topic();
     break;
   }
-  case flow_eEvent_Key_Left: {
+  case flow_eEvent_Key_Left:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
     int sts;
 
     brow_GetSelectedNodes(xhelpnav->brow->ctx, &node_list, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       xhelpnav->brow_push();
       return 1;
     }
 
-    if (brow_IsOpen(node_list[0])) {
+    if (brow_IsOpen(node_list[0]))
+    {
       // Close this node
       object = node_list[0];
       free(node_list);
-    } else {
+    }
+    else
+    {
       // Close parent
       sts = brow_GetParent(xhelpnav->brow->ctx, node_list[0], &object);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         free(node_list);
         xhelpnav->brow_push();
         return 1;
@@ -367,11 +376,11 @@ static int xhelpnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
     delete item;
     break;
   case flow_eEvent_MB1DoubleClick:
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_GetUserData(event->object.object, (void**)&item);
-      item->doubleclick_action(
-          xhelpnav->brow, xhelpnav, event->object.x, event->object.y);
+      item->doubleclick_action(xhelpnav->brow, xhelpnav, event->object.x, event->object.y);
       break;
     default:;
     }
@@ -381,10 +390,12 @@ static int xhelpnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
     double ll_x, ll_y, ur_x, ur_y;
     int sts;
 
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_MeasureNode(event->object.object, &ll_x, &ll_y, &ur_x, &ur_y);
-      if (event->object.x < ll_x + 1.0) {
+      if (event->object.x < ll_x + 1.0)
+      {
         // Simulate doubleclick
         flow_tEvent doubleclick_event;
 
@@ -396,9 +407,12 @@ static int xhelpnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
         return sts;
       }
 
-      if (brow_FindSelectedObject(xhelpnav->brow->ctx, event->object.object)) {
+      if (brow_FindSelectedObject(xhelpnav->brow->ctx, event->object.object))
+      {
         brow_SelectClear(xhelpnav->brow->ctx);
-      } else {
+      }
+      else
+      {
         brow_SelectClear(xhelpnav->brow->ctx);
         brow_SetInverse(event->object.object, 1);
         brow_SelectInsert(xhelpnav->brow->ctx, event->object.object);
@@ -422,8 +436,8 @@ int CoXHelpNav::brow_pop()
 
   if (brow_cnt >= XHELPNAV_BROW_MAX)
     return 0;
-  brow_CreateSecondaryCtx(brow->ctx, &secondary_ctx, CoXHelpNav::init_brow_cb,
-      (void*)this, flow_eCtxType_Brow);
+  brow_CreateSecondaryCtx(brow->ctx, &secondary_ctx, CoXHelpNav::init_brow_cb, (void*)this,
+                          flow_eCtxType_Brow);
 
   brow_ChangeCtx(brow->ctx, brow_stack[brow_cnt]->ctx);
   *brow = *brow_stack[brow_cnt];
@@ -453,62 +467,35 @@ int CoXHelpNav::brow_push_all()
 
 void CoXHelpNav::enable_events(CoXHelpNavBrow* brow)
 {
-  brow_EnableEvent(brow->ctx, flow_eEvent_MB1DoubleClickShift,
-      flow_eEventType_CallBack, xhelpnav_brow_cb);
-  brow_EnableEvent(brow->ctx, flow_eEvent_MB1DoubleClick,
-      flow_eEventType_CallBack, xhelpnav_brow_cb);
-  brow_EnableEvent(brow->ctx, flow_eEvent_MB1DoubleClickShiftCtrl,
-      flow_eEventType_CallBack, xhelpnav_brow_cb);
-  brow_EnableEvent(brow->ctx, flow_eEvent_MB1ClickShift,
-      flow_eEventType_CallBack, xhelpnav_brow_cb);
-  brow_EnableEvent(brow->ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack,
-      xhelpnav_brow_cb);
-  brow_EnableEvent(brow->ctx, flow_eEvent_MB3Down, flow_eEventType_CallBack,
-      xhelpnav_brow_cb);
-  brow_EnableEvent(brow->ctx, flow_eEvent_MB3Press, flow_eEventType_CallBack,
-      xhelpnav_brow_cb);
-  brow_EnableEvent(brow->ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack,
-      xhelpnav_brow_cb);
-  brow_EnableEvent(brow->ctx, flow_eEvent_ObjectDeleted,
-      flow_eEventType_CallBack, xhelpnav_brow_cb);
-  brow_EnableEvent(brow->ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack,
-      xhelpnav_brow_cb);
-  brow_EnableEvent(brow->ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack,
-      xhelpnav_brow_cb);
-  brow_EnableEvent(brow->ctx, flow_eEvent_Key_PF1, flow_eEventType_CallBack,
-      xhelpnav_brow_cb);
-  brow_EnableEvent(brow->ctx, flow_eEvent_Key_PF2, flow_eEventType_CallBack,
-      xhelpnav_brow_cb);
-  brow_EnableEvent(brow->ctx, flow_eEvent_Key_PF3, flow_eEventType_CallBack,
-      xhelpnav_brow_cb);
-  brow_EnableEvent(brow->ctx, flow_eEvent_Key_PF4, flow_eEventType_CallBack,
-      xhelpnav_brow_cb);
-  brow_EnableEvent(brow->ctx, flow_eEvent_Key_Return, flow_eEventType_CallBack,
-      xhelpnav_brow_cb);
-  brow_EnableEvent(brow->ctx, flow_eEvent_Key_Right, flow_eEventType_CallBack,
-      xhelpnav_brow_cb);
-  brow_EnableEvent(brow->ctx, flow_eEvent_Key_Left, flow_eEventType_CallBack,
-      xhelpnav_brow_cb);
-  brow_EnableEvent(brow->ctx, flow_eEvent_Key_ShiftRight,
-      flow_eEventType_CallBack, xhelpnav_brow_cb);
-  brow_EnableEvent(brow->ctx, flow_eEvent_Key_ShiftLeft,
-      flow_eEventType_CallBack, xhelpnav_brow_cb);
-  brow_EnableEvent(brow->ctx, flow_eEvent_Key_ShiftUp, flow_eEventType_CallBack,
-      xhelpnav_brow_cb);
-  brow_EnableEvent(brow->ctx, flow_eEvent_Key_ShiftDown,
-      flow_eEventType_CallBack, xhelpnav_brow_cb);
-  brow_EnableEvent(brow->ctx, flow_eEvent_Key_PageUp, flow_eEventType_CallBack,
-      xhelpnav_brow_cb);
-  brow_EnableEvent(brow->ctx, flow_eEvent_Key_PageDown,
-      flow_eEventType_CallBack, xhelpnav_brow_cb);
-  brow_EnableEvent(brow->ctx, flow_eEvent_Key_ShiftRight,
-      flow_eEventType_CallBack, xhelpnav_brow_cb);
-  brow_EnableEvent(brow->ctx, flow_eEvent_Resized, flow_eEventType_CallBack,
-      xhelpnav_brow_cb);
-  brow_EnableEvent(brow->ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack,
-      xhelpnav_brow_cb);
-  brow_EnableEvent(brow->ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack,
-      xhelpnav_brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_MB1DoubleClickShift, flow_eEventType_CallBack, xhelpnav_brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, xhelpnav_brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_MB1DoubleClickShiftCtrl, flow_eEventType_CallBack,
+                   xhelpnav_brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_MB1ClickShift, flow_eEventType_CallBack, xhelpnav_brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, xhelpnav_brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_MB3Down, flow_eEventType_CallBack, xhelpnav_brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_MB3Press, flow_eEventType_CallBack, xhelpnav_brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, xhelpnav_brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack, xhelpnav_brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack, xhelpnav_brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack, xhelpnav_brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_PF1, flow_eEventType_CallBack, xhelpnav_brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_PF2, flow_eEventType_CallBack, xhelpnav_brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_PF3, flow_eEventType_CallBack, xhelpnav_brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_PF4, flow_eEventType_CallBack, xhelpnav_brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_Return, flow_eEventType_CallBack, xhelpnav_brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_Right, flow_eEventType_CallBack, xhelpnav_brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_Left, flow_eEventType_CallBack, xhelpnav_brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_ShiftRight, flow_eEventType_CallBack, xhelpnav_brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_ShiftLeft, flow_eEventType_CallBack, xhelpnav_brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_ShiftUp, flow_eEventType_CallBack, xhelpnav_brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_ShiftDown, flow_eEventType_CallBack, xhelpnav_brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_PageUp, flow_eEventType_CallBack, xhelpnav_brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_PageDown, flow_eEventType_CallBack, xhelpnav_brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_ShiftRight, flow_eEventType_CallBack, xhelpnav_brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Resized, flow_eEventType_CallBack, xhelpnav_brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, xhelpnav_brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, xhelpnav_brow_cb);
 }
 
 //
@@ -537,8 +524,7 @@ int CoXHelpNav::init_brow_cb(BrowCtx* ctx, void* client_data)
 {
   CoXHelpNav* xhelpnav = (CoXHelpNav*)client_data;
 
-  xhelpnav->brow_stack[xhelpnav->brow_cnt]
-      = new CoXHelpNavBrow(ctx, (void*)xhelpnav);
+  xhelpnav->brow_stack[xhelpnav->brow_cnt] = new CoXHelpNavBrow(ctx, (void*)xhelpnav);
 
   xhelpnav->brow_stack[xhelpnav->brow_cnt]->brow_setup();
   xhelpnav->brow_stack[xhelpnav->brow_cnt]->create_nodeclasses();
@@ -592,20 +578,23 @@ pwr_tStatus CoXHelpNav::search_exec(bool reverse)
     active = true;
 
   brow_GetObjectList(brow->ctx, &object_list, &object_cnt);
-  for (int i = 0; i < object_cnt; i++) {
+  for (int i = 0; i < object_cnt; i++)
+  {
     if (reverse)
       idx = object_cnt - 1 - i;
     else
       idx = i;
 
-    if (!active) {
+    if (!active)
+    {
       if (search_node == object_list[idx])
         active = true;
       continue;
     }
     brow_GetUserData(object_list[idx], (void**)&item);
     hit = item->search(search_str, search_strict);
-    if (hit) {
+    if (hit)
+    {
       // Select and center node
       brow_SelectClear(brow->ctx);
       brow_SetInverse(object_list[idx], 1);
@@ -621,54 +610,36 @@ pwr_tStatus CoXHelpNav::search_exec(bool reverse)
   return XHELP__SEARCHNOTFOUND;
 }
 
-HItem::HItem() : type(xhelpnav_eHItemType_Object), node(NULL)
-{
-}
+HItem::HItem() : type(xhelpnav_eHItemType_Object), node(NULL) {}
 
-HItem::~HItem()
-{
-}
+HItem::~HItem() {}
 
-int HItem::doubleclick_action(
-    CoXHelpNavBrow* brow, CoXHelpNav* xhelpnav, double x, double y)
-{
-  return 1;
-}
+int HItem::doubleclick_action(CoXHelpNavBrow* brow, CoXHelpNav* xhelpnav, double x, double y) { return 1; }
 
-bool HItem::search(char* str, bool strict)
-{
-  return false;
-}
+bool HItem::search(char* str, bool strict) { return false; }
 
-HItemHeader::HItemHeader(CoXHelpNavBrow* brow, const char* item_name,
-    const char* title, brow_tNode dest, flow_eDest dest_code)
+HItemHeader::HItemHeader(CoXHelpNavBrow* brow, const char* item_name, const char* title, brow_tNode dest,
+                         flow_eDest dest_code)
 {
   type = xhelpnav_eHItemType_Header;
-  brow_CreateNode(brow->ctx, "header", brow->nc_header, dest, dest_code,
-      (void*)this, 1, &node);
+  brow_CreateNode(brow->ctx, "header", brow->nc_header, dest, dest_code, (void*)this, 1, &node);
   brow_SetAnnotation(node, 0, title, strlen(title));
 }
 
-HItemHeader::~HItemHeader()
-{
-}
+HItemHeader::~HItemHeader() {}
 
-HItemHelpLine::HItemHelpLine(CoXHelpNavBrow* brow, const char* item_name,
-    brow_tNode dest, flow_eDest dest_code)
+HItemHelpLine::HItemHelpLine(CoXHelpNavBrow* brow, const char* item_name, brow_tNode dest,
+                             flow_eDest dest_code)
 {
   type = xhelpnav_eHItemType_HelpLine;
-  brow_CreateNode(brow->ctx, "header", brow->nc_line, dest, dest_code,
-      (void*)this, 1, &node);
+  brow_CreateNode(brow->ctx, "header", brow->nc_line, dest, dest_code, (void*)this, 1, &node);
 }
 
-HItemHelpLine::~HItemHelpLine()
-{
-}
+HItemHelpLine::~HItemHelpLine() {}
 
-HItemHelpImage::HItemHelpImage(CoXHelpNavBrow* brow, const char* item_name,
-    brow_tNodeClass nc, const char* item_link, const char* item_bookmark,
-    const char* item_file_name, navh_eHelpFile help_file_type, brow_tNode dest,
-    flow_eDest dest_code)
+HItemHelpImage::HItemHelpImage(CoXHelpNavBrow* brow, const char* item_name, brow_tNodeClass nc,
+                               const char* item_link, const char* item_bookmark, const char* item_file_name,
+                               navh_eHelpFile help_file_type, brow_tNode dest, flow_eDest dest_code)
     : file_type(help_file_type)
 {
   type = xhelpnav_eHItemType_HelpImage;
@@ -679,47 +650,42 @@ HItemHelpImage::HItemHelpImage(CoXHelpNavBrow* brow, const char* item_name,
   else
     strcpy(file_name, "");
 
-  brow_CreateNode(
-      brow->ctx, "image", nc, dest, dest_code, (void*)this, 1, &node);
+  brow_CreateNode(brow->ctx, "image", nc, dest, dest_code, (void*)this, 1, &node);
   if (str_StartsWith(link, "$web"))
     brow_SetAnnotPixmap(node, 0, brow->pixmap_weblink);
   else if (link[0] != 0)
     brow_SetAnnotPixmap(node, 0, brow->pixmap_morehelp);
 }
 
-int HItemHelpImage::doubleclick_action(
-    CoXHelpNavBrow* brow, CoXHelpNav* xhelpnav, double x, double y)
+int HItemHelpImage::doubleclick_action(CoXHelpNavBrow* brow, CoXHelpNav* xhelpnav, double x, double y)
 {
-  int sts;
+  int sts = 0;
 
-  if (!streq(link, "")) {
-    if (str_StartsWith(link, "$web:")) {
+  if (!streq(link, ""))
+  {
+    if (str_StartsWith(link, "$web:"))
+    {
       // Open the url
       xhelpnav_open_URL(xhelpnav, &link[5]);
-    } else if ((strstr(link, ".htm") != 0) || (strstr(link, ".pdf") != 0)) {
+    }
+    else if ((strstr(link, ".htm") != 0) || (strstr(link, ".pdf") != 0))
+    {
       // Open the url
       xhelpnav_open_URL(xhelpnav, link);
-    } else {
-      if (file_name[0] == 0) {
-        sts = xhelpnav->help(
-            link, bookmark, navh_eHelpFile_Base, NULL, 1, true);
-        if (EVEN(sts))
-          sts = xhelpnav->help(
-              link, bookmark, navh_eHelpFile_Project, NULL, 1, true);
-      } else
-        sts = xhelpnav->help(
-            link, bookmark, navh_eHelpFile_Other, file_name, 1, true);
+    }
+    else
+    {
+      doubleclick_action_helper_func(xhelpnav, sts, link, bookmark, file_name);
     }
   }
   return 1;
 }
 
-HItemHeaderLarge::HItemHeaderLarge(CoXHelpNavBrow* brow, const char* item_name,
-    const char* title, brow_tNode dest, flow_eDest dest_code)
+HItemHeaderLarge::HItemHeaderLarge(CoXHelpNavBrow* brow, const char* item_name, const char* title,
+                                   brow_tNode dest, flow_eDest dest_code)
 {
   type = xhelpnav_eHItemType_HeaderLarge;
-  brow_CreateNode(brow->ctx, "header", brow->nc_headerlarge, dest, dest_code,
-      (void*)this, 1, &node);
+  brow_CreateNode(brow->ctx, "header", brow->nc_headerlarge, dest, dest_code, (void*)this, 1, &node);
   brow_SetAnnotation(node, 0, title, strlen(title));
 }
 
@@ -737,12 +703,11 @@ bool HItemHeaderLarge::search(char* str, bool strict)
   return false;
 }
 
-HItemHelpHeader::HItemHelpHeader(CoXHelpNavBrow* brow, const char* item_name,
-    const char* title, bool base, brow_tNode dest, flow_eDest dest_code)
+HItemHelpHeader::HItemHelpHeader(CoXHelpNavBrow* brow, const char* item_name, const char* title, bool base,
+                                 brow_tNode dest, flow_eDest dest_code)
 {
   type = xhelpnav_eHItemType_HelpHeader;
-  brow_CreateNode(brow->ctx, "header", brow->nc_header, dest, dest_code,
-      (void*)this, 1, &node);
+  brow_CreateNode(brow->ctx, "header", brow->nc_header, dest, dest_code, (void*)this, 1, &node);
   brow_SetAnnotation(node, 0, title, strlen(title));
   if (!base)
     brow_SetAnnotPixmap(node, 0, brow->pixmap_closehelp);
@@ -762,19 +727,17 @@ bool HItemHelpHeader::search(char* str, bool strict)
   return false;
 }
 
-int HItemHelpHeader::doubleclick_action(
-    CoXHelpNavBrow* brow, CoXHelpNav* xhelpnav, double x, double y)
+int HItemHelpHeader::doubleclick_action(CoXHelpNavBrow* brow, CoXHelpNav* xhelpnav, double x, double y)
 {
   if (xhelpnav)
     xhelpnav->brow_push();
   return 1;
 }
 
-HItemHelp::HItemHelp(CoXHelpNavBrow* brow, const char* item_name,
-    const char* text, const char* text2, const char* text3,
-    const char* item_link, const char* item_bookmark,
-    const char* item_file_name, navh_eHelpFile help_file_type, int help_index,
-    brow_tNode dest, flow_eDest dest_code)
+HItemHelp::HItemHelp(CoXHelpNavBrow* brow, const char* item_name, const char* text, const char* text2,
+                     const char* text3, const char* item_link, const char* item_bookmark,
+                     const char* item_file_name, navh_eHelpFile help_file_type, int help_index,
+                     brow_tNode dest, flow_eDest dest_code)
     : file_type(help_file_type), index(help_index)
 {
   type = xhelpnav_eHItemType_Help;
@@ -784,8 +747,7 @@ HItemHelp::HItemHelp(CoXHelpNavBrow* brow, const char* item_name,
     strcpy(file_name, item_file_name);
   else
     strcpy(file_name, "");
-  brow_CreateNode(
-      brow->ctx, "help", brow->nc_text, dest, dest_code, (void*)this, 1, &node);
+  brow_CreateNode(brow->ctx, "help", brow->nc_text, dest, dest_code, (void*)this, 1, &node);
   brow_SetAnnotation(node, 0, text, strlen(text));
   if (text2[0] != 0)
     brow_SetAnnotation(node, 1, text2, strlen(text2));
@@ -801,7 +763,8 @@ bool HItemHelp::search(char* str, bool strict)
 {
   char text[256];
 
-  for (int i = 0; i < 3; i++) {
+  for (int i = 0; i < 3; i++)
+  {
     brow_GetAnnotation(node, i, text, sizeof(text));
     if (text[0] == 0)
       continue;
@@ -813,40 +776,38 @@ bool HItemHelp::search(char* str, bool strict)
   return false;
 }
 
-int HItemHelp::doubleclick_action(
-    CoXHelpNavBrow* brow, CoXHelpNav* xhelpnav, double x, double y)
+int HItemHelp::doubleclick_action(CoXHelpNavBrow* brow, CoXHelpNav* xhelpnav, double x, double y)
 {
-  int sts;
+  int sts = 0;
 
-  if (index) {
+  if (index)
+  {
     sts = xhelpnav->help_index(file_type, file_name, 1);
-  } else if (!streq(link, "")) {
-    if (str_StartsWith(link, "$web:")) {
+  }
+  else if (!streq(link, ""))
+  {
+    if (str_StartsWith(link, "$web:"))
+    {
       // Open the url
       xhelpnav_open_URL(xhelpnav, &link[5]);
-    } else if ((strstr(link, ".htm") != 0) || (strstr(link, ".pdf") != 0)) {
+    }
+    else if ((strstr(link, ".htm") != 0) || (strstr(link, ".pdf") != 0))
+    {
       // Open the url
       xhelpnav_open_URL(xhelpnav, link);
-    } else {
-      if (file_name[0] == 0) {
-        sts = xhelpnav->help(
-            link, bookmark, navh_eHelpFile_Base, NULL, 1, true);
-        if (EVEN(sts))
-          sts = xhelpnav->help(
-              link, bookmark, navh_eHelpFile_Project, NULL, 1, true);
-      } else
-        sts = xhelpnav->help(
-            link, bookmark, navh_eHelpFile_Other, file_name, 1, true);
+    }
+    else
+    {
+      doubleclick_action_helper_func(xhelpnav, sts, link, bookmark, file_name);
     }
   }
   return 1;
 }
 
-HItemHelpBold::HItemHelpBold(CoXHelpNavBrow* brow, const char* item_name,
-    const char* text, const char* text2, const char* text3,
-    const char* item_link, const char* item_bookmark,
-    const char* item_file_name, navh_eHelpFile help_file_type, int help_index,
-    brow_tNode dest, flow_eDest dest_code)
+HItemHelpBold::HItemHelpBold(CoXHelpNavBrow* brow, const char* item_name, const char* text, const char* text2,
+                             const char* text3, const char* item_link, const char* item_bookmark,
+                             const char* item_file_name, navh_eHelpFile help_file_type, int help_index,
+                             brow_tNode dest, flow_eDest dest_code)
     : file_type(help_file_type), index(help_index)
 {
   type = xhelpnav_eHItemType_HelpBold;
@@ -856,8 +817,7 @@ HItemHelpBold::HItemHelpBold(CoXHelpNavBrow* brow, const char* item_name,
     strcpy(file_name, item_file_name);
   else
     strcpy(file_name, "");
-  brow_CreateNode(brow->ctx, "help", brow->nc_object, dest, dest_code,
-      (void*)this, 1, &node);
+  brow_CreateNode(brow->ctx, "help", brow->nc_object, dest, dest_code, (void*)this, 1, &node);
   brow_SetAnnotation(node, 0, text, strlen(text));
   if (text2[0] != 0)
     brow_SetAnnotation(node, 1, text2, strlen(text2));
@@ -873,7 +833,8 @@ bool HItemHelpBold::search(char* str, bool strict)
 {
   char text[256];
 
-  for (int i = 0; i < 3; i++) {
+  for (int i = 0; i < 3; i++)
+  {
     brow_GetAnnotation(node, i, text, sizeof(text));
     if (text[0] == 0)
       continue;
@@ -885,33 +846,99 @@ bool HItemHelpBold::search(char* str, bool strict)
   return false;
 }
 
-int HItemHelpBold::doubleclick_action(
-    CoXHelpNavBrow* brow, CoXHelpNav* xhelpnav, double x, double y)
+int HItemHelpBold::doubleclick_action(CoXHelpNavBrow* brow, CoXHelpNav* xhelpnav, double x, double y)
 {
-  int sts;
+  int sts = 0;
 
-  if (index) {
+  if (index)
+  {
     sts = xhelpnav->help_index(file_type, file_name, 1);
-  } else if (!streq(link, "")) {
-    if (str_StartsWith(link, "$web:")) {
+  }
+  else if (!streq(link, ""))
+  {
+    if (str_StartsWith(link, "$web:"))
+    {
       // Open the url
       xhelpnav_open_URL(xhelpnav, &link[5]);
-    } else if ((strstr(link, ".htm") != 0) || (strstr(link, ".pdf") != 0)) {
+    }
+    else if ((strstr(link, ".htm") != 0) || (strstr(link, ".pdf") != 0))
+    {
       // Open the url
       xhelpnav_open_URL(xhelpnav, link);
-    } else {
-      if (file_name[0] == 0) {
-        sts = xhelpnav->help(
-            link, bookmark, navh_eHelpFile_Base, NULL, 1, true);
-        if (EVEN(sts))
-          sts = xhelpnav->help(
-              link, bookmark, navh_eHelpFile_Project, NULL, 1, true);
-      } else
-        sts = xhelpnav->help(
-            link, bookmark, navh_eHelpFile_Other, file_name, 1, true);
+    }
+    else
+    {
+      doubleclick_action_helper_func(xhelpnav, sts, link, bookmark, file_name);
     }
   }
   return 1;
+}
+
+void handleError(CoXHelpNav* xhelpnav, int sts, char temp_file_name[80],
+                 std::optional<ErrorLog> error_optional_log)
+{
+  if (EVEN(sts))
+  {
+    char msg[256];
+    char error_msg[336];
+    errh_GetError(sts, msg, sizeof(msg));
+    sprintf(error_msg, "Error: %s. File:%s", msg, temp_file_name);
+
+    if (xhelpnav->utility == xhelp_eUtility_Xtt)
+    {
+      xhelpnav->message('E', error_msg);
+      ((CoXHelp*)xhelpnav->parent_ctx)->status_message('E', error_msg);
+    }
+    else if (xhelpnav->utility == xhelp_eUtility_Wtt)
+    {
+      MsgWindow::message('E', error_msg, msgw_ePop_Yes);
+      ((CoXHelp*)xhelpnav->parent_ctx)->status_message('E', error_msg);
+    }
+
+    if (error_optional_log && !error_optional_log->log_map.empty())
+    {
+      for (const auto& outerEntry : error_optional_log->log_map)
+      {
+        printf("Error(s) in following file: %s \n", outerEntry.first.c_str());
+        for (const auto& innerEntry : outerEntry.second.place_map)
+        {
+          for (const auto& innerInnerEntry : innerEntry.second.reason_map)
+          {
+            char temp_error_msg[256];
+            errh_GetError(innerInnerEntry.second, temp_error_msg, sizeof(temp_error_msg));
+            printf("Error: %s in line number: %d. Line: %s \n", temp_error_msg, innerEntry.first,
+                   innerInnerEntry.first.c_str());
+          }
+        }
+      }
+    }
+    else
+    {
+      printf("Error log is empty! \n");
+    }
+  }
+}
+
+void doubleclick_action_helper_func(CoXHelpNav* xhelpnav, int sts, char* link, char* bookmark,
+                                    char* file_name)
+{
+  char temp_file_name[80];
+  std::optional<ErrorLog> error_optional_log;
+
+  if (file_name[0] == 0)
+  {
+    temp_file_name[0] = '\0';
+    sts = xhelpnav->help(link, bookmark, navh_eHelpFile_Base, NULL, 1, true, &error_optional_log);
+    if (EVEN(sts))
+      sts = xhelpnav->help(link, bookmark, navh_eHelpFile_Project, NULL, 1, true, &error_optional_log);
+  }
+  else
+  {
+    sts = xhelpnav->help(link, bookmark, navh_eHelpFile_Other, file_name, 1, true, &error_optional_log);
+    sprintf(temp_file_name, " %s", file_name);
+  }
+
+  handleError(xhelpnav, sts, temp_file_name, error_optional_log);
 }
 
 static void trim(char* str)
@@ -920,7 +947,8 @@ static void trim(char* str)
     return;
 
   unsigned char* s = (unsigned char*)str;
-  while (*s) {
+  while (*s)
+  {
     if (*s < ' ')
       *s = ' ';
     s++;
@@ -928,15 +956,15 @@ static void trim(char* str)
 }
 
 /*************************************************************************
-*
-* Name:		help()
-*
-**************************************************************************/
+ *
+ * Name:		help()
+ *
+ **************************************************************************/
 
-static void* xhelpnav_help_insert_cb(void* ctx, navh_eItemType item_type,
-    const char* text1, const char* text2, const char* text3, const char* link,
-    const char* bookmark, const char* file_name, navh_eHelpFile file_type,
-    int help_index, const char* bm, int coding)
+static void* xhelpnav_help_insert_cb(void* ctx, navh_eItemType item_type, const char* text1,
+                                     const char* text2, const char* text3, const char* link,
+                                     const char* bookmark, const char* file_name, navh_eHelpFile file_type,
+                                     int help_index, const char* bm, int coding)
 {
   CoXHelpNav* xhelpnav = (CoXHelpNav*)ctx;
   char* llink = 0;
@@ -949,113 +977,128 @@ static void* xhelpnav_help_insert_cb(void* ctx, navh_eItemType item_type,
   else if (link)
     llink = (char*)link;
 
-  if (xhelpnav->init_help == 1) {
+  if (xhelpnav->init_help == 1)
+  {
     xhelpnav->brow_pop();
     brow_SetNodraw(xhelpnav->brow->ctx);
     brow_SetTextCoding(xhelpnav->brow->ctx, (flow_eTextCoding)coding);
     xhelpnav->init_help = 0;
-  } else if (xhelpnav->init_help == 2) {
+  }
+  else if (xhelpnav->init_help == 2)
+  {
     brow_SetTextCoding(xhelpnav->brow->ctx, (flow_eTextCoding)coding);
     xhelpnav->init_help = 0;
   }
 
-  switch (item_type) {
+  switch (item_type)
+  {
   case navh_eItemType_Help:
-  case navh_eItemType_HelpCode: {
-    if (text1) {
+  case navh_eItemType_HelpCode:
+  {
+    if (text1)
+    {
       t1 = (char*)calloc(1, strlen(text1) + 1);
       strcpy(t1, text1);
       trim(t1);
     }
-    if (text2) {
+    if (text2)
+    {
       t2 = (char*)calloc(1, strlen(text2) + 1);
       strcpy(t2, text2);
       trim(t2);
     }
-    if (text3) {
+    if (text3)
+    {
       t3 = (char*)calloc(1, strlen(text3) + 1);
       strcpy(t3, text3);
       trim(t3);
     }
-    HItemHelp* item = new HItemHelp(xhelpnav->brow, "help", t1, t2, t3, llink,
-        bookmark, file_name, file_type, help_index, NULL, flow_eDest_IntoLast);
+    HItemHelp* item = new HItemHelp(xhelpnav->brow, "help", t1, t2, t3, llink, bookmark, file_name, file_type,
+                                    help_index, NULL, flow_eDest_IntoLast);
     free(t1);
     free(t2);
     free(t3);
     return item->node;
   }
-  case navh_eItemType_HelpBold: {
-    if (text1) {
+  case navh_eItemType_HelpBold:
+  {
+    if (text1)
+    {
       t1 = (char*)calloc(1, strlen(text1) + 1);
       strcpy(t1, text1);
       trim(t1);
     }
-    if (text2) {
+    if (text2)
+    {
       t2 = (char*)calloc(1, strlen(text2) + 1);
       strcpy(t2, text2);
       trim(t2);
     }
-    if (text3) {
+    if (text3)
+    {
       t3 = (char*)calloc(1, strlen(text3) + 1);
       strcpy(t3, text3);
       trim(t3);
     }
-    HItemHelpBold* item
-        = new HItemHelpBold(xhelpnav->brow, "help", t1, t2, t3, llink, bookmark,
-            file_name, file_type, help_index, NULL, flow_eDest_IntoLast);
+    HItemHelpBold* item = new HItemHelpBold(xhelpnav->brow, "help", t1, t2, t3, llink, bookmark, file_name,
+                                            file_type, help_index, NULL, flow_eDest_IntoLast);
     free(t1);
     free(t2);
     free(t3);
     return item->node;
   }
-  case navh_eItemType_HelpHeader: {
-    if (text1) {
+  case navh_eItemType_HelpHeader:
+  {
+    if (text1)
+    {
       t1 = (char*)calloc(1, strlen(text1) + 1);
       strcpy(t1, text1);
       trim(t1);
     }
-    HItemHelpHeader* item = new HItemHelpHeader(xhelpnav->brow, "help", t1,
-        xhelpnav->brow_cnt == 1, NULL, flow_eDest_IntoLast);
+    HItemHelpHeader* item =
+        new HItemHelpHeader(xhelpnav->brow, "help", t1, xhelpnav->brow_cnt == 1, NULL, flow_eDest_IntoLast);
     free(t1);
     return item->node;
   }
-  case navh_eItemType_Header: {
-    if (text1) {
+  case navh_eItemType_Header:
+  {
+    if (text1)
+    {
       t1 = (char*)calloc(1, strlen(text1) + 1);
       strcpy(t1, text1);
       trim(t1);
     }
-    HItemHeader* item = new HItemHeader(
-        xhelpnav->brow, "help", t1, NULL, flow_eDest_IntoLast);
+    HItemHeader* item = new HItemHeader(xhelpnav->brow, "help", t1, NULL, flow_eDest_IntoLast);
     free(t1);
     return item->node;
   }
-  case navh_eItemType_HeaderLarge: {
-    if (text1) {
+  case navh_eItemType_HeaderLarge:
+  {
+    if (text1)
+    {
       t1 = (char*)calloc(1, strlen(text1) + 1);
       strcpy(t1, text1);
       trim(t1);
     }
-    HItemHeaderLarge* item = new HItemHeaderLarge(
-        xhelpnav->brow, "help", t1, NULL, flow_eDest_IntoLast);
+    HItemHeaderLarge* item = new HItemHeaderLarge(xhelpnav->brow, "help", t1, NULL, flow_eDest_IntoLast);
     free(t1);
     return item->node;
   }
-  case navh_eItemType_HorizontalLine: {
-    HItemHelpLine* item
-        = new HItemHelpLine(xhelpnav->brow, "help", NULL, flow_eDest_IntoLast);
+  case navh_eItemType_HorizontalLine:
+  {
+    HItemHelpLine* item = new HItemHelpLine(xhelpnav->brow, "help", NULL, flow_eDest_IntoLast);
     return item->node;
   }
-  case navh_eItemType_Image: {
+  case navh_eItemType_Image:
+  {
     brow_tNodeClass nc;
 
-    brow_CreateNodeClass(
-        xhelpnav->brow->ctx, "Image", flow_eNodeGroup_Common, &nc);
+    brow_CreateNodeClass(xhelpnav->brow->ctx, "Image", flow_eNodeGroup_Common, &nc);
     brow_AddFrame(nc, 0, 0, 20, 0.8, flow_eDrawType_LineGray, -1, 1);
     brow_AddAnnotPixmap(nc, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
     brow_AddImage(nc, text1, 2, 0);
-    HItemHelpImage* item = new HItemHelpImage(xhelpnav->brow, "help", nc, llink,
-        bookmark, file_name, file_type, NULL, flow_eDest_IntoLast);
+    HItemHelpImage* item = new HItemHelpImage(xhelpnav->brow, "help", nc, llink, bookmark, file_name,
+                                              file_type, NULL, flow_eDest_IntoLast);
     return item->node;
   }
   default:
@@ -1063,22 +1106,21 @@ static void* xhelpnav_help_insert_cb(void* ctx, navh_eItemType item_type,
   }
 }
 
-int CoXHelpNav::help(const char* help_key, const char* help_bookmark,
-    navh_eHelpFile file_type, const char* file_name, int pop, bool strict)
+int CoXHelpNav::help(const char* help_key, const char* help_bookmark, navh_eHelpFile file_type,
+                     const char* file_name, int pop, bool strict, std::optional<ErrorLog>* error_log)
 {
   int sts;
   brow_tNode bookmark_node;
   brow_tNode prev, first;
   NavHelp* navhelp;
 
-  switch (utility) {
+  switch (utility)
+  {
   case xhelp_eUtility_Xtt:
-    navhelp
-        = new NavHelp((void*)this, xhelp_cFile_BaseXtt, xhelp_cFile_Project);
+    navhelp = new NavHelp((void*)this, xhelp_cFile_BaseXtt, xhelp_cFile_Project);
     break;
   case xhelp_eUtility_Wtt:
-    navhelp
-        = new NavHelp((void*)this, xhelp_cFile_BaseWtt, xhelp_cFile_Project);
+    navhelp = new NavHelp((void*)this, xhelp_cFile_BaseWtt, xhelp_cFile_Project);
     break;
   default:
     return 0;
@@ -1087,14 +1129,52 @@ int CoXHelpNav::help(const char* help_key, const char* help_bookmark,
 
   if (pop)
     init_help = 1;
-  else {
+  else
+  {
     init_help = 2;
     brow_SetNodraw(brow->ctx);
   }
-  sts = navhelp->help(
-      help_key, help_bookmark, file_type, file_name, &bookmark_node, strict);
-  if (EVEN(sts)) {
-    if (!pop || (pop && init_help != 1)) {
+
+  // the if statement needs to be used so that we dont go below brow_cnt 0.
+  // if 1, then it should return base project name.
+  char* previous_filename;
+  navh_eHelpFile previous_filetype;
+  if (brow_cnt >= 1)
+  {
+    if (strcmp(brow_stack[brow_cnt - 1]->current_filename, ""))
+    {
+      previous_filename = brow_stack[brow_cnt - 1]->current_filename;
+      previous_filetype = brow_stack[brow_cnt - 1]->current_filetype;
+    }
+    else
+    {
+      previous_filename = navhelp->project_file;
+      previous_filetype = navh_eHelpFile_Project;
+    }
+  }
+  else
+  {
+    previous_filename = navhelp->project_file;
+    previous_filetype = navh_eHelpFile_Project;
+  }
+
+  if (error_log)
+  {
+    std::tie(sts, *error_log) =
+        navhelp->help_with_status(help_key, help_bookmark, file_type, file_name, &bookmark_node, strict,
+                                  previous_filename, previous_filetype);
+  }
+  else
+  {
+    auto result = navhelp->help_with_status(help_key, help_bookmark, file_type, file_name, &bookmark_node,
+                                            strict, previous_filename, previous_filetype);
+    sts = result.first;
+  }
+
+  if (EVEN(sts))
+  {
+    if (!pop || (pop && init_help != 1))
+    {
       brow_push();
       brow_ResetNodraw(brow->ctx);
     }
@@ -1103,24 +1183,27 @@ int CoXHelpNav::help(const char* help_key, const char* help_bookmark,
 
   brow_ResetNodraw(brow->ctx);
   brow_Redraw(brow->ctx, 0);
-  if (bookmark_node) {
+  if (bookmark_node)
+  {
     brow_CenterObject(brow->ctx, bookmark_node, 0.0);
     sts = brow_GetPrevious(brow->ctx, bookmark_node, &prev);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       brow_SelectClear(brow->ctx);
       brow_SetInverse(prev, 1);
       brow_SelectInsert(brow->ctx, prev);
     }
-  } else {
+  }
+  else
+  {
     sts = brow_GetFirst(brow->ctx, &first);
     if (ODD(sts))
       brow_CenterObject(brow->ctx, first, 0.0);
   }
-  strncpy(brow_stack[brow_cnt - 1]->current_key, help_key,
-      sizeof(brow_stack[brow_cnt - 1]->current_key));
+  strncpy(brow_stack[brow_cnt - 1]->current_key, help_key, sizeof(brow_stack[brow_cnt - 1]->current_key));
   if (file_name)
     strncpy(brow_stack[brow_cnt - 1]->current_filename, file_name,
-        sizeof(brow_stack[brow_cnt - 1]->current_filename));
+            sizeof(brow_stack[brow_cnt - 1]->current_filename));
   else
     strcpy(brow_stack[brow_cnt - 1]->current_filename, "");
   brow_stack[brow_cnt - 1]->current_filetype = file_type;
@@ -1128,6 +1211,13 @@ int CoXHelpNav::help(const char* help_key, const char* help_bookmark,
   delete navhelp;
 
   return 1;
+}
+
+void CoXHelpNav::message(char sev, char* text)
+{
+  errh_eAnix test_Anix = errh_eNAnix;
+  errh_Init("help", test_Anix);
+  errh_Error(text);
 }
 
 int CoXHelpNav::home()
@@ -1139,20 +1229,14 @@ int CoXHelpNav::home()
   current_filetype = brow_stack[0]->current_filetype;
 
   if (current_filetype == navh_eHelpFile_Other)
-    strncpy(current_filename, brow_stack[0]->current_filename,
-        sizeof(current_filename));
+    strncpy(current_filename, brow_stack[0]->current_filename, sizeof(current_filename));
 
-  // if ( current_filetype == navh_eHelpFile_Other)
-  //  current_filetype = navh_eHelpFile_Project;
-
-  if (current_filetype
-      == navh_eHelpFile_Base /*&& utility == xhelp_eUtility_Xtt*/)
+  if (current_filetype == navh_eHelpFile_Base)
     strcpy(topic, "overview");
 
   brow_push_all();
   clear();
-  help(topic, 0, current_filetype,
-      current_filename[0] == 0 ? 0 : current_filename, 0, 0);
+  help(topic, 0, current_filetype, current_filename[0] == 0 ? 0 : current_filename, 0, 0);
   return 1;
 }
 
@@ -1172,32 +1256,32 @@ int CoXHelpNav::next_topic()
   pwr_tFileName current_filename;
 
   current_filetype = brow_stack[brow_cnt - 1]->current_filetype;
-  strncpy(
-      current_key, brow_stack[brow_cnt - 1]->current_key, sizeof(current_key));
-  strncpy(current_filename, brow_stack[brow_cnt - 1]->current_filename,
-      sizeof(current_filename));
+  strncpy(current_key, brow_stack[brow_cnt - 1]->current_key, sizeof(current_key));
+  strncpy(current_filename, brow_stack[brow_cnt - 1]->current_filename, sizeof(current_filename));
 
-  switch (utility) {
+  switch (utility)
+  {
   case xhelp_eUtility_Xtt:
-    navhelp
-        = new NavHelp((void*)this, xhelp_cFile_BaseXtt, xhelp_cFile_Project);
+    navhelp = new NavHelp((void*)this, xhelp_cFile_BaseXtt, xhelp_cFile_Project);
     break;
   case xhelp_eUtility_Wtt:
-    navhelp
-        = new NavHelp((void*)this, xhelp_cFile_BaseWtt, xhelp_cFile_Project);
+    navhelp = new NavHelp((void*)this, xhelp_cFile_BaseWtt, xhelp_cFile_Project);
     break;
   default:
     return 0;
   }
 
-  sts = navhelp->get_next_key(current_key, current_filetype,
-      current_filename[0] == 0 ? 0 : current_filename, 1, next_key);
+  sts = navhelp->get_next_key(current_key, current_filetype, current_filename[0] == 0 ? 0 : current_filename,
+                              1, next_key);
   delete navhelp;
-  if (ODD(sts)) {
+
+  if (ODD(sts))
+  {
     brow_push();
-    sts = help(next_key, 0, current_filetype,
-        current_filename[0] == 0 ? 0 : current_filename, 1, 1);
+    sts = help(next_key, 0, current_filetype, current_filename[0] == 0 ? 0 : current_filename, 1, 1);
   }
+
+  handleError(this, sts, current_filename, std::nullopt);
   return sts;
 }
 
@@ -1211,57 +1295,52 @@ int CoXHelpNav::previous_topic()
   pwr_tFileName current_filename;
 
   current_filetype = brow_stack[brow_cnt - 1]->current_filetype;
-  strncpy(
-      current_key, brow_stack[brow_cnt - 1]->current_key, sizeof(current_key));
-  strncpy(current_filename, brow_stack[brow_cnt - 1]->current_filename,
-      sizeof(current_filename));
+  strncpy(current_key, brow_stack[brow_cnt - 1]->current_key, sizeof(current_key));
+  strncpy(current_filename, brow_stack[brow_cnt - 1]->current_filename, sizeof(current_filename));
 
-  switch (utility) {
+  switch (utility)
+  {
   case xhelp_eUtility_Xtt:
-    navhelp
-        = new NavHelp((void*)this, xhelp_cFile_BaseXtt, xhelp_cFile_Project);
+    navhelp = new NavHelp((void*)this, xhelp_cFile_BaseXtt, xhelp_cFile_Project);
     break;
   case xhelp_eUtility_Wtt:
-    navhelp
-        = new NavHelp((void*)this, xhelp_cFile_BaseWtt, xhelp_cFile_Project);
+    navhelp = new NavHelp((void*)this, xhelp_cFile_BaseWtt, xhelp_cFile_Project);
     break;
   default:
     return 0;
   }
 
   sts = navhelp->get_previous_key(current_key, current_filetype,
-      current_filename[0] == 0 ? 0 : current_filename, 1, prev_key);
+                                  current_filename[0] == 0 ? 0 : current_filename, 1, prev_key);
   delete navhelp;
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     brow_push();
-    sts = help(prev_key, 0, current_filetype,
-        current_filename[0] == 0 ? 0 : current_filename, 1, 1);
+    sts = help(prev_key, 0, current_filetype, current_filename[0] == 0 ? 0 : current_filename, 1, 1);
   }
   return sts;
 }
 
 /*************************************************************************
-*
-* Name:		help_index()
-*
-**************************************************************************/
+ *
+ * Name:		help_index()
+ *
+ **************************************************************************/
 
-int CoXHelpNav::help_index(
-    navh_eHelpFile file_type, const char* file_name, int pop)
+int CoXHelpNav::help_index(navh_eHelpFile file_type, const char* file_name, int pop)
 {
   int sts;
   brow_tObject* object_list;
   int object_cnt;
   NavHelp* navhelp;
 
-  switch (utility) {
+  switch (utility)
+  {
   case xhelp_eUtility_Xtt:
-    navhelp
-        = new NavHelp((void*)this, xhelp_cFile_BaseXtt, xhelp_cFile_Project);
+    navhelp = new NavHelp((void*)this, xhelp_cFile_BaseXtt, xhelp_cFile_Project);
     break;
   case xhelp_eUtility_Wtt:
-    navhelp
-        = new NavHelp((void*)this, xhelp_cFile_BaseWtt, xhelp_cFile_Project);
+    navhelp = new NavHelp((void*)this, xhelp_cFile_BaseWtt, xhelp_cFile_Project);
     break;
   default:
     return 0;
@@ -1271,10 +1350,9 @@ int CoXHelpNav::help_index(
   if (pop)
     brow_pop();
   brow_SetNodraw(brow->ctx);
-  new HItemHelpHeader(
-      brow, "help_index", "Index", brow_cnt == 1, NULL, flow_eDest_IntoLast);
-  new HItemHelp(brow, "help_index", "", "", "", "", "", NULL,
-      navh_eHelpFile_Base, 0, NULL, flow_eDest_IntoLast);
+  new HItemHelpHeader(brow, "help_index", "Index", brow_cnt == 1, NULL, flow_eDest_IntoLast);
+  new HItemHelp(brow, "help_index", "", "", "", "", "", NULL, navh_eHelpFile_Base, 0, NULL,
+                flow_eDest_IntoLast);
 
   sts = navhelp->help_index(file_type, file_name);
 

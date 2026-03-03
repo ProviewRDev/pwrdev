@@ -58,7 +58,7 @@
 #include "rt_io_msg.h"
 #include "rt_io_pnak_locals.h"
 #include "rt_pb_msg.h"
-#include "rt_profinet.h"
+#include "profinet.h"
 #include "rt_pn_iface.h"
 
 #include "rt_mh_appl.h"
@@ -272,6 +272,53 @@ void pack_read_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, unsigned short device_
   pRR->LengthLowByte = _PN_U16_LOW_BYTE(read_request->Length);
 }
 
+void pack_read_im0_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, unsigned short device_ref)
+{
+  unsigned offset = 0u;
+
+  T_PNAK_SERVICE_DESCRIPTION* service_desc;
+  T_PN_SERVICE_READ_REQ* pRR;
+
+  memset(ServiceReqRes, 0, sizeof(T_PNAK_SERVICE_REQ_RES));
+  ServiceReqRes->NumberEntries = 1;
+  ServiceReqRes->ServiceEntry[0].ServiceOffset = 0;
+
+  service_desc = (T_PNAK_SERVICE_DESCRIPTION*)&ServiceReqRes->ServiceChannel[offset];
+
+  service_desc->DeviceRef = device_ref;
+  service_desc->Instance = PN_CONTROLLER;
+  service_desc->Service = PN_SERVICE_READ;
+  service_desc->Primitive = PNAK_SERVICE_REQ;
+  service_desc->ClientId = 1; // Use ClientId 1 to identify IM0 read
+  service_desc->InvokeId = 0;
+  service_desc->DataLength = sizeof(T_PN_SERVICE_READ_REQ);
+
+  pRR = (T_PN_SERVICE_READ_REQ*)(service_desc + 1);
+
+  pRR->VersionHighByte = 1;
+  pRR->VersionLowByte = 0;
+
+  // API = 0 (default API)
+  pRR->APIHighWordHighByte = 0;
+  pRR->APIHighWordLowByte = 0;
+  pRR->APILowWordHighByte = 0;
+  pRR->APILowWordLowByte = 0;
+
+  // Slot 0, Subslot 1 (DAP subslot for IM0)
+  pRR->SlotNumberHighByte = _PN_U16_HIGH_BYTE(0u);
+  pRR->SlotNumberLowByte = _PN_U16_LOW_BYTE(0u);
+  pRR->SubSlotNumberHighByte = _PN_U16_HIGH_BYTE(1u);
+  pRR->SubSlotNumberLowByte = _PN_U16_LOW_BYTE(1u);
+
+  // Index for I&M0 = 0xAFF0
+  pRR->IndexHighByte = _PN_U16_HIGH_BYTE(PROFINET_INDEX_IDENT_AND_MAINTENANCE_0);
+  pRR->IndexLowByte = _PN_U16_LOW_BYTE(PROFINET_INDEX_IDENT_AND_MAINTENANCE_0);
+
+  // Length of T_PROFINET_IDENT_MAINTENANCE
+  pRR->LengthHighByte = _PN_U16_HIGH_BYTE(sizeof(T_PROFINET_IDENT_MAINTENANCE));
+  pRR->LengthLowByte = _PN_U16_LOW_BYTE(sizeof(T_PROFINET_IDENT_MAINTENANCE));
+}
+
 void pack_write_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, unsigned short device_ref,
                     pwr_sClass_PnWriteReq* wr_req)
 {
@@ -443,13 +490,13 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, std::shared_ptr<Pr
   num_apis = pn_device->m_API_map.size();
 
   /* Calculate the rest */
-  for (auto const& slot : pn_device->m_slot_list)
+  for (auto& slot : pn_device->m_slot_map)
   {
     // Skip empty slots
-    if (slot.m_module_ID == "")
+    if (slot.second.m_module_ID == "")
       continue;
 
-    for (auto const& subslot : slot.m_subslot_map)
+    for (auto const& subslot : slot.second.m_subslot_map)
     {
       // Skip unconfigured subslots...
       if (subslot.second.m_submodule_ID == "")
@@ -462,8 +509,13 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, std::shared_ptr<Pr
         data_record_length += data_record.second.m_data_length;
       }
     }
+
     // Count modules
     num_modules++;
+
+    // "Plug" the module into our runtime modules
+    pn_device->m_rt_plugged_slots_map.insert(
+        std::make_pair(slot.second.m_slot_number, std::ref(slot.second)));
   }
 
   pData = (char*)(service_desc + 1);
@@ -716,14 +768,25 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, std::shared_ptr<Pr
     pAPI->NumberOfModulesLowByte = _PN_U16_LOW_BYTE(api.second.m_module_ref.size());
 
     /* Fill references to Modules */
-
     pModuleReference = (T_PN_REFERENCE*)(pAPI + 1);
 
-    for (unsigned int index : api.second.m_module_ref)
+    for (unsigned int slot_number : api.second.m_module_ref)
     {
+      size_t module_index = 0;
+      // Maps are associative by design so we iterate over the map to get the index of the module
+      // we are looking for
+      for (auto it = pn_device->m_rt_plugged_slots_map.begin(); it != pn_device->m_rt_plugged_slots_map.end();
+           ++it, ++module_index)
+      {
+        if (it->first == slot_number)
+        {
+          break;
+        }
+      }
+
       total_data_length += sizeof(T_PN_REFERENCE);
-      pModuleReference->ReferenceHighByte = _PN_U16_HIGH_BYTE(index);
-      pModuleReference->ReferenceLowByte = _PN_U16_LOW_BYTE(index);
+      pModuleReference->ReferenceHighByte = _PN_U16_HIGH_BYTE(module_index);
+      pModuleReference->ReferenceLowByte = _PN_U16_LOW_BYTE(module_index);
       pModuleReference++;
     }
 
@@ -734,11 +797,11 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, std::shared_ptr<Pr
 
   pModule = (T_PN_MODULE*)pAPI;
 
-  for (auto& slot : pn_device->m_slot_list)
+  // Iterate over the plugged slots (that is the modules plugged into the slots :) ) and fill the data for the
+  // modules
+  for (auto const& plugged_module : pn_device->m_rt_plugged_slots_map)
   {
-    // Skip empty slot
-    if (slot.m_module_ID == "")
-      continue;
+    const ProfinetSlot& slot = plugged_module.second.get(); // Access the ProfinetSlot object
 
     total_data_length += sizeof(T_PN_MODULE);
     /* Fill data for MODULE */
@@ -760,6 +823,10 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, std::shared_ptr<Pr
 
     for (auto& subslot : slot.m_subslot_map)
     {
+      // Skip empty subslots here aswell
+      if (subslot.second.m_submodule_ID == "")
+        continue;
+
       total_data_length += sizeof(T_PN_SUBMODULE);
       /* Fill data for the submodule */
 
@@ -802,14 +869,18 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, std::shared_ptr<Pr
   /* Fill the DATA_RECORD's */
   pDataRecord = (T_PN_DATA_RECORD*)pModule;
 
-  for (auto& slot : pn_device->m_slot_list)
+  for (auto& slot : pn_device->m_slot_map)
   {
     // Skip empty slot
-    if (slot.m_module_ID == "")
+    if (slot.second.m_module_ID == "")
       continue;
 
-    for (auto& subslot : slot.m_subslot_map)
+    for (auto& subslot : slot.second.m_subslot_map)
     {
+      // Skip unconfigured subslots...
+      if (subslot.second.m_submodule_ID == "")
+        continue;
+
       for (auto& data_record : subslot.second.m_data_record_map)
       {
         total_data_length += sizeof(T_PN_DATA_RECORD) + data_record.second.m_data_length;
@@ -996,6 +1067,107 @@ int unpack_read_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local)
     error_con->Detail = pErrorCon->Detail;
     error_con->AdditionalDetail = pErrorCon->AdditionalDetail;
     error_con->AreaCode = pErrorCon->AreaCode;
+  }
+
+  return -1;
+}
+
+int unpack_read_im0_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local, io_sAgent* ap)
+{
+  int i;
+  io_sRack* slave_list;
+  pwr_sClass_PnDevice* dev = NULL;
+  unsigned short device_ref = pSdb->DeviceRef;
+  std::shared_ptr<ProfinetDevice> pn_device;
+
+  if (!ap)
+  {
+    errh_Warning("PROFINET: No valid agent pointer while unpacking IM0 read con "
+                 "for device %d",
+                 device_ref);
+    return PNAK_OK;
+  }
+
+  // Find device in agent rack. Start iterating on 1 since 0 is our "station".
+  for (slave_list = ap->racklist, i = 1; slave_list != NULL; slave_list = slave_list->next, i++)
+  {
+    if (local->device_list[i]->m_rt_device_ref == device_ref)
+    {
+      dev = (pwr_sClass_PnDevice*)slave_list->op;
+      pn_device = local->device_list[i];
+      break;
+    }
+  }
+
+  if (!dev)
+  {
+    errh_Warning("PROFINET: No device found for IM0 read, device reference %d", device_ref);
+    return PNAK_OK;
+  }
+
+  if (pSdb->Result == PNAK_RESULT_POS)
+  {
+    T_PN_SERVICE_READ_CON* pReadCon = (T_PN_SERVICE_READ_CON*)(pSdb + 1);
+    PN_U16 length = _HIGH_LOW_BYTES_TO_PN_U16(pReadCon->LengthHighByte, pReadCon->LengthLowByte);
+
+    if (length >= sizeof(T_PROFINET_IDENT_MAINTENANCE))
+    {
+      T_PROFINET_IDENT_MAINTENANCE* pIM0 = (T_PROFINET_IDENT_MAINTENANCE*)(pReadCon + 1);
+
+      // Fill in the IM0 structure in the PnDevice
+      pwr_sClass_IM0* im0 = &dev->IM.IM0;
+
+      im0->BlockType = _HIGH_LOW_BYTES_TO_PN_U16(pIM0->Header.TypeHighByte, pIM0->Header.TypeLowByte);
+      im0->BlockLength = _HIGH_LOW_BYTES_TO_PN_U16(pIM0->Header.LengthHighByte, pIM0->Header.LengthLowByte);
+      im0->BlockVersionHighByte = pIM0->Header.VersionHighByte;
+      im0->BlockVersionLowByte = pIM0->Header.VersionLowByte;
+
+      im0->ManufacturerID = _HIGH_LOW_BYTES_TO_PN_U16(pIM0->VendorIdHighByte, pIM0->VendorIdLowByte);
+
+      // Copy OrderId (20 bytes, null-terminate)
+      memcpy(im0->OrderNo, pIM0->OrderId, PROFINET_IDENT_MAINTENANCE_ORDER_ID_LENGTH);
+
+      // Copy SerialNumber (16 bytes, null-terminate)
+      memcpy(im0->SerialNo, pIM0->SerialNumber, PROFINET_IDENT_MAINTENANCE_SR_NUMBER_LENGTH);
+
+      im0->HardwareRevision = _HIGH_LOW_BYTES_TO_PN_U16(pIM0->HwRevisionHighByte, pIM0->HwRevisionLowByte);
+
+      // Software revision is stored as 4 bytes: prefix (V/R/P/U/T) + major + minor + patch
+      im0->SoftwareRevision[0] = pIM0->SwRevisionHighWordHighByte;
+      im0->SoftwareRevision[1] = pIM0->SwRevisionHighWordLowByte;
+      im0->SoftwareRevision[2] = pIM0->SwRevisionLowWordHighByte;
+      im0->SoftwareRevision[3] = pIM0->SwRevisionLowWordLowByte;
+
+      im0->RevisionStatus =
+          _HIGH_LOW_BYTES_TO_PN_U16(pIM0->RevisionCounterHighByte, pIM0->RevisionCounterLowByte);
+
+      im0->ProfileID = _HIGH_LOW_BYTES_TO_PN_U16(pIM0->ProfileIdHighByte, pIM0->ProfileIdLowByte);
+
+      im0->ProfileSpecificType =
+          _HIGH_LOW_BYTES_TO_PN_U16(pIM0->ProfileTypeHighByte, pIM0->ProfileTypeLowByte);
+
+      im0->IMVersion = _HIGH_LOW_BYTES_TO_PN_U16(pIM0->VersionHighByte, pIM0->VersionLowByte);
+
+      im0->IMSupport = _HIGH_LOW_BYTES_TO_PN_U16(pIM0->SupportedHighByte, pIM0->SupportedLowByte);
+
+      // Mark IM0 as read for this device
+      pn_device->m_rt_im0_read = true;
+
+      errh_Info("PROFINET: IM0 read successfully for device %s, ManufacturerID: 0x%04X, OrderNo: %.20s",
+                slave_list->Name, im0->ManufacturerID, im0->OrderNo);
+    }
+    else
+    {
+      errh_Warning("PROFINET: IM0 read returned insufficient data length %d for device %d", length,
+                   device_ref);
+    }
+
+    return PNAK_OK;
+  }
+  else if (pSdb->Result == PNAK_RESULT_NEG)
+  {
+    T_PN_SERVICE_ERROR_CON* pErrorCon = (T_PN_SERVICE_ERROR_CON*)(pSdb + 1);
+    print_error_con(pErrorCon, device_ref, __FILE__, __LINE__, "unpack_read_im0_con()");
   }
 
   return -1;
@@ -1240,7 +1412,7 @@ int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local
           pwr_tOName dev_name; // The name/path of the device that generated
                                // the alarm
           char data_str[250];  // If we have a data payload available we store it in hex format as a string
-          std::ostringstream event_text_str, event_more_text_str;
+          std::ostringstream event_text_stream, event_more_text_stream, log_text_stream;
 
           gdh_ObjidToName(dev_objid, dev_name, sizeof(dev_name), cdh_mName_pathStrict);
 
@@ -1248,29 +1420,32 @@ int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local
           for (int dlength = 0; dlength < data_length; dlength++)
             sprintf(&data_str[dlength * 2], "%02X", *(data.raw_data + dlength));
 
-          event_text_str << "PROFINET: ";
+          event_text_stream << "PROFINET: ";
           // Diagnostics
           if (alarm->Type & PROFINET_ALARM_DIAGNOSIS_APPEARS)
           {
-            event_text_str << "[++Diagnostics]";
+            event_text_stream << "DIAG APPEAR ";
+            log_text_stream << "DIAGNOSIS APPEARS ";
           }
           else if (alarm->Type & PROFINET_ALARM_DIAGNOSIS_DISAPPEARS)
           {
-            event_text_str << "[--Diagnostics]";
+            event_text_stream << "DIAG CLEARED ";
+            log_text_stream << "DIAGNOSIS DISAPPEARS ";
           }
           // Treat everything else as an "alarm"?
           else
           {
-            event_text_str << "[Alarm]";
+            event_text_stream << "ALARM ";
+            log_text_stream << "ALARM ";
           }
 
           // Add prio if available...
-          if (alarm->Prio == pwr_ePnAlarmPrioEnum_High)
-            event_text_str << "(H)";
-          else if (alarm->Prio == pwr_ePnAlarmPrioEnum_Low)
-            event_text_str << "(L)";
+          // if (alarm->Prio == pwr_ePnAlarmPrioEnum_High)
+          //   event_text_str << "(H)";
+          // else if (alarm->Prio == pwr_ePnAlarmPrioEnum_Low)
+          //   event_text_str << "(L)";
 
-          event_text_str << "{M" << alarm->SlotNumber << ":SM" << alarm->SubslotNumber << "} ";
+          event_text_stream << "M" << alarm->SlotNumber << ":SM" << alarm->SubslotNumber << " ";
 
           // If we have data we can try to generate a more detailed message
           if (data_length > 0)
@@ -1283,8 +1458,8 @@ int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local
             // Do we have any errors of this type saved in our device?
             if (device_channel_diag_map->count(error_type))
             {
-              event_text_str << device_channel_diag_map->at(error_type).m_name;
-              event_more_text_str << device_channel_diag_map->at(error_type).m_help;
+              event_text_stream << device_channel_diag_map->at(error_type).m_name;
+              event_more_text_stream << device_channel_diag_map->at(error_type).m_help;
 
 #if (pwr_dHost_byteOrder == pwr_dLittleEndian)
               ushort ext_error_type = bswap_16(data.pn_data->ExtChannelErrorType);
@@ -1295,25 +1470,25 @@ int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local
               // Maybe we have extended diagnostics/error strings aswell?
               if (device_channel_diag_map->at(error_type).m_ext_channel_diag_map.count(ext_error_type))
               {
-                event_text_str << " - "
-                               << device_channel_diag_map->at(error_type)
-                                      .m_ext_channel_diag_map.at(ext_error_type)
-                                      .m_name;
-                event_more_text_str << " - "
-                                    << device_channel_diag_map->at(error_type)
-                                           .m_ext_channel_diag_map.at(ext_error_type)
-                                           .m_help;
+                event_text_stream << " - "
+                                  << device_channel_diag_map->at(error_type)
+                                         .m_ext_channel_diag_map.at(ext_error_type)
+                                         .m_name;
+                event_more_text_stream << " - "
+                                       << device_channel_diag_map->at(error_type)
+                                              .m_ext_channel_diag_map.at(ext_error_type)
+                                              .m_help;
               }
             }
             else // No detailed descriptions of this error/diagnostics available. Just print out the data as
                  // is...
             {
-              event_more_text_str << "Data: " << data_str;
+              event_more_text_stream << "Data: " << data_str;
             }
           }
 
-          std::string event_text = event_text_str.str();
-          std::string event_more_text = event_more_text_str.str();
+          std::string event_text = event_text_stream.str();
+          std::string event_more_text = event_more_text_stream.str();
           event_text.resize(sizeof(pwr_tString80) - 1);
           event_more_text.resize(sizeof(pwr_tString256) - 1);
 
@@ -1467,7 +1642,9 @@ int unpack_get_device_state_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal
           // module->RealIdentNumber = ident_number;
 
           // Update "runtime" slot data
-          ProfinetSlot& s = pn_device->m_slot_list.at(slot_number);
+          // auto module_list_index = findSlotIndex(pn_device, slot_number);
+          ProfinetSlot& s = pn_device->m_rt_plugged_slots_map.at(slot_number);
+          // ProfinetSlot& s = pn_device->m_slot_list.at(module_list_index);
           s.m_rt_state = module_state;
           s.m_rt_phys_ident_number = ident_number;
 
@@ -1487,7 +1664,8 @@ int unpack_get_device_state_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal
                                                                pDiffModuleSubslot->StateLowByte);
 
             // Update subslot data
-            ProfinetSubslot& ss = pn_device->m_slot_list.at(slot_number).m_subslot_map.at(subslot_number);
+            ProfinetSubslot& ss =
+                pn_device->m_rt_plugged_slots_map.at(slot_number).get().m_subslot_map.at(subslot_number);
             ss.m_rt_state = submodule_state;
             ss.m_rt_phys_ident_number = ident_number;
           }
@@ -1518,7 +1696,7 @@ int unpack_get_device_state_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal
         for (module_list = slave_list->cardlist; module_list != NULL; module_list = module_list->next)
         {
           module = (pwr_sClass_PnModule*)module_list->op;
-          ProfinetSlot& slot = pn_device->m_slot_list.at(module->Slot);
+          ProfinetSlot& slot = pn_device->m_rt_plugged_slots_map.at(module->Slot).get();
           if (slot.m_rt_phys_ident_number == 0)
           {
             module->State = pwr_ePnModuleStateEnum_OK;
@@ -1622,8 +1800,9 @@ int unpack_download_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local)
           _HIGH_LOW_BYTES_TO_PN_U16(pIOCRInfo->IOCRIdentifierHighByte, pIOCRInfo->IOCRIdentifierLowByte);
       pn_device->m_IOCR_map.at(type).m_rt_io_data_length =
           _HIGH_LOW_BYTES_TO_PN_U16(pIOCRInfo->IODataLengthHighByte, pIOCRInfo->IODataLengthLowByte);
-      pn_device->m_IOCR_map.at(type).m_rt_io_data =
-          (unsigned char*)calloc(1, pn_device->m_IOCR_map.at(type).m_rt_io_data_length);
+      // pn_device->m_IOCR_map.at(type).m_rt_io_data =
+      //     (unsigned char*)calloc(1, pn_device->m_IOCR_map.at(type).m_rt_io_data_length);
+      // pn_device->m_IOCR_map.at(type).m_rt_io_data = (PN_U8*)calloc(1, PROFINET_IO_DATA_MAX_LENGTH);
 
       NumberAPIs = _HIGH_LOW_BYTES_TO_PN_U16(pIOCRInfo->NumberOfAPIsHighByte, pIOCRInfo->NumberOfAPIsLowByte);
 
@@ -1639,12 +1818,12 @@ int unpack_download_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local)
 
         for (IODataIndex = 0u; IODataIndex < NumberIODatas; IODataIndex++)
         {
-          for (auto& slot : pn_device->m_slot_list)
+          for (auto& slot : pn_device->m_slot_map)
           {
-            if (slot.m_slot_number ==
+            if (slot.second.m_slot_number ==
                 _HIGH_LOW_BYTES_TO_PN_U16(pDataInfo->SlotNumberHighByte, pDataInfo->SlotNumberLowByte))
             {
-              for (auto& subslot : slot.m_subslot_map)
+              for (auto& subslot : slot.second.m_subslot_map)
               {
                 if (subslot.second.m_subslot_number ==
                     _HIGH_LOW_BYTES_TO_PN_U16(pDataInfo->SubSlotNumberHighByte,
@@ -1672,12 +1851,12 @@ int unpack_download_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local)
 
         for (IODataIndex = 0u; IODataIndex < NumberIODatas; IODataIndex++)
         {
-          for (auto& slot : pn_device->m_slot_list)
+          for (auto& slot : pn_device->m_slot_map)
           {
-            if (slot.m_slot_number ==
+            if (slot.second.m_slot_number ==
                 _HIGH_LOW_BYTES_TO_PN_U16(pDataInfo->SlotNumberHighByte, pDataInfo->SlotNumberLowByte))
             {
-              for (auto& subslot : slot.m_subslot_map)
+              for (auto& subslot : slot.second.m_subslot_map)
               {
                 if (subslot.second.m_subslot_number ==
                     _HIGH_LOW_BYTES_TO_PN_U16(pDataInfo->SubSlotNumberHighByte,
@@ -1750,7 +1929,15 @@ int handle_service_con(io_sAgentLocal* local, io_sAgent* ap)
         }
         case PN_SERVICE_READ:
         {
-          sts = unpack_read_con(pSdb, local);
+          // ClientId 1 is used for IM0 read requests
+          if (pSdb->ClientId == 1)
+          {
+            sts = unpack_read_im0_con(pSdb, local, ap);
+          }
+          else
+          {
+            sts = unpack_read_con(pSdb, local);
+          }
           break;
         }
 
@@ -1783,7 +1970,7 @@ int handle_service_con(io_sAgentLocal* local, io_sAgent* ap)
         }
         }
       }
-      else if (pSdb->Instance == PN_SUPERVISOR) // Profinet Viewer
+      else if (pSdb->Instance == PN_SUPERVISOR) // Profinet Viewer is a supervisor for instance
       {
         switch (pSdb->Service)
         {
@@ -1897,6 +2084,19 @@ void handle_device_state_changed(io_sAgentLocal* local, io_sAgent* ap)
           {
             sts = wait_service_con(local, ap);
           }
+
+          // Read IM0 data only once when device becomes connected
+          if (!local->device_list[ii]->m_rt_im0_read)
+          {
+            pack_read_im0_req(&local->service_req_res, local->device_list[ii]->m_rt_device_ref);
+
+            sts = pnak_send_service_req_res(0, &local->service_req_res);
+
+            if (sts == PNAK_OK)
+            {
+              sts = wait_service_con(local, ap);
+            }
+          }
         }
       }
     }
@@ -1982,12 +2182,6 @@ void* handle_events(void* ptr)
   T_PNAK_WAIT_OBJECT wait_object;
   int sts;
 
-  // Connect to alarm handling
-  sts = connect_alarm();
-  if EVEN (sts)
-    errh_Warning("PROFINET: Unable to initialize alarm queue. Alarms from this "
-                 "service won't work...");
-
   pwr_sClass_PnControllerSoftingPNAK* op;
   io_sPnRackLocal* r_local;
 
@@ -2006,6 +2200,14 @@ void* handle_events(void* ptr)
   args = (agent_args*)ptr;
   local = (io_sAgentLocal*)args->local;
   ap = args->ap;
+
+  // Connect to alarm handling
+  sts = connect_alarm();
+  if EVEN (sts)
+  {
+    errh_Warning("PROFINET: Unable to initialize alarm queue. Alarms from this "
+                 "service won't work...");
+  }
 
   pthread_mutex_lock(&local->mutex);
 
@@ -2032,6 +2234,22 @@ void* handle_events(void* ptr)
     pn_controller->m_NetworkSettings.m_subnet_mask =
         inet_ntoa(((struct sockaddr_in*)&ifr.ifr_netmask)->sin_addr);
   }
+  if (ioctl(s, SIOCGIFHWADDR, &ifr) == 0)
+  {
+    char mac[6];
+    memcpy(mac, ifr.ifr_hwaddr.sa_data, 6);
+    std::ostringstream mac_stream;
+    mac_stream << std::hex << std::setfill('0') << std::setw(2) << (unsigned int)(unsigned char)mac[0] << ":"
+               << std::setw(2) << (unsigned int)(unsigned char)mac[1] << ":" << std::setw(2)
+               << (unsigned int)(unsigned char)mac[2] << ":" << std::setw(2)
+               << (unsigned int)(unsigned char)mac[3] << ":" << std::setw(2)
+               << (unsigned int)(unsigned char)mac[4] << ":" << std::setw(2)
+               << (unsigned int)(unsigned char)mac[5];
+
+    pn_controller->m_NetworkSettings.m_mac_address = mac_stream.str();
+
+    errh_Info("PROFINET: Using MAC address %s", pn_controller->m_NetworkSettings.m_mac_address.c_str());
+  }
 
   sscanf(pn_controller->m_NetworkSettings.m_ip_address.c_str(), "%hhu.%hhu.%hhu.%hhu",
          &pn_controller->m_rt_ipaddress[3], &pn_controller->m_rt_ipaddress[2],
@@ -2045,7 +2263,7 @@ void* handle_events(void* ptr)
 
   pn_controller->m_rt_interface_name = std::string(op->EthernetDevice);
   pn_controller->m_vendor_id = 279; // Softing vendor id
-  pn_controller->m_device_id = 0;
+  pn_controller->m_device_id = 81;  // Softing device id (81)
   pn_controller->m_rt_version = "1.0";
 
   local->device_list.push_back(pn_controller);
@@ -2100,9 +2318,9 @@ void* handle_events(void* ptr)
           offset_inputs = 0;
           offset_outputs = 0;
 
-          for (auto& module_data : pn_device->m_slot_list)
+          for (auto& module_data : pn_device->m_slot_map)
           {
-            for (auto& submodule_data : module_data.m_subslot_map)
+            for (auto& submodule_data : module_data.second.m_subslot_map)
             {
               if (iocr.first == PROFINET_IO_CR_TYPE_INPUT &&
                   (submodule_data.second.m_rt_io_submodule_type == PROFINET_IO_SUBMODULE_TYPE_INPUT ||
@@ -2344,6 +2562,7 @@ void* handle_events(void* ptr)
     {
       errh_Fatal("PROFINET: Fatal exception occured. Stopping PROFINET!");
       pnak_stop_stack(0);
+      break;
     }
   }
   pnak_term();

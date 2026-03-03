@@ -55,17 +55,13 @@ static qdb_sNode* addNode(qini_sNode* nep)
     return NULL;
 
   strcpy(np->link[0].name, nep->name);
-  strncpy(
-      np->nidstr, cdh_NodeIdToString(0, nep->nid, 0, 0), sizeof(np->nidstr));
+  strncpy(np->nidstr, cdh_NodeIdToString(0, nep->nid, 0, 0), sizeof(np->nidstr));
   np->sa.sin_family = AF_INET;
   np->sa.sin_addr.s_addr = nep->naddr.s_addr;
   if (nep->flags.b.port)
     np->sa.sin_port = htons(nep->port);
   else
     np->sa.sin_port = htons(55000 + qdb->g->bus);
-
-  memcpy(&np->link[0].arp.arp_pa.sa_data, &np->link[0].sa.sin_addr.s_addr,
-      sizeof(np->link[0].sa.sin_addr.s_addr));
 
   np->link[0].sa.sin_family = AF_INET;
   if (nep->port)
@@ -82,7 +78,8 @@ static qdb_sNode* addNode(qini_sNode* nep)
   np->link_cnt++;
 
   np->is_secondary = nep->is_secondary;
-  if (!streq(nep->secondary_name, "")) {
+  if (!streq(nep->secondary_name, ""))
+  {
     strcpy(np->link[1].name, nep->secondary_name);
     np->link[1].sa.sin_family = AF_INET;
     if (nep->port)
@@ -96,8 +93,7 @@ static qdb_sNode* addNode(qini_sNode* nep)
   return np;
 }
 
-static qdb_sQue* addQueue(
-    qdb_sAppl* ap, qcom_tQix qix, char* name, qdb_eQue type, pwr_tBitMask flags)
+static qdb_sQue* addQueue(qdb_sAppl* ap, qcom_tQix qix, char* name, qdb_eQue type, pwr_tBitMask flags)
 {
   pwr_tStatus sts;
   qcom_sQid qid;
@@ -112,11 +108,13 @@ static qdb_sQue* addQueue(
   qp->flags.m = flags;
   strcpy(qp->name, name);
 
-  if (qp->flags.b.broadcast) {
+  if (qp->flags.b.broadcast)
+  {
     qdb_AddBond(&sts, qp, qdb->exportque);
   }
 
-  if (ap != NULL) {
+  if (ap != NULL)
+  {
     pool_QinsertPred(&sts, &qdb->pool, &qp->que_ll, &ap->que_lh);
     qp->aid = ap->aid;
   }
@@ -124,8 +122,7 @@ static qdb_sQue* addQueue(
   return qp;
 }
 
-int qini_ParseFile(
-    FILE* f, tree_sTable* ntp, int* warnings, int* errors, int* fatals)
+int qini_ParseFile(FILE* f, tree_sTable* ntp, int* warnings, int* errors, int* fatals)
 {
   pwr_tStatus sts = 1;
   int n, n2;
@@ -150,54 +147,59 @@ int qini_ParseFile(
   pwr_tNodeId nid;
   struct in_addr naddr;
   qini_sNode* nep;
-  struct arpreq arpreq;
 
-  while ((s = fgets(buffer, sizeof(buffer) - 1, f)) != NULL) {
-    if (*s == '#' || *s == '!') {
+  while ((s = fgets(buffer, sizeof(buffer) - 1, f)) != NULL)
+  {
+    if (*s == '#' || *s == '!')
+    {
       s++;
       continue;
     }
 
-    n = sscanf(s, "%s %s %s %s %s %s %s %s %s %s %s %s %s", name, s_nid,
-        s_naddr, s_port, s_connection, s_min_resend_time, s_max_resend_time,
-        s_export_buf_quota, s_ack_delay, s_seg_size, s_is_secondary,
-        secondary_name, s_secondary_naddr);
-    if (n < 3) {
+    n = sscanf(s, "%s %s %s %s %s %s %s %s %s %s %s %s %s", name, s_nid, s_naddr, s_port, s_connection,
+               s_min_resend_time, s_max_resend_time, s_export_buf_quota, s_ack_delay, s_seg_size,
+               s_is_secondary, secondary_name, s_secondary_naddr);
+    if (n < 3)
+    {
       errh_Error("error in line, <wrong number of arguments>, skip to next "
                  "line.\n>> %s",
-          s);
+                 s);
       (*errors)++;
       continue;
     }
 
     sts = ini_GetAlias(name, alias, alias_naddr);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       strcpy(name, alias);
       strcpy(s_naddr, alias_naddr);
     }
 
     sts = cdh_StringToVolumeId(s_nid, (pwr_tVolumeId*)&nid);
-    if (EVEN(sts)) {
-      errh_Error(
-          "error in line, <node identity>, skip to next line.\n>> %s", s);
+    if (EVEN(sts))
+    {
+      errh_Error("error in line, <node identity>, skip to next line.\n>> %s", s);
       (*errors)++;
       continue;
     }
 
     sts = net_StringToAddr(s_naddr, &naddr);
-    if (EVEN(sts)) {
-      errh_Error(
-          "error in line, <network address>, skip to next line.\n>> %s", s);
+    if (EVEN(sts))
+    {
+      errh_Error("error in line, <network address>, skip to next line.\n>> %s", s);
       (*errors)++;
       continue;
     }
 
     nep = tree_Find(&sts, ntp, &nid);
-    if (nep != NULL) {
+    if (nep != NULL)
+    {
       errh_Warning("node is already defined: %s, skip to next line", s);
       (*warnings)++;
       continue;
-    } else {
+    }
+    else
+    {
       nep = tree_Insert(&sts, ntp, &nid);
     }
 
@@ -215,17 +217,21 @@ int qini_ParseFile(
       nep->export_buf_quota = atoi(s_export_buf_quota);
     else
       nep->export_buf_quota = 600000;
-    if (n > 8) {
+    if (n > 8)
+    {
       n2 = sscanf(s_ack_delay, "%f", &nep->ack_delay);
       if (n2 != 1)
         nep->ack_delay = 0.001;
-    } else
+    }
+    else
       nep->ack_delay = 0.001;
-    if (n > 9) {
+    if (n > 9)
+    {
       nep->seg_size = atoi(s_seg_size);
       if (nep->seg_size == 0)
         nep->seg_size = 8192;
-    } else
+    }
+    else
       nep->seg_size = 8192;
 
     if (n > 8)
@@ -234,27 +240,23 @@ int qini_ParseFile(
     if (n > 9 && !streq(secondary_name, "-"))
       strcpy(nep->secondary_name, secondary_name);
 
-    if (n > 10 && !streq(s_secondary_naddr, "-")) {
+    if (n > 10 && !streq(s_secondary_naddr, "-"))
+    {
       sts = net_StringToAddr(s_secondary_naddr, &naddr);
       nep->secondary_naddr.s_addr = htonl(naddr.s_addr);
-      if (EVEN(sts)) {
-        errh_Error(
-            "error in line, <network address>, skip to next line.\n>> %s", s);
+      if (EVEN(sts))
+      {
+        errh_Error("error in line, <network address>, skip to next line.\n>> %s", s);
         (*errors)++;
         continue;
       }
     }
-
-    memset(&arpreq, 0, sizeof(arpreq));
-    memcpy(&arpreq.arp_pa.sa_data, &naddr, sizeof(naddr));
-    inet_GetArpEntry(&sts, 0, &arpreq);
   }
 
   return error;
 }
 
-pwr_tBoolean qini_BuildDb(pwr_tStatus* sts, tree_sTable* nodes, qini_sNode* me,
-    void* cp, qcom_tBus bus)
+pwr_tBoolean qini_BuildDb(pwr_tStatus* sts, tree_sTable* nodes, qini_sNode* me, void* cp, qcom_tBus bus)
 {
   qdb_sInit init;
   qdb_sNode* np;
@@ -274,32 +276,24 @@ pwr_tBoolean qini_BuildDb(pwr_tStatus* sts, tree_sTable* nodes, qini_sNode* me,
 
   qdb_ScopeLock
   {
-    for (nep = tree_Minimum(sts, nodes); nep != NULL;
-         nep = tree_Successor(sts, nodes, nep)) {
+    for (nep = tree_Minimum(sts, nodes); nep != NULL; nep = tree_Successor(sts, nodes, nep))
+    {
       np = addNode(nep);
     }
 
     ap = qdb_AddAppl(NULL, YES);
 
-    qdb->exportque = addQueue(
-        NULL, qdb_cIexport, "export", qdb_eQue_private, qdb_mQue_system);
-    addQueue(
-        ap, qcom_cInetEvent, "netEvent", qdb_eQue_forward, qdb_mQue_system);
-    addQueue(
-        ap, qcom_cIapplEvent, "applEvent", qdb_eQue_forward, qdb_mQue_system);
-    addQueue(ap, qcom_cImhAllHandlers, "allHandlers", qdb_eQue_forward,
-        qdb_mQue_broadcast);
-    addQueue(ap, qcom_cImhAllOutunits, "allOutunits", qdb_eQue_forward,
-        qdb_mQue_broadcast);
-    addQueue(
-        ap, qcom_cIhdServer, "hdServer", qdb_eQue_forward, qdb_mQue_broadcast);
-    addQueue(
-        ap, qcom_cIhdClient, "hdClient", qdb_eQue_forward, qdb_mQue_broadcast);
+    qdb->exportque = addQueue(NULL, qdb_cIexport, "export", qdb_eQue_private, qdb_mQue_system);
+    addQueue(ap, qcom_cInetEvent, "netEvent", qdb_eQue_forward, qdb_mQue_system);
+    addQueue(ap, qcom_cIapplEvent, "applEvent", qdb_eQue_forward, qdb_mQue_system);
+    addQueue(ap, qcom_cImhAllHandlers, "allHandlers", qdb_eQue_forward, qdb_mQue_broadcast);
+    addQueue(ap, qcom_cImhAllOutunits, "allOutunits", qdb_eQue_forward, qdb_mQue_broadcast);
+    addQueue(ap, qcom_cIhdServer, "hdServer", qdb_eQue_forward, qdb_mQue_broadcast);
+    addQueue(ap, qcom_cIhdClient, "hdClient", qdb_eQue_forward, qdb_mQue_broadcast);
 #if !defined OS_CYGWIN
     addQueue(NULL, qcom_cInacp, "nacp", qdb_eQue_private, qdb_mQue_system);
 #endif
-    addQueue(ap, qcom_cIini, "ini", qdb_eQue_forward,
-        qdb_mQue_system | qdb_mQue_event);
+    addQueue(ap, qcom_cIini, "ini", qdb_eQue_forward, qdb_mQue_system | qdb_mQue_event);
   }
   qdb_ScopeUnlock;
 
