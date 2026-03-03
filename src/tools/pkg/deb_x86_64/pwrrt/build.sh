@@ -93,9 +93,6 @@ co_convert -t -d $pwr_doc $pwr_eload/xtt_version_help.dat
   echo "</head></html>"
 } > $pwr_doc/en_us/package_version.html
 
-# Print rt version file
-echo "Version: $version" > $pwr_eexe/rt_version.dat
-
 if [ "$1" == "-v" ]; then
   exit
 fi

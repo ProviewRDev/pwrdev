@@ -54,7 +54,7 @@ fi
         echo "<b>Proview $vermajmin"
 	echo "Version V$version"
         echo ""
-        echo "Copyright © 2005-${d:0:4} SSAB EMEA AB"
+        echo "Copyright ï¿½ 2005-${d:0:4} SSAB EMEA AB"
         echo ""
         echo "This program is free software; you can redistribute it and/or"
         echo "modify it under the terms of the GNU General Public License as"
@@ -95,9 +95,6 @@ fi
 
 # Convert to html
 co_convert -t -d $pwr_doc $pwr_eexe/xtt_version_help.dat
-
-# Print rt version file
-echo "Version: $version" > $pwr_eexe/rt_version.dat
 
 if [ "$1" == "-v" ]; then
   exit
