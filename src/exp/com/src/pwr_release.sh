@@ -35,13 +35,16 @@
 # General Public License plus this exception.
 #
 #
-# pwr_release.sh -- Prepare the ProviewR tree for a new release.
+# pwr_release.sh -- Prepare the ProviewR tree for a new release,
+#                   or bump the packaging revision.
 #
 # Usage:
 #   pwr_release.sh [--dry-run] <new_version>
+#   pwr_release.sh [--dry-run] --pkgrev
 #
 #   <new_version>  Version string in the form "V<major>.<minor>.<patch>",
 #                  e.g. V6.2.0
+#   --pkgrev       Increment the deb/rpm packaging revision only.
 #   --dry-run      Show what would be changed without modifying any files.
 #
 
@@ -54,13 +57,16 @@ readonly ROOT=$(cd "$(dirname "$0")/../../../.." && pwd)
 readonly VERSION_H="$ROOT/src/exp/inc/src/pwr_version.h"
 readonly CHANGELOG="$ROOT/CHANGELOG.md"
 readonly UPGRADE_SH="$ROOT/src/exp/com/src/upgrade.sh"
+readonly PKG_DIR="$ROOT/src/tools/pkg"
 
 DRY_RUN=0
 NEW_VERSION=""
+PKGREV_MODE=0
 
 usage() {
   cat <<EOF
 Usage: $SCRIPT_NAME [--dry-run] <new_version>
+       $SCRIPT_NAME [--dry-run] --pkgrev
 
 Prepares the ProviewR source tree for a new release:
 
@@ -70,14 +76,22 @@ Prepares the ProviewR source tree for a new release:
   3. Updates upgrade.sh OLD/NEW version pair.
   4. Stamps CHANGELOG.md: moves [Unreleased] to a dated release heading
      and creates a fresh [Unreleased] section.
+  5. Updates all deb control files and RPM spec files (Version, Package
+     names, Replaces lists, Depends references).
+
+Or, with --pkgrev, bumps only the packaging revision (-N for deb,
+Release: for RPM) without changing the upstream version.
 
 Arguments:
   <new_version>   Version in format V<major>.<minor>.<patch>, e.g. V6.2.0
+  --pkgrev        Bump the packaging/release revision number only.
   --dry-run       Print actions without modifying files.
 
 Example:
   $SCRIPT_NAME V6.2.0
   $SCRIPT_NAME --dry-run V6.2.0
+  $SCRIPT_NAME --pkgrev
+  $SCRIPT_NAME --dry-run --pkgrev
 EOF
   exit 1
 }
@@ -102,11 +116,70 @@ do_sed() {
 while [ $# -gt 0 ]; do
   case "$1" in
     --dry-run) DRY_RUN=1; shift ;;
+    --pkgrev)  PKGREV_MODE=1; shift ;;
     -h|--help) usage ;;
     V[0-9]*) NEW_VERSION="$1"; shift ;;
     *) error "Unknown argument: $1" ;;
   esac
 done
+
+# ---- --pkgrev mode: bump packaging revision only ----------------------------
+
+if [ "$PKGREV_MODE" -eq 1 ]; then
+  echo "=============================================="
+  echo " Bump packaging revision"
+  echo "=============================================="
+  [ "$DRY_RUN" -eq 1 ] && echo "  Mode : DRY RUN"
+  echo ""
+
+  count=0
+
+  # Bump deb control files: Version: X.Y.Z-N -> X.Y.Z-(N+1)
+  echo "== Deb control files =="
+  while IFS= read -r ctrl; do
+    relpath="${ctrl#"$ROOT"/}"
+    cur_debver=$(grep '^Version:' "$ctrl" | head -1 | sed 's/^Version: *//')
+    if [[ "$cur_debver" =~ ^([0-9]+\.[0-9]+\.[0-9]+)-([0-9]+)$ ]]; then
+      upstream="${BASH_REMATCH[1]}"
+      debrev="${BASH_REMATCH[2]}"
+      new_debrev=$((debrev + 1))
+      do_sed "$relpath: ${upstream}-${debrev} -> ${upstream}-${new_debrev}" \
+        "s|^Version: .*|Version: ${upstream}-${new_debrev}|" \
+        "$ctrl"
+      # Update version in description continuation line
+      do_sed "$relpath: description version" \
+        "s|^ ${upstream}-${debrev} | ${upstream}-${new_debrev} |" \
+        "$ctrl"
+      count=$((count + 1))
+    else
+      warn "$relpath: Version '$cur_debver' doesn't match X.Y.Z-N pattern, skipping"
+    fi
+  done < <(find "$PKG_DIR" -name control -not -path '*/DEBIAN/*' 2>/dev/null | sort)
+  echo ""
+
+  # Bump RPM spec files: Release: N -> N+1
+  echo "== RPM spec files =="
+  while IFS= read -r spec; do
+    relpath="${spec#"$ROOT"/}"
+    if grep -q '^Release:' "$spec"; then
+      cur_rel=$(grep '^Release:' "$spec" | head -1 | awk '{print $2}')
+      new_rel=$((cur_rel + 1))
+      do_sed "$relpath: Release ${cur_rel} -> ${new_rel}" \
+        "s|^Release:.*|Release: ${new_rel}|" \
+        "$spec"
+      count=$((count + 1))
+    fi
+  done < <(find "$PKG_DIR" -name '*.spec' 2>/dev/null | sort)
+  echo ""
+
+  echo "=============================================="
+  echo " Packaging revision bumped ($count files)"
+  echo "=============================================="
+  [ "$DRY_RUN" -eq 1 ] && echo " (dry-run mode — no files were modified)"
+  exit 0
+fi
+
+# ---- full release mode: require version argument ----------------------------
 
 [ -z "$NEW_VERSION" ] && usage
 
@@ -118,7 +191,8 @@ fi
 VER_MAJOR="${BASH_REMATCH[1]}"
 VER_MINOR="${BASH_REMATCH[2]}"
 VER_PATCH="${BASH_REMATCH[3]}"
-VER_SHORT="V${VER_MAJOR}${VER_MINOR}"  # e.g. V62
+VER_SHORT="V${VER_MAJOR}${VER_MINOR}"  # e.g. V62 (for pwr_version.h)
+PKG_SHORT="${VER_MAJOR}${VER_MINOR}"    # e.g. 62  (for package names)
 
 # Read current version from pwr_version.h
 CUR_VERSION=$(grep 'pwrv_cPwrVersionStr' "$VERSION_H" | head -1 | sed 's/.*"\(V[^"]*\)".*/\1/')
@@ -126,11 +200,22 @@ if [ -z "$CUR_VERSION" ]; then
   error "Could not read current version from $VERSION_H"
 fi
 
-# Extract old major.minor for upgrade.sh
+# Extract old major.minor for upgrade.sh and packaging
 if [[ "$CUR_VERSION" =~ ^V([0-9]+)\.([0-9]+) ]]; then
   OLD_MAJMIN="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}"
+  OLD_SHORT="${BASH_REMATCH[1]}${BASH_REMATCH[2]}"  # e.g. 61
+else
+  error "Cannot parse current version: $CUR_VERSION"
 fi
 NEW_MAJMIN="${VER_MAJOR}.${VER_MINOR}"
+
+MAJMIN_CHANGED=0
+if [ "$OLD_SHORT" != "$PKG_SHORT" ]; then
+  MAJMIN_CHANGED=1
+fi
+
+# Upstream version for packaging (no V prefix, no deb revision)
+PKG_UPSTREAM="${VER_MAJOR}.${VER_MINOR}.${VER_PATCH}"
 
 # Current year for copyright
 YEAR=$(date +%Y)
@@ -147,6 +232,10 @@ echo "=============================================="
 echo "  Repository root : $ROOT"
 echo "  Current version : $CUR_VERSION"
 echo "  New version     : $NEW_VERSION"
+echo "  Pkg short       : $OLD_SHORT -> $PKG_SHORT"
+if [ "$MAJMIN_CHANGED" -eq 1 ]; then
+  echo "  Major.minor     : CHANGED (package names will be updated)"
+fi
 echo "  Copyright year  : $YEAR"
 echo "  Release date    : $RELEASE_DATE"
 echo "  Build time      : $BUILD_TIME"
@@ -241,6 +330,109 @@ else
   info "Changelog stamped with [$NEW_VERSION] - $RELEASE_DATE"
 fi
 
+echo ""
+
+# ---- Step 5: Update packaging files ----------------------------------------
+
+echo "== Step 5: Update packaging files =="
+
+DEB_VER="${PKG_UPSTREAM}-1"  # Upstream version + debian revision reset to 1
+
+# -- 5a. Deb control files ---------------------------------------------------
+
+echo "  -- Deb control files --"
+while IFS= read -r ctrl; do
+  relpath="${ctrl#"$ROOT"/}"
+
+  # Read the ORIGINAL package name before any modifications
+  orig_pkg=$(grep '^Package:' "$ctrl" | head -1 | awk '{print $2}')
+
+  # 1) Update Version: line
+  do_sed "$relpath: Version -> $DEB_VER" \
+    "s|^Version: .*|Version: ${DEB_VER}|" \
+    "$ctrl"
+
+  # 2) Update description continuation line (e.g. " 6.1.3-1 Base release")
+  do_sed "$relpath: description version -> $DEB_VER" \
+    "s|^ [0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*-[0-9][0-9]* | ${DEB_VER} |" \
+    "$ctrl"
+
+  if [ "$MAJMIN_CHANGED" -eq 1 ]; then
+    # 3) Update Package: name if it contains the old short version
+    if [[ "$orig_pkg" == *"$OLD_SHORT"* ]]; then
+      new_pkg="${orig_pkg/$OLD_SHORT/$PKG_SHORT}"
+      do_sed "$relpath: Package $orig_pkg -> $new_pkg" \
+        "s|^Package: ${orig_pkg}$|Package: ${new_pkg}|" \
+        "$ctrl"
+    fi
+
+    # 4) Update Depends: references to ProviewR packages
+    #    e.g. "pwr61 (>= 6.1.3-1)" -> "pwr70 (>= 7.0.0-1)"
+    if grep -q "${OLD_SHORT}" "$ctrl" 2>/dev/null; then
+      # Replace package name references (pwr61, pwrdemo61, pwrrpi61, etc.)
+      do_sed "$relpath: Depends pkg refs $OLD_SHORT -> $PKG_SHORT" \
+        "s|\(pwr[a-z0-9]*\)${OLD_SHORT}|\1${PKG_SHORT}|g" \
+        "$ctrl"
+    fi
+    # Update ProviewR version constraints in Depends
+    # Match patterns like "(>= 6.1.3-1)" after a pwr* package name
+    if grep -q "pwr.*>= [0-9]" "$ctrl" 2>/dev/null; then
+      do_sed "$relpath: Depends version constraint -> $DEB_VER" \
+        "s|\(pwr[a-z0-9]* (>= \)[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*-[0-9][0-9]*|\1${DEB_VER}|g" \
+        "$ctrl"
+    fi
+
+    # 5) Update Replaces: list
+    if grep -q '^Replaces:' "$ctrl"; then
+      if [ "$orig_pkg" = "pwrrt" ] || [ "$orig_pkg" = "pwrsev" ]; then
+        # Version-less packages: add the new dev package name so they
+        # can replace it (pwr70 etc.)
+        do_sed "$relpath: Replaces += pwr${PKG_SHORT}" \
+          "s|^\(Replaces:.*\)|\1,pwr${PKG_SHORT}|" \
+          "$ctrl"
+      elif [ "$orig_pkg" = "pwr${OLD_SHORT}" ]; then
+        # Dev package (pwr61 -> Replaces already has pwr50..pwr60):
+        # add the old name (pwr61) since it's being renamed to pwr70
+        do_sed "$relpath: Replaces += pwr${OLD_SHORT}" \
+          "s|^\(Replaces:.*\)|\1,pwr${OLD_SHORT}|" \
+          "$ctrl"
+      elif [[ "$orig_pkg" == pwrrpi*"$OLD_SHORT" ]]; then
+        # Pi packages: their Replaces references the dev package;
+        # update from old to new (already handled by step 4 above
+        # which replaced all OLD_SHORT occurrences).
+        :
+      fi
+    fi
+  fi
+done < <(find "$PKG_DIR" -name control -not -path '*/DEBIAN/*' 2>/dev/null | sort)
+echo ""
+
+# -- 5b. RPM spec files ------------------------------------------------------
+
+echo "  -- RPM spec files --"
+while IFS= read -r spec; do
+  relpath="${spec#"$ROOT"/}"
+
+  # 1) Update Version: and Release:
+  do_sed "$relpath: Version -> $PKG_UPSTREAM" \
+    "s|^Version:.*|Version: ${PKG_UPSTREAM}|" \
+    "$spec"
+
+  do_sed "$relpath: Release -> 1" \
+    "s|^Release:.*|Release: 1|" \
+    "$spec"
+
+  if [ "$MAJMIN_CHANGED" -eq 1 ]; then
+    # 2) Update Name: if it contains the old short version
+    orig_name=$(grep '^Name:' "$spec" | head -1 | awk '{print $2}')
+    if [[ "$orig_name" == *"$OLD_SHORT"* ]]; then
+      new_name="${orig_name/$OLD_SHORT/$PKG_SHORT}"
+      do_sed "$relpath: Name $orig_name -> $new_name" \
+        "s|^Name: ${orig_name}$|Name: ${new_name}|" \
+        "$spec"
+    fi
+  fi
+done < <(find "$PKG_DIR" -name '*.spec' 2>/dev/null | sort)
 echo ""
 
 # ---- Summary ----------------------------------------------------------------
