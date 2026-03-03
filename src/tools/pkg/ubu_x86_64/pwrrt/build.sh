@@ -10,7 +10,11 @@ if [ -e $pwr_inc/pwr_version.h ]; then
     echo "Unable to get pwr version"
     ver="V00"
   fi
-  ver=${ver:2:2}
+  ver=$(echo "$ver" | tr -d '"' | sed 's/^V//')
+
+  # Extract major.minor version for display (e.g. "V6.1")
+  vermajmin=`eval cat $pwr_inc/pwr_version.h | grep "\\bpwrv_cPwrVersionStr\\b" | awk '{print $3}'`
+  vermajmin=$(echo "$vermajmin" | tr -d '"' | sed 's/\.[^.]*$//')
 fi
 
 # Generate version help file
@@ -43,7 +47,7 @@ fi
 	echo ""
 	echo ""
 	echo ""
-        echo "<b>ProviewR V${version:0:3}"
+        echo "<b>ProviewR $vermajmin"
 	echo "Version V$version"
         echo ""
         echo "Copyright � 2005-${d:0:4} SSAB EMEA AB"

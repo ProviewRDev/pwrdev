@@ -10,7 +10,11 @@ if [ -e $pwr_inc/pwr_version.h ]; then
     echo "Unable to get pwr version"
     ver="V00"
   fi
-  ver=${ver:2:2}
+  ver=$(echo "$ver" | tr -d '"' | sed 's/^V//')
+
+  # Extract major.minor version for display (e.g. "V6.1")
+  vermajmin=`eval cat $pwr_inc/pwr_version.h | grep "\\bpwrv_cPwrVersionStr\\b" | awk '{print $3}'`
+  vermajmin=$(echo "$vermajmin" | tr -d '"' | sed 's/\.[^.]*$//')
 fi
 
 proot=$pwre_croot/project/pwrdemo
@@ -31,11 +35,13 @@ find $pkgroot -type d | xargs chmod 755
 cp $pkgsrc/control $pkgroot/DEBIAN
 echo "#!/bin/bash" > $pkgroot/DEBIAN/postinst
 echo "ver=\"$ver\"" >> $pkgroot/DEBIAN/postinst
+echo "vermajmin=\"$vermajmin\"" >> $pkgroot/DEBIAN/postinst
 echo "pwre_target=\"$pwre_target\"" >> $pkgroot/DEBIAN/postinst
 cat $pkgsrc/postinst >> $pkgroot/DEBIAN/postinst
 
 echo "#!/bin/sh" > $pkgroot/DEBIAN/prerm
 echo "ver=\"$ver\"" >> $pkgroot/DEBIAN/prerm
+echo "vermajmin=\"$vermajmin\"" >> $pkgroot/DEBIAN/prerm
 cat $pkgsrc/prerm >> $pkgroot/DEBIAN/prerm
 
 chmod 755 $pkgroot/DEBIAN/postinst

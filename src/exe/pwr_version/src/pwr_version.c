@@ -39,6 +39,7 @@
    define common version variables.  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "rt_load.h"
@@ -47,12 +48,44 @@
 
 typedef char pwr_tVersionStr[32];
 
+/* Parse a version string "V<major>.<minor>.<patch>" into integer components.
+   Returns 0 on success, -1 on failure. */
+static int parse_version(const char* str, char* prefix, int* major, int* minor, int* patch)
+{
+  if (sscanf(str, "%c%d.%d.%d", prefix, major, minor, patch) != 4)
+    return -1;
+  return 0;
+}
+
+/* Write SET_VERSION and string macros for a given version.
+   Handles multi-digit version components (e.g., V7.11.13). */
+static void write_version_macros(FILE* fp, const char* name, const char* verstr)
+{
+  char prefix;
+  int major, minor, patch;
+
+  if (parse_version(verstr, &prefix, &major, &minor, &patch) != 0)
+  {
+    fprintf(stderr, "Warning: cannot parse version string '%s'\n", verstr);
+    return;
+  }
+
+  fprintf(fp,
+          "#define pwrv_c%sVersion         "
+          "SET_VERSION('%c', %d, %d, %d)\n",
+          name, prefix, major, minor, patch);
+  fprintf(fp, "#define pwrv_c%sVersionStr      \"%s\"\n", name, verstr);
+}
+
 int main(int argc, char* argv[])
 {
   time_t tp;
   struct tm* time_tm;
   char timestr[80];
+  char buildtimestr[80];
   FILE* fp;
+  char prefix;
+  int major, minor, patch;
 
   pwr_tVersionStr SmdVersion;
   pwr_tVersionStr BmdVersion;
@@ -61,7 +94,8 @@ int main(int argc, char* argv[])
   pwr_tVersionStr Version;
 
   /* get arguments */
-  if (argc < 2) {
+  if (argc < 2)
+  {
     printf("Error creating pwr_version.h: wrong number of arguments\n");
     exit(0);
   }
@@ -76,6 +110,14 @@ int main(int argc, char* argv[])
   time(&tp);
   time_tm = localtime(&tp);
   strftime(timestr, sizeof(timestr), "%d %B %Y", time_tm);
+  strftime(buildtimestr, sizeof(buildtimestr), "%d-%b-%Y %H:%M:%S", time_tm);
+
+  /* Parse the main version for WbdbVersionShortStr */
+  if (parse_version(WbdbVersion, &prefix, &major, &minor, &patch) != 0)
+  {
+    fprintf(stderr, "Error: cannot parse WbdbVersion '%s'\n", WbdbVersion);
+    exit(1);
+  }
 
   fp = fopen("pwr_version.h", "w");
   fprintf(fp, "\n");
@@ -96,12 +138,17 @@ int main(int argc, char* argv[])
   fprintf(fp, "\n");
   fprintf(fp, "#include <time.h>\n");
   fprintf(fp, "\n");
-  fprintf(fp, "#ifndef pwr_h\n");
   fprintf(fp, "#include \"pwr.h\"\n");
+  fprintf(fp, "\n");
+  fprintf(fp, "#if (pwr_dHost_byteOrder == pwr_dLittleEndian)\n");
+  fprintf(fp, "#define SET_VERSION(a, b, c, d) "
+              "((pwr_tVersion)((d << 24) + (c << 16) + (b << 8) + a))\n");
+  fprintf(fp, "#else\n");
+  fprintf(fp, "#define SET_VERSION(a, b, c, d) "
+              "((pwr_tVersion)((a << 24) + (b << 16) + (c << 8) + d))\n");
   fprintf(fp, "#endif\n");
   fprintf(fp, "\n");
-  fprintf(
-      fp, "#define pwrv_cOpSys              \"Unknown Operating System\"\n");
+  fprintf(fp, "#define pwrv_cOpSys              \"Unknown Operating System\"\n");
   fprintf(fp, "\n");
   fprintf(fp, "#if defined VAX || defined __VAX\n");
   fprintf(fp, "#define pwrv_cHardware           \"VAX\"\n");
@@ -110,35 +157,19 @@ int main(int argc, char* argv[])
   fprintf(fp, "#endif\n");
   fprintf(fp, "\n");
   fprintf(fp, "#define pwrv_cBuildTime          ((time_t) %d)\n", (int)tp);
-  fprintf(fp, "#define pwrv_cBuildTimeStr       \"%s\"\n", timestr);
+  fprintf(fp, "#define pwrv_cBuildTimeStr       \"%s\"\n", buildtimestr);
   fprintf(fp, "\n");
-  fprintf(fp, "#define pwrv_cPwrVersion         ((pwr_tVersion)((%c << 24) + "
-              "(%c << 16) + (%c << 8) + \'%c\'))\n",
-      Version[5], Version[3], Version[1], Version[0]);
-  fprintf(fp, "#define pwrv_cPwrVersionStr      \"%s\"\n", Version);
+
+  write_version_macros(fp, "Pwr", Version);
   fprintf(fp, "\n");
-  fprintf(fp, "#define pwrv_cSmdVersion         ((pwr_tVersion)((%c << 24) + "
-              "(%c << 16) + (%c << 8) + \'%c\'))\n",
-      SmdVersion[5], SmdVersion[3], SmdVersion[1], SmdVersion[0]);
-  fprintf(fp, "#define pwrv_cSmdVersionStr      \"%s\"\n", SmdVersion);
+  write_version_macros(fp, "Smd", SmdVersion);
   fprintf(fp, "\n");
-  fprintf(fp, "#define pwrv_cBmdVersion         ((pwr_tVersion)((%c << 24) + "
-              "(%c << 16) + (%c << 8) + \'%c\'))\n",
-      BmdVersion[5], BmdVersion[3], BmdVersion[1], BmdVersion[0]);
-  fprintf(fp, "#define pwrv_cBmdVersionStr      \"%s\"\n", BmdVersion);
+  write_version_macros(fp, "Bmd", BmdVersion);
   fprintf(fp, "\n");
-  fprintf(fp, "#define pwrv_cWbdbVersion        ((pwr_tVersion)((%c << 24) + "
-              "(%c << 16) + (%c << 8) + \'%c\'))\n",
-      WbdbVersion[5], WbdbVersion[3], WbdbVersion[1], WbdbVersion[0]);
-  fprintf(fp, "#define pwrv_cWbdbVersionStr     \"%s\"\n", WbdbVersion);
-  fprintf(fp, "#define pwrv_cWbdbVersionShortStr \"%c%c%c\"\n", WbdbVersion[0],
-      WbdbVersion[1], WbdbVersion[3]);
-  fprintf(fp, "#define pwrv_cWbdbVersionStr     \"%s\"\n", WbdbVersion);
+  write_version_macros(fp, "Wbdb", WbdbVersion);
+  fprintf(fp, "#define pwrv_cWbdbVersionShortStr \"%c%d%d\"\n", prefix, major, minor);
   fprintf(fp, "\n");
-  fprintf(fp, "#define pwrv_cLffVersion         ((pwr_tVersion)((%c << 24) + "
-              "(%c << 16) + (%c << 8) + \'%c\'))\n",
-      LffVersion[5], LffVersion[3], LffVersion[1], LffVersion[0]);
-  fprintf(fp, "#define pwrv_cLffVersionStr      \"%s\"\n", LffVersion);
+  write_version_macros(fp, "Lff", LffVersion);
   fprintf(fp, "\n");
   fprintf(fp, "#endif\n");
   fclose(fp);

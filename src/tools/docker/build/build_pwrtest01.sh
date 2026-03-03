@@ -6,8 +6,8 @@ root=`eval pwd`
 
 if [ -e $root/src/exp/inc/src/pwr_version.h ]; then
   verl=`eval cat $root/src/exp/inc/src/pwr_version.h | grep "\bpwrv_cPwrVersionStr\b" | awk '{print $3}'`
-  verl=${verl:1:6}
-  ver=${verl:0:2}${verl:3:1}${verl:5:1}
+  verl=$(echo "$verl" | tr -d '"')
+  ver=$(echo "$verl" | tr -d ".")
 fi
 
 # Setup pwre

@@ -183,7 +183,7 @@ pwre_get_variables()
     if [ -z $pwr_dbversion ]; then
       echo "Unable to get pwr db version"
     fi
-    export pwr_dbversion=${pwr_dbversion:1:3}
+    export pwr_dbversion=$(echo "$pwr_dbversion" | tr -d '"')
     export pwre_dbversion=$pwr_dbversion
   fi
 }
