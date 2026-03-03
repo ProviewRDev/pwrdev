@@ -50,7 +50,6 @@
 #include <sys/socket.h>
 #include <signal.h>
 #include <iostream>
-#include <fstream>
 
 #include "co_cdh.h"
 #include "co_dcli.h"
@@ -271,24 +270,7 @@ pwr_tStatus status_server::init(int ignore_config)
   else
     m_config = (pwr_sClass_StatusServerConfig*)calloc(1, sizeof(*m_config));
 
-  // Read version file
-
-  char buff[100];
-  pwr_tFileName fname;
-
-  dcli_translate_filename(fname, "$pwr_exe/rt_version.dat");
-
-  std::ifstream fp(fname);
-
-  if (fp)
-  {
-    fp.getline(buff, sizeof(buff));
-    strcpy(m_version, "V");
-    strcat(m_version, &buff[9]);
-    fp.close();
-  }
-  else
-    strncpy(m_version, pwrv_cPwrVersionStr, sizeof(m_version));
+  strncpy(m_version, pwrv_cPwrVersionStr, sizeof(m_version));
 
   // Ignore SIGPIPE signal
   signal(SIGPIPE, signal_callback_handler);

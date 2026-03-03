@@ -38,8 +38,6 @@
 #include <unistd.h>
 #include <net/if.h>
 
-#include <fstream>
-
 #include "pwr_version.h"
 #include "pwr_baseclasses.h"
 
@@ -184,24 +182,8 @@ int main(int argc, char* argv[])
     aproc_RegisterObject(config_oid);
   }
 
-  // Read version file
-
-  char buff[100];
-  pwr_tFileName fname;
-
-  dcli_translate_filename(fname, "$pwr_exe/rt_version.dat");
-
-  std::ifstream fp(fname);
-
-  if (fp)
-  {
-    fp.getline(buff, sizeof(buff));
-    strcpy(statussrv->version, "V");
-    strcat(statussrv->version, &buff[9]);
-    fp.close();
-  }
-  else
-    strncpy(statussrv->version, pwrv_cPwrVersionStr, sizeof(statussrv->version));
+  strncpy(statussrv->version, pwrv_cPwrVersionStr,
+      sizeof(statussrv->version));
 
   // Create a cyclic tread to receive swap and terminate events
   pthread_t thread;
