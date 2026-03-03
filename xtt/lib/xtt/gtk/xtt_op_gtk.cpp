@@ -2053,7 +2053,7 @@ void OpGtk::set_text_size()
   char str[80];
   char bold_str[10] = "";
 
-  sprintf(str, "%s %s%f", "Helvetica", bold_str, FONT_SCALE * (text_size + 2));
+  sprintf(str, "%s %s%f", "Roboto", bold_str, FONT_SCALE * (text_size + 2));
   fd = pango_font_description_from_string(str);
 
   for (unsigned int i = 0; i < 25; i++)

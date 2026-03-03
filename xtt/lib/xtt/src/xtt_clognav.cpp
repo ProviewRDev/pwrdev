@@ -81,68 +81,68 @@ void CLogNavBrow::create_nodeclasses()
   // Create common-class
 
   brow_CreateNodeClass(ctx, "EventDefault", flow_eNodeGroup_Common, &nc_event);
-  brow_AddAnnot(nc_event, 0.8, 0.6, 0, flow_eDrawType_TextHelveticaBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_event, 0.8, 0.6, 0, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
   brow_AddAnnotPixmap(nc_event, 0, 1.6, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_event, 1, 2.2, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_event, 3.3, 0.6, 1, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_event, 10, 0.6, 2, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_event, 26, 0.6, 3, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_event, 3.3, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_event, 10, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_event, 26, 0.6, 3, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_event, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Nodeclass for Info message
   brow_CreateNodeClass(ctx, "InfoMsg", flow_eNodeGroup_Common, &nc_msg_info);
   brow_AddFilledRect(nc_msg_info, 0.2, 0.15, 0.4, 0.4, flow_eDrawType_Green);
   brow_AddRect(nc_msg_info, 0.2, 0.15, 0.4, 0.4, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_msg_info, 0.8, 0.6, 0, flow_eDrawType_TextHelveticaBold, 2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_msg_info, 2, 0.6, 1, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_msg_info, 8, 0.6, 2, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_msg_info, 11, 0.6, 3, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_msg_info, 18, 0.6, 4, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_info, 0.8, 0.6, 0, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_info, 2, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_info, 8, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_info, 11, 0.6, 3, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_info, 18, 0.6, 4, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_msg_info, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Nodeclass for Warning message
   brow_CreateNodeClass(ctx, "WarningMsg", flow_eNodeGroup_Common, &nc_msg_warning);
   brow_AddFilledRect(nc_msg_warning, 0.2, 0.15, 0.4, 0.4, flow_eDrawType_Yellow);
   brow_AddRect(nc_msg_warning, 0.2, 0.15, 0.4, 0.4, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_msg_warning, 0.8, 0.6, 0, flow_eDrawType_TextHelveticaBold, 2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_msg_warning, 2, 0.6, 1, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_msg_warning, 8, 0.6, 2, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_msg_warning, 11, 0.6, 3, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_msg_warning, 18, 0.6, 4, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_warning, 0.8, 0.6, 0, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_warning, 2, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_warning, 8, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_warning, 11, 0.6, 3, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_warning, 18, 0.6, 4, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_msg_warning, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Nodeclass for Error message
   brow_CreateNodeClass(ctx, "ErrorMsg", flow_eNodeGroup_Common, &nc_msg_error);
   brow_AddFilledRect(nc_msg_error, 0.2, 0.15, 0.4, 0.4, flow_eDrawType_LineRed);
   brow_AddRect(nc_msg_error, 0.2, 0.15, 0.4, 0.4, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_msg_error, 0.8, 0.6, 0, flow_eDrawType_TextHelveticaBold, 2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_msg_error, 2, 0.6, 1, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_msg_error, 8, 0.6, 2, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_msg_error, 11, 0.6, 3, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_msg_error, 18, 0.6, 4, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_error, 0.8, 0.6, 0, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_error, 2, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_error, 8, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_error, 11, 0.6, 3, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_error, 18, 0.6, 4, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_msg_error, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Nodeclass for Fatal messages
   brow_CreateNodeClass(ctx, "FatalMsg", flow_eNodeGroup_Common, &nc_msg_fatal);
   brow_AddFilledRect(nc_msg_fatal, 0.2, 0.15, 0.4, 0.4, flow_eDrawType_LineRed);
   brow_AddRect(nc_msg_fatal, 0.2, 0.15, 0.4, 0.4, flow_eDrawType_Line, 4, 0);
-  brow_AddAnnot(nc_msg_fatal, 0.8, 0.6, 0, flow_eDrawType_TextHelveticaBold, 2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_msg_fatal, 2, 0.6, 1, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_msg_fatal, 8, 0.6, 2, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_msg_fatal, 11, 0.6, 3, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_msg_fatal, 18, 0.6, 4, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_fatal, 0.8, 0.6, 0, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_fatal, 2, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_fatal, 8, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_fatal, 11, 0.6, 3, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_fatal, 18, 0.6, 4, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_msg_fatal, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Nodeclass for Proview restart
   brow_CreateNodeClass(ctx, "Restart", flow_eNodeGroup_Common, &nc_restart);
   brow_AddFilledRect(nc_restart, 0, 0, 48, 0.8, flow_eDrawType_Yellow);
-  brow_AddAnnot(nc_restart, 11, 0.6, 0, flow_eDrawType_TextHelveticaBold, 2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_restart, 18, 0.6, 1, flow_eDrawType_TextHelveticaBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_restart, 11, 0.6, 0, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_restart, 18, 0.6, 1, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_restart, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   brow_CreateNodeClass(ctx, "Text", flow_eNodeGroup_Common, &nc_text);
   brow_AddRect(nc_text, 0.2, 0.15, 0.4, 0.4, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_text, 18, 0.6, 0, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_text, 18, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_text, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 }
 

@@ -81,7 +81,7 @@ typedef struct
   unsigned char* data[DRAW_PIXMAP_SIZE];
 } draw_sPixmap;
 
-//char FlowDrawGtk::font_name[40] = "Roboto";
+// char FlowDrawGtk::font_name[40] = "Roboto";
 
 static GdkEvent last_event;
 
@@ -1650,7 +1650,8 @@ int FlowDrawGtk::text(FlowCtx* ctx, int x, int y, char* text, int len, flow_eDra
   }
 
   cairo_t* cr = get_cairo();
-  if (gc_type == flow_eDrawType_TextHelveticaErase || gc_type == flow_eDrawType_TextHelveticaEraseBold)
+  if (gc_type == flow_eDrawType_TextHelveticaErase || gc_type == flow_eDrawType_TextHelveticaEraseBold ||
+      gc_type == flow_eDrawType_TextRobotoErase || gc_type == flow_eDrawType_TextRobotoEraseBold)
     cairo_set_source(cr, gc_erase);
   else if (highlight)
     cairo_set_source(cr, gc_red);
@@ -1688,6 +1689,18 @@ int FlowDrawGtk::text_inverse(FlowCtx* ctx, int x, int y, char* txt, int len, fl
     break;
   case flow_eDrawType_TextHelveticaBold:
     gc_type = flow_eDrawType_TextHelveticaEraseBold;
+    break;
+  case flow_eDrawType_TextRobotoErase:
+    gc_type = flow_eDrawType_TextRoboto;
+    break;
+  case flow_eDrawType_TextRobotoEraseBold:
+    gc_type = flow_eDrawType_TextRobotoBold;
+    break;
+  case flow_eDrawType_TextRoboto:
+    gc_type = flow_eDrawType_TextRobotoErase;
+    break;
+  case flow_eDrawType_TextRobotoBold:
+    gc_type = flow_eDrawType_TextRobotoEraseBold;
     break;
   default:;
   }
@@ -1738,7 +1751,8 @@ int FlowDrawGtk::nav_text(FlowCtx* ctx, int x, int y, char* text, int len, flow_
   size *= DRAW_TSCALE;
 
   cairo_t* cr = get_cairo_nav();
-  if (gc_type == flow_eDrawType_TextHelveticaErase || gc_type == flow_eDrawType_TextHelveticaEraseBold)
+  if (gc_type == flow_eDrawType_TextHelveticaErase || gc_type == flow_eDrawType_TextHelveticaEraseBold ||
+      gc_type == flow_eDrawType_TextRobotoErase || gc_type == flow_eDrawType_TextRobotoEraseBold)
     cairo_set_source(cr, gc_erase);
   else
     cairo_set_source(cr, gc_black);
@@ -2245,52 +2259,57 @@ cairo_font_face_t* FlowDrawGtk::get_font_face(flow_eDrawType gc_type)
 {
   switch (gc_type)
   {
-    case flow_eDrawType_TextHelveticaBold:
-    case flow_eDrawType_TextHelveticaEraseBold:
+  case flow_eDrawType_TextHelveticaBold:
+  case flow_eDrawType_TextHelveticaEraseBold:
+  {
+    if (!font_face_bold)
     {
-      if (!font_face_bold)
-      {
-        font_face_bold = cairo_toy_font_face_create(FONT_NAME_HELVETICA, CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-      }
-      return font_face_bold;  
+      font_face_bold =
+          cairo_toy_font_face_create(FONT_NAME_HELVETICA, CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
     }
-
-    case flow_eDrawType_TextHelvetica:
-    case flow_eDrawType_TextHelveticaErase:
-    {
-      if (!font_face_normal)
-      {
-        font_face_normal = cairo_toy_font_face_create(FONT_NAME_HELVETICA, CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
-      }
-      return font_face_normal;
-    }
-
-    case flow_eDrawType_TextRobotoBold:
-    case flow_eDrawType_TextRobotoEraseBold:
-    {
-      if (!font_face_bold)
-      {
-        font_face_bold = cairo_toy_font_face_create(FONT_NAME_ROBOTO, CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-      }
-      return font_face_bold;  
-    }
-
-    case flow_eDrawType_TextRoboto:
-    case flow_eDrawType_TextRobotoErase:
-    default:
-    {
-      if (!font_face_normal)
-      {
-        font_face_normal = cairo_toy_font_face_create(FONT_NAME_ROBOTO, CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
-      }
-      return font_face_normal;
-    }    
+    return font_face_bold;
   }
-  
+
+  case flow_eDrawType_TextHelvetica:
+  case flow_eDrawType_TextHelveticaErase:
+  {
+    if (!font_face_normal)
+    {
+      font_face_normal =
+          cairo_toy_font_face_create(FONT_NAME_HELVETICA, CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+    }
+    return font_face_normal;
+  }
+
+  case flow_eDrawType_TextRobotoBold:
+  case flow_eDrawType_TextRobotoEraseBold:
+  {
+    if (!font_face_bold)
+    {
+      font_face_bold =
+          cairo_toy_font_face_create(FONT_NAME_ROBOTO, CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+    }
+    return font_face_bold;
+  }
+
+  case flow_eDrawType_TextRoboto:
+  case flow_eDrawType_TextRobotoErase:
+  default:
+  {
+    if (!font_face_normal)
+    {
+      font_face_normal =
+          cairo_toy_font_face_create(FONT_NAME_ROBOTO, CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+    }
+    return font_face_normal;
+  }
+  }
+
   // if (gc_type == flow_eDrawType_TextHelveticaBold || gc_type == flow_eDrawType_TextHelveticaEraseBold)
   // {
   //   if (!font_face_bold)
-  //     font_face_bold = cairo_toy_font_face_create(font_name, CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+  //     font_face_bold = cairo_toy_font_face_create(font_name, CAIRO_FONT_SLANT_NORMAL,
+  //     CAIRO_FONT_WEIGHT_BOLD);
   //   return font_face_bold;
   // }
   // else

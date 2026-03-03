@@ -107,7 +107,7 @@ int FlowPrintDrawGtk::print_page(double ll_x, double ll_y, double ur_x, double u
 
     layout = gtk_print_context_create_pango_layout(print_ctx);
 
-    desc = pango_font_description_from_string("Helvetica 9");
+    desc = pango_font_description_from_string("Roboto 9");
     pango_layout_set_font_description(layout, desc);
     pango_font_description_free(desc);
 
@@ -127,7 +127,7 @@ int FlowPrintDrawGtk::print_page(double ll_x, double ll_y, double ur_x, double u
 
     layout = gtk_print_context_create_pango_layout(print_ctx);
 
-    desc = pango_font_description_from_string("Helvetica 9");
+    desc = pango_font_description_from_string("Roboto 9");
     pango_layout_set_font_description(layout, desc);
     pango_font_description_free(desc);
 
@@ -282,10 +282,10 @@ int FlowPrintDrawGtk::text(double x, double y, char* text, int len, flow_eDrawTy
   switch (type)
   {
   case flow_eDrawType_TextHelvetica:
-    sprintf(font, "Helvetica %3.1f", 1.0 * size);
+    sprintf(font, "Roboto %3.1f", 1.0 * size);
     break;
   case flow_eDrawType_TextHelveticaBold:
-    sprintf(font, "Helvetica Bold %3.1f", 1.0 * size);
+    sprintf(font, "Roboto Bold %3.1f", 1.0 * size);
     break;
   default:;
   }
