@@ -77,5 +77,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Lucida Sans font due to it being licensed. All uses of this font will be replaced with Helvetica.
 - errh_Log function was removed due to it not being used throughout the codebase.
 - The old Profinet Viewer has been removed and replaced with the new and improved one.
+- Removed rt_version.dat. The runtime version is now compiled in from pwr_version.h instead of read from a file that was only created during packaging. This also fixes the empty Version field in the runtime status monitor on non-packaged (dev) builds.
 
 [unreleased]: https://gitlab.ssab.com/pwrdev/pwr/-/compare/V6.1.3...HEAD
