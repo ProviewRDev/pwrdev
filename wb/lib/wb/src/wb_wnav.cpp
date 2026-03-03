@@ -2379,7 +2379,6 @@ WNavGbl::WNavGbl()
       show_attrxref(0), show_objref(0), show_objxref(0), show_truedb(0),
       enable_comment(0), enable_revisions(0), color_theme(0)
 {
-  strcpy(version, wnav_cVersion);
   strcpy(platform, "");
   strcpy(os, "");
   strcpy(hw, "");

@@ -49,7 +49,6 @@
 #include "wb_watttext.h"
 #include "wb_wnav_brow.h"
 
-#define wnav_cVersion "X6.1.1"
 #define wnav_cScriptDescKey "!** Description"
 #define wnav_cScriptInvisKey "!** Invisible"
 #define wnav_cInitFile "pwrp_login:wtt_init"
@@ -168,7 +167,6 @@ public:
 class WNavGbl {
 public:
   WNavGbl();
-  char version[10];
   unsigned long priv;
   char platform[20];
   char os[20];
