@@ -187,7 +187,8 @@ int main(int argc, char* argv[])
     strcat(statussrv->version, &buff[9]);
     fp.close();
   } else
-    strcpy(statussrv->version, "");
+    strncpy(statussrv->version, pwrv_cPwrVersionStr,
+        sizeof(statussrv->version));
 
   // Create a cyclic tread to receive swap and terminate events
   pthread_t thread;

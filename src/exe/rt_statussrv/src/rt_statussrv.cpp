@@ -271,7 +271,7 @@ pwr_tStatus status_server::init(int ignore_config)
     strcat(m_version, &buff[9]);
     fp.close();
   } else
-    strcpy(m_version, "");
+    strncpy(m_version, pwrv_cPwrVersionStr, sizeof(m_version));
 
   // Ignore SIGPIPE signal
   signal(SIGPIPE, signal_callback_handler);
