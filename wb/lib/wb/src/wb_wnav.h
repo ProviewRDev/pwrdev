@@ -55,21 +55,24 @@
 #define wnav_cSymbolFile "pwrp_login:wtt_symbols.pwr_com"
 #define WNAV_BROW_MAX 25
 
-typedef enum {
+typedef enum
+{
   wnav_eSelectionFormat_User,
   wnav_eSelectionFormat_Graph,
   wnav_eSelectionFormat_Objid,
   wnav_eSelectionFormat_Attrref
 } wnav_eSelectionFormat;
 
-typedef enum {
+typedef enum
+{
   wnav_mOpen_All = ~0,
   wnav_mOpen_Children = 1 << 0,
   wnav_mOpen_Attributes = 1 << 1,
   wnav_mOpen_Crossref = 1 << 2
 } wnav_mOpen;
 
-typedef enum {
+typedef enum
+{
   wnav_eType_GdbNodeFlags = 10000,
   wnav_eType_Empty = 10001,
   wnav_eType_FixStr = 10002,
@@ -79,32 +82,37 @@ typedef enum {
   wnav_eType_ColorTheme = 10006
 } wnav_eType;
 
-typedef enum {
+typedef enum
+{
   wnav_eDestCode_After,
   wnav_eDestCode_Before,
   wnav_eDestCode_FirstChild,
   wnav_eDestCode_LastChild
 } wnav_eDestCode;
 
-typedef enum {
+typedef enum
+{
   wnav_eSearchType_No,
   wnav_eSearchType_Name,
   wnav_eSearchType_RegularExpr
 } wnav_eSearchType;
 
-typedef enum {
+typedef enum
+{
   wnav_eWindowType_No,
   wnav_eWindowType_W1,
   wnav_eWindowType_W2
 } wnav_eWindowType;
 
-typedef struct {
+typedef struct
+{
   char title[80];
   int item_type;
   void* action;
 } wnav_sStartMenu;
 
-typedef struct wnav_s_Menu {
+typedef struct wnav_s_Menu
+{
   char title[80];
   int item_type;
   char command[256];
@@ -115,22 +123,24 @@ typedef struct wnav_s_Menu {
 
 typedef struct s_trace_node t_trace_node;
 
-typedef enum {
+typedef enum
+{
   applist_eType_Trace,
   applist_eType_Graph,
   applist_eType_Attr
 } applist_eType;
 
-typedef struct {
+typedef struct
+{
   unsigned int num;
   char name[40];
 } wnav_sEnumElement;
 
-typedef struct {
+typedef struct
+{
   unsigned int num;
   wnav_sEnumElement* elements;
 } wnav_sEnum;
-
 
 extern wnav_sEnum wnav_enum_types[];
 
@@ -141,10 +151,10 @@ class CoLogin;
 class WCrr;
 class WRev;
 
-class ApplListElem {
+class ApplListElem
+{
 public:
-  ApplListElem(applist_eType al_type, void* al_ctx, pwr_tObjid al_objid,
-      const char* al_name);
+  ApplListElem(applist_eType al_type, void* al_ctx, pwr_tObjid al_objid, const char* al_name);
   applist_eType type;
   void* ctx;
   pwr_tObjid objid;
@@ -152,19 +162,20 @@ public:
   ApplListElem* next;
 };
 
-class ApplList {
+class ApplList
+{
 public:
-  ApplList() : root(NULL){}
+  ApplList() : root(NULL) {}
 
   ApplListElem* root;
-  void insert(
-      applist_eType type, void* ctx, pwr_tObjid objid, const char* name);
+  void insert(applist_eType type, void* ctx, pwr_tObjid objid, const char* name);
   void remove(void* ctx);
   int find(applist_eType type, char* name, void** ctx);
   int find(applist_eType type, pwr_tObjid objid, void** ctx);
 };
 
-class WNavGbl {
+class WNavGbl
+{
 public:
   WNavGbl();
   unsigned long priv;
@@ -196,11 +207,11 @@ public:
   int symbolfile_exec(void* wnav);
 };
 
-class WNav : public WUtility {
+class WNav : public WUtility
+{
 public:
-  WNav(void* xn_parent_ctx, const char* xn_name, const char* xn_layout,
-      ldh_tSesContext xn_ldhses, wnav_sStartMenu* root_menu,
-      wnav_eWindowType xn_type, pwr_tStatus* status);
+  WNav(void* xn_parent_ctx, const char* xn_name, const char* xn_layout, ldh_tSesContext xn_ldhses,
+       wnav_sStartMenu* root_menu, wnav_eWindowType xn_type, pwr_tStatus* status);
   virtual ~WNav();
 
   WNavGbl gbl;
@@ -234,8 +245,7 @@ public:
   void (*save_cb)(void*, int);
   void (*revert_cb)(void*, int confirm);
   char* (*script_filename_cb)(void*);
-  int (*format_selection_cb)(
-      void*, pwr_sAttrRef, char**, int, int, wnav_eSelectionFormat);
+  int (*format_selection_cb)(void*, pwr_sAttrRef, char**, int, int, wnav_eSelectionFormat);
   int (*get_global_select_cb)(void*, pwr_sAttrRef**, int**, int*);
   int (*global_unselect_objid_cb)(void*, pwr_tObjid objid);
   void (*set_window_char_cb)(void*, int, int);
@@ -278,110 +288,48 @@ public:
   int nodraw;
   WRev* rev;
 
-  virtual void pop()
-  {
-  }
-  virtual void set_inputfocus(int focus)
-  {
-  }
-  virtual void print(const char* title)
-  {
-  }
-  virtual void trace_start()
-  {
-  }
-  virtual void set_selection_owner()
-  {
-  }
-  virtual Ge* ge_new(char* graph_name, int nojournal)
+  virtual void pop() {}
+  virtual void set_inputfocus(int focus) {}
+  virtual void print(const char* title) {}
+  virtual void trace_start() {}
+  virtual void set_selection_owner() {}
+  virtual Ge* ge_new(char* graph_name, int nojournal) { return 0; }
+  virtual WGe* wge_new(char* name, char* filename, char* object_name, int modal) { return 0; }
+  virtual void create_popup_menu(pwr_tAttrRef aref, int x, int y) {}
+  virtual int get_selection(char* str, int len) { return 0; }
+  virtual int open_foe(const char* name, pwr_tOid plcpgm, void** foectx, int map_window, ldh_eAccess access,
+                       pwr_tOid oid)
   {
     return 0;
   }
-  virtual WGe* wge_new(char* name, char* filename, char* object_name, int modal)
+  virtual void wda_new(pwr_tOid oid, pwr_tCid cid, char* attribute, int edit_mode, int advuser,
+                       int display_objectname)
+  {
+  }
+  virtual void message_dialog(char* title, char* text) {}
+  virtual int confirm_dialog(char* title, char* text, int display_cancel, int* cancel) { return 0; }
+  virtual int continue_dialog(char* title, char* text) { return 0; }
+  virtual int prompt_dialog(char* title, char* text, char** value) { return 0; }
+  virtual void wge_subwindow_loop(WGe* wge) {}
+  virtual void wge_modal_loop(WGe* wge) {}
+  virtual bool has_window() { return false; }
+  virtual wb_utl* utl_new() { return 0; }
+  virtual WRev* rev_new() { return 0; }
+  virtual void logw_new(char* item, wlog_eCategory* categories, int show_item) {}
+  virtual CoLogin* login_new(const char* name, const char* groupname, void (*bc_success)(void*),
+                             void (*bc_cancel)(void*), pwr_tStatus* status)
   {
     return 0;
   }
-  virtual void create_popup_menu(pwr_tAttrRef aref, int x, int y)
-  {
-  }
-  virtual int get_selection(char* str, int len)
-  {
-    return 0;
-  }
-  virtual int open_foe(const char* name, pwr_tOid plcpgm, void** foectx,
-      int map_window, ldh_eAccess access, pwr_tOid oid)
-  {
-    return 0;
-  }
-  virtual void wda_new(pwr_tOid oid, pwr_tCid cid, char* attribute,
-      int edit_mode, int advuser, int display_objectname)
-  {
-  }
-  virtual void message_dialog(char* title, char* text)
-  {
-  }
-  virtual int confirm_dialog(
-      char* title, char* text, int display_cancel, int* cancel)
-  {
-    return 0;
-  }
-  virtual int continue_dialog(char* title, char* text)
-  {
-    return 0;
-  }
-  virtual int prompt_dialog(char* title, char* text, char** value)
-  {
-    return 0;
-  }
-  virtual void wge_subwindow_loop(WGe* wge)
-  {
-  }
-  virtual void wge_modal_loop(WGe* wge)
-  {
-  }
-  virtual bool has_window()
-  {
-    return false;
-  }
-  virtual wb_utl* utl_new()
-  {
-    return 0;
-  }
-  virtual WRev* rev_new()
-  {
-    return 0;
-  }
-  virtual void logw_new(char* item, wlog_eCategory* categories, int show_item)
-  {
-  }
-  virtual CoLogin* login_new(const char* name, const char* groupname,
-      void (*bc_success)(void*), void (*bc_cancel)(void*), pwr_tStatus* status)
-  {
-    return 0;
-  }
-  virtual WCrr* wcrr_new(pwr_tAttrRef* aref, pwr_tStatus* status)
-  {
-    return 0;
-  }
-  virtual WbBckW* bckw_new(char* name, wb_bck_list* list, pwr_tStatus* status)
-  {
-    return 0;
-  }
-  virtual WbExpW* expw_new(char* name, int type, pwr_tStatus* status)
-  {
-    return 0;
-  }
-  virtual WAttText* watttext_new(
-      pwr_tAttrRef aref, int editmode, pwr_tStatus* status)
-  {
-    return 0;
-  }
+  virtual WCrr* wcrr_new(pwr_tAttrRef* aref, pwr_tStatus* status) { return 0; }
+  virtual WbBckW* bckw_new(char* name, wb_bck_list* list, pwr_tStatus* status) { return 0; }
+  virtual WbExpW* expw_new(char* name, int type, pwr_tStatus* status) { return 0; }
+  virtual WAttText* watttext_new(pwr_tAttrRef aref, int editmode, pwr_tStatus* status) { return 0; }
 
   static int brow_cb(FlowCtx* ctx, flow_tEvent event);
   static int init_brow_base_cb(FlowCtx* fctx, void* client_data);
   static int init_brow_cb(BrowCtx* ctx, void* client_data);
-  static int trace_connect_bc(brow_tObject object, char* name, char* attr,
-      flow_eTraceType type, void** p);
+  static int trace_connect_bc(brow_tObject object, char* name, char* attr, flow_eTraceType type, void** p);
   static int trace_disconnect_bc(brow_tObject object);
   static int trace_scan_bc(brow_tObject object, void* p);
   static void foe_get_build_options_cb(void* ctx, wb_build_opt** opt);
@@ -389,14 +337,12 @@ public:
   static int local_enum_to_string(int type_id, pwr_tEnum enumval, char* str, int strsize);
   static int is_local_enum(int type_id);
 
-  int create_object_item(pwr_tObjid objid, brow_tNode dest,
-      flow_eDest dest_code, void** item, int is_root);
+  int create_object_item(pwr_tObjid objid, brow_tNode dest, flow_eDest dest_code, void** item, int is_root);
   void zoom(double zoom_factor);
   void get_zoom(double* zoom_factor);
   void unzoom();
   int set_attr_value(brow_tObject node, pwr_tObjid objid, char* value_str);
-  int check_attr_value(
-      brow_tObject node, int* multiline, char** init_value, int* size);
+  int check_attr_value(brow_tObject node, int* multiline, char** init_value, int* size);
   int set_object_name(brow_tObject node, pwr_tObjid objid, char* value_str);
   int check_object_name(brow_tObject node);
   int get_select(pwr_sAttrRef** attrref, int** is_attr, int* cnt);
@@ -414,40 +360,32 @@ public:
   int setup();
   void force_trace_scan();
   void menu_tree_build(wnav_sStartMenu* root);
-  wnav_sMenu* menu_tree_build_children(
-      wnav_sStartMenu* first_child, wnav_sMenu* parent);
+  wnav_sMenu* menu_tree_build_children(wnav_sStartMenu* first_child, wnav_sMenu* parent);
   void menu_tree_free();
   void menu_tree_free_children(wnav_sMenu* first_child);
   int menu_tree_search(char* name, wnav_sMenu** menu_item);
-  int menu_tree_search_children(
-      char* name, wnav_sMenu* child_list, wnav_sMenu** menu_item);
-  int menu_tree_insert(char* title, int item_type, char* command,
-      char* destination, int dest_code, wnav_sMenu** menu_item);
+  int menu_tree_search_children(char* name, wnav_sMenu* child_list, wnav_sMenu** menu_item);
+  int menu_tree_insert(char* title, int item_type, char* command, char* destination, int dest_code,
+                       wnav_sMenu** menu_item);
   int menu_tree_delete(char* name);
   int open_plc();
   int open_plc(pwr_tOid oid);
-  int is_editmode()
-  {
-    return editmode;
-  }
+  int is_editmode() { return editmode; }
   void set_editmode(int value);
-  int volume_attached(
-      ldh_tWBContext wbcontext, ldh_tSesContext ldhsession, int pop);
+  int volume_attached(ldh_tWBContext wbcontext, ldh_tSesContext ldhsession, int pop);
   int volume_detached();
   void ldh_event(ldh_sEvent* event);
   void ldh_refresh(pwr_tObjid new_open);
   void refresh();
   void collapse();
-  void set_options(int ena_comment, int ena_revisions, int sh_class,
-      int sh_alias, int sh_descrip, int sh_objref, int sh_objxref,
-      int sh_attrref, int sh_attrxref, int bu_force, int bu_debug, int bu_syntax,
-      int bu_crossref, int bu_crossrefsim, int bu_crossrefgraph, int bu_manual,
-      int bu_nocopy, int col_theme);
-  void get_options(int* ena_comment, int* ena_revisions, int* sh_class,
-      int* sh_alias, int* sh_descrip, int* sh_objref, int* sh_objxref,
-      int* sh_attrref, int* sh_attrxref, int* bu_force, int* bu_debug,
-      int* bu_syntax, int* bu_crossref, int* bu_crossrefsim, int* bu_crossrefgraph,
-      int* bu_manual, int* bu_nocopy, int *col_theme);
+  void set_options(int ena_comment, int ena_revisions, int sh_class, int sh_alias, int sh_descrip,
+                   int sh_objref, int sh_objxref, int sh_attrref, int sh_attrxref, int bu_force, int bu_debug,
+                   int bu_syntax, int bu_crossref, int bu_crossrefsim, int bu_crossrefgraph, int bu_manual,
+                   int bu_nocopy, int col_theme);
+  void get_options(int* ena_comment, int* ena_revisions, int* sh_class, int* sh_alias, int* sh_descrip,
+                   int* sh_objref, int* sh_objxref, int* sh_attrref, int* sh_attrxref, int* bu_force,
+                   int* bu_debug, int* bu_syntax, int* bu_crossref, int* bu_crossrefsim,
+                   int* bu_crossrefgraph, int* bu_manual, int* bu_nocopy, int* col_theme);
   int save_settings(std::ofstream& fp);
   int node_to_objid(brow_tNode node, pwr_tObjid* objid);
   int unselect_objid(pwr_tObjid objid);
@@ -461,39 +399,32 @@ public:
   pwr_tStatus get_command_sts();
   int command(char* input_str);
   int readcmdfile(char* incommand);
-  int get_current_object(
-      pwr_tObjid* objid, char* objectname, int size, ldh_eName nametype);
+  int get_current_object(pwr_tObjid* objid, char* objectname, int size, ldh_eName nametype);
   int find_name(char* name, pwr_tObjid* objid);
   int show_symbols();
   int search(char* search_str, int regexp);
   int search_root(char* search_str, pwr_tObjid* found_objid, int next);
-  int search_object(
-      pwr_tObjid objid, char* search_str, pwr_tObjid* found_objid, int next);
+  int search_object(pwr_tObjid objid, char* search_str, pwr_tObjid* found_objid, int next);
   int search_next();
   int show_file(const char* filename, const char* intitle, int hide_dir);
   void select_object(brow_tObject object);
   int select_object(pwr_tOid oid);
-  int get_next(
-      pwr_tOid oid, wnav_eDestCode dest, pwr_tOid* next_oid, wnav_eDestCode* d);
+  int get_next(pwr_tOid oid, wnav_eDestCode dest, pwr_tOid* next_oid, wnav_eDestCode* d);
   void set_select_visible();
   void update_color_theme(int ct);
-  static int get_next_free_vid(
-      pwr_tVid min_vid, pwr_tVid max_vid, pwr_tVid* next);
+  static int get_next_free_vid(pwr_tVid min_vid, pwr_tVid max_vid, pwr_tVid* next);
   static int check_new_vid(pwr_tVid vid);
   static int check_new_volumename(char* vname);
 
   // Crr module member functions
-  static int crr_signal(WNavBrow* brow, ldh_tSesContext ldhses, char* filename,
-      char* signalname, brow_tNode parent_node);
-  static int crr_object(WNavBrow* brow, ldh_tSesContext ldhses, char* filename,
-      char* objectname, brow_tNode parent_node);
-  static int crr_code(WNavBrow* brow, ldh_tSesContext ldhses, char* filename,
-      char* str, int brief, int func, int case_sensitive);
+  static int crr_signal(WNavBrow* brow, ldh_tSesContext ldhses, char* filename, char* signalname,
+                        brow_tNode parent_node);
+  static int crr_object(WNavBrow* brow, ldh_tSesContext ldhses, char* filename, char* objectname,
+                        brow_tNode parent_node);
+  static int crr_code(WNavBrow* brow, ldh_tSesContext ldhses, char* filename, char* str, int brief, int func,
+                      int case_sensitive);
   int display_objects(pwr_tCid* cidp, char* name, pwr_tObjid root, int depth);
-  void set_nodraw()
-  {
-    nodraw = 1;
-  }
+  void set_nodraw() { nodraw = 1; }
   void reset_nodraw()
   {
     nodraw = 0;
@@ -503,10 +434,9 @@ public:
 
 int wnav_cut_segments(char* outname, char* name, int segments);
 
-int wnav_attr_string_to_value(ldh_tSesContext ldhses, int type_id,
-    char* value_str, void* buffer_ptr, int buff_size, int attr_size);
-void wnav_attrvalue_to_string(ldh_tSesContext ldhses, int type_id,
-    void* value_ptr, char** buff, int* len);
+int wnav_attr_string_to_value(ldh_tSesContext ldhses, int type_id, char* value_str, void* buffer_ptr,
+                              int buff_size, int attr_size);
+void wnav_attrvalue_to_string(ldh_tSesContext ldhses, int type_id, void* value_ptr, char** buff, int* len);
 char* wnav_get_message(int sts);
 
 #endif
