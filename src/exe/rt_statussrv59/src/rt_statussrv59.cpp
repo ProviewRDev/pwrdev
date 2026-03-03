@@ -182,8 +182,7 @@ int main(int argc, char* argv[])
     aproc_RegisterObject(config_oid);
   }
 
-  strncpy(statussrv->version, pwrv_cPwrVersionStr,
-      sizeof(statussrv->version));
+  strncpy(statussrv->version, pwrv_cPwrVersionStr, sizeof(statussrv->version));
 
   // Create a cyclic tread to receive swap and terminate events
   pthread_t thread;
