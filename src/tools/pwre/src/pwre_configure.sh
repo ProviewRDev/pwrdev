@@ -515,7 +515,13 @@ else
     pwre_config_check_include powerlink EPL 1 "$epl/Include/Epl.h"
     pwre_config_check_include powerlinkuser EPLU 0 "$epl/Examples/X86/Generic/powerlink_user_lib/EplCfg.h"
     pwre_config_check_include rsvg  RSVG  1 "/usr/include/librsvg-2/librsvg/rsvg.h:/usr/include/librsvg-2.0/librsvg/rsvg.h"
-    pwre_config_check_include pydev   PYDEV   0 "/usr/include/python3.6m/pymath.h:/usr/include/python3.7m/pymath.h:/usr/include/python3.8/pymath.h:/usr/include/python3.9/pymath.h:/usr/include/python3.10/pymath.h:/usr/include/python3.11/pymath.h"
+    # Dynamically find pymath.h for any installed Python 3.x version
+    pydev_paths=$(find /usr/include/python3* -maxdepth 1 -name "pymath.h" 2>/dev/null | sort -V | paste -s -d':')
+    if [ -n "$pydev_paths" ]; then
+        pwre_config_check_include pydev   PYDEV   0 "$pydev_paths"
+    else
+        echo "...Checking   No    pydev"
+    fi
     pwre_config_check_tool android ANDROID "/usr/local/android-sdk-linux/tools/android"
 
 
