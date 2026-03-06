@@ -10474,13 +10474,34 @@ int gcg_comp_m37(gcg_ctx gcgctx, vldh_t_node node)
   switch (conn_cid)
   {
   case pwr_cClass_GetIp:
+  case pwr_cClass_GetDTp:
+  case pwr_cClass_GetATp:
+  case pwr_cClass_GetSp:
   {
     // Get the referenced object
     pwr_tAttrRef* attrref;
     pwr_tAttrRef aref;
     char *name_p, *s;
+    char devbody_attr[32];
 
-    sts = ldh_GetObjectPar(ldhses, conn_node->ln.oid, "DevBody", "IpObject", (char**)&attrref, &size);
+    switch (conn_cid)
+    {
+    case pwr_cClass_GetIp:
+      strcpy(devbody_attr, "IpObject");
+      break;
+    case pwr_cClass_GetDTp:
+      strcpy(devbody_attr, "DTpObject");
+      break;
+    case pwr_cClass_GetATp:
+      strcpy(devbody_attr, "ATpObject");
+      break;
+    case pwr_cClass_GetSp:
+      strcpy(devbody_attr, "SpObject");
+      break;
+    default:;
+    }
+
+    sts = ldh_GetObjectPar(ldhses, conn_node->ln.oid, "DevBody", devbody_attr, (char**)&attrref, &size);
     if (EVEN(sts))
       return sts;
 
