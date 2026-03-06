@@ -93,13 +93,13 @@ fi
 
 # Insert base in projectlist
 if [ ! -e $aroot/db/pwr_projectlist.dat ]; then
-  echo "%base V${ver:0:1}.${ver:1:1} /usr/pwr$ver" > $aroot/db/pwr_projectlist.dat
+  echo "%base $vermajmin /usr/pwr$ver" > $aroot/db/pwr_projectlist.dat
 else
   set +e
-  ptst=`eval grep "^%base" $aroot/db/pwr_projectlist.dat | grep "\bV${ver:0:1}.${ver:1:1}\b"`
+  ptst=`eval grep "^%base" $aroot/db/pwr_projectlist.dat | grep "\b$vermajmin\b"`
   set -e
   if [ "$ptst" = "" ]; then
-    echo "%base V${ver:0:1}.${ver:1:1} /usr/pwr$ver" >> $aroot/db/pwr_projectlist.dat
+    echo "%base $vermajmin /usr/pwr$ver" >> $aroot/db/pwr_projectlist.dat
   fi
 fi
 

@@ -855,7 +855,7 @@ sub method_build()
 {
   my $flavour;
   my $program;
-  if ($_[0] eq "motif" || $_[0] eq "gtk" || $_[0] eq "qt" ) {
+  if ($_[0] eq "gtk" || $_[0] eq "qt" ) {
     $flavour = $_[0];
   } else {
     $program = $_[0];

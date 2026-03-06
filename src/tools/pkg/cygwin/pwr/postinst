@@ -1,12 +1,7 @@
 #!/bin/bash
 set -e
 
-# Get version from current path
-dname=`eval dirname $0`
-pwrdir=`eval bash -c "cd $dname; pwd"`
-ver="${pwrdir:12:1}${pwrdir:13:1}"
-
-echo $pwrdir $ver
+# ver and vermajmin are injected by build.sh
 
 pwre_target="os_cygwin/hw_x86"
 
@@ -64,13 +59,13 @@ fi
 
 # Insert base in projectlist
 if [ ! -e $aroot/db/pwr_projectlist.dat ]; then
-  echo "%base V${ver:0:1}.${ver:1:1} /usr/pwr$ver" > $aroot/db/pwr_projectlist.dat
+  echo "%base $vermajmin /usr/pwr$ver" > $aroot/db/pwr_projectlist.dat
 else
   set +e
-  ptst=`eval grep "^%base" $aroot/db/pwr_projectlist.dat | grep "\bV${ver:0:1}.${ver:1:1}\b"`
+  ptst=`eval grep "^%base" $aroot/db/pwr_projectlist.dat | grep "\b$vermajmin\b"`
   set -e
   if [ "$ptst" = "" ]; then
-    echo "%base V${ver:0:1}.${ver:1:1} /usr/pwr$ver" >> $aroot/db/pwr_projectlist.dat
+    echo "%base $vermajmin /usr/pwr$ver" >> $aroot/db/pwr_projectlist.dat
   fi
 fi
 

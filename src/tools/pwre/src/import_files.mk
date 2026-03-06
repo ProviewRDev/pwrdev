@@ -74,10 +74,6 @@ op_gtk_modules = \
 		$(pwre_broot)/$(pwre_os)/$(pwre_hw)/exp/inc/wb_nav_gtk.h \
 		$(pwre_broot)/$(pwre_os)/$(pwre_hw)/exp/inc/wb_log_gtk.h
 
-op_motif_modules = \
-		$(pwre_broot)/$(pwre_os)/$(pwre_hw)/exp/inc/wb_nav_motif.h
-
-
 java_modules = \
 		$(pwre_broot)/$(pwre_os)/$(pwre_hw)/exp/lib/pwr_rt.jar \
 		$(pwre_broot)/$(pwre_os)/$(pwre_hw)/exp/lib/pwr_jop.jar \
@@ -95,13 +91,10 @@ import_files : $(rt_modules) $(op_modules) $(java_modules) $(op_gtk_modules)
 _gtk :
 rt : $(rt_modules)
 rt_gtk :
-rt_motif :
 op : $(op_modules)
 op_gtk : $(op_gtk_modules)
-op_motif : $(op_motif_modules)
 java : $(java_modules)
 java_gtk :
-java_motif :
 
 .SUFFIXES:
 
@@ -238,10 +231,6 @@ $(pwre_broot)/$(pwre_os)/$(pwre_hw)/telemecanique/inc/%.hpp : $(pwre_vmsinc)/exp
 	@ cp $(source) $(target)
 
 $(pwre_broot)/$(pwre_os)/$(pwre_hw)/exp/exe/%.sh : $(pwre_vmsinc)/exp/exe/%.sh
-	@ echo Import ${target}
-	@ cp $(source) $(target)
-
-$(pwre_broot)/$(pwre_os)/$(pwre_hw)/exp/inc/wb_%_motif.h : $(pwre_croot)/wb/lib/wb/motif/wb_%_motif.h
 	@ echo Import ${target}
 	@ cp $(source) $(target)
 

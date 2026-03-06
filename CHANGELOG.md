@@ -71,11 +71,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PROFINET: Softing headers have moved outside the codebase.
 - Update Classes will now be more thorough and check sizes of class definitions compared to database and update accordingly. (https://gitlab.ssab.com/pwrdev/pwr/-/issues/189)
 
+### Deprecated
+- Nodave for communcating with legacy S7 300/400 will be removed next release.
+- MQ (dmq) which is a 32-bit message queue will be removed next release.
+
 ### Removed
 
 - Java support, only the websocket server will remain java for now. This was however removed several versions back. It's here to make it official.
 - Lucida Sans font due to it being licensed. All uses of this font will be replaced with Helvetica.
 - errh_Log function was removed due to it not being used throughout the codebase.
 - The old Profinet Viewer has been removed and replaced with the new and improved one.
+- Removed rt_version.dat. The runtime version is now compiled in from pwr_version.h instead of read from a file that was only created during packaging. This also fixes the empty Version field in the runtime status monitor on non-packaged (dev) builds.
+- Removed all remnants of the Motif framework that was still present.
 
 [unreleased]: https://gitlab.ssab.com/pwrdev/pwr/-/compare/V6.1.3...HEAD
