@@ -604,9 +604,6 @@ SOAP_FMAC5 int SOAP_FMAC6 __s0__XttStart(struct soap* soap, _s0__XttStart* s0__X
   if (s0__XttStart->GUI)
     strncpy(gui, s0__XttStart->GUI->c_str(), sizeof(gui));
 
-  if (streq(gui, "motif"))
-    strcpy(sw_d, "-d");
-
   int i = 1;
   if (!streq(opplace, ""))
     argv[i++] = opplace;
