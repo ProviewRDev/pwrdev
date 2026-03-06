@@ -172,6 +172,7 @@ palette NavigatorPalette
           class ABB_ACS880_1
           class ABB_ACS880_PnDevice
           class ABB_ACS880_Pn_1
+          class ABB_ACS880_Pn_2
           class ABB_ACS880_PnModule          
           class ABB_ACS880_PnMotorAggr
           class ABB_ACS880_PnFanAggr
@@ -245,6 +246,7 @@ palette NavigatorPalette
         {
           class Siemens_Motor_1LA
           class Sinamics_G120_Tgm1
+          class Sinamics_G120_Tgm999
         }
         menu Suco
         {
@@ -1345,6 +1347,7 @@ palette PlcEditorPalette
       class ABB_ACS800_1Fo
       class ABB_ACS800MotorAggrFo
       class ABB_ACS880_1Fo
+      class ABB_ACS880_Pn_2Fo
       class ABB_ACS880MotorAggrFo
       class ABB_Sensor_Pb_PA_Fo
       class ABB_TempSensor_TF12Fo
@@ -1355,6 +1358,7 @@ palette PlcEditorPalette
     menu Siemens
     {
       class Sinamics_G120_Tgm1Fo
+      class Sinamics_G120_Tgm999Fo
     }
     menu OtherManufacturer
     {
@@ -1371,6 +1375,7 @@ palette PlcEditorPalette
       class ABB_ACS800_1Sim
       class ABB_ACS800MotorAggrSim
       class ABB_ACS880_1Sim
+      class ABB_ACS880_Pn_2Sim
       class ABB_ACS880MotorAggrSim
       class BaseContactorSim
       class BaseCDamperSim
@@ -1391,6 +1396,7 @@ palette PlcEditorPalette
       class Eurotherm_EPowerSim
       class Eurotherm_EPowerAggrSim
       class SEW_Movidrive_1Sim
+      class Sinamics_G120_Tgm999Sim
     }
     menu Miscellaneous
     {

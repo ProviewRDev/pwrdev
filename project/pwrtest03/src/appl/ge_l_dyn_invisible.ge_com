@@ -48,14 +48,14 @@ main()
 
   xm = x0 + 1;
   ym = y0 + 1;
-  id = CreateText("Invisible", xm, ym, 4, eFont_LucidaSans, 0, eDrawType_CustomColor34);
+  id = CreateText("Invisible", xm, ym, 4, eFont_Helvetica, 0, eDrawType_CustomColor34);
 
 # One instance
 
   ym += 1.4;
   x2 = xm;
   y2 = ym;
-  id = CreateText("One instance", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("One instance", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   y1 = ym + 0.5;
   x1 = xm;
@@ -83,7 +83,7 @@ main()
   ym += 3.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Two instances", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Two instances", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   y1 = ym + 0.5;
   x1 = xm;
@@ -122,7 +122,7 @@ main()
   ym += 3.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Three instances", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Three instances", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   y1 = ym + 0.5;
   x1 = xm;
@@ -170,7 +170,7 @@ main()
   ym += 3.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Four instances", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Four instances", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   y1 = ym + 0.5;
   x1 = xm;
@@ -228,7 +228,7 @@ main()
   ym += 3.2;
   x2 = xm;
   y2 = ym;
-  id = CreateText("One instance, dimmed", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("One instance, dimmed", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   y1 = ym + 0.5;
   x1 = xm;
@@ -256,7 +256,7 @@ main()
   ym += 3.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Two instances, dimmed", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Two instances, dimmed", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   y1 = ym + 0.5;
   x1 = xm;
@@ -295,7 +295,7 @@ main()
   ym += 3.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Three instances, dimmed", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Three instances, dimmed", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   y1 = ym + 0.5;
   x1 = xm;
@@ -343,7 +343,7 @@ main()
   ym += 3.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Four instances, dimmed", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Four instances, dimmed", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   y1 = ym + 0.5;
   x1 = xm;
@@ -401,7 +401,7 @@ main()
   ym += 3.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Two instances, dimmed/invisible", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Two instances, dimmed/invisible", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   y1 = ym + 0.5;
   x1 = xm;

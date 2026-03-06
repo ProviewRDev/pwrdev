@@ -42,7 +42,7 @@
 class FlowText : public FlowArrayElem {
 public:
   FlowText(FlowCtx* flow_ctx, const char* text1, double x = 0, double y = 0,
-      flow_eDrawType d_type = flow_eDrawType_TextHelveticaBold, int t_size = 2);
+      flow_eDrawType d_type = flow_eDrawType_TextRobotoBold, int t_size = 2);
   friend std::ostream& operator<<(std::ostream& o, const FlowText t);
   void zoom();
   void nav_zoom();

@@ -11,7 +11,11 @@ if [ -e $pwr_inc/pwr_version.h ]; then
     echo "Unable to get pwr version"
     ver="V00"
   fi
-  ver=${ver:2:2}
+  ver=$(echo "$ver" | tr -d '"' | sed 's/^V//')
+
+  # Extract major.minor version for display (e.g. "V6.1")
+  vermajmin=`eval cat $pwr_inc/pwr_version.h | grep "\\bpwrv_cPwrVersionStr\\b" | awk '{print $3}'`
+  vermajmin=$(echo "$vermajmin" | tr -d '"' | sed 's/\.[^.]*$//')
 fi
 
 # Generate version help file
@@ -50,7 +54,7 @@ fi
 	echo ""
 	echo ""
 	echo ""
-        echo "<b>Proview V${version:0:3}"
+        echo "<b>Proview $vermajmin"
 	echo "Version V$version"
         echo ""
         echo "Copyright © 2005-${d:0:4} SSAB EMEA AB"
@@ -155,7 +159,7 @@ chmod a+x $pkgroot/etc/pwrp_profile
 
 # Copy adm files to cnf
 cp $pwre_sroot/tools/pkg/deb/adm/pwr_setup.sh $pkgroot/usr/pwr$ver/$pwre_target/exp/cnf
-echo "pwrp set base V${ver:0:1}.${ver:1:1}" >> $pkgroot/usr/pwr$ver/$pwre_target/exp/cnf/pwr_setup.sh
+echo "pwrp set base $vermajmin" >> $pkgroot/usr/pwr$ver/$pwre_target/exp/cnf/pwr_setup.sh
 chmod a+x $pkgroot/usr/pwr$ver/$pwre_target/exp/cnf/pwr_setup.sh
 cp $pwre_sroot/tools/pkg/deb/adm/pwra_env.sh $pkgroot/usr/pwr$ver/$pwre_target/exp/cnf
 chmod a+x $pkgroot/usr/pwr$ver/$pwre_target/exp/cnf/pwra_env.sh
@@ -180,10 +184,10 @@ cp $pwre_sroot/tools/pkg/deb/user/wtt_init1.pwr_com $pkgroot/usr/pwr$ver/$pwre_t
   echo "[Desktop Entry]"
   echo "Version=1.0"
   echo "Encoding=UTF-8"
-  echo "Name=Proview V${version:0:3}"
+  echo "Name=Proview $vermajmin"
   echo "Type=Application"
   echo "Comment=Start Proview"
-  echo "Exec=xterm -title \"Proview Development Console\" -e 'export pwra_db=$aroot/db;source \$pwra_db/pwra_env.sh set base V""${version:0:3}"";source \$pwra_db/pwra_env.sh set bus;wb -p pwrp pwrp'"
+  echo "Exec=xterm -title \"Proview Development Console\" -e 'export pwra_db=$aroot/db;source \$pwra_db/pwra_env.sh set base $vermajmin;source \$pwra_db/pwra_env.sh set bus;wb -p pwrp pwrp'"
   echo "Icon=$aroot/db/proview_icon.png"
   echo "Categories=GNOME;GTK;Application;"
 } > $pkgroot/usr/pwr$ver/$pwre_target/exp/cnf/user/proview$ver.desktop

@@ -91,7 +91,9 @@ long http_request(const char* hostname, const char* path, std::string body)
   if (err < 0)
   {
     perror("can't connect to server port");
-    exit(1);
+    close(sd);
+    SSL_CTX_free(ctx);
+    return -1;
   }
   if (exp_debug)
     printf("(3) TCP connection open to host '%s', port %d\n", hostname, sock_addr.sin_port);
@@ -99,6 +101,15 @@ long http_request(const char* hostname, const char* path, std::string body)
   SSL* ssl = SSL_new(ctx);
   SSL_set_fd(ssl, sd);
   err = SSL_connect(ssl);
+  if (err <= 0)
+  {
+    if (exp_debug)
+      printf("SSL_connect failed: %d\n", SSL_get_error(ssl, err));
+    SSL_free(ssl);
+    close(sd);
+    SSL_CTX_free(ctx);
+    return -1;
+  }
   if (exp_debug)
   {
     printf("(4) SSL endpoint created & handshake completed\n");

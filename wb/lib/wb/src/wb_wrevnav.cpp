@@ -95,11 +95,11 @@ void WRevNavBrow::create_nodeclasses()
       ctx, "NavigatorDefault", flow_eNodeGroup_Common, &nc_object);
   brow_AddAnnotPixmap(nc_object, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_object, 1, 1.1, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_object, 2, 0.6, 0, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_object, 2, 0.6, 0, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_object, 7, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_object, 7, 0.6, 1, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_object, 11, 0.6, 2, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_object, 11, 0.6, 2, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_object, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 
@@ -109,25 +109,25 @@ void WRevNavBrow::create_nodeclasses()
       ctx, "NavigatorTable", flow_eNodeGroup_Common, &nc_table);
   brow_AddAnnotPixmap(nc_table, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_table, 1, 1.1, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_table, 2, 0.6, 0, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_table, 2, 0.6, 0, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_table, 8, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_table, 8, 0.6, 1, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 12, 0.6, 2, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_table, 12, 0.6, 2, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 16, 0.6, 3, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_table, 16, 0.6, 3, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 20, 0.6, 4, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_table, 20, 0.6, 4, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 24, 0.6, 5, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_table, 24, 0.6, 5, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 28, 0.6, 6, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_table, 28, 0.6, 6, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 32, 0.6, 7, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_table, 32, 0.6, 7, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 35, 0.6, 8, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_table, 35, 0.6, 8, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 38, 0.6, 9, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_table, 38, 0.6, 9, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_table, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 }

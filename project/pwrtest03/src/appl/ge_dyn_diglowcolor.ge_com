@@ -43,7 +43,7 @@ main()
 
   x = x0 + 1;
   y = y0 + 1;
-  id = CreateText("DigLowColor", x, y, 4, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("DigLowColor", x, y, 4, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 #  x1 = x + 2.5;
 #  y1 = y + 0.92;

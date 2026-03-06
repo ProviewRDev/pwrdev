@@ -50,6 +50,7 @@
 #include "co_msg.h"
 #include "co_string.h"
 #include "co_fs_util.h"
+#include "co_pugixml.hpp"
 
 #include "rt_pb_msg.h"
 
@@ -773,7 +774,6 @@ static pwr_tStatus generate_viewer_data(device_sCtx* ctx)
 {
   pwr_tOid controller_oid;
   pwr_tCid controller_cid;
-  FILE* pnviewer_fp;
   pwr_tFileName fname;
   pwr_tStatus sts;
   pwr_tOid child_module_oid;
@@ -789,6 +789,8 @@ static pwr_tStatus generate_viewer_data(device_sCtx* ctx)
 
   ProfinetRuntimeData profinet_rt_data;
 
+  std::cout << "Generating Profinet Viewer data file..." << std::endl;
+
   sts = ldh_GetParent(ctx->ldhses, ctx->aref.Objid, &controller_oid);
   if (EVEN(sts))
     return sts;
@@ -796,20 +798,13 @@ static pwr_tStatus generate_viewer_data(device_sCtx* ctx)
   sts = ldh_GetObjectClass(ctx->ldhses, controller_oid, &controller_cid);
   if (ODD(sts) && controller_cid == pwr_cClass_PnControllerSoftingPNAK)
   {
-    // Extract ethernet device
-    sts = ldh_GetObjectPar(ctx->ldhses, controller_oid, "RtBody", "EthernetDevice", (char**)&ethernet_device,
-                           &size);
-    if (EVEN(sts))
-      return sts;
-    str_trim(ethernet_device, ethernet_device);
-    str_ToLower(ethernet_device, ethernet_device);
-    sprintf(fname, "$pwrp_load/pwr_pnviewer_%s.dat", ethernet_device);
-    free(ethernet_device);
-    dcli_translate_filename(fname, fname);
+    // Create XML document
+    pugi::xml_document doc;
+    pugi::xml_node devices = doc.append_child("ProfinetDevices");
 
-    pnviewer_fp = fopen(fname, "w");
-    if (!pnviewer_fp)
-      return 0;
+    // Add XML declaration comment
+    pugi::xml_node decl = doc.prepend_child(pugi::node_comment);
+    decl.set_value(" ProviewR Profinet Device Viewer Data ");
 
     for (sts = ldh_GetChild(ctx->ldhses, controller_oid, &child_module_oid); ODD(sts);
          sts = ldh_GetNextSibling(ctx->ldhses, child_module_oid, &child_module_oid))
@@ -827,18 +822,39 @@ static pwr_tStatus generate_viewer_data(device_sCtx* ctx)
         mac_address = profinet_rt_data.m_PnDevice->m_NetworkSettings.m_mac_address;
         vendor_id = profinet_rt_data.m_PnDevice->m_vendor_id;
         device_id = profinet_rt_data.m_PnDevice->m_device_id;
+
+        // Create device element
+        pugi::xml_node device = devices.append_child("Device");
+        device.append_attribute("name").set_value(device_name.c_str());
+        device.append_attribute("type").set_value(device_text.c_str());
+        device.append_attribute("ip_address").set_value(ip_address.c_str());
+        device.append_attribute("mac_address").set_value(mac_address.c_str());
+        device.append_attribute("vendor_id").set_value(vendor_id);
+        device.append_attribute("device_id").set_value(device_id);
       }
       else
       {
         MsgWindow::message('W', "Could not read pwr_pn xml file, creation of pwr_pnviewer xml file failed");
-        fclose(pnviewer_fp);
         return 0;
       }
-
-      fprintf(pnviewer_fp, "\"%s\" \"%s\" \"%s\" \"%s\" %d %d\n", device_text.c_str(), device_name.c_str(),
-              ip_address.c_str(), mac_address.c_str(), vendor_id, device_id);
     }
-    fclose(pnviewer_fp);
+
+    // Extract ethernet device
+    sts = ldh_GetObjectPar(ctx->ldhses, controller_oid, "RtBody", "EthernetDevice", (char**)&ethernet_device,
+                           &size);
+    if (EVEN(sts))
+      return sts;
+    str_trim(ethernet_device, ethernet_device);
+    str_ToLower(ethernet_device, ethernet_device);
+    sprintf(fname, "$pwrp_load/pwr_pnviewer_%s.xml", ethernet_device);
+    free(ethernet_device);
+    dcli_translate_filename(fname, fname);
+
+    if (!doc.save_file(fname, "  ")) // Use 2-space indentation
+    {
+      MsgWindow::message('E', "Failed to save pwr_pnviewer xml file");
+      return 0;
+    }
   }
   return 1;
 }

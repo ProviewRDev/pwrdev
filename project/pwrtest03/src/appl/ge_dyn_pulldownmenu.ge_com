@@ -47,7 +47,7 @@ main()
 
   xm = x0 + 1;
   ym = y0 + 1;
-  id = CreateText("PulldownMenu", xm, ym, 4, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("PulldownMenu", xm, ym, 4, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   xm = x0 - 0.2;
   ym = y0 + 1.8;

@@ -43,12 +43,12 @@
 
 #include "co_cdh.h"
 #include "co_dcli.h"
+#include "co_log_parser.h"
 #include "co_string.h"
 #include "co_syi.h"
 #include "co_time.h"
 
 #include "rt_gdh.h"
-
 #include "xtt_clognav.h"
 
 //
@@ -81,97 +81,68 @@ void CLogNavBrow::create_nodeclasses()
   // Create common-class
 
   brow_CreateNodeClass(ctx, "EventDefault", flow_eNodeGroup_Common, &nc_event);
-  brow_AddAnnot(nc_event, 0.8, 0.6, 0, flow_eDrawType_TextHelveticaBold, 2,
-      flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_event, 0.8, 0.6, 0, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
   brow_AddAnnotPixmap(nc_event, 0, 1.6, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_event, 1, 2.2, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_event, 3.3, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_event, 10, 0.6, 2, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_event, 26, 0.6, 3, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_event, 3.3, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_event, 10, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_event, 26, 0.6, 3, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_event, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Nodeclass for Info message
   brow_CreateNodeClass(ctx, "InfoMsg", flow_eNodeGroup_Common, &nc_msg_info);
   brow_AddFilledRect(nc_msg_info, 0.2, 0.15, 0.4, 0.4, flow_eDrawType_Green);
   brow_AddRect(nc_msg_info, 0.2, 0.15, 0.4, 0.4, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_msg_info, 0.8, 0.6, 0, flow_eDrawType_TextHelveticaBold, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_msg_info, 2, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_msg_info, 8, 0.6, 2, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_msg_info, 11, 0.6, 3, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_msg_info, 18, 0.6, 4, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_info, 0.8, 0.6, 0, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_info, 2, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_info, 8, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_info, 11, 0.6, 3, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_info, 18, 0.6, 4, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_msg_info, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Nodeclass for Warning message
-  brow_CreateNodeClass(
-      ctx, "WarningMsg", flow_eNodeGroup_Common, &nc_msg_warning);
-  brow_AddFilledRect(
-      nc_msg_warning, 0.2, 0.15, 0.4, 0.4, flow_eDrawType_Yellow);
+  brow_CreateNodeClass(ctx, "WarningMsg", flow_eNodeGroup_Common, &nc_msg_warning);
+  brow_AddFilledRect(nc_msg_warning, 0.2, 0.15, 0.4, 0.4, flow_eDrawType_Yellow);
   brow_AddRect(nc_msg_warning, 0.2, 0.15, 0.4, 0.4, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_msg_warning, 0.8, 0.6, 0, flow_eDrawType_TextHelveticaBold,
-      2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_msg_warning, 2, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_msg_warning, 8, 0.6, 2, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_msg_warning, 11, 0.6, 3, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_msg_warning, 18, 0.6, 4, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_warning, 0.8, 0.6, 0, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_warning, 2, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_warning, 8, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_warning, 11, 0.6, 3, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_warning, 18, 0.6, 4, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_msg_warning, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Nodeclass for Error message
   brow_CreateNodeClass(ctx, "ErrorMsg", flow_eNodeGroup_Common, &nc_msg_error);
   brow_AddFilledRect(nc_msg_error, 0.2, 0.15, 0.4, 0.4, flow_eDrawType_LineRed);
   brow_AddRect(nc_msg_error, 0.2, 0.15, 0.4, 0.4, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_msg_error, 0.8, 0.6, 0, flow_eDrawType_TextHelveticaBold, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_msg_error, 2, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_msg_error, 8, 0.6, 2, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_msg_error, 11, 0.6, 3, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_msg_error, 18, 0.6, 4, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_error, 0.8, 0.6, 0, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_error, 2, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_error, 8, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_error, 11, 0.6, 3, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_error, 18, 0.6, 4, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_msg_error, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Nodeclass for Fatal messages
   brow_CreateNodeClass(ctx, "FatalMsg", flow_eNodeGroup_Common, &nc_msg_fatal);
   brow_AddFilledRect(nc_msg_fatal, 0.2, 0.15, 0.4, 0.4, flow_eDrawType_LineRed);
   brow_AddRect(nc_msg_fatal, 0.2, 0.15, 0.4, 0.4, flow_eDrawType_Line, 4, 0);
-  brow_AddAnnot(nc_msg_fatal, 0.8, 0.6, 0, flow_eDrawType_TextHelveticaBold, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_msg_fatal, 2, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_msg_fatal, 8, 0.6, 2, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_msg_fatal, 11, 0.6, 3, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_msg_fatal, 18, 0.6, 4, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_fatal, 0.8, 0.6, 0, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_fatal, 2, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_fatal, 8, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_fatal, 11, 0.6, 3, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_msg_fatal, 18, 0.6, 4, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_msg_fatal, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Nodeclass for Proview restart
   brow_CreateNodeClass(ctx, "Restart", flow_eNodeGroup_Common, &nc_restart);
   brow_AddFilledRect(nc_restart, 0, 0, 48, 0.8, flow_eDrawType_Yellow);
-  brow_AddAnnot(nc_restart, 11, 0.6, 0, flow_eDrawType_TextHelveticaBold, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_restart, 18, 0.6, 1, flow_eDrawType_TextHelveticaBold, 2,
-      flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_restart, 11, 0.6, 0, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_restart, 18, 0.6, 1, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_restart, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   brow_CreateNodeClass(ctx, "Text", flow_eNodeGroup_Common, &nc_text);
   brow_AddRect(nc_text, 0.2, 0.15, 0.4, 0.4, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_text, 18, 0.6, 0, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_text, 18, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_text, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 }
 
@@ -188,38 +159,22 @@ void CLogNavBrow::brow_setup()
   brow_SetAttributes(ctx, &brow_attr, mask);
   brow_SetCtxUserData(ctx, clognav);
 
-  brow_EnableEvent(
-      ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, CLogNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack,
-      CLogNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_MB3Press, flow_eEventType_CallBack, CLogNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_MB3Down, flow_eEventType_CallBack, CLogNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, CLogNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack,
-      CLogNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack, CLogNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack, CLogNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_PageUp, flow_eEventType_CallBack, CLogNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_Key_PageDown, flow_eEventType_CallBack,
-      CLogNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, CLogNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, CLogNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Right, flow_eEventType_CallBack, CLogNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Left, flow_eEventType_CallBack, CLogNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_PF3, flow_eEventType_CallBack, CLogNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Radiobutton, flow_eEventType_CallBack, CLogNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, CLogNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, CLogNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB3Press, flow_eEventType_CallBack, CLogNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB3Down, flow_eEventType_CallBack, CLogNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, CLogNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack, CLogNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack, CLogNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack, CLogNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PageUp, flow_eEventType_CallBack, CLogNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PageDown, flow_eEventType_CallBack, CLogNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, CLogNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, CLogNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Right, flow_eEventType_CallBack, CLogNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Left, flow_eEventType_CallBack, CLogNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PF3, flow_eEventType_CallBack, CLogNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Radiobutton, flow_eEventType_CallBack, CLogNav::brow_cb);
 }
 
 //
@@ -253,25 +208,19 @@ int CLogNav::init_brow_cb(FlowCtx* fctx, void* client_data)
 }
 
 CLogNav::CLogNav(void* clog_parent_ctx)
-    : parent_ctx(clog_parent_ctx), clog_size(0), max_size(10000),
-      current_pos_high(0), current_pos_low(0)
+    : parent_ctx(clog_parent_ctx), clog_size(0), max_size(10000), current_pos_high(0), current_pos_low(0)
 {
 }
 
 //
 //  Delete ev
 //
-CLogNav::~CLogNav()
-{
-}
+CLogNav::~CLogNav() {}
 
-CLogNavBrow::~CLogNavBrow()
-{
-  free_pixmaps();
-}
+CLogNavBrow::~CLogNavBrow() { free_pixmaps(); }
 
-void CLogNav::set_filter(bool success, bool info, bool warning, bool error,
-    bool fatal, bool text, const char* str)
+void CLogNav::set_filter(bool success, bool info, bool warning, bool error, bool fatal, bool text,
+                         const char* str)
 {
   filter.show_success = success;
   filter.show_info = info;
@@ -284,8 +233,7 @@ void CLogNav::set_filter(bool success, bool info, bool warning, bool error,
   draw();
 }
 
-void CLogNav::get_filter(bool* success, bool* info, bool* warning, bool* error,
-    bool* fatal, bool* text)
+void CLogNav::get_filter(bool* success, bool* info, bool* warning, bool* error, bool* fatal, bool* text)
 {
   *success = filter.show_success;
   *info = filter.show_info;
@@ -301,31 +249,36 @@ void CLogNav::get_files()
   pwr_tStatus sts;
   char file_spec[200];
   char found_file[200];
-  pwr_tTime time = { 0, 0 };
+  pwr_tTime time = {0, 0};
   struct stat info;
 
   syi_NodeName(&sts, nodename, sizeof(nodename));
 
   sprintf(file_spec, "$pwrp_log/pwr_%s.log", nodename);
   sts = dcli_search_file(file_spec, found_file, DCLI_DIR_SEARCH_INIT);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     stat(found_file, &info);
     time.tv_sec = info.st_ctime;
 
     CLogFile* cf = new CLogFile(found_file, time);
     file_list.push_back(*cf);
     delete cf;
-  } else {
+  }
+  else
+  {
     CLogFile* cf = new CLogFile();
     file_list.push_back(*cf);
     delete cf;
   }
   dcli_search_file(file_spec, found_file, DCLI_DIR_SEARCH_END);
 
-  for (int i = 1; i < 21; i++) {
+  for (int i = 1; i < 21; i++)
+  {
     sprintf(file_spec, "$pwrp_log/pwr_%s.log.%d.gz", nodename, i);
     sts = dcli_search_file(file_spec, found_file, DCLI_DIR_SEARCH_INIT);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       stat(found_file, &info);
       time.tv_sec = info.st_ctime;
 
@@ -339,7 +292,7 @@ void CLogNav::get_files()
 
 int CLogNav::update()
 {
-  int pos[2] = { current_pos_low, current_pos_high };
+  int pos[2] = {current_pos_low, current_pos_high};
   read(pos, 2);
   return 1;
 }
@@ -369,8 +322,8 @@ void CLogNav::read(int* pos_list, int pos_cnt)
   char line[400];
   errh_eSeverity severity = errh_eSeverity_Null;
   pwr_tTime time;
-  pwr_tTime ztime = { 0, 0 };
-  char time_str[40];
+  pwr_tTime ztime = {0, 0};
+  //  char time_str[40];
   char logger[40];
   int pid;
   int sts;
@@ -384,10 +337,13 @@ void CLogNav::read(int* pos_list, int pos_cnt)
 
   current_pos_low = file_list.size();
   current_pos_high = 0;
-  for (int i = file_list.size() - 1; i >= 0; i--) {
+  for (int i = file_list.size() - 1; i >= 0; i--)
+  {
     found = 0;
-    for (int j = 0; j < pos_cnt; j++) {
-      if (pos_list[j] - 1 == i) {
+    for (int j = 0; j < pos_cnt; j++)
+    {
+      if (pos_list[j] - 1 == i)
+      {
         found = 1;
         break;
       }
@@ -400,11 +356,14 @@ void CLogNav::read(int* pos_list, int pos_cnt)
     if (i + 1 < current_pos_low)
       current_pos_low = i + 1;
 
-    if (i == 0) {
+    if (i == 0)
+    {
       strcpy(filename, file_list[0].name);
       if (streq(filename, ""))
         continue;
-    } else {
+    }
+    else
+    {
       // Unzip the file
       char cmd[5 + sizeof(file_list[i].name) + 3 + sizeof(tmpfile) + 1];
       sprintf(cmd, "zcat %s > %s", file_list[i].name, tmpfile);
@@ -416,49 +375,49 @@ void CLogNav::read(int* pos_list, int pos_cnt)
     if (!fp)
       return;
 
-    while (1) {
+    while (1)
+    {
       sts = dcli_read_line(line, sizeof(line), fp);
       if (!sts)
         break;
 
-      if (line[1] == ' ' && line[27] == ' '
-          && (line[0] == 'S' || line[0] == 'I' || line[0] == 'W'
-                 || line[0] == 'E' || line[0] == 'F')) {
-        switch (line[0]) {
-        case 'S':
-          severity = errh_eSeverity_Success;
-          break;
-        case 'I':
-          severity = errh_eSeverity_Info;
-          break;
-        case 'W':
-          severity = errh_eSeverity_Warning;
-          break;
-        case 'E':
-          severity = errh_eSeverity_Error;
-          break;
-        case 'F':
-          severity = errh_eSeverity_Fatal;
-          break;
-        default:;
+      // Use factory method to automatically detect format and parse
+      auto log_msg = LogMessage::create_message(line);
+
+      if (log_msg && log_msg->is_valid())
+      {
+        // Successfully parsed as either RFC5424 or ProviewR format
+        severity = log_msg->get_severity();
+
+        // Extract hostname/logger TODO CHANGE hostname
+        std::string hostname = log_msg->get_app_name();
+        strncpy(logger, hostname.c_str(), sizeof(logger) - 1);
+        logger[sizeof(logger) - 1] = 0;
+
+        // Extract app name if hostname is empty
+        if (hostname.empty())
+        {
+          std::string app_name = log_msg->get_app_name();
+          strncpy(logger, app_name.c_str(), sizeof(logger) - 1);
+          logger[sizeof(logger) - 1] = 0;
         }
-        strncpy(logger, &line[2], 18);
-        logger[18] = 0;
 
-        sts = sscanf(&line[22], "%d", &pid);
-        if (sts != 1)
-          pid = 0;
+        // Extract process ID
+        std::string proc_id_str = log_msg->get_proc_id();
+        pid = proc_id_str.empty() ? 0 : atoi(proc_id_str.c_str());
 
-        strncpy(&time_str[2], &line[28], 20);
-        time_str[0] = '2';
-        time_str[1] = '0';
-        time_str[22] = 0;
-        time_FormAsciiToA(time_str, HUNDRED, GB, &time);
+        // Use parsed timestamp
+        time = log_msg->get_timestamp();
 
-        msg = new CLogMsg(severity, logger, pid, time, &line[49]);
+        // Use parsed message
+        std::string message_text = log_msg->get_message();
+        msg = new CLogMsg(severity, logger, pid, time, const_cast<char*>(message_text.c_str()));
         msg_list.push_back(*msg);
         delete msg;
-      } else {
+      }
+      else
+      {
+        // Unknown format or parsing failed, treat as plain text
         str_trim(line, line);
         msg = new CLogMsg(errh_eSeverity_Null, "", 0, ztime, line);
         msg_list.push_back(*msg);
@@ -480,15 +439,17 @@ void CLogNav::draw()
   brow_SetNodraw(brow->ctx);
   brow_DeleteAll(brow->ctx);
 
-  for (int i = 0; i < (int)msg_list.size(); i++) {
-    if (str_StartsWith(msg_list[i].text, "Setting log file to:")) {
-      item = new ItemMsgRestart(
-          this, "Restart", msg_list[i].time, dest, flow_eDest_After);
+  for (int i = 0; i < (int)msg_list.size(); i++)
+  {
+    if (str_StartsWith(msg_list[i].text, "Setting log file to:"))
+    {
+      item = new ItemMsgRestart(this, "Restart", msg_list[i].time, dest, flow_eDest_After);
       dest = item->node;
     }
 
     bool insert = false;
-    switch (msg_list[i].severity) {
+    switch (msg_list[i].severity)
+    {
     case errh_eSeverity_Success:
       if (filter.show_success)
         insert = true;
@@ -515,44 +476,44 @@ void CLogNav::draw()
       break;
     }
 
-    if (insert && !streq(filter.str, "")) {
-      if (strstr(msg_list[i].logger, filter.str) == 0
-          && strstr(msg_list[i].text, filter.str) == 0)
+    if (insert && !streq(filter.str, ""))
+    {
+      if (strstr(msg_list[i].logger, filter.str) == 0 && strstr(msg_list[i].text, filter.str) == 0)
         insert = false;
     }
 
-    if (insert) {
-      item = new ItemMsg(this, "Msg", msg_list[i].severity, msg_list[i].logger,
-          msg_list[i].pid, msg_list[i].time, msg_list[i].text, dest,
-          flow_eDest_After);
+    if (insert)
+    {
+      item = new ItemMsg(this, "Msg", msg_list[i].severity, msg_list[i].logger, msg_list[i].pid,
+                         msg_list[i].time, msg_list[i].text, dest, flow_eDest_After);
       dest = item->node;
     }
   }
 
   brow_ResetNodraw(brow->ctx);
+
+  // Simple viewport positioning: center on last (newest) object
+  if (dest != 0)
+  {
+    // Only if we have content to display
+    // Simply center on the last (newest) object
+    brow_CenterObject(brow->ctx, dest, 0.9);
+  }
+
   brow_Redraw(brow->ctx, 0);
 }
 
 //
 //  Zoom
 //
-void CLogNav::zoom(double zoom_factor)
-{
-  brow_Zoom(brow->ctx, zoom_factor);
-}
+void CLogNav::zoom(double zoom_factor) { brow_Zoom(brow->ctx, zoom_factor); }
 
 //
 //  Return to base zoom factor
 //
-void CLogNav::unzoom()
-{
-  brow_UnZoom(brow->ctx);
-}
+void CLogNav::unzoom() { brow_UnZoom(brow->ctx); }
 
-void CLogNav::set_nodraw()
-{
-  brow_SetNodraw(brow->ctx);
-}
+void CLogNav::set_nodraw() { brow_SetNodraw(brow->ctx); }
 
 void CLogNav::reset_nodraw()
 {
@@ -568,36 +529,46 @@ int CLogNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
   CLogNav* clognav;
   ItemMsg* item;
 
-  if (event->event == flow_eEvent_ObjectDeleted) {
+  if (event->event == flow_eEvent_ObjectDeleted)
+  {
     brow_GetUserData(event->object.object, (void**)&item);
     delete item;
     return 1;
   }
 
   brow_GetCtxUserData((BrowCtx*)ctx, (void**)&clognav);
-  switch (event->event) {
-  case flow_eEvent_Key_Up: {
+  switch (event->event)
+  {
+  case flow_eEvent_Key_Up:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
     int sts;
 
     brow_GetSelectedNodes(clognav->brow->ctx, &node_list, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       sts = brow_GetLastVisible(clognav->brow->ctx, &object);
       if (EVEN(sts))
         return 1;
-    } else {
-      if (!brow_IsVisible(
-              clognav->brow->ctx, node_list[0], flow_eVisible_Partial)) {
+    }
+    else
+    {
+      if (!brow_IsVisible(clognav->brow->ctx, node_list[0], flow_eVisible_Partial))
+      {
         sts = brow_GetLastVisible(clognav->brow->ctx, &object);
         if (EVEN(sts))
           return 1;
-      } else {
+      }
+      else
+      {
         sts = brow_GetPrevious(clognav->brow->ctx, node_list[0], &object);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           sts = brow_GetLast(clognav->brow->ctx, &object);
-          if (EVEN(sts)) {
+          if (EVEN(sts))
+          {
             if (node_count)
               free(node_list);
             return 1;
@@ -614,28 +585,36 @@ int CLogNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
       free(node_list);
     break;
   }
-  case flow_eEvent_Key_Down: {
+  case flow_eEvent_Key_Down:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
     int sts;
 
     brow_GetSelectedNodes(clognav->brow->ctx, &node_list, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       sts = brow_GetFirstVisible(clognav->brow->ctx, &object);
       if (EVEN(sts))
         return 1;
-    } else {
-      if (!brow_IsVisible(
-              clognav->brow->ctx, node_list[0], flow_eVisible_Partial)) {
+    }
+    else
+    {
+      if (!brow_IsVisible(clognav->brow->ctx, node_list[0], flow_eVisible_Partial))
+      {
         sts = brow_GetFirstVisible(clognav->brow->ctx, &object);
         if (EVEN(sts))
           return 1;
-      } else {
+      }
+      else
+      {
         sts = brow_GetNext(clognav->brow->ctx, node_list[0], &object);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           sts = brow_GetFirst(clognav->brow->ctx, &object);
-          if (EVEN(sts)) {
+          if (EVEN(sts))
+          {
             if (node_count)
               free(node_list);
             return 1;
@@ -652,19 +631,23 @@ int CLogNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
       free(node_list);
     break;
   }
-  case flow_eEvent_Key_PageDown: {
+  case flow_eEvent_Key_PageDown:
+  {
     brow_Page(clognav->brow->ctx, 0.9);
     break;
   }
-  case flow_eEvent_Key_PageUp: {
+  case flow_eEvent_Key_PageUp:
+  {
     brow_Page(clognav->brow->ctx, -0.9);
     break;
   }
-  case flow_eEvent_ScrollDown: {
+  case flow_eEvent_ScrollDown:
+  {
     brow_Page(clognav->brow->ctx, 0.1);
     break;
   }
-  case flow_eEvent_ScrollUp: {
+  case flow_eEvent_ScrollUp:
+  {
     brow_Page(clognav->brow->ctx, -0.1);
     break;
   }
@@ -673,11 +656,15 @@ int CLogNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     break;
   case flow_eEvent_MB1Click:
     // Select
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
-      if (brow_FindSelectedObject(clognav->brow->ctx, event->object.object)) {
+      if (brow_FindSelectedObject(clognav->brow->ctx, event->object.object))
+      {
         brow_SelectClear(clognav->brow->ctx);
-      } else {
+      }
+      else
+      {
         brow_SelectClear(clognav->brow->ctx);
         brow_SetInverse(event->object.object, 1);
         brow_SelectInsert(clognav->brow->ctx, event->object.object);
@@ -687,7 +674,8 @@ int CLogNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
       brow_SelectClear(clognav->brow->ctx);
     }
     break;
-  case flow_eEvent_MB3Down: {
+  case flow_eEvent_MB3Down:
+  {
     brow_SetClickSensitivity(clognav->brow->ctx, flow_mSensitivity_MB3Press);
     break;
   }
@@ -696,11 +684,10 @@ int CLogNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
   return 1;
 }
 
-ItemMsg::ItemMsg(CLogNav* item_clognav, const char* item_name,
-    errh_eSeverity item_severity, char* item_logger, int item_pid,
-    pwr_tTime item_time, char* item_text, brow_tNode dest, flow_eDest dest_code)
-    : ItemMsgBase(item_clognav, item_name, dest), severity(item_severity),
-      pid(item_pid), time(item_time)
+ItemMsg::ItemMsg(CLogNav* item_clognav, const char* item_name, errh_eSeverity item_severity,
+                 char* item_logger, int item_pid, pwr_tTime item_time, char* item_text, brow_tNode dest,
+                 flow_eDest dest_code)
+    : ItemMsgBase(item_clognav, item_name, dest), severity(item_severity), pid(item_pid), time(item_time)
 {
   char type_str[2];
   char time_str[40];
@@ -710,43 +697,43 @@ ItemMsg::ItemMsg(CLogNav* item_clognav, const char* item_name,
   strncpy(text, item_text, sizeof(text));
   text[sizeof(text) - 1] = 0;
 
-  switch (severity) {
+  switch (severity)
+  {
   case errh_eSeverity_Success:
-    brow_CreateNode(clognav->brow->ctx, item_name, clognav->brow->nc_msg_info,
-        dest, dest_code, (void*)this, 1, &node);
+    brow_CreateNode(clognav->brow->ctx, item_name, clognav->brow->nc_msg_info, dest, dest_code, (void*)this,
+                    1, &node);
     strcpy(type_str, "S");
     break;
   case errh_eSeverity_Info:
-    brow_CreateNode(clognav->brow->ctx, item_name, clognav->brow->nc_msg_info,
-        dest, dest_code, (void*)this, 1, &node);
+    brow_CreateNode(clognav->brow->ctx, item_name, clognav->brow->nc_msg_info, dest, dest_code, (void*)this,
+                    1, &node);
     strcpy(type_str, "I");
     break;
   case errh_eSeverity_Warning:
-    brow_CreateNode(clognav->brow->ctx, item_name,
-        clognav->brow->nc_msg_warning, dest, dest_code, (void*)this, 1, &node);
+    brow_CreateNode(clognav->brow->ctx, item_name, clognav->brow->nc_msg_warning, dest, dest_code,
+                    (void*)this, 1, &node);
     strcpy(type_str, "W");
     break;
   case errh_eSeverity_Error:
-    brow_CreateNode(clognav->brow->ctx, item_name, clognav->brow->nc_msg_error,
-        dest, dest_code, (void*)this, 1, &node);
+    brow_CreateNode(clognav->brow->ctx, item_name, clognav->brow->nc_msg_error, dest, dest_code, (void*)this,
+                    1, &node);
     strcpy(type_str, "E");
     break;
   case errh_eSeverity_Fatal:
-    brow_CreateNode(clognav->brow->ctx, item_name, clognav->brow->nc_msg_fatal,
-        dest, dest_code, (void*)this, 1, &node);
+    brow_CreateNode(clognav->brow->ctx, item_name, clognav->brow->nc_msg_fatal, dest, dest_code, (void*)this,
+                    1, &node);
     strcpy(type_str, "F");
     break;
   default:
-    brow_CreateNode(clognav->brow->ctx, item_name, clognav->brow->nc_text, dest,
-        dest_code, (void*)this, 1, &node);
+    brow_CreateNode(clognav->brow->ctx, item_name, clognav->brow->nc_text, dest, dest_code, (void*)this, 1,
+                    &node);
     brow_SetAnnotation(node, 0, text, strlen(text));
     return;
   }
   sprintf(pid_str, "%5d", pid);
 
   brow_SetAnnotation(node, 0, type_str, strlen(type_str));
-  time_AtoAscii(
-      &time, time_eFormat_ComprDateAndTime, time_str, sizeof(time_str));
+  time_AtoAscii(&time, time_eFormat_ComprDateAndTime, time_str, sizeof(time_str));
   brow_SetAnnotation(node, 1, logger, strlen(logger));
   brow_SetAnnotation(node, 2, pid_str, strlen(pid_str));
   brow_SetAnnotation(node, 3, time_str, strlen(time_str));
@@ -755,17 +742,16 @@ ItemMsg::ItemMsg(CLogNav* item_clognav, const char* item_name,
   //  brow_SetAnnotPixmap( node, 0, clognav->brow->pixmap_leaf);
 }
 
-ItemMsgRestart::ItemMsgRestart(CLogNav* item_clognav, const char* item_name,
-    pwr_tTime item_time, brow_tNode dest, flow_eDest dest_code)
+ItemMsgRestart::ItemMsgRestart(CLogNav* item_clognav, const char* item_name, pwr_tTime item_time,
+                               brow_tNode dest, flow_eDest dest_code)
     : ItemMsgBase(item_clognav, item_name, dest), time(item_time)
 {
   char time_str[40];
 
-  brow_CreateNode(clognav->brow->ctx, item_name, clognav->brow->nc_restart,
-      dest, dest_code, (void*)this, 1, &node);
+  brow_CreateNode(clognav->brow->ctx, item_name, clognav->brow->nc_restart, dest, dest_code, (void*)this, 1,
+                  &node);
 
-  time_AtoAscii(
-      &time, time_eFormat_ComprDateAndTime, time_str, sizeof(time_str));
+  time_AtoAscii(&time, time_eFormat_ComprDateAndTime, time_str, sizeof(time_str));
   brow_SetAnnotation(node, 0, time_str, strlen(time_str));
   brow_SetAnnotation(node, 1, "Proview startup", strlen("Proview startup"));
 }

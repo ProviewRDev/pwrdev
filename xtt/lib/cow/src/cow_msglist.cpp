@@ -71,11 +71,11 @@ void MsgListBrow::create_nodeclasses()
   brow_CreateNodeClass(
       ctx, "EventDefault", flow_eNodeGroup_Common, &nc_default);
   brow_AddAnnotPixmap(nc_default, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_default, 1.4, 0.6, 0, flow_eDrawType_TextHelveticaBold, 2,
+  brow_AddAnnot(nc_default, 1.4, 0.6, 0, flow_eDrawType_TextRobotoBold, 2,
       flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_default, 2.2, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_default, 2.2, 0.6, 1, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_default, 9, 0.6, 2, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_default, 9, 0.6, 2, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_default, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
@@ -84,11 +84,11 @@ void MsgListBrow::create_nodeclasses()
   brow_AddAnnotPixmap(nc_error, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddFilledRect(nc_error, 0.8, 0.15, 0.4, 0.4, flow_eDrawType_LineRed);
   brow_AddRect(nc_error, 0.8, 0.15, 0.4, 0.4, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_error, 1.4, 0.6, 0, flow_eDrawType_TextHelveticaBold, 2,
+  brow_AddAnnot(nc_error, 1.4, 0.6, 0, flow_eDrawType_TextRobotoBold, 2,
       flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_error, 2.2, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_error, 2.2, 0.6, 1, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_error, 9, 0.6, 2, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_error, 9, 0.6, 2, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_error, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
@@ -97,11 +97,11 @@ void MsgListBrow::create_nodeclasses()
   brow_AddAnnotPixmap(nc_fatal, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddFilledRect(nc_fatal, 0.8, 0.15, 0.4, 0.4, flow_eDrawType_LineRed);
   brow_AddRect(nc_fatal, 0.8, 0.15, 0.4, 0.4, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_fatal, 1.4, 0.6, 0, flow_eDrawType_TextHelveticaBold, 2,
+  brow_AddAnnot(nc_fatal, 1.4, 0.6, 0, flow_eDrawType_TextRobotoBold, 2,
       flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_fatal, 2.2, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_fatal, 2.2, 0.6, 1, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_fatal, 9, 0.6, 2, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_fatal, 9, 0.6, 2, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_fatal, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
@@ -110,11 +110,11 @@ void MsgListBrow::create_nodeclasses()
   brow_AddAnnotPixmap(nc_warning, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddFilledRect(nc_warning, 0.8, 0.15, 0.4, 0.4, flow_eDrawType_Yellow);
   brow_AddRect(nc_warning, 0.8, 0.15, 0.4, 0.4, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_warning, 1.4, 0.6, 0, flow_eDrawType_TextHelveticaBold, 2,
+  brow_AddAnnot(nc_warning, 1.4, 0.6, 0, flow_eDrawType_TextRobotoBold, 2,
       flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_warning, 2.2, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_warning, 2.2, 0.6, 1, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_warning, 9, 0.6, 2, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_warning, 9, 0.6, 2, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_warning, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
@@ -123,11 +123,11 @@ void MsgListBrow::create_nodeclasses()
   brow_AddAnnotPixmap(nc_info, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddFilledRect(nc_info, 0.8, 0.15, 0.4, 0.4, flow_eDrawType_Green);
   brow_AddRect(nc_info, 0.8, 0.15, 0.4, 0.4, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_info, 1.4, 0.6, 0, flow_eDrawType_TextHelveticaBold, 2,
+  brow_AddAnnot(nc_info, 1.4, 0.6, 0, flow_eDrawType_TextRobotoBold, 2,
       flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_info, 2.2, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_info, 2.2, 0.6, 1, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_info, 9, 0.6, 2, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_info, 9, 0.6, 2, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_info, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
@@ -136,11 +136,11 @@ void MsgListBrow::create_nodeclasses()
   brow_AddAnnotPixmap(nc_success, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   // brow_AddFilledRect( nc_success, 0.8, 0.15, 0.4, 0.4, flow_eDrawType_Green);
   brow_AddRect(nc_success, 0.8, 0.15, 0.4, 0.4, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_success, 1.4, 0.6, 0, flow_eDrawType_TextHelveticaBold, 2,
+  brow_AddAnnot(nc_success, 1.4, 0.6, 0, flow_eDrawType_TextRobotoBold, 2,
       flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_success, 2.2, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_success, 2.2, 0.6, 1, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_success, 9, 0.6, 2, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_success, 9, 0.6, 2, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_success, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 }

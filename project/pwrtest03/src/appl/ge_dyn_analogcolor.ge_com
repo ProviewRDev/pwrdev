@@ -46,7 +46,7 @@ main()
 
   x = x0 + 1;
   y = y0 + 1;
-  id = CreateText("AnalogColor", x, y, 4, eFont_LucidaSans, 0, eDrawType_CustomColor34);
+  id = CreateText("AnalogColor", x, y, 4, eFont_Helvetica, 0, eDrawType_CustomColor34);
 
 #  x1 = x + 2.5;
 #  y1 = y + 0.92;
@@ -59,7 +59,7 @@ main()
   y += 1;
   x2 = x0 + 1;
   y2 = y + 0.6;
-  id = CreateText("One instance  Priority in decreasing order from top bar", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("One instance  Priority in decreasing order from top bar", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   y += 1.1;
   x2 = x + 2;
@@ -99,7 +99,7 @@ main()
   y += 1.5;
   x2 = x0 + 1;
   y2 = y + 0.6;
-  id = CreateText("Two instances", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Two instances", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   y += 1.1;
   x = x0 + 1;
@@ -155,7 +155,7 @@ main()
   y += 0.5;
   x2 = x0 + 1;
   y2 = y + 0.6;
-  id = CreateText("Three instances", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Three instances", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   y += 1.1;
   x = x0 + 1;
@@ -225,7 +225,7 @@ main()
   y += 0.5;
   x2 = x0 + 1;
   y2 = y + 0.6;
-  id = CreateText("Four instances", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Four instances", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   y += 1.1;
   x = x0 + 1;
@@ -309,7 +309,7 @@ main()
   y += 1;
   x2 = x0 + 1;
   y2 = y + 0.6;
-  id = CreateText("Four instances, CommonAttribute, GreaterThan", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Four instances, CommonAttribute, GreaterThan", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   y += 1.1;
   x = x0 + 1;
@@ -391,7 +391,7 @@ main()
   y += 1;
   x2 = x0 + 1;
   y2 = y + 0.6;
-  id = CreateText("Four instances, CommonAttribute, GreaterEqual", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Four instances, CommonAttribute, GreaterEqual", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   y += 1.1;
   x = x0 + 1;
@@ -473,7 +473,7 @@ main()
   y += 1;
   x2 = x0 + 1;
   y2 = y + 0.6;
-  id = CreateText("Four instances, CommonAttribute, LessThan", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Four instances, CommonAttribute, LessThan", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   y += 1.1;
   x = x0 + 1;
@@ -555,7 +555,7 @@ main()
   y += 1;
   x2 = x0 + 1;
   y2 = y + 0.6;
-  id = CreateText("Four instances, CommonAttribute, LessEqual", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Four instances, CommonAttribute, LessEqual", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   y += 1.1;
   x = x0 + 1;
@@ -637,7 +637,7 @@ main()
   y += 1;
   x2 = x0 + 1;
   y2 = y + 0.6;
-  id = CreateText("Four instances, CommonAttribute, Equal", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Four instances, CommonAttribute, Equal", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   y += 1.1;
   x = x0 + 1;

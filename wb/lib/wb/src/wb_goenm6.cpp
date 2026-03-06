@@ -179,36 +179,36 @@ int goen_create_nodetype_m6(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
       flow_eDrawType_Line, 2);
   flow_AddAnnot(nc_pid, f_width - f_header_width + f_annot_offs_x,
       f_height - 2 * f_repeat - f_annot_offs_y - f_yoffs, 1,
-      flow_eDrawType_TextHelvetica, 3, flow_eAnnotType_OneLine,
+      flow_eDrawType_TextRoboto, 3, flow_eAnnotType_OneLine,
       flow_mDisplayLevel_1);
   flow_AddAnnot(nc_pid, f_width - f_header_width + f_annot_offs_x,
       f_height - f_repeat - f_annot_offs_y - f_yoffs, 2,
-      flow_eDrawType_TextHelvetica, 3, flow_eAnnotType_OneLine,
+      flow_eDrawType_TextRoboto, 3, flow_eAnnotType_OneLine,
       flow_mDisplayLevel_1);
   flow_AddAnnot(nc_pid, f_width - f_header_width + f_annot_offs_x,
-      f_height - f_annot_offs_y - f_yoffs, 4, flow_eDrawType_TextHelvetica, 3,
+      f_height - f_annot_offs_y - f_yoffs, 4, flow_eDrawType_TextRoboto, 3,
       flow_eAnnotType_OneLine, flow_mDisplayLevel_1);
   flow_AddAnnot(nc_pid, f_width - f_header_width + f_header_sep2 + f_repeat / 2,
       f_height - f_repeat - f_annot_offs_y - f_yoffs, 0,
-      flow_eDrawType_TextHelvetica, 3, flow_eAnnotType_OneLine,
+      flow_eDrawType_TextRoboto, 3, flow_eAnnotType_OneLine,
       flow_mDisplayLevel_1);
   flow_AddAnnot(nc_pid, f_width - f_header_width + f_header_sep2 + f_repeat / 2,
-      f_height - f_annot_offs_y - f_yoffs, 5, flow_eDrawType_TextHelvetica, 3,
+      f_height - f_annot_offs_y - f_yoffs, 5, flow_eDrawType_TextRoboto, 3,
       flow_eAnnotType_OneLine, flow_mDisplayLevel_1);
   flow_AddAnnot(nc_pid, f_width - f_header_width + f_header_sep3 + f_repeat / 2,
-      f_height - f_annot_offs_y - f_yoffs, 3, flow_eDrawType_TextHelvetica, 3,
+      f_height - f_annot_offs_y - f_yoffs, 3, flow_eDrawType_TextRoboto, 3,
       flow_eAnnotType_OneLine, flow_mDisplayLevel_1);
   if (graph_index != 1)
     flow_AddText(nc_pid, "ProviewR",
         f_width - f_header_width + f_header_sep1 + f_repeat,
-        f_height - f_repeat / 2 - f_yoffs, flow_eDrawType_TextHelvetica, 9);
+        f_height - f_repeat / 2 - f_yoffs, flow_eDrawType_TextRoboto, 9);
   else {
     flow_AddText(nc_pid, "SSAB",
         f_width - f_header_width + f_header_sep1 + f_repeat,
-        f_height - f_repeat * 3 / 4 - f_yoffs, flow_eDrawType_TextHelvetica, 9);
+        f_height - f_repeat * 3 / 4 - f_yoffs, flow_eDrawType_TextRoboto, 9);
     flow_AddText(nc_pid, "Oxel�sund",
         f_width - f_header_width + f_header_sep1 + f_repeat * 1.1,
-        f_height - f_repeat / 4 - f_yoffs, flow_eDrawType_TextHelvetica, 1);
+        f_height - f_repeat / 4 - f_yoffs, flow_eDrawType_TextRoboto, 1);
   }
 
   *node_class = nc_pid;

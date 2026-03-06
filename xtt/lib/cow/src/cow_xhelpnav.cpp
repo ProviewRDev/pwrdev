@@ -59,7 +59,7 @@ static void xhelpnav_open_URL(CoXHelpNav* xhelpnav, char* url)
     (xhelpnav->open_URL_cb)(xhelpnav->parent_ctx, url);
 }
 
-static void xhelpnav_help_message_cb(void* ctx, char sev, char* text)
+static void __attribute__((unused)) xhelpnav_help_message_cb(void* ctx, char sev, char* text)
 {
   CoXHelpNav* xhelpnav = (CoXHelpNav*)ctx;
   xhelpnav->message(sev, text);
@@ -97,9 +97,9 @@ void CoXHelpNavBrow::create_nodeclasses()
   brow_CreateNodeClass(ctx, "NavigatorDefault", flow_eNodeGroup_Common, &nc_object);
   brow_AddAnnotPixmap(nc_object, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_object, 1, 1.1, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_object, 2, 0.6, 0, flow_eDrawType_TextHelveticaBold, 2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_object, 7, 0.6, 1, flow_eDrawType_TextHelveticaBold, 2, flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_object, 11, 0.6, 2, flow_eDrawType_TextHelveticaBold, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_object, 2, 0.6, 0, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_object, 7, 0.6, 1, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_object, 11, 0.6, 2, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_object, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Create text
@@ -107,25 +107,25 @@ void CoXHelpNavBrow::create_nodeclasses()
   brow_CreateNodeClass(ctx, "NavigatorText", flow_eNodeGroup_Common, &nc_text);
   brow_AddAnnotPixmap(nc_text, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_text, 1, 1.1, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_text, 2, 0.6, 0, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_text, 7, 0.6, 1, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_text, 11, 0.6, 2, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_text, 2, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_text, 7, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_text, 11, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_text, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Create Header
 
   brow_CreateNodeClass(ctx, "NavigatorHead", flow_eNodeGroup_Common, &nc_header);
   brow_AddAnnotPixmap(nc_header, 0, 0.2, 0.4, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_header, 2, 1.0, 0, flow_eDrawType_TextHelveticaBold, 4, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_header, 8, 1.0, 1, flow_eDrawType_TextHelveticaBold, 4, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_header, 2, 1.0, 0, flow_eDrawType_TextRobotoBold, 4, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_header, 8, 1.0, 1, flow_eDrawType_TextRobotoBold, 4, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_header, 0, 0, 20, 1.4, flow_eDrawType_LineGray, -1, 1);
 
   // Create Header2
 
   brow_CreateNodeClass(ctx, "NavigatorHeadLarge", flow_eNodeGroup_Common, &nc_headerlarge);
   brow_AddAnnotPixmap(nc_headerlarge, 0, 0.2, 0.4, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_headerlarge, 2, 1.0, 0, flow_eDrawType_TextHelveticaBold, 6, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_headerlarge, 8, 1.0, 1, flow_eDrawType_TextHelveticaBold, 6, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_headerlarge, 2, 1.0, 0, flow_eDrawType_TextRobotoBold, 6, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_headerlarge, 8, 1.0, 1, flow_eDrawType_TextRobotoBold, 6, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_headerlarge, 0, 0, 20, 2.0, flow_eDrawType_LineGray, -1, 1);
 
   // Create Horizontal line
@@ -659,7 +659,7 @@ HItemHelpImage::HItemHelpImage(CoXHelpNavBrow* brow, const char* item_name, brow
 
 int HItemHelpImage::doubleclick_action(CoXHelpNavBrow* brow, CoXHelpNav* xhelpnav, double x, double y)
 {
-  int sts;
+  int sts = 0;
 
   if (!streq(link, ""))
   {
@@ -778,7 +778,7 @@ bool HItemHelp::search(char* str, bool strict)
 
 int HItemHelp::doubleclick_action(CoXHelpNavBrow* brow, CoXHelpNav* xhelpnav, double x, double y)
 {
-  int sts;
+  int sts = 0;
 
   if (index)
   {
@@ -848,7 +848,7 @@ bool HItemHelpBold::search(char* str, bool strict)
 
 int HItemHelpBold::doubleclick_action(CoXHelpNavBrow* brow, CoXHelpNav* xhelpnav, double x, double y)
 {
-  int sts;
+  int sts = 0;
 
   if (index)
   {
@@ -927,7 +927,7 @@ void doubleclick_action_helper_func(CoXHelpNav* xhelpnav, int sts, char* link, c
 
   if (file_name[0] == 0)
   {
-    sprintf(temp_file_name, "");
+    temp_file_name[0] = '\0';
     sts = xhelpnav->help(link, bookmark, navh_eHelpFile_Base, NULL, 1, true, &error_optional_log);
     if (EVEN(sts))
       sts = xhelpnav->help(link, bookmark, navh_eHelpFile_Project, NULL, 1, true, &error_optional_log);

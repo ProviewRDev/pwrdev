@@ -181,9 +181,9 @@ Check installation
 
 Check also that the Proview runtime package is installed correctly
 
-<c>> cat $pwr_exe/rt_version.dat 
+<c>> rt_ini --version
 
-will show the version of the current package.
+will show the version of Proview.
 
 Check that the project package is installed, for example by looking at the plcprogram
 
@@ -231,7 +231,7 @@ messages in the terminal window.
 <c>> rt_ini -i
 
 <c>   Proview/R Version V4.6.0 for Linux on Unknown Hardware 
-<c>   Copyright © 17-OCT-2015 12:00:00 by SSAB EMEA AB 
+<c>   Copyright ï¿½ 17-OCT-2015 12:00:00 by SSAB EMEA AB 
 
 <c>   Proview/R is free software; you can redistribute it and/or 
 <c>   modify it under the terms of the GNU General Public License. 
@@ -367,7 +367,7 @@ Update the classes and build the rootvolume for the node.
 If the volume is a Proview base volume, check that the installed pwrrt version corresponds to 
 the version in the development environment 
 
-<c>> cat $pwr_exe/rt_version.dat
+<c>> rt_ini --version
 
 If this doesn't help, the versions for the loadfiles can be viewed with wb_ldlist in the 
 development environment. Check the versions of the .dbs files on $pwrp_load

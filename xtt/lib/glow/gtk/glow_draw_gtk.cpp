@@ -92,7 +92,7 @@ typedef struct
 } draw_sColor;
 
 char GlowDrawGtk::font_names[glow_eFont__][40] = {"Helvetica", "Times", "New century schoolbook", "Courier",
-                                                  "Lucida Sans"};
+                                                  "Roboto"};
 
 static GdkEvent last_event;
 

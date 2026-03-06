@@ -54,7 +54,8 @@ typedef void* GdkImlibImage;
 #define DRAW_PRESS_PIX 9
 #define DRAW_TSCALE 0.93
 
-typedef struct {
+typedef struct
+{
   GtkWidget* w;
   int x;
   int y;
@@ -65,7 +66,8 @@ typedef struct {
   FlowCtx* ctx;
 } draw_sAnnotData;
 
-typedef struct {
+typedef struct
+{
   FlowCtx* ctx;
   void (*callback_func)(FlowCtx* ctx);
   guint timer_id;
@@ -73,12 +75,13 @@ typedef struct {
 
 typedef int GdkPixmap; // TODO
 
-typedef struct {
+typedef struct
+{
   cairo_surface_t* pixmap[DRAW_PIXMAP_SIZE];
   unsigned char* data[DRAW_PIXMAP_SIZE];
 } draw_sPixmap;
 
-char FlowDrawGtk::font_name[40] = "Lucida Sans";
+// char FlowDrawGtk::font_name[40] = "Roboto";
 
 static GdkEvent last_event;
 
@@ -91,14 +94,12 @@ static int flow_create_cursor(FlowDrawGtk* draw_ctx)
   /* Create some cursors */
 
   /* Cross cursor */
-  draw_ctx->cursors[draw_eCursor_CrossHair]
-      = gdk_cursor_new_for_display(draw_ctx->display, GDK_CROSSHAIR);
+  draw_ctx->cursors[draw_eCursor_CrossHair] = gdk_cursor_new_for_display(draw_ctx->display, GDK_CROSSHAIR);
 
-  draw_ctx->cursors[draw_eCursor_DiamondCross]
-      = gdk_cursor_new_for_display(draw_ctx->display, GDK_DIAMOND_CROSS);
+  draw_ctx->cursors[draw_eCursor_DiamondCross] =
+      gdk_cursor_new_for_display(draw_ctx->display, GDK_DIAMOND_CROSS);
 
-  draw_ctx->cursors[draw_eCursor_Hand]
-      = gdk_cursor_new_for_display(draw_ctx->display, GDK_HAND2);
+  draw_ctx->cursors[draw_eCursor_Hand] = gdk_cursor_new_for_display(draw_ctx->display, GDK_HAND2);
 
   return 1;
 }
@@ -125,7 +126,8 @@ static int draw_free_gc(FlowDrawGtk* draw_ctx)
   return 1;
 }
 
-typedef struct {
+typedef struct
+{
   double fg[3];
   double bg[3];
   double inverse[3];
@@ -137,180 +139,199 @@ typedef struct {
 } draw_sTheme;
 
 static draw_sTheme theme[] = {
-  // Standard, not used
-  {{0.0, 0.0, 0.0}, // Foreground
-   {1.0, 1.0, 1.0}, // Background
-   {0.0, 0.0, 0.0}, // Inverse
-   {0.6, 0.6, 0.6}, // Gray
-   {0.3, 0.3, 0.3}, // Darkgray
-   {1.0, 0.2, 0.2}, // Red
-   {1.0, 1.0, 0.0}, // Yellow
-   {0.2, 1.0, 0.2}  // Green
-  }, // Sand
-  {{0.288, 0.118, 0.009}, // Foreground
-   {1.000, 0.949, 0.891}, // Background
-   {0.0, 0.0, 0.0}, // Inverse
-   {0.6, 0.6, 0.6}, // Gray
-   {0.3, 0.3, 0.3}, // Darkgray
-   {1.0, 0.2, 0.2}, // Red
-   {1.0, 1.0, 0.0}, // Yellow
-   {0.2, 1.0, 0.2}  // Green
-  }, // Maroon
-  {{0.000, 0.000, 0.000}, // Foreground
-   {0.906, 0.851, 0.851}, // Background
-   {0.0, 0.0, 0.0}, // Inverse
-   {0.6, 0.6, 0.6}, // Gray
-   {0.3, 0.3, 0.3}, // Darkgray
-   {1.0, 0.2, 0.2}, // Red
-   {1.0, 1.0, 0.0}, // Yellow
-   {0.2, 1.0, 0.2}  // Green
-  }, // Sienna
-  {{1.000, 0.749, 0.459}, // Foreground
-   {0.184, 0.067, 0.000}, // Background
-   {0.0, 0.0, 0.0}, // Inverse
-   {0.6, 0.6, 0.6}, // Gray
-   {0.3, 0.3, 0.3}, // Darkgray
-   {1.0, 0.2, 0.2}, // Red
-   {1.0, 1.0, 0.0}, // Yellow
-   {0.2, 1.0, 0.2}  // Green
-  }, // DarkBlue
-  {{1.000, 1.000, 1.000}, // Foreground
-   {0.122, 0.184, 0.247}, // Background
-   {1.0, 1.0, 1.0}, // Inverse
-   {0.6, 0.6, 0.6}, // Gray
-   {0.3, 0.3, 0.3}, // Darkgray
-   {1.0, 0.2, 0.2}, // Red
-   {1.0, 1.0, 0.0}, // Yellow
-   {0.2, 1.0, 0.2} // Green
-  }, // Classic
-  {{0.0, 0.0, 0.0}, // Foreground
-   {1.0, 1.0, 1.0}, // Background
-   {0.0, 0.0, 0.0}, // Inverse
-   {0.6, 0.6, 0.6}, // Gray
-   {0.3, 0.3, 0.3}, // Darkgray
-   {1.0, 0.2, 0.2}, // Red
-   {1.0, 1.0, 0.0}, // Yellow
-   {0.2, 1.0, 0.2}  // Green
-  }, // Midnight
-  {{1.000, 0.686, 0.424}, // Foreground
-   {0.145, 0.153, 0.251}, // Background
-   {0.0, 0.0, 0.0}, // Inverse
-   {0.6, 0.6, 0.6}, // Gray
-   {0.3, 0.3, 0.3}, // Darkgray
-   {1.0, 0.2, 0.2}, // Red
-   {1.0, 1.0, 0.0}, // Yellow
-   {0.2, 1.0, 0.2}  // Green
-  }, // PlayRoom
-  {{0.098, 0.388, 0.753}, // Foreground
-   {1.000, 0.886, 0.988}, // Background
-   {0.0, 0.0, 0.0}, // Inverse
-   {0.6, 0.6, 0.6}, // Gray
-   {0.3, 0.3, 0.3}, // Darkgray
-   {1.0, 0.2, 0.2}, // Red
-   {1.0, 1.0, 0.0}, // Yellow
-   {0.2, 1.0, 0.2}  // Green
-  }, // NordicLight
-  {{0.000, 0.000, 0.000}, // Foreground
-   {0.906, 0.941, 1.000}, // Background
-   {0.0, 0.0, 0.0}, // Inverse
-   {0.6, 0.6, 0.6}, // Gray
-   {0.3, 0.3, 0.3}, // Darkgray
-   {1.0, 0.2, 0.2}, // Red
-   {1.0, 1.0, 0.0}, // Yellow
-   {0.2, 1.0, 0.2}  // Green
-  }, // Contrast
-  {{0.0, 0.0, 0.0}, // Foreground
-   {1.0, 1.0, 1.0}, // Background
-   {0.0, 0.0, 0.0}, // Inverse
-   {0.6, 0.6, 0.6}, // Gray
-   {0.3, 0.3, 0.3}, // Darkgray
-   {1.0, 0.2, 0.2}, // Red
-   {1.0, 1.0, 0.0}, // Yellow
-   {0.2, 1.0, 0.2}  // Green
-  }, // AzureContrast
-  {{0.0, 0.0, 0.0}, // Foreground
-   {0.639, 0.812, 0.980}, // Background
-   {0.0, 0.0, 0.0}, // Inverse
-   {0.6, 0.6, 0.6}, // Gray
-   {0.3, 0.3, 0.3}, // Darkgray
-   {1.0, 0.2, 0.2}, // Red
-   {1.0, 1.0, 0.0}, // Yellow
-   {0.2, 1.0, 0.2}  // Green
-  }, // OchreContrast
-  {{0.0, 0.0, 0.0}, // Foreground
-   {0.988, 0.812, 0.475}, // Background
-   {0.0, 0.0, 0.0}, // Inverse
-   {0.6, 0.6, 0.6}, // Gray
-   {0.3, 0.3, 0.3}, // Darkgray
-   {1.0, 0.2, 0.2}, // Red
-   {1.0, 1.0, 0.0}, // Yellow
-   {0.2, 1.0, 0.2}  // Green
-  }, // Chesterfield
-  {{0.941, 0.823, 0.718}, // Foreground
-   {0.223, 0.027, 0.012}, // Background
-   {0.0, 0.0, 0.0}, // Inverse
-   {0.6, 0.6, 0.6}, // Gray
-   {0.3, 0.3, 0.3}, // Darkgray
-   {1.0, 0.2, 0.2}, // Red
-   {1.0, 1.0, 0.0}, // Yellow
-   {0.2, 1.0, 0.2}  // Green
-  }, // TerraVerte
-  {{0.0, 0.0, 0.0}, // Foreground
-   {1.0, 1.0, 1.0}, // Background
-   {0.0, 0.0, 0.0}, // Inverse
-   {0.6, 0.6, 0.6}, // Gray
-   {0.3, 0.3, 0.3}, // Darkgray
-   {1.0, 0.2, 0.2}, // Red
-   {1.0, 1.0, 0.0}, // Yellow
-   {0.2, 1.0, 0.2}  // Green
-  }, // Polar
-  {{0.000, 0.000, 0.000}, // Foreground
-   {0.890, 0.937, 1.000}, // Background
-   {0.0, 0.0, 0.0}, // Inverse
-   {0.6, 0.6, 0.6}, // Gray
-   {0.3, 0.3, 0.3}, // Darkgray
-   {1.0, 0.2, 0.2}, // Red
-   {1.0, 1.0, 0.0}, // Yellow
-   {0.2, 1.0, 0.2}  // Green
-  }, // StandardLight
-  {{0.0, 0.0, 0.0}, // Foreground
-   {1.0, 1.0, 1.0}, // Background
-   {0.0, 0.0, 0.0}, // Inverse
-   {0.6, 0.6, 0.6}, // Gray
-   {0.3, 0.3, 0.3}, // Darkgray
-   {1.0, 0.2, 0.2}, // Red
-   {1.0, 1.0, 0.0}, // Yellow
-   {0.2, 1.0, 0.2}  // Green
-  }, // StandardDark
-  {{1.000, 1.000, 1.000}, // Foreground
-   {0.180, 0.180, 0.180}, // Background
-   {0.6, 0.6, 0.6}, // Inverse
-   {0.3, 0.3, 0.3}, // Gray
-   {0.15, 0.15, 0.15}, // Darkgray
-   {1.0, 0.2, 0.2}, // Red
-   {1.0, 1.0, 0.0}, // Yellow
-   {0.2, 1.0, 0.2} // Green
-  }};
+    // Standard, not used
+    {
+        {0.0, 0.0, 0.0}, // Foreground
+        {1.0, 1.0, 1.0}, // Background
+        {0.0, 0.0, 0.0}, // Inverse
+        {0.6, 0.6, 0.6}, // Gray
+        {0.3, 0.3, 0.3}, // Darkgray
+        {1.0, 0.2, 0.2}, // Red
+        {1.0, 1.0, 0.0}, // Yellow
+        {0.2, 1.0, 0.2}  // Green
+    },                   // Sand
+    {
+        {0.288, 0.118, 0.009}, // Foreground
+        {1.000, 0.949, 0.891}, // Background
+        {0.0, 0.0, 0.0},       // Inverse
+        {0.6, 0.6, 0.6},       // Gray
+        {0.3, 0.3, 0.3},       // Darkgray
+        {1.0, 0.2, 0.2},       // Red
+        {1.0, 1.0, 0.0},       // Yellow
+        {0.2, 1.0, 0.2}        // Green
+    },                         // Maroon
+    {
+        {0.000, 0.000, 0.000}, // Foreground
+        {0.906, 0.851, 0.851}, // Background
+        {0.0, 0.0, 0.0},       // Inverse
+        {0.6, 0.6, 0.6},       // Gray
+        {0.3, 0.3, 0.3},       // Darkgray
+        {1.0, 0.2, 0.2},       // Red
+        {1.0, 1.0, 0.0},       // Yellow
+        {0.2, 1.0, 0.2}        // Green
+    },                         // Sienna
+    {
+        {1.000, 0.749, 0.459}, // Foreground
+        {0.184, 0.067, 0.000}, // Background
+        {0.0, 0.0, 0.0},       // Inverse
+        {0.6, 0.6, 0.6},       // Gray
+        {0.3, 0.3, 0.3},       // Darkgray
+        {1.0, 0.2, 0.2},       // Red
+        {1.0, 1.0, 0.0},       // Yellow
+        {0.2, 1.0, 0.2}        // Green
+    },                         // DarkBlue
+    {
+        {1.000, 1.000, 1.000}, // Foreground
+        {0.122, 0.184, 0.247}, // Background
+        {1.0, 1.0, 1.0},       // Inverse
+        {0.6, 0.6, 0.6},       // Gray
+        {0.3, 0.3, 0.3},       // Darkgray
+        {1.0, 0.2, 0.2},       // Red
+        {1.0, 1.0, 0.0},       // Yellow
+        {0.2, 1.0, 0.2}        // Green
+    },                         // Classic
+    {
+        {0.0, 0.0, 0.0}, // Foreground
+        {1.0, 1.0, 1.0}, // Background
+        {0.0, 0.0, 0.0}, // Inverse
+        {0.6, 0.6, 0.6}, // Gray
+        {0.3, 0.3, 0.3}, // Darkgray
+        {1.0, 0.2, 0.2}, // Red
+        {1.0, 1.0, 0.0}, // Yellow
+        {0.2, 1.0, 0.2}  // Green
+    },                   // Midnight
+    {
+        {1.000, 0.686, 0.424}, // Foreground
+        {0.145, 0.153, 0.251}, // Background
+        {0.0, 0.0, 0.0},       // Inverse
+        {0.6, 0.6, 0.6},       // Gray
+        {0.3, 0.3, 0.3},       // Darkgray
+        {1.0, 0.2, 0.2},       // Red
+        {1.0, 1.0, 0.0},       // Yellow
+        {0.2, 1.0, 0.2}        // Green
+    },                         // PlayRoom
+    {
+        {0.098, 0.388, 0.753}, // Foreground
+        {1.000, 0.886, 0.988}, // Background
+        {0.0, 0.0, 0.0},       // Inverse
+        {0.6, 0.6, 0.6},       // Gray
+        {0.3, 0.3, 0.3},       // Darkgray
+        {1.0, 0.2, 0.2},       // Red
+        {1.0, 1.0, 0.0},       // Yellow
+        {0.2, 1.0, 0.2}        // Green
+    },                         // NordicLight
+    {
+        {0.000, 0.000, 0.000}, // Foreground
+        {0.906, 0.941, 1.000}, // Background
+        {0.0, 0.0, 0.0},       // Inverse
+        {0.6, 0.6, 0.6},       // Gray
+        {0.3, 0.3, 0.3},       // Darkgray
+        {1.0, 0.2, 0.2},       // Red
+        {1.0, 1.0, 0.0},       // Yellow
+        {0.2, 1.0, 0.2}        // Green
+    },                         // Contrast
+    {
+        {0.0, 0.0, 0.0}, // Foreground
+        {1.0, 1.0, 1.0}, // Background
+        {0.0, 0.0, 0.0}, // Inverse
+        {0.6, 0.6, 0.6}, // Gray
+        {0.3, 0.3, 0.3}, // Darkgray
+        {1.0, 0.2, 0.2}, // Red
+        {1.0, 1.0, 0.0}, // Yellow
+        {0.2, 1.0, 0.2}  // Green
+    },                   // AzureContrast
+    {
+        {0.0, 0.0, 0.0},       // Foreground
+        {0.639, 0.812, 0.980}, // Background
+        {0.0, 0.0, 0.0},       // Inverse
+        {0.6, 0.6, 0.6},       // Gray
+        {0.3, 0.3, 0.3},       // Darkgray
+        {1.0, 0.2, 0.2},       // Red
+        {1.0, 1.0, 0.0},       // Yellow
+        {0.2, 1.0, 0.2}        // Green
+    },                         // OchreContrast
+    {
+        {0.0, 0.0, 0.0},       // Foreground
+        {0.988, 0.812, 0.475}, // Background
+        {0.0, 0.0, 0.0},       // Inverse
+        {0.6, 0.6, 0.6},       // Gray
+        {0.3, 0.3, 0.3},       // Darkgray
+        {1.0, 0.2, 0.2},       // Red
+        {1.0, 1.0, 0.0},       // Yellow
+        {0.2, 1.0, 0.2}        // Green
+    },                         // Chesterfield
+    {
+        {0.941, 0.823, 0.718}, // Foreground
+        {0.223, 0.027, 0.012}, // Background
+        {0.0, 0.0, 0.0},       // Inverse
+        {0.6, 0.6, 0.6},       // Gray
+        {0.3, 0.3, 0.3},       // Darkgray
+        {1.0, 0.2, 0.2},       // Red
+        {1.0, 1.0, 0.0},       // Yellow
+        {0.2, 1.0, 0.2}        // Green
+    },                         // TerraVerte
+    {
+        {0.0, 0.0, 0.0}, // Foreground
+        {1.0, 1.0, 1.0}, // Background
+        {0.0, 0.0, 0.0}, // Inverse
+        {0.6, 0.6, 0.6}, // Gray
+        {0.3, 0.3, 0.3}, // Darkgray
+        {1.0, 0.2, 0.2}, // Red
+        {1.0, 1.0, 0.0}, // Yellow
+        {0.2, 1.0, 0.2}  // Green
+    },                   // Polar
+    {
+        {0.000, 0.000, 0.000}, // Foreground
+        {0.890, 0.937, 1.000}, // Background
+        {0.0, 0.0, 0.0},       // Inverse
+        {0.6, 0.6, 0.6},       // Gray
+        {0.3, 0.3, 0.3},       // Darkgray
+        {1.0, 0.2, 0.2},       // Red
+        {1.0, 1.0, 0.0},       // Yellow
+        {0.2, 1.0, 0.2}        // Green
+    },                         // StandardLight
+    {
+        {0.0, 0.0, 0.0}, // Foreground
+        {1.0, 1.0, 1.0}, // Background
+        {0.0, 0.0, 0.0}, // Inverse
+        {0.6, 0.6, 0.6}, // Gray
+        {0.3, 0.3, 0.3}, // Darkgray
+        {1.0, 0.2, 0.2}, // Red
+        {1.0, 1.0, 0.0}, // Yellow
+        {0.2, 1.0, 0.2}  // Green
+    },                   // StandardDark
+    {
+        {1.000, 1.000, 1.000}, // Foreground
+        {0.180, 0.180, 0.180}, // Background
+        {0.6, 0.6, 0.6},       // Inverse
+        {0.3, 0.3, 0.3},       // Gray
+        {0.15, 0.15, 0.15},    // Darkgray
+        {1.0, 0.2, 0.2},       // Red
+        {1.0, 1.0, 0.0},       // Yellow
+        {0.2, 1.0, 0.2}        // Green
+    }};
 
 static int flow_create_gc(FlowDrawGtk* draw_ctx, int ct)
 {
   // GdkRGBA c;
-  //gtk_style_context_get_color(draw_ctx->style_context, GTK_STATE_FLAG_NORMAL, &c);
-  //draw_ctx->gc_black = cairo_pattern_create_rgba(c.red, c.green, c.blue, c.alpha);
+  // gtk_style_context_get_color(draw_ctx->style_context, GTK_STATE_FLAG_NORMAL, &c);
+  // draw_ctx->gc_black = cairo_pattern_create_rgba(c.red, c.green, c.blue, c.alpha);
 
   int i = ct;
-  if (i >= sizeof(theme)/sizeof(theme[0]))
+  if (i >= sizeof(theme) / sizeof(theme[0]))
     i = 0;
 
   draw_ctx->gc_black = cairo_pattern_create_rgb(theme[i].fg[0], theme[i].fg[1], theme[i].fg[2]);
   draw_ctx->gc_erase = cairo_pattern_create_rgb(theme[i].bg[0], theme[i].bg[1], theme[i].bg[2]);
-  draw_ctx->gc_inverse = cairo_pattern_create_rgb(theme[i].inverse[0], theme[i].inverse[1], theme[i].inverse[2]);
+  draw_ctx->gc_inverse =
+      cairo_pattern_create_rgb(theme[i].inverse[0], theme[i].inverse[1], theme[i].inverse[2]);
   draw_ctx->gc_gray = cairo_pattern_create_rgb(theme[i].gray[0], theme[i].gray[1], theme[i].gray[2]);
-  draw_ctx->gc_darkgray = cairo_pattern_create_rgb(theme[i].darkgray[0], theme[i].darkgray[1], theme[i].darkgray[2]);
+  draw_ctx->gc_darkgray =
+      cairo_pattern_create_rgb(theme[i].darkgray[0], theme[i].darkgray[1], theme[i].darkgray[2]);
   draw_ctx->gc_red = cairo_pattern_create_rgb(theme[i].red[0], theme[i].red[1], theme[i].red[2]);
   draw_ctx->gc_yellow = cairo_pattern_create_rgb(theme[i].yellow[0], theme[i].yellow[1], theme[i].yellow[2]);
   draw_ctx->gc_green = cairo_pattern_create_rgb(theme[i].green[0], theme[i].green[1], theme[i].green[2]);
-  
+
   return 1;
 }
 
@@ -336,10 +357,9 @@ FlowDrawGtk::~FlowDrawGtk()
     g_source_remove(timer_id);
 }
 
-int FlowDrawGtk::create_secondary_ctx(FlowCtx* flow_ctx,
-    void** secondary_flow_ctx,
-    int (*init_proc)(FlowCtx* ctx, void* client_data), void* client_data,
-    flow_eCtxType type)
+int FlowDrawGtk::create_secondary_ctx(FlowCtx* flow_ctx, void** secondary_flow_ctx,
+                                      int (*init_proc)(FlowCtx* ctx, void* client_data), void* client_data,
+                                      flow_eCtxType type)
 {
   FlowCtx* ctx;
 
@@ -355,7 +375,8 @@ int FlowDrawGtk::create_secondary_ctx(FlowCtx* flow_ctx,
   ctx->trace_scan_func = flow_ctx->trace_scan_func;
   ctx->trace_started = flow_ctx->trace_started;
   ctx->zoom_factor = flow_ctx->zoom_factor;
-  if (type == flow_eCtxType_Brow) {
+  if (type == flow_eCtxType_Brow)
+  {
     ((BrowCtx*)ctx)->scroll_callback = ((BrowCtx*)flow_ctx)->scroll_callback;
     ((BrowCtx*)ctx)->scroll_data = ((BrowCtx*)flow_ctx)->scroll_data;
   }
@@ -376,10 +397,12 @@ int FlowDrawGtk::change_ctx(FlowCtx* from_ctx, FlowCtx* to_ctx)
   to_ctx->window_height = from_ctx->window_height;
   from_ctx->set_nodraw();
   to_ctx->reset_nodraw();
-  if (from_ctx->type() == flow_eCtxType_Brow) {
+  if (from_ctx->type() == flow_eCtxType_Brow)
+  {
     to_ctx->zoom_factor = from_ctx->zoom_factor;
     ((BrowCtx*)to_ctx)->configure(0);
-  } else
+  }
+  else
     to_ctx->redraw();
   return 1;
 }
@@ -391,16 +414,13 @@ void FlowDrawGtk::delete_secondary_ctx(FlowCtx* ctx)
 }
 
 FlowDrawGtk::FlowDrawGtk(GtkWidget* x_toplevel, void** flow_ctx,
-    int (*init_proc)(GtkWidget* w, FlowCtx* ctx, void* client_data),
-    void* client_data, flow_eCtxType type)
-    : toplevel(x_toplevel), nav_shell(0), nav_toplevel(0), display(0),
-      window(0), nav_window(0), screen(0), gc_black(0), gc_gray(0), 
-      gc_darkgray(0), gc_red(0), gc_yellow(0), gc_green(0), gc_erase(0),
-      gc_inverse(0), timer_id(0),
-      closing_down(0), cairo_cr(0), cairo_cr_refcnt(0), cairo_region(0),
-      cairo_context(0), cairo_nav_cr(0), cairo_nav_cr_refcnt(0), cairo_nav_region(0),
-      cairo_nav_context(0), antialias(CAIRO_ANTIALIAS_NONE), 
-      nav_antialias(CAIRO_ANTIALIAS_NONE), style_context(0),
+                         int (*init_proc)(GtkWidget* w, FlowCtx* ctx, void* client_data), void* client_data,
+                         flow_eCtxType type)
+    : toplevel(x_toplevel), nav_shell(0), nav_toplevel(0), display(0), window(0), nav_window(0), screen(0),
+      gc_black(0), gc_gray(0), gc_darkgray(0), gc_red(0), gc_yellow(0), gc_green(0), gc_erase(0),
+      gc_inverse(0), timer_id(0), closing_down(0), cairo_cr(0), cairo_cr_refcnt(0), cairo_region(0),
+      cairo_context(0), cairo_nav_cr(0), cairo_nav_cr_refcnt(0), cairo_nav_region(0), cairo_nav_context(0),
+      antialias(CAIRO_ANTIALIAS_NONE), nav_antialias(CAIRO_ANTIALIAS_NONE), style_context(0),
       font_face_bold(0), font_face_normal(0)
 {
   memset(cursors, 0, sizeof(cursors));
@@ -418,8 +438,8 @@ FlowDrawGtk::FlowDrawGtk(GtkWidget* x_toplevel, void** flow_ctx,
   screen = gtk_widget_get_screen(toplevel);
   style_context = gtk_widget_get_style_context(toplevel);
   update_color_theme(CoWow::ColorTheme());
-  //flow_create_gc(this, 0);
-  //set_white_background(basectx);
+  // flow_create_gc(this, 0);
+  // set_white_background(basectx);
 
   flow_create_cursor(this);
 
@@ -465,30 +485,36 @@ int FlowDrawGtk::expose(FlowCtx* ctx, cairo_t* cr, int is_navigator)
   int x, y, width, height;
   GdkRectangle rect;
 
-  if (!is_navigator) {
+  if (!is_navigator)
+  {
     pwr_Assert(cairo_cr_refcnt == 0);
 
     cairo_cr = cr;
     cairo_cr_refcnt++;
     get_window_size(ctx, &ctx->window_width, &ctx->window_height);
-    if (gdk_cairo_get_clip_rectangle(cr, &rect)) {
+    if (gdk_cairo_get_clip_rectangle(cr, &rect))
+    {
       x = rect.x;
       y = rect.y;
       width = rect.width;
       height = rect.height;
-    } else {
+    }
+    else
+    {
       x = 0;
       y = 0;
       width = ctx->window_width;
       height = ctx->window_height;
     }
-    //gtk_render_background(style_context, cr, 0, 0, x + width, y + height);
+    // gtk_render_background(style_context, cr, 0, 0, x + width, y + height);
     fill_rect(ctx, x, y, width, height, flow_eDrawType_LineErase);
     sts = ctx->event_handler(flow_eEvent_Exposure, x, y, width, height);
     cairo_cr = 0;
     cairo_cr_refcnt--;
     pwr_Assert(cairo_cr_refcnt == 0);
-  } else {  
+  }
+  else
+  {
     pwr_Assert(cairo_nav_cr_refcnt == 0);
 
     cairo_nav_cr = cr;
@@ -517,12 +543,16 @@ int FlowDrawGtk::event_handler(FlowCtx* ctx, GdkEvent event)
   if (closing_down)
     return 1;
 
-  if (event.any.window == window || event.type == GDK_KEY_PRESS) {
-    switch (event.type) {
-    case GDK_KEY_PRESS: {
+  if (event.any.window == window || event.type == GDK_KEY_PRESS)
+  {
+    switch (event.type)
+    {
+    case GDK_KEY_PRESS:
+    {
       guint keysym = event.key.keyval;
 
-      switch (keysym) {
+      switch (keysym)
+      {
       case GDK_KEY_Return:
         sts = ctx->event_handler(flow_eEvent_Key_Return, 0, 0, 0, 0);
         //            printf( "-- Return key event\n");
@@ -583,22 +613,25 @@ int FlowDrawGtk::event_handler(FlowCtx* ctx, GdkEvent event)
     }
     case GDK_BUTTON_PRESS:
 
-      switch (event.button.button) {
+      switch (event.button.button)
+      {
       case 1:
-        ctx->event_handler(flow_eEvent_MB1Down, (int)event.button.x,
-            (int)event.button.y, 0, 0);
-        if (click_sensitivity & flow_mSensitivity_MB1Click
-            && !(click_sensitivity & flow_mSensitivity_MB1DoubleClick)
-            && !(click_sensitivity & flow_mSensitivity_MB1Press)) {
+        ctx->event_handler(flow_eEvent_MB1Down, (int)event.button.x, (int)event.button.y, 0, 0);
+        if (click_sensitivity & flow_mSensitivity_MB1Click &&
+            !(click_sensitivity & flow_mSensitivity_MB1DoubleClick) &&
+            !(click_sensitivity & flow_mSensitivity_MB1Press))
+        {
           memcpy(&last_event, &event, sizeof(event));
           button_pressed = 0;
           button_clicked = 1;
           last_press_x = (int)event.button.x;
           last_press_y = (int)event.button.y;
           return 1;
-        } else if (!(click_sensitivity & flow_mSensitivity_MB1Click)
-            && !(click_sensitivity & flow_mSensitivity_MB1DoubleClick)
-            && click_sensitivity & flow_mSensitivity_MB1Press) {
+        }
+        else if (!(click_sensitivity & flow_mSensitivity_MB1Click) &&
+                 !(click_sensitivity & flow_mSensitivity_MB1DoubleClick) &&
+                 click_sensitivity & flow_mSensitivity_MB1Press)
+        {
           memcpy(&last_event, &event, sizeof(event));
           button_pressed = 1;
           button_clicked = 0;
@@ -607,20 +640,22 @@ int FlowDrawGtk::event_handler(FlowCtx* ctx, GdkEvent event)
         }
         break;
       case 2:
-        ctx->event_handler(flow_eEvent_MB2Down, (int)event.button.x,
-            (int)event.button.y, 0, 0);
-        if (click_sensitivity & flow_mSensitivity_MB2Click
-            && !(click_sensitivity & flow_mSensitivity_MB2DoubleClick)
-            && !(click_sensitivity & flow_mSensitivity_MB2Press)) {
+        ctx->event_handler(flow_eEvent_MB2Down, (int)event.button.x, (int)event.button.y, 0, 0);
+        if (click_sensitivity & flow_mSensitivity_MB2Click &&
+            !(click_sensitivity & flow_mSensitivity_MB2DoubleClick) &&
+            !(click_sensitivity & flow_mSensitivity_MB2Press))
+        {
           memcpy(&last_event, &event, sizeof(event));
           button_pressed = 0;
           button_clicked = 1;
           last_press_x = (int)event.button.x;
           last_press_y = (int)event.button.y;
           return 1;
-        } else if (!(click_sensitivity & flow_mSensitivity_MB2Click)
-            && !(click_sensitivity & flow_mSensitivity_MB2DoubleClick)
-            && click_sensitivity & flow_mSensitivity_MB2Press) {
+        }
+        else if (!(click_sensitivity & flow_mSensitivity_MB2Click) &&
+                 !(click_sensitivity & flow_mSensitivity_MB2DoubleClick) &&
+                 click_sensitivity & flow_mSensitivity_MB2Press)
+        {
           memcpy(&last_event, &event, sizeof(event));
           button_pressed = 1;
           button_clicked = 0;
@@ -629,13 +664,12 @@ int FlowDrawGtk::event_handler(FlowCtx* ctx, GdkEvent event)
         }
         break;
       case 3: // Button 3
-        ctx->event_handler(flow_eEvent_MB3Down, (int)event.button.x,
-            (int)event.button.y, 0, 0);
-        if (click_sensitivity & flow_mSensitivity_MB3Press
-            && !(click_sensitivity & flow_mSensitivity_MB3DoubleClick)
-            && !(click_sensitivity & flow_mSensitivity_MB3Click)) {
-          ctx->event_handler(flow_eEvent_MB3Press, (int)event.button.x,
-              (int)event.button.y, 0, 0);
+        ctx->event_handler(flow_eEvent_MB3Down, (int)event.button.x, (int)event.button.y, 0, 0);
+        if (click_sensitivity & flow_mSensitivity_MB3Press &&
+            !(click_sensitivity & flow_mSensitivity_MB3DoubleClick) &&
+            !(click_sensitivity & flow_mSensitivity_MB3Click))
+        {
+          ctx->event_handler(flow_eEvent_MB3Press, (int)event.button.x, (int)event.button.y, 0, 0);
           click_sensitivity = 0;
           return 1;
         }
@@ -643,7 +677,8 @@ int FlowDrawGtk::event_handler(FlowCtx* ctx, GdkEvent event)
       default:;
       }
       /* Detect press or click event */
-      if (button_clicked) {
+      if (button_clicked)
+      {
         /* Wait for release */
         button_clicked_and_pressed = 1;
         cancel_event_timer(ctx);
@@ -655,60 +690,55 @@ int FlowDrawGtk::event_handler(FlowCtx* ctx, GdkEvent event)
         event_timer(ctx, 200);
         return 1;
       }
-      if (!button_pressed) {
+      if (!button_pressed)
+      {
         memcpy(&last_event, &event, sizeof(event));
         button_pressed = event.button.button;
         last_press_x = (int)event.button.x;
         last_press_y = (int)event.button.y;
         event_timer(ctx, 200);
         return 1;
-      } else {
+      }
+      else
+      {
         /* Press event, callback from timer */
         button_pressed = 0;
         button_clicked_and_pressed = 0;
-        switch (event.button.button) {
+        switch (event.button.button)
+        {
         case 1: // Button1
           button1_pressed = 1;
-          if ((event.button.state & GDK_SHIFT_MASK)
-              && !(event.button.state & GDK_CONTROL_MASK))
-            sts = ctx->event_handler(flow_eEvent_MB1PressShift,
-                (int)event.button.x, (int)event.button.y, 0, 0);
-          else if (!(event.button.state & GDK_SHIFT_MASK)
-              && (event.button.state & GDK_CONTROL_MASK))
-            sts = ctx->event_handler(flow_eEvent_MB1PressCtrl,
-                (int)event.button.x, (int)event.button.y, 0, 0);
-          else if ((event.button.state & GDK_SHIFT_MASK)
-              && (event.button.state & GDK_CONTROL_MASK))
-            sts = ctx->event_handler(flow_eEvent_MB1PressShiftCtrl,
-                (int)event.button.x, (int)event.button.y, 0, 0);
+          if ((event.button.state & GDK_SHIFT_MASK) && !(event.button.state & GDK_CONTROL_MASK))
+            sts =
+                ctx->event_handler(flow_eEvent_MB1PressShift, (int)event.button.x, (int)event.button.y, 0, 0);
+          else if (!(event.button.state & GDK_SHIFT_MASK) && (event.button.state & GDK_CONTROL_MASK))
+            sts =
+                ctx->event_handler(flow_eEvent_MB1PressCtrl, (int)event.button.x, (int)event.button.y, 0, 0);
+          else if ((event.button.state & GDK_SHIFT_MASK) && (event.button.state & GDK_CONTROL_MASK))
+            sts = ctx->event_handler(flow_eEvent_MB1PressShiftCtrl, (int)event.button.x, (int)event.button.y,
+                                     0, 0);
           else
-            ctx->event_handler(flow_eEvent_MB1Press, (int)event.button.x,
-                (int)event.button.y, 0, 0);
+            ctx->event_handler(flow_eEvent_MB1Press, (int)event.button.x, (int)event.button.y, 0, 0);
           click_sensitivity = 0;
           break;
         case 2: // Button2
           button2_pressed = 1;
-          if ((event.button.state & GDK_SHIFT_MASK)
-              && !(event.button.state & GDK_CONTROL_MASK))
-            sts = ctx->event_handler(flow_eEvent_MB2PressShift,
-                (int)event.button.x, (int)event.button.y, 0, 0);
-          else if (!(event.button.state & GDK_SHIFT_MASK)
-              && (event.button.state & GDK_CONTROL_MASK))
-            sts = ctx->event_handler(flow_eEvent_MB2PressShift,
-                (int)event.button.x, (int)event.button.y, 0, 0);
-          else if ((event.button.state & GDK_SHIFT_MASK)
-              && (event.button.state & GDK_CONTROL_MASK))
-            sts = ctx->event_handler(flow_eEvent_MB2PressShiftCtrl,
-                (int)event.button.x, (int)event.button.y, 0, 0);
+          if ((event.button.state & GDK_SHIFT_MASK) && !(event.button.state & GDK_CONTROL_MASK))
+            sts =
+                ctx->event_handler(flow_eEvent_MB2PressShift, (int)event.button.x, (int)event.button.y, 0, 0);
+          else if (!(event.button.state & GDK_SHIFT_MASK) && (event.button.state & GDK_CONTROL_MASK))
+            sts =
+                ctx->event_handler(flow_eEvent_MB2PressShift, (int)event.button.x, (int)event.button.y, 0, 0);
+          else if ((event.button.state & GDK_SHIFT_MASK) && (event.button.state & GDK_CONTROL_MASK))
+            sts = ctx->event_handler(flow_eEvent_MB2PressShiftCtrl, (int)event.button.x, (int)event.button.y,
+                                     0, 0);
           else
-            sts = ctx->event_handler(flow_eEvent_MB2Press, (int)event.button.x,
-                (int)event.button.y, 0, 0);
+            sts = ctx->event_handler(flow_eEvent_MB2Press, (int)event.button.x, (int)event.button.y, 0, 0);
           click_sensitivity = 0;
           break;
         case 3: // Button3
           button3_pressed = 1;
-          sts = ctx->event_handler(flow_eEvent_MB3Press, (int)event.button.x,
-              (int)event.button.y, 0, 0);
+          sts = ctx->event_handler(flow_eEvent_MB3Press, (int)event.button.x, (int)event.button.y, 0, 0);
           click_sensitivity = 0;
           break;
         }
@@ -720,112 +750,107 @@ int FlowDrawGtk::event_handler(FlowCtx* ctx, GdkEvent event)
       button2_pressed = 0;
       button3_pressed = 0;
 
-      if (!button_pressed) {
-        if (button_clicked) {
+      if (!button_pressed)
+      {
+        if (button_clicked)
+        {
           /* Button click, callback from timer */
           button_clicked = 0;
-          switch (event.button.button) {
+          switch (event.button.button)
+          {
           case 1: // Button1
-            if ((event.button.state & GDK_SHIFT_MASK)
-                && !(event.button.state & GDK_CONTROL_MASK))
-              sts = ctx->event_handler(flow_eEvent_MB1ClickShift,
-                  (int)event.button.x, (int)event.button.y, 0, 0);
-            else if (!(event.button.state & GDK_SHIFT_MASK)
-                && (event.button.state & GDK_CONTROL_MASK))
-              sts = ctx->event_handler(flow_eEvent_MB1ClickCtrl,
-                  (int)event.button.x, (int)event.button.y, 0, 0);
-            else if ((event.button.state & GDK_SHIFT_MASK)
-                && (event.button.state & GDK_CONTROL_MASK))
-              sts = ctx->event_handler(flow_eEvent_MB1ClickShiftCtrl,
-                  (int)event.button.x, (int)event.button.y, 0, 0);
+            if ((event.button.state & GDK_SHIFT_MASK) && !(event.button.state & GDK_CONTROL_MASK))
+              sts = ctx->event_handler(flow_eEvent_MB1ClickShift, (int)event.button.x, (int)event.button.y, 0,
+                                       0);
+            else if (!(event.button.state & GDK_SHIFT_MASK) && (event.button.state & GDK_CONTROL_MASK))
+              sts = ctx->event_handler(flow_eEvent_MB1ClickCtrl, (int)event.button.x, (int)event.button.y, 0,
+                                       0);
+            else if ((event.button.state & GDK_SHIFT_MASK) && (event.button.state & GDK_CONTROL_MASK))
+              sts = ctx->event_handler(flow_eEvent_MB1ClickShiftCtrl, (int)event.button.x,
+                                       (int)event.button.y, 0, 0);
             else
-              sts = ctx->event_handler(flow_eEvent_MB1Click,
-                  (int)event.button.x, (int)event.button.y, 0, 0);
+              sts = ctx->event_handler(flow_eEvent_MB1Click, (int)event.button.x, (int)event.button.y, 0, 0);
             click_sensitivity = 0;
             break;
           case 2: // Button2
-            if ((event.button.state & GDK_SHIFT_MASK)
-                && !(event.button.state & GDK_CONTROL_MASK))
-              sts = ctx->event_handler(flow_eEvent_MB2ClickShift,
-                  (int)event.button.x, (int)event.button.y, 0, 0);
-            else if (!(event.button.state & GDK_SHIFT_MASK)
-                && (event.button.state & GDK_CONTROL_MASK))
-              sts = ctx->event_handler(flow_eEvent_MB2ClickCtrl,
-                  (int)event.button.x, (int)event.button.y, 0, 0);
-            else if ((event.button.state & GDK_SHIFT_MASK)
-                && (event.button.state & GDK_CONTROL_MASK))
-              sts = ctx->event_handler(flow_eEvent_MB2ClickShiftCtrl,
-                  (int)event.button.x, (int)event.button.y, 0, 0);
+            if ((event.button.state & GDK_SHIFT_MASK) && !(event.button.state & GDK_CONTROL_MASK))
+              sts = ctx->event_handler(flow_eEvent_MB2ClickShift, (int)event.button.x, (int)event.button.y, 0,
+                                       0);
+            else if (!(event.button.state & GDK_SHIFT_MASK) && (event.button.state & GDK_CONTROL_MASK))
+              sts = ctx->event_handler(flow_eEvent_MB2ClickCtrl, (int)event.button.x, (int)event.button.y, 0,
+                                       0);
+            else if ((event.button.state & GDK_SHIFT_MASK) && (event.button.state & GDK_CONTROL_MASK))
+              sts = ctx->event_handler(flow_eEvent_MB2ClickShiftCtrl, (int)event.button.x,
+                                       (int)event.button.y, 0, 0);
             else
-              sts = ctx->event_handler(flow_eEvent_MB2Click,
-                  (int)event.button.x, (int)event.button.y, 0, 0);
+              sts = ctx->event_handler(flow_eEvent_MB2Click, (int)event.button.x, (int)event.button.y, 0, 0);
             click_sensitivity = 0;
             break;
           case 3: // Button3
-            sts = ctx->event_handler(flow_eEvent_MB3Click, (int)event.button.x,
-                (int)event.button.y, 0, 0);
+            sts = ctx->event_handler(flow_eEvent_MB3Click, (int)event.button.x, (int)event.button.y, 0, 0);
             click_sensitivity = 0;
             break;
           }
-        } else {
-          /* Button release */
-          sts = ctx->event_handler(flow_eEvent_ButtonRelease,
-              (int)event.button.x, (int)event.button.y, 0, 0);
         }
-      } else {
+        else
+        {
+          /* Button release */
+          sts = ctx->event_handler(flow_eEvent_ButtonRelease, (int)event.button.x, (int)event.button.y, 0, 0);
+        }
+      }
+      else
+      {
         /* Button click */
         cancel_event_timer(ctx);
-        if (!button_clicked_and_pressed) {
+        if (!button_clicked_and_pressed)
+        {
           /* wait for button double click */
           memcpy(&last_event, &event, sizeof(event));
           button_clicked = 1;
           event_timer(ctx, 200);
           button_pressed = 0;
           return 1;
-        } else {
+        }
+        else
+        {
           /* Button double click */
           cancel_event_timer(ctx);
           button_clicked = 0;
           button_pressed = 0;
           button_clicked_and_pressed = 0;
-          switch (event.button.button) {
+          switch (event.button.button)
+          {
           case 1: // Button1
-            if ((event.button.state & GDK_SHIFT_MASK)
-                && !(event.button.state & GDK_CONTROL_MASK))
-              sts = ctx->event_handler(flow_eEvent_MB1DoubleClickShift,
-                  (int)event.button.x, (int)event.button.y, 0, 0);
-            else if (!(event.button.state & GDK_SHIFT_MASK)
-                && (event.button.state & GDK_CONTROL_MASK))
-              sts = ctx->event_handler(flow_eEvent_MB1DoubleClickCtrl,
-                  (int)event.button.x, (int)event.button.y, 0, 0);
-            else if ((event.button.state & GDK_SHIFT_MASK)
-                && (event.button.state & GDK_CONTROL_MASK))
-              sts = ctx->event_handler(flow_eEvent_MB1DoubleClickShiftCtrl,
-                  (int)event.button.x, (int)event.button.y, 0, 0);
+            if ((event.button.state & GDK_SHIFT_MASK) && !(event.button.state & GDK_CONTROL_MASK))
+              sts = ctx->event_handler(flow_eEvent_MB1DoubleClickShift, (int)event.button.x,
+                                       (int)event.button.y, 0, 0);
+            else if (!(event.button.state & GDK_SHIFT_MASK) && (event.button.state & GDK_CONTROL_MASK))
+              sts = ctx->event_handler(flow_eEvent_MB1DoubleClickCtrl, (int)event.button.x,
+                                       (int)event.button.y, 0, 0);
+            else if ((event.button.state & GDK_SHIFT_MASK) && (event.button.state & GDK_CONTROL_MASK))
+              sts = ctx->event_handler(flow_eEvent_MB1DoubleClickShiftCtrl, (int)event.button.x,
+                                       (int)event.button.y, 0, 0);
             else
-              sts = ctx->event_handler(flow_eEvent_MB1DoubleClick,
-                  (int)event.button.x, (int)event.button.y, 0, 0);
+              sts = ctx->event_handler(flow_eEvent_MB1DoubleClick, (int)event.button.x, (int)event.button.y,
+                                       0, 0);
             if (sts == FLOW__TERMINATED)
               return sts;
             click_sensitivity = 0;
 
             break;
           case 2: // Button2
-            if ((event.button.state & GDK_SHIFT_MASK)
-                && !(event.button.state & GDK_CONTROL_MASK))
-              sts = ctx->event_handler(flow_eEvent_MB2DoubleClickShift,
-                  (int)event.button.x, (int)event.button.y, 0, 0);
-            else if (!(event.button.state & GDK_SHIFT_MASK)
-                && (event.button.state & GDK_CONTROL_MASK))
-              sts = ctx->event_handler(flow_eEvent_MB2DoubleClickCtrl,
-                  (int)event.button.x, (int)event.button.y, 0, 0);
-            else if ((event.button.state & GDK_SHIFT_MASK)
-                && (event.button.state & GDK_CONTROL_MASK))
-              sts = ctx->event_handler(flow_eEvent_MB2DoubleClickShiftCtrl,
-                  (int)event.button.x, (int)event.button.y, 0, 0);
+            if ((event.button.state & GDK_SHIFT_MASK) && !(event.button.state & GDK_CONTROL_MASK))
+              sts = ctx->event_handler(flow_eEvent_MB2DoubleClickShift, (int)event.button.x,
+                                       (int)event.button.y, 0, 0);
+            else if (!(event.button.state & GDK_SHIFT_MASK) && (event.button.state & GDK_CONTROL_MASK))
+              sts = ctx->event_handler(flow_eEvent_MB2DoubleClickCtrl, (int)event.button.x,
+                                       (int)event.button.y, 0, 0);
+            else if ((event.button.state & GDK_SHIFT_MASK) && (event.button.state & GDK_CONTROL_MASK))
+              sts = ctx->event_handler(flow_eEvent_MB2DoubleClickShiftCtrl, (int)event.button.x,
+                                       (int)event.button.y, 0, 0);
             else
-              sts = ctx->event_handler(flow_eEvent_MB2DoubleClick,
-                  (int)event.button.x, (int)event.button.y, 0, 0);
+              sts = ctx->event_handler(flow_eEvent_MB2DoubleClick, (int)event.button.x, (int)event.button.y,
+                                       0, 0);
             click_sensitivity = 0;
             break;
           case 3: // Button3
@@ -836,12 +861,12 @@ int FlowDrawGtk::event_handler(FlowCtx* ctx, GdkEvent event)
       }
       break;
     case GDK_EXPOSE:
-      sts = ctx->event_handler(flow_eEvent_Exposure, event.expose.area.x,
-          event.expose.area.y, event.expose.area.width,
-          event.expose.area.height);
+      sts = ctx->event_handler(flow_eEvent_Exposure, event.expose.area.x, event.expose.area.y,
+                               event.expose.area.width, event.expose.area.height);
       break;
     case GDK_VISIBILITY_NOTIFY:
-      switch (event.visibility.state) {
+      switch (event.visibility.state)
+      {
       case GDK_VISIBILITY_UNOBSCURED:
         sts = ctx->event_handler(flow_eEvent_VisibilityUnobscured, 0, 0, 0, 0);
         break;
@@ -851,90 +876,80 @@ int FlowDrawGtk::event_handler(FlowCtx* ctx, GdkEvent event)
       }
       break;
     case GDK_MOTION_NOTIFY:
-      if (event.motion.is_hint) {
+      if (event.motion.is_hint)
+      {
         int x, y;
 
-        gdk_window_get_device_position(event.any.window, 
-	    gdk_seat_get_pointer(gdk_display_get_default_seat(gdk_display_get_default())),
-	    &x, &y, NULL);
+        gdk_window_get_device_position(
+            event.any.window, gdk_seat_get_pointer(gdk_display_get_default_seat(gdk_display_get_default())),
+            &x, &y, NULL);
         event.button.x = x;
         event.button.y = y;
       }
 
-      if (button3_pressed) {
+      if (button3_pressed)
+      {
         button3_pressed = 0;
         button_pressed = 0;
         button_clicked_and_pressed = 0;
       }
 
-      if (button_pressed
-          && (ABS((int)event.button.x - last_press_x) > DRAW_PRESS_PIX
-                 || ABS((int)event.button.y - last_press_y) > DRAW_PRESS_PIX)) {
+      if (button_pressed && (ABS((int)event.button.x - last_press_x) > DRAW_PRESS_PIX ||
+                             ABS((int)event.button.y - last_press_y) > DRAW_PRESS_PIX))
+      {
         event.button.x = last_press_x;
         event.button.y = last_press_y;
 
         /* Button press */
         cancel_event_timer(ctx);
-        switch (button_pressed) {
+        switch (button_pressed)
+        {
         case 1: // Button1
           button1_pressed = 1;
-          if ((event.button.state & GDK_SHIFT_MASK)
-              && !(event.button.state & GDK_CONTROL_MASK))
-            sts = ctx->event_handler(flow_eEvent_MB1PressShift,
-                (int)event.button.x, (int)event.button.y, 0, 0);
-          else if (!(event.button.state & GDK_SHIFT_MASK)
-              && (event.button.state & GDK_CONTROL_MASK))
-            sts = ctx->event_handler(flow_eEvent_MB1PressCtrl,
-                (int)event.button.x, (int)event.button.y, 0, 0);
-          else if ((event.button.state & GDK_SHIFT_MASK)
-              && (event.button.state & GDK_CONTROL_MASK))
-            sts = ctx->event_handler(flow_eEvent_MB1PressShiftCtrl,
-                (int)event.button.x, (int)event.button.y, 0, 0);
+          if ((event.button.state & GDK_SHIFT_MASK) && !(event.button.state & GDK_CONTROL_MASK))
+            sts =
+                ctx->event_handler(flow_eEvent_MB1PressShift, (int)event.button.x, (int)event.button.y, 0, 0);
+          else if (!(event.button.state & GDK_SHIFT_MASK) && (event.button.state & GDK_CONTROL_MASK))
+            sts =
+                ctx->event_handler(flow_eEvent_MB1PressCtrl, (int)event.button.x, (int)event.button.y, 0, 0);
+          else if ((event.button.state & GDK_SHIFT_MASK) && (event.button.state & GDK_CONTROL_MASK))
+            sts = ctx->event_handler(flow_eEvent_MB1PressShiftCtrl, (int)event.button.x, (int)event.button.y,
+                                     0, 0);
           else
-            ctx->event_handler(flow_eEvent_MB1Press, (int)event.button.x,
-                (int)event.button.y, 0, 0);
+            ctx->event_handler(flow_eEvent_MB1Press, (int)event.button.x, (int)event.button.y, 0, 0);
           break;
         case 2: // Button2
           button2_pressed = 1;
-          if ((event.button.state & GDK_SHIFT_MASK)
-              && !(event.button.state & GDK_CONTROL_MASK))
-            sts = ctx->event_handler(flow_eEvent_MB2PressShift,
-                (int)event.button.x, (int)event.button.y, 0, 0);
-          else if (!(event.button.state & GDK_SHIFT_MASK)
-              && (event.button.state & GDK_CONTROL_MASK))
-            sts = ctx->event_handler(flow_eEvent_MB2PressShift,
-                (int)event.button.x, (int)event.button.y, 0, 0);
-          else if ((event.button.state & GDK_SHIFT_MASK)
-              && (event.button.state & GDK_CONTROL_MASK))
-            sts = ctx->event_handler(flow_eEvent_MB2PressShiftCtrl,
-                (int)event.button.x, (int)event.button.y, 0, 0);
+          if ((event.button.state & GDK_SHIFT_MASK) && !(event.button.state & GDK_CONTROL_MASK))
+            sts =
+                ctx->event_handler(flow_eEvent_MB2PressShift, (int)event.button.x, (int)event.button.y, 0, 0);
+          else if (!(event.button.state & GDK_SHIFT_MASK) && (event.button.state & GDK_CONTROL_MASK))
+            sts =
+                ctx->event_handler(flow_eEvent_MB2PressShift, (int)event.button.x, (int)event.button.y, 0, 0);
+          else if ((event.button.state & GDK_SHIFT_MASK) && (event.button.state & GDK_CONTROL_MASK))
+            sts = ctx->event_handler(flow_eEvent_MB2PressShiftCtrl, (int)event.button.x, (int)event.button.y,
+                                     0, 0);
           else
-            sts = ctx->event_handler(flow_eEvent_MB2Press, (int)event.button.x,
-                (int)event.button.y, 0, 0);
+            sts = ctx->event_handler(flow_eEvent_MB2Press, (int)event.button.x, (int)event.button.y, 0, 0);
           break;
         case 3: // Button3
           button3_pressed = 1;
-          sts = ctx->event_handler(flow_eEvent_MB3Press, (int)event.button.x,
-              (int)event.button.y, 0, 0);
+          sts = ctx->event_handler(flow_eEvent_MB3Press, (int)event.button.x, (int)event.button.y, 0, 0);
           break;
         }
         button_pressed = 0;
         button_clicked_and_pressed = 0;
       }
       if (button1_pressed || button2_pressed || button3_pressed)
-        sts = ctx->event_handler(flow_eEvent_ButtonMotion, (int)event.button.x,
-            (int)event.button.y, 0, 0);
+        sts = ctx->event_handler(flow_eEvent_ButtonMotion, (int)event.button.x, (int)event.button.y, 0, 0);
       else
-        sts = ctx->event_handler(flow_eEvent_CursorMotion, (int)event.button.x,
-            (int)event.button.y, 0, 0);
+        sts = ctx->event_handler(flow_eEvent_CursorMotion, (int)event.button.x, (int)event.button.y, 0, 0);
       break;
     case GDK_ENTER_NOTIFY:
-      sts = ctx->event_handler(flow_eEvent_Enter, (int)event.crossing.x,
-          (int)event.crossing.y, 0, 0);
+      sts = ctx->event_handler(flow_eEvent_Enter, (int)event.crossing.x, (int)event.crossing.y, 0, 0);
       break;
     case GDK_LEAVE_NOTIFY:
-      sts = ctx->event_handler(flow_eEvent_Leave, (int)event.crossing.x,
-          (int)event.crossing.y, 0, 0);
+      sts = ctx->event_handler(flow_eEvent_Leave, (int)event.crossing.x, (int)event.crossing.y, 0, 0);
       break;
     case GDK_MAP:
       sts = ctx->event_handler(flow_eEvent_Map, 0, 0, 0, 0);
@@ -953,19 +968,21 @@ int FlowDrawGtk::event_handler(FlowCtx* ctx, GdkEvent event)
     default:
       break;
     }
-  } else if (event.any.window == nav_window) {
-    switch (event.type) {
+  }
+  else if (event.any.window == nav_window)
+  {
+    switch (event.type)
+    {
     case GDK_BUTTON_PRESS:
-      switch (event.button.button) {
+      switch (event.button.button)
+      {
       case 1: // Button1
         button1_pressed = 1;
-        sts = ctx->event_handler_nav(
-            flow_eEvent_MB1Press, (int)event.button.x, (int)event.button.y);
+        sts = ctx->event_handler_nav(flow_eEvent_MB1Press, (int)event.button.x, (int)event.button.y);
         break;
       case 2: // Button2
         button2_pressed = 1;
-        sts = ctx->event_handler_nav(
-            flow_eEvent_MB2Press, (int)event.button.x, (int)event.button.y);
+        sts = ctx->event_handler_nav(flow_eEvent_MB2Press, (int)event.button.x, (int)event.button.y);
         break;
       case 3: // Button3
         button3_pressed = 1;
@@ -973,7 +990,8 @@ int FlowDrawGtk::event_handler(FlowCtx* ctx, GdkEvent event)
       }
       break;
     case GDK_BUTTON_RELEASE:
-      switch (event.button.button) {
+      switch (event.button.button)
+      {
       case 1: // Button1
         button1_pressed = 0;
         break;
@@ -984,34 +1002,31 @@ int FlowDrawGtk::event_handler(FlowCtx* ctx, GdkEvent event)
         button3_pressed = 0;
         break;
       }
-      if (event.button.button == 1 && (event.button.state & GDK_SHIFT_MASK)
-          && !(event.button.state & GDK_CONTROL_MASK))
-        sts = ctx->event_handler_nav(flow_eEvent_MB1ClickShift,
-            (int)event.button.x, (int)event.button.y);
+      if (event.button.button == 1 && (event.button.state & GDK_SHIFT_MASK) &&
+          !(event.button.state & GDK_CONTROL_MASK))
+        sts = ctx->event_handler_nav(flow_eEvent_MB1ClickShift, (int)event.button.x, (int)event.button.y);
       else
-        sts = ctx->event_handler_nav(flow_eEvent_ButtonRelease,
-            (int)event.button.x, (int)event.button.y);
+        sts = ctx->event_handler_nav(flow_eEvent_ButtonRelease, (int)event.button.x, (int)event.button.y);
       break;
     case GDK_EXPOSE:
       sts = ctx->event_handler_nav(flow_eEvent_Exposure, 0, 0);
       break;
     case GDK_MOTION_NOTIFY:
-      if (event.motion.is_hint) {
+      if (event.motion.is_hint)
+      {
         int x, y;
 
-        gdk_window_get_device_position(event.any.window, 
-	    gdk_seat_get_pointer(gdk_display_get_default_seat(gdk_display_get_default())),
+        gdk_window_get_device_position(
+            event.any.window, gdk_seat_get_pointer(gdk_display_get_default_seat(gdk_display_get_default())),
             &x, &y, NULL);
         event.button.x = x;
         event.button.y = y;
       }
 
       if (button1_pressed || button2_pressed || button3_pressed)
-        sts = ctx->event_handler_nav(
-            flow_eEvent_ButtonMotion, (int)event.button.x, (int)event.button.y);
+        sts = ctx->event_handler_nav(flow_eEvent_ButtonMotion, (int)event.button.x, (int)event.button.y);
       else
-        sts = ctx->event_handler_nav(
-            flow_eEvent_CursorMotion, (int)event.button.x, (int)event.button.y);
+        sts = ctx->event_handler_nav(flow_eEvent_CursorMotion, (int)event.button.x, (int)event.button.y);
       break;
     default:;
     }
@@ -1023,16 +1038,16 @@ int FlowDrawGtk::event_handler(FlowCtx* ctx, GdkEvent event)
   return 1;
 }
 
-void FlowDrawGtk::enable_event(FlowCtx* ctx, flow_eEvent event,
-    flow_eEventType event_type,
-    int (*event_cb)(FlowCtx* ctx, flow_tEvent event))
+void FlowDrawGtk::enable_event(FlowCtx* ctx, flow_eEvent event, flow_eEventType event_type,
+                               int (*event_cb)(FlowCtx* ctx, flow_tEvent event))
 {
   ctx->enable_event(event, event_type, event_cb);
 }
 
 cairo_t* FlowDrawGtk::get_cairo(int create)
 {
-  if (!cairo_cr_refcnt) {
+  if (!cairo_cr_refcnt)
+  {
     if (!create)
       printf("** Cairo context create error\n");
 
@@ -1049,7 +1064,8 @@ void FlowDrawGtk::end_cairo(cairo_t* cr)
   pwr_Assert(cairo_cr_refcnt != 0);
   cairo_cr_refcnt--;
 
-  if (cairo_cr_refcnt == 0) {
+  if (cairo_cr_refcnt == 0)
+  {
     gdk_window_end_draw_frame(window, cairo_context);
     cairo_region_destroy(cairo_region);
   }
@@ -1057,7 +1073,8 @@ void FlowDrawGtk::end_cairo(cairo_t* cr)
 
 cairo_t* FlowDrawGtk::get_cairo_nav()
 {
-  if (!cairo_nav_cr_refcnt) {
+  if (!cairo_nav_cr_refcnt)
+  {
     cairo_nav_region = cairo_region_create();
     cairo_nav_context = gdk_window_begin_draw_frame(nav_window, cairo_nav_region);
     cairo_nav_cr = gdk_drawing_context_get_cairo_context(cairo_nav_context);
@@ -1071,29 +1088,33 @@ void FlowDrawGtk::end_cairo_nav(cairo_t* cr)
   pwr_Assert(cairo_nav_cr_refcnt != 0);
   cairo_nav_cr_refcnt--;
 
-  if (cairo_nav_cr_refcnt == 0) {
+  if (cairo_nav_cr_refcnt == 0)
+  {
     gdk_window_end_draw_frame(nav_window, cairo_nav_context);
     cairo_region_destroy(cairo_nav_region);
   }
 }
 
-int FlowDrawGtk::rect(FlowCtx* ctx, int x, int y, int width, int height,
-    flow_eDrawType gc_type, int idx, int highlight, int dimmed)
+int FlowDrawGtk::rect(FlowCtx* ctx, int x, int y, int width, int height, flow_eDrawType gc_type, int idx,
+                      int highlight, int dimmed)
 {
   if (ctx->nodraw)
     return 1;
 
-  cairo_t *cr = get_cairo();
+  cairo_t* cr = get_cairo();
 
   cairo_set_antialias(cr, antialias);
-  if (highlight) {
+  if (highlight)
+  {
     if (gc_type == flow_eDrawType_LineGray)
       cairo_set_source(cr, gc_black);
     else if (gc_type == flow_eDrawType_LineErase)
       cairo_set_source(cr, gc_erase);
     else
       cairo_set_source(cr, gc_red);
-  } else {
+  }
+  else
+  {
     if (dimmed || gc_type == flow_eDrawType_LineGray)
       cairo_set_source(cr, gc_gray);
     else if (gc_type == flow_eDrawType_LineErase)
@@ -1101,7 +1122,7 @@ int FlowDrawGtk::rect(FlowCtx* ctx, int x, int y, int width, int height,
     else
       cairo_set_source(cr, gc_black);
   }
-  cairo_set_line_width(cr, idx+1);
+  cairo_set_line_width(cr, idx + 1);
 
   cairo_rectangle(cr, x, y, width, height);
   cairo_stroke(cr);
@@ -1110,17 +1131,16 @@ int FlowDrawGtk::rect(FlowCtx* ctx, int x, int y, int width, int height,
   return 1;
 }
 
-int FlowDrawGtk::rect_erase(
-    FlowCtx* ctx, int x, int y, int width, int height, int idx)
+int FlowDrawGtk::rect_erase(FlowCtx* ctx, int x, int y, int width, int height, int idx)
 {
   if (ctx->nodraw)
     return 1;
 
-  cairo_t *cr = get_cairo();
+  cairo_t* cr = get_cairo();
 
   cairo_set_antialias(cr, antialias);
   cairo_set_source(cr, gc_erase);
-  cairo_set_line_width(cr, idx+1);
+  cairo_set_line_width(cr, idx + 1);
 
   cairo_rectangle(cr, x, y, width, height);
   cairo_stroke(cr);
@@ -1128,13 +1148,13 @@ int FlowDrawGtk::rect_erase(
   return 1;
 }
 
-int FlowDrawGtk::nav_rect(FlowCtx* ctx, int x, int y, int width, int height,
-    flow_eDrawType gc_type, int idx, int highlight)
+int FlowDrawGtk::nav_rect(FlowCtx* ctx, int x, int y, int width, int height, flow_eDrawType gc_type, int idx,
+                          int highlight)
 {
   if (ctx->no_nav || ctx->nodraw)
     return 1;
 
-  cairo_t *cr = get_cairo_nav();
+  cairo_t* cr = get_cairo_nav();
 
   cairo_set_antialias(cr, nav_antialias);
   if (gc_type == flow_eDrawType_LineGray && highlight)
@@ -1143,7 +1163,7 @@ int FlowDrawGtk::nav_rect(FlowCtx* ctx, int x, int y, int width, int height,
     cairo_set_source(cr, gc_red);
   else
     cairo_set_source(cr, gc_black);
-  cairo_set_line_width(cr, idx+1);
+  cairo_set_line_width(cr, idx + 1);
 
   cairo_rectangle(cr, x, y, width, height);
   cairo_stroke(cr);
@@ -1151,17 +1171,16 @@ int FlowDrawGtk::nav_rect(FlowCtx* ctx, int x, int y, int width, int height,
   return 1;
 }
 
-int FlowDrawGtk::nav_rect_erase(
-    FlowCtx* ctx, int x, int y, int width, int height, int idx)
+int FlowDrawGtk::nav_rect_erase(FlowCtx* ctx, int x, int y, int width, int height, int idx)
 {
   if (ctx->no_nav || ctx->nodraw)
     return 1;
 
-  cairo_t *cr = get_cairo_nav();
+  cairo_t* cr = get_cairo_nav();
 
   cairo_set_antialias(cr, nav_antialias);
   cairo_set_source(cr, gc_erase);
-  cairo_set_line_width(cr, idx+1);
+  cairo_set_line_width(cr, idx + 1);
 
   cairo_rectangle(cr, x, y, width, height);
   cairo_stroke(cr);
@@ -1169,13 +1188,13 @@ int FlowDrawGtk::nav_rect_erase(
   return 1;
 }
 
-int FlowDrawGtk::triangle(FlowCtx* ctx, int x, int y, int width, int height,
-    flow_eDrawType gc_type, int idx, int highlight, int dimmed)
+int FlowDrawGtk::triangle(FlowCtx* ctx, int x, int y, int width, int height, flow_eDrawType gc_type, int idx,
+                          int highlight, int dimmed)
 {
   if (ctx->nodraw)
     return 1;
 
-  cairo_t *cr = get_cairo();
+  cairo_t* cr = get_cairo();
 
   cairo_set_antialias(cr, antialias);
   if (dimmed || gc_type == flow_eDrawType_LineGray)
@@ -1186,7 +1205,7 @@ int FlowDrawGtk::triangle(FlowCtx* ctx, int x, int y, int width, int height,
     cairo_set_source(cr, gc_red);
   else
     cairo_set_source(cr, gc_black);
-  cairo_set_line_width(cr, idx+1);
+  cairo_set_line_width(cr, idx + 1);
 
   cairo_move_to(cr, x, y + height);
   cairo_line_to(cr, x + width / 2, y);
@@ -1197,17 +1216,16 @@ int FlowDrawGtk::triangle(FlowCtx* ctx, int x, int y, int width, int height,
   return 1;
 }
 
-int FlowDrawGtk::triangle_erase(
-    FlowCtx* ctx, int x, int y, int width, int height, int idx)
+int FlowDrawGtk::triangle_erase(FlowCtx* ctx, int x, int y, int width, int height, int idx)
 {
   if (ctx->nodraw)
     return 1;
 
-  cairo_t *cr = get_cairo();
+  cairo_t* cr = get_cairo();
 
   cairo_set_antialias(cr, antialias);
   cairo_set_source(cr, gc_erase);
-  cairo_set_line_width(cr, idx+1);
+  cairo_set_line_width(cr, idx + 1);
 
   cairo_move_to(cr, x, y + height);
   cairo_line_to(cr, x + width / 2, y);
@@ -1218,20 +1236,20 @@ int FlowDrawGtk::triangle_erase(
   return 1;
 }
 
-int FlowDrawGtk::nav_triangle(FlowCtx* ctx, int x, int y, int width, int height,
-    flow_eDrawType gc_type, int idx, int highlight)
+int FlowDrawGtk::nav_triangle(FlowCtx* ctx, int x, int y, int width, int height, flow_eDrawType gc_type,
+                              int idx, int highlight)
 {
   if (ctx->no_nav || ctx->nodraw)
     return 1;
 
-  cairo_t *cr = get_cairo_nav();
+  cairo_t* cr = get_cairo_nav();
 
   cairo_set_antialias(cr, nav_antialias);
   if (highlight)
     cairo_set_source(cr, gc_red);
   else
     cairo_set_source(cr, gc_black);
-  cairo_set_line_width(cr, idx+1);
+  cairo_set_line_width(cr, idx + 1);
 
   cairo_move_to(cr, x, y + height);
   cairo_line_to(cr, x + width / 2, y);
@@ -1242,13 +1260,12 @@ int FlowDrawGtk::nav_triangle(FlowCtx* ctx, int x, int y, int width, int height,
   return 1;
 }
 
-int FlowDrawGtk::nav_fill_triangle(
-    FlowCtx* ctx, int x, int y, int width, int height, flow_eDrawType gc_type)
+int FlowDrawGtk::nav_fill_triangle(FlowCtx* ctx, int x, int y, int width, int height, flow_eDrawType gc_type)
 {
   if (ctx->no_nav || ctx->nodraw || gc_type != flow_eDrawType_LineRed)
     return 1;
 
-  cairo_t *cr = get_cairo_nav();
+  cairo_t* cr = get_cairo_nav();
 
   cairo_set_antialias(cr, nav_antialias);
   cairo_set_source(cr, gc_red);
@@ -1262,13 +1279,12 @@ int FlowDrawGtk::nav_fill_triangle(
   return 1;
 }
 
-int FlowDrawGtk::nav_triangle_erase(
-    FlowCtx* ctx, int x, int y, int width, int height, int idx)
+int FlowDrawGtk::nav_triangle_erase(FlowCtx* ctx, int x, int y, int width, int height, int idx)
 {
   if (ctx->no_nav || ctx->nodraw)
     return 1;
 
-  cairo_t *cr = get_cairo_nav();
+  cairo_t* cr = get_cairo_nav();
 
   cairo_set_antialias(cr, nav_antialias);
   cairo_set_source(cr, gc_erase);
@@ -1282,18 +1298,19 @@ int FlowDrawGtk::nav_triangle_erase(
   return 1;
 }
 
-int FlowDrawGtk::arrow(FlowCtx* ctx, int x1, int y1, int x2, int y2, int x3,
-    int y3, flow_eDrawType gc_type, int idx, int highlight)
+int FlowDrawGtk::arrow(FlowCtx* ctx, int x1, int y1, int x2, int y2, int x3, int y3, flow_eDrawType gc_type,
+                       int idx, int highlight)
 {
   if (ctx->nodraw)
     return 1;
 
-  cairo_t *cr = get_cairo();
+  cairo_t* cr = get_cairo();
 
   cairo_set_antialias(cr, antialias);
   if (highlight)
     cairo_set_source(cr, gc_red);
-  else {
+  else
+  {
     if (gc_type == flow_eDrawType_LineGray)
       cairo_set_source(cr, gc_gray);
     else
@@ -1308,13 +1325,12 @@ int FlowDrawGtk::arrow(FlowCtx* ctx, int x1, int y1, int x2, int y2, int x3,
   return 1;
 }
 
-int FlowDrawGtk::arrow_erase(
-    FlowCtx* ctx, int x1, int y1, int x2, int y2, int x3, int y3, int idx)
+int FlowDrawGtk::arrow_erase(FlowCtx* ctx, int x1, int y1, int x2, int y2, int x3, int y3, int idx)
 {
   if (ctx->nodraw)
     return 1;
 
-  cairo_t *cr = get_cairo();
+  cairo_t* cr = get_cairo();
 
   cairo_set_antialias(cr, antialias);
   cairo_set_source(cr, gc_erase);
@@ -1328,13 +1344,13 @@ int FlowDrawGtk::arrow_erase(
   return 1;
 }
 
-int FlowDrawGtk::nav_arrow(FlowCtx* ctx, int x1, int y1, int x2, int y2, int x3,
-    int y3, flow_eDrawType gc_type, int idx, int highlight)
+int FlowDrawGtk::nav_arrow(FlowCtx* ctx, int x1, int y1, int x2, int y2, int x3, int y3,
+                           flow_eDrawType gc_type, int idx, int highlight)
 {
   if (ctx->no_nav || ctx->nodraw)
     return 1;
 
-  cairo_t *cr = get_cairo_nav();
+  cairo_t* cr = get_cairo_nav();
 
   cairo_set_antialias(cr, nav_antialias);
   if (gc_type == flow_eDrawType_LineGray && highlight)
@@ -1355,13 +1371,12 @@ int FlowDrawGtk::nav_arrow(FlowCtx* ctx, int x1, int y1, int x2, int y2, int x3,
   return 1;
 }
 
-int FlowDrawGtk::nav_arrow_erase(
-    FlowCtx* ctx, int x1, int y1, int x2, int y2, int x3, int y3, int idx)
+int FlowDrawGtk::nav_arrow_erase(FlowCtx* ctx, int x1, int y1, int x2, int y2, int x3, int y3, int idx)
 {
   if (ctx->no_nav || ctx->nodraw)
     return 1;
 
-  cairo_t *cr = get_cairo_nav();
+  cairo_t* cr = get_cairo_nav();
 
   cairo_set_antialias(cr, nav_antialias);
   cairo_set_source(cr, gc_erase);
@@ -1375,9 +1390,8 @@ int FlowDrawGtk::nav_arrow_erase(
   return 1;
 }
 
-int FlowDrawGtk::arc(FlowCtx* ctx, int x, int y, int width, int height,
-    int angle1, int angle2, flow_eDrawType gc_type, int idx, int highlight,
-    int dimmed)
+int FlowDrawGtk::arc(FlowCtx* ctx, int x, int y, int width, int height, int angle1, int angle2,
+                     flow_eDrawType gc_type, int idx, int highlight, int dimmed)
 {
   if (ctx->nodraw)
     return 1;
@@ -1386,7 +1400,7 @@ int FlowDrawGtk::arc(FlowCtx* ctx, int x, int y, int width, int height,
     return 1;
 
   cairo_matrix_t matrix;
-  cairo_t *cr = get_cairo();
+  cairo_t* cr = get_cairo();
 
   cairo_set_antialias(cr, antialias);
   if (dimmed)
@@ -1397,15 +1411,17 @@ int FlowDrawGtk::arc(FlowCtx* ctx, int x, int y, int width, int height,
     cairo_set_source(cr, gc_red);
   else
     cairo_set_source(cr, gc_black);
-  cairo_set_line_width(cr, idx+1);
+  cairo_set_line_width(cr, idx + 1);
 
-  if (width != height) {
+  if (width != height)
+  {
     cairo_get_matrix(cr, &matrix);
-    cairo_translate(cr, x + width/2, y + height/2);
-    cairo_scale(cr, 1, (double)height/width);
-    cairo_translate(cr, -(x + width/2), -(y + height/2));
+    cairo_translate(cr, x + width / 2, y + height / 2);
+    cairo_scale(cr, 1, (double)height / width);
+    cairo_translate(cr, -(x + width / 2), -(y + height / 2));
   }
-  cairo_arc(cr, x+width/2, y+height/2, 0.5 * width, -M_PI/180*(angle1 + angle2),- M_PI/180*angle1);
+  cairo_arc(cr, x + width / 2, y + height / 2, 0.5 * width, -M_PI / 180 * (angle1 + angle2),
+            -M_PI / 180 * angle1);
 
   if (width != height)
     cairo_set_matrix(cr, &matrix);
@@ -1415,27 +1431,28 @@ int FlowDrawGtk::arc(FlowCtx* ctx, int x, int y, int width, int height,
   return 1;
 }
 
-int FlowDrawGtk::arc_erase(FlowCtx* ctx, int x, int y, int width, int height,
-    int angle1, int angle2, int idx)
+int FlowDrawGtk::arc_erase(FlowCtx* ctx, int x, int y, int width, int height, int angle1, int angle2, int idx)
 {
   if (ctx->nodraw)
     return 1;
 
   cairo_matrix_t matrix;
-  cairo_t *cr = get_cairo();
+  cairo_t* cr = get_cairo();
 
   cairo_set_antialias(cr, antialias);
   cairo_set_source(cr, gc_erase);
-  cairo_set_line_width(cr, idx+1);
+  cairo_set_line_width(cr, idx + 1);
 
-  if (width != height) {
+  if (width != height)
+  {
     cairo_get_matrix(cr, &matrix);
-    cairo_translate(cr, x + width/2, y + height/2);
-    cairo_scale(cr, 1, (double)height/width);
-    cairo_translate(cr, -(x + width/2), -(y + height/2));
+    cairo_translate(cr, x + width / 2, y + height / 2);
+    cairo_scale(cr, 1, (double)height / width);
+    cairo_translate(cr, -(x + width / 2), -(y + height / 2));
   }
 
-  cairo_arc(cr, x+width/2, y+height/2, 0.5 * width, -M_PI/180*(angle1+angle2), -M_PI/180*angle1);
+  cairo_arc(cr, x + width / 2, y + height / 2, 0.5 * width, -M_PI / 180 * (angle1 + angle2),
+            -M_PI / 180 * angle1);
 
   if (width != height)
     cairo_set_matrix(cr, &matrix);
@@ -1445,8 +1462,8 @@ int FlowDrawGtk::arc_erase(FlowCtx* ctx, int x, int y, int width, int height,
   return 1;
 }
 
-int FlowDrawGtk::nav_arc(FlowCtx* ctx, int x, int y, int width, int height,
-    int angle1, int angle2, flow_eDrawType gc_type, int idx, int highlight)
+int FlowDrawGtk::nav_arc(FlowCtx* ctx, int x, int y, int width, int height, int angle1, int angle2,
+                         flow_eDrawType gc_type, int idx, int highlight)
 {
   if (ctx->no_nav || ctx->nodraw)
     return 1;
@@ -1455,7 +1472,7 @@ int FlowDrawGtk::nav_arc(FlowCtx* ctx, int x, int y, int width, int height,
     return 1;
 
   cairo_matrix_t matrix;
-  cairo_t *cr = get_cairo_nav();
+  cairo_t* cr = get_cairo_nav();
 
   cairo_set_antialias(cr, nav_antialias);
   if (gc_type == flow_eDrawType_LineGray && highlight)
@@ -1464,15 +1481,17 @@ int FlowDrawGtk::nav_arc(FlowCtx* ctx, int x, int y, int width, int height,
     cairo_set_source(cr, gc_red);
   else
     cairo_set_source(cr, gc_black);
-  cairo_set_line_width(cr, idx+1);
+  cairo_set_line_width(cr, idx + 1);
 
-  if (width != height) {
+  if (width != height)
+  {
     cairo_get_matrix(cr, &matrix);
-    cairo_translate(cr, x + width/2, y + height/2);
-    cairo_scale(cr, 1, (double)height/width);
-    cairo_translate(cr, -(x + width/2), -(y + height/2));
+    cairo_translate(cr, x + width / 2, y + height / 2);
+    cairo_scale(cr, 1, (double)height / width);
+    cairo_translate(cr, -(x + width / 2), -(y + height / 2));
   }
-  cairo_arc(cr, x+width/2, y+height/2, 0.5 * width, -M_PI/180*(angle1 + angle2),- M_PI/180*angle1);
+  cairo_arc(cr, x + width / 2, y + height / 2, 0.5 * width, -M_PI / 180 * (angle1 + angle2),
+            -M_PI / 180 * angle1);
 
   if (width != height)
     cairo_set_matrix(cr, &matrix);
@@ -1482,8 +1501,8 @@ int FlowDrawGtk::nav_arc(FlowCtx* ctx, int x, int y, int width, int height,
   return 1;
 }
 
-int FlowDrawGtk::nav_arc_erase(FlowCtx* ctx, int x, int y, int width,
-    int height, int angle1, int angle2, int idx)
+int FlowDrawGtk::nav_arc_erase(FlowCtx* ctx, int x, int y, int width, int height, int angle1, int angle2,
+                               int idx)
 {
   if (ctx->no_nav || ctx->nodraw)
     return 1;
@@ -1492,19 +1511,21 @@ int FlowDrawGtk::nav_arc_erase(FlowCtx* ctx, int x, int y, int width,
     return 1;
 
   cairo_matrix_t matrix;
-  cairo_t *cr = get_cairo_nav();
+  cairo_t* cr = get_cairo_nav();
 
   cairo_set_antialias(cr, nav_antialias);
   cairo_set_source(cr, gc_erase);
-  cairo_set_line_width(cr, idx+1);
+  cairo_set_line_width(cr, idx + 1);
 
-  if (width != height) {
+  if (width != height)
+  {
     cairo_get_matrix(cr, &matrix);
-    cairo_translate(cr, x + width/2, y + height/2);
-    cairo_scale(cr, 1, (double)height/width);
-    cairo_translate(cr, -(x + width/2), -(y + height/2));
+    cairo_translate(cr, x + width / 2, y + height / 2);
+    cairo_scale(cr, 1, (double)height / width);
+    cairo_translate(cr, -(x + width / 2), -(y + height / 2));
   }
-  cairo_arc(cr, x+width/2, y+height/2, 0.5 * width, -M_PI/180*(angle1 + angle2),- M_PI/180*angle1);
+  cairo_arc(cr, x + width / 2, y + height / 2, 0.5 * width, -M_PI / 180 * (angle1 + angle2),
+            -M_PI / 180 * angle1);
 
   if (width != height)
     cairo_set_matrix(cr, &matrix);
@@ -1514,13 +1535,13 @@ int FlowDrawGtk::nav_arc_erase(FlowCtx* ctx, int x, int y, int width,
   return 1;
 }
 
-int FlowDrawGtk::line(FlowCtx* ctx, int x1, int y1, int x2, int y2,
-    flow_eDrawType gc_type, int idx, int highlight, int dimmed)
+int FlowDrawGtk::line(FlowCtx* ctx, int x1, int y1, int x2, int y2, flow_eDrawType gc_type, int idx,
+                      int highlight, int dimmed)
 {
   if (ctx->nodraw)
     return 1;
 
-  cairo_t *cr = get_cairo();
+  cairo_t* cr = get_cairo();
 
   cairo_set_antialias(cr, antialias);
   if (dimmed || gc_type == flow_eDrawType_LineGray)
@@ -1531,19 +1552,20 @@ int FlowDrawGtk::line(FlowCtx* ctx, int x1, int y1, int x2, int y2,
     cairo_set_source(cr, gc_red);
   else
     cairo_set_source(cr, gc_black);
-  if (gc_type == flow_eDrawType_LineDashed) {
+  if (gc_type == flow_eDrawType_LineDashed)
+  {
     double d[] = {7.0};
     cairo_set_dash(cr, d, 1, 0);
   }
-      
-  cairo_set_line_width(cr, idx+1);
+
+  cairo_set_line_width(cr, idx + 1);
 
   if (y1 == y2)
     x1--;
   cairo_move_to(cr, x1, y1);
   cairo_line_to(cr, x2, y2);
   cairo_stroke(cr);
-  
+
   if (gc_type == flow_eDrawType_LineDashed)
     cairo_set_dash(cr, 0, 0, 0);
 
@@ -1551,16 +1573,15 @@ int FlowDrawGtk::line(FlowCtx* ctx, int x1, int y1, int x2, int y2,
   return 1;
 }
 
-int FlowDrawGtk::line_erase(
-    FlowCtx* ctx, int x1, int y1, int x2, int y2, int idx)
+int FlowDrawGtk::line_erase(FlowCtx* ctx, int x1, int y1, int x2, int y2, int idx)
 {
   if (ctx->nodraw)
     return 1;
 
-  cairo_t *cr = get_cairo();
+  cairo_t* cr = get_cairo();
   cairo_set_antialias(cr, antialias);
   cairo_set_source(cr, gc_erase);
-  cairo_set_line_width(cr, idx+1);
+  cairo_set_line_width(cr, idx + 1);
 
   if (y1 == y2)
     x1--;
@@ -1571,13 +1592,13 @@ int FlowDrawGtk::line_erase(
   return 1;
 }
 
-int FlowDrawGtk::nav_line(FlowCtx* ctx, int x1, int y1, int x2, int y2,
-    flow_eDrawType gc_type, int idx, int highlight)
+int FlowDrawGtk::nav_line(FlowCtx* ctx, int x1, int y1, int x2, int y2, flow_eDrawType gc_type, int idx,
+                          int highlight)
 {
   if (ctx->no_nav || ctx->nodraw)
     return 1;
 
-  cairo_t *cr = get_cairo_nav();
+  cairo_t* cr = get_cairo_nav();
 
   cairo_set_antialias(cr, nav_antialias);
   if (gc_type == flow_eDrawType_LineGray && highlight)
@@ -1586,7 +1607,7 @@ int FlowDrawGtk::nav_line(FlowCtx* ctx, int x1, int y1, int x2, int y2,
     cairo_set_source(cr, gc_red);
   else
     cairo_set_source(cr, gc_black);
-  cairo_set_line_width(cr, idx+1);
+  cairo_set_line_width(cr, idx + 1);
 
   cairo_move_to(cr, x1, y1);
   cairo_line_to(cr, x2, y2);
@@ -1595,17 +1616,16 @@ int FlowDrawGtk::nav_line(FlowCtx* ctx, int x1, int y1, int x2, int y2,
   return 1;
 }
 
-int FlowDrawGtk::nav_line_erase(
-    FlowCtx* ctx, int x1, int y1, int x2, int y2, int idx)
+int FlowDrawGtk::nav_line_erase(FlowCtx* ctx, int x1, int y1, int x2, int y2, int idx)
 {
   if (ctx->no_nav || ctx->nodraw)
     return 1;
 
-  cairo_t *cr = get_cairo_nav();
+  cairo_t* cr = get_cairo_nav();
 
   cairo_set_antialias(cr, nav_antialias);
   cairo_set_source(cr, gc_erase);
-  cairo_set_line_width(cr, idx+1);
+  cairo_set_line_width(cr, idx + 1);
 
   cairo_move_to(cr, x1, y1);
   cairo_line_to(cr, x2, y2);
@@ -1614,9 +1634,8 @@ int FlowDrawGtk::nav_line_erase(
   return 1;
 }
 
-int FlowDrawGtk::text(FlowCtx* ctx, int x, int y, char* text, int len,
-    flow_eDrawType gc_type, int idx, int highlight, int dimmed, int line,
-    double size)
+int FlowDrawGtk::text(FlowCtx* ctx, int x, int y, char* text, int len, flow_eDrawType gc_type, int idx,
+                      int highlight, int dimmed, int line, double size)
 {
   if (ctx->nodraw)
     return 1;
@@ -1624,14 +1643,15 @@ int FlowDrawGtk::text(FlowCtx* ctx, int x, int y, char* text, int len,
   size *= DRAW_TSCALE;
 
   char* textutf8 = 0;
-  if (ctx->text_coding != flow_eTextCoding_UTF_8) {
+  if (ctx->text_coding != flow_eTextCoding_UTF_8)
+  {
     textutf8 = g_convert(text, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
     text = textutf8;
   }
 
-  cairo_t *cr = get_cairo();
-  if (gc_type == flow_eDrawType_TextHelveticaErase ||
-      gc_type == flow_eDrawType_TextHelveticaEraseBold)
+  cairo_t* cr = get_cairo();
+  if (gc_type == flow_eDrawType_TextHelveticaErase || gc_type == flow_eDrawType_TextHelveticaEraseBold ||
+      gc_type == flow_eDrawType_TextRobotoErase || gc_type == flow_eDrawType_TextRobotoEraseBold)
     cairo_set_source(cr, gc_erase);
   else if (highlight)
     cairo_set_source(cr, gc_red);
@@ -1640,7 +1660,7 @@ int FlowDrawGtk::text(FlowCtx* ctx, int x, int y, char* text, int len,
 
   cairo_set_font_face(cr, get_font_face(gc_type));
   cairo_set_font_size(cr, size);
-  cairo_move_to(cr, x, y-1);
+  cairo_move_to(cr, x, y - 1);
   cairo_show_text(cr, text);
   end_cairo(cr);
 
@@ -1650,33 +1670,45 @@ int FlowDrawGtk::text(FlowCtx* ctx, int x, int y, char* text, int len,
   return 1;
 }
 
-int FlowDrawGtk::text_inverse(FlowCtx* ctx, int x, int y, char* txt, int len,
-    flow_eDrawType gc_type, int idx, int line, double size)
+int FlowDrawGtk::text_inverse(FlowCtx* ctx, int x, int y, char* txt, int len, flow_eDrawType gc_type, int idx,
+                              int line, double size)
 {
   if (ctx->nodraw)
     return 1;
 
-  switch (gc_type) {
+  switch (gc_type)
+  {
   case flow_eDrawType_TextHelveticaErase:
-    gc_type =  flow_eDrawType_TextHelvetica;
+    gc_type = flow_eDrawType_TextHelvetica;
     break;
   case flow_eDrawType_TextHelveticaEraseBold:
-    gc_type =  flow_eDrawType_TextHelveticaBold;
+    gc_type = flow_eDrawType_TextHelveticaBold;
     break;
   case flow_eDrawType_TextHelvetica:
-    gc_type =  flow_eDrawType_TextHelveticaErase;
+    gc_type = flow_eDrawType_TextHelveticaErase;
     break;
   case flow_eDrawType_TextHelveticaBold:
-    gc_type =  flow_eDrawType_TextHelveticaEraseBold;
+    gc_type = flow_eDrawType_TextHelveticaEraseBold;
     break;
-  default:
-    ;
+  case flow_eDrawType_TextRobotoErase:
+    gc_type = flow_eDrawType_TextRoboto;
+    break;
+  case flow_eDrawType_TextRobotoEraseBold:
+    gc_type = flow_eDrawType_TextRobotoBold;
+    break;
+  case flow_eDrawType_TextRoboto:
+    gc_type = flow_eDrawType_TextRobotoErase;
+    break;
+  case flow_eDrawType_TextRobotoBold:
+    gc_type = flow_eDrawType_TextRobotoEraseBold;
+    break;
+  default:;
   }
   return text(ctx, x, y, txt, len, gc_type, idx, 0, 0, line, size);
 }
 
-int FlowDrawGtk::text_erase(FlowCtx* ctx, int x, int y, char* text, int len,
-    flow_eDrawType gc_type, int idx, int line, double size)
+int FlowDrawGtk::text_erase(FlowCtx* ctx, int x, int y, char* text, int len, flow_eDrawType gc_type, int idx,
+                            int line, double size)
 {
   if (ctx->nodraw)
     return 1;
@@ -1684,20 +1716,22 @@ int FlowDrawGtk::text_erase(FlowCtx* ctx, int x, int y, char* text, int len,
   size *= DRAW_TSCALE;
 
   char* textutf8 = 0;
-  if (ctx->text_coding != flow_eTextCoding_UTF_8) {
+  if (ctx->text_coding != flow_eTextCoding_UTF_8)
+  {
     textutf8 = g_convert(text, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
     text = textutf8;
   }
 
   cairo_text_extents_t extents;
-  cairo_t *cr = get_cairo();
+  cairo_t* cr = get_cairo();
   cairo_set_source(cr, gc_erase);
 
   cairo_set_font_face(cr, get_font_face(gc_type));
   cairo_set_font_size(cr, size);
   cairo_text_extents(cr, text, &extents);
   cairo_set_source(cr, gc_erase);
-  cairo_rectangle(cr, (double)x + extents.x_bearing, (double)y + extents.y_bearing, extents.width, extents.height);
+  cairo_rectangle(cr, (double)x + extents.x_bearing, (double)y + extents.y_bearing, extents.width,
+                  extents.height);
   cairo_fill(cr);
 
   end_cairo(cr);
@@ -1708,17 +1742,17 @@ int FlowDrawGtk::text_erase(FlowCtx* ctx, int x, int y, char* text, int len,
   return 1;
 }
 
-int FlowDrawGtk::nav_text(FlowCtx* ctx, int x, int y, char* text, int len,
-    flow_eDrawType gc_type, int idx, int highlight, int line, double size)
+int FlowDrawGtk::nav_text(FlowCtx* ctx, int x, int y, char* text, int len, flow_eDrawType gc_type, int idx,
+                          int highlight, int line, double size)
 {
   if (ctx->no_nav || ctx->nodraw)
     return 1;
 
   size *= DRAW_TSCALE;
 
-  cairo_t *cr = get_cairo_nav();
-  if (gc_type == flow_eDrawType_TextHelveticaErase ||
-      gc_type == flow_eDrawType_TextHelveticaEraseBold)
+  cairo_t* cr = get_cairo_nav();
+  if (gc_type == flow_eDrawType_TextHelveticaErase || gc_type == flow_eDrawType_TextHelveticaEraseBold ||
+      gc_type == flow_eDrawType_TextRobotoErase || gc_type == flow_eDrawType_TextRobotoEraseBold)
     cairo_set_source(cr, gc_erase);
   else
     cairo_set_source(cr, gc_black);
@@ -1731,8 +1765,8 @@ int FlowDrawGtk::nav_text(FlowCtx* ctx, int x, int y, char* text, int len,
   return 1;
 }
 
-int FlowDrawGtk::nav_text_erase(FlowCtx* ctx, int x, int y, char* text, int len,
-    flow_eDrawType gc_type, int idx, int line, double size)
+int FlowDrawGtk::nav_text_erase(FlowCtx* ctx, int x, int y, char* text, int len, flow_eDrawType gc_type,
+                                int idx, int line, double size)
 {
   if (ctx->no_nav || ctx->nodraw)
     return 1;
@@ -1740,20 +1774,22 @@ int FlowDrawGtk::nav_text_erase(FlowCtx* ctx, int x, int y, char* text, int len,
   size *= DRAW_TSCALE;
 
   char* textutf8 = 0;
-  if (ctx->text_coding != flow_eTextCoding_UTF_8) {
+  if (ctx->text_coding != flow_eTextCoding_UTF_8)
+  {
     textutf8 = g_convert(text, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
     text = textutf8;
   }
 
   cairo_text_extents_t extents;
-  cairo_t *cr = get_cairo_nav();
+  cairo_t* cr = get_cairo_nav();
   cairo_set_source(cr, gc_erase);
 
   cairo_set_font_face(cr, get_font_face(gc_type));
   cairo_set_font_size(cr, size);
   cairo_text_extents(cr, text, &extents);
   cairo_set_source(cr, gc_erase);
-  cairo_rectangle(cr, (double)x + extents.x_bearing, (double)y + extents.y_bearing, extents.width, extents.height);
+  cairo_rectangle(cr, (double)x + extents.x_bearing, (double)y + extents.y_bearing, extents.width,
+                  extents.height);
   cairo_fill(cr);
 
   end_cairo_nav(cr);
@@ -1764,40 +1800,43 @@ int FlowDrawGtk::nav_text_erase(FlowCtx* ctx, int x, int y, char* text, int len,
   return 1;
 }
 
-int FlowDrawGtk::pixmaps_create(
-    FlowCtx* ctx, flow_sPixmapData* pixmap_data, void** pixmaps)
+int FlowDrawGtk::pixmaps_create(FlowCtx* ctx, flow_sPixmapData* pixmap_data, void** pixmaps)
 {
   cairo_format_t format = CAIRO_FORMAT_A1;
   int stride;
 
   draw_sPixmap* pms;
-  flow_sPixmapDataElem *prev_pdata = NULL,
-      *pdata = (flow_sPixmapDataElem *)pixmap_data;
+  flow_sPixmapDataElem *prev_pdata = NULL, *pdata = (flow_sPixmapDataElem*)pixmap_data;
   int i;
 
   pms = (draw_sPixmap*)calloc(1, sizeof(*pms));
-  for (i = 0; i < DRAW_PIXMAP_SIZE; i++) {
-    if (i == 0 || (i > 0 && pdata->bits != prev_pdata->bits)) {
+  for (i = 0; i < DRAW_PIXMAP_SIZE; i++)
+  {
+    if (i == 0 || (i > 0 && pdata->bits != prev_pdata->bits))
+    {
       stride = cairo_format_stride_for_width(format, pdata->width);
 
-      pms->data[i] = (unsigned char *)calloc(1, stride * pdata->height);
-      int pwidth = ((pdata->width - 1)/8 + 1);
+      pms->data[i] = (unsigned char*)calloc(1, stride * pdata->height);
+      int pwidth = ((pdata->width - 1) / 8 + 1);
       int pidx = 0;
       int sidx = 0;
-      for (int j = 0; j < pdata->height; j++) {
-	for (int k = 0; k < pwidth; k++) {
-	  pms->data[i][sidx] = pdata->bits[pidx];
-	  pidx++;	  
-	  sidx++;
-	}
-	sidx = (j + 1) * stride;
+      for (int j = 0; j < pdata->height; j++)
+      {
+        for (int k = 0; k < pwidth; k++)
+        {
+          pms->data[i][sidx] = pdata->bits[pidx];
+          pidx++;
+          sidx++;
+        }
+        sidx = (j + 1) * stride;
       }
 
-      pms->pixmap[i] = cairo_image_surface_create_for_data(pms->data[i], 
-	  format, pdata->width, pdata->height, stride);
+      pms->pixmap[i] =
+          cairo_image_surface_create_for_data(pms->data[i], format, pdata->width, pdata->height, stride);
 
-      //free(data);
-    } else
+      // free(data);
+    }
+    else
       pms->pixmap[i] = pms->pixmap[i - 1];
     prev_pdata = pdata;
     pdata++;
@@ -1812,25 +1851,25 @@ void FlowDrawGtk::pixmaps_delete(FlowCtx* ctx, void* pixmaps)
   int i;
 
   pms = (draw_sPixmap*)pixmaps;
-  for (i = 0; i < DRAW_PIXMAP_SIZE; i++) {
-    if (i == 0 || (i > 0 && pms->pixmap[i] != pms->pixmap[i - 1])) {
+  for (i = 0; i < DRAW_PIXMAP_SIZE; i++)
+  {
+    if (i == 0 || (i > 0 && pms->pixmap[i] != pms->pixmap[i - 1]))
+    {
       cairo_surface_destroy(pms->pixmap[i]);
       free(pms->data[i]);
     }
   }
   free(pixmaps);
-
 }
 
-int FlowDrawGtk::pixmap(FlowCtx* ctx, int x, int y,
-    flow_sPixmapData* pixmap_data, void* pixmaps, flow_eDrawType gc_type,
-    int idx, int highlight, int line)
+int FlowDrawGtk::pixmap(FlowCtx* ctx, int x, int y, flow_sPixmapData* pixmap_data, void* pixmaps,
+                        flow_eDrawType gc_type, int idx, int highlight, int line)
 {
   if (ctx->nodraw)
     return 1;
 
-  cairo_t *cr = get_cairo();
- 
+  cairo_t* cr = get_cairo();
+
   draw_sPixmap* pms = (draw_sPixmap*)pixmaps;
 #if 0
   flow_sPixmapDataElem* pdata = (flow_sPixmapDataElem*)pixmap_data + idx;
@@ -1854,15 +1893,14 @@ int FlowDrawGtk::pixmap(FlowCtx* ctx, int x, int y,
   return 1;
 }
 
-int FlowDrawGtk::pixmap_inverse(FlowCtx* ctx, int x, int y,
-    flow_sPixmapData* pixmap_data, void* pixmaps, flow_eDrawType gc_type,
-    int idx, int line)
+int FlowDrawGtk::pixmap_inverse(FlowCtx* ctx, int x, int y, flow_sPixmapData* pixmap_data, void* pixmaps,
+                                flow_eDrawType gc_type, int idx, int line)
 {
   if (ctx->nodraw)
     return 1;
 
-  cairo_t *cr = get_cairo();
- 
+  cairo_t* cr = get_cairo();
+
   draw_sPixmap* pms = (draw_sPixmap*)pixmaps;
   flow_sPixmapDataElem* pdata = (flow_sPixmapDataElem*)pixmap_data + idx;
 
@@ -1884,9 +1922,8 @@ int FlowDrawGtk::pixmap_inverse(FlowCtx* ctx, int x, int y,
   return 1;
 }
 
-int FlowDrawGtk::pixmap_erase(FlowCtx* ctx, int x, int y,
-    flow_sPixmapData* pixmap_data, void* pixmaps, flow_eDrawType gc_type,
-    int idx, int line)
+int FlowDrawGtk::pixmap_erase(FlowCtx* ctx, int x, int y, flow_sPixmapData* pixmap_data, void* pixmaps,
+                              flow_eDrawType gc_type, int idx, int line)
 {
   flow_sPixmapDataElem* pdata = (flow_sPixmapDataElem*)pixmap_data + idx;
 
@@ -1895,15 +1932,14 @@ int FlowDrawGtk::pixmap_erase(FlowCtx* ctx, int x, int y,
   return 1;
 }
 
-int FlowDrawGtk::nav_pixmap(FlowCtx* ctx, int x, int y,
-    flow_sPixmapData* pixmap_data, void* pixmaps, flow_eDrawType gc_type,
-    int idx, int highlight, int line)
+int FlowDrawGtk::nav_pixmap(FlowCtx* ctx, int x, int y, flow_sPixmapData* pixmap_data, void* pixmaps,
+                            flow_eDrawType gc_type, int idx, int highlight, int line)
 {
   if (ctx->no_nav || ctx->nodraw)
     return 1;
 
-  cairo_t *cr = get_cairo_nav();
- 
+  cairo_t* cr = get_cairo_nav();
+
   draw_sPixmap* pms = (draw_sPixmap*)pixmaps;
   flow_sPixmapDataElem* pdata = (flow_sPixmapDataElem*)pixmap_data + idx;
 
@@ -1920,9 +1956,8 @@ int FlowDrawGtk::nav_pixmap(FlowCtx* ctx, int x, int y,
   return 1;
 }
 
-int FlowDrawGtk::nav_pixmap_erase(FlowCtx* ctx, int x, int y,
-    flow_sPixmapData* pixmap_data, void* pixmaps, flow_eDrawType gc_type,
-    int idx, int line)
+int FlowDrawGtk::nav_pixmap_erase(FlowCtx* ctx, int x, int y, flow_sPixmapData* pixmap_data, void* pixmaps,
+                                  flow_eDrawType gc_type, int idx, int line)
 {
   flow_sPixmapDataElem* pdata = (flow_sPixmapDataElem*)pixmap_data + idx;
 
@@ -1930,16 +1965,16 @@ int FlowDrawGtk::nav_pixmap_erase(FlowCtx* ctx, int x, int y,
   return 1;
 }
 
-int FlowDrawGtk::fill_rect(
-    FlowCtx* ctx, int x, int y, int w, int h, flow_eDrawType gc_type)
+int FlowDrawGtk::fill_rect(FlowCtx* ctx, int x, int y, int w, int h, flow_eDrawType gc_type)
 {
   if (ctx->nodraw)
     return 1;
 
-  cairo_t *cr = get_cairo();
+  cairo_t* cr = get_cairo();
 
   cairo_set_antialias(cr, antialias);
-  switch (gc_type) {
+  switch (gc_type)
+  {
   case flow_eDrawType_LineRed:
     cairo_set_source(cr, gc_red);
     break;
@@ -1967,16 +2002,16 @@ int FlowDrawGtk::fill_rect(
   return 1;
 }
 
-int FlowDrawGtk::nav_fill_rect(
-    FlowCtx* ctx, int x, int y, int w, int h, flow_eDrawType gc_type)
+int FlowDrawGtk::nav_fill_rect(FlowCtx* ctx, int x, int y, int w, int h, flow_eDrawType gc_type)
 {
   if (ctx->no_nav || ctx->nodraw)
     return 1;
 
-  cairo_t *cr = get_cairo_nav();
+  cairo_t* cr = get_cairo_nav();
 
   cairo_set_antialias(cr, nav_antialias);
-  switch (gc_type) {
+  switch (gc_type)
+  {
   case flow_eDrawType_LineRed:
     cairo_set_source(cr, gc_red);
     break;
@@ -2001,16 +2036,16 @@ int FlowDrawGtk::nav_fill_rect(
   return 1;
 }
 
-int FlowDrawGtk::fill_triangle(
-    FlowCtx* ctx, int x, int y, int w, int h, flow_eDrawType gc_type)
+int FlowDrawGtk::fill_triangle(FlowCtx* ctx, int x, int y, int w, int h, flow_eDrawType gc_type)
 {
   if (ctx->nodraw)
     return 1;
 
-  cairo_t *cr = get_cairo();
+  cairo_t* cr = get_cairo();
 
   cairo_set_antialias(cr, antialias);
-  switch (gc_type) {
+  switch (gc_type)
+  {
   case flow_eDrawType_LineRed:
     cairo_set_source(cr, gc_red);
     break;
@@ -2038,8 +2073,8 @@ int FlowDrawGtk::fill_triangle(
   return 1;
 }
 
-int FlowDrawGtk::image(FlowCtx* ctx, int x, int y, int width, int height,
-    flow_tImImage image, flow_tPixmap pixmap, flow_tPixmap clip_mask)
+int FlowDrawGtk::image(FlowCtx* ctx, int x, int y, int width, int height, flow_tImImage image,
+                       flow_tPixmap pixmap, flow_tPixmap clip_mask)
 {
   if (ctx->nodraw)
     return 1;
@@ -2047,12 +2082,12 @@ int FlowDrawGtk::image(FlowCtx* ctx, int x, int y, int width, int height,
   if (width == 0 || height == 0)
     return 1;
 
-  cairo_t *cr = get_cairo();
+  cairo_t* cr = get_cairo();
 
   if (clip_mask)
     set_image_clip_mask(ctx, clip_mask, x, y);
 
-  gdk_cairo_set_source_pixbuf(cr, (GdkPixbuf *)image, x, y);
+  gdk_cairo_set_source_pixbuf(cr, (GdkPixbuf*)image, x, y);
   cairo_paint(cr);
 
   if (clip_mask)
@@ -2069,7 +2104,7 @@ void FlowDrawGtk::clear(FlowCtx* ctx)
     return;
 
   fill_rect(ctx, 0, 0, ctx->window_width, ctx->window_height, flow_eDrawType_LineErase);
-  //gdk_window_clear(window);
+  // gdk_window_clear(window);
 }
 
 void FlowDrawGtk::nav_clear(FlowCtx* ctx)
@@ -2080,7 +2115,7 @@ void FlowDrawGtk::nav_clear(FlowCtx* ctx)
 void FlowDrawGtk::get_window_size(FlowCtx* ctx, int* width, int* height)
 {
   *width = gdk_window_get_width(window);
-  *height = gdk_window_get_height(window); 
+  *height = gdk_window_get_height(window);
 }
 
 void FlowDrawGtk::get_nav_window_size(FlowCtx* ctx, int* width, int* height)
@@ -2096,8 +2131,8 @@ void FlowDrawGtk::set_nav_window_size(FlowCtx* ctx, int width, int height)
   hints.max_width = width;
   hints.min_height = height;
   hints.max_height = height;
-  gtk_window_set_geometry_hints(GTK_WINDOW(nav_toplevel), GTK_WIDGET(nav_toplevel), 
-     &hints, (GdkWindowHints)(GDK_HINT_MIN_SIZE | GDK_HINT_MAX_SIZE));
+  gtk_window_set_geometry_hints(GTK_WINDOW(nav_toplevel), GTK_WIDGET(nav_toplevel), &hints,
+                                (GdkWindowHints)(GDK_HINT_MIN_SIZE | GDK_HINT_MAX_SIZE));
   gtk_window_set_default_size(GTK_WINDOW(nav_toplevel), width, height);
 }
 
@@ -2115,15 +2150,15 @@ static gboolean draw_timer_cb(void* data)
 static gboolean event_timer_cb(void* ctx)
 {
   ((FlowDrawGtk*)((FlowCtx*)ctx)->fdraw)->timer_id = 0;
-  ((FlowDrawGtk*)((FlowCtx*)ctx)->fdraw)
-      ->event_handler((FlowCtx*)ctx, last_event);
+  ((FlowDrawGtk*)((FlowCtx*)ctx)->fdraw)->event_handler((FlowCtx*)ctx, last_event);
   return FALSE;
 }
 
 static void cancel_event_timer(FlowCtx* ctx)
 {
   FlowDrawGtk* draw_ctx = (FlowDrawGtk*)ctx->fdraw;
-  if (draw_ctx->timer_id) {
+  if (draw_ctx->timer_id)
+  {
     g_source_remove(draw_ctx->timer_id);
     draw_ctx->timer_id = 0;
   }
@@ -2135,8 +2170,7 @@ static void event_timer(FlowCtx* ctx, int time_ms)
   draw_ctx->timer_id = g_timeout_add(time_ms, event_timer_cb, ctx);
 }
 
-void FlowDrawGtk::set_timer(
-    FlowCtx* ctx, int time_ms, void (*callback_func)(FlowCtx* ctx), void** id)
+void FlowDrawGtk::set_timer(FlowCtx* ctx, int time_ms, void (*callback_func)(FlowCtx* ctx), void** id)
 {
   draw_sTimerCb* timer_cb;
 
@@ -2177,37 +2211,38 @@ void FlowDrawGtk::set_nav_cursor(FlowCtx* ctx, draw_eCursor cursor)
   gdk_display_flush(display);
 }
 
-int FlowDrawGtk::get_text_extent(FlowCtx* ctx, const char* text, int len,
-    flow_eDrawType gc_type, int idx, double* width, double* height, double size)
+int FlowDrawGtk::get_text_extent(FlowCtx* ctx, const char* text, int len, flow_eDrawType gc_type, int idx,
+                                 double* width, double* height, double size)
 {
   cairo_text_extents_t extents;
   gsize len1;
 
   size *= DRAW_TSCALE;
 
-  char* t = (char*)malloc(len+1);
+  char* t = (char*)malloc(len + 1);
   strncpy(t, text, len);
   text = t;
 
   char* textutf8 = 0;
-  if (ctx->text_coding != flow_eTextCoding_UTF_8) {
-    char c = ((char *)text)[len];
-    ((char *)text)[len] = 0;
+  if (ctx->text_coding != flow_eTextCoding_UTF_8)
+  {
+    char c = ((char*)text)[len];
+    ((char*)text)[len] = 0;
     textutf8 = g_convert(text, len, "UTF-8", "ISO8859-1", NULL, &len1, NULL);
-    ((char *)text)[len] = c;
+    ((char*)text)[len] = c;
     text = textutf8;
     len = len1;
   }
 
-  cairo_t *cr = get_cairo(1);
+  cairo_t* cr = get_cairo(1);
 
   cairo_set_font_face(cr, get_font_face(gc_type));
   cairo_set_font_size(cr, size);
 
-  char c = ((char *)text)[len];
-  ((char *)text)[len] = 0;
+  char c = ((char*)text)[len];
+  ((char*)text)[len] = 0;
   cairo_text_extents(cr, text, &extents);
-  ((char *)text)[len] = c;
+  ((char*)text)[len] = c;
   *width = extents.width;
   *height = extents.height;
 
@@ -2222,21 +2257,69 @@ int FlowDrawGtk::get_text_extent(FlowCtx* ctx, const char* text, int len,
 
 cairo_font_face_t* FlowDrawGtk::get_font_face(flow_eDrawType gc_type)
 {
-  if (gc_type == flow_eDrawType_TextHelveticaBold ||
-      gc_type == flow_eDrawType_TextHelveticaEraseBold) {
+  switch (gc_type)
+  {
+  case flow_eDrawType_TextHelveticaBold:
+  case flow_eDrawType_TextHelveticaEraseBold:
+  {
     if (!font_face_bold)
-      font_face_bold = cairo_toy_font_face_create(font_name, CAIRO_FONT_SLANT_NORMAL,
-          CAIRO_FONT_WEIGHT_BOLD);
+    {
+      font_face_bold =
+          cairo_toy_font_face_create(FONT_NAME_HELVETICA, CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+    }
     return font_face_bold;
   }
-  else {
+
+  case flow_eDrawType_TextHelvetica:
+  case flow_eDrawType_TextHelveticaErase:
+  {
     if (!font_face_normal)
-      font_face_normal = cairo_toy_font_face_create(font_name, CAIRO_FONT_SLANT_NORMAL,
-        CAIRO_FONT_WEIGHT_NORMAL);
+    {
+      font_face_normal =
+          cairo_toy_font_face_create(FONT_NAME_HELVETICA, CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+    }
     return font_face_normal;
   }
-}
 
+  case flow_eDrawType_TextRobotoBold:
+  case flow_eDrawType_TextRobotoEraseBold:
+  {
+    if (!font_face_bold)
+    {
+      font_face_bold =
+          cairo_toy_font_face_create(FONT_NAME_ROBOTO, CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+    }
+    return font_face_bold;
+  }
+
+  case flow_eDrawType_TextRoboto:
+  case flow_eDrawType_TextRobotoErase:
+  default:
+  {
+    if (!font_face_normal)
+    {
+      font_face_normal =
+          cairo_toy_font_face_create(FONT_NAME_ROBOTO, CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+    }
+    return font_face_normal;
+  }
+  }
+
+  // if (gc_type == flow_eDrawType_TextHelveticaBold || gc_type == flow_eDrawType_TextHelveticaEraseBold)
+  // {
+  //   if (!font_face_bold)
+  //     font_face_bold = cairo_toy_font_face_create(font_name, CAIRO_FONT_SLANT_NORMAL,
+  //     CAIRO_FONT_WEIGHT_BOLD);
+  //   return font_face_bold;
+  // }
+  // else
+  // {
+  //   if (!font_face_normal)
+  //     font_face_normal =
+  //         cairo_toy_font_face_create(font_name, CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+  //   return font_face_normal;
+  // }
+}
 
 void FlowDrawGtk::copy_area(FlowCtx* ctx, int x, int y)
 {
@@ -2246,8 +2329,7 @@ void FlowDrawGtk::copy_area(FlowCtx* ctx, int x, int y)
   ctx->draw(0, 0, ctx->window_width, ctx->window_height);
 }
 
-void FlowDrawGtk::clear_area(
-    FlowCtx* ctx, int ll_x, int ur_x, int ll_y, int ur_y)
+void FlowDrawGtk::clear_area(FlowCtx* ctx, int ll_x, int ur_x, int ll_y, int ur_y)
 {
   fill_rect(ctx, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, flow_eDrawType_LineErase);
 }
@@ -2258,31 +2340,23 @@ void FlowDrawGtk::set_inputfocus(FlowCtx* ctx)
   // gtk_widget_grab_focus( toplevel);
 }
 
-void FlowDrawGtk::set_click_sensitivity(FlowCtx* ctx, int value)
-{
-  click_sensitivity = value;
-}
+void FlowDrawGtk::set_click_sensitivity(FlowCtx* ctx, int value) { click_sensitivity = value; }
 
-void FlowDrawGtk::set_image_clip_mask(
-    FlowCtx* ctx, flow_tPixmap pixmap, int x, int y)
-{
-}
+void FlowDrawGtk::set_image_clip_mask(FlowCtx* ctx, flow_tPixmap pixmap, int x, int y) {}
 
-void FlowDrawGtk::reset_image_clip_mask(FlowCtx* ctx)
-{
-}
+void FlowDrawGtk::reset_image_clip_mask(FlowCtx* ctx) {}
 
 void FlowDrawGtk::set_white_background(FlowCtx* ctx)
 {
-  //fill_rect(ctx, 0, 0, ctx->window_width, ctx->window_height, flow_eDrawType_LineErase);
-
+  // fill_rect(ctx, 0, 0, ctx->window_width, ctx->window_height, flow_eDrawType_LineErase);
 }
 
 int FlowDrawGtk::get_font_idx(int gc_type)
 {
   int font_idx;
 
-  switch (gc_type) {
+  switch (gc_type)
+  {
   case flow_eDrawType_TextHelvetica:
   case flow_eDrawType_TextHelveticaErase:
     font_idx = draw_eFont_Helvetica;
@@ -2291,39 +2365,39 @@ int FlowDrawGtk::get_font_idx(int gc_type)
   case flow_eDrawType_TextHelveticaEraseBold:
     font_idx = draw_eFont_HelveticaBold;
     break;
+  case flow_eDrawType_TextRoboto:
+  case flow_eDrawType_TextRobotoErase:
+    font_idx = draw_eFont_Roboto;
+    break;
+  case flow_eDrawType_TextRobotoBold:
+  case flow_eDrawType_TextRobotoEraseBold:
+    font_idx = draw_eFont_RobotoBold;
+    break;
   default:
-    font_idx = draw_eFont_Helvetica;
+    font_idx = draw_eFont_Roboto;
   }
 
   return font_idx;
 }
 
-int FlowDrawGtk::image_get_width(flow_tImImage image)
-{
-  return gdk_pixbuf_get_width((GdkPixbuf*)image);
-}
+int FlowDrawGtk::image_get_width(flow_tImImage image) { return gdk_pixbuf_get_width((GdkPixbuf*)image); }
 
-int FlowDrawGtk::image_get_height(flow_tImImage image)
-{
-  return gdk_pixbuf_get_height((GdkPixbuf*)image);
-}
+int FlowDrawGtk::image_get_height(flow_tImImage image) { return gdk_pixbuf_get_height((GdkPixbuf*)image); }
 
-void FlowDrawGtk::image_scale(float scale, flow_tImImage orig_im,
-    flow_tImImage* im, flow_tPixmap* im_pixmap, flow_tPixmap* im_mask)
+void FlowDrawGtk::image_scale(float scale, flow_tImImage orig_im, flow_tImImage* im, flow_tPixmap* im_pixmap,
+                              flow_tPixmap* im_mask)
 {
   int current_width = int(scale * gdk_pixbuf_get_width((GdkPixbuf*)orig_im));
   int current_height = int(scale * gdk_pixbuf_get_height((GdkPixbuf*)orig_im));
 
   if (*im)
     g_object_unref((GdkPixbuf*)*im);
-  *im = gdk_pixbuf_scale_simple(
-      (GdkPixbuf*)orig_im, current_width, current_height, GDK_INTERP_NEAREST);
+  *im = gdk_pixbuf_scale_simple((GdkPixbuf*)orig_im, current_width, current_height, GDK_INTERP_NEAREST);
 }
 
-int FlowDrawGtk::image_load(const char* imagefile, float scale, float nav_scale,
-    flow_tImImage* orig_im, flow_tImImage* im, flow_tPixmap* im_pixmap,
-    flow_tPixmap* im_mask, flow_tPixmap* im_nav_pixmap,
-    flow_tPixmap* im_nav_mask)
+int FlowDrawGtk::image_load(const char* imagefile, float scale, float nav_scale, flow_tImImage* orig_im,
+                            flow_tImImage* im, flow_tPixmap* im_pixmap, flow_tPixmap* im_mask,
+                            flow_tPixmap* im_nav_pixmap, flow_tPixmap* im_nav_mask)
 {
   pwr_tFileName filename;
   bool found = false;
@@ -2331,8 +2405,10 @@ int FlowDrawGtk::image_load(const char* imagefile, float scale, float nav_scale,
   strcpy(filename, imagefile);
 
   // Look for file in $pwrp_exe, $pwr_doc/en_us/orm and $pwr_exe
-  for (int i = 0; i < 3; i++) {
-    switch (i) {
+  for (int i = 0; i < 3; i++)
+  {
+    switch (i)
+    {
     case 0:
       strcpy(filename, "$pwrp_exe/");
       break;
@@ -2362,15 +2438,13 @@ int FlowDrawGtk::image_load(const char* imagefile, float scale, float nav_scale,
   int width = int(scale * gdk_pixbuf_get_width((GdkPixbuf*)*orig_im));
   int height = int(scale * gdk_pixbuf_get_height((GdkPixbuf*)*orig_im));
 
-  *im = (flow_tImImage*)gdk_pixbuf_scale_simple(
-      (GdkPixbuf*)*orig_im, width, height, GDK_INTERP_NEAREST);
+  *im = (flow_tImImage*)gdk_pixbuf_scale_simple((GdkPixbuf*)*orig_im, width, height, GDK_INTERP_NEAREST);
   return 1;
 }
 
-FlowPrintDraw* FlowDrawGtk::print_draw_new(void* context, const char* title,
-    int page, void* flow_ctx, int page_border, int* sts)
+FlowPrintDraw* FlowDrawGtk::print_draw_new(void* context, const char* title, int page, void* flow_ctx,
+                                           int page_border, int* sts)
 {
-  FlowPrintDrawGtk* pd
-      = new FlowPrintDrawGtk(context, title, page, flow_ctx, page_border, sts);
+  FlowPrintDrawGtk* pd = new FlowPrintDrawGtk(context, title, page, flow_ctx, page_border, sts);
   return (FlowPrintDraw*)pd;
 }

@@ -114,8 +114,8 @@ pwre_config_check_tool()
 # Arguments
 # 1: archive name
 # 2: define name (PWRE_CONF_$2 will be defined)
-# 3: special archives for gtk and motif (lib, gtk, motif)
-# 4: variable to insert archive in (rt, wb, gtk, motif)
+# 3: special archives for gtk (lib, gtk)
+# 4: variable to insert archive in (rt, wb, gtk)
 # 5: if 1, add -DPWRE_CONF_$2 to cc command.
 # 6: search list for archive.
 # Examples
@@ -166,8 +166,6 @@ pwre_config_check_lib()
                 lib=${file##/*/lib}
                 if test $4 == "gtk"; then
                     conf_libgtk=$conf_libgtk" -l${lib%.*}"
-		elif test $4 == "motif"; then
-                    conf_libmotif=$conf_libmotif" -l${lib%.*}"
 		elif test $4 == "qt"; then
                     conf_libqt=$conf_libqt" -l${lib%.*}"
 		elif test $4 == "wb"; then
@@ -203,8 +201,6 @@ pwre_config_check_lib()
 	    elif test $3 == "gst"; then
                 conf_libgst=$conf_libgst" \\\`pkg-config --libs gstreamer-video-1.0 gstreamer-1.0\\\`"
                 conf_incdirgst=$conf_incdirgst" \\\`pkg-config --cflags gstreamer-video-1.0 gstreamer-1.0\\\`"
-	    elif test $3 == "motif"; then
-                conf_libmotif=$conf_libmotif" -lImlib -lMrm -lXm -lXpm -lXt -lX11 -lXext -lXp -lSM -lICE"
             else
                 echo "Unknown type"
             fi
@@ -233,7 +229,6 @@ conf_libwmq=""
 conf_libpnak=""
 conf_libgtk=""
 conf_libqt=""
-conf_libmotif=""
 conf_libgst=""
 conf_libdir=""
 conf_incdirgtk=""
@@ -399,11 +394,9 @@ if [ $is_arm -eq 1 ] && [ $ebuild -eq 1 ]; then
     echo "export pwre_conf_libpwrxtt=\"-lpwr_xtt -lpwr_ge -lpwr_cow -lpwr_flow -lpwr_glow\"" >> $cfile
     echo "export pwre_conf_libpwrxttgtk=\" -lpwr_xtt_gtk -lpwr_ge_gtk -lpwr_cow_gtk -lpwr_flow_gtk -lpwr_glow_gtk\"" >> $cfile
     echo "export pwre_conf_libpwrxttqt=\" -lpwr_xtt_qt -lpwr_ge_qt -lpwr_cow_qt -lpwr_flow_qt -lpwr_glow_qt\"" >> $cfile
-    echo "export pwre_conf_libpwrxttmotif=\" -lpwr_xtt_motif -lpwr_ge_motif -lpwr_cow_motif -lpwr_flow_motif -lpwr_glow_motif\"" >> $cfile
     echo "export pwre_conf_libpwrwb=\"-lpwr_wb\"" >> $cfile
     echo "export pwre_conf_libpwrwbgtk=\"-lpwr_wb_gtk\"" >> $cfile
     echo "export pwre_conf_libpwrwbqt=\"-lpwr_wb_qt\"" >> $cfile
-    echo "export pwre_conf_libpwrwbmotif=\"-lpwr_wb_motif\"" >> $cfile
     echo "export pwre_conf_libpwropc=\"-lpwr_opc\"" >> $cfile
     echo "export pwre_conf_libpwrremote=\"-lpwr_remote\"" >> $cfile
     echo "export pwre_conf_libpwrnmps=\"-lpwr_nmps\"" >> $cfile
@@ -421,7 +414,6 @@ if [ $is_arm -eq 1 ] && [ $ebuild -eq 1 ]; then
     echo "export pwre_conf_libpnak=\"$conf_libpnak\"" >> $cfile
     echo "export pwre_conf_libgtk=\"$conf_libgtk\"" >> $cfile
     echo "export pwre_conf_libqt=\"$conf_libqt\"" >> $cfile
-    echo "export pwre_conf_libmotif=\"$conf_libmotif\"" >> $cfile
     echo "export pwre_conf_libgst=\"$conf_libgtk\"" >> $cfile
     echo "export pwre_conf_libdir=\"$conf_libdir\"" >> $cfile
     echo "export pwre_conf_incdir=\"$conf_incdir\"" >> $cfile
@@ -442,14 +434,16 @@ else
 
     pwre_config_check_lib librpcsvc LIBRPCSVC lib lib 0 "/usr/lib/librpcsvc.so:/usr/lib/librpcsvc.a:/usr/lib/$hwpl-linux-$gnu/librpcsvc.a:/usr/lib/$hwpl-linux-$gnu/libtirpc.so:/usr/lib64/librpcsvc.so:/usr/lib64/librpcsvc.a:/usr/lib64/libtirpc.so"
     pwre_config_check_lib libasound LIBASOUND lib lib 0 "/usr/lib/libasound.so:/usr/lib/libasound.a:/usr/lib/$hwpl-linux-$gnu/libasound.so:/usr/lib64/libasound.so:/usr/lib64/libasound.a"
-    pwre_config_check_lib libpthread LIBPTHREAD lib lib 0 "/usr/lib/libpthread.so:/usr/lib/libpthread.a:/usr/lib/$hwpl-linux-$gnu/libpthread.so:/usr/lib64/libpthread.so:/usr/lib64/libpthread.a"
+    # As of glibc 2.34 this is fully merged 
+    # pwre_config_check_lib libpthread LIBPTHREAD lib lib 0 "/usr/lib/libpthread.so:/usr/lib/libpthread.a:/usr/lib/$hwpl-linux-$gnu/libpthread.so:/usr/lib64/libpthread.so:/usr/lib64/libpthread.a"
     pwre_config_check_lib libm      LIBM     lib lib 0 "/usr/lib/libm.so:/usr/lib/libm.a:/usr/lib/$hwpl-linux-$gnu/libm.so:/usr/lib64/libm.so:/usr/lib64/libm.a"
     pwre_config_check_lib libcap    LIBCAP   lib lib 1 "/usr/lib/$hwpl-linux-$gnu/libcap.so"
     pwre_config_check_lib libdb     LIBDB    lib db 1 "/usr/lib/libdb.so:/usr/lib/$hwpl-linux-$gnu/libdb.so:/usr/lib64/libdb-4.8.so"
     pwre_config_check_lib libdb_cxx LIBDB_CXX lib wb 1 "/usr/lib/libdb_cxx.so:/usr/lib/$hwpl-linux-$gnu/libdb_cxx.so:/usr/lib64/libdb_cxx-4.8.so"
     pwre_config_check_lib libz      LIBZ     lib lib 0 "/usr/lib/libz.so:/usr/lib/libz.a:/usr/lib/$hwpl-linux-$gnu/libz.so:/usr/lib64/libz.so:/usr64/lib/libz.a"
     pwre_config_check_lib libcrypt  LIBCRYPT lib lib 0 "/usr/lib/libcrypt.so:/usr/lib/libcrypt.a:/usr/lib/$hwpl-linux-$gnu/libcrypt.so:/usr/lib64/libcrypt.so:/usr/lib64/libcrypt.a"
-    pwre_config_check_lib librt     LIBRT    lib lib 0 "/usr/lib/librt.so:/usr/lib/librt.a:/usr/lib/$hwpl-linux-$gnu/librt.so:/usr/lib64/librt.so:/usr/lib64/librt.a"
+    # As of glibc 2.34 this is fully merged 
+    # pwre_config_check_lib librt     LIBRT    lib lib 0 "/usr/lib/librt.so:/usr/lib/librt.a:/usr/lib/$hwpl-linux-$gnu/librt.so:/usr/lib64/librt.so:/usr/lib64/librt.a"
     pwre_config_check_lib libX11    LIBX11   lib lib 0 "/usr/lib/libX11.so:/usr/lib/$hwpl-linux-$gnu/libX11.so:/usr/lib64/libX11.so"
     pwre_config_check_include alsa  ALSA  1 "/usr/include/alsa/asoundlib.h"
     pwre_config_check_include rpc  RPC  1 "/usr/include/rpc/rpc.h:/usr/include/tirpc/rpc"
@@ -471,7 +465,6 @@ else
     echo "Optional :"
     pwre_config_check_include jni   JNI   1 "$jdk/include/jni.h"
     pwre_config_check_include jni   JNI   0 "$jdk/include/linux/jni_md.h"
-    pwre_config_check_lib motif     MRM      motif motif 0 "/usr/lib/libMrm.so"
     pwre_config_check_lib mysql     MYSQL    lib lib 1 "/usr/lib/libmysqlclient.so:/usr/lib/mysql/libmysqlclient.so:/usr/lib/$hwpl-linux-$gnu/libmysqlclient.so:/usr/lib/$hwpl-linux-$gnu/libmariadbclient.so:/usr/lib64/libmariadb.so"
     pwre_config_check_include mysql MYSQL 1 "/usr/include/mysql/mysql.h:/usr/include/mariadb/mysql.h"
     pwre_config_check_include sqlite3 SQLITE3   1 "/usr/include/sqlite3.h"
@@ -486,7 +479,14 @@ else
     pwre_config_check_lib wmq       WMQ      lib wmq 1 "/usr/lib/libmqic.so"
     pwre_config_check_include rdkafka RDKAFKA 1 "/usr/include/librdkafka/rdkafka.h"
     pwre_config_check_lib rdkafka   LIBRDKAFKA  lib librdkafka 1 "/usr/lib/librdkafka.so:/usr/lib/$hwpl-linux-$gnu/librdkafka.so"
-    pwre_config_check_lib libprofinet PNAK     lib pnak 1 "/usr/lib/libprofinet.a"
+    pwre_config_check_include profinet.h PNAK 0 "/usr/include/softing/profinet/profinet.h"
+    pwre_config_check_include pnak.h PNAK 0 "/usr/include/softing/profinet/pnak.h"
+    pwre_config_check_lib libprofinet PNAK lib pnak 1 "/usr/lib/libprofinet.so"    
+    pwre_config_check_lib libsnmp   PNAK  lib pnak 0 "/usr/lib/libsnmp.so:/usr/lib/$hwpl-linux-$gnu/libsnmp.so:/usr/lib64/libsnmp.so"
+    pwre_config_check_lib libnetsnmpagent PNAK lib pnak 0 "/usr/lib/libnetsnmpagent.so:/usr/lib/$hwpl-linux-$gnu/libnetsnmpagent.so:/usr/lib64/libnetsnmpagent.so"
+    pwre_config_check_lib libnetsnmpmibs PNAK lib pnak 0 "/usr/lib/libnetsnmpmibs.so:/usr/lib/$hwpl-linux-$gnu/libnetsnmpmibs.so:/usr/lib64/libnetsnmpmibs.so"
+    pwre_config_check_lib libnetsnmphelpers PNAK lib pnak 0 "/usr/lib/libnetsnmphelpers.so:/usr/lib/$hwpl-linux-$gnu/libnetsnmphelpers.so:/usr/lib64/libnetsnmphelpers.so"
+    pwre_config_check_lib libnetsnmptrapd PNAK lib pnak 0 "/usr/lib/libnetsnmptrapd.so:/usr/lib/$hwpl-linux-$gnu/libnetsnmptrapd.so:/usr/lib64/libnetsnmptrapd.so"
     pwre_config_check_lib libusb    LIBUSB   lib libusb 1 "/usr/lib/libusb-1.0.so:/usr/lib/$hwpl-linux-$gnu/libusb-1.0.so"
     pwre_config_check_lib powerlink POWERLINK lib powerlink 1 "$epl/build/Examples/X86/Generic/powerlink_user_lib/libpowerlink.a"
     pwre_config_check_lib powerlinkcn POWERLINKCN lib powerlinkcn 1 "$epl/buildcn/Examples/X86/Generic/powerlink_user_lib/libpowerlink.a"
@@ -506,7 +506,13 @@ else
     pwre_config_check_include powerlink EPL 1 "$epl/Include/Epl.h"
     pwre_config_check_include powerlinkuser EPLU 0 "$epl/Examples/X86/Generic/powerlink_user_lib/EplCfg.h"
     pwre_config_check_include rsvg  RSVG  1 "/usr/include/librsvg-2/librsvg/rsvg.h:/usr/include/librsvg-2.0/librsvg/rsvg.h"
-    pwre_config_check_include pydev   PYDEV   0 "/usr/include/python3.6m/pymath.h:/usr/include/python3.7m/pymath.h:/usr/include/python3.8/pymath.h:/usr/include/python3.9/pymath.h:/usr/include/python3.10/pymath.h:/usr/include/python3.11/pymath.h"
+    # Dynamically find pymath.h for any installed Python 3.x version
+    pydev_paths=$(find /usr/include/python3* -maxdepth 1 -name "pymath.h" 2>/dev/null | sort -V | paste -s -d':')
+    if [ -n "$pydev_paths" ]; then
+        pwre_config_check_include pydev   PYDEV   0 "$pydev_paths"
+    else
+        echo "...Checking   No    pydev"
+    fi
     pwre_config_check_tool android ANDROID "/usr/local/android-sdk-linux/tools/android"
 
 
@@ -536,11 +542,9 @@ else
     echo "export pwre_conf_libpwrxtt=\"-lpwr_xtt -lpwr_ge -lpwr_cow -lpwr_flow -lpwr_glow\"" >> $cfile
     echo "export pwre_conf_libpwrxttgtk=\" -lpwr_xtt_gtk -lpwr_ge_gtk -lpwr_cow_gtk -lpwr_flow_gtk -lpwr_glow_gtk\"" >> $cfile
     echo "export pwre_conf_libpwrxttqt=\" -lpwr_xtt_qt -lpwr_ge_qt -lpwr_cow_qt -lpwr_flow_qt -lpwr_glow_qt\"" >> $cfile
-    echo "export pwre_conf_libpwrxttmotif=\" -lpwr_xtt_motif -lpwr_ge_motif -lpwr_cow_motif -lpwr_flow_motif -lpwr_glow_motif\"" >> $cfile
     echo "export pwre_conf_libpwrwb=\"-lpwr_wb\"" >> $cfile
     echo "export pwre_conf_libpwrwbgtk=\"-lpwr_wb_gtk\"" >> $cfile
     echo "export pwre_conf_libpwrwbqt=\"-lpwr_wb_qt\"" >> $cfile
-    echo "export pwre_conf_libpwrwbmotif=\"-lpwr_wb_motif\"" >> $cfile
     echo "export pwre_conf_libpwropc=\"-lpwr_opc\"" >> $cfile
     echo "export pwre_conf_libpwrremote=\"-lpwr_remote\"" >> $cfile
     echo "export pwre_conf_libpwrnmps=\"-lpwr_nmps\"" >> $cfile
@@ -554,7 +558,6 @@ else
     echo "export pwre_conf_libgtk=\"$conf_libgtk\"" >> $cfile
     echo "export pwre_conf_libqt=\"$conf_libqt\"" >> $cfile
     echo "export pwre_conf_libgst=\"$conf_libgst\"" >> $cfile
-    echo "export pwre_conf_libmotif=\"$conf_libmotif\"" >> $cfile
     echo "export pwre_conf_libdir=\"$conf_libdir\"" >> $cfile
     echo "export pwre_conf_incdir=\"$conf_incdir\"" >> $cfile
     echo "export pwre_conf_incdirgtk=\"$conf_incdirgtk\"" >> $cfile

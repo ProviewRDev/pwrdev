@@ -135,7 +135,7 @@ int goen_create_nodetype_m12(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
         flow_AddRect(nc, -f_width / 2, -f_height / 2, f_width, f_height,
             flow_eDrawType_Line, 2, flow_mDisplayLevel_1);
         flow_AddText(nc, "Lost description file", -f_width / 2 + f_strheight,
-            0.5 * f_strheight, flow_eDrawType_TextHelvetica, GOEN_F_TEXTSIZE);
+            0.5 * f_strheight, flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE);
         *node_class = nc;
         return GOEN__SUCCESS;
       }
@@ -151,7 +151,7 @@ int goen_create_nodetype_m12(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
       flow_eDrawType_LineRed, 1, flow_mDisplayLevel_2);
   flow_AddAnnot(nc, x + f_strlength,
       y + (GOEN_DISPLAYNODEHEIGHT + f_strheight) / 2.0, GOEN_DISPLAYNODE_ANNOT,
-      flow_eDrawType_TextHelvetica, GOEN_F_TEXTSIZE, flow_eAnnotType_OneLine,
+      flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE, flow_eAnnotType_OneLine,
       flow_mDisplayLevel_2);
 
   *node_class = nc;

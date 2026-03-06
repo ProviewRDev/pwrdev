@@ -444,7 +444,7 @@ CoXHelpGtk::CoXHelpGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx, xhelp_eUti
   vbox_status = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
   // adding container to scrolled window
-  gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scrolled_window), vbox_status);
+  gtk_container_add(GTK_CONTAINER(scrolled_window), vbox_status);
   gtk_widget_set_size_request(scrolled_window, -1, 50);
 
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(menu_bar), FALSE, FALSE, 0);

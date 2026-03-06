@@ -11,7 +11,11 @@ if [ -e $pwr_inc/pwr_version.h ]; then
     echo "Unable to get pwr version"
     ver="V00"
   fi
-  ver=${ver:2:2}
+  ver=$(echo "$ver" | tr -d '"' | sed 's/^V//')
+
+  # Extract major.minor version for display (e.g. "V6.1")
+  vermajmin=`eval cat $pwr_inc/pwr_version.h | grep "\\bpwrv_cPwrVersionStr\\b" | awk '{print $3}'`
+  vermajmin=$(echo "$vermajmin" | tr -d '"' | sed 's/\.[^.]*$//')
 fi
 
 datfile=$pwre_sroot/tools/pkg/cygwin/pwrdemo/control
@@ -57,7 +61,7 @@ cp $pwre_sroot/tools/pkg/cygwin/user/proview_icon.ico $pkgroot/usr/pwrp/pwrdemo$
   echo "export PATH=/usr/local/bin:/usr/bin"
   echo "export pwra_db=$aroot/db"
   echo "source \$pwra_db/pwr_setup.sh"
-  echo "source \$pwra_db/pwra_env.sh set base V""${version:0:3}"""
+  echo "source \$pwra_db/pwra_env.sh set base $vermajmin"
   echo "source \$pwra_db/pwra_env.sh set bus"
   echo "pwrp set project pwrdemo$ver"
   echo "export DISPLAY=127.0.0.1:0"
@@ -69,7 +73,11 @@ echo "-- Building package"
 cd $pkgroot
 cp $pkgsrc/control $pkgroot/etc/pwrdemo$ver
 cp $pkgsrc/prerm $pkgroot/etc/pwrdemo$ver
-cp $pkgsrc/postinst $pkgroot/etc/pwrdemo$ver
+echo "#!/bin/bash" > $pkgroot/etc/pwrdemo$ver/postinst
+echo "ver=\"$ver\"" >> $pkgroot/etc/pwrdemo$ver/postinst
+echo "vermajmin=\"$vermajmin\"" >> $pkgroot/etc/pwrdemo$ver/postinst
+tail -n +2 $pkgsrc/postinst >> $pkgroot/etc/pwrdemo$ver/postinst
+chmod 755 $pkgroot/etc/pwrdemo$ver/postinst
 
 tar -czf ../$packagename *
 

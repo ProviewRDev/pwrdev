@@ -48,13 +48,13 @@ main()
 
   xm = x0 + 1;
   ym = y0 + 1;
-  id = CreateText("InputFocus", xm, ym, 4, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("InputFocus", xm, ym, 4, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # First Tab group
   ym += 1.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("First Tab group", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("First Tab group", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   x1 = xm;
   y1 = ym + 0.4;
@@ -98,7 +98,7 @@ main()
   ym += 2.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Second Tab group", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Second Tab group", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   for (i = 0; i < vsize; i++)
     for (j = 0; j < hsize; j++)
@@ -158,7 +158,7 @@ main()
   ym += 15.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Third Tab group", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Third Tab group", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   for (i = 0; i < vsize; i++)
     for (j = 0; j < hsize; j++)
@@ -213,7 +213,7 @@ main()
   ym += 7;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Each value field is a Tab group", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Each value field is a Tab group", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 
   vsize = 4;

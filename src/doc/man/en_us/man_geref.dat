@@ -388,7 +388,7 @@ desired size in the menu. You can also use the scale function to change the size
 
 <h1>Font
 The font is selected with the font menu in the tool panel, You can choose between the fonts
-Helvetica, Times, New Century Schoolbook, Courier and Lucida Sans. Select the text and 
+Helvetica, Times, New Century Schoolbook and Courier. Select the text and 
 specify the wanted font in the menu.
 
 <h1>Color
@@ -1121,7 +1121,7 @@ the output format for the values in the columns, by inserting Column1.Format and
 Column2.Format. '%6.1f' means a float value with 6 characters and 1 decimal.
 
 Some other details are modified in table object,
-- The font is set to Lucida Sans, by selecting the table, and set Lucida Sans in the tool bar.
+- The font is set to Helvetica, by selecting the table, and set Helvetica in the tool bar.
 - The text size is increased to 12 from Textsize in the tool panel.
 - The row height is adapted to the larger text size by setting Table.RowHeight to 0.8.
 
@@ -6051,7 +6051,7 @@ with 'add'.
 <b>Example
 
 <c>set textsize 14
-<c>set textfont LucidaSans
+<c>set textfont Helvetica
 <c>set textcolor RedHigh8
 <c>set bold
 <c>create text/text="Example" /x1=3 /y1=5
@@ -6655,7 +6655,7 @@ size. The text size can be 8, 10, 12, 14, 18 or 24.
 set textfont
 
 Set 'textfont' in the editor. All text objects will in the future be created with this font.
-The font can be 'Helvetica', 'Times', 'New Century Schoolbook', 'Curier' or 'LucidaSans'.
+The font can be 'Helvetica', 'Times', 'New Century Schoolbook' or 'Courier'.
 
 <b>Syntax
 
@@ -7232,7 +7232,6 @@ eFont_Helvetica
 eFont_Times
 eFont_NewCenturySchoolbook
 eFont_Courier
-eFont_LucidaSans
 
 <h2>Directions <bookmark> directions
 eDirection_Center
@@ -8523,7 +8522,7 @@ float  <t>descent  <t>The descent is returned in this variable.
 <b>Example
 <c> float width;
  
-<c> GetTextExtent("This is a text", 3, eFont_LucidaSans, 1, width);
+<c> GetTextExtent("This is a text", 3, eFont_Helvetica, 1, width);
 </topic>
 
 <topic>GetUI_Env() <style>function
@@ -9467,7 +9466,7 @@ int <t>font     <t>Text font.
 <c> int id;
 
 <c> SelectAdd(id);
-<c> SetSelectTextFont(eFont_LucidaSans);
+<c> SetSelectTextFont(eFont_Helvetica);
 
 </topic>
 
@@ -9558,7 +9557,7 @@ Example
 <c>  ! Print a text
 <c>  set bold
 <c>  set textsize 24
-<c>  set textfont LucidaSans
+<c>  set textfont Helvetica
 <c>  set textcolor RedHigh8
 <c>  create text/text="Example" /x1=3 /y1=5
 

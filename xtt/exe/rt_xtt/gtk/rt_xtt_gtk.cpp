@@ -92,20 +92,20 @@ static GdkFilterReturn xtt_hotkey_filter(GdkXEvent* xevent, GdkEvent* event, gpo
 }
 
 void XttGtk::xtt_mainloop()
-{ 
+{
 
   // Declare a sigaction structure
   struct sigaction sa;
-  
+
   // Clear the sigaction structure
   memset(&sa, 0, sizeof(sa));
-  
+
   // Specify the signal handler function
   sa.sa_handler = signal_handler;
-  
+
   // Block all signals while the signal handler is running
   sigfillset(&sa.sa_mask);
-  
+
   // Register the signals
   sigaction(SIGTERM, &sa, NULL);
   sigaction(SIGINT, &sa, NULL);
@@ -116,7 +116,7 @@ void XttGtk::xtt_mainloop()
 
   while (!g_xtt_exit_process)
   {
-    g_main_context_iteration(NULL, FALSE);
+    g_main_context_iteration(NULL, TRUE);
   }
 }
 

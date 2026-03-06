@@ -41,9 +41,14 @@
 
 #include "pwr.h"
 
-typedef enum { gsd_DpSlave, gsd_DpMaster } gsd_eDpType;
+typedef enum
+{
+  gsd_DpSlave,
+  gsd_DpMaster
+} gsd_eDpType;
 
-typedef enum {
+typedef enum
+{
   gsd_ProfibusDP,
   gsd_Boolean,
   gsd_Bit,
@@ -80,6 +85,13 @@ typedef enum {
   gsd_ExtUserPrmDataRef,
   gsd_ExtUserPrmDataConst,
   gsd_Text,
+  gsd_JokerblockType,
+  gsd_EndJokerblockType,
+  gsd_VersionFirmware,
+  gsd_EndVersionFirmware,
+  gsd_UnitDiagType,
+  gsd_EndUnitDiagType,
+  gsd_XValue,
   gsd_End
 } gsd_eType;
 
@@ -170,6 +182,14 @@ typedef struct sExtUserPrmDataRef
   sExtUserPrmDataRef* next;
 } gsd_sExtUserPrmDataRef;
 
+typedef struct sJokerblockDef
+{
+  int Structure_Type; // 32-128: manufacturer specific, 129: User_Prm_Data
+  int Slot_Number;    // Referenced slot number
+  int Location;       // 0: Prm-Telegram, 1: both, 2: Ext-Prm-Telegram
+  struct sJokerblockDef* next;
+} gsd_sJokerblockDef;
+
 typedef struct
 {
   gsd_sExtUserPrmDataRef* ref;
@@ -237,6 +257,12 @@ public:
   int modified;
   int byte_order;
 
+  // Jokerblock support (GSD Revision 5)
+  int jokerblock_supp;                    // 1 if Jokerblock_supp=1 in GSD
+  int prm_block_structure_supp;           // 1 if Prm_Block_Structure_supp=1 in GSD
+  gsd_sJokerblockDef* jokerblock_list;    // List of Jokerblock definitions
+  gsd_sJokerblockDef* current_jokerblock; // Currently parsing Jokerblock
+
   static gsd_sKeyword keywordlist[];
 
   int read(char* filename);
@@ -248,16 +274,13 @@ public:
   int configure_module(gsd_sModuleConf* mclist);
   int prm_len(gsd_sPrmDataItem* item, int item_size);
   int prm_items_set_default_data(gsd_sPrmDataItem* item, int item_size);
-  int prm_items_to_data(gsd_sPrmDataItem* item, int item_size,
-                        unsigned char* data, int data_size);
-  int prm_data_to_items(gsd_sPrmDataItem* item, int item_size,
-                        unsigned char* data, int data_size,
+  int prm_items_to_data(gsd_sPrmDataItem* item, int item_size, unsigned char* data, int data_size);
+  int prm_data_to_items(gsd_sPrmDataItem* item, int item_size, unsigned char* data, int data_size,
                         int set_default = 0);
   void set_classes(gsd_sModuleClass* mclist) { module_classlist = mclist; }
   int get_svalue(const char* key, char* value, int size);
   int get_ivalue(const char* key, int* value);
-  int add_module_conf(pwr_tCid cid, pwr_tOid oid, char* name,
-                      char* module_name);
+  int add_module_conf(pwr_tCid cid, pwr_tOid oid, char* name, char* module_name);
   int move_module_conf(gsd_sModuleConf* src, gsd_sModuleConf* dest);
   int copy_module_conf(gsd_sModuleConf* m);
   int cut_module_conf(gsd_sModuleConf* m);
@@ -265,7 +288,7 @@ public:
   void pack_config(char* config, int* len);
   int get_user_prm_data(char* data, int* len, int size);
   int unpack_ext_user_prm_data(char* data, int len);
-  void pack_ext_user_prm_data(char* data, int* len);
+  void pack_ext_user_prm_data(char* data, int* len, int include_jokerblocks = 1);
   void compress(char* line);
   int syntax_check(int* idx);
   void set_modified(int mod) { modified = mod; }

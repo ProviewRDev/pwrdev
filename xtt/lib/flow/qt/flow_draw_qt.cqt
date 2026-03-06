@@ -97,7 +97,7 @@ static QColor draw_type_to_color(FlowDrawQt* draw_ctx, int painter_type)
 
 #define FONT_SCALE 0.7
 
-static QFont get_font(int painter_type, double size, const char* fontstr = "Lucida Sans")
+static QFont get_font(int painter_type, double size, const char* fontstr = "Helvetica")
 {
   QFont res(fontstr);
   res.setPointSizeF(size);

@@ -69,6 +69,24 @@ int send_kafka_key_val(void* val, int val_len)
   int e = rd_kafka_producev(producer, RD_KAFKA_V_TOPIC(topic), RD_KAFKA_V_MSGFLAGS(RD_KAFKA_MSG_F_COPY),
                             RD_KAFKA_V_VALUE((void*)val, val_len), RD_KAFKA_V_END);
 
+  if (e != 0)
+  {
+    errh_Error("Kafka produce error: %s, attempting reconnection...",
+               rd_kafka_err2str((rd_kafka_resp_err_t)e));
+
+    // Attempt to reconnect
+    if (kafka_reconnect())
+    {
+      // Retry send after reconnection
+      e = rd_kafka_producev(producer, RD_KAFKA_V_TOPIC(topic), RD_KAFKA_V_MSGFLAGS(RD_KAFKA_MSG_F_COPY),
+                            RD_KAFKA_V_VALUE((void*)val, val_len), RD_KAFKA_V_END);
+      if (e == 0)
+      {
+        errh_Info("Message sent successfully after reconnection");
+      }
+    }
+  }
+
   if (e == 0)
     rd_kafka_poll(producer, 0);
 
@@ -200,5 +218,43 @@ void kafka_exit()
 }
 
 void kafka_flush(int tmo) { rd_kafka_flush(producer, tmo); }
+
+int kafka_reconnect()
+{
+  if (producer)
+  {
+    errh_Info("Closing existing Kafka connection for reconnection...");
+    rd_kafka_flush(producer, 5000);
+    rd_kafka_destroy(producer);
+    producer = NULL;
+  }
+
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GKeyFile) key_file = g_key_file_new();
+  if (!g_key_file_load_from_file(key_file, config_file, G_KEY_FILE_NONE, &error))
+  {
+    confobj->ServerConnection = pwr_eSsabDbServerConnection_NoConfigFile;
+    errh_Error("Error loading config file for reconnection: %s, %s", error->message, config_file);
+    return 0;
+  }
+
+  rd_kafka_conf_t* conf = rd_kafka_conf_new();
+  load_config_group(conf, key_file, "default");
+
+  rd_kafka_conf_set_dr_msg_cb(conf, dr_msg_cb);
+
+  char errstr[512];
+  producer = rd_kafka_new(RD_KAFKA_PRODUCER, conf, errstr, sizeof(errstr));
+  if (!producer)
+  {
+    confobj->ServerConnection = pwr_eSsabDbServerConnection_InitFailed;
+    errh_Error("Failed to reconnect producer: %s", errstr);
+    return 0;
+  }
+
+  confobj->ServerConnection = pwr_eSsabDbServerConnection_Up;
+  errh_Info("Kafka reconnection successful");
+  return 1;
+}
 
 #endif

@@ -1281,11 +1281,11 @@ void Nav::create_nodeclasses()
       brow_ctx, "NavigatorDefault", flow_eNodeGroup_Common, &nc_object);
   brow_AddAnnotPixmap(nc_object, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_object, 1, 1.1, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_object, 2, 0.6, 0, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_object, 2, 0.6, 0, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_object, 5, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_object, 5, 0.6, 1, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_object, 9, 0.6, 2, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_object, 9, 0.6, 2, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_object, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 }

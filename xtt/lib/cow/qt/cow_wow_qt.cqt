@@ -1033,7 +1033,7 @@ static void EndPrint(flow_tCtx ctx, ctx_settings* settings)
 static int GetPrintHeaderMargin(QPainter* painter)
 {
   QFont tmpFont = painter->font();
-  QFont font("Lucida Sans", 9);
+  QFont font("Helvetica", 9);
   painter->setFont(font);
   QFontMetrics fm(painter->font());
   int height = fm.lineSpacing();
@@ -1068,7 +1068,7 @@ static void PrintPage(QPainter* painter, const char* title, flow_tCtx ctx, QImag
   painter->setPen(tmpPen); // Restore pen
 
   QFont tmpFont = painter->font();
-  QFont font("Lucida Sans", 9);
+  QFont font("Helvetica", 9);
   painter->setFont(font);
   QFontMetrics fm(painter->font());
   if (page > 0) {
