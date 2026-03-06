@@ -71,6 +71,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PROFINET: Softing headers have moved outside the codebase.
 - Update Classes will now be more thorough and check sizes of class definitions compared to database and update accordingly. (https://gitlab.ssab.com/pwrdev/pwr/-/issues/189)
 
+### Deprecated
+- Nodave for communcating with legacy S7 300/400 will be removed next release.
+- MQ (dmq) which is a 32-bit message queue will be removed next release.
+
 ### Removed
 
 - Java support, only the websocket server will remain java for now. This was however removed several versions back. It's here to make it official.
