@@ -272,12 +272,73 @@ void pack_read_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, unsigned short device_
   pRR->LengthLowByte = _PN_U16_LOW_BYTE(read_request->Length);
 }
 
-void pack_read_im0_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, unsigned short device_ref)
+static bool resolve_im0_read_target(ProfinetDevice const* pn_device, unsigned short* slot,
+                                    unsigned short* subslot)
+{
+  *slot = DAP_DEFAULT_SLOT;
+  *subslot = 1u;
+
+  if (!pn_device)
+    return false;
+
+  auto resolve_subslot = [&](ProfinetSlot const& dap_slot) {
+    // IM0 is typically served on subslot 1. Keep this as primary preference.
+    auto ss_it = dap_slot.m_subslot_map.find(1u);
+    if (ss_it != dap_slot.m_subslot_map.end())
+    {
+      *subslot = static_cast<unsigned short>(ss_it->second.m_subslot_number);
+      return;
+    }
+
+    // Fall back to the first configured subslot in the DAP.
+    for (auto const& ss : dap_slot.m_subslot_map)
+    {
+      if (!ss.second.m_submodule_ID.empty())
+      {
+        *subslot = static_cast<unsigned short>(ss.second.m_subslot_number);
+        return;
+      }
+    }
+
+    if (!dap_slot.m_subslot_map.empty())
+      *subslot = static_cast<unsigned short>(dap_slot.m_subslot_map.begin()->second.m_subslot_number);
+  };
+
+  // DAP_ID is persisted runtime data and maps to Slot.ModuleID.
+  for (auto const& slot_pair : pn_device->m_slot_map)
+  {
+    if (!pn_device->m_DAP_ID.empty() && slot_pair.second.m_module_ID == pn_device->m_DAP_ID)
+    {
+      *slot = static_cast<unsigned short>(slot_pair.second.m_slot_number);
+      resolve_subslot(slot_pair.second);
+      return true;
+    }
+  }
+
+  return false;
+}
+
+void pack_read_im0_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, ProfinetDevice const* pn_device)
 {
   unsigned offset = 0u;
+  unsigned short device_ref = 0;
+  unsigned short dap_slot = DAP_DEFAULT_SLOT;
+  unsigned short dap_subslot = 1u;
 
   T_PNAK_SERVICE_DESCRIPTION* service_desc;
   T_PN_SERVICE_READ_REQ* pRR;
+
+  if (!pn_device)
+    return;
+
+  device_ref = pn_device->m_rt_device_ref;
+  bool found_dap = resolve_im0_read_target(pn_device, &dap_slot, &dap_subslot);
+
+  if (!found_dap)
+  {
+    errh_Warning("PROFINET: IM0 read fallback to default DAP slot/subslot (%u/%u), devref %u", dap_slot,
+                 dap_subslot, device_ref);
+  }
 
   memset(ServiceReqRes, 0, sizeof(T_PNAK_SERVICE_REQ_RES));
   ServiceReqRes->NumberEntries = 1;
@@ -304,11 +365,11 @@ void pack_read_im0_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, unsigned short dev
   pRR->APILowWordHighByte = 0;
   pRR->APILowWordLowByte = 0;
 
-  // Slot 0, Subslot 1 (DAP subslot for IM0)
-  pRR->SlotNumberHighByte = _PN_U16_HIGH_BYTE(0u);
-  pRR->SlotNumberLowByte = _PN_U16_LOW_BYTE(0u);
-  pRR->SubSlotNumberHighByte = _PN_U16_HIGH_BYTE(1u);
-  pRR->SubSlotNumberLowByte = _PN_U16_LOW_BYTE(1u);
+  // Read IM0 from the configured DAP slot/subslot.
+  pRR->SlotNumberHighByte = _PN_U16_HIGH_BYTE(dap_slot);
+  pRR->SlotNumberLowByte = _PN_U16_LOW_BYTE(dap_slot);
+  pRR->SubSlotNumberHighByte = _PN_U16_HIGH_BYTE(dap_subslot);
+  pRR->SubSlotNumberLowByte = _PN_U16_LOW_BYTE(dap_subslot);
 
   // Index for I&M0 = 0xAFF0
   pRR->IndexHighByte = _PN_U16_HIGH_BYTE(PROFINET_INDEX_IDENT_AND_MAINTENANCE_0);
@@ -2088,7 +2149,7 @@ void handle_device_state_changed(io_sAgentLocal* local, io_sAgent* ap)
           // Read IM0 data only once when device becomes connected
           if (!local->device_list[ii]->m_rt_im0_read)
           {
-            pack_read_im0_req(&local->service_req_res, local->device_list[ii]->m_rt_device_ref);
+            pack_read_im0_req(&local->service_req_res, local->device_list[ii].get());
 
             sts = pnak_send_service_req_res(0, &local->service_req_res);
 

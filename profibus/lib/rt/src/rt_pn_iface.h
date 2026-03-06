@@ -84,7 +84,7 @@ void pack_alarm_ack_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, unsigned short re
 
 void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, std::shared_ptr<ProfinetDevice> pn_device);
 
-void pack_read_im0_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, unsigned short device_ref);
+void pack_read_im0_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, ProfinetDevice const* pn_device);
 
 int unpack_write_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local);
 int unpack_read_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local);
