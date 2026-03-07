@@ -218,8 +218,6 @@ int wnav_attr_string_to_value(ldh_tSesContext ldhses, int type_id, char* value_s
     break;
   }
   case pwr_eType_Int32:
-  case pwr_eType_Status:
-  case pwr_eType_NetStatus:
   {
     if (streq(value_str, "IntMin"))
       *(int*)buffer_ptr = INT_MIN;
@@ -423,6 +421,8 @@ int wnav_attr_string_to_value(ldh_tSesContext ldhses, int type_id, char* value_s
     }
     break;
   }
+  default:
+    return WNAV__INPUT_SYNTAX;
   }
   return 1;
 }
@@ -724,25 +724,10 @@ void wnav_attrvalue_to_string(ldh_tSesContext ldhses, int type_id, void* value_p
     *buff = str;
     break;
   }
-  case pwr_eType_Void:
-  {
-    str[0] = 0;
-    *len = 0;
-    *buff = str;
-    break;
-  }
-  case pwr_eType_Status:
-  case pwr_eType_NetStatus:
-  {
-    msg_GetMsg(*(pwr_tStatus*)value_ptr, str, sizeof(str));
-    *len = strlen(str);
-    *buff = str;
-    break;
-  }
   default:
     sts = WNav::local_enum_to_string(type_id, *(pwr_tEnum*)value_ptr, str, 40);
     if (EVEN(sts))
-      strcpy(str, "Undefined");
+      str[0] = 0;
     *len = strlen(str);
     *buff = str;
   }
