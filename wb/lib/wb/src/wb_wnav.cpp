@@ -123,7 +123,7 @@ int WNav::local_enum_to_string(int type_id, pwr_tEnum enumval, char* str, int st
     }
   }
   if (!found)
-    return 1;
+    return 0;
 
   elem_p = enum_p->elements;
   for (; elem_p->name[0] != 0; elem_p++)
@@ -218,6 +218,8 @@ int wnav_attr_string_to_value(ldh_tSesContext ldhses, int type_id, char* value_s
     break;
   }
   case pwr_eType_Int32:
+  case pwr_eType_Status:
+  case pwr_eType_NetStatus:
   {
     if (streq(value_str, "IntMin"))
       *(int*)buffer_ptr = INT_MIN;
@@ -718,6 +720,21 @@ void wnav_attrvalue_to_string(ldh_tSesContext ldhses, int type_id, void* value_p
   case pwr_eType_RefId:
   {
     cdh_SubidToString(str, sizeof(str), *(pwr_tSubid*)value_ptr, 1);
+    *len = strlen(str);
+    *buff = str;
+    break;
+  }
+  case pwr_eType_Void:
+  {
+    str[0] = 0;
+    *len = 0;
+    *buff = str;
+    break;
+  }
+  case pwr_eType_Status:
+  case pwr_eType_NetStatus:
+  {
+    msg_GetMsg(*(pwr_tStatus*)value_ptr, str, sizeof(str));
     *len = strlen(str);
     *buff = str;
     break;
