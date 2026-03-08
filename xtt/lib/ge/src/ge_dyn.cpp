@@ -280,6 +280,210 @@ static int check_format(char* format, int type)
   return 0;
 }
 
+static int table_format_width(const char* format)
+{
+  const char* s;
+  int width = 0;
+
+  s = strchr(format, '%');
+  if (!s)
+    return 0;
+  s++;
+
+  while (*s == '-' || *s == '+' || *s == ' ' || *s == '#' || *s == '0')
+    s++;
+
+  while (isdigit((unsigned char)*s))
+  {
+    width = width * 10 + (*s - '0');
+    s++;
+  }
+  return width;
+}
+
+static int normalize_integer_format(
+    char* out, size_t out_size, const char* format, int type_id)
+{
+  const char* modifier = "";
+  size_t modifier_len = 0;
+  size_t len = strlen(format);
+  size_t conv_idx;
+  size_t prefix_len;
+
+  if (!len || out_size == 0)
+    return 0;
+
+  conv_idx = len - 1;
+  prefix_len = conv_idx;
+  if (conv_idx >= 2 && format[conv_idx - 1] == 'l' && format[conv_idx - 2] == 'l')
+    prefix_len = conv_idx - 2;
+  else if (conv_idx >= 2 && format[conv_idx - 1] == 'h' && format[conv_idx - 2] == 'h')
+    prefix_len = conv_idx - 2;
+  else if (conv_idx >= 1 && (format[conv_idx - 1] == 'l' || format[conv_idx - 1] == 'h'))
+    prefix_len = conv_idx - 1;
+
+  switch (type_id)
+  {
+  case pwr_eType_Int64:
+  case pwr_eType_UInt64:
+    modifier = "ll";
+    modifier_len = 2;
+    break;
+  case pwr_eType_Int16:
+  case pwr_eType_UInt16:
+    modifier = "h";
+    modifier_len = 1;
+    break;
+  default:
+    break;
+  }
+
+  if (prefix_len + modifier_len + 2 > out_size)
+    return 0;
+
+  memcpy(out, format, prefix_len);
+  memcpy(out + prefix_len, modifier, modifier_len);
+  out[prefix_len + modifier_len] = format[conv_idx];
+  out[prefix_len + modifier_len + 1] = 0;
+  return 1;
+}
+
+static int ge_table_format_value(char* buf, size_t buf_size, const char* format,
+    int type_id, void* value_ptr, pwr_tMask bitmask, int* len)
+{
+  char conv;
+  char safe_format[80];
+  int unsigned_conv;
+
+  if (streq(format, ""))
+    return 0;
+
+  conv = format[strlen(format) - 1];
+  unsigned_conv = conv == 'u' || conv == 'o' || conv == 'x' || conv == 'X';
+
+  switch (type_id)
+  {
+  case pwr_eType_String:
+  case pwr_eType_Text:
+    *len = snprintf(buf, buf_size, format, (char*)value_ptr);
+    return 1;
+  case pwr_eType_Float32:
+    *len = snprintf(buf, buf_size, format, *(pwr_tFloat32*)value_ptr);
+    return 1;
+  case pwr_eType_Float64:
+    *len = snprintf(buf, buf_size, format, *(pwr_tFloat64*)value_ptr);
+    return 1;
+  case pwr_eType_Status:
+  case pwr_eType_NetStatus:
+    if (conv == 'm')
+    {
+      if (*(pwr_tStatus*)value_ptr == 0)
+      {
+        strcpy(buf, "");
+        *len = 0;
+      }
+      else if (format[1] == '1')
+      {
+        msg_GetText(*(pwr_tStatus*)value_ptr, buf, buf_size);
+        *len = strlen(buf);
+      }
+      else
+      {
+        msg_GetMsg(*(pwr_tStatus*)value_ptr, buf, buf_size);
+        *len = strlen(buf);
+      }
+      return 1;
+    }
+    break;
+  case graph_eType_Bit:
+    strcpy(buf, (*(pwr_tMask*)value_ptr & bitmask) ? "1" : "0");
+    *len = 1;
+    return 1;
+  case pwr_eType_Mask:
+    if (conv == 'b')
+    {
+      if (str_StartsWith(&format[1], "16"))
+        cdh_MaskToBinaryString(*(pwr_tMask*)value_ptr, 16, buf);
+      else
+        cdh_MaskToBinaryString(*(pwr_tMask*)value_ptr, 32, buf);
+      *len = strlen(buf);
+      return 1;
+    }
+    break;
+  default:;
+  }
+
+  if (!(conv == 'd' || conv == 'i' || conv == 'u' || conv == 'o' || conv == 'x'
+          || conv == 'X' || conv == 'c'))
+    return 0;
+
+  if (!normalize_integer_format(safe_format, sizeof(safe_format), format, type_id))
+    return 0;
+
+  switch (type_id)
+  {
+  case pwr_eType_Boolean:
+    *len = snprintf(buf, buf_size, safe_format,
+        unsigned_conv ? (unsigned int)*(pwr_tBoolean*)value_ptr
+                      : (int)*(pwr_tBoolean*)value_ptr);
+    return 1;
+  case pwr_eType_Int8:
+    *len = snprintf(buf, buf_size, safe_format,
+        conv == 'c' ? (int)*(pwr_tInt8*)value_ptr
+                    : (unsigned_conv ? (unsigned int)(pwr_tUInt8)(*(pwr_tInt8*)value_ptr)
+                                     : (int)*(pwr_tInt8*)value_ptr));
+    return 1;
+  case pwr_eType_Char:
+    *len = snprintf(buf, buf_size, safe_format,
+        conv == 'c' ? (int)*(unsigned char*)value_ptr
+                    : (unsigned_conv ? (unsigned int)*(unsigned char*)value_ptr
+                                     : (int)*(char*)value_ptr));
+    return 1;
+  case pwr_eType_UInt8:
+    *len = snprintf(buf, buf_size, safe_format,
+        conv == 'c' ? (int)*(pwr_tUInt8*)value_ptr
+                    : (unsigned_conv ? (unsigned int)*(pwr_tUInt8*)value_ptr
+                                     : (int)*(pwr_tUInt8*)value_ptr));
+    return 1;
+  case pwr_eType_Int16:
+    *len = snprintf(buf, buf_size, safe_format,
+        unsigned_conv ? (unsigned int)(pwr_tUInt16)(*(pwr_tInt16*)value_ptr)
+                      : (int)*(pwr_tInt16*)value_ptr);
+    return 1;
+  case pwr_eType_UInt16:
+    *len = snprintf(buf, buf_size, safe_format,
+        unsigned_conv ? (unsigned int)*(pwr_tUInt16*)value_ptr
+                      : (int)*(pwr_tUInt16*)value_ptr);
+    return 1;
+  case pwr_eType_Int32:
+  case pwr_eType_Enum:
+  case pwr_eType_Status:
+  case pwr_eType_NetStatus:
+    *len = snprintf(buf, buf_size, safe_format,
+        unsigned_conv ? (pwr_tUInt32)(*(pwr_tInt32*)value_ptr)
+                      : *(pwr_tInt32*)value_ptr);
+    return 1;
+  case pwr_eType_UInt32:
+  case pwr_eType_Mask:
+    *len = snprintf(buf, buf_size, safe_format,
+        unsigned_conv ? *(pwr_tUInt32*)value_ptr
+                      : (pwr_tInt32)(*(pwr_tUInt32*)value_ptr));
+    return 1;
+  case pwr_eType_Int64:
+    *len = snprintf(buf, buf_size, safe_format,
+        unsigned_conv ? (unsigned long long)(pwr_tUInt64)(*(pwr_tInt64*)value_ptr)
+                      : (long long)*(pwr_tInt64*)value_ptr);
+    return 1;
+  case pwr_eType_UInt64:
+    *len = snprintf(buf, buf_size, safe_format,
+        unsigned_conv ? (unsigned long long)*(pwr_tUInt64*)value_ptr
+                      : (long long)(pwr_tInt64)(*(pwr_tUInt64*)value_ptr));
+    return 1;
+  default:
+    return 0;
+  }
+}
+
 static void set_curve_default_color(int instance, glow_eDrawType* curve_color, glow_eDrawType* fill_color)
 {
   if (*curve_color == glow_eDrawType_Inherit)
@@ -13672,6 +13876,29 @@ int GeTable::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
     case pwr_eType_String:
       info.column_size[i] = size[i];
       break;
+    case pwr_eType_Float32:
+    case pwr_eType_Float64:
+      info.column_size[i] = MAX(14, table_format_width(format[i]));
+      break;
+    case pwr_eType_Boolean:
+    case pwr_eType_Int64:
+    case pwr_eType_UInt64:
+    case pwr_eType_Int32:
+    case pwr_eType_UInt32:
+    case pwr_eType_Int16:
+    case pwr_eType_UInt16:
+    case pwr_eType_Int8:
+    case pwr_eType_UInt8:
+    case pwr_eType_Char:
+    case pwr_eType_Enum:
+    case pwr_eType_Mask:
+      info.column_size[i]
+          = MAX(cdh_TypeToMaxStrSize((pwr_eType)type_id[i], size[i], 1),
+              MAX(14, table_format_width(format[i])));
+      break;
+    case graph_eType_Bit:
+      info.column_size[i] = 1;
+      break;
     case pwr_eType_Status:
     case pwr_eType_NetStatus:
       info.column_size[i] = 80;
@@ -13703,7 +13930,7 @@ int GeTable::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
       }
       break;
     default:
-      info.column_size[i] = 14;
+      info.column_size[i] = MAX(14, table_format_width(format[i]));
     }
 
     old_value[i] = (char*)calloc(elements[i], size[i]);
@@ -13797,41 +14024,11 @@ int GeTable::scan(grow_tObject object)
             continue;
         }
 
-        switch (type_id[i])
+        if (ge_table_format_value(buf, sizeof(buf), format[i], type_id[i],
+                headerref_p[i][j], bitmask[i], &len))
+          ;
+        else switch (type_id[i])
         {
-        case pwr_eType_Float32:
-          len = sprintf(buf, format[i], *(pwr_tFloat32*)headerref_p[i][j]);
-          break;
-        case pwr_eType_Int32:
-        case pwr_eType_UInt32:
-          len = sprintf(buf, format[i], *(pwr_tInt32*)headerref_p[i][j]);
-          break;
-        case pwr_eType_Int16:
-        case pwr_eType_UInt16:
-          len = sprintf(buf, format[i], *(pwr_tInt16*)headerref_p[i][j]);
-          break;
-        case pwr_eType_Status:
-        case pwr_eType_NetStatus:
-          if (*(pwr_tStatus*)headerref_p[i][j] == 0)
-          {
-            strcpy(buf, "");
-            len = 0;
-            break;
-          }
-          switch (format[i][1])
-          {
-          case '1':
-            // Format %1m: Write only the text
-            msg_GetText(*(pwr_tStatus*)headerref_p[i][j], buf, sizeof(buf));
-            break;
-          default:
-            msg_GetMsg(*(pwr_tStatus*)headerref_p[i][j], buf, sizeof(buf));
-          }
-          len = strlen(buf);
-          break;
-        case pwr_eType_String:
-          len = sprintf(buf, format[i], (char*)headerref_p[i][j]);
-          break;
         case pwr_eType_Objid:
         {
           int sts;
@@ -13929,13 +14126,6 @@ int GeTable::scan(grow_tObject object)
           len = sprintf(buf, "%s", timstr);
           break;
         }
-        case graph_eType_Bit:
-          if (*(pwr_tMask*)headerref_p[i][j] & bitmask[i])
-            strcpy(buf, "1");
-          else
-            strcpy(buf, "0");
-          len = 1;
-          break;
         default:
         {
           int sts;
@@ -13964,19 +14154,11 @@ int GeTable::scan(grow_tObject object)
             continue;
         }
 
-        switch (type_id[i])
+        if (ge_table_format_value(buf, sizeof(buf), format[i], type_id[i],
+                p[i] + offs, bitmask[i], &len))
+          ;
+        else switch (type_id[i])
         {
-        case pwr_eType_Float32:
-          len = sprintf(buf, format[i], *(pwr_tFloat32*)(p[i] + offs));
-          break;
-        case pwr_eType_Boolean:
-        case pwr_eType_Int32:
-        case pwr_eType_UInt32:
-          len = sprintf(buf, format[i], *(pwr_tInt32*)(p[i] + offs));
-          break;
-        case pwr_eType_String:
-          len = sprintf(buf, format[i], (char*)(p[i] + offs));
-          break;
         case pwr_eType_Objid:
         {
           int sts;
@@ -14100,13 +14282,6 @@ int GeTable::scan(grow_tObject object)
           len = sprintf(buf, "%s", timstr);
           break;
         }
-        case graph_eType_Bit:
-          if (*(pwr_tMask*)(p[i] + offs) & bitmask[i])
-            strcpy(buf, "1");
-          else
-            strcpy(buf, "0");
-          len = 1;
-          break;
         default:
         {
           int sts;
