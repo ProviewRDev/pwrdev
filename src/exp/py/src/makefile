@@ -46,15 +46,20 @@ clean_py := $(patsubst %.py, clean_%.py, $(py_sources))
 clean_mplstyle := $(patsubst %.mplstyle, clean_%.mplstyle, $(mplstyle_sources))
 clean_png := $(patsubst %.png, clean_%.png, $(png_sources))
 
+# Python packages (directories)
+py_packages := pwr_upgrade
+
+export_pkg := $(patsubst %, $(exe_dir)/%, $(py_packages))
+clean_pkg := $(patsubst %, clean_%, $(py_packages))
 
 .PHONY : all init copy lib exe clean realclean\
-         $(clean_py)
+         $(clean_py) $(clean_pkg)
 
 all : init copy | silent
 
 init : silent
 
-copy : $(export_py) $(export_mplstyle) $(export_png) | silent
+copy : $(export_py) $(export_mplstyle) $(export_png) $(export_pkg) | silent
 
 lib : silent
 
@@ -62,7 +67,7 @@ exe : silent
 
 clean :
 
-realclean : clean $(clean_py) $(clean_mplstyle) $(clean_png)
+realclean : clean $(clean_py) $(clean_mplstyle) $(clean_png) $(clean_pkg)
 
 silent :
 	@ :
@@ -79,6 +84,14 @@ $(export_png) : $(exe_dir)/%.png : %.png
 	@ $(log_exp)
 	@ $(cp) $(cpflags) $(source) $(target)
 
+# Copy Python package directories (including sub-packages)
+$(export_pkg) : $(exe_dir)/% : $(co_source)/%
+	@ echo "-- Installing package $*"
+	@ cd $(co_source) && find $* -name '*.py' | while read f; do \
+	    mkdir -p $(exe_dir)/$$(dirname $$f); \
+	    $(cp) $(co_source)/$$f $(exe_dir)/$$f; \
+	  done
+
 $(clean_py) : clean_%.py : %.py
 	@ rm $(exe_dir)/$*.py
 
@@ -87,3 +100,6 @@ $(clean_mplstyle) : clean_%.mplstyle : %.mplstyle
 
 $(clean_png) : clean_%.png : %.png
 	@ rm $(exe_dir)/$*.png
+
+$(clean_pkg) : clean_% :
+	@ rm -rf $(exe_dir)/$*
