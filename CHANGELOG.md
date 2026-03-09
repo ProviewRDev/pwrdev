@@ -79,6 +79,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Xtt console log has had its filters and search improved and controls moved to the toolbar instead of a separate window.
 - PROFINET: Softing headers have moved outside the codebase.
 - Update Classes will now be more thorough and check sizes of class definitions compared to database and update accordingly. (https://gitlab.ssab.com/pwrdev/pwr/-/issues/189)
+- Various exit/return paths changed in some wb tooling used in reload/upgrade process. Some errors have been downgraded to warnings which is more in line with how one would expect things to be.
 
 ### Deprecated
 - Nodave for communcating with legacy S7 300/400 will be removed next release.
