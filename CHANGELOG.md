@@ -55,6 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed a display bug in ge tables where buffers had no room for a null termination and thus data from the next cell was shown in the cell before.
   - Also added support for 64-bit integers and float, both size wise and with regards to formatting flags.
 - Fixed rabbitmq + mqtt message size calculations
+- UDP IO: Implemented stall action 
 
 
 ### Changed

@@ -28,4 +28,5 @@ typedef struct {
   struct bfb_buf write_req; /* Data area for the write request */
   int next_read_req_item; /* Index for next position in read request area */
   int next_write_req_item; /* Index for next position in write request area */
+  int comm_error_count; /* Consecutive scans without any UDP response */
 } io_sRackLocal;
