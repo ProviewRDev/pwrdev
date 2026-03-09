@@ -4689,6 +4689,24 @@ to with the function io_write().
 
 <c>sts = io_write( io_ctx);
 
+<h1>Driver extension responsibilities
+When extending ProviewR with new I/O methods, the framework identifies objects and
+calls methods in the defined order, but stall handling is implemented in the methods.
+This means that Agent/Rack/Card methods are responsible for communication fault detection,
+error counter handling and stall actions.
+
+At threshold crossing in method code, set I/O handler flags and object references.
+<c>ctx->IOHandler->CardErrorSoftLimit = 1;
+<c>ctx->IOHandler->ErrorSoftLimitObject = cdh_ObjidToAref(...);
+<c>ctx->IOHandler->CardErrorHardLimit = 1;
+<c>ctx->IOHandler->ErrorHardLimitObject = cdh_ObjidToAref(...);
+
+For EmergencyBreak actions, set the node flag from method code.
+<c>ctx->Node->EmergBreakTrue = 1;
+
+For ResetInputs actions, method code has to reset the driver's input image explicitly.
+The framework does not know transport specific buffers and can not reset them generically.
+
 </topic>
 
 <topic> dg_appl_threadsafety

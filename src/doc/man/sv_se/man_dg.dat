@@ -4639,6 +4639,24 @@ och även mot signalerna för utenheterna som skrivs med funktionen  io_write().
 
 <c>sts = io_write( io_ctx);
 
+<h1>Ansvar vid utökning av drivrutiner
+När man utökar ProviewR med nya I/O-metoder identifierar ramverket objekten och
+anropar metoderna i rätt ordning, men stallhantering implementeras i metoderna.
+Det innebär att Agent/Rack/Kort-metoderna ansvarar för detektering av kommunikationsfel,
+felräkning och stallaktioner.
+
+När gränsvärden passeras i metodkoden ska flaggor och objektreferenser i IOHandler sättas.
+<c>ctx->IOHandler->CardErrorSoftLimit = 1;
+<c>ctx->IOHandler->ErrorSoftLimitObject = cdh_ObjidToAref(...);
+<c>ctx->IOHandler->CardErrorHardLimit = 1;
+<c>ctx->IOHandler->ErrorHardLimitObject = cdh_ObjidToAref(...);
+
+För EmergencyBreak sätt nodflaggan i metodkoden.
+<c>ctx->Node->EmergBreakTrue = 1;
+
+För ResetInputs måste metodkoden uttryckligen nollställa drivrutinens indataavbild.
+Ramverket känner inte till transportspecifika buffertar och kan inte nollställa dem generellt.
+
 </topic>
 
 <topic> dg_appl_threadsafety
@@ -12349,8 +12367,6 @@ genom att omges av apostrofer.
 
 
 </chapter>
-
-
 
 
 
