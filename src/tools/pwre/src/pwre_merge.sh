@@ -17,7 +17,12 @@ merge_dir_func()
 
   if [ ! -z "$files" ]; then
     for file in $files; do
-      if [ ! -d $fromdir/$file ]; then
+      if [ -d $fromdir/$file ]; then
+        if [ ! -e $todir/$file ]; then
+          mkdir -p $todir/$file
+        fi
+        merge_dir_func $todir/$file $fromdir/$file
+      else
         if [ -e $todir/$file ]; then
           if [ $todir/$file -ot $fromdir/$file ]; then
             if [ $ver -eq 1 ]; then
