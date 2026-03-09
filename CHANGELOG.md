@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PROFIBUS: Added support for jokerblocks introduced in GSD revision 4/5
 - GrowWidgets now implement a minimal accessible interface adding "popup" support for external onscreen keyboards, like onboard for instance.
 - Accessibility support (ATK interface implementations) for widgets created by GE editor. Enabling external onscreen touch keyboards to popup when focusing input fields, if installed and activated.
+- RemnodeUDP: Added PMTU discovery setting (Do/Don't Fragment, DF bit).
 
 ### Fixed
 
@@ -51,6 +52,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PID + CompPID: Fixed incorrect function when PidAlg was set to only I. It will now integrate correct with respect to Inverse flag.
 - Traces for ConstAv and ConstIv are now working as they should. And can be used as one would expect.
 - Fixed a display regression bug from color theme implementation in the workbench for various types across the workbench for void and status types. Code for DataArithms for instance, would show up in the DataIn1/2/3/4 attributes. And also, in objects where statuses are used, the value of the Status attribute would show up as the attribute value from the attribute above.
+- Fixed a display bug in ge tables where buffers had no room for a null termination and thus data from the next cell was shown in the cell before.
+  - Also added support for 64-bit integers and float, both size wise and with regards to formatting flags.
 
 
 ### Changed
