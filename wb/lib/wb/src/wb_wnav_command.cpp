@@ -4752,8 +4752,11 @@ static int wnav_wb_func(void* client_data, void* client_flag)
     nofocode = ODD(dcli_get_qualifier("/NOFOCODE", 0, 0));
 
     sts = wnav_wccm_get_ldhsession_cb(wnav, &wnav->ldhses);
+    if (EVEN(sts))
+      return sts;
 
-    sts = ldh_WbDump(wnav->ldhses, hierarchystr_p, outputstr, keepname, noindex, nofocode);
+    sts = ldh_WbDump(
+        wnav->ldhses, hierarchystr_p, outputstr, keepname, noindex, nofocode);
     if (EVEN(sts))
       wnav->message(' ', wnav_get_message(sts));
     return sts;
@@ -4772,6 +4775,8 @@ static int wnav_wb_func(void* client_data, void* client_flag)
     noindex = ODD(dcli_get_qualifier("/NOINDEX", 0, 0));
 
     sts = wnav_wccm_get_ldhsession_cb(wnav, &wnav->ldhses);
+    if (EVEN(sts))
+      return sts;
 
     sts = ldh_WbLoad(wnav->ldhses, loadfilestr, noindex);
     if (EVEN(sts))
