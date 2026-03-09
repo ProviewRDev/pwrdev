@@ -54,6 +54,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed a display regression bug from color theme implementation in the workbench for various types across the workbench for void and status types. Code for DataArithms for instance, would show up in the DataIn1/2/3/4 attributes. And also, in objects where statuses are used, the value of the Status attribute would show up as the attribute value from the attribute above.
 - Fixed a display bug in ge tables where buffers had no room for a null termination and thus data from the next cell was shown in the cell before.
   - Also added support for 64-bit integers and float, both size wise and with regards to formatting flags.
+- Fixed rabbitmq + mqtt message size calculations
 
 
 ### Changed
