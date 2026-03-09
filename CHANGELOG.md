@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [V7.0.0] - 2026-04-01
+
 ### Added
 
 - Added triage bot to the project.
@@ -26,6 +28,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GrowWidgets now implement a minimal accessible interface adding "popup" support for external onscreen keyboards, like onboard for instance.
 - Accessibility support (ATK interface implementations) for widgets created by GE editor. Enabling external onscreen touch keyboards to popup when focusing input fields, if installed and activated.
 - RemnodeUDP: Added PMTU discovery setting (Do/Don't Fragment, DF bit).
+- A new pwr_upgrade tool has been added that unifies what reload.sh and upgrade.sh did. It should simplify the upgrade procedure for both users and devs.
+  - reload.sh and upgrade.sh will be kept until the next version
 
 ### Fixed
 
@@ -77,6 +81,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Xtt console log has had its filters and search improved and controls moved to the toolbar instead of a separate window.
 - PROFINET: Softing headers have moved outside the codebase.
 - Update Classes will now be more thorough and check sizes of class definitions compared to database and update accordingly. (https://gitlab.ssab.com/pwrdev/pwr/-/issues/189)
+- Various exit/return paths changed in some wb tooling used in reload/upgrade process. Some errors have been downgraded to warnings which is more in line with how one would expect things to be.
 
 ### Deprecated
 - Nodave for communcating with legacy S7 300/400 will be removed next release.
@@ -91,4 +96,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed rt_version.dat. The runtime version is now compiled in from pwr_version.h instead of read from a file that was only created during packaging. This also fixes the empty Version field in the runtime status monitor on non-packaged (dev) builds.
 - Removed all remnants of the Motif framework that was still present.
 
-[unreleased]: https://gitlab.ssab.com/pwrdev/pwr/-/compare/V6.1.3...HEAD
+[unreleased]: https://gitlab.ssab.com/pwrdev/pwr/-/compare/V7.0.0...HEAD
+[V7.0.0]: https://gitlab.ssab.com/pwrdev/pwr/-/compare/V6.1.3...V7.0.0

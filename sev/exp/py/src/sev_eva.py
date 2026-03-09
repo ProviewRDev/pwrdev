@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 #
 # ProviewR   Open Source Process Control.
-# Copyright (C) 2005-2019 SSAB EMEA AB.
+# Copyright (C) 2005-2026 SSAB EMEA AB.
 #
 # This file is part of ProviewR.
 #

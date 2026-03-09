@@ -9,7 +9,7 @@
 
 Name: pwr48
 Summary: Proview/R development and runtime environment
-Version: 4.8.4
+Version: 7.0.0
 Release: 1
 License: GPL
 BuildArch: i386

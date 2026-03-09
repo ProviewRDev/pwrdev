@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -106,6 +106,15 @@ void wb_vrepwbl::error(const char* msg, const char* file, int line_number)
   // line_number <<
   // '\n';
   error_cnt++;
+}
+
+void wb_vrepwbl::warning(const char* msg, const char* file, int line_number)
+{
+  char str[400];
+  snprintf(str, sizeof(str), "Wbl warning: %s, %s line: %d", msg, file,
+      line_number);
+  MsgWindow::message('W', str);
+  warning_cnt++;
 }
 
 void wb_vrepwbl::info()
@@ -318,6 +327,11 @@ int wb_vrepwbl::load(const char* fname)
     sprintf(str, "Errors when loading volume: %d error%s found", error_cnt,
         (error_cnt == 1) ? "" : "s");
     MsgWindow::message('F', str);
+  } else if (warning_cnt) {
+    char str[80];
+    sprintf(str, "Warnings when loading volume: %d warning%s found",
+        warning_cnt, (warning_cnt == 1) ? "" : "s");
+    MsgWindow::message('W', str);
   } else
     MsgWindow::message('I', "Volume", volume_name, "loaded");
 

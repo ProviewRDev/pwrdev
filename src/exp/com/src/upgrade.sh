@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # ProviewR   Open Source Process Control.
-# Copyright (C) 2005-2024 SSAB EMEA AB.
+# Copyright (C) 2005-2026 SSAB EMEA AB.
 #
 # This file is part of ProviewR.
 #
@@ -44,8 +44,8 @@ let reload__loaddb=4
 let pass__continue=1
 let pass__execute=2
 
-OLD_PWR_VERSION="6.0"
-NEW_PWR_VERSION="6.1"
+OLD_PWR_VERSION="6.1"
+NEW_PWR_VERSION="7.0"
 
 if [ -e /usr/pwr46 ]; then
   v46_root="/usr/pwr46"
