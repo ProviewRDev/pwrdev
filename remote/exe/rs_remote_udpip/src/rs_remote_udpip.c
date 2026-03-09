@@ -108,6 +108,104 @@ struct sockaddr_in my_addr;    /* My named socket description */
 struct sockaddr_in their_addr; /* Remote socket description */
 struct sockaddr_in dual_addr;  /* Maybe a dual socket description */
 
+enum
+{
+  udp_ePmtuDiscovery_Default = 0,
+  udp_ePmtuDiscovery_Dont = 1,
+  udp_ePmtuDiscovery_Do = 2
+};
+
+typedef struct
+{
+  int pmtu_discovery;
+} remote_udp_socket_options;
+
+static remote_udp_socket_options socket_options;
+
+static int ReadRemnodeEnumAttribute(const char* attribute, int default_value)
+{
+  char object_name[256];
+  char attribute_name[320];
+  pwr_tEnum value = default_value;
+  pwr_tStatus sts;
+
+  sts = gdh_ObjidToName(rn.objid, object_name, sizeof(object_name), cdh_mNName);
+  if (EVEN(sts))
+    return default_value;
+
+  if (snprintf(attribute_name, sizeof(attribute_name), "%s.%s", object_name, attribute)
+      >= (int)sizeof(attribute_name))
+    return default_value;
+
+  sts = gdh_GetObjectInfo(attribute_name, &value, sizeof(value));
+  if (ODD(sts))
+    return value;
+
+  return default_value;
+}
+
+static void LoadSocketOptions(void)
+{
+  /* Load optional settings by name so appended RemnodeUDP attributes do not
+     require direct struct access in this process. */
+  socket_options.pmtu_discovery = ReadRemnodeEnumAttribute("PmtuDiscovery", udp_ePmtuDiscovery_Default);
+}
+
+static const char* PmtuDiscoveryToString(int pmtu_discovery)
+{
+  switch (pmtu_discovery) {
+  case udp_ePmtuDiscovery_Default:
+    return "Default";
+  case udp_ePmtuDiscovery_Dont:
+    return "Dont";
+  case udp_ePmtuDiscovery_Do:
+    return "Do";
+  default:
+    return "Unknown";
+  }
+}
+
+static int ApplySocketOptions(int sock)
+{
+  int opt;
+
+  switch (socket_options.pmtu_discovery) {
+  case udp_ePmtuDiscovery_Default:
+    return 1;
+  case udp_ePmtuDiscovery_Dont:
+#if defined(IP_MTU_DISCOVER) && defined(IP_PMTUDISC_DONT)
+    opt = IP_PMTUDISC_DONT;
+    break;
+#else
+    errh_Error("UDP Path MTU discovery mode %s is not supported on this platform",
+        PmtuDiscoveryToString(socket_options.pmtu_discovery));
+    return 0;
+#endif
+  case udp_ePmtuDiscovery_Do:
+#if defined(IP_MTU_DISCOVER) && defined(IP_PMTUDISC_DO)
+    opt = IP_PMTUDISC_DO;
+    break;
+#else
+    errh_Error("UDP Path MTU discovery mode %s is not supported on this platform",
+        PmtuDiscoveryToString(socket_options.pmtu_discovery));
+    return 0;
+#endif
+  default:
+    errh_Error("Unknown UDP Path MTU discovery mode %d", socket_options.pmtu_discovery);
+    return 0;
+  }
+
+#if defined(IP_MTU_DISCOVER)
+  if (setsockopt(sock, IPPROTO_IP, IP_MTU_DISCOVER, &opt, sizeof(opt)) < 0) {
+    errh_Error("setsockopt(IP_MTU_DISCOVER=%s) failed, %s",
+        PmtuDiscoveryToString(socket_options.pmtu_discovery), strerror(errno));
+    return 0;
+  }
+#endif
+
+  return 1;
+}
+
 /*************************************************************************
 **************************************************************************
 *
@@ -394,6 +492,13 @@ void CreateSocket()
     exit(0);
   }
 
+  sts = ApplySocketOptions(my_socket);
+  if (!sts)
+  {
+    errh_SetStatus(PWR__SRVTERM);
+    exit(0);
+  }
+
   if (rn_udp->LocalPort != 0)
   {
     /* Set local port */
@@ -619,6 +724,7 @@ int main(int argc, char* argv[])
   rn.local = NULL; // We dont use local structure since we only have one remnode
   rn.retransmit_time = rn_udp->RetransmitTime;
   rn_udp->ErrCount = 0;
+  LoadSocketOptions();
 
   sts = RemTrans_Init(&rn);
 
