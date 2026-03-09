@@ -467,7 +467,7 @@ unsigned int rmq_receive()
         }
         search_remtrans = false;
         sts = RemTrans_Receive(remtrans, (char*)envelope.message.body.bytes + sizeof(rabbit_header),
-                               envelope.message.body.len);
+                               envelope.message.body.len - sizeof(rabbit_header));
         if (sts != STATUS_OK && sts != STATUS_BUFF)
           errh_Error("Error from RemTrans_Receive, queue %s, status %d", rn_rmq->ReceiveQueue, sts, 0);
         msg_received = 1;
