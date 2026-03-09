@@ -9,7 +9,7 @@
 
 Name: pwrsev
 Summary: Proview/R storage environment
-Version: 5.8.0
+Version: 7.0.0
 Release: 1
 License: GPL
 BuildArch: x86_64

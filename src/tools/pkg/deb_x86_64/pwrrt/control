@@ -17,7 +17,7 @@ Depends: libc6 (>= 2.41),
  xfonts-100dpi,
  xterm,
  libmariadb3 (>= 1:11.8.3)
-Replaces: pwr50,pwr51,pwr52,pwr53,pwr54,pwr55,pwr56,pwr57,pwr58,pwr59,pwr60,pwr61
+Replaces: pwr50,pwr51,pwr52,pwr53,pwr54,pwr55,pwr56,pwr57,pwr58,pwr59,pwr60,pwr7,pwr7
 Maintainer: Proview <postmaster@proview.se>
 Description:
  7.0.0-1 Debian Trixie release

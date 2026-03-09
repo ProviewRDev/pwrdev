@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # ProviewR   Open Source Process Control.
-# Copyright (C) 2005-2024 SSAB EMEA AB.
+# Copyright (C) 2005-2026 SSAB EMEA AB.
 #
 # This file is part of ProviewR.
 #
@@ -192,7 +192,7 @@ VER_MAJOR="${BASH_REMATCH[1]}"
 VER_MINOR="${BASH_REMATCH[2]}"
 VER_PATCH="${BASH_REMATCH[3]}"
 VER_SHORT="V${VER_MAJOR}"    # e.g. V7 (for pwr_version.h / wbdb paths)
-PKG_SHORT="${VER_MAJOR}"      # e.g. 7  (for package names: pwr_7, pwrdemo_7)
+PKG_SHORT="${VER_MAJOR}"      # e.g. 7  (for package names: pwr7, pwrdemo7)
 
 # Known versioned package base names (longest first to avoid partial matches)
 PKG_BASES="pwrrpi64 pwrdemo pwrrpi pwr"
@@ -365,12 +365,12 @@ while IFS= read -r ctrl; do
     "$ctrl"
 
   if [ "$PKG_CHANGED" -eq 1 ]; then
-    # 3) Update Package: name — strip old version suffix, add _<new>
-    #    Handles both legacy (pwr61) and new (pwr_7) format
+    # 3) Update Package: name — strip old version suffix and append <new>
+    #    Handles both legacy (pwr61) and accidentally generated (pwr_7) format
     if [[ "$orig_pkg" == *"$OLD_SHORT" ]]; then
       base_pkg="${orig_pkg%"$OLD_SHORT"}"   # strip version: pwr61->pwr, pwr_7->pwr_
-      base_pkg="${base_pkg%_}"              # strip trailing underscore if present
-      new_pkg="${base_pkg}_${PKG_SHORT}"    # pwr_7, pwrdemo_7, pwrrpi64_7
+      base_pkg="${base_pkg%_}"              # normalize any trailing underscore
+      new_pkg="${base_pkg}${PKG_SHORT}"     # pwr7, pwrdemo7, pwrrpi647
       do_sed "$relpath: Package $orig_pkg -> $new_pkg" \
         "s|^Package: ${orig_pkg}$|Package: ${new_pkg}|" \
         "$ctrl"
@@ -380,11 +380,12 @@ while IFS= read -r ctrl; do
     #    Uses explicit base name list to avoid regex ambiguity (e.g. pwrrpi6461)
     for base in $PKG_BASES; do
       old_legacy="${base}${OLD_SHORT}"       # legacy format: pwr61, pwrrpi6461
-      old_uscore="${base}_${OLD_SHORT}"      # underscore format: pwr_7, pwrrpi64_7
-      new_name="${base}_${PKG_SHORT}"        # target: pwr_8, pwrrpi64_8
+      old_uscore="${base}_${OLD_SHORT}"      # bad underscore format: pwr_7, pwrrpi64_7
+      new_name="${base}${PKG_SHORT}"         # target: pwr8, pwrrpi648
 
       if grep -q "${old_uscore}\|${old_legacy}" "$ctrl" 2>/dev/null; then
-        # Replace underscore format first (more specific), then legacy
+        # Replace underscore format first (more specific), then legacy.
+        # The target name is always normalized without underscore.
         do_sed "$relpath: ${old_uscore} -> ${new_name}" \
           "s|${old_uscore}|${new_name}|g" \
           "$ctrl"
@@ -406,8 +407,8 @@ while IFS= read -r ctrl; do
     if grep -q '^Replaces:' "$ctrl"; then
       if [ "$orig_pkg" = "pwrrt" ] || [ "$orig_pkg" = "pwrsev" ]; then
         # Version-less packages: add the new dev package name
-        do_sed "$relpath: Replaces += pwr_${PKG_SHORT}" \
-          "s|^\(Replaces:.*\)|\1,pwr_${PKG_SHORT}|" \
+        do_sed "$relpath: Replaces += pwr${PKG_SHORT}" \
+          "s|^\(Replaces:.*\)|\1,pwr${PKG_SHORT}|" \
           "$ctrl"
       elif [[ "$orig_pkg" == *"$OLD_SHORT" ]]; then
         # Versioned dev package being renamed: add old name to Replaces
@@ -441,7 +442,7 @@ while IFS= read -r spec; do
     if [[ "$orig_name" == *"$OLD_SHORT" ]]; then
       base_name="${orig_name%"$OLD_SHORT"}"
       base_name="${base_name%_}"
-      new_name="${base_name}_${PKG_SHORT}"
+      new_name="${base_name}${PKG_SHORT}"
       do_sed "$relpath: Name $orig_name -> $new_name" \
         "s|^Name: ${orig_name}$|Name: ${new_name}|" \
         "$spec"
@@ -451,7 +452,7 @@ while IFS= read -r spec; do
     for base in $PKG_BASES; do
       old_legacy="${base}${OLD_SHORT}"
       old_uscore="${base}_${OLD_SHORT}"
-      new_name="${base}_${PKG_SHORT}"
+      new_name="${base}${PKG_SHORT}"
       if grep -q "${old_uscore}\|${old_legacy}" "$spec" 2>/dev/null; then
         do_sed "$relpath: ${old_uscore} -> ${new_name}" \
           "s|${old_uscore}|${new_name}|g" \

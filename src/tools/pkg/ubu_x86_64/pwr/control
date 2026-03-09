@@ -1,6 +1,6 @@
 Source: pwrsrc
 Section: devel
-Package: pwr61
+Package: pwr7
 Priority: optional
 Maintainer: ProviewR <postmaster@proview.se>
 Version: 7.0.0-1
@@ -22,8 +22,8 @@ Depends: libc6 (>= 2.35-0ubuntu3.1),
  xterm,
  xfonts-100dpi,
  util-linux
-Replaces: pwr50,pwr51,pwr52,pwr54,pwr55,pwr56,pwr57,pwr58,pwr59,pwr60
+Replaces: pwr50,pwr51,pwr52,pwr54,pwr55,pwr56,pwr57,pwr58,pwr59,pwr60,pwr61
 Homepage: http://www.proview.se
 Installed-Size: 1114020
 Description: ProviewR development and runtime environment package
- 6.1.3-1 Base release
+ 7.0.0-1 Base release

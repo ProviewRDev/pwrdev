@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [V7.0.0] - 2026-03-09
+
 ### Added
 
 - Added triage bot to the project.
@@ -91,4 +93,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed rt_version.dat. The runtime version is now compiled in from pwr_version.h instead of read from a file that was only created during packaging. This also fixes the empty Version field in the runtime status monitor on non-packaged (dev) builds.
 - Removed all remnants of the Motif framework that was still present.
 
-[unreleased]: https://gitlab.ssab.com/pwrdev/pwr/-/compare/V6.1.3...HEAD
+[unreleased]: https://gitlab.ssab.com/pwrdev/pwr/-/compare/V7.0.0...HEAD
+[V7.0.0]: https://gitlab.ssab.com/pwrdev/pwr/-/compare/V6.1.3...V7.0.0

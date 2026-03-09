@@ -1,10 +1,10 @@
 Package: pwrrpi59
-Version: 6.1.0-1
+Version: 7.0.0-1
 Section: base
 Priority: optional
 Architecture: i386
-Depends: pwr59 (>= 5.9.0-1)
+Depends: pwr59 (>= 7.0.0-1)
 Replaces: pwr59
 Maintainer: Proview <postmaster@proview.se>
 Description: Proview RPI development package
- 6.1.0-1 Base release
+ 7.0.0-1 Base release
