@@ -2442,7 +2442,9 @@ int wb_wblnode::attrStringToValue(int type_id, char* value_str, void* buffer_ptr
       return 0;
 
     if (sts == LDH__NUMAREF)
-      m_vrep->error("Local numeric attribute reference conversion", getFileName(), line_number);
+      m_vrep->warning(
+          "Local numeric attribute reference conversion", getFileName(),
+          line_number);
 
     memcpy(buffer_ptr, &attrref, sizeof(attrref));
 
