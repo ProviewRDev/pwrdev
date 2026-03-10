@@ -7725,8 +7725,6 @@ Volume OtherIO $ClassVolume 0.0.250.10
           EndBody
         EndObject
         !/**
-        ! Not yet implemented.
-        !
         ! Specifies the action when the errorcounter has reached the error limit.
         ! 
         ! No                no action.
