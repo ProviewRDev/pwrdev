@@ -86,14 +86,9 @@ class ProjectEnvironment:
         for load_path in glob.glob(load_pattern):
             if Path(load_path).name == "directory.wb_load":
                 continue
-            # Check if it's a ClassVolume
-            try:
-                with open(load_path, 'r') as f:
-                    first_line = f.readline()
-                    if 'ClassVolume' in first_line or 'pwr_eClass_ClassVolume' in first_line:
-                        volumes.append(load_path)
-            except (IOError, OSError):
-                pass
+            volume_info = get_volume_info_from_load_file(load_path)
+            if volume_info and "ClassVolume" in volume_info["class"]:
+                volumes.append(load_path)
         return sorted(volumes)
     
     @property
@@ -101,6 +96,15 @@ class ProjectEnvironment:
         """Get list of .wb_dmp dump files."""
         dmp_pattern = os.path.join(self.pwrp_db, "*.wb_dmp")
         return sorted(glob.glob(dmp_pattern))
+
+
+@dataclass(frozen=True)
+class ProjectLock:
+    """Information about a detected ProviewR project lock file."""
+    resource: str
+    target_path: str
+    lock_path: str
+    owner: Optional[str]
 
 
 def translate_filename(name: str) -> str:
@@ -191,23 +195,98 @@ def save_file_with_backup(filepath: str, max_versions: int = 9) -> Optional[str]
     return backup_path
 
 
-def get_volume_name_from_load_file(filepath: str) -> Optional[str]:
-    """Extract volume name from a .wb_load file."""
+def get_volume_info_from_load_file(filepath: str) -> Optional[Dict[str, str]]:
+    """
+    Extract volume declaration information from a .wb_load file.
+
+    Returns a dict with keys ``name`` and ``class`` for the first matching
+    ``Volume <name> <class> ...`` declaration, or ``None`` if no volume line
+    can be found.
+    """
     try:
         with open(filepath, 'r') as f:
             for line in f:
-                # Look for ClassVolume or pwr_eClass_ClassVolume
-                match = re.search(r'(?:ClassVolume|pwr_eClass_ClassVolume)\s+(\w+)', line)
+                stripped = line.strip()
+                if not stripped or stripped.startswith('!'):
+                    continue
+
+                match = re.match(r'^Volume\s+(\S+)\s+(\S+)', stripped)
                 if match:
-                    return match.group(1)
+                    return {"name": match.group(1), "class": match.group(2)}
     except (IOError, OSError):
         pass
+    return None
+
+
+def get_volume_name_from_load_file(filepath: str) -> Optional[str]:
+    """Extract volume name from a .wb_load file."""
+    volume_info = get_volume_info_from_load_file(filepath)
+    if volume_info:
+        return volume_info["name"]
     return None
 
 
 def ensure_directory(path: str) -> None:
     """Ensure a directory exists, creating it if necessary."""
     os.makedirs(path, exist_ok=True)
+
+
+def get_lock_path(target_path: str) -> str:
+    """Return the ProviewR lock-file path for a database or load file."""
+    return f"{target_path}.lock"
+
+
+def read_lock_owner(lock_path: str) -> Optional[str]:
+    """Read the first line of a ProviewR lock file."""
+    try:
+        with open(lock_path, 'r') as f:
+            owner = f.readline().strip()
+            return owner or None
+    except (IOError, OSError):
+        return None
+
+
+def detect_project_locks(env: ProjectEnvironment) -> List[ProjectLock]:
+    """Detect project database and classvolume lock files."""
+    candidates = []
+    seen_targets = set()
+
+    def add_candidate(resource: str, target_path: str) -> None:
+        if not os.path.exists(target_path):
+            return
+        if target_path in seen_targets:
+            return
+        seen_targets.add(target_path)
+        candidates.append((resource, target_path))
+
+    add_candidate("Directory volume", os.path.join(env.pwrp_db, "directory.wb_load"))
+
+    for db_name in env.databases:
+        add_candidate(f"Database {db_name}", os.path.join(env.pwrp_db, f"{db_name}.db"))
+
+    for load_path in env.classvolumes:
+        volume_name = get_volume_name_from_load_file(load_path) or Path(load_path).stem
+        add_candidate(f"Class volume {volume_name}", load_path)
+
+    locks = []
+    for resource, target_path in candidates:
+        lock_path = get_lock_path(target_path)
+        if os.path.exists(lock_path):
+            locks.append(
+                ProjectLock(
+                    resource=resource,
+                    target_path=target_path,
+                    lock_path=lock_path,
+                    owner=read_lock_owner(lock_path),
+                )
+            )
+
+    return locks
+
+
+def remove_project_lock(lock: ProjectLock) -> None:
+    """Remove a ProviewR project lock file."""
+    os.remove(lock.lock_path)
 
 
 def detect_platform() -> Dict[str, str]:

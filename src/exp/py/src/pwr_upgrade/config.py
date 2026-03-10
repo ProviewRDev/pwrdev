@@ -28,8 +28,8 @@ from typing import List, Optional
 
 
 # Default version settings
-DEFAULT_OLD_VERSION = "6.0"
-DEFAULT_NEW_VERSION = "6.1"
+DEFAULT_OLD_VERSION = "6.1"
+DEFAULT_NEW_VERSION = "7.0"
 
 
 @dataclass
@@ -45,7 +45,7 @@ class UpgradeConfig:
     start_from: Optional[str] = None
     
     # Behavior options
-    interactive: bool = True
+    interactive: bool = True  # Default mode: prompt for selection and per-step actions
     dry_run: bool = False
     backup_count: int = 9
     log_level: str = "INFO"

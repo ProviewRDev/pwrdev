@@ -25,7 +25,7 @@ Upgrade step definitions and registry.
 Steps are divided into:
   - Core steps: needed for every upgrade (defined here)
   - Version-specific steps: only for certain version transitions
-    (defined in version_steps/<from>_to_<to>.py)
+    (defined in version_steps/<from>_to_<to> as a module or package)
 
 The upgrade runs in two phases:
   Phase 1 (--dump): dumpdb — runs in OLD version environment
@@ -36,6 +36,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import List, Optional, Dict
 import importlib
+import inspect
 
 
 class StepStatus(Enum):
@@ -45,6 +46,21 @@ class StepStatus(Enum):
     SUCCESS = "success"
     FAILED = "failed"
     SKIPPED = "skipped"
+
+
+class StepRunner(Enum):
+    """Execution backend for an upgrade step."""
+    BUILTIN = "builtin"
+    PYTHON = "python"
+    WB_CMD_SCRIPT = "wb_cmd_script"
+    BINARY = "binary"
+    SHELL = "shell"
+
+
+class StepScope(Enum):
+    """Execution scope for an upgrade step."""
+    ONCE = "once"
+    PER_VOLUME = "per_volume"
 
 
 @dataclass
@@ -68,6 +84,18 @@ class UpgradeStep:
     
     # Can this step be skipped?
     skippable: bool = True
+
+    # How the step is executed
+    runner: StepRunner = StepRunner.BUILTIN
+
+    # Executable, script, or command template used by non-builtin runners
+    artifact: Optional[str] = None
+
+    # Whether the runner executes once or once per volume
+    scope: StepScope = StepScope.ONCE
+
+    # File that registered the step; used to resolve relative artifacts
+    source_file: Optional[str] = None
     
     # Current status
     status: StepStatus = StepStatus.PENDING
@@ -93,8 +121,12 @@ def register_step(
     category: str = "upgrade",
     depends_on: List[str] = None,
     skippable: bool = True,
+    runner: StepRunner = StepRunner.BUILTIN,
+    artifact: Optional[str] = None,
+    scope: StepScope = StepScope.ONCE,
 ) -> UpgradeStep:
     """Register an upgrade step."""
+    caller = inspect.stack()[1].filename
     step = UpgradeStep(
         name=name,
         description=description,
@@ -102,6 +134,10 @@ def register_step(
         category=category,
         depends_on=depends_on or [],
         skippable=skippable,
+        runner=runner,
+        artifact=artifact,
+        scope=scope,
+        source_file=caller,
     )
     UPGRADE_STEPS[name] = step
     return step
@@ -336,8 +372,8 @@ def load_version_steps(from_version: str, to_version: str) -> List[str]:
     """
     Load version-specific steps for a particular upgrade path.
     
-    Looks for a module in version_steps/ named like v60_to_v61.py
-    The module must define:
+    Looks for a module or package in version_steps/ named like v60_to_v61.
+    It must define:
       - register_steps(): function that calls register_step() for each step
       - VERSION_STEPS: list of step names in execution order
     
@@ -477,4 +513,10 @@ def select_steps(steps: List[UpgradeStep], references: List[str]) -> List[Upgrad
 def filter_steps(steps: List[UpgradeStep], skip_refs: List[str]) -> List[UpgradeStep]:
     """Filter out skipped steps using step names, numbers, or numeric ranges."""
     skip_names = set(expand_step_references(skip_refs, steps))
+    non_skippable = sorted(step.name for step in steps
+                           if step.name in skip_names and not step.skippable)
+    if non_skippable:
+        raise ValueError(
+            "step(s) cannot be skipped: " + ", ".join(non_skippable)
+        )
     return [step for step in steps if step.name not in skip_names]

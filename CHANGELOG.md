@@ -25,7 +25,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CoLogger has been added (co_logger.h) that can be used in applications for easy logging in RFC5424 format.
 - bcomp: Added MinOut to compposit
 - PROFIBUS: Added support for jokerblocks introduced in GSD revision 4/5
-- GrowWidgets now implement a minimal accessible interface adding "popup" support for external onscreen keyboards, like onboard for instance.
 - Accessibility support (ATK interface implementations) for widgets created by GE editor. Enabling external onscreen touch keyboards to popup when focusing input fields, if installed and activated.
 - RemnodeUDP: Added PMTU discovery setting (Do/Don't Fragment, DF bit).
 - A new pwr_upgrade tool has been added that unifies what reload.sh and upgrade.sh did. It should simplify the upgrade procedure for both users and devs.

@@ -33,9 +33,12 @@
 #   --dry-run           Preview actions without executing
 #   --all               Run all steps without prompting
 #   --from STEP         Start from a specific step
-#   --skip STEPS        Skip specified steps (comma-separated)
+#   --skip STEPS        Skip skippable steps (comma-separated)
 #   --reload-only       Run dumpdb, renamedb and loaddb only
 #   --list              List all available steps
+#
+# Default behavior is interactive: select steps, inspect help, and
+# confirm, skip, or stop at each step.
 #
 # This tool replaces and unifies reload.sh and upgrade.sh functionality.
 
