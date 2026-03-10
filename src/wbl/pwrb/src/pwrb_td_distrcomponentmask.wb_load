@@ -164,14 +164,12 @@ SObject pwrb:Type
      EndBody
     EndObject
     !/**
-    !  The .rhosts file used by rsh is included. The source is fetched from
-    !     1. $pwrp_cnf/'nodename'/.rhosts
-    !     2. $pwra_db/.rhosts
+    !  Reserved bit kept for compatibility with older projects.
     !*/
-    Object RHostsFile $Bit
+    Object Unused $Bit
      Body SysBody
-       Attr PgmName = "RHostsFile"
-       Attr Text = "RHostsFile"
+       Attr PgmName = "Unused"
+       Attr Text = "Unused"
        Attr Value = 1024
      EndBody
     EndObject

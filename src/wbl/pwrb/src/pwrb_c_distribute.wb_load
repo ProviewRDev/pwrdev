@@ -89,10 +89,10 @@ SObject pwrb:Class
 !  and distributed to /home/b55
 ! @b FlowFiles
 !  The plc trace files $pwrp_load/*.flw are included.
-! @b RHostsFile
-!  The .rhost file used by rsh is included. The source is fetched from
-!     1. $pwrp_cnf/'nodename'/.rhosts
-!     2. $pwra_db/.rhosts
+! @b AuthorizedKeysFile
+!  The .ssh/authorized_keys file used by ssh is included. The source is fetched from
+!     1. $pwrp_cnf/'nodename'/authorized_keys
+!     2. $pwra_db/authorized_keys
 ! @b WebFiles
 !  All web-files in $pwrp_web are included.
 !
@@ -128,7 +128,7 @@ SObject pwrb:Class
     EndObject
     Object Template Distribute
       Body DevBody
-        Attr Components = 4095
+        Attr Components = 11263
       EndBody
     EndObject
   EndObject

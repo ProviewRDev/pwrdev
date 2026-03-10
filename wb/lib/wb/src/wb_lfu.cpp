@@ -673,7 +673,6 @@ pwr_tStatus lfu_SaveDirectoryVolume(ldh_tSesContext ldhses, CoWow* wow, int quie
   char nodename[80];
   pwr_tUInt32* os_ptr;
   pwr_tUInt32 os;
-  pwr_tEnum* remote_access_type_ptr;
   pwr_tUInt32* bus_number_ptr;
   pwr_tBoolean* single_scan_ptr;
   pwr_tFloat32* scantime_ptr;
@@ -2539,16 +2538,6 @@ pwr_tStatus lfu_SaveDirectoryVolume(ldh_tSesContext ldhses, CoWow* wow, int quie
           os = *os_ptr;
           sprintf(os_str, "%d", os);
 
-          /* Get RemoteAccessType attribute */
-          sts = ldh_GetObjectPar(ldhses, nodeobjid, "RtBody", "RemoteAccessType",
-                                 (char**)&remote_access_type_ptr, &size);
-          if (EVEN(sts))
-            return sts;
-
-          if (*remote_access_type_ptr == pwr_eRemoteShellEnum_RSH)
-            distr_options |= lfu_mDistrOpt_RSH;
-          free(remote_access_type_ptr);
-
           /* Check that there is a rootvolume for this node */
           found = 0;
           sts = ldh_GetChild(ldhses, nodeobjid, &volobjid);
@@ -2973,12 +2962,6 @@ pwr_tStatus lfu_SaveDirectoryVolume(ldh_tSesContext ldhses, CoWow* wow, int quie
                 }
                 if (*components_ptr & pwr_mDistrComponentMask_FlowFiles)
                   fprintf(file, "appl %s W $pwrp_load/*.flw\n", nodename_ptr);
-                if (*components_ptr & pwr_mDistrComponentMask_RHostsFile)
-                  fprintf(file,
-                          "appl %s W "
-                          "$pwrp_cnf/%s/.rhosts:$pwra_db/.rhosts "
-                          "/home/pwrp/.rhosts\n",
-                          nodename_ptr, nodename_ptr);
                 if (*components_ptr & pwr_mDistrComponentMask_AuthorizedKeysFile)
                   fprintf(file,
                           "appl %s W "
