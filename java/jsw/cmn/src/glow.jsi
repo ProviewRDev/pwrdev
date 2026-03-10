@@ -21479,7 +21479,7 @@ function GrowTable(ctx) {
                 this.column_adjustment[i] == Glow.eAdjustment_Center
               ) {
                 var width, height, descent;
-                var dim = this.ctx.gdraw.getTextExten(
+                var dim = this.ctx.gdraw.getTextExtent(
                   this.cell_value[offs],
                   text_idx,
                   this.font,
