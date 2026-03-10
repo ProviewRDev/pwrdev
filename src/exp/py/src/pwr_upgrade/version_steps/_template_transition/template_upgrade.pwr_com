@@ -1,0 +1,25 @@
+!** Invisible: Template wb_cmd script for a version transition
+!
+
+# Example: update a value in all objects of a class.
+#
+# Copy this file into a real version package and replace the class names,
+# attributes, and constants with transition-specific logic.
+
+function int update_template_objects()
+  string name = GetClassListAttrRef("TemplateClass");
+
+  while (name != "")
+    printf("Template wb_cmd step visiting %s\n", name);
+
+    # Example:
+    # SetAttribute(name + ".SomeAttr", 1);
+
+    name = GetNextAttrRef("TemplateClass", name);
+  endwhile
+endfunction
+
+main()
+  update_template_objects();
+  save /quiet
+endmain

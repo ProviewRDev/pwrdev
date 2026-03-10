@@ -31,22 +31,74 @@ Located in `src/exp/py/src/pwr_upgrade/`.
 | `__main__.py`   | Entry point — CLI argument parsing (getopt) |
 | `cli.py`        | Rich TUI — banners, step table, prompts, summary |
 | `config.py`     | `UpgradeConfig` dataclass; YAML file loading; sample-config generator |
-| `steps.py`      | Step registry and ordering. Defines core steps (phase 1 + phase 2) and the `load_version_steps()` dynamic loader |
-| `executor.py`   | `StepExecutor` — one `execute_<step>()` method per step. Calls `wb_cmd`, shell commands, file manipulations |
+| `steps.py`      | Step registry and ordering. Defines core steps, version-step metadata, and the `load_version_steps()` dynamic loader |
+| `executor.py`   | `StepExecutor` — executes built-in core steps and generic runner-backed steps (`python`, `wb_cmd_script`, `binary`, `shell`) |
 | `utils.py`      | `ProjectEnvironment` dataclass (reads `$pwrp_*` env vars), backup helpers, error types |
+
+### Interactive Mode
+
+`pwr_upgrade` runs in interactive mode by default. In this mode the user can:
+
+- select a subset of steps before execution,
+- inspect detailed help for the next step,
+- execute one step at a time with `y`,
+- stop the run with `n`,
+- switch to unattended execution for the remaining steps with `go`,
+- skip the current step with `skip` if and only if that step is marked `skippable=True`.
+
+The `--all` option disables the prompts and runs the selected step list without interaction.
+The `--skip` option only accepts steps that are marked skippable.
 
 #### `version_steps/` — Version-Specific Step Modules
 
 Located in `src/exp/py/src/pwr_upgrade/version_steps/`.
 
-Each module covers one version pair and follows the naming convention `v<from>_to_<to>.py` (e.g. `v60_to_v61.py`). A module must define:
+Each module covers one version pair and follows the naming convention `v<from>_to_<to>` (for example `v60_to_v61`). It can be a single `.py` file or, preferably when assets are needed, a package directory with `__init__.py`. It must define:
 
 - `VERSION_STEPS` — ordered list of step name strings.
 - `register_steps()` — function that calls `register_step()` for each entry.
 
 These steps are inserted between `updateclasses` and `compile` during phase 2. They are loaded dynamically based on the `from_version` / `to_version` in the config.
 
-To add a new version transition, create `version_steps/v61_to_v62.py` and follow the existing pattern.
+To add a new version transition, create `version_steps/v61_to_v62.py` for a simple transition or `version_steps/v61_to_v62/` for a transition that needs colocated assets.
+
+A complete safe template is available in `version_steps/_template_transition/`.
+It is intentionally ignored by the loader and can be copied when starting a new transition.
+
+Each registered step can also declare:
+
+- `runner` — how it executes (`builtin`, `python`, `wb_cmd_script`, `binary`, `shell`)
+- `artifact` — installed tool/script path or module-relative file
+- `scope` — `once` or `per_volume`
+
+This is the intended upgrade framework going forward: the version module should mostly describe *what runs*, while `executor.py` provides reusable runner backends.
+
+### Version-Step Runners
+
+Use the smallest execution backend that matches the change:
+
+| Runner | Use for | Typical artifact |
+|--------|---------|------------------|
+| `builtin` | Shared Python logic that belongs to the core framework | `executor.py` method |
+| `python` | Version-local Python logic that should live beside one transition | `remove_lucida_sans.py:run` |
+| `wb_cmd_script` | Object-tree traversal, attribute fixups, object creation in a loaded volume | `upgrade.pwr_com` or `$pwr_exe/<script>.pwr_com` |
+| `binary` | Heavier schema/API logic, XML parsing, conversions that belong in C/C++ | `$pwr_exe/<tool>` |
+| `shell` | Thin wrappers around stable external commands | `script.sh` or `$pwr_exe/<script>.sh` |
+
+The runner choice matters more than the version number. Do not force every version transition to have one binary, one `.pwr_com`, and one shell script. Most transitions should only need one or two step types.
+
+### Binary Placement
+
+Upgrade-specific binaries should **stay in the normal build subsystem** and be referenced from the version-step metadata after installation.
+
+Examples:
+
+- workbench/API tools belong under `wb/exe/...`
+- generic upgrade utilities belong under `src/upgrade/exe/...`
+
+The version-step module should then reference the installed artifact, typically with `$pwr_exe/<tool>`.
+
+Do **not** move compiled binaries into `src/exp/py/src/pwr_upgrade/version_steps/...` or another `src/exp` folder just to group them by version. That would fight the build system and blur ownership. Keep the source where the build already expects it, and let the version-step metadata point at the installed result.
 
 ### wb_cmd Scripts (`.pwr_com`)
 
@@ -54,7 +106,7 @@ These are scripts for the ProviewR workbench command interpreter (`wb_cmd`). The
 
 | File | Versions | What it does |
 |------|----------|--------------|
-| `src/exp/com/src/upgrade.pwr_com` | V6.0 → V6.1 | Iterates `PnDevice` objects and sets attribute values that cannot be supplied via class templates — for example `AlarmBuffer.BufferSize = 10` (a `NoEdit` attribute) and `StartupTime` defaults. |
+| `src/exp/com/src/upgrade.pwr_com` | V6.0 → V6.1 | Legacy/global copy of the V6.1→V7.0 `PnDevice` fixup script. The modern `pwr_upgrade` flow can instead keep version-local `.pwr_com` assets beside the transition package. |
 | `src/exp/com/src/upgrade_pb.pwr_com` | V5.4 → V5.5 | Creates `RootVolumeLoad` / `RootVolumeConfig` objects under `SevNodeConfig` and sets `Distribute.Components` bits. |
 | `src/exp/com/src/reload_vol_versions.pwr_com` | Any | Saves and restores `ClassVolume.RtVersion` attributes across a reload. Called by `reload.sh`. |
 
@@ -65,7 +117,7 @@ These are scripts for the ProviewR workbench command interpreter (`wb_cmd`). The
 - You need to create or rearrange objects (e.g. adding a new child object under every instance of a class).
 - The change is data-level, not schema-level — the class definition itself hasn't changed, but instances need attribute fixup.
 
-The `.pwr_com` script is invoked by `executor.py` as:
+The `.pwr_com` script is invoked by `executor.py` through the `wb_cmd_script` runner as:
 
 ```
 wb_cmd -q -v <volume> @$pwr_exe/upgrade.pwr_com
@@ -97,7 +149,7 @@ Both scripts are currently historical artifacts from much older version transiti
 | File | What it does |
 |------|--------------|
 | `src/upgrade/exe/upgrade_bckcnv/src/upgrade_bckcnv.c` | Converts backup (`.bck`) files from 32-bit to 64-bit layout. Only relevant for the 32→64-bit platform transition. |
-| `wb/exe/wb_upgrade/src/wb_upgrade.cpp` | Historical V2.0→V2.1 object-attribute mapping. Dead code, kept for reference. |
+| `wb/exe/wb_upgrade/src/wb_upgrade.cpp` | Historical V2.0→V2.1 object-attribute mapping. Legacy reference, not part of the modern `pwr_upgrade` flow. |
 
 ### Legacy Scripts
 
@@ -113,13 +165,13 @@ The following steps are defined in `steps.py` and are version-independent:
 
 | Step | What it does |
 |------|--------------|
-| `dumpdb` | For every volume listed in `$pwrp_db/pwrp_cnf_volumelist.dat`, call `wb_cmd` to export each volume database to a `.wb_dmp` text file. This is the portable representation. |
+| `dumpdb` | For every discovered project database volume, call `wb_cmd` to export the database to a `.wb_dmp` text file. This is the portable representation. |
 
 ### Phase 2 (runs in NEW version, default)
 
 | Step | What it does |
 |------|--------------|
-| `savedirectory` | Export the directory volume via `wb_cmd list/directory`. |
+| `savedirectory` | Save the directory volume with `wb_cmd -q -v directory save`. |
 | `classvolumes` | For each class volume, run `co_convert` to regenerate struct/proto header files and wb_load from the new installation's templates. |
 | `renamedb` | Backup existing `.db` files to numbered suffixes (`.db.1`, `.db.2`, ...). |
 | `loaddb` | Load every `.wb_dmp` back into a fresh database using `wb_cmd wb load`. |
@@ -134,20 +186,38 @@ The following steps are defined in `steps.py` and are version-independent:
 
 When preparing a release that requires project-level migration, here is where each kind of change goes.
 
+### 0. Start with a Version-Step Manifest
+
+Create or update `version_steps/v<X>_to_v<Y>.py` or `version_steps/v<X>_to_v<Y>/` and register each required step with:
+
+- `name`
+- `description`
+- `depends_on`
+- `skippable`
+- `runner`
+- `artifact` if the runner is not `builtin`
+- `scope`
+
+Only put imperative logic in `executor.py` when the generic runners are not enough.
+
 ### 1. Schema Changes (attribute rename / class move)
 
 Write a dump-conversion step. Options:
 
-- **AWK/sed script** — add a new file next to `upgrade_dmp.awk`, call it from the version-step executor.
-- **Python in executor.py** — parse `.wb_dmp` lines directly in the `execute_*` method if the transformation is simple.
+- **version-local Python step** — preferred for simple or moderate text rewriting that should disappear with this version pair.
+- **AWK/sed script** — acceptable for historical compatibility or very small line-based rewrites.
 
-Register the step in `version_steps/v<X>_to_v<Y>.py` and add the executor method in `executor.py`.
+Register the step in the version-step module or package. Only add a new executor method if the generic runner model is not enough.
 
 ### 2. Object-Level Data Fixup (set attribute values post-load)
 
-Write a **`.pwr_com` script**. Place it in `src/exp/com/src/` and name it descriptively (e.g. `upgrade_v62.pwr_com`).
+Write a **`.pwr_com` script**. Prefer placing it in the version-step package if it is only needed for one transition. Keep it under `src/exp/com/src/` only when it is shared with legacy tooling or otherwise belongs in the global install set.
 
-The script is run by `executor.py` as `wb_cmd -q -v <vol> @$pwr_exe/<script>.pwr_com` per volume.
+Register the step with:
+
+- `runner=StepRunner.WB_CMD_SCRIPT`
+- `artifact="<script>.pwr_com"` for a package-local asset, or `artifact="$pwr_exe/<script>.pwr_com"` for an installed shared script
+- `scope=StepScope.PER_VOLUME`
 
 Use `.pwr_com` when you need to:
 - Set `NoEdit` attributes to hardcoded constants.
@@ -157,11 +227,16 @@ Use `.pwr_com` when you need to:
 
 ### 3. External File Conversions (XML, graphics, config files)
 
-Write an executor method in `executor.py` that calls the appropriate tool or does the transformation in Python. Register the step in the version-steps module.
+Use either:
+
+- `runner=StepRunner.BINARY` for an installed executable, or
+- `runner=StepRunner.PYTHON` for a version-local Python helper.
 
 Examples:
 - Profinet XML: `wb_convert_pn_xml` (C binary)
 - PWG/PWSG graphics: regex replacement in Python (see `execute_remove_lucida_sans`)
+
+If a new binary is needed, keep its source in the normal build tree (`wb/exe/...`, `src/upgrade/exe/...`, etc.) and reference the installed executable from the version-step metadata. Do not relocate it under `src/exp` just because the upgrade module uses it.
 
 ### 4. Config / Defaults Update
 
@@ -172,10 +247,11 @@ Update `config.py`:
 ### 5. Checklist
 
 ```
-[ ] version_steps/v<X>_to_v<Y>.py    — register step names + descriptions
-[ ] executor.py                       — add execute_<step>() methods
+[ ] version_steps/v<X>_to_v<Y>.py or /__init__.py — register steps with runner/artifact/scope metadata
+[ ] executor.py                       — add code only if a generic runner is not enough
 [ ] *.pwr_com (if needed)             — wb_cmd script for object fixup
 [ ] upgrade_dmp_vXY.awk (if needed)   — dump text rewriting
+[ ] new binary source (if needed)     — place in wb/exe/... or src/upgrade/exe/...
 [ ] config.py                         — bump DEFAULT versions
 [ ] Test: pwr_upgrade.sh --help       — verify steps appear
 [ ] Test: pwr_upgrade.sh --dry-run    — verify step ordering

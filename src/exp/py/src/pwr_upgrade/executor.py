@@ -24,8 +24,8 @@ Command execution engine for ProviewR upgrade tool.
 """
 
 import os
-import re
 import glob
+import importlib.util
 import shlex
 import subprocess
 import time
@@ -39,8 +39,9 @@ from .utils import (
     save_file_with_backup,
     get_volume_name_from_load_file,
     ensure_directory,
+    translate_filename,
 )
-from .steps import UpgradeStep, StepStatus
+from .steps import UpgradeStep, StepStatus, StepRunner, StepScope
 from .config import UpgradeConfig
 
 
@@ -158,6 +159,112 @@ class StepExecutor:
         cmd_parts.append(args)
 
         return self.run_command_args(cmd_parts)
+
+    def resolve_step_artifact(self, step: UpgradeStep) -> str:
+        """Resolve a step artifact path from env vars or module-relative paths."""
+        if not step.artifact:
+            raise UpgradeError(f"Step {step.name} has no artifact configured", step=step.name)
+
+        translated = translate_filename(step.artifact)
+        if translated == step.artifact and step.artifact.startswith("$"):
+            variable, sep, remainder = step.artifact[1:].partition("/")
+            value = getattr(self.env, variable, None)
+            if value:
+                translated = os.path.join(value, remainder) if sep else value
+
+        if translated != step.artifact or os.path.isabs(translated):
+            return translated
+
+        if step.source_file:
+            return os.path.normpath(os.path.join(os.path.dirname(step.source_file), step.artifact))
+
+        return translated
+
+    def get_step_volumes(self, step: UpgradeStep) -> List[str]:
+        """Get the target volume list for a step."""
+        del step
+        return self.env.databases
+
+    def execute_wb_cmd_script_step(self, step: UpgradeStep) -> None:
+        """Execute a wb_cmd script once or once per volume."""
+        script_path = self.resolve_step_artifact(step)
+        if not self.config.dry_run and not os.path.exists(script_path):
+            raise UpgradeError(f"wb_cmd script not found: {script_path}", step=step.name)
+
+        if step.scope == StepScope.PER_VOLUME:
+            for db_name in self.get_step_volumes(step):
+                self.log(f"-- Running {step.name} on volume {db_name}")
+                self.wb_cmd(f'@"{script_path}"', volume=db_name)
+            return
+
+        self.log(f"-- Running {step.name}")
+        self.wb_cmd(f'@"{script_path}"')
+
+    def execute_binary_step(self, step: UpgradeStep) -> None:
+        """Execute an installed binary once or once per volume."""
+        tool_path = self.resolve_step_artifact(step)
+        if not self.config.dry_run and not os.path.exists(tool_path):
+            raise UpgradeError(f"Binary not found: {tool_path}", step=step.name)
+
+        if step.scope == StepScope.PER_VOLUME:
+            for db_name in self.get_step_volumes(step):
+                self.log(f"-- Running {os.path.basename(tool_path)} on volume {db_name}")
+                self.run_command_args([tool_path, db_name])
+            return
+
+        self.log(f"-- Running {os.path.basename(tool_path)}")
+        self.run_command_args([tool_path])
+
+    def execute_shell_step(self, step: UpgradeStep) -> None:
+        """Execute an installed shell script once or once per volume."""
+        script_path = self.resolve_step_artifact(step)
+        if not self.config.dry_run and not os.path.exists(script_path):
+            raise UpgradeError(f"Shell script not found: {script_path}", step=step.name)
+
+        if step.scope == StepScope.PER_VOLUME:
+            for db_name in self.get_step_volumes(step):
+                self.log(f"-- Running {os.path.basename(script_path)} on volume {db_name}")
+                self.run_command_args([script_path, db_name])
+            return
+
+        self.log(f"-- Running {os.path.basename(script_path)}")
+        self.run_command_args([script_path])
+
+    def execute_python_step(self, step: UpgradeStep) -> None:
+        """Execute a Python helper module from the version-step package."""
+        artifact = step.artifact or ""
+        module_ref, _, callable_name = artifact.partition(":")
+        callable_name = callable_name or "run"
+        module_path = self.resolve_step_artifact(
+            UpgradeStep(
+                name=step.name,
+                description=step.description,
+                artifact=module_ref,
+                source_file=step.source_file,
+            )
+        )
+
+        if not self.config.dry_run and not os.path.exists(module_path):
+            raise UpgradeError(f"Python step module not found: {module_path}", step=step.name)
+
+        spec = importlib.util.spec_from_file_location(
+            f"pwr_upgrade_step_{step.name}",
+            module_path,
+        )
+        if spec is None or spec.loader is None:
+            raise UpgradeError(f"Unable to load Python step module: {module_path}", step=step.name)
+
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+
+        runner = getattr(module, callable_name, None)
+        if runner is None:
+            raise UpgradeError(
+                f"Python step callable not found: {callable_name} in {module_path}",
+                step=step.name,
+            )
+
+        runner(self, step)
     
     # =========================================================================
     # Step Implementations
@@ -201,6 +308,10 @@ class StepExecutor:
             self.log("No class volumes found")
             return
         
+        self.log("Found classvolumes:")
+        for load_file in class_volumes:
+            self.log(load_file)
+        self.log("")
         self.log(f"Found {len(class_volumes)} class volume(s)")
         
         ensure_directory(self.env.pwrp_inc)
@@ -262,72 +373,6 @@ class StepExecutor:
         for db_name in databases:
             self.log(f"-- Updating classes in volume {db_name}")
             self.wb_cmd("update classes", volume=db_name)
-    
-    def execute_convert_volume_objects(self, step: UpgradeStep) -> None:
-        """Convert objects in volumes."""
-        databases = self.env.databases
-        
-        upgrade_script = os.path.join(self.env.pwr_exe, "upgrade.pwr_com")
-        if not os.path.exists(upgrade_script):
-            self.log(f"Warning: Upgrade script not found: {upgrade_script}")
-            return
-        
-        for db_name in databases:
-            self.log(f"-- Converting volume {db_name}")
-            self.wb_cmd(f'@"{upgrade_script}"', volume=db_name)
-    
-    def execute_convert_pn_xml(self, step: UpgradeStep) -> None:
-        """Convert Profinet XML files."""
-        databases = self.env.databases
-        
-        convert_tool = os.path.join(self.env.pwr_exe, "wb_convert_pn_xml")
-        if not os.path.exists(convert_tool):
-            self.log("Profinet XML conversion tool not available, skipping")
-            return
-        
-        for db_name in databases:
-            self.log(f"-- Processing volume {db_name}")
-            self.run_command(f'"{convert_tool}" {db_name}', check=False)
-    
-    def execute_remove_lucida_sans(self, step: UpgradeStep) -> None:
-        """Replace Lucida Sans font with Helvetica."""
-        # Find all .pwg and .pwsg files
-        graph_files = []
-        for ext in ('*.pwg', '*.pwsg'):
-            graph_files.extend(glob.glob(
-                os.path.join(self.env.project_root, '**', ext),
-                recursive=True
-            ))
-        
-        if not graph_files:
-            self.log("No graph files found")
-            return
-        
-        # Font code pattern: specific codes followed by font type 4 (Lucida Sans)
-        # Replace with font type 0 (default/Helvetica)
-        pattern = re.compile(rb'^(2729|4223|3010|2245|1307) 4$', re.MULTILINE)
-        
-        count = 0
-        for graph_file in graph_files:
-            self.log(f"-- Processing {graph_file}")
-            
-            if self.config.dry_run:
-                continue
-            
-            try:
-                with open(graph_file, 'rb') as f:
-                    content = f.read()
-                
-                new_content, replacements = pattern.subn(rb'\1 0', content)
-                
-                if replacements > 0:
-                    with open(graph_file, 'wb') as f:
-                        f.write(new_content)
-                    count += replacements
-            except (IOError, OSError) as e:
-                self.log(f"Warning: Could not process {graph_file}: {e}")
-        
-        self.log(f"Replaced {count} font references")
     
     def execute_compile(self, step: UpgradeStep) -> None:
         """Compile all PLC programs."""
@@ -400,18 +445,30 @@ class StepExecutor:
             'renamedb': self.execute_renamedb,
             'loaddb': self.execute_loaddb,
             'updateclasses': self.execute_updateclasses,
-            'convert_volume_objects': self.execute_convert_volume_objects,
-            'convert_pn_xml': self.execute_convert_pn_xml,
-            'remove_lucida_sans': self.execute_remove_lucida_sans,
             'compile': self.execute_compile,
             'createload': self.execute_createload,
             'createboot': self.execute_createboot,
             'createpackage': self.execute_createpackage,
         }
-        
-        executor = executors.get(step.name)
-        if not executor:
-            raise UpgradeError(f"No executor found for step: {step.name}", step=step.name)
+
+        runner_executors = {
+            StepRunner.PYTHON: self.execute_python_step,
+            StepRunner.WB_CMD_SCRIPT: self.execute_wb_cmd_script_step,
+            StepRunner.BINARY: self.execute_binary_step,
+            StepRunner.SHELL: self.execute_shell_step,
+        }
+
+        if step.runner == StepRunner.BUILTIN:
+            executor = executors.get(step.name)
+            if not executor:
+                raise UpgradeError(f"No executor found for step: {step.name}", step=step.name)
+        else:
+            executor = runner_executors.get(step.runner)
+            if not executor:
+                raise UpgradeError(
+                    f"No executor available for runner {step.runner.value}: {step.name}",
+                    step=step.name,
+                )
         
         step.status = StepStatus.RUNNING
         start_time = time.time()
