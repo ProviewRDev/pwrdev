@@ -626,16 +626,20 @@ int WGre::node_annot_message(
       case pwr_eType_AttrRef: {
         /* Get the object name from ldh */
         pwr_tAttrRef* arp = (pwr_tAttrRef*)parvalue;
-        char* name;
+        char* name = 0;
 
         if (cdh_ObjidIsNull(arp->Objid))
           annot_str[0] = '\0';
         else {
           sts = ldh_AttrRefToName((node->hn.wind)->hw.ldhses, arp,
               ldh_eName_ArefObject, &name, &size);
-          if (EVEN(sts))
+          if (EVEN(sts) || !name)
             annot_str[0] = '\0';
-          strcpy(annot_str, name);
+          else {
+            strncpy(annot_str, name,
+                MIN((int)sizeof(annot_str), annot_max_size));
+            annot_str[MIN((int)sizeof(annot_str), annot_max_size) - 1] = 0;
+          }
         }
         break;
       }
