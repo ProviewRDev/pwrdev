@@ -20,6 +20,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
+include(WiresharkPlugin)
+
+# Plugin name and version info (major minor micro extra)
+set_module_info(redcom 6 1 3 0)
+
 
 set(DISSECTOR_SRC
 	packet-redcom.c
@@ -30,36 +35,45 @@ set(PLUGIN_FILES
 	${DISSECTOR_SRC}
 )
 
-set(CLEAN_FILES
+set_source_files_properties(
 	${PLUGIN_FILES}
-)
-
-if (WERROR)
-	set_source_files_properties(
-		${CLEAN_FILES}
-		PROPERTIES
-		COMPILE_FLAGS -Werror
+	PROPERTIES
+	COMPILE_FLAGS "${WERROR_COMMON_FLAGS}"
 	)
-endif()
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-
-register_dissector_files(plugin.c
+register_plugin_files(plugin.c
 	plugin
 	${DISSECTOR_SRC}
 )
 
-add_library(redcom ${LINK_MODE_MODULE}
-	${PLUGIN_FILES}
-)
-set_target_properties(redcom PROPERTIES PREFIX "")
-set_target_properties(redcom PROPERTIES LINK_FLAGS "${WS_LINK_FLAGS}")
+add_wireshark_plugin_library(redcom epan)
 
 target_link_libraries(redcom epan)
 
-install(TARGETS redcom
-	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/@CPACK_PACKAGE_NAME@/plugins/${CPACK_PACKAGE_VERSION} NAMELINK_SKIP
-	RUNTIME DESTINATION ${CMAKE_INSTALL_LIBDIR}/@CPACK_PACKAGE_NAME@/plugins/${CPACK_PACKAGE_VERSION}
-	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}/@CPACK_PACKAGE_NAME@/plugins/${CPACK_PACKAGE_VERSION}
+install_plugin(redcom epan)
+
+file(GLOB DISSECTOR_HEADERS RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "*.h")
+CHECKAPI(
+	NAME
+	  redcom
+	SWITCHES
+	  --group dissectors-prohibited
+	  --group dissectors-restricted
+	SOURCES
+	  ${DISSECTOR_SRC}
+	  ${DISSECTOR_HEADERS}
 )
+
+#
+# Editor modelines  -  https://www.wireshark.org/tools/modelines.html
+#
+# Local variables:
+# c-basic-offset: 8
+# tab-width: 8
+# indent-tabs-mode: t
+# End:
+#
+# vi: set shiftwidth=8 tabstop=8 noexpandtab:
+# :indentSize=8:tabSize=8:noTabs=false:
+#
 
