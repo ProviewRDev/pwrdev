@@ -60,6 +60,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed rabbitmq + mqtt message size calculations
 - UDP IO: Implemented stall action
 - Various dereferenced null pointers in the workbench that caused the workbench to crash
+- Message handler application requests no longer block for up to one hour waiting for a `qcom_Request()` reply. They now use the normal MH send/receive timeout and preserve `MH__TMO` on timeout.
 
 
 ### Changed
