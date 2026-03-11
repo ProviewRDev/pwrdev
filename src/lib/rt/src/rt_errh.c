@@ -278,6 +278,24 @@ char* errh_GetError(const int sts, char* buf, int bufSize) { return get_message(
  */
 char* errh_GetText(const int sts, char* buf, int bufSize) { return get_message(sts, 1, buf, bufSize); }
 
+char* errh_Log(char* buff, char severity, const char* msg, ...)
+{
+  char* s;
+  va_list ap;
+
+  s = get_header(severity, buff);
+  va_start(ap, msg);
+  msg_vsprintf(s, msg, NULL, ap);
+  va_end(ap);
+
+  if (g_interactive)
+    printf("%s\n", buff);
+  else
+    errh_send(buff, severity, 0, errh_eMsgType_Log);
+
+  return buff;
+}
+
 /**
  * @brief Log a success message.
  * The function has a variable argument list similar to sprintf.
