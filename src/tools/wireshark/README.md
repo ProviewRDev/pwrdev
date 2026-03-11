@@ -6,6 +6,10 @@ Built for Wireshark 4.4.14.
 This directory contains the subdirectories qcom and redcom that contains files to build 
 the wireshark dissectors for QCom and RedCom.
 
+For QCom there is also a Lua dissector available in
+`packet-qcom.lua`. It can be loaded by stock Wireshark builds, for
+example the Debian package, without rebuilding Wireshark.
+
 Build QCom and Redcom dissectors
 --------------------------------
 
