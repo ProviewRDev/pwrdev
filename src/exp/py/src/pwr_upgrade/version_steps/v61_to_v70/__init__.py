@@ -30,6 +30,7 @@ from pwr_upgrade.steps import register_step, StepRunner, StepScope
 
 VERSION_STEPS = [
     "convert_volume_objects",
+    "normalize_node_distribution",
     "convert_pn_xml",
     "remove_lucida_sans",
 ]
@@ -58,6 +59,25 @@ Specific changes for V6.1->V7.0:
     )
 
     register_step(
+        name="normalize_node_distribution",
+        description="Normalize node distribution settings (V6.1->V7.0)",
+        help_text="""\
+Normalizes project node distribution settings to the V7.0 SSH-only model.
+
+Specific changes for V6.1->V7.0:
+- NodeConfig.RemoteAccessType normalized to SSH
+- SevNodeConfig.RemoteAccessType normalized to SSH
+- Distribute.Components updated to use AuthorizedKeysFile instead of the old reserved bit
+""",
+        category="version-specific",
+        depends_on=["convert_volume_objects"],
+        skippable=True,
+        runner=StepRunner.WB_CMD_SCRIPT,
+        artifact="normalize_node_distribution.pwr_com",
+        scope=StepScope.PER_VOLUME,
+    )
+
+    register_step(
         name="convert_pn_xml",
         description="Convert Profinet XML files (V6.1->V7.0)",
         help_text="""\
@@ -67,7 +87,7 @@ PnDevice objects to the V7.0 format.
 Only relevant if the project uses Profinet I/O.
 """,
         category="version-specific",
-        depends_on=["convert_volume_objects"],
+        depends_on=["normalize_node_distribution"],
         skippable=True,
         runner=StepRunner.BINARY,
         artifact="$pwr_exe/wb_convert_pn_xml",

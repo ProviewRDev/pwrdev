@@ -48,8 +48,7 @@ extern "C" {
 #endif
 
 typedef enum {
-  lfu_mDistrOpt_NoRootVolume = 1 << 0,
-  lfu_mDistrOpt_RSH = 1 << 1
+  lfu_mDistrOpt_NoRootVolume = 1 << 0
 } lfu_mDistrOpt;
 
 typedef enum {

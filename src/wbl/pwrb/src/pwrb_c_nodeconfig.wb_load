@@ -167,14 +167,13 @@ SObject pwrb:Class
         EndBody
       EndObject
       !/**
-      ! @Summary Remote shell access type.
-      ! Remote shell access type, SSH or RSH.
-      ! SSH will copy the distribtion package with scp and unpack it with SSH.
-      ! This recommended of security reasons. It requires createion of a public/private
-      ! key pair, where the public should be copied to the target node.
+      ! @Summary Remote access type.
+      ! SSH is the supported remote access type for distribution.
+      ! The distribution package is copied with scp and unpacked with SSH.
+      ! This requires creation of a public/private key pair where the public
+      ! key is copied to the target node.
       !
-      ! RSH will copy with ftp and unpack with RSH. I requires a .rhosts file on the target
-      ! node and that the login of user pwrp is unchanged.
+      ! SSH is used for distribution.
       !*/
       Object RemoteAccessType $Attribute 11 
         Body SysBody
@@ -233,6 +232,7 @@ SObject pwrb:Class
     EndObject
     Object Template NodeConfig
       Body RtBody
+        Attr RemoteAccessType = 0
         Attr QComExportBufQuota = 600000
         Attr QComAckDelay = 0.002
       EndBody

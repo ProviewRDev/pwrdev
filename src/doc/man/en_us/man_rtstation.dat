@@ -152,11 +152,9 @@ runtime node, copy the package to the runtime node and install the package. When
 package, you will have to enter the password for pwrp in the terminal window. The package file 
 is placed on $pwrp_load/pwrp_pkg_'nodename'_'version'.tgz.
 
-Note! If you have selected RSH as RemoteAccessType in the NodeConfig object, the initial 
-distribution will fail to unpack the package. The package has to be installed with pwr_pkg.sh. 
-Log in to to runtime node as pwrp, check that the .tgz file is present and install it with 
-
-<c>> pwr_pkg.sh -i 'tgz-file'
+Distribution uses SSH and scp. Make sure the NodeConfig object is configured
+for SSH access and that the target node has the corresponding authorized key
+installed for user pwrp before running distribution.
 </topic>
 
 <topic> rts_runtime_check

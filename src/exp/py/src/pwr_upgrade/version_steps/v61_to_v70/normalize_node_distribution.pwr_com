@@ -1,4 +1,4 @@
-!** Invisible: Script for upgrading from V6.1 to V7.0
+!** Invisible: Normalize node distribution settings for upgrading from V6.1 to V7.0
 ! 
 # ProviewR   Open Source Process Control.
 # Copyright (C) 2005-2024 SSAB EMEA AB.
@@ -34,61 +34,68 @@
 # combined work), being distributed under the terms of the GNU 
 # General Public License plus this exception.
 #
-#
 
-# AlarmBuffer.BufferSize is a new noedit attribute and need
-# to be set to it's constant value.
-function int update_buffersize_pndevice(string name)  
-  int old_buffer_size;
-  int new_buffer_size = 10;
-  
-  string attr = name + ".AlarmBuffer.BufferSize";
-  old_buffer_size = GetAttribute(attr);
-  
-  # NOEDIT attribute
-  if (old_buffer_size != new_buffer_size)
-    printf("Updating value %s: %d -> %d\n", attr, old_buffer_size, new_buffer_size);
-    SetAttribute(attr, new_buffer_size);
+# Normalize RemoteAccessType to SSH.
+function int update_remoteaccess(string name)
+  string attr;
+  int access;
+
+  attr = name + ".RemoteAccessType";
+  access = GetAttribute(attr);
+  if (access != 0)
+    printf("Updating value %s: %d -> 0\n", attr, access);
+    SetAttribute(attr, 0);
   endif
-    
 endfunction
 
-# StartupTime was changed in earlier versions but was never
-# updated to default values. So if it's still 0 we consider
-# it as "not touched" and set it to default value.
-function int update_startuptime_pndevice(string name)  
-  int new_startup_time = 5;     
-  int old_startup_time;
-    
-  string attr = name + ".StartupTime";
-  old_startup_time = GetAttribute(attr);
-  
-  # Editable attribute but if it's 0 we set it to the default
-  if (old_startup_time == 0)
-    printf("Updating value %s: %d -> %d\n", attr, old_startup_time, new_startup_time);
-    SetAttribute(attr, new_startup_time);
-  endif    
-  
-endfunction
+# Replace the old reserved compatibility bit with AuthorizedKeysFile.
+function int update_distribute_components(string name)
+  string child;
+  string class;
+  string attr;
+  int components;
+  int new_components;
 
-# PnDevice related stuff
-function int update_pndevices()    
-  string name = GetClassListAttrRef("PnDevice");
-  while (name != "")
-    printf("Updating PnDevice %s\n", name);
-    
-    update_buffersize_pndevice(name);
-    update_startuptime_pndevice(name);
-    
-    name = GetNextAttrRef("PnDevice", name);
+  child = GetChild(name);
+  while (child != "")
+    class = GetObjectClass(child);
+    if (class == "Distribute")
+      attr = child + ".Components";
+      components = GetAttribute(attr);
+      new_components = components | 8192;
+      if ((components & 1024) != 0)
+        new_components = new_components - 1024;
+      endif
+      if (components != new_components)
+        printf("Updating value %s: %d -> %d\n", attr, components,
+            new_components);
+        SetAttribute(attr, new_components);
+      endif
+      break;
+    endif
+    child = GetNextSibling(child);
   endwhile
 endfunction
 
-# Main entry, choose what to include for the upgrade process
-main()  
+function int update_nodeconfigs()
+  string name = GetClassList("NodeConfig");
+  while (name != "")
+    printf("Updating NodeConfig %s\n", name);
+    update_remoteaccess(name);
+    update_distribute_components(name);
+    name = GetNextObject(name);
+  endwhile
 
-  # V6.1 changes alot of things in profinet devices
-  update_pndevices();
+  name = GetClassList("SevNodeConfig");
+  while (name != "")
+    printf("Updating SevNodeConfig %s\n", name);
+    update_remoteaccess(name);
+    update_distribute_components(name);
+    name = GetNextObject(name);
+  endwhile
+endfunction
 
+main()
+  update_nodeconfigs();
   save /quiet
 endmain
