@@ -161,9 +161,9 @@ static unsigned int instance_highest(unsigned int instance_mask)
   return 0;
 }
 
-static int check_format(char* format, int type)
+static const char* format_conversion_ptr(const char* format)
 {
-  char* s;
+  const char* s;
 
   s = strchr(format, '%');
   if (s == 0)
@@ -177,6 +177,24 @@ static int check_format(char* format, int type)
     s++;
   }
   if (*s == 0)
+    return 0;
+
+  return s;
+}
+
+static bool treat_char_array_as_string(int type, int size, const char* format)
+{
+  const char* s = format_conversion_ptr(format);
+
+  return type == pwr_eType_Char && size > 1 && s && *s == 's';
+}
+
+static int check_format(const char* format, int type, int size)
+{
+  const char* s;
+
+  s = format_conversion_ptr(format);
+  if (s == 0)
     return 0;
 
   switch (type)
@@ -245,6 +263,8 @@ static int check_format(char* format, int type)
   case pwr_eType_Char:
   case pwr_eType_UInt8:
     if (*s == 'd' || *s == 'u' || *s == 'o' || *s == 'x' || *s == 'X' || *s == 'c')
+      return 1;
+    if (type == pwr_eType_Char && treat_char_array_as_string(type, size, format))
       return 1;
     break;
   case pwr_eType_Time:
@@ -5912,7 +5932,7 @@ int GeValue::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
     else
       annot_typeid = dyn_get_typeid(format);
 
-    if (!check_format(format, annot_typeid))
+    if (!check_format(format, annot_typeid, size))
     {
       char name[80];
 
@@ -5983,6 +6003,7 @@ int GeValue::scan(grow_tObject object)
 {
   char buf[120];
   int len = 0;
+  int cmp_size;
 
   if (!p)
     return 1;
@@ -5998,7 +6019,22 @@ int GeValue::scan(grow_tObject object)
       *(pwr_tNetStatus*)p = PWR__NETTIMEOUT;
   }
 
-  switch (annot_typeid)
+  if (treat_char_array_as_string(annot_typeid, size, format))
+  {
+    cmp_size = MIN(size, (int)sizeof(old_value));
+
+    if (!first_scan)
+    {
+      if (strncmp(old_value, (char*)p, cmp_size) == 0)
+        return 1;
+    }
+    else
+      first_scan = false;
+
+    memcpy(&old_value, p, cmp_size);
+    len = snprintf(buf, sizeof(buf), format, (char*)p);
+  }
+  else switch (annot_typeid)
   {
   case pwr_eType_Float32:
   {
@@ -6102,16 +6138,17 @@ int GeValue::scan(grow_tObject object)
   }
   case pwr_eType_String:
   case pwr_eType_Text:
+    cmp_size = MIN(size, (int)sizeof(old_value));
     if (!first_scan)
     {
-      if (strncmp(old_value, (char*)p, size) == 0)
+      if (strncmp(old_value, (char*)p, cmp_size) == 0)
         // No change since last time
         return 1;
     }
     else
       first_scan = false;
 
-    memcpy(&old_value, p, MIN(size, (int)sizeof(old_value)));
+    memcpy(&old_value, p, cmp_size);
 
     len = snprintf(buf, sizeof(buf), format, (char*)p);
     break;
@@ -6601,7 +6638,7 @@ int GeValue::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
     dyn->graph->syntax_msg('E', object, msg);
     (*error_cnt)++;
   }
-  else if (!check_format(format, attr_type))
+  else if (!check_format(format, attr_type, attr_size))
   {
     char msg[200];
 
@@ -6933,8 +6970,9 @@ int GeValueInput::change_value(grow_tObject object, char* text)
     sts = graph_attr_string_to_value(annot_typeid, "0", (void*)&buf, sizeof(buf), sizeof(buf));
   else
   {
-    if (annot_typeid == pwr_eType_String)
-      sts = graph_attr_string_to_value(annot_typeid, text, (void*)&buf, sizeof(buf), annot_size);
+    if (annot_typeid == pwr_eType_String ||
+        treat_char_array_as_string(annot_typeid, annot_size, value_element->format))
+      sts = graph_attr_string_to_value(pwr_eType_String, text, (void*)&buf, sizeof(buf), annot_size);
     else
       sts = graph_attr_string_to_value(annot_typeid, text, (void*)&buf, sizeof(buf), sizeof(buf));
   }
@@ -14687,7 +14725,7 @@ int GeTable::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
         (*error_cnt)++;
       }
 
-      else if (!check_format(format[i], attr_type))
+      else if (!check_format(format[i], attr_type, attr_size))
       {
         char msg[200];
 
