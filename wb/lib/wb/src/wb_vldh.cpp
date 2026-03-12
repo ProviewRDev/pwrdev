@@ -973,7 +973,10 @@ int vldh_wind_quit_all(vldh_t_wind wind)
   if (EVEN(sts))
     return sts;
 
-  if (!info.Empty) {
+  // Created windows already have an LDH object from vldh_wind_create().
+  // Always revert those sessions on quit so the transient subwindow object
+  // is removed even if the session doesn't report pending changes.
+  if ((wind->hw.status & VLDH_CREATE) != 0 || !info.Empty) {
     sts = ldh_RevertSession(wind->hw.ldhses);
     if (EVEN(sts))
       return sts;
