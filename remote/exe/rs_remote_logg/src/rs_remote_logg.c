@@ -35,19 +35,19 @@
  */
 
 /*************************************************************************
-*
-* 	PROGRAM		rs_remote_logg
-*
-*       Modifierad
-*		950301	Claes Sjöfors	Skapad
-*		010402	Claes Jurstrand	Qcom istf DMQ från v3.0b
-*		040630	Claes Jurstrand	v4.0.0
-*
-*
-*	Funktion:
-*		Tar emot transar med loggar från remote och loggar på fil.
-*
-**************************************************************************/
+ *
+ * 	PROGRAM		rs_remote_logg
+ *
+ *       Modifierad
+ *		950301	Claes SjÃ¶fors	Skapad
+ *		010402	Claes Jurstrand	Qcom istf DMQ frÃ¥n v3.0b
+ *		040630	Claes Jurstrand	v4.0.0
+ *
+ *
+ *	Funktion:
+ *		Tar emot transar med loggar frÃ¥n remote och loggar pÃ¥ fil.
+ *
+ **************************************************************************/
 
 /*_Include filer_________________________________________________________*/
 
@@ -72,27 +72,28 @@
 
 /*_Globala variabler______________________________________________________*/
 
-qcom_sQid remlogg_qid = { rs_pwr_logg_qix, 0 };
+qcom_sQid remlogg_qid = {rs_pwr_logg_qix, 0};
 qcom_sQattr remlogg_qattr;
 qcom_sGet remlogg_get;
 
 /* Global functions________________________________________________________*/
 
-#define LogAndExit(status)                                                     \
-  {                                                                            \
-    errh_CErrLog(REM__LOGGEXIT, errh_ErrArgMsg(status), NULL);                 \
-    exit(status);                                                              \
+#define LogAndExit(status)                                                                                   \
+  {                                                                                                          \
+    errh_CErrLog(REM__LOGGEXIT, errh_ErrArgMsg(status), NULL);                                               \
+    exit(status);                                                                                            \
   }
 
-#define Log(status1, status2)                                                  \
-  {                                                                            \
-    errh_CErrLog(status1, errh_ErrArgMsg(status2), NULL);                      \
+#define Log(status1, status2)                                                                                \
+  {                                                                                                          \
+    errh_CErrLog(status1, errh_ErrArgMsg(status2), NULL);                                                    \
   }
 
 #define LOGG_FILE_EXT ".log"
 #define LOGG_MAX_SIZE 32000
 
-typedef struct {
+typedef struct
+{
   pwr_tObjid objid;
   pwr_sClass_LoggConfig* loggconf;
   gdh_tDlid subid;
@@ -101,34 +102,33 @@ typedef struct {
   int wait_count;
 } logg_t_loggconf_list;
 
-typedef struct {
+typedef struct
+{
   logg_t_loggconf_list* loggconflist;
   int loggconf_count;
-} * logg_ctx;
+}* logg_ctx;
 
 /*_Local functions________________________________________________________*/
 static pwr_tStatus logg_loggconflist_add(logg_ctx loggctx, pwr_tObjid objid,
-    logg_t_loggconf_list** loggconflist, int* loggconflist_count);
+                                         logg_t_loggconf_list** loggconflist, int* loggconflist_count);
 static int logg_get_filename(char* inname, char* outname, char* ext);
-static pwr_tStatus logg_open_file(
-    logg_t_loggconf_list* conflist_ptr, int first_time);
+static pwr_tStatus logg_open_file(logg_t_loggconf_list* conflist_ptr, int first_time);
 static pwr_tStatus logg_print(logg_ctx loggctx, pwr_tUInt32 ident, char* msg);
-static pwr_tStatus logg_get_message(
-    logg_ctx loggctx, pwr_tUInt32* ident, char** msg);
+static pwr_tStatus logg_get_message(logg_ctx loggctx, pwr_tUInt32* ident, char** msg);
 static pwr_tStatus logg_init(logg_ctx loggctx);
 static pwr_tStatus logg_free_message(void);
 
 /****************************************************************************
-* Name:		exit_hdlr()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Called at exit
-*
-**************************************************************************/
+ * Name:		exit_hdlr()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Called at exit
+ *
+ **************************************************************************/
 void exit_hdlr()
 {
   gdh_DLUnrefObjectInfoAll();
@@ -136,34 +136,31 @@ void exit_hdlr()
 }
 
 /****************************************************************************
-* Name:		interrupt_hdlr()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Called at interrupt
-*
-**************************************************************************/
-void interrupt_hdlr()
-{
-  exit(0);
-}
+ * Name:		interrupt_hdlr()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Called at interrupt
+ *
+ **************************************************************************/
+void interrupt_hdlr() { exit(0); }
 
 /****************************************************************************
-* Name:		logg_loggconflist_add()
-*
-* Type		pwr_tStatus
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Add a conversion config object to the list.
-*
-**************************************************************************/
+ * Name:		logg_loggconflist_add()
+ *
+ * Type		pwr_tStatus
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Add a conversion config object to the list.
+ *
+ **************************************************************************/
 static pwr_tStatus logg_loggconflist_add(logg_ctx loggctx, pwr_tObjid objid,
-    logg_t_loggconf_list** loggconflist, int* loggconflist_count)
+                                         logg_t_loggconf_list** loggconflist, int* loggconflist_count)
 {
   logg_t_loggconf_list* loggconflist_ptr;
   logg_t_loggconf_list* new_loggconflist;
@@ -183,23 +180,25 @@ static pwr_tStatus logg_loggconflist_add(logg_ctx loggctx, pwr_tObjid objid,
 
   /* Check that identity is unique */
   loggconflist_ptr = *loggconflist;
-  for (i = 0; i < *loggconflist_count; i++) {
+  for (i = 0; i < *loggconflist_count; i++)
+  {
     if (loggconflist_ptr->loggconf->Identity == loggconf->Identity)
       return REM__DUPLIDENT;
     loggconflist_ptr++;
   }
 
-  if (*loggconflist_count == 0) {
+  if (*loggconflist_count == 0)
+  {
     *loggconflist = calloc(1, sizeof(logg_t_loggconf_list));
     if (*loggconflist == 0)
       return REM__NOMEMORY;
-  } else {
-    new_loggconflist
-        = calloc(*loggconflist_count + 1, sizeof(logg_t_loggconf_list));
+  }
+  else
+  {
+    new_loggconflist = calloc(*loggconflist_count + 1, sizeof(logg_t_loggconf_list));
     if (new_loggconflist == 0)
       return REM__NOMEMORY;
-    memcpy(new_loggconflist, *loggconflist,
-        *loggconflist_count * sizeof(logg_t_loggconf_list));
+    memcpy(new_loggconflist, *loggconflist, *loggconflist_count * sizeof(logg_t_loggconf_list));
     free(*loggconflist);
     *loggconflist = new_loggconflist;
   }
@@ -209,8 +208,8 @@ static pwr_tStatus logg_loggconflist_add(logg_ctx loggctx, pwr_tObjid objid,
   /* Direct link to the cell */
   memset(&attrref, 0, sizeof(attrref));
   attrref = cdh_ObjidToAref(objid);
-  sts = gdh_DLRefObjectInfoAttrref(&attrref,
-      (pwr_tAddress*)&loggconflist_ptr->loggconf, &loggconflist_ptr->subid);
+  sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&loggconflist_ptr->loggconf,
+                                   &loggconflist_ptr->subid);
   if (EVEN(sts))
     return sts;
 
@@ -220,17 +219,17 @@ static pwr_tStatus logg_loggconflist_add(logg_ctx loggctx, pwr_tObjid objid,
 }
 
 /*************************************************************************
-*
-* Name:		logg_get_filename
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Adderar extention till filname om det saknas.
-*
-**************************************************************************/
+ *
+ * Name:		logg_get_filename
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Adderar extention till filname om det saknas.
+ *
+ **************************************************************************/
 static int logg_get_filename(char* inname, char* outname, char* ext)
 {
   char* s;
@@ -242,13 +241,15 @@ static int logg_get_filename(char* inname, char* outname, char* ext)
   dcli_translate_filename(outname, inname);
 
   /* Look for extension in filename */
-  if (ext != NULL) {
+  if (ext != NULL)
+  {
     s = strrchr(outname, ':');
     if (s == 0)
       s = outname;
 
     s2 = strrchr(s, '>');
-    if (s2 == 0) {
+    if (s2 == 0)
+    {
       s2 = strrchr(s, ']');
       if (s2 == 0)
         s2 = s;
@@ -272,33 +273,33 @@ static int logg_get_filename(char* inname, char* outname, char* ext)
   memcpy(&comp_timestr[9], &timestr[12], 2);
   memcpy(&comp_timestr[11], &timestr[15], 2);
   comp_timestr[13] = 0;
-//	  strcat(outname, comp_timestr);
+  //	  strcat(outname, comp_timestr);
 
   return REM__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		logg_open_file
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Open current logg file and write a file header.
-*
-**************************************************************************/
+ *
+ * Name:		logg_open_file
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Open current logg file and write a file header.
+ *
+ **************************************************************************/
 
-static pwr_tStatus logg_open_file(
-    logg_t_loggconf_list* conflist_ptr, int first_time)
+static pwr_tStatus logg_open_file(logg_t_loggconf_list* conflist_ptr, int first_time)
 {
   int csts;
   char filename[80];
   pwr_tTime time;
   char timestr[80];
 
-  if (!first_time) {
+  if (!first_time)
+  {
     /* Check if it's time for a new try to open the file */
     conflist_ptr->wait_count++;
     if (conflist_ptr->wait_count < 10)
@@ -310,18 +311,21 @@ static pwr_tStatus logg_open_file(
   logg_get_filename(conflist_ptr->loggconf->LoggFile, filename, LOGG_FILE_EXT);
 
   conflist_ptr->outfile = fopen(filename, "a+");
-  if (conflist_ptr->outfile != NULL) {
+  if (conflist_ptr->outfile != NULL)
+  {
     /* Write a file header */
     time_GetTime(&time);
     time_AtoAscii(&time, time_eFormat_DateAndTime, timestr, sizeof(timestr));
-    csts = fprintf(
-        conflist_ptr->outfile, "RemLogg file opened at %s\n\n", timestr);
-    if (csts >= 0) {
+    csts = fprintf(conflist_ptr->outfile, "RemLogg file opened at %s\n\n", timestr);
+    if (csts >= 0)
+    {
       conflist_ptr->loggconf->FileOpenCount++;
       errh_CErrLog(REM__LOGGFILEOPEN, errh_ErrArgAF(filename), NULL);
       conflist_ptr->file_open = 1;
       return REM__SUCCESS;
-    } else {
+    }
+    else
+    {
       fclose(conflist_ptr->outfile);
     }
   }
@@ -330,17 +334,17 @@ static pwr_tStatus logg_open_file(
 }
 
 /*************************************************************************
-*
-* Name:		logg_print
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Skrivning av logg meddelande på fil.
-*
-**************************************************************************/
+ *
+ * Name:		logg_print
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Skrivning av logg meddelande pï¿½ fil.
+ *
+ **************************************************************************/
 
 static pwr_tStatus logg_print(logg_ctx loggctx, pwr_tUInt32 ident, char* msg)
 {
@@ -359,23 +363,30 @@ static pwr_tStatus logg_print(logg_ctx loggctx, pwr_tUInt32 ident, char* msg)
   found = 0;
   garbage_loggconf_found = 0;
   conflist_ptr = loggctx->loggconflist;
-  for (i = 0; i < loggctx->loggconf_count; i++) {
-    if (conflist_ptr->loggconf->Identity == 0) {
+  for (i = 0; i < loggctx->loggconf_count; i++)
+  {
+    if (conflist_ptr->loggconf->Identity == 0)
+    {
       /* This is the garbage loggfile */
       garbage_conflist_ptr = conflist_ptr;
       garbage_loggconf_found = 1;
     }
-    if (conflist_ptr->loggconf->Identity == ident) {
+    if (conflist_ptr->loggconf->Identity == ident)
+    {
       found = 1;
       break;
     }
     conflist_ptr++;
   }
-  if (!found) {
-    if (garbage_loggconf_found) {
+  if (!found)
+  {
+    if (garbage_loggconf_found)
+    {
       /* Write the logg on the garbage file */
       conflist_ptr = garbage_conflist_ptr;
-    } else {
+    }
+    else
+    {
       errh_CErrLog(REM__LOGGIDEN, NULL);
       return REM__SUCCESS;
     }
@@ -384,21 +395,27 @@ static pwr_tStatus logg_print(logg_ctx loggctx, pwr_tUInt32 ident, char* msg)
                   conflist_ptr->outfile);
           if (csts == 0)
   */
-  if (conflist_ptr->outfile) {
+  if (conflist_ptr->outfile)
+  {
     csts = fprintf(conflist_ptr->outfile, "%s\n", msg);
-    if (csts < 0) {
+    if (csts < 0)
+    {
       /* File error, close file and try to open it later */
       errh_CErrLog(REM__LOGGWRITE, NULL);
       fclose(conflist_ptr->outfile);
       conflist_ptr->file_open = 0;
-    } else {
+    }
+    else
+    {
       csts = fflush(conflist_ptr->outfile);
-      if (csts != 0) {
+      if (csts != 0)
+      {
         /* File error, close file and try to open it later */
         errh_CErrLog(REM__LOGGWRITE, NULL);
         fclose(conflist_ptr->outfile);
         conflist_ptr->file_open = 0;
-      } else
+      }
+      else
         conflist_ptr->loggconf->LoggCount++;
     }
   }
@@ -406,20 +423,19 @@ static pwr_tStatus logg_print(logg_ctx loggctx, pwr_tUInt32 ident, char* msg)
 }
 
 /*************************************************************************
-*
-* Name:		logg_get_message
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Reads message from qcom with timeout
-*
-**************************************************************************/
+ *
+ * Name:		logg_get_message
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Reads message from qcom with timeout
+ *
+ **************************************************************************/
 
-static pwr_tStatus logg_get_message(
-    logg_ctx loggctx, pwr_tUInt32* ident, char** msg)
+static pwr_tStatus logg_get_message(logg_ctx loggctx, pwr_tUInt32* ident, char** msg)
 {
   pwr_tStatus sts;
   unsigned int timeout = 200; /* 200 ms */
@@ -433,20 +449,26 @@ static pwr_tStatus logg_get_message(
     return REM__TIMEOUT;
   else if (EVEN(sts) || (sts == QCOM__QEMPTY))
     return sts;
-  else {
-    if (remlogg_get.type.b == qcom_eBtype_event) {
+  else
+  {
+    if (remlogg_get.type.b == qcom_eBtype_event)
+    {
       qcom_sEvent* ep = (qcom_sEvent*)remlogg_get.data;
       ini_mEvent new_event;
 
-      if (remlogg_get.type.s == qcom_cIini) {
+      if (remlogg_get.type.s == qcom_cIini)
+      {
         new_event.m = ep->mask;
-        if (new_event.b.terminate) {
+        if (new_event.b.terminate)
+        {
           exit(0);
         }
       }
       logg_free_message();
       return QCOM__QEMPTY;
-    } else {
+    }
+    else
+    {
       *ident = *(pwr_tUInt32*)remlogg_get.data;
       *msg = (char*)remlogg_get.data + sizeof(pwr_tUInt32);
     }
@@ -455,17 +477,17 @@ static pwr_tStatus logg_get_message(
 }
 
 /*************************************************************************
-*
-* Name:		logg_free_message
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Frees qcom message
-*
-**************************************************************************/
+ *
+ * Name:		logg_free_message
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Frees qcom message
+ *
+ **************************************************************************/
 
 static pwr_tStatus logg_free_message(void)
 {
@@ -481,17 +503,17 @@ static pwr_tStatus logg_free_message(void)
 }
 
 /*************************************************************************
-*
-* Name:		logg_init
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Initiering av loggfunktionen.
-*
-**************************************************************************/
+ *
+ * Name:		logg_init
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Initiering av loggfunktionen.
+ *
+ **************************************************************************/
 
 static pwr_tStatus logg_init(logg_ctx loggctx)
 {
@@ -502,10 +524,10 @@ static pwr_tStatus logg_init(logg_ctx loggctx)
 
   /* Get the logg config objects on this node */
   sts = gdh_GetClassList(pwr_cClass_LoggConfig, &objid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     /* Store and direct link the LoggConfig objects */
-    sts = logg_loggconflist_add(
-        loggctx, objid, &loggctx->loggconflist, &loggctx->loggconf_count);
+    sts = logg_loggconflist_add(loggctx, objid, &loggctx->loggconflist, &loggctx->loggconf_count);
     if (EVEN(sts))
       Log(REM__CONFINIT, sts);
 
@@ -514,7 +536,8 @@ static pwr_tStatus logg_init(logg_ctx loggctx)
 
   /* Open the files */
   conflist_ptr = loggctx->loggconflist;
-  for (i = 0; i < loggctx->loggconf_count; i++) {
+  for (i = 0; i < loggctx->loggconf_count; i++)
+  {
     sts = logg_open_file(conflist_ptr, 1);
     conflist_ptr++;
   }
@@ -555,13 +578,15 @@ int main()
 
   /* Create the remlogg queue */
 
-  if (!qcom_CreateQ(&sts, &remlogg_qid, &remlogg_qattr, "Logg")) {
+  if (!qcom_CreateQ(&sts, &remlogg_qid, &remlogg_qattr, "Logg"))
+  {
     LogAndExit(sts);
   }
 
   /* Bind it to rt_ini event-queue */
 
-  if (!qcom_Bind(&sts, &remlogg_qid, &qcom_cQini)) {
+  if (!qcom_Bind(&sts, &remlogg_qid, &qcom_cQini))
+  {
     errh_Fatal("qcom_Bind, %m", sts);
     //          errh_SetStatus( PWR__SRVTERM);
     exit(-1);
@@ -575,28 +600,37 @@ int main()
   if (EVEN(sts))
     LogAndExit(sts);
 
-  for (;;) {
+  for (;;)
+  {
     /* Get logg message */
     sts = logg_get_message(loggctx, &ident, &msg);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       Log(REM__LOGGRCV, sts);
-    } else if (sts != REM__TIMEOUT) {
+    }
+    else if (sts != REM__TIMEOUT)
+    {
       logg_print(loggctx, ident, msg);
       sts = logg_free_message();
     }
 
     /* Check if its time to open any file... */
     conflist_ptr = loggctx->loggconflist;
-    for (i = 0; i < loggctx->loggconf_count; i++) {
-      if (conflist_ptr->loggconf->NewVersion) {
+    for (i = 0; i < loggctx->loggconf_count; i++)
+    {
+      if (conflist_ptr->loggconf->NewVersion)
+      {
         conflist_ptr->loggconf->NewVersion = 0;
-        if (conflist_ptr->file_open) {
+        if (conflist_ptr->file_open)
+        {
           if (conflist_ptr->outfile)
             fclose(conflist_ptr->outfile);
           conflist_ptr->file_open = 0;
           sts = logg_open_file(conflist_ptr, 1);
         }
-      } else if (!conflist_ptr->file_open) {
+      }
+      else if (!conflist_ptr->file_open)
+      {
         sts = logg_open_file(conflist_ptr, 0);
       }
       conflist_ptr++;

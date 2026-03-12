@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -41,10 +41,10 @@
 
 #include "xtt_clog.h"
 
-class CLogGtk : public CLog {
+class CLogGtk : public CLog
+{
 public:
-  CLogGtk(void* clog_parent_ctx, GtkWidget* clog_parent_wid,
-      const char* clog_name, pwr_tStatus* status);
+  CLogGtk(void* clog_parent_ctx, GtkWidget* clog_parent_wid, const char* clog_name, pwr_tStatus* status);
   ~CLogGtk();
 
   GtkWidget* parent_wid;
@@ -52,27 +52,27 @@ public:
   GtkWidget* toplevel;
   GtkWidget* form_clog;
   GtkWidget* clognav_widget;
-  GtkWidget* filter_form;
-  GtkWidget* show_success_w;
-  GtkWidget* show_info_w;
-  GtkWidget* show_warning_w;
-  GtkWidget* show_error_w;
-  GtkWidget* show_fatal_w;
-  GtkWidget* show_text_w;
-  GtkWidget* filter_string_w;
   GtkWidget* filesel_form;
   GtkWidget* filesel_list_w;
   GdkCursor* clock_cursor;
+
+  // Toolbar widgets
+  GtkWidget* toolbar;
+  GtkWidget* filter_entry;
+  GtkWidget* success_toggle;
+  GtkWidget* info_toggle;
+  GtkWidget* warning_toggle;
+  GtkWidget* error_toggle;
+  GtkWidget* fatal_toggle;
+  GtkWidget* text_toggle;
 
   void pop();
   void set_clock_cursor();
   void reset_cursor();
   void free_cursor();
-  void create_filter_dialog();
   void print();
 
-  static gboolean action_inputfocus(
-      GtkWidget* w, GdkEvent* event, gpointer data);
+  static gboolean action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data);
   static void activate_exit(GtkWidget* w, gpointer data);
   static void activate_select_file(GtkWidget* w, gpointer data);
   static void activate_next_file(GtkWidget* w, gpointer data);
@@ -82,13 +82,14 @@ public:
   static void activate_zoom_in(GtkWidget* w, gpointer data);
   static void activate_zoom_out(GtkWidget* w, gpointer data);
   static void activate_zoom_reset(GtkWidget* w, gpointer data);
-  static void activate_filter(GtkWidget* w, gpointer data);
   static void activate_help(GtkWidget* w, gpointer data);
   static void activate_helpmsg(GtkWidget* w, gpointer data);
-  static void filter_ok_cb(GtkWidget* w, gpointer data);
-  static void filter_apply_cb(GtkWidget* w, gpointer data);
-  static void filter_cancel_cb(GtkWidget* w, gpointer data);
   static void file_selected_cb(void* ctx, char* text, int ok_pressed);
+
+  // Toolbar callbacks
+  static void toolbar_apply_filter(GtkWidget* w, gpointer data);
+  static void toolbar_clear_filter(GtkWidget* w, gpointer data);
+  static void toolbar_filter_entry_activate(GtkWidget* w, gpointer data);
 };
 
 #endif

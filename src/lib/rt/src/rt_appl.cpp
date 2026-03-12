@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -41,18 +41,17 @@
 /*! \file rt_appl.cpp
     \brief Functions for the rt_appl class. */
 
-
 #include "rt_appl.h"
 #include "rt_gdh.h"
 #include "rt_aproc.h"
 #include "rt_pwr_msg.h"
 #include "rt_qcom_msg.h"
+#include "rt_errh.h"
 #include "rt_ini_event.h"
 #include "co_error.h"
 #include "pwr_baseclasses.h"
 
-rt_appl::rt_appl(
-    const char* name, errh_eAnix anix, double scantime, qcom_sQid qid)
+rt_appl::rt_appl(const char* name, errh_eAnix anix, double scantime, qcom_sQid qid)
     : m_anix(anix), m_scantime(scantime), m_maxdelay(5), m_qid(qid)
 {
   strcpy(m_name, name);
@@ -70,14 +69,16 @@ void rt_appl::init()
 
   // Init database
   sts = gdh_Init("rs_appl");
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("gdh_Init, %m", sts);
     errh_SetStatus(PWR__APPLTERM);
     exit(sts);
   }
 
   // Create a queue to receive stop and restart events
-  if (!qcom_Init(&sts, 0, "rs_appl")) {
+  if (!qcom_Init(&sts, 0, "rs_appl"))
+  {
     errh_Fatal("qcom_Init, %m", sts);
     errh_SetStatus(PWR__APPLTERM);
     exit(sts);
@@ -85,14 +86,16 @@ void rt_appl::init()
 
   qAttr.type = qcom_eQtype_private;
   qAttr.quota = 100;
-  if (!qcom_CreateQ(&sts, &m_qid, &qAttr, "events")) {
+  if (!qcom_CreateQ(&sts, &m_qid, &qAttr, "events"))
+  {
     errh_Fatal("qcom_CreateQ, %m", sts);
     errh_SetStatus(PWR__APPLTERM);
     exit(sts);
   }
 
   qini = qcom_cQini;
-  if (!qcom_Bind(&sts, &m_qid, &qini)) {
+  if (!qcom_Bind(&sts, &m_qid, &qini))
+  {
     errh_Fatal("qcom_Bind(Qini), %m", sts);
     errh_SetStatus(PWR__APPLTERM);
     exit(-1);
@@ -125,9 +128,12 @@ void rt_appl::mainloop()
   int swap = 0;
   bool first_scan = true;
 
-  try {
+  try
+  {
     open();
-  } catch (co_error& e) {
+  }
+  catch (co_error& e)
+  {
     errh_Error((char*)e.what().c_str());
     errh_Fatal("rs_appl aborting");
     errh_SetStatus(PWR__APPLTERM);
@@ -138,33 +144,44 @@ void rt_appl::mainloop()
   errh_SetStatus(PWR__ARUN);
 
   first_scan = true;
-  for (;;) {
-    if (first_scan) {
+  for (;;)
+  {
+    if (first_scan)
+    {
       tmo = (int)(m_scantime * 1000 - 1);
     }
 
     get.maxSize = sizeof(mp);
     get.data = mp;
     qcom_Get(&sts, &m_qid, &get, tmo);
-    if (sts == QCOM__TMO || sts == QCOM__QEMPTY) {
-      if (!swap) {
+    if (sts == QCOM__TMO || sts == QCOM__QEMPTY)
+    {
+      if (!swap)
+      {
         aproc_TimeStamp(m_scantime, m_maxdelay);
         scan();
       }
-    } else {
+    }
+    else
+    {
       ini_mEvent new_event;
       qcom_sEvent* ep = (qcom_sEvent*)get.data;
 
       new_event.m = ep->mask;
-      if (new_event.b.oldPlcStop && !swap) {
+      if (new_event.b.oldPlcStop && !swap)
+      {
         errh_SetStatus(PWR__APPLRESTART);
         swap = 1;
         close();
-      } else if (new_event.b.swapDone && swap) {
+      }
+      else if (new_event.b.swapDone && swap)
+      {
         swap = 0;
         open();
         errh_SetStatus(PWR__ARUN);
-      } else if (new_event.b.terminate) {
+      }
+      else if (new_event.b.terminate)
+      {
         exit(0);
       }
     }
@@ -172,33 +189,16 @@ void rt_appl::mainloop()
   }
 }
 
-double rt_appl::scantime()
-{
-  return m_scantime;
-}
+double rt_appl::scantime() { return m_scantime; }
 
-void rt_appl::set_scantime(double time)
-{
-  m_scantime = time;
-}
+void rt_appl::set_scantime(double time) { m_scantime = time; }
 
-pwr_tOid& rt_appl::apploid()
-{
-  return m_apploid;
-}
+pwr_tOid& rt_appl::apploid() { return m_apploid; }
 
-void rt_appl::open()
-{
-}
+void rt_appl::open() {}
 
-void rt_appl::close()
-{
-}
+void rt_appl::close() {}
 
-void rt_appl::scan()
-{
-}
+void rt_appl::scan() {}
 
-rt_appl::~rt_appl()
-{
-}
+rt_appl::~rt_appl() {}

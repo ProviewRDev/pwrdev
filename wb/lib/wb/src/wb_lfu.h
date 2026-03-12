@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -48,8 +48,7 @@ extern "C" {
 #endif
 
 typedef enum {
-  lfu_mDistrOpt_NoRootVolume = 1 << 0,
-  lfu_mDistrOpt_RSH = 1 << 1
+  lfu_mDistrOpt_NoRootVolume = 1 << 0
 } lfu_mDistrOpt;
 
 typedef enum {

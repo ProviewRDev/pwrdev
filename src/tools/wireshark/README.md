@@ -1,0 +1,57 @@
+
+Wireshark dissectors for Proview
+
+Built for Wireshark 4.4.14.
+
+This directory contains the subdirectories qcom and redcom that contains files to build 
+the wireshark dissectors for QCom and RedCom.
+
+For QCom there is also a Lua dissector available in
+`packet-qcom.lua`. It can be loaded by stock Wireshark builds, for
+example the Debian package, without rebuilding Wireshark.
+
+Build QCom and Redcom dissectors
+--------------------------------
+
+1. Download the wireshark source code and go to the root directory.
+
+2. Read doc/README.plugins and doc/README.developer on the wireshark directory.
+
+3. Create the directory plugins/epan/qcom and copy the files on 
+   $pwre_croot/src/tools/wireshark/qcom to this directory.
+   respectively.
+
+4. Create the directory plugins/epan/redcom and copy the files on 
+   $pwre_croot/src/tools/wireshark/redcom to this directory.
+
+5. Edit ./CMakeLists.txt files and add qcom and redcom analog to the gryphon dissector
+
+6. Build wireshark
+
+   Install dependencies
+   > sudo ./tools/debian-setup.sh --install-deb-deps
+
+   Build
+   > mkdir build
+   > cd build
+   > cmake ..
+   > make
+
+   Install
+   > sudo make install
+
+9. To run wireshark, define PWR_BUS_ID and run wireshark as root
+   > export PWR_BUS_ID=999
+   > wireshark
+
+   Specify filter 'qcom' and start capturing.
+
+10. Build debian package.
+
+   From wireshark root directory
+
+   > ln -snf packaging/debian
+   > export DEB_BUILD_OPTIONS="nocheck"
+   > dpkg-buildpackage -b -us -uc -jauto
+
+  

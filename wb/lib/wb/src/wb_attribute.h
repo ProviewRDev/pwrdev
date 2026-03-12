@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -39,37 +39,132 @@
 
 #include "wb_object.h"
 
-/*
-  class wb_attribute {
-  void *value;
-
-  ...
-
-
-  wb_attribute::~wb_attribute() {
-  if (value != 0)
-  free value;
-*/
+/**
+ * @file wb_attribute.h
+ * @brief Workbench attribute representation and manipulation
+ *
+ * This file defines the wb_attribute class, which provides access to object
+ * attributes in the ProviewR workbench. Attributes are accessed through a
+ * layered representation system that abstracts database storage details.
+ *
+ * @section arch Architecture Overview
+ *
+ * The workbench uses a multi-layered representation system:
+ *
+ * @code
+ * wb_attribute (API layer - user interface)
+ *      ↓
+ * wb_adrep (Attribute Definition Representation - metadata)
+ *      ↓
+ * wb_orep (Object Representation - object abstraction)
+ *      ↓
+ * wb_vrep (Volume Representation - storage backend)
+ *      ↓
+ * .dbs/.db files (Persistent storage - Berkeley DB or other)
+ * @endcode
+ *
+ * @subsection vrep Volume Representation (wb_vrep)
+ * Base class for volume storage backends. Implementations include:
+ * - wb_vrepdb:   Berkeley DB backend (.db files) - for runtime volumes
+ * - wb_vrepdbs:  Class definition storage (.dbs files) - compiled class metadata
+ * - wb_vrepwbl:  Workbench Load format (.wb_load files) - human-readable source
+ * - wb_vrepmem:  In-memory representation for temporary objects
+ *
+ * @subsection orep Object Representation (wb_orep)
+ * Abstract interface to an object in a volume. Provides navigation
+ * (parent, children, siblings) and access to object metadata (OID, CID, name).
+ * Different vrep types have corresponding orep implementations (orepdbs, orepwbl, etc.)
+ *
+ * @subsection adrep Attribute Definition Representation (wb_adrep)
+ * Represents an attribute definition from a class. Contains metadata like:
+ * - Size, offset, type
+ * - Array dimensions
+ * - Flags (pointer, array, class, etc.)
+ * - Type ID and program name
+ *
+ * @section loading Loading Process
+ *
+ * When opening a volume:
+ * 1. Volume file (.db or .dbs) is opened → wb_vrep created
+ * 2. Class definitions are loaded from .dbs files → wb_merep (class repository)
+ * 3. When accessing an object → wb_orep created (references vrep)
+ * 4. When accessing attribute → wb_attribute created (references orep + adrep)
+ * 5. Calling value() reads actual data from database through vrep→orep→adrep chain
+ *
+ * @section storage Database Storage
+ *
+ * Berkeley DB (.db files) store:
+ * - ohead: Object headers (OID, CID, name, body sizes, timestamps)
+ * - rbody: Runtime bodies (actual attribute data for pwr_eBix_rt)
+ * - dbody: Development bodies (actual attribute data for pwr_eBix_dev)
+ *
+ * Class files (.dbs) store:
+ * - Compiled class definitions
+ * - Attribute metadata (sizes, offsets, types)
+ * - Body templates
+ *
+ * @section memory Memory Management
+ *
+ * Reference counting is used throughout:
+ * - wb_attribute holds references to m_orep and m_adrep
+ * - Calling ref() increments counter
+ * - Calling unref() or destructor decrements counter
+ * - Object destroyed when count reaches zero
+ */
 
 class wb_adrep;
 class wb_orep;
 
-class wb_attribute : public wb_status {
+/**
+ * @class wb_attribute
+ * @brief High-level API for accessing and manipulating object attributes
+ *
+ * Provides a user-friendly interface to object attributes, hiding the complexity
+ * of the underlying representation system. Handles automatic memory management
+ * through reference counting.
+ */
+class wb_attribute : public wb_status
+{
+  /** @brief Object representation this attribute belongs to (ref-counted) */
   wb_orep* m_orep;
+
+  /** @brief Attribute definition from class (ref-counted, NULL for whole body) */
   wb_adrep* m_adrep;
 
+  /** @brief Size of attribute in bytes (from class definition) */
   size_t m_size;
+
+  /** @brief Offset of attribute within object body */
   size_t m_offset;
-  int m_idx; // -1 if whole array, only valid for arrays
+
+  /** @brief Array index (-1 = whole array, ≥0 = specific element) */
+  int m_idx;
+
+  /** @brief Type identifier for the attribute */
   pwr_tTid m_tid;
+
+  /** @brief Original type before any conversions/casts */
   pwr_tTid m_original_tid;
+
+  /** @brief Number of elements (1 for scalar, >1 for array) */
   int m_elements;
+
+  /** @brief Flag indicating if this is an array element (not whole array) */
   int m_is_elem;
+
+  /** @brief Base type (Int32, Float32, String, etc.) */
   pwr_eType m_type;
+
+  /** @brief Attribute flags (PWR_MASK_CLASS, PWR_MASK_ARRAY, PWR_MASK_POINTER, etc.) */
   int m_flags;
 
-  pwr_eBix m_bix; // Used when sub class
+  /** @brief Body index (rt=runtime, dev=development) when accessing subclass bodies */
+  pwr_eBix m_bix;
+
+  /** @brief Cached body data (allocated by value(), freed by destructor) */
   void* m_body;
+
+  /** @brief True if attribute is shadowed by a subclass */
   bool m_shadowed;
 
 public:
@@ -79,36 +174,20 @@ public:
   wb_attribute(pwr_tStatus, wb_orep*, wb_adrep*, int idx = -1);
   wb_attribute(pwr_tStatus, wb_orep*, const char* bname);
   wb_attribute(pwr_tStatus, wb_orep*, const char* bname, const char* aname);
-  wb_attribute(
-      const wb_attribute& pa, int pidx, const char* aname, int aidx = 0);
+  wb_attribute(const wb_attribute& pa, int pidx, const char* aname, int aidx = 0);
 
   ~wb_attribute();
   wb_attribute& operator=(const wb_attribute&);
-  operator bool() const
-  {
-    return oddSts();
-  }
-  operator wb_orep*() const
-  {
-    return m_orep;
-  }
+  operator bool() const { return oddSts(); }
+  operator wb_orep*() const { return m_orep; }
 
   bool operator==(const wb_attribute&) const;
 
   // wb_object& operator=(const wb_orep&);
 
-  bool isClass() const
-  {
-    return (m_flags & PWR_MASK_CLASS || m_flags & PWR_MASK_BUFFER);
-  }
-  bool isSuperClass() const
-  {
-    return (m_flags & PWR_MASK_CLASS && m_flags & PWR_MASK_SUPERCLASS);
-  }
-  bool isArray() const
-  {
-    return (m_flags & PWR_MASK_ARRAY);
-  }
+  bool isClass() const { return (m_flags & PWR_MASK_CLASS || m_flags & PWR_MASK_BUFFER); }
+  bool isSuperClass() const { return (m_flags & PWR_MASK_CLASS && m_flags & PWR_MASK_SUPERCLASS); }
+  bool isArray() const { return (m_flags & PWR_MASK_ARRAY); }
 
   pwr_tOid aoid() const; // get objects object id
   pwr_sAttrRef aref() const;
@@ -150,27 +229,12 @@ public:
   void name(const char* name);
   void name(wb_name* name);
   const char* attrName() const;
-  bool isShadowed()
-  {
-    return m_shadowed;
-  }
-  void setShadowed(bool shadowed)
-  {
-    m_shadowed = shadowed;
-  }
+  bool isShadowed() { return m_shadowed; }
+  void setShadowed(bool shadowed) { m_shadowed = shadowed; }
 
-  pwr_tStatus sts() const
-  {
-    return m_sts;
-  }
-  wb_adrep* adrep()
-  {
-    return m_adrep;
-  }
-  void addFlagsDisableAttr()
-  {
-    m_flags |= PWR_MASK_DISABLEATTR;
-  }
+  pwr_tStatus sts() const { return m_sts; }
+  wb_adrep* adrep() { return m_adrep; }
+  void addFlagsDisableAttr() { m_flags |= PWR_MASK_DISABLEATTR; }
   void castId(pwr_tCastId* castid);
   pwr_tDisableAttr disabled();
   pwr_tCid adefCid();

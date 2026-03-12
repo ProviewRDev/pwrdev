@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -88,11 +88,11 @@ void NodelistNavBrow::create_nodeclasses()
   brow_AddAnnotPixmap(nc_node, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddFilledRect(nc_node, 1.3, 0.15, 0.4, 0.4, flow_eDrawType_DarkGray);
   brow_AddRect(nc_node, 1.3, 0.15, 0.4, 0.4, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_node, 2.2, 0.6, 0, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_node, 2.2, 0.6, 0, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_node, 8, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_node, 8, 0.6, 1, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_node, 25, 0.6, 2, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_node, 25, 0.6, 2, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_node, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
@@ -100,9 +100,9 @@ void NodelistNavBrow::create_nodeclasses()
 
   brow_CreateNodeClass(ctx, "Attr", flow_eNodeGroup_Common, &nc_attr);
   brow_AddAnnotPixmap(nc_attr, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_attr, 2.2, 0.6, 0, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_attr, 2.2, 0.6, 0, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_attr, 8, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_attr, 8, 0.6, 1, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_attr, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 
@@ -114,9 +114,9 @@ void NodelistNavBrow::create_nodeclasses()
   brow_AddFilledRect(
       nc_sys_sts_attr, 1.3, 0.15, 0.4, 0.4, flow_eDrawType_DarkGray);
   brow_AddRect(nc_sys_sts_attr, 1.3, 0.15, 0.4, 0.4, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_sys_sts_attr, 2.2, 0.6, 0, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_sys_sts_attr, 2.2, 0.6, 0, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_sys_sts_attr, 8, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_sys_sts_attr, 8, 0.6, 1, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 1);
   brow_AddFrame(
       nc_sys_sts_attr, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
@@ -127,11 +127,11 @@ void NodelistNavBrow::create_nodeclasses()
   brow_AddAnnotPixmap(nc_sts_attr, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddFilledRect(nc_sts_attr, 1.3, 0.15, 0.4, 0.4, flow_eDrawType_DarkGray);
   brow_AddRect(nc_sts_attr, 1.3, 0.15, 0.4, 0.4, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_sts_attr, 2.2, 0.6, 0, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_sts_attr, 2.2, 0.6, 0, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_sts_attr, 5, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_sts_attr, 5, 0.6, 1, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_sts_attr, 10, 0.6, 2, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_sts_attr, 10, 0.6, 2, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_sts_attr, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 }

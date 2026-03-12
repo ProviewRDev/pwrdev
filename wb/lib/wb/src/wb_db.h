@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -42,25 +42,116 @@
 
 class wb_name;
 
+/**
+ * @file wb_db.h
+ * @brief Berkeley DB wrapper for ProviewR workbench volumes
+ *
+ * Provides C++ abstraction over Berkeley DB storage for volume data.
+ * Runtime volumes (.db files) use this backend to persist object instances.
+ *
+ * @section db_file_structure Database File Structure
+ *
+ * Each .db file (e.g., $pwrp_db/v_myvolume.db) contains multiple tables:
+ *
+ * - **ohead**: Object metadata (db_sObject entries, key=oid)
+ * - **rbody**: Runtime body data (key=oid, value=binary blob)
+ * - **dbody**: Devbody data (key=oid, value=binary blob)
+ * - **class**: Cached class metadata from .dbs files (chead entries)
+ * - **name**: Name → OID lookup index
+ * - **info**: Volume metadata (vid, cid, name, timestamp)
+ *
+ * @section berkeley_db_tables Berkeley DB Table Usage
+ *
+ * @subsection ohead_table ohead Table
+ * Stores object headers (metadata):
+ * @code
+ * Key: pwr_tOid (8 bytes: VID+OIX)
+ * Value: db_sObject struct:
+ *   - oid, cid, poid (identity and class)
+ *   - name, normname (object name and normalized)
+ *   - time (object header timestamp)
+ *   - boid, aoid, foid, loid (hierarchy links)
+ *   - flags (object flags)
+ *   - body[0].time, body[0].size (RtBody info)
+ *   - body[1].time, body[1].size (DevBody info)
+ * @endcode
+ *
+ * @subsection rbody_dbody_tables rbody/dbody Tables
+ * Store actual attribute data as binary blobs:
+ * @code
+ * Key: pwr_tOid (8 bytes)
+ * Value: Binary attribute data (size from ohead.body[bix].size)
+ *
+ * Example read:
+ * 1. ohead.get(oid) → body[0].size = 1024 bytes
+ * 2. rbody.get(oid) → returns 1024-byte blob
+ * 3. Cast blob to class body struct based on cid
+ * @endcode
+ *
+ * @subsection class_table class Table (chead)
+ * Cached class metadata from .dbs files:
+ * @code
+ * Key: pwr_tCid
+ * Value: dbs_sClass struct (class definition metadata)
+ *
+ * Updated when:
+ * - Volume first created (copies from .dbs)
+ * - "Update Classes" operation (wb_merep::checkFiles)
+ * @endcode
+ *
+ * @section transactions Transaction Support
+ *
+ * wb_db uses Berkeley DB transactions for atomicity:
+ * @code
+ * wb_db_txn* txn = db.begin(NULL);
+ *
+ * wb_db_ohead o(&db, txn, oid);
+ * o.name("NewName");
+ * o.put(txn);
+ *
+ * db.commit();  // or db.abort() to rollback
+ * @endcode
+ */
+
 #pragma pack(push)
 #pragma pack(4)
-typedef struct {
-  pwr_tOid oid; /**< object identifier */
-  pwr_tCid cid; /**< class identifier */
-  pwr_tOid poid; /**< object identifier of parent */
-  pwr_tObjName name; /**< name of object */
-  pwr_tObjName normname; /**< normalized object name. */
-  pwr_tTime time; /**< time of last change in object header */
-  pwr_tOid boid; /**< object before this object. */
-  pwr_tOid aoid; /**< object after this object. */
-  pwr_tOid foid; /**< first child object. */
-  pwr_tOid loid; /**< last child object. */
+/**
+ * @struct db_sObject
+ * @brief Object header record stored in ohead table
+ *
+ * Contains all object metadata except attribute bodies. Hierarchy is
+ * represented by parent/sibling/child OID links (poid/boid/aoid/foid/loid).
+ *
+ * Body size fields are CRITICAL for memory allocation - must match class
+ * definition to prevent buffer overflows. See wb_vrepdb::checkClass() for
+ * size validation during "Update Classes" operations.
+ */
+typedef struct
+{
+  pwr_tOid oid;          /**< Object identifier (unique within volume) */
+  pwr_tCid cid;          /**< Class identifier (what class this instantiates) */
+  pwr_tOid poid;         /**< Parent object identifier (pwr_cNOid if root) */
+  pwr_tObjName name;     /**< Object name (original case) */
+  pwr_tObjName normname; /**< Normalized name (lowercase, for lookups) */
+  pwr_tTime time;        /**< Object header timestamp (structure changes) */
+  pwr_tOid boid;         /**< Before sibling (previous in parent's child list) */
+  pwr_tOid aoid;         /**< After sibling (next in parent's child list) */
+  pwr_tOid foid;         /**< First child object (pwr_cNOid if no children) */
+  pwr_tOid loid;         /**< Last child object (pwr_cNOid if no children) */
 
-  pwr_mClassDef flags;
-  struct {
-    pwr_tTime time;
-    pwr_tUInt32 size;
-  } body[2]; /**< bodies */
+  pwr_mClassDef flags; /**< Object flags (System, DevOnly, etc.) */
+
+  /**
+   * @brief Body metadata for RtBody (index 0) and DevBody (index 1)
+   *
+   * CRITICAL: size fields must match class definition body sizes.
+   * Buffer overflow if: allocated_size < stored_size in database.
+   */
+  struct
+  {
+    pwr_tTime time;   /**< Body modification timestamp */
+    pwr_tUInt32 size; /**< Body size in bytes (from class definition) */
+  } body[2];
 } db_sObject;
 #pragma pack(pop)
 
@@ -70,41 +161,41 @@ class wb_destination;
 
 #define wb_db_txn DbTxn
 
-class wb_db : public wb_import {
+/**
+ * @class wb_db
+ * @brief Berkeley DB database wrapper for volume persistence
+ *
+ * Manages a single .db file containing a volume's objects. Provides
+ * transaction-safe operations for creating, reading, updating, and
+ * deleting objects and their attributes.
+ */
+class wb_db : public wb_import
+{
 public:
-  pwr_tVid m_vid;
-  pwr_tCid m_cid;
-  pwr_tObjName m_volumeName;
-  char m_fileName[512];
+  pwr_tVid m_vid;            /**< Volume ID this database represents */
+  pwr_tCid m_cid;            /**< Volume class ID */
+  pwr_tObjName m_volumeName; /**< Volume name */
+  char m_fileName[512];      /**< Full path to .db file */
 
-  DbEnv* m_env;
-  Db* m_t_ohead;
-  Db* m_t_rbody;
-  Db* m_t_dbody;
-  Db* m_t_class;
-  Db* m_t_name;
-  Db* m_t_info;
+  DbEnv* m_env;  /**< Berkeley DB environment */
+  Db* m_t_ohead; /**< Object header table (db_sObject) */
+  Db* m_t_rbody; /**< Runtime body table (binary blobs) */
+  Db* m_t_dbody; /**< Devbody table (binary blobs) */
+  Db* m_t_class; /**< Cached class metadata (chead) */
+  Db* m_t_name;  /**< Name → OID index */
+  Db* m_t_info;  /**< Volume metadata */
 
-  wb_db_txn* m_txn;
+  wb_db_txn* m_txn; /**< Current transaction (or NULL) */
 
 public:
   wb_db();
   wb_db(pwr_tVid vid);
   //~wb_db();
 
-  pwr_tCid cid()
-  {
-    return m_cid;
-  }
-  pwr_tVid vid()
-  {
-    return m_vid;
-  }
+  pwr_tCid cid() { return m_cid; }
+  pwr_tVid vid() { return m_vid; }
   // pwr_tTime time() { return m_volume.time;}
-  char* volumeName()
-  {
-    return m_volumeName;
-  }
+  char* volumeName() { return m_volumeName; }
 
   pwr_tOid new_oid(wb_db_txn* txn);
   pwr_tOid new_oid(wb_db_txn* txn, pwr_tOid oid);
@@ -114,8 +205,7 @@ public:
   void openDb(bool useTxn);
 
   void copy(wb_export& e, const char* fileName);
-  void create(
-      pwr_tVid vid, pwr_tCid cid, const char* volumeName, const char* fileName);
+  void create(pwr_tVid vid, pwr_tCid cid, const char* volumeName, const char* fileName);
 
   int del_family(wb_db_txn* txn, Dbc* cp, pwr_tOid poid);
 
@@ -135,28 +225,26 @@ public:
 
   bool importVolume(wb_export& e);
 
-  bool importHead(pwr_tOid oid, pwr_tCid cid, pwr_tOid poid, pwr_tOid boid,
-      pwr_tOid aoid, pwr_tOid foid, pwr_tOid loid, const char* name,
-      const char* normname, pwr_mClassDef flags, pwr_tTime ohTime,
-      pwr_tTime rbTime, pwr_tTime dbTime, size_t rbSize, size_t dbSize);
+  bool importHead(pwr_tOid oid, pwr_tCid cid, pwr_tOid poid, pwr_tOid boid, pwr_tOid aoid, pwr_tOid foid,
+                  pwr_tOid loid, const char* name, const char* normname, pwr_mClassDef flags,
+                  pwr_tTime ohTime, pwr_tTime rbTime, pwr_tTime dbTime, size_t rbSize, size_t dbSize);
 
   bool importRbody(pwr_tOid oid, size_t size, void* body);
 
   bool importDbody(pwr_tOid oid, size_t size, void* body);
 
-  bool importDocBlock(pwr_tOid oid, size_t size, char* block)
-  {
-    return true;
-  }
+  bool importDocBlock(pwr_tOid oid, size_t size, char* block) { return true; }
 
   bool importMeta(dbs_sMenv* mep);
 
   void checkClassList(pwr_tOid oid, pwr_tCid cid, bool update);
 };
 
-class wb_db_info {
+class wb_db_info
+{
 public:
-  struct {
+  struct
+  {
     pwr_tVid vid;
     pwr_tCid cid;
     pwr_tTime time;
@@ -174,39 +262,19 @@ public:
   void put(wb_db_txn* txn);
   void get(wb_db_txn* txn);
 
-  pwr_tCid cid()
-  {
-    return m_volume.cid;
-  }
-  pwr_tVid vid()
-  {
-    return m_volume.vid;
-  }
-  pwr_tTime time()
-  {
-    return m_volume.time;
-  }
-  char* name()
-  {
-    return m_volume.name;
-  }
+  pwr_tCid cid() { return m_volume.cid; }
+  pwr_tVid vid() { return m_volume.vid; }
+  pwr_tTime time() { return m_volume.time; }
+  char* name() { return m_volume.name; }
 
-  void cid(pwr_tCid cid)
-  {
-    m_volume.cid = cid;
-  }
-  void vid(pwr_tVid vid)
-  {
-    m_volume.vid = vid;
-  }
-  void time(pwr_tTime time)
-  {
-    m_volume.time = time;
-  }
+  void cid(pwr_tCid cid) { m_volume.cid = cid; }
+  void vid(pwr_tVid vid) { m_volume.vid = vid; }
+  void time(pwr_tTime time) { m_volume.time = time; }
   void name(char const* name);
 };
 
-class wb_db_ohead {
+class wb_db_ohead
+{
 public:
   db_sObject m_o;
   pwr_tOid m_oid;
@@ -221,153 +289,58 @@ public:
   wb_db_ohead(wb_db* db);
   wb_db_ohead(wb_db* db, pwr_tOid oid);
   wb_db_ohead(wb_db* db, wb_db_txn* txn, pwr_tOid oid);
-  wb_db_ohead(wb_db* db, pwr_tOid oid, pwr_tCid cid, pwr_tOid poid,
-      pwr_tOid boid, pwr_tOid aoid, pwr_tOid foid, pwr_tOid loid,
-      const char* name, const char* normname, pwr_mClassDef flags,
-      pwr_tTime ohTime, pwr_tTime rbTime, pwr_tTime dbTime, size_t rbSize,
-      size_t dbSize);
+  wb_db_ohead(wb_db* db, pwr_tOid oid, pwr_tCid cid, pwr_tOid poid, pwr_tOid boid, pwr_tOid aoid,
+              pwr_tOid foid, pwr_tOid loid, const char* name, const char* normname, pwr_mClassDef flags,
+              pwr_tTime ohTime, pwr_tTime rbTime, pwr_tTime dbTime, size_t rbSize, size_t dbSize);
 
   wb_db_ohead& get(wb_db_txn* txn);
   wb_db_ohead& get(wb_db_txn* txn, pwr_tOid oid);
 
-  void setDb(wb_db* db)
-  {
-    m_db = db;
-  }
+  void setDb(wb_db* db) { m_db = db; }
 
   int put(wb_db_txn* txn);
   int del(wb_db_txn* txn);
 
-  pwr_tOid oid()
-  {
-    return m_o.oid;
-  }
-  pwr_tVid vid()
-  {
-    return m_o.oid.vid;
-  }
-  pwr_tOix oix()
-  {
-    return m_o.oid.oix;
-  }
-  pwr_tCid cid()
-  {
-    return m_o.cid;
-  }
-  pwr_tOid poid()
-  {
-    return m_o.poid;
-  }
-  pwr_tOid foid()
-  {
-    return m_o.foid;
-  }
-  pwr_tOid loid()
-  {
-    return m_o.loid;
-  }
-  pwr_tOid boid()
-  {
-    return m_o.boid;
-  }
-  pwr_tOid aoid()
-  {
-    return m_o.aoid;
-  }
-  pwr_tTime ohTime()
-  {
-    return m_o.time;
-  }
+  pwr_tOid oid() { return m_o.oid; }
+  pwr_tVid vid() { return m_o.oid.vid; }
+  pwr_tOix oix() { return m_o.oid.oix; }
+  pwr_tCid cid() { return m_o.cid; }
+  pwr_tOid poid() { return m_o.poid; }
+  pwr_tOid foid() { return m_o.foid; }
+  pwr_tOid loid() { return m_o.loid; }
+  pwr_tOid boid() { return m_o.boid; }
+  pwr_tOid aoid() { return m_o.aoid; }
+  pwr_tTime ohTime() { return m_o.time; }
 
-  const char* name()
-  {
-    return m_o.name;
-  }
+  const char* name() { return m_o.name; }
 
-  const char* normname()
-  {
-    return m_o.normname;
-  }
+  const char* normname() { return m_o.normname; }
 
-  pwr_mClassDef flags()
-  {
-    return m_o.flags;
-  }
+  pwr_mClassDef flags() { return m_o.flags; }
 
-  size_t rbSize()
-  {
-    return m_o.body[0].size;
-  }
-  size_t dbSize()
-  {
-    return m_o.body[1].size;
-  }
-  pwr_tTime rbTime()
-  {
-    return m_o.body[0].time;
-  }
-  pwr_tTime dbTime()
-  {
-    return m_o.body[1].time;
-  }
+  size_t rbSize() { return m_o.body[0].size; }
+  size_t dbSize() { return m_o.body[1].size; }
+  pwr_tTime rbTime() { return m_o.body[0].time; }
+  pwr_tTime dbTime() { return m_o.body[1].time; }
 
   void name(wb_name& name);
   void name(pwr_tOid& oid);
 
-  void oid(pwr_tOid oid)
-  {
-    m_o.oid = m_oid = oid;
-  }
+  void oid(pwr_tOid oid) { m_o.oid = m_oid = oid; }
 
-  void cid(pwr_tCid cid)
-  {
-    m_o.cid = cid;
-  }
-  void poid(pwr_tOid oid)
-  {
-    m_o.poid = oid;
-  }
-  void foid(pwr_tOid oid)
-  {
-    m_o.foid = oid;
-  }
-  void loid(pwr_tOid oid)
-  {
-    m_o.loid = oid;
-  }
-  void boid(pwr_tOid oid)
-  {
-    m_o.boid = oid;
-  }
-  void aoid(pwr_tOid oid)
-  {
-    m_o.aoid = oid;
-  }
-  void flags(pwr_mClassDef flags)
-  {
-    m_o.flags = flags;
-  }
+  void cid(pwr_tCid cid) { m_o.cid = cid; }
+  void poid(pwr_tOid oid) { m_o.poid = oid; }
+  void foid(pwr_tOid oid) { m_o.foid = oid; }
+  void loid(pwr_tOid oid) { m_o.loid = oid; }
+  void boid(pwr_tOid oid) { m_o.boid = oid; }
+  void aoid(pwr_tOid oid) { m_o.aoid = oid; }
+  void flags(pwr_mClassDef flags) { m_o.flags = flags; }
 
-  void rbSize(size_t size)
-  {
-    m_o.body[0].size = size;
-  }
-  void dbSize(size_t size)
-  {
-    m_o.body[1].size = size;
-  }
-  void ohTime(pwr_tTime& time)
-  {
-    m_o.time = time;
-  }
-  void rbTime(pwr_tTime& time)
-  {
-    m_o.body[0].time = time;
-  }
-  void dbTime(pwr_tTime& time)
-  {
-    m_o.body[1].time = time;
-  }
+  void rbSize(size_t size) { m_o.body[0].size = size; }
+  void dbSize(size_t size) { m_o.body[1].size = size; }
+  void ohTime(pwr_tTime& time) { m_o.time = time; }
+  void rbTime(pwr_tTime& time) { m_o.body[0].time = time; }
+  void dbTime(pwr_tTime& time) { m_o.body[1].time = time; }
 
   void clear();
 
@@ -375,14 +348,17 @@ public:
   void iter(wb_import& i);
 };
 
-class wb_db_name {
+class wb_db_name
+{
 public:
-  struct {
+  struct
+  {
     pwr_tOid poid;
     pwr_tObjName normname;
   } m_k;
 
-  struct {
+  struct
+  {
     pwr_tOid oid;
     // pwr_tCid      cid;   // saved here to optimize tree traversal
     // pwr_mClassDef flags; // saved here to optimize tree traversal
@@ -407,15 +383,14 @@ public:
   void name(wb_name& name);
   void iter(void (*print)(pwr_tOid poid, pwr_tObjName name, pwr_tOid oid));
 
-  pwr_tOid oid()
-  {
-    return m_d.oid;
-  }
+  pwr_tOid oid() { return m_d.oid; }
 };
 
-class wb_db_class {
+class wb_db_class
+{
 public:
-  struct {
+  struct
+  {
     pwr_tCid cid;
     pwr_tOid oid;
   } m_k;
@@ -439,20 +414,16 @@ public:
   int put(wb_db_txn* txn);
   int del(wb_db_txn* txn);
 
-  pwr_tCid cid()
-  {
-    return m_k.cid;
-  }
-  pwr_tOid oid()
-  {
-    return m_k.oid;
-  }
+  pwr_tCid cid() { return m_k.cid; }
+  pwr_tOid oid() { return m_k.oid; }
 
   void iter(void (*func)(pwr_tOid oid, pwr_tCid cid));
 };
 
-class wb_db_class_iterator {
-  struct {
+class wb_db_class_iterator
+{
+  struct
+  {
     pwr_tCid cid;
     pwr_tOid oid;
   } m_k;
@@ -470,34 +441,20 @@ public:
   wb_db_class_iterator(wb_db* db, pwr_tCid cid, pwr_tOid oid);
   ~wb_db_class_iterator();
 
-  bool atEnd()
-  {
-    return m_atEnd;
-  }
+  bool atEnd() { return m_atEnd; }
   bool first();
   bool succObject();
   bool succClass();
   bool succClass(pwr_tCid cid);
 
-  pwr_tOid oid()
-  {
-    return m_k.oid;
-  }
-  pwr_tCid cid()
-  {
-    return m_k.cid;
-  }
-  void oid(pwr_tOid oid)
-  {
-    m_k.oid = oid;
-  }
-  void cid(pwr_tCid cid)
-  {
-    m_k.cid = cid;
-  }
+  pwr_tOid oid() { return m_k.oid; }
+  pwr_tCid cid() { return m_k.cid; }
+  void oid(pwr_tOid oid) { m_k.oid = oid; }
+  void cid(pwr_tCid cid) { m_k.cid = cid; }
 };
 
-class wb_db_dbody {
+class wb_db_dbody
+{
 public:
   wb_db* m_db;
 
@@ -513,10 +470,7 @@ public:
   wb_db_dbody(wb_db* db, pwr_tOid oid);
   wb_db_dbody(wb_db* db, pwr_tOid oid, size_t size, void* p);
 
-  void oid(pwr_tOid oid)
-  {
-    m_oid = oid;
-  }
+  void oid(pwr_tOid oid) { m_oid = oid; }
 
   int get(wb_db_txn* txn, size_t offset, size_t size, void* p);
   int put(wb_db_txn* txn);
@@ -528,7 +482,8 @@ public:
   void iter(wb_import& i);
 };
 
-class wb_db_rbody {
+class wb_db_rbody
+{
 public:
   wb_db* m_db;
 
@@ -544,10 +499,7 @@ public:
   wb_db_rbody(wb_db* db, pwr_tOid oid);
   wb_db_rbody(wb_db* db, pwr_tOid oid, size_t size, void* p);
 
-  void oid(pwr_tOid oid)
-  {
-    m_oid = oid;
-  }
+  void oid(pwr_tOid oid) { m_oid = oid; }
 
   int get(wb_db_txn* txn, size_t offset, size_t size, void* p);
   int put(wb_db_txn* txn);

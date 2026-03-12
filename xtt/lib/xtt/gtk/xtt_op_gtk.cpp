@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -108,8 +108,8 @@ OpGtk::OpGtk(void* op_parent_ctx, GtkWidget* op_parent_wid, char* opplace, pwr_t
   memset(a_active, 0, sizeof(a_active));
   memset(appl_buttons, 0, sizeof(appl_buttons));
 
-  toplevel =
-      (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", OP_HEIGHT_MIN, "default-width", OP_WIDTH_DEFAULT , NULL);
+  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", OP_HEIGHT_MIN, "default-width",
+                                      OP_WIDTH_DEFAULT, NULL);
 
   int dark_theme = CoWowGtk::GetDarkTheme(toplevel);
 
@@ -624,7 +624,7 @@ OpGtk::OpGtk(void* op_parent_ctx, GtkWidget* op_parent_wid, char* opplace, pwr_t
   gtk_box_pack_start(GTK_BOX(hbox_conf), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 2);
   gtk_box_pack_start(GTK_BOX(hbox_conf), appl_form, TRUE, TRUE, 0);
 
-  //gtk_widget_set_direction(vbox_ala, GTK_TEXT_DIR_LTR); 
+  // gtk_widget_set_direction(vbox_ala, GTK_TEXT_DIR_LTR);
   GtkWidget* pane = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
   gtk_paned_pack1(GTK_PANED(pane), vbox_ala, TRUE, FALSE);
   gtk_paned_pack2(GTK_PANED(pane), hbox_conf, FALSE, TRUE);
@@ -665,8 +665,7 @@ OpGtk::OpGtk(void* op_parent_ctx, GtkWidget* op_parent_wid, char* opplace, pwr_t
   }
 
   gtk_window_resize(GTK_WINDOW(toplevel), monitor_geometry.width, OP_HEIGHT_MIN);
-  if (monitor_geometry.width != OP_WIDTH_DEFAULT || 
-      monitor_geometry.x != 0 || monitor_geometry.y != 0)
+  if (monitor_geometry.width != OP_WIDTH_DEFAULT || monitor_geometry.x != 0 || monitor_geometry.y != 0)
     gtk_window_move(GTK_WINDOW(toplevel), monitor_geometry.x, monitor_geometry.y);
 
   wow = new CoWowGtk(toplevel);
@@ -1039,7 +1038,7 @@ int OpGtk::configure(char* opplace_str)
                                     // first Monitor, 2 == Froce second monitor and so on ...)
 
   if (monitor > numberOfMonitors || monitor < 0)
-    monitor = 0;    // Use primary if one have input a larger number than there are monitors...
+    monitor = 0; // Use primary if one have input a larger number than there are monitors...
 
   if (monitor == 0) // Use primary
   {
@@ -1053,7 +1052,8 @@ int OpGtk::configure(char* opplace_str)
 
   if (display_monitor)
     gdk_monitor_get_geometry(display_monitor, &monitor_geometry);
-  else {
+  else
+  {
     monitor_geometry.width = OP_WIDTH_DEFAULT;
     monitor_geometry.x = 0;
     monitor_geometry.y = 0;
@@ -2053,7 +2053,7 @@ void OpGtk::set_text_size()
   char str[80];
   char bold_str[10] = "";
 
-  sprintf(str, "%s %s%f", "Lucida Sans", bold_str, FONT_SCALE * (text_size + 2));
+  sprintf(str, "%s %s%f", "Roboto", bold_str, FONT_SCALE * (text_size + 2));
   fd = pango_font_description_from_string(str);
 
   for (unsigned int i = 0; i < 25; i++)

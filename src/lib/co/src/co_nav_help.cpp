@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -40,6 +40,8 @@
 /*_Include files_________________________________________________________*/
 
 #include <stdlib.h>
+#include <map>
+#include <vector>
 
 extern "C"
 {
@@ -57,11 +59,78 @@ extern "C"
 static FILE* navhelp_open_file(NavHelp* navhelp, navh_eHelpFile file_type, const char* file_name);
 static pwr_tStatus get_lang_file(char* file, char* found_file);
 
+/*** Local Variables ***************************************************/
+static ErrorLog static_error_log;
+static std::vector<std::pair<navh_eHelpFile, std::string>> static_file_tree;
+
 NavHelp::NavHelp(void* h_parent_ctx, const char* h_base_file, const char* h_project_file)
     : parent_ctx(h_parent_ctx), noprop(0)
 {
   strncpy(project_file, h_project_file, sizeof(project_file));
   strncpy(base_file, h_base_file, sizeof(base_file));
+}
+
+std::pair<int, ErrorLog> NavHelp::help_with_status(const char* help_key, const char* help_bookmark,
+                                                   navh_eHelpFile file_type, const char* file_name,
+                                                   void** book_mark, bool strict, const char* curr_filename,
+                                                   navh_eHelpFile previous_filetype)
+{
+  // This function calls help and returns the provided map with error status
+  static_error_log.log_map.clear();
+  static_file_tree.clear();
+
+  static_file_tree.push_back(std::make_pair(previous_filetype, curr_filename));
+  int sts = help(help_key, help_bookmark, file_type, file_name, book_mark, strict);
+
+  return {sts, static_error_log};
+}
+
+std::pair<std::string, std::map<int, std::string>> NavHelp::line_counter(const char* help_key,
+                                                                         const char* file_name)
+{
+  // FIND IF FILE EXISTS
+  int file_tree_size = static_file_tree.size() - 1;
+  std::string tree_file_name = static_file_tree.at(file_tree_size).second;
+  FILE* line_counter_file =
+      navhelp_open_file(this, static_file_tree.at(file_tree_size).first, tree_file_name.c_str());
+
+  if (!line_counter_file && file_tree_size > 0) // file doesnt exist "NO FILE ERROR"
+  {
+    static_file_tree.pop_back();
+    return line_counter(help_key, file_name);
+  }
+
+  // FIND ERROR LINE
+  int error_line_number = 0;
+  char error_line[256];
+  std::map<int, std::string> error_number_line;
+
+  // file doesn't exist
+  if (!line_counter_file)
+  {
+    error_number_line[-1] = "";
+    return {tree_file_name, error_number_line};
+  }
+
+  // search through the whole file to find any error related to help_key or file_name
+  while (dcli_search_line_in_file(line_counter_file, help_key, file_name, error_line, &error_line_number))
+  {
+    error_number_line[error_line_number] = error_line;
+  }
+  fclose(line_counter_file); // close file when done
+
+  if (static_file_tree.size() == 1)
+  {
+    return {tree_file_name, error_number_line};
+  }
+
+  if (error_line_number == 0 && error_number_line.empty())
+  {
+    static_file_tree.pop_back();
+    return line_counter(help_key, file_name);
+  }
+
+  return {tree_file_name, error_number_line};
 }
 
 int NavHelp::help(const char* help_key, const char* help_bookmark, navh_eHelpFile file_type,
@@ -116,10 +185,27 @@ int NavHelp::help(const char* help_key, const char* help_bookmark, navh_eHelpFil
     str_ToLower(search_bookmark, help_bookmark);
   }
 
+  if(file_name){
+    static_file_tree.push_back(std::make_pair(file_type, file_name));
+  }
+
   // Open file
   file = navhelp_open_file(this, file_type, file_name);
   if (!file)
+  {
+    // key: error line number, value: error line
+    std::pair<std::string, std::map<int, std::string>> result = line_counter(help_key, file_name);
+
+    //{file_name, {line_number, error_line}}
+    for (const auto& pair : result.second)
+    {
+      static_error_log.log_map[str_trim_rtn(result.first.c_str())]
+          .place_map[pair.first]
+          .reason_map[str_trim_rtn(pair.second.c_str())] = NAV__NOFILE;
+    }
+
     return NAV__NOFILE;
+  }
 
   if (!print_all)
     key_nr = dcli_parse(key, " 	", "", (char*)key_part, sizeof(key_part) / sizeof(key_part[0]),
@@ -149,6 +235,7 @@ int NavHelp::help(const char* help_key, const char* help_bookmark, navh_eHelpFil
       if (!noprop || strstr(include_file, "$pwr_lang") == 0)
       {
         sts = help(help_key, help_bookmark, navh_eHelpFile_Other, include_file, book_mark, strict);
+
         if (ODD(sts) && !print_all)
         {
           fclose(file);
@@ -544,7 +631,21 @@ int NavHelp::help(const char* help_key, const char* help_bookmark, navh_eHelpFil
   fclose(file);
 
   if (!print_all && !hit)
+  {
+
+    // key: error line number, value: error line
+    std::pair<std::string, std::map<int, std::string>> result = line_counter(help_key, file_name);
+
+    //{file_name, {line_number, error line}}
+    for (const auto& pair : result.second)
+    {
+      static_error_log.log_map[str_trim_rtn(result.first.c_str())]
+          .place_map[pair.first]
+          .reason_map[str_trim_rtn(pair.second.c_str())] = NAV__TOPICNOTFOUND;
+    }
+    
     return NAV__TOPICNOTFOUND;
+  }
   return NAV__SUCCESS;
 }
 
@@ -574,8 +675,9 @@ int NavHelp::get_next_key(const char* help_key, navh_eHelpFile file_type, const 
   // Open file
   file = navhelp_open_file(this, file_type, file_name);
   if (!file)
+  {
     return NAV__NOFILE;
-
+  }
   key_nr = dcli_parse(key, " 	", "", (char*)key_part, sizeof(key_part) / sizeof(key_part[0]),
                       sizeof(key_part[0]), 0);
 
@@ -671,7 +773,9 @@ int NavHelp::get_previous_key(const char* help_key, navh_eHelpFile file_type, co
   // Open file
   file = navhelp_open_file(this, file_type, file_name);
   if (!file)
+  {
     return NAV__NOFILE;
+  }
 
   key_nr = dcli_parse(key, " 	", "", (char*)key_part, sizeof(key_part) / sizeof(key_part[0]),
                       sizeof(key_part[0]), 0);
@@ -756,7 +860,9 @@ int NavHelp::help_index(navh_eHelpFile file_type, const char* file_name)
   // Open file
   file = navhelp_open_file(this, file_type, file_name);
   if (!file)
+  {
     return NAV__NOFILE;
+  }
 
   sts = dcli_read_line(line, sizeof(line), file);
   while (ODD(sts))
@@ -858,7 +964,9 @@ static pwr_tStatus get_lang_file(char* file, char* found_file)
   pwr_tStatus sts;
 
   if (!str_StartsWith(file, "$pwr_lang/"))
+  {
     return NAV__NOFILE;
+  }
 
   // Try pwr_exe/xx_xx/
   sprintf(lng_include_file, "$pwr_exe/%s/%s", Lng::get_language_str(), &file[10]);
@@ -877,7 +985,9 @@ static pwr_tStatus get_lang_file(char* file, char* found_file)
       dcli_translate_filename(tmp_file, lng_include_file);
       sts = dcli_file_time(tmp_file, &t);
       if (EVEN(sts))
+      {
         return NAV__NOFILE;
+      }
     }
   }
   strcpy(found_file, tmp_file);

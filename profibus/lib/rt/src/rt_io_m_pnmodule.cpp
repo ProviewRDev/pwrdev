@@ -32,22 +32,22 @@
 #include "rt_io_bus.h"
 #include "rt_io_msg.h"
 #include "rt_pb_msg.h"
-#include "rt_profinet.h"
-#include "rt_pnak.h"
+#include "profinet.h"
+#include "pnak.h"
 #include "rt_pn_runtime_data.h"
 #include "rt_io_pn_locals.h"
 
 /*----------------------------------------------------------------------------*\
    Init method for the Pnmodule
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardInit(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sPnCardLocal* local;
   pwr_sClass_PnModule* op;
 
   op = (pwr_sClass_PnModule*)cp->op;
   local = (io_sPnCardLocal*)cp->Local;
+  (void)local; // Do nothing
 
   op->Status = PB__NORMAL;
 
@@ -57,8 +57,7 @@ static pwr_tStatus IoCardInit(
 /*----------------------------------------------------------------------------*\
    Read method for the Pn module
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardRead(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sPnCardLocal* local;
   pwr_sClass_PnModule* op;
@@ -74,8 +73,7 @@ static pwr_tStatus IoCardRead(
   /* on all inputs. Default StallAction is ResetInputs which means that */
   /* all inputs will be zeroed */
 
-  io_bus_card_read(ctx, rp, cp, local->input_area, 0, slave->ByteOrdering,
-      slave->FloatRepresentation);
+  io_bus_card_read(ctx, rp, cp, local->input_area, 0, slave->ByteOrdering, slave->FloatRepresentation);
 
   return IO__SUCCESS;
 }
@@ -83,8 +81,7 @@ static pwr_tStatus IoCardRead(
 /*----------------------------------------------------------------------------*\
    Write method for the Pn module
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardWrite(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sPnCardLocal* local;
   pwr_sClass_PnModule* op;
@@ -96,9 +93,9 @@ static pwr_tStatus IoCardWrite(
 
   op->Status = slave->Status;
 
-  if (op->Status == PB__NORMAL) {
-    io_bus_card_write(ctx, cp, local->output_area, slave->ByteOrdering,
-        slave->FloatRepresentation);
+  if (op->Status == PB__NORMAL)
+  {
+    io_bus_card_write(ctx, cp, local->output_area, slave->ByteOrdering, slave->FloatRepresentation);
   }
   //  printf("Method Pb_Module-IoCardWrite\n");
   return IO__SUCCESS;
@@ -107,8 +104,7 @@ static pwr_tStatus IoCardWrite(
 /*----------------------------------------------------------------------------*\
    Close method for the Pb module
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardClose(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sPnCardLocal* local;
   local = (io_sPnCardLocal*)cp->Local;
@@ -123,6 +119,6 @@ static pwr_tStatus IoCardClose(
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindIoMethods(PnModule) = { pwr_BindIoMethod(IoCardInit),
-  pwr_BindIoMethod(IoCardRead), pwr_BindIoMethod(IoCardWrite),
-  pwr_BindIoMethod(IoCardClose), pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(PnModule) = {pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardRead),
+                                           pwr_BindIoMethod(IoCardWrite), pwr_BindIoMethod(IoCardClose),
+                                           pwr_NullMethod};

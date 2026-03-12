@@ -392,7 +392,7 @@ lämplig storlek i menyn. Man kan även använda skalnings-funktionen för att ändra
 
 <h1>Font
 Fonten ställs in med font menyn in verktygspanelen. De fonter som finns a välja mellan är
-Helvetica, Times, New Century Schoolbook, Courier och Lucida Sans. Välj ut texten och ange 
+Helvetica, Times, New Century Schoolbook och Courier. Välj ut texten och ange 
 lämplig font i menyn.
 
 <h1>Färg
@@ -1115,7 +1115,7 @@ formateringen av värdena i kolumnerna genom att fylla i Column1.Format och Colum
 '%6.1f' innebär ett flyttal med 6 tecken och en decimal.
 
 En del andra detaljer är ändrade på tabellen, 
-- fonten är satt till Lucida Sans, genom att välja ut tabellen och ange Lucida Sans i 
+- fonten är satt till Helvetica, genom att välja ut tabellen och ange Helvetica i 
   verktygspanelen.
 - Textstorleken är ökad till 12 med Textsize i verktygspanelen.
 - Höjden på raderna har anpassats till den större texten genom att Table.RowHeight är 0.8.
@@ -6002,7 +6002,7 @@ Exempel på polylinje
 Exempel
 
 <c>set textsize 14
-<c>set textfont LucidaSans
+<c>set textfont Helvetica
 <c>set textcolor RedHigh8
 <c>set bold
 <c>create text/text="Example" /x1=3 /y1=5
@@ -6551,8 +6551,7 @@ textstorlek. Textstorleken kan vara 8, 10, 12, 14, 18 eller 24.
 set textfont
 
 Sätter typsnitt i editorn. Alla textobjekt kommer i fortsättning att skapas med detta
-typsnitt. Typsnittet kan vara 'Helvetica', 'Times', 'New Century Schoolbook', 'Curier' 
-eller 'LucidaSans'.
+typsnitt. Typsnittet kan vara 'Helvetica', 'Times', 'New Century Schoolbook' eller 'Courier'.
 
 <b>Syntax
 
@@ -7127,7 +7126,6 @@ eFont_Helvetica
 eFont_Times
 eFont_NewCenturySchoolbook
 eFont_Courier
-eFont_LucidaSans
 
 <h2>Riktning <bookmark> directions
 eDirection_Center
@@ -8270,7 +8268,7 @@ float  <t>descent  <t>Textens descent returneras i denna variabel.
 <b>Exempel
 <c> float width;
  
-<c> GetTextExtent("Detta är en text", 3, eFont_LucidaSans, 1, width);
+<c> GetTextExtent("Detta är en text", 3, eFont_Helvetica, 1, width);
 </topic>
 
 <topic>GroupGetFirstObject() <style>function
@@ -9014,7 +9012,7 @@ int <t>font     <t>Typsnitt.
 <c> int id;
 
 <c> SelectAdd(id);
-<c> SetSelectTextFont(eFont_LucidaSans);
+<c> SetSelectTextFont(eFont_Helvetica);
 
 </topic>
 
@@ -9083,7 +9081,7 @@ Exempel
 <c>  ! Skriv en text
 <c>  set bold
 <c>  set textsize 24
-<c>  set textfont LucidaSans
+<c>  set textfont Helvetica
 <c>  set textcolor RedHigh8
 <c>  create text/text="Example" /x1=3 /y1=5
 

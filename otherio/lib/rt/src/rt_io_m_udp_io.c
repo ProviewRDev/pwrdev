@@ -79,6 +79,7 @@ typedef struct {
   char* input_area;
   char* output_area;
   int softlimit_logged;
+  int hardlimit_logged;
   pwr_tTime last_try_connect_time;
   pwr_tTime last_receive_time;
   unsigned int msgs_lost;
@@ -99,6 +100,58 @@ typedef struct {
 */
 
 static char rcv_buffer[65536];
+
+static int udp_is_link_send_error(int errnum)
+{
+  return errnum == ENETDOWN || errnum == ENETUNREACH || errnum == EHOSTUNREACH;
+}
+
+static void udp_reset_inputs(io_sLocalUDP_IO* local)
+{
+  if (local->input_area && local->input_area_size > 0)
+    memset(local->input_area, 0, local->input_area_size);
+}
+
+static pwr_tStatus udp_check_stall(
+    io_tCtx ctx, io_sCard* cp, io_sLocalUDP_IO* local, int reset_inputs)
+{
+  pwr_sClass_UDP_IO* op = (pwr_sClass_UDP_IO*)cp->op;
+
+  if (op->ErrorCount >= op->ErrorSoftLimit && !local->softlimit_logged) {
+    errh_Warning("IO Card ErrorSoftLimit reached, '%s'", cp->Name);
+    ctx->IOHandler->CardErrorSoftLimit = 1;
+    ctx->IOHandler->ErrorSoftLimitObject = cdh_ObjidToAref(cp->Objid);
+    local->softlimit_logged = 1;
+  } else if (op->ErrorCount < op->ErrorSoftLimit)
+    local->softlimit_logged = 0;
+
+  if (op->ErrorCount >= op->ErrorHardLimit && !local->hardlimit_logged) {
+    if (op->StallAction == pwr_eStallActionEnum_EmergencyBreak)
+      errh_Error("IO Card ErrorHardLimit reached '%s', IO stopped", cp->Name);
+    else if (op->StallAction == pwr_eStallActionEnum_ResetInputs)
+      errh_Error(
+          "IO Card ErrorHardLimit reached '%s', IO input area reset", cp->Name);
+    else
+      errh_Error("IO Card ErrorHardLimit reached '%s'", cp->Name);
+
+    ctx->IOHandler->CardErrorHardLimit = 1;
+    ctx->IOHandler->ErrorHardLimitObject = cdh_ObjidToAref(cp->Objid);
+    local->hardlimit_logged = 1;
+  } else if (op->ErrorCount < op->ErrorHardLimit)
+    local->hardlimit_logged = 0;
+
+  if (op->ErrorCount < op->ErrorHardLimit)
+    return IO__SUCCESS;
+
+  if (op->StallAction == pwr_eStallActionEnum_ResetInputs && reset_inputs)
+    udp_reset_inputs(local);
+  else if (op->StallAction == pwr_eStallActionEnum_EmergencyBreak) {
+    ctx->Node->EmergBreakTrue = 1;
+    return IO__ERRDEVICE;
+  }
+
+  return IO__SUCCESS;
+}
 
 pwr_tStatus udp_recv_data(
     io_sLocalUDP_IO* local, io_sCard* cp, char* buf, int buf_size)
@@ -239,6 +292,7 @@ static pwr_tStatus IoCardInit(
 
   op->Link = pwr_eUpDownEnum_Down;
   op->Status = IOM__UDP_INIT;
+  op->ErrorCount = 0;
 
   /* Create a socket for UDP */
   local->socket = socket(AF_INET, SOCK_DGRAM, 0);
@@ -361,9 +415,11 @@ static pwr_tStatus IoCardRead(
   io_sLocalUDP_IO* local = (io_sLocalUDP_IO*)cp->Local;
   pwr_sClass_UDP_IO* op = (pwr_sClass_UDP_IO*)cp->op;
   unsigned int sts;
+  pwr_tStatus stall_sts;
   io_sUDP_Header header;
   pwr_tTime now;
   pwr_tDeltaTime dt;
+  int timed_out;
 
   sts = udp_recv_data(local, cp, local->input_buffer, local->input_buffer_size);
   if (ODD(sts)) {
@@ -374,36 +430,31 @@ static pwr_tStatus IoCardRead(
         pwr_eFloatRepEnum_FloatIEEE);
 
     time_GetTimeMonotonic(&local->last_receive_time);
+    op->ErrorCount = 0;
     if (op->Link == pwr_eUpDownEnum_Down) {
       op->Link = pwr_eUpDownEnum_Up;
       op->Status = IOM__UDP_UP;
     }
   }
 
-  if (op->Link == pwr_eUpDownEnum_Up) {
-    time_GetTimeMonotonic(&now);
-    time_Adiff(&dt, &now, &local->last_receive_time);
-    if (time_DToFloat(0, &dt) >= op->LinkTimeout) {
-      op->Link = pwr_eUpDownEnum_Down;
-      op->Status = IOM__UDP_DOWN;
-    }
+  time_GetTimeMonotonic(&now);
+  time_Adiff(&dt, &now, &local->last_receive_time);
+  timed_out = time_DToFloat(0, &dt) >= op->LinkTimeout;
+  if (timed_out) {
+    op->Link = pwr_eUpDownEnum_Down;
+    op->Status = IOM__UDP_DOWN;
+    if (!ODD(sts))
+      op->ErrorCount++;
   }
 
-  if (op->ErrorCount == op->ErrorSoftLimit && !local->softlimit_logged) {
-    errh_Warning("IO Card ErrorSoftLimit reached, '%s'", cp->Name);
-    ctx->IOHandler->CardErrorSoftLimit = 1;
-    ctx->IOHandler->ErrorSoftLimitObject = cdh_ObjidToAref(cp->Objid);
-    local->softlimit_logged = 1;
-  }
-  if (op->ErrorCount >= op->ErrorHardLimit) {
-    errh_Error("IO Card ErrorHardLimit reached '%s', IO stopped", cp->Name);
-    ctx->Node->EmergBreakTrue = 1;
-    ctx->IOHandler->CardErrorHardLimit = 1;
-    ctx->IOHandler->ErrorHardLimitObject = cdh_ObjidToAref(cp->Objid);
-    return IO__ERRDEVICE;
+  stall_sts = udp_check_stall(ctx, cp, local, 1);
+  if (op->ErrorCount >= op->ErrorHardLimit
+      && op->StallAction == pwr_eStallActionEnum_ResetInputs) {
+    io_bus_card_read(ctx, rp, cp, local->input_area, 0, local->byte_ordering,
+        pwr_eFloatRepEnum_FloatIEEE);
   }
 
-  return IO__SUCCESS;
+  return stall_sts;
 }
 
 static pwr_tStatus IoCardWrite(
@@ -447,6 +498,11 @@ static pwr_tStatus IoCardWrite(
   if (sts < 0) {
     op->Status = IOM__UDP_DOWN;
     op->Link = pwr_eUpDownEnum_Down;
+    if (udp_is_link_send_error(errno)) {
+      if (op->ErrorCount <= op->ErrorHardLimit)
+        op->ErrorCount = op->ErrorHardLimit + 1;
+    } else
+      op->ErrorCount++;
   }
 
   if (try_connect) {
@@ -455,19 +511,10 @@ static pwr_tStatus IoCardWrite(
       op->Link = pwr_eUpDownEnum_Up;
     }
   }
-  op->TX_Packets++;
+  if (sts >= 0)
+    op->TX_Packets++;
 
-  if (op->ErrorCount == op->ErrorSoftLimit && !local->softlimit_logged) {
-    errh_Warning("IO Card ErrorSoftLimit reached, '%s'", cp->Name);
-    local->softlimit_logged = 1;
-  }
-  if (op->ErrorCount >= op->ErrorHardLimit) {
-    errh_Error("IO Card ErrorHardLimit reached '%s', IO stopped", cp->Name);
-    ctx->Node->EmergBreakTrue = 1;
-    return IO__ERRDEVICE;
-  }
-
-  return IO__SUCCESS;
+  return udp_check_stall(ctx, cp, local, 0);
 }
 
 /*  Every method should be registred here. */

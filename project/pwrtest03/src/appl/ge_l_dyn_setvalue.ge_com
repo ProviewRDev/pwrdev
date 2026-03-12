@@ -47,13 +47,13 @@ main()
 
   xm = x0 + 1;
   ym = y0 + 1;
-  id = CreateText("SetValue", xm, ym, 4, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("SetValue", xm, ym, 4, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # Button
   ym += 1.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Click to set", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Click to set", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   ym += 0.0;
   x1 = xm;
@@ -91,7 +91,7 @@ main()
   ym += 4.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Three instances", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Three instances", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   ym += 0.0;
   x1 = xm;
@@ -158,7 +158,7 @@ main()
   ym += 7;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Set string", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Set string", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   ym += 0.0;
   x1 = xm;
@@ -196,7 +196,7 @@ main()
   ym += 5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Set integer", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Set integer", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   ym += 0.0;
   x1 = xm;

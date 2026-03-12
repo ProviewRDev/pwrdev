@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -76,15 +76,18 @@ static pwr_tStatus GenerateXddFile(ldh_sMenuCall* ip)
   str_ToLower(foutname, foutname);
   dcli_translate_filename(foutname, foutname);
   fout = fopen(foutname, "w");
-  if (!fout) {
+  if (!fout)
+  {
     fclose(fin);
     return 0;
   }
 
-  while (dcli_read_line(line, sizeof(line), fin)) {
+  while (dcli_read_line(line, sizeof(line), fin))
+  {
     str_trim(l2, line);
 
-    if (streq(l2, "</ObjectList>")) {
+    if (streq(l2, "</ObjectList>"))
+    {
       pwr_tEnum representation;
       pwr_tUInt16 number;
       unsigned short mv_index;
@@ -103,100 +106,122 @@ static pwr_tStatus GenerateXddFile(ldh_sMenuCall* ip)
       int tx_entries;
 
       // Count entries
-      for (wb_object child = o.first(); child; child = child.after()) {
-        for (wb_object grandchild = child.first(); grandchild;
-             grandchild = grandchild.after()) {
-          switch (grandchild.cid()) {
-          case pwr_cClass_ChanDi: {
-            wb_attribute a
-                = sp->attribute(grandchild.oid(), "RtBody", "Representation");
-            if (!a) {
+      for (wb_object child = o.first(); child; child = child.after())
+      {
+        for (wb_object grandchild = child.first(); grandchild; grandchild = grandchild.after())
+        {
+          switch (grandchild.cid())
+          {
+          case pwr_cClass_ChanDi:
+          {
+            wb_attribute a = sp->attribute(grandchild.oid(), "RtBody", "Representation");
+            if (!a)
+            {
               fclose(fin);
               fclose(fout);
               return a.sts();
             }
 
             a.value(&representation);
-            if (!a) {
+            if (!a)
+            {
               fclose(fin);
               fclose(fout);
               return a.sts();
             }
 
             a = sp->attribute(grandchild.oid(), "RtBody", "Number");
-            if (!a) {
+            if (!a)
+            {
               fclose(fin);
               fclose(fout);
               return a.sts();
             }
 
             a.value(&number);
-            if (!a) {
+            if (!a)
+            {
               fclose(fin);
               fclose(fout);
               return a.sts();
             }
 
-            if (number == 0) {
-              switch (representation) {
+            if (number == 0)
+            {
+              switch (representation)
+              {
               case pwr_eDataRepEnum_Bit8:
+              case pwr_eDataRepEnum_BitField8:
                 di_entries += 1;
                 break;
               case pwr_eDataRepEnum_Bit16:
+              case pwr_eDataRepEnum_BitField16:
                 di_entries += 2;
                 break;
               case pwr_eDataRepEnum_Bit32:
+              case pwr_eDataRepEnum_BitField32:
                 di_entries += 4;
                 break;
               case pwr_eDataRepEnum_Bit64:
+              case pwr_eDataRepEnum_BitField64:
                 di_entries += 8;
                 break;
               }
             }
             break;
           }
-          case pwr_cClass_ChanDo: {
-            wb_attribute a
-                = sp->attribute(grandchild.oid(), "RtBody", "Representation");
-            if (!a) {
+          case pwr_cClass_ChanDo:
+          {
+            wb_attribute a = sp->attribute(grandchild.oid(), "RtBody", "Representation");
+            if (!a)
+            {
               fclose(fin);
               fclose(fout);
               return a.sts();
             }
 
             a.value(&representation);
-            if (!a) {
+            if (!a)
+            {
               fclose(fin);
               fclose(fout);
               return a.sts();
             }
 
             a = sp->attribute(grandchild.oid(), "RtBody", "Number");
-            if (!a) {
+            if (!a)
+            {
               fclose(fin);
               fclose(fout);
               return a.sts();
             }
 
             a.value(&number);
-            if (!a) {
+            if (!a)
+            {
               fclose(fin);
               fclose(fout);
               return a.sts();
             }
 
-            if (number == 0) {
-              switch (representation) {
+            if (number == 0)
+            {
+              switch (representation)
+              {
               case pwr_eDataRepEnum_Bit8:
+              case pwr_eDataRepEnum_BitField8:
                 do_entries += 1;
                 break;
               case pwr_eDataRepEnum_Bit16:
+              case pwr_eDataRepEnum_BitField16:
                 do_entries += 2;
                 break;
               case pwr_eDataRepEnum_Bit32:
+              case pwr_eDataRepEnum_BitField32:
                 do_entries += 4;
                 break;
               case pwr_eDataRepEnum_Bit64:
+              case pwr_eDataRepEnum_BitField64:
                 do_entries += 8;
                 break;
               }
@@ -204,23 +229,26 @@ static pwr_tStatus GenerateXddFile(ldh_sMenuCall* ip)
             break;
           }
           case pwr_cClass_ChanAi:
-          case pwr_cClass_ChanIi: {
-            wb_attribute a
-                = sp->attribute(grandchild.oid(), "RtBody", "Representation");
-            if (!a) {
+          case pwr_cClass_ChanIi:
+          {
+            wb_attribute a = sp->attribute(grandchild.oid(), "RtBody", "Representation");
+            if (!a)
+            {
               fclose(fin);
               fclose(fout);
               return a.sts();
             }
 
             a.value(&representation);
-            if (!a) {
+            if (!a)
+            {
               fclose(fin);
               fclose(fout);
               return a.sts();
             }
 
-            switch (representation) {
+            switch (representation)
+            {
             case pwr_eDataRepEnum_Int8:
             case pwr_eDataRepEnum_UInt8:
               ai8_entries++;
@@ -238,23 +266,26 @@ static pwr_tStatus GenerateXddFile(ldh_sMenuCall* ip)
             break;
           }
           case pwr_cClass_ChanIo:
-          case pwr_cClass_ChanAo: {
-            wb_attribute a
-                = sp->attribute(grandchild.oid(), "RtBody", "Representation");
-            if (!a) {
+          case pwr_cClass_ChanAo:
+          {
+            wb_attribute a = sp->attribute(grandchild.oid(), "RtBody", "Representation");
+            if (!a)
+            {
               fclose(fin);
               fclose(fout);
               return a.sts();
             }
 
             a.value(&representation);
-            if (!a) {
+            if (!a)
+            {
               fclose(fin);
               fclose(fout);
               return a.sts();
             }
 
-            switch (representation) {
+            switch (representation)
+            {
             case pwr_eDataRepEnum_Int8:
             case pwr_eDataRepEnum_UInt8:
               ao8_entries++;
@@ -278,7 +309,8 @@ static pwr_tStatus GenerateXddFile(ldh_sMenuCall* ip)
 
       // Rx mapping
       rx_entries = di_entries + ai8_entries + ai16_entries + ai32_entries;
-      if (rx_entries > 0) {
+      if (rx_entries > 0)
+      {
         int di_cnt = 0;
         int ai8_cnt = 0;
         int ai16_cnt = 0;
@@ -291,72 +323,86 @@ static pwr_tStatus GenerateXddFile(ldh_sMenuCall* ip)
                       "name=\"PDO_RxMappParam_00h_AU64\" objectType=\"8\" "
                       "CDCFlag=\"TRUE\">\n");
         fprintf(fout,
-            "            <SubObject subIndex=\"00\" name=\"NumberOfEntries\" "
-            "objectType=\"7\" dataType=\"0005\" accessType=\"rw\" "
-            "defaultValue=\"0x00\" actualValue=\"0x%02x\" CDCFlag=\"TRUE\"/>\n",
-            rx_entries);
+                "            <SubObject subIndex=\"00\" name=\"NumberOfEntries\" "
+                "objectType=\"7\" dataType=\"0005\" accessType=\"rw\" "
+                "defaultValue=\"0x00\" actualValue=\"0x%02x\" CDCFlag=\"TRUE\"/>\n",
+                rx_entries);
         rx_cnt++;
 
-        for (wb_object child = o.first(); child; child = child.after()) {
-          for (wb_object grandchild = child.first(); grandchild;
-               grandchild = grandchild.after()) {
-            switch (grandchild.cid()) {
-            case pwr_cClass_ChanDi: {
-              wb_attribute a
-                  = sp->attribute(grandchild.oid(), "RtBody", "Representation");
-              if (!a) {
+        for (wb_object child = o.first(); child; child = child.after())
+        {
+          for (wb_object grandchild = child.first(); grandchild; grandchild = grandchild.after())
+          {
+            switch (grandchild.cid())
+            {
+            case pwr_cClass_ChanDi:
+            {
+              wb_attribute a = sp->attribute(grandchild.oid(), "RtBody", "Representation");
+              if (!a)
+              {
                 fclose(fin);
                 fclose(fout);
                 return a.sts();
               }
 
               a.value(&representation);
-              if (!a) {
+              if (!a)
+              {
                 fclose(fin);
                 fclose(fout);
                 return a.sts();
               }
 
               a = sp->attribute(grandchild.oid(), "RtBody", "Number");
-              if (!a) {
+              if (!a)
+              {
                 fclose(fin);
                 fclose(fout);
                 return a.sts();
               }
 
               a.value(&number);
-              if (!a) {
+              if (!a)
+              {
                 fclose(fin);
                 fclose(fout);
                 return a.sts();
               }
 
-              if (number == 0) {
-                switch (representation) {
+              if (number == 0)
+              {
+                switch (representation)
+                {
                 case pwr_eDataRepEnum_Bit8:
+                case pwr_eDataRepEnum_BitField8:
                   entries = 1;
                   break;
                 case pwr_eDataRepEnum_Bit16:
+                case pwr_eDataRepEnum_BitField16:
                   entries = 2;
                   break;
                 case pwr_eDataRepEnum_Bit32:
+                case pwr_eDataRepEnum_BitField32:
                   entries = 4;
                   break;
                 case pwr_eDataRepEnum_Bit64:
+                case pwr_eDataRepEnum_BitField64:
                   entries = 8;
                   break;
                 }
-                for (int i = 0; i < entries; i++) {
+                for (int i = 0; i < entries; i++)
+                {
                   mv_index = 0x6200;
                   mv_subindex = di_cnt + 1;
                   mv_size = 8;
-                  fprintf(fout, "            <SubObject subIndex=\"%02x\" "
-                                "name=\"ObjectMapping\" objectType=\"7\" "
-                                "dataType=\"001B\" accessType=\"rw/ro\" "
-                                "defaultValue=\"0\" "
-                                "actualValue=\"0x%04x%04x%04x%04x\" "
-                                "CDCFlag=\"TRUE\"/>\n",
-                      rx_cnt, mv_size, rx_offset, mv_subindex, mv_index);
+                  fprintf(fout,
+                          "            <SubObject subIndex=\"%02x\" "
+                          "name=\"ObjectMapping\" objectType=\"7\" "
+                          "dataType=\"001B\" accessType=\"rw/ro\" "
+                          "defaultValue=\"0\" "
+                          "actualValue=\"0x%04x%04x%04x%04x\" "
+                          "CDCFlag=\"TRUE\"/>\n",
+                          rx_cnt, mv_size, rx_offset, mv_subindex, mv_index);
                   rx_offset += mv_size;
                   di_cnt++;
                   rx_cnt++;
@@ -365,34 +411,37 @@ static pwr_tStatus GenerateXddFile(ldh_sMenuCall* ip)
               break;
             }
             case pwr_cClass_ChanAi:
-            case pwr_cClass_ChanIi: {
-              wb_attribute a
-                  = sp->attribute(grandchild.oid(), "RtBody", "Representation");
-              if (!a) {
+            case pwr_cClass_ChanIi:
+            {
+              wb_attribute a = sp->attribute(grandchild.oid(), "RtBody", "Representation");
+              if (!a)
+              {
                 fclose(fin);
                 fclose(fout);
                 return a.sts();
               }
 
               a.value(&representation);
-              if (!a) {
+              if (!a)
+              {
                 fclose(fin);
                 fclose(fout);
                 return a.sts();
               }
 
-              switch (representation) {
+              switch (representation)
+              {
               case pwr_eDataRepEnum_Int8:
               case pwr_eDataRepEnum_UInt8:
                 mv_index = 0x6410;
                 mv_subindex = ai8_cnt + 1;
                 mv_size = 8;
                 fprintf(fout,
-                    "            <SubObject subIndex=\"%02x\" "
-                    "name=\"ObjectMapping\" objectType=\"7\" dataType=\"001B\" "
-                    "accessType=\"rw/ro\" defaultValue=\"0\" "
-                    "actualValue=\"0x%04x%04x%04x%04x\" CDCFlag=\"TRUE\"/>\n",
-                    rx_cnt, mv_size, rx_offset, mv_subindex, mv_index);
+                        "            <SubObject subIndex=\"%02x\" "
+                        "name=\"ObjectMapping\" objectType=\"7\" dataType=\"001B\" "
+                        "accessType=\"rw/ro\" defaultValue=\"0\" "
+                        "actualValue=\"0x%04x%04x%04x%04x\" CDCFlag=\"TRUE\"/>\n",
+                        rx_cnt, mv_size, rx_offset, mv_subindex, mv_index);
                 rx_offset += mv_size;
                 ai8_cnt++;
                 rx_cnt++;
@@ -403,11 +452,11 @@ static pwr_tStatus GenerateXddFile(ldh_sMenuCall* ip)
                 mv_subindex = ai16_cnt + 1;
                 mv_size = 16;
                 fprintf(fout,
-                    "            <SubObject subIndex=\"%02x\" "
-                    "name=\"ObjectMapping\" objectType=\"7\" dataType=\"001B\" "
-                    "accessType=\"rw/ro\" defaultValue=\"0\" "
-                    "actualValue=\"0x%04x%04x%04x%04x\" CDCFlag=\"TRUE\"/>\n",
-                    rx_cnt, mv_size, rx_offset, mv_subindex, mv_index);
+                        "            <SubObject subIndex=\"%02x\" "
+                        "name=\"ObjectMapping\" objectType=\"7\" dataType=\"001B\" "
+                        "accessType=\"rw/ro\" defaultValue=\"0\" "
+                        "actualValue=\"0x%04x%04x%04x%04x\" CDCFlag=\"TRUE\"/>\n",
+                        rx_cnt, mv_size, rx_offset, mv_subindex, mv_index);
                 rx_offset += mv_size;
                 ai16_cnt++;
                 rx_cnt++;
@@ -418,11 +467,11 @@ static pwr_tStatus GenerateXddFile(ldh_sMenuCall* ip)
                 mv_subindex = ai32_cnt + 1;
                 mv_size = 32;
                 fprintf(fout,
-                    "            <SubObject subIndex=\"%02x\" "
-                    "name=\"ObjectMapping\" objectType=\"7\" dataType=\"001B\" "
-                    "accessType=\"rw/ro\" defaultValue=\"0\" "
-                    "actualValue=\"0x%04x%04x%04x%04x\" CDCFlag=\"TRUE\"/>\n",
-                    rx_cnt, mv_size, rx_offset, mv_subindex, mv_index);
+                        "            <SubObject subIndex=\"%02x\" "
+                        "name=\"ObjectMapping\" objectType=\"7\" dataType=\"001B\" "
+                        "accessType=\"rw/ro\" defaultValue=\"0\" "
+                        "actualValue=\"0x%04x%04x%04x%04x\" CDCFlag=\"TRUE\"/>\n",
+                        rx_cnt, mv_size, rx_offset, mv_subindex, mv_index);
                 rx_offset += mv_size;
                 ai32_cnt++;
                 rx_cnt++;
@@ -441,7 +490,8 @@ static pwr_tStatus GenerateXddFile(ldh_sMenuCall* ip)
 
       // Tx mapping
       tx_entries = do_entries + ao8_entries + ao16_entries + ao32_entries;
-      if (tx_entries > 0) {
+      if (tx_entries > 0)
+      {
         int do_cnt = 0;
         int ao8_cnt = 0;
         int ao16_cnt = 0;
@@ -454,73 +504,87 @@ static pwr_tStatus GenerateXddFile(ldh_sMenuCall* ip)
                       "name=\"PDO_TxMappParam_00h_AU64\" objectType=\"8\" "
                       "CDCFlag=\"TRUE\">\n");
         fprintf(fout,
-            "            <SubObject subIndex=\"00\" name=\"NumberOfEntries\" "
-            "objectType=\"7\" dataType=\"0005\" accessType=\"rw\" "
-            "defaultValue=\"0x00\" actualValue=\"0x%x\" CDCFlag=\"TRUE\"/>\n",
-            tx_entries);
+                "            <SubObject subIndex=\"00\" name=\"NumberOfEntries\" "
+                "objectType=\"7\" dataType=\"0005\" accessType=\"rw\" "
+                "defaultValue=\"0x00\" actualValue=\"0x%x\" CDCFlag=\"TRUE\"/>\n",
+                tx_entries);
         tx_cnt++;
 
-        for (wb_object child = o.first(); child; child = child.after()) {
-          for (wb_object grandchild = child.first(); grandchild;
-               grandchild = grandchild.after()) {
-            switch (grandchild.cid()) {
-            case pwr_cClass_ChanDo: {
-              wb_attribute a
-                  = sp->attribute(grandchild.oid(), "RtBody", "Representation");
-              if (!a) {
+        for (wb_object child = o.first(); child; child = child.after())
+        {
+          for (wb_object grandchild = child.first(); grandchild; grandchild = grandchild.after())
+          {
+            switch (grandchild.cid())
+            {
+            case pwr_cClass_ChanDo:
+            {
+              wb_attribute a = sp->attribute(grandchild.oid(), "RtBody", "Representation");
+              if (!a)
+              {
                 fclose(fin);
                 fclose(fout);
                 return a.sts();
               }
 
               a.value(&representation);
-              if (!a) {
+              if (!a)
+              {
                 fclose(fin);
                 fclose(fout);
                 return a.sts();
               }
 
               a = sp->attribute(grandchild.oid(), "RtBody", "Number");
-              if (!a) {
+              if (!a)
+              {
                 fclose(fin);
                 fclose(fout);
                 return a.sts();
               }
 
               a.value(&number);
-              if (!a) {
+              if (!a)
+              {
                 fclose(fin);
                 fclose(fout);
                 return a.sts();
               }
 
-              if (number == 0) {
-                switch (representation) {
+              if (number == 0)
+              {
+                switch (representation)
+                {
                 case pwr_eDataRepEnum_Bit8:
+                case pwr_eDataRepEnum_BitField8:
                   entries = 1;
                   break;
                 case pwr_eDataRepEnum_Bit16:
+                case pwr_eDataRepEnum_BitField16:
                   entries = 2;
                   break;
                 case pwr_eDataRepEnum_Bit32:
+                case pwr_eDataRepEnum_BitField32:
                   entries = 4;
                   break;
                 case pwr_eDataRepEnum_Bit64:
+                case pwr_eDataRepEnum_BitField64:
                   entries = 8;
                   break;
                 }
-                for (int i = 0; i < entries; i++) {
+                for (int i = 0; i < entries; i++)
+                {
                   mv_index = 0x6000;
                   mv_subindex = do_cnt + 1;
                   mv_offset = do_cnt * 8;
                   mv_size = 8;
-                  fprintf(fout, "            <SubObject subIndex=\"%02x\" "
-                                "name=\"ObjectMapping\" objectType=\"7\" "
-                                "dataType=\"001B\" accessType=\"rw/ro\" "
-                                "defaultValue=\"0\" "
-                                "actualValue=\"0x%04x%04x%04x%04x\" "
-                                "CDCFlag=\"TRUE\"/>\n",
-                      tx_cnt, mv_size, tx_offset, mv_subindex, mv_index);
+                  fprintf(fout,
+                          "            <SubObject subIndex=\"%02x\" "
+                          "name=\"ObjectMapping\" objectType=\"7\" "
+                          "dataType=\"001B\" accessType=\"rw/ro\" "
+                          "defaultValue=\"0\" "
+                          "actualValue=\"0x%04x%04x%04x%04x\" "
+                          "CDCFlag=\"TRUE\"/>\n",
+                          tx_cnt, mv_size, tx_offset, mv_subindex, mv_index);
                   tx_offset += mv_size;
                   do_cnt++;
                   tx_cnt++;
@@ -529,34 +593,37 @@ static pwr_tStatus GenerateXddFile(ldh_sMenuCall* ip)
               break;
             }
             case pwr_cClass_ChanIo:
-            case pwr_cClass_ChanAo: {
-              wb_attribute a
-                  = sp->attribute(grandchild.oid(), "RtBody", "Representation");
-              if (!a) {
+            case pwr_cClass_ChanAo:
+            {
+              wb_attribute a = sp->attribute(grandchild.oid(), "RtBody", "Representation");
+              if (!a)
+              {
                 fclose(fin);
                 fclose(fout);
                 return a.sts();
               }
 
               a.value(&representation);
-              if (!a) {
+              if (!a)
+              {
                 fclose(fin);
                 fclose(fout);
                 return a.sts();
               }
 
-              switch (representation) {
+              switch (representation)
+              {
               case pwr_eDataRepEnum_Int8:
               case pwr_eDataRepEnum_UInt8:
                 mv_index = 0x6400;
                 mv_subindex = ao8_cnt + 1;
                 mv_size = 8;
                 fprintf(fout,
-                    "            <SubObject subIndex=\"%02x\" "
-                    "name=\"ObjectMapping\" objectType=\"7\" dataType=\"001B\" "
-                    "accessType=\"rw/ro\" defaultValue=\"0\" "
-                    "actualValue=\"0x%04x%04x%04x%04x\" CDCFlag=\"TRUE\"/>\n",
-                    tx_cnt, mv_size, tx_offset, mv_subindex, mv_index);
+                        "            <SubObject subIndex=\"%02x\" "
+                        "name=\"ObjectMapping\" objectType=\"7\" dataType=\"001B\" "
+                        "accessType=\"rw/ro\" defaultValue=\"0\" "
+                        "actualValue=\"0x%04x%04x%04x%04x\" CDCFlag=\"TRUE\"/>\n",
+                        tx_cnt, mv_size, tx_offset, mv_subindex, mv_index);
                 tx_offset += mv_size;
                 ao8_cnt++;
                 tx_cnt++;
@@ -567,11 +634,11 @@ static pwr_tStatus GenerateXddFile(ldh_sMenuCall* ip)
                 mv_subindex = ao16_cnt + 1;
                 mv_size = 16;
                 fprintf(fout,
-                    "            <SubObject subIndex=\"%02x\" "
-                    "name=\"ObjectMapping\" objectType=\"7\" dataType=\"001B\" "
-                    "accessType=\"rw/ro\" defaultValue=\"0\" "
-                    "actualValue=\"0x%04x%04x%04x%04x\" CDCFlag=\"TRUE\"/>\n",
-                    tx_cnt, mv_size, tx_offset, mv_subindex, mv_index);
+                        "            <SubObject subIndex=\"%02x\" "
+                        "name=\"ObjectMapping\" objectType=\"7\" dataType=\"001B\" "
+                        "accessType=\"rw/ro\" defaultValue=\"0\" "
+                        "actualValue=\"0x%04x%04x%04x%04x\" CDCFlag=\"TRUE\"/>\n",
+                        tx_cnt, mv_size, tx_offset, mv_subindex, mv_index);
                 tx_offset += mv_size;
                 ao16_cnt++;
                 tx_cnt++;
@@ -582,11 +649,11 @@ static pwr_tStatus GenerateXddFile(ldh_sMenuCall* ip)
                 mv_subindex = ao32_cnt + 1;
                 mv_size = 32;
                 fprintf(fout,
-                    "            <SubObject subIndex=\"%02x\" "
-                    "name=\"ObjectMapping\" objectType=\"7\" dataType=\"001B\" "
-                    "accessType=\"rw/ro\" defaultValue=\"0\" "
-                    "actualValue=\"0x%04x%04x%04x%04x\" CDCFlag=\"TRUE\"/>\n",
-                    tx_cnt, mv_size, tx_offset, mv_subindex, mv_index);
+                        "            <SubObject subIndex=\"%02x\" "
+                        "name=\"ObjectMapping\" objectType=\"7\" dataType=\"001B\" "
+                        "accessType=\"rw/ro\" defaultValue=\"0\" "
+                        "actualValue=\"0x%04x%04x%04x%04x\" CDCFlag=\"TRUE\"/>\n",
+                        tx_cnt, mv_size, tx_offset, mv_subindex, mv_index);
                 tx_offset += mv_size;
                 ao32_cnt++;
                 tx_cnt++;
@@ -603,7 +670,9 @@ static pwr_tStatus GenerateXddFile(ldh_sMenuCall* ip)
         fprintf(fout, "          </Object>\n");
       }
       fprintf(fout, "%s\n", line);
-    } else {
+    }
+    else
+    {
       fprintf(fout, "%s\n", line);
     }
   }
@@ -617,14 +686,11 @@ static pwr_tStatus GenerateXddFile(ldh_sMenuCall* ip)
   return 1;
 }
 
-static pwr_tStatus GenerateXddFileFilter(ldh_sMenuCall* ip)
-{
-  return 1;
-}
+static pwr_tStatus GenerateXddFileFilter(ldh_sMenuCall* ip) { return 1; }
 
 /*----------------------------------------------------------------------------*\
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindMethods(Epl_CNServer) = { pwr_BindMethod(GenerateXddFile),
-  pwr_BindMethod(GenerateXddFileFilter), pwr_NullMethod };
+pwr_dExport pwr_BindMethods(Epl_CNServer) = {pwr_BindMethod(GenerateXddFile),
+                                             pwr_BindMethod(GenerateXddFileFilter), pwr_NullMethod};

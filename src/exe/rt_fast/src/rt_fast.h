@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -39,7 +39,8 @@
 
 #include <vector>
 
-extern "C" {
+extern "C"
+{
 #include "pwr_baseclasses.h"
 #include "rt_qcom.h"
 }
@@ -52,19 +53,20 @@ extern "C" {
 #define FAST_CURVES 10
 #define fast_cNoTrigg 0xffffffff
 
-typedef enum {
-  fast_mFunction_ManTrigg = 1 << 0, //!< Allow manual trigg.
-  fast_mFunction_LevelTrigg = 1 << 1, //!< Trigg on level.
-  fast_mFunction_BeforeTrigg = 1 << 2, //!< Display points before trigg.
-  fast_mFunction_AlwaysPrepared = 1
-      << 3, //!< Overwrite old curve as soon as the old is viewed.
-  fast_mFunction_User = 1 << 4 //!< Curve is handled by the user.
+typedef enum
+{
+  fast_mFunction_ManTrigg = 1 << 0,       //!< Allow manual trigg.
+  fast_mFunction_LevelTrigg = 1 << 1,     //!< Trigg on level.
+  fast_mFunction_BeforeTrigg = 1 << 2,    //!< Display points before trigg.
+  fast_mFunction_AlwaysPrepared = 1 << 3, //!< Overwrite old curve as soon as the old is viewed.
+  fast_mFunction_User = 1 << 4            //!< Curve is handled by the user.
 } fast_mFunction;
 
-class fastobject {
-  public:
+class fastobject
+{
+public:
   fastobject(pwr_sAttrRef* arp)
-      : aref(*arp), p(0), trigg(0), time_buffer(0), old_level(0), stop_index(0),
+      : aref(*arp), p(0), trigg(0), time_buffer(0), current_index(0), old_level(0), stop_index(0),
         scan_div(0), scan_cnt(0)
   {
     memset(attributes, 0, sizeof(attributes));
@@ -74,7 +76,7 @@ class fastobject {
   void close();
   void scan();
 
-  private:
+private:
   pwr_sAttrRef aref;
   pwr_sClass_DsFastCurve* p;
   pwr_tBoolean* trigg;
@@ -101,24 +103,20 @@ class fastobject {
 
 //! Handling of TrendCurve objects.
 /*! ...
-*/
+ */
 
-class rt_fast {
-  public:
-  rt_fast() : fast_cnt(0), scan_time(0.1)
-  {
-  }
+class rt_fast
+{
+public:
+  rt_fast() : fast_cnt(0), scan_time(0.1) {}
 
   void init(qcom_sQid* qid);
   void open();
   void close();
   void scan();
-  double scantime()
-  {
-    return scan_time;
-  }
+  double scantime() { return scan_time; }
 
-  private:
+private:
   std::vector<fastobject*> objects;
   int fast_cnt;
   double scan_time;

@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -72,8 +72,7 @@ lfu_volume_info::lfu_volume_info() : vid(0), cid(0), volrep(ldh_eVolRep_Db)
   strcpy(server, "");
 }
 
-lfu_volume_info::lfu_volume_info(const lfu_volume_info& x)
-    : vid(x.vid), cid(x.cid), volrep(x.volrep)
+lfu_volume_info::lfu_volume_info(const lfu_volume_info& x) : vid(x.vid), cid(x.cid), volrep(x.volrep)
 {
   strncpy(name, x.name, sizeof(name));
   strncpy(server, x.server, sizeof(server));
@@ -94,12 +93,12 @@ lfu_boot_info::lfu_boot_info(const lfu_boot_info& x)
   strncpy(volume_name, x.volume_name, sizeof(volume_name));
 }
 
-class lfu_nodeconf {
+class lfu_nodeconf
+{
 public:
   lfu_nodeconf()
-      : isfriend(0), port(0), vid(0), connection(0), qcom_min_resend_time(0),
-        qcom_max_resend_time(0), has_secondary(0), redcom_port(0),
-        redcom_min_resend_time(0), redcom_max_resend_time(0),
+      : isfriend(0), port(0), vid(0), connection(0), qcom_min_resend_time(0), qcom_max_resend_time(0),
+        has_secondary(0), redcom_port(0), redcom_min_resend_time(0), redcom_max_resend_time(0),
         redcom_export_buf_quota(0), redcom_ack_delay(0), redcom_segment_size(0)
   {
     strcpy(address, "");
@@ -131,7 +130,8 @@ public:
   pwr_tUInt32 redcom_segment_size;
 };
 
-typedef struct {
+typedef struct
+{
   char name[32];
   pwr_tVid vid;
   pwr_tCid cid;
@@ -142,8 +142,7 @@ typedef struct {
 
 static void lfu_creadb_qb_yes(void* ctx, void* data);
 
-pwr_tStatus lfu_volumelist_load(
-    const char* filename, lfu_t_volumelist** vollist, int* volcount)
+pwr_tStatus lfu_volumelist_load(const char* filename, lfu_t_volumelist** vollist, int* volcount)
 {
   FILE* file;
   char line[200];
@@ -161,7 +160,8 @@ pwr_tStatus lfu_volumelist_load(
   syntax_error = 0;
   dcli_translate_filename(fname, filename);
   file = fopen(fname, "r");
-  if (!file) {
+  if (!file)
+  {
     printf("-- Error, unable to open file \"%s\"\n", fname);
     *volcount = 0;
     return LFU__NOFILE;
@@ -170,10 +170,11 @@ pwr_tStatus lfu_volumelist_load(
   list_alloc = 0;
   line_count = 0;
   count = 0;
-  while (ODD(sts = utl_read_line(line, sizeof(line), file, &line_count))) {
-    nr = utl_parse(line, " 	", "", (char*)param,
-        sizeof(param) / sizeof(param[0]), sizeof(param[0]));
-    if (nr < 3) {
+  while (ODD(sts = utl_read_line(line, sizeof(line), file, &line_count)))
+  {
+    nr = utl_parse(line, " 	", "", (char*)param, sizeof(param) / sizeof(param[0]), sizeof(param[0]));
+    if (nr < 3)
+    {
       printf("-- Syntax error in file '%s' line %d, \n", filename, line_count);
       printf("        \"%s\"\n", line);
       count++;
@@ -208,7 +209,8 @@ pwr_tStatus lfu_volumelist_load(
     else
       strcpy(list_ptr->p6, "");
     sts = cdh_StringToVolumeId(param[1], &list_ptr->volume_id);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       printf("-- Syntax error in file '%s' line %d, \n", filename, line_count);
       printf("        \"%s\"\n", line);
       count++;
@@ -228,17 +230,17 @@ pwr_tStatus lfu_volumelist_load(
 }
 
 /************************************************************************
-*
-* Name: 	lfu_create_loadfile
-*
-* Type:	void
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Create loadfile for a volume.
-*
-*************************************************************************/
+ *
+ * Name: 	lfu_create_loadfile
+ *
+ * Type:	void
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Create loadfile for a volume.
+ *
+ *************************************************************************/
 pwr_tStatus lfu_create_loadfile(ldh_tSesContext ldhses)
 {
   pwr_tStatus sts;
@@ -251,7 +253,8 @@ pwr_tStatus lfu_create_loadfile(ldh_tSesContext ldhses)
 
   sts = ldh_GetVolumeClass(ldh_SessionToWB(ldhses), volinfo.Volume, &cid);
 
-  if (cid == pwr_eClass_RootVolume || cid == pwr_eClass_SubVolume) {
+  if (cid == pwr_eClass_RootVolume || cid == pwr_eClass_SubVolume)
+  {
     sts = gcg_comp_volume(ldhses);
     if (EVEN(sts))
       return sts;
@@ -261,19 +264,19 @@ pwr_tStatus lfu_create_loadfile(ldh_tSesContext ldhses)
 }
 
 /************************************************************************
-*
-* Name: 	lfu_create_bootfile
-*
-* Type:	void
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Create bootfile for one node.
-*
-*************************************************************************/
-pwr_tStatus lfu_create_bootfile(char* nodeconfigname, int nodetype,
-    lfu_t_volumelist* volumelist, int volumecount, int debug)
+ *
+ * Name: 	lfu_create_bootfile
+ *
+ * Type:	void
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Create bootfile for one node.
+ *
+ *************************************************************************/
+pwr_tStatus lfu_create_bootfile(char* nodeconfigname, int nodetype, lfu_t_volumelist* volumelist,
+                                int volumecount, int debug)
 {
   int i, j;
   FILE* file;
@@ -301,9 +304,11 @@ pwr_tStatus lfu_create_bootfile(char* nodeconfigname, int nodetype,
 
   volumelist_ptr = volumelist;
   utl_toupper(nodeconfigname_upper, nodeconfigname);
-  for (j = 0; j < volumecount; j++) {
+  for (j = 0; j < volumecount; j++)
+  {
     utl_toupper(vollistname_upper, volumelist_ptr->p1);
-    if (!strcmp(nodeconfigname_upper, vollistname_upper)) {
+    if (!strcmp(nodeconfigname_upper, vollistname_upper))
+    {
       strcpy(nodename, volumelist_ptr->p2);
       sscanf(volumelist_ptr->p3, "%d", &bus);
       sscanf(volumelist_ptr->p4, "%d", (int*)&os);
@@ -312,11 +317,15 @@ pwr_tStatus lfu_create_bootfile(char* nodeconfigname, int nodetype,
       node_vollist_count = 0;
       first_volumelist_ptr = volumelist_ptr;
 
-      while (!strcmp(nodeconfigname_upper, vollistname_upper)) {
-        if (node_vollist_count < LFU_MAX_NODE_VOLUMES) {
+      while (!strcmp(nodeconfigname_upper, vollistname_upper))
+      {
+        if (node_vollist_count < LFU_MAX_NODE_VOLUMES)
+        {
           node_vollist[node_vollist_count] = volumelist_ptr->volume_id;
           node_vollist_count++;
-        } else {
+        }
+        else
+        {
           printf("** Error, max number of volumes exceeded\n");
           return LFU__NOFILE;
         }
@@ -327,8 +336,8 @@ pwr_tStatus lfu_create_bootfile(char* nodeconfigname, int nodetype,
       /* Get data for plc and print volumes on terminal */
       printf("-- Creating bootfile for node %s\n", nodename);
 
-      sts = gcg_comp_rtnode(nodename, os, bus, 1, &errorcount, &warningcount,
-          debug, node_vollist, node_vollist_count, 0, single_scantime);
+      sts = gcg_comp_rtnode(nodename, os, bus, 1, &errorcount, &warningcount, debug, node_vollist,
+                            node_vollist_count, 0, single_scantime);
       if (EVEN(sts))
         return sts;
       if (sts == GSX__NOPLC)
@@ -340,7 +349,8 @@ pwr_tStatus lfu_create_bootfile(char* nodeconfigname, int nodetype,
       sprintf(filename, pwr_cNameBoot, load_cDirectory, cdh_Low(nodename), bus);
       dcli_translate_filename(filename, filename);
       file = fopen(filename, "w");
-      if (!file) {
+      if (!file)
+      {
         printf("** Error, Unable to open bootfile, %s", filename);
         return LFU__NOFILE;
       }
@@ -349,22 +359,26 @@ pwr_tStatus lfu_create_bootfile(char* nodeconfigname, int nodetype,
       fprintf(file, "%s\n", timstr);
 
       sts = lfu_ReadSysObjectFile(systemname, systemgroup);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         fprintf(file, "\n");
         fprintf(file, "\n");
-      } else {
+      }
+      else
+      {
         fprintf(file, "%s\n", systemname);
         fprintf(file, "%s\n", systemgroup);
       }
 
       plcproc_count = 0;
-      gcg_read_volume_plclist(first_volumelist_ptr->volume_id, 0, 0, 0, 0,
-          &plcproc_count, &plcproclist);
+      gcg_read_volume_plclist(first_volumelist_ptr->volume_id, 0, 0, 0, 0, &plcproc_count, &plcproclist);
 
       if (noplc || plcproc_count == 0)
         fprintf(file, "-\n");
-      else {
-        for (i = 0; i < (int)plcproc_count; i++) {
+      else
+      {
+        for (i = 0; i < (int)plcproc_count; i++)
+        {
           if (i != 0)
             fprintf(file, ",");
           strncpy(plcname, cdh_Low(plcproclist[i].name), sizeof(plcname));
@@ -375,14 +389,16 @@ pwr_tStatus lfu_create_bootfile(char* nodeconfigname, int nodetype,
       node_vollist_count = 0;
       volumelist_ptr = first_volumelist_ptr;
       utl_toupper(vollistname_upper, volumelist_ptr->p1);
-      while (!strcmp(nodeconfigname_upper, vollistname_upper)) {
+      while (!strcmp(nodeconfigname_upper, vollistname_upper))
+      {
         fprintf(file, "%s %s\n", volumelist_ptr->volume_name,
-            cdh_VolumeIdToString(0, 0, volumelist_ptr->volume_id, 0, 0));
+                cdh_VolumeIdToString(0, 0, volumelist_ptr->volume_id, 0, 0));
         volumelist_ptr++;
         utl_toupper(vollistname_upper, volumelist_ptr->p1);
       }
 
-      if (nodetype == bld_eNodeType_Sev) {
+      if (nodetype == bld_eNodeType_Sev)
+      {
         fprintf(file, "pwrs 0.0.0.1\n");
         fprintf(file, "pwrb 0.0.0.2\n");
       }
@@ -397,51 +413,48 @@ pwr_tStatus lfu_create_bootfile(char* nodeconfigname, int nodetype,
 }
 
 /*************************************************************************
-*
-* Name:		lfu_GetPlcFileVersion
-*
-* Type		pwr_tStatus
-*
-* Description:
-*	Find the highest version of a plc-file.
-*
-* Parameters
-*
-**************************************************************************/
-pwr_tStatus lfu_GetPlcFileVersion(
-    pwr_tVolumeId volumeid, int* version, pwr_tTime* date)
+ *
+ * Name:		lfu_GetPlcFileVersion
+ *
+ * Type		pwr_tStatus
+ *
+ * Description:
+ *	Find the highest version of a plc-file.
+ *
+ * Parameters
+ *
+ **************************************************************************/
+pwr_tStatus lfu_GetPlcFileVersion(pwr_tVolumeId volumeid, int* version, pwr_tTime* date)
 {
   pwr_tStatus sts;
   char filename[80];
   unsigned char volid[4];
 
   memcpy(&volid, &volumeid, sizeof(volid));
-  sprintf(filename, "pwrp_load:plc_%3.3u_%3.3u_%3.3u_%3.3u_*.exe", volid[3],
-      volid[2], volid[1], volid[0]);
+  sprintf(filename, "pwrp_load:plc_%3.3u_%3.3u_%3.3u_%3.3u_*.exe", volid[3], volid[2], volid[1], volid[0]);
   sts = lfu_GetFileVersion(filename, 5, version, date);
   return sts;
 }
 
 /*************************************************************************
-*
-* Name:		lfu_GetFileVersion
-*
-* Type		pwr_tStatus
-*
-* Description:
-*		Finds the highest version for a file, and returns
-*		proview-version and date for this file.
-*		Filename is given as a pattern, and the version
-*		has to be in the filename befor the extention
-*		with the number of digits given in num_of_digits.
-*		ex "pwrp_load:ld_vol_000_000_001_001_%%%%%.dat.0"
-*
-* Parameters
-*
-**************************************************************************/
+ *
+ * Name:		lfu_GetFileVersion
+ *
+ * Type		pwr_tStatus
+ *
+ * Description:
+ *		Finds the highest version for a file, and returns
+ *		proview-version and date for this file.
+ *		Filename is given as a pattern, and the version
+ *		has to be in the filename befor the extention
+ *		with the number of digits given in num_of_digits.
+ *		ex "pwrp_load:ld_vol_000_000_001_001_%%%%%.dat.0"
+ *
+ * Parameters
+ *
+ **************************************************************************/
 
-pwr_tStatus lfu_GetFileVersion(
-    char* pattern, int number_of_digits, int* version, pwr_tTime* date)
+pwr_tStatus lfu_GetFileVersion(char* pattern, int number_of_digits, int* version, pwr_tTime* date)
 {
   pwr_tStatus sts;
   char found_file[160];
@@ -451,7 +464,7 @@ pwr_tStatus lfu_GetFileVersion(
   char version_str[10];
   int highest_version = 0;
   char highest_filename[80] = "";
-  pwr_tTime highest_date = { 0, 0 };
+  pwr_tTime highest_date = {0, 0};
   int found;
   int nr;
   int found_version;
@@ -463,7 +476,8 @@ pwr_tStatus lfu_GetFileVersion(
   search_ctx = 0;
   dcli_translate_filename(trn_pattern, pattern);
   sts = dcli_search_file(trn_pattern, found_file, DCLI_DIR_SEARCH_INIT);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     found = 1;
 
     sts = dir_get_fileinfo(found_file, &found_date, &size, &vms_vers, NULL);
@@ -476,21 +490,27 @@ pwr_tStatus lfu_GetFileVersion(
     strncpy(version_str, s, number_of_digits);
     version_str[number_of_digits] = 0;
     nr = sscanf(version_str, "%d", &found_version);
-    if (nr == 1) {
-      if (found_version > highest_version) {
+    if (nr == 1)
+    {
+      if (found_version > highest_version)
+      {
         highest_version = found_version;
-        if (time_Acomp(&found_date, &highest_date) < 0) {
+        if (time_Acomp(&found_date, &highest_date) < 0)
+        {
           printf("** Warning, %s has later creation time but lower version "
                  "than %s\n",
-              highest_filename, found_file);
+                 highest_filename, found_file);
         }
         highest_date = found_date;
         strcpy(highest_filename, found_file);
-      } else {
-        if (time_Acomp(&found_date, &highest_date) > 0) {
+      }
+      else
+      {
+        if (time_Acomp(&found_date, &highest_date) > 0)
+        {
           printf("** Warning, %s has later creation time but lower version "
                  "than %s\n",
-              found_file, highest_filename);
+                 found_file, highest_filename);
         }
       }
     }
@@ -505,8 +525,7 @@ pwr_tStatus lfu_GetFileVersion(
   return 1;
 }
 
-pwr_tStatus lfu_IncrementAndGetVersion(
-    char* filename, unsigned long* current_version)
+pwr_tStatus lfu_IncrementAndGetVersion(char* filename, unsigned long* current_version)
 {
   FILE* file;
   int nr;
@@ -516,15 +535,19 @@ pwr_tStatus lfu_IncrementAndGetVersion(
 
   dcli_translate_filename(fname, filename);
   file = fopen(fname, "r+");
-  if (!file) {
+  if (!file)
+  {
     file = fopen(fname, "w");
     if (!file)
       return LFU__NOFILE;
     version = 1;
-  } else {
+  }
+  else
+  {
     fgetpos(file, &pos);
     nr = fscanf(file, "%ld", &version);
-    if (nr != 1) {
+    if (nr != 1)
+    {
       fclose(file);
       return LFU__PLCVERSION;
     }
@@ -539,15 +562,15 @@ pwr_tStatus lfu_IncrementAndGetVersion(
 }
 
 /*************************************************************************
-*
-* Name:		lfu_ReadSysObjectFile
-*
-* Type		pwr_tStatus
-*
-* Description:
-*		Read info of the systemobject in the directory db.
-*
-**************************************************************************/
+ *
+ * Name:		lfu_ReadSysObjectFile
+ *
+ * Type		pwr_tStatus
+ *
+ * Description:
+ *		Read info of the systemobject in the directory db.
+ *
+ **************************************************************************/
 
 pwr_tStatus lfu_ReadSysObjectFile(char* SystemName, char* SystemGroup)
 {
@@ -557,13 +580,17 @@ pwr_tStatus lfu_ReadSysObjectFile(char* SystemName, char* SystemGroup)
 
   dcli_translate_filename(fname, pwr_cNameSysObject);
   file = fopen(fname, "r");
-  if (file == 0) {
+  if (file == 0)
+  {
     strcpy(SystemName, "");
     strcpy(SystemGroup, "");
     return LFU__NOFILE;
-  } else {
+  }
+  else
+  {
     nr = fscanf(file, "%s", SystemName);
-    if (nr != 1) {
+    if (nr != 1)
+    {
       fclose(file);
       return LFU__FILECRP;
     }
@@ -591,7 +618,8 @@ pwr_tStatus lfu_WriteSysObjectFile(ldh_tSesContext ldhses)
 
   dcli_translate_filename(fname, pwr_cNameSysObject);
   file = fopen(fname, "w");
-  if (!file) {
+  if (!file)
+  {
     printf("** Error, unable to open file \"%s\"\n", pwr_cNameSysObject);
     return LFU__NOFILE;
   }
@@ -602,19 +630,18 @@ pwr_tStatus lfu_WriteSysObjectFile(ldh_tSesContext ldhses)
 }
 
 /************************************************************************
-*
-* Name: lfu_save_directoryvolume
-*
-* Type: int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Syntax control and file generation when a directory volume is saved.
-*
-*************************************************************************/
-pwr_tStatus lfu_SaveDirectoryVolume(
-    ldh_tSesContext ldhses, CoWow* wow, int quiet)
+ *
+ * Name: lfu_save_directoryvolume
+ *
+ * Type: int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Syntax control and file generation when a directory volume is saved.
+ *
+ *************************************************************************/
+pwr_tStatus lfu_SaveDirectoryVolume(ldh_tSesContext ldhses, CoWow* wow, int quiet)
 {
   pwr_tStatus sts;
   lfu_t_volumelist* volumelist;
@@ -646,7 +673,6 @@ pwr_tStatus lfu_SaveDirectoryVolume(
   char nodename[80];
   pwr_tUInt32* os_ptr;
   pwr_tUInt32 os;
-  pwr_tEnum* remote_access_type_ptr;
   pwr_tUInt32* bus_number_ptr;
   pwr_tBoolean* single_scan_ptr;
   pwr_tFloat32* scantime_ptr;
@@ -692,7 +718,8 @@ pwr_tStatus lfu_SaveDirectoryVolume(
 
   /* Load the volume list */
   sts = lfu_volumelist_load(pwr_cNameGblVolumeList, &volumelist, &volumecount);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     syntax_error = 1;
     if (sts == LFU__NOFILE)
       return sts;
@@ -700,40 +727,43 @@ pwr_tStatus lfu_SaveDirectoryVolume(
 
   dcli_translate_filename(fname, pwr_cNameVolumeList);
   file = fopen(fname, "w");
-  if (file == 0) {
+  if (file == 0)
+  {
     printf("** Error, Unable to open file \"%s\"\n", fname);
     return LFU__NOFILE;
   }
 
   /* Check that the configured volumes exist */
-  for (int k = 0; k < 2; k++) {
+  for (int k = 0; k < 2; k++)
+  {
     // Check class volumes in the first round, and other volumes after
 
     for (sts = ldh_GetRootList(ldhses, &envobjid); ODD(sts);
-         sts = ldh_GetNextSibling(ldhses, envobjid, &envobjid)) {
+         sts = ldh_GetNextSibling(ldhses, envobjid, &envobjid))
+    {
       sts = ldh_GetObjectClass(ldhses, envobjid, &vcid);
       if (EVEN(sts))
         return sts;
 
-      if (vcid == pwr_cClass_WbEnvironment) {
+      if (vcid == pwr_cClass_WbEnvironment)
+      {
         if (k != 1)
           continue;
 
         /* Create directory list file */
-        sts = ldh_ObjidToName(
-            ldhses, envobjid, ldh_eName_Object, name, sizeof(name), &size);
+        sts = ldh_ObjidToName(ldhses, envobjid, ldh_eName_Object, name, sizeof(name), &size);
         if (EVEN(sts))
           return sts;
 
-        sts = ldh_GetObjectPar(
-            ldhses, envobjid, "RtBody", "Path", (char**)&path_ptr, &size);
+        sts = ldh_GetObjectPar(ldhses, envobjid, "RtBody", "Path", (char**)&path_ptr, &size);
         if (EVEN(sts))
           return sts;
 
         dcli_translate_filename(filename, pwr_cNameFilePath);
 
         fpath = fopen(filename, "w");
-        if (!fpath) {
+        if (!fpath)
+        {
           printf("** Unable to open path file %s\n", filename);
           syntax_error = 1;
           free((char*)path_ptr);
@@ -742,7 +772,8 @@ pwr_tStatus lfu_SaveDirectoryVolume(
 
         path_file_created = 1;
 
-        for (i = 0; i < 50; i++) {
+        for (i = 0; i < 50; i++)
+        {
           str_trim(path, path_ptr[i]);
           if (!streq(path, ""))
             fprintf(fpath, "%s\n", path);
@@ -752,18 +783,18 @@ pwr_tStatus lfu_SaveDirectoryVolume(
 
         // Get xxxVolumeLoad objects
         sts = ldh_GetChild(ldhses, envobjid, &volobjid);
-        while (ODD(sts)) {
+        while (ODD(sts))
+        {
           sts = ldh_GetObjectClass(ldhses, volobjid, &vcid);
           if (EVEN(sts))
             return sts;
 
-          if (vcid == pwr_cClass_RootVolumeLoad
-              || vcid == pwr_cClass_SubVolumeLoad
-              || vcid == pwr_cClass_ClassVolumeLoad
-              || vcid == pwr_cClass_DetachedClassVolumeLoad
-              || vcid == pwr_cClass_SharedVolumeLoad) {
-            sts = ldh_ObjidToName(ldhses, volobjid, ldh_eName_Object,
-                volume_name, sizeof(volume_name), &size);
+          if (vcid == pwr_cClass_RootVolumeLoad || vcid == pwr_cClass_SubVolumeLoad ||
+              vcid == pwr_cClass_ClassVolumeLoad || vcid == pwr_cClass_DetachedClassVolumeLoad ||
+              vcid == pwr_cClass_SharedVolumeLoad)
+          {
+            sts =
+                ldh_ObjidToName(ldhses, volobjid, ldh_eName_Object, volume_name, sizeof(volume_name), &size);
             if (EVEN(sts))
               return sts;
             utl_toupper(name, volume_name);
@@ -771,12 +802,15 @@ pwr_tStatus lfu_SaveDirectoryVolume(
             /* Check that the name is in the global volume list */
             found = 0;
             volumelist_ptr = volumelist;
-            for (i = 0; i < volumecount; i++) {
+            for (i = 0; i < volumecount; i++)
+            {
               utl_toupper(volname, volumelist_ptr->volume_name);
-              if (!strcmp(name, volname)) {
+              if (!strcmp(name, volname))
+              {
                 found = 1;
 
-                switch (vcid) {
+                switch (vcid)
+                {
                 case pwr_cClass_RootVolumeLoad:
                   strcpy(classname, "RootVolume");
                   break;
@@ -795,42 +829,35 @@ pwr_tStatus lfu_SaveDirectoryVolume(
                 }
 
                 fprintf(file, "%s %s %s load\n", volume_name,
-                    cdh_VolumeIdToString(0, 0, volumelist_ptr->volume_id, 0, 0),
-                    classname);
+                        cdh_VolumeIdToString(0, 0, volumelist_ptr->volume_id, 0, 0), classname);
                 break;
               }
               volumelist_ptr++;
             }
-            if (!found) {
+            if (!found)
+            {
               char msg[200];
-              sprintf(msg,
-                  "Error in VolumeConfig object,  '%s' is not configured in the global\
+              sprintf(msg, "Error in VolumeConfig object,  '%s' is not configured in the global\
  volume list",
-                  name);
+                      name);
               MsgWindow::message('E', msg, msgw_ePop_Default);
               syntax_error = 1;
             }
           }
           sts = ldh_GetNextSibling(ldhses, volobjid, &volobjid);
         }
-      } else if (vcid == pwr_cClass_RootVolumeConfig
-          || vcid == pwr_cClass_SubVolumeConfig
-          || vcid == pwr_cClass_ClassVolumeConfig
-          || vcid == pwr_cClass_DetachedClassVolumeConfig
-          || vcid == pwr_cClass_SharedVolumeConfig
-          || vcid == pwr_cClass_CloneVolumeConfig
-          || vcid == pwr_cClass_ExternVolumeConfig) {
-        if (!(vcid == pwr_cClass_ClassVolumeConfig
-                || vcid == pwr_cClass_DetachedClassVolumeConfig)
-            && k == 0)
+      }
+      else if (vcid == pwr_cClass_RootVolumeConfig || vcid == pwr_cClass_SubVolumeConfig ||
+               vcid == pwr_cClass_ClassVolumeConfig || vcid == pwr_cClass_DetachedClassVolumeConfig ||
+               vcid == pwr_cClass_SharedVolumeConfig || vcid == pwr_cClass_CloneVolumeConfig ||
+               vcid == pwr_cClass_ExternVolumeConfig)
+      {
+        if (!(vcid == pwr_cClass_ClassVolumeConfig || vcid == pwr_cClass_DetachedClassVolumeConfig) && k == 0)
           continue;
-        if ((vcid == pwr_cClass_ClassVolumeConfig
-                || vcid == pwr_cClass_DetachedClassVolumeConfig)
-            && k == 1)
+        if ((vcid == pwr_cClass_ClassVolumeConfig || vcid == pwr_cClass_DetachedClassVolumeConfig) && k == 1)
           continue;
 
-        sts = ldh_ObjidToName(ldhses, envobjid, ldh_eName_Object, volume_name,
-            sizeof(volume_name), &size);
+        sts = ldh_ObjidToName(ldhses, envobjid, ldh_eName_Object, volume_name, sizeof(volume_name), &size);
         if (EVEN(sts))
           return sts;
         utl_toupper(name, volume_name);
@@ -838,154 +865,154 @@ pwr_tStatus lfu_SaveDirectoryVolume(
         /* Check that the name is in the global volume list */
         found = 0;
         volumelist_ptr = volumelist;
-        for (i = 0; i < volumecount; i++) {
+        for (i = 0; i < volumecount; i++)
+        {
           utl_toupper(volname, volumelist_ptr->volume_name);
-          if (!strcmp(name, volname)) {
+          if (!strcmp(name, volname))
+          {
             found = 1;
 
             bool out_of_range = false;
-            switch (vcid) {
+            switch (vcid)
+            {
             case pwr_cClass_RootVolumeConfig:
               strcpy(classname, "RootVolume");
-              if (volumelist_ptr->volume_id < cdh_cUserVolMin
-                  || volumelist_ptr->volume_id > cdh_cUserVolMax)
+              if (volumelist_ptr->volume_id < cdh_cUserVolMin || volumelist_ptr->volume_id > cdh_cUserVolMax)
                 out_of_range = true;
               break;
             case pwr_cClass_SubVolumeConfig:
               strcpy(classname, "SubVolume");
-              if (volumelist_ptr->volume_id < cdh_cUserVolMin
-                  || volumelist_ptr->volume_id > cdh_cUserVolMax)
+              if (volumelist_ptr->volume_id < cdh_cUserVolMin || volumelist_ptr->volume_id > cdh_cUserVolMax)
                 out_of_range = true;
               break;
             case pwr_cClass_ClassVolumeConfig:
               strcpy(classname, "ClassVolume");
-              if (volumelist_ptr->volume_id < cdh_cUserClassVolMin
-                  || volumelist_ptr->volume_id > cdh_cUserClassVolMax)
+              if (volumelist_ptr->volume_id < cdh_cUserClassVolMin ||
+                  volumelist_ptr->volume_id > cdh_cUserClassVolMax)
                 out_of_range = true;
               break;
             case pwr_cClass_DetachedClassVolumeConfig:
               strcpy(classname, "DetachedClassVolume");
-              if (volumelist_ptr->volume_id < cdh_cUserClassVolMin
-                  || volumelist_ptr->volume_id > cdh_cUserClassVolMax)
+              if (volumelist_ptr->volume_id < cdh_cUserClassVolMin ||
+                  volumelist_ptr->volume_id > cdh_cUserClassVolMax)
                 out_of_range = true;
               break;
             case pwr_cClass_SharedVolumeConfig:
               strcpy(classname, "SharedVolume");
-              if (volumelist_ptr->volume_id < cdh_cUserVolMin
-                  || volumelist_ptr->volume_id > cdh_cUserVolMax)
+              if (volumelist_ptr->volume_id < cdh_cUserVolMin || volumelist_ptr->volume_id > cdh_cUserVolMax)
                 out_of_range = true;
               break;
             case pwr_cClass_ExternVolumeConfig:
               strcpy(classname, "ExternVolume");
-              if (volumelist_ptr->volume_id < cdh_cUserVolMin
-                  || volumelist_ptr->volume_id > cdh_cUserVolMax)
+              if (volumelist_ptr->volume_id < cdh_cUserVolMin || volumelist_ptr->volume_id > cdh_cUserVolMax)
                 out_of_range = true;
               break;
             case pwr_cClass_CloneVolumeConfig:
               strcpy(classname, "RootVolume");
-              if (volumelist_ptr->volume_id < cdh_cUserVolMin
-                  || volumelist_ptr->volume_id > cdh_cUserVolMax)
+              if (volumelist_ptr->volume_id < cdh_cUserVolMin || volumelist_ptr->volume_id > cdh_cUserVolMax)
                 out_of_range = true;
               break;
             }
 
-            if (out_of_range) {
+            if (out_of_range)
+            {
               char msg[200];
-              sprintf(msg, "Error in Volume identity for volume '%s', %s is "
-                           "out of range",
-                  name,
-                  cdh_VolumeIdToString(0, 0, volumelist_ptr->volume_id, 1, 0));
+              sprintf(msg,
+                      "Error in Volume identity for volume '%s', %s is "
+                      "out of range",
+                      name, cdh_VolumeIdToString(0, 0, volumelist_ptr->volume_id, 1, 0));
               MsgWindow::message('E', msg, msgw_ePop_Default);
               syntax_error = 1;
             }
 
-            switch (vcid) {
+            switch (vcid)
+            {
             case pwr_cClass_RootVolumeConfig:
             case pwr_cClass_SubVolumeConfig:
             case pwr_cClass_ClassVolumeConfig:
             case pwr_cClass_DetachedClassVolumeConfig:
-            case pwr_cClass_SharedVolumeConfig: {
+            case pwr_cClass_SharedVolumeConfig:
+            {
               int* dbenum = 0;
               char* server = 0;
 
-              sts = ldh_GetObjectPar(ldhses, envobjid, "RtBody", "Database",
-                  (char**)&dbenum, &size);
+              sts = ldh_GetObjectPar(ldhses, envobjid, "RtBody", "Database", (char**)&dbenum, &size);
               if (EVEN(sts))
                 return sts;
 
-              if (((vcid == pwr_cClass_ClassVolumeConfig
-                       || vcid == pwr_cClass_DetachedClassVolumeConfig)
-                      && *dbenum == 2)
-                  || (!(vcid == pwr_cClass_ClassVolumeConfig
-                          || vcid == pwr_cClass_DetachedClassVolumeConfig)
-                         && *dbenum == 1)) {
-                sts = ldh_GetObjectPar(ldhses, envobjid, "RtBody", "Server",
-                    (char**)&server, &size);
+              if (((vcid == pwr_cClass_ClassVolumeConfig || vcid == pwr_cClass_DetachedClassVolumeConfig) &&
+                   *dbenum == 2) ||
+                  (!(vcid == pwr_cClass_ClassVolumeConfig || vcid == pwr_cClass_DetachedClassVolumeConfig) &&
+                   *dbenum == 1))
+              {
+                sts = ldh_GetObjectPar(ldhses, envobjid, "RtBody", "Server", (char**)&server, &size);
                 if (EVEN(sts))
                   return sts;
               }
 
               fprintf(file, "%s %s %s cnf %d", volume_name,
-                  cdh_VolumeIdToString(0, 0, volumelist_ptr->volume_id, 0, 0),
-                  classname, *dbenum);
-              if (server) {
+                      cdh_VolumeIdToString(0, 0, volumelist_ptr->volume_id, 0, 0), classname, *dbenum);
+              if (server)
+              {
                 fprintf(file, " %s\n", server);
                 free(server);
-              } else
+              }
+              else
                 fprintf(file, "\n");
               free(dbenum);
               break;
             }
-            case pwr_cClass_ExternVolumeConfig: {
+            case pwr_cClass_ExternVolumeConfig:
+            {
               char* devprovider;
               char* rtprovider;
 
-              sts = ldh_GetObjectPar(ldhses, envobjid, "RtBody", "DevProvider",
-                  (char**)&devprovider, &size);
+              sts = ldh_GetObjectPar(ldhses, envobjid, "RtBody", "DevProvider", (char**)&devprovider, &size);
               if (EVEN(sts))
                 return sts;
-              sts = ldh_GetObjectPar(ldhses, envobjid, "RtBody", "RtProvider",
-                  (char**)&rtprovider, &size);
+              sts = ldh_GetObjectPar(ldhses, envobjid, "RtBody", "RtProvider", (char**)&rtprovider, &size);
               if (EVEN(sts))
                 return sts;
 
               fprintf(file, "%s %s %s cnf %s %s\n", volume_name,
-                  cdh_VolumeIdToString(0, 0, volumelist_ptr->volume_id, 0, 0),
-                  classname, devprovider, rtprovider);
+                      cdh_VolumeIdToString(0, 0, volumelist_ptr->volume_id, 0, 0), classname, devprovider,
+                      rtprovider);
               free(devprovider);
               free(rtprovider);
               break;
             }
-            case pwr_cClass_CloneVolumeConfig: {
+            case pwr_cClass_CloneVolumeConfig:
+            {
               char* parentvolume;
 
-              sts = ldh_GetObjectPar(ldhses, envobjid, "RtBody", "ParentVolume",
-                  (char**)&parentvolume, &size);
+              sts =
+                  ldh_GetObjectPar(ldhses, envobjid, "RtBody", "ParentVolume", (char**)&parentvolume, &size);
               if (EVEN(sts))
                 return sts;
 
               // Check parent volume
               int parent_found = 0;
-              for (int j = 0; j < volumecount; j++) {
-                if (str_NoCaseStrcmp(parentvolume, volumelist[j].volume_name)
-                    == 0) {
+              for (int j = 0; j < volumecount; j++)
+              {
+                if (str_NoCaseStrcmp(parentvolume, volumelist[j].volume_name) == 0)
+                {
                   parent_found = 1;
                   break;
                 }
               }
-              if (!parent_found) {
+              if (!parent_found)
+              {
                 char msg[200];
                 sprintf(msg,
-                    "Error in VolumeConfig object '%s', parent volume is not configured in the global\
+                        "Error in VolumeConfig object '%s', parent volume is not configured in the global\
  volume list",
-                    name);
+                        name);
                 MsgWindow::message('E', msg, msgw_ePop_Default);
                 syntax_error = 1;
               }
 
               fprintf(file, "%s %s %s clone %s\n", volume_name,
-                  cdh_VolumeIdToString(0, 0, volumelist_ptr->volume_id, 0, 0),
-                  classname, parentvolume);
+                      cdh_VolumeIdToString(0, 0, volumelist_ptr->volume_id, 0, 0), classname, parentvolume);
               free(parentvolume);
               break;
             }
@@ -995,19 +1022,23 @@ pwr_tStatus lfu_SaveDirectoryVolume(
           volumelist_ptr++;
         }
 
-        if (!found) {
+        if (!found)
+        {
           char msg[200];
-          sprintf(msg,
-              "Error in VolumeConfig object,  '%s' is not configured in the global\
+          sprintf(msg, "Error in VolumeConfig object,  '%s' is not configured in the global\
  volume list",
-              name);
+                  name);
           MsgWindow::message('E', msg, msgw_ePop_Default);
           syntax_error = 1;
-        } else {
-          switch (vcid) {
+        }
+        else
+        {
+          switch (vcid)
+          {
           case pwr_cClass_RootVolumeConfig:
           case pwr_cClass_SubVolumeConfig:
-          case pwr_cClass_SharedVolumeConfig: {
+          case pwr_cClass_SharedVolumeConfig:
+          {
             /* Check if the databas is created */
             int* dbenum_p = 0;
             char* server_p = 0;
@@ -1015,7 +1046,8 @@ pwr_tStatus lfu_SaveDirectoryVolume(
             pwr_tCid volcid = 0;
             pwr_tString40 server = "";
 
-            switch (vcid) {
+            switch (vcid)
+            {
             case pwr_cClass_RootVolumeConfig:
               volcid = pwr_eClass_RootVolume;
               break;
@@ -1028,8 +1060,7 @@ pwr_tStatus lfu_SaveDirectoryVolume(
             default:;
             }
 
-            sts = ldh_GetObjectPar(ldhses, envobjid, "RtBody", "Database",
-                (char**)&dbenum_p, &size);
+            sts = ldh_GetObjectPar(ldhses, envobjid, "RtBody", "Database", (char**)&dbenum_p, &size);
             if (EVEN(sts))
               return sts;
 
@@ -1037,22 +1068,25 @@ pwr_tStatus lfu_SaveDirectoryVolume(
               volrep = ldh_eVolRep_Db;
             else if (*dbenum_p == pwr_eVolumeDatabaseEnum_MySql)
               volrep = ldh_eVolRep_Dbms;
-            else {
+            else
+            {
               free(dbenum_p);
               break;
             }
 
             free(dbenum_p);
 
-            if (volrep == ldh_eVolRep_Db) {
+            if (volrep == ldh_eVolRep_Db)
+            {
               sprintf(filename, "$pwrp_db/%s.db/info", volume_name);
               str_ToLower(filename, filename);
               dcli_translate_filename(filename, filename);
-              sts = dcli_search_file(
-                  filename, found_file, DCLI_DIR_SEARCH_INIT);
+              sts = dcli_search_file(filename, found_file, DCLI_DIR_SEARCH_INIT);
               dcli_search_file(filename, found_file, DCLI_DIR_SEARCH_END);
-              if (EVEN(sts)) {
-                if (wow) {
+              if (EVEN(sts))
+              {
+                if (wow)
+                {
                   lfu_sCreaDb* data;
                   data = (lfu_sCreaDb*)calloc(1, sizeof(*data));
                   strcpy(data->name, volumelist_ptr->volume_name);
@@ -1064,38 +1098,38 @@ pwr_tStatus lfu_SaveDirectoryVolume(
 
                   sprintf(text, "   Volume '%s' is not yet created.\n \n\
    Do you want to create this volume.\n",
-                      volume_name);
+                          volume_name);
                   if (quiet)
                     lfu_creadb_qb_yes(NULL, (void*)data);
                   else
-                    wow->DisplayQuestion(NULL, "Create volume", text,
-                        lfu_creadb_qb_yes, NULL, (void*)data);
-                } else {
+                    wow->DisplayQuestion(NULL, "Create volume", text, lfu_creadb_qb_yes, NULL, (void*)data);
+                }
+                else
+                {
                   char msg[200];
-                  sprintf(msg, "Warning, Volume '%s' is not yet created.",
-                      volume_name);
+                  sprintf(msg, "Warning, Volume '%s' is not yet created.", volume_name);
                   MsgWindow::message('W', msg, msgw_ePop_Default);
                 }
               }
             }
-            if (volrep == ldh_eVolRep_Dbms) {
-              sts = ldh_GetObjectPar(ldhses, envobjid, "RtBody", "Server",
-                  (char**)&server_p, &size);
+            if (volrep == ldh_eVolRep_Dbms)
+            {
+              sts = ldh_GetObjectPar(ldhses, envobjid, "RtBody", "Server", (char**)&server_p, &size);
               if (EVEN(sts))
                 return sts;
 
               strcpy(server, server_p);
               free(server_p);
 
-              sprintf(
-                  filename, "$pwrp_db/%s.dbms/connection.dmsql", volume_name);
+              sprintf(filename, "$pwrp_db/%s.dbms/connection.dmsql", volume_name);
               str_ToLower(filename, filename);
               dcli_translate_filename(filename, filename);
-              sts = dcli_search_file(
-                  filename, found_file, DCLI_DIR_SEARCH_INIT);
+              sts = dcli_search_file(filename, found_file, DCLI_DIR_SEARCH_INIT);
               dcli_search_file(filename, found_file, DCLI_DIR_SEARCH_END);
-              if (EVEN(sts)) {
-                if (wow) {
+              if (EVEN(sts))
+              {
+                if (wow)
+                {
                   lfu_sCreaDb* data;
                   data = (lfu_sCreaDb*)calloc(1, sizeof(*data));
                   strcpy(data->name, volumelist_ptr->volume_name);
@@ -1107,16 +1141,16 @@ pwr_tStatus lfu_SaveDirectoryVolume(
 
                   sprintf(text, "   Volume '%s' is not yet created.\n \n\
    Do you want to create this volume.\n",
-                      volume_name);
+                          volume_name);
                   if (quiet)
                     lfu_creadb_qb_yes(NULL, (void*)data);
                   else
-                    wow->DisplayQuestion(NULL, "Create volume", text,
-                        lfu_creadb_qb_yes, NULL, (void*)data);
-                } else {
+                    wow->DisplayQuestion(NULL, "Create volume", text, lfu_creadb_qb_yes, NULL, (void*)data);
+                }
+                else
+                {
                   char msg[200];
-                  sprintf(msg, "Error, Volume '%s' is not yet created.",
-                      volume_name);
+                  sprintf(msg, "Error, Volume '%s' is not yet created.", volume_name);
                   MsgWindow::message('E', msg, msgw_ePop_Default);
                 }
               }
@@ -1124,14 +1158,14 @@ pwr_tStatus lfu_SaveDirectoryVolume(
             break;
           }
           case pwr_cClass_DetachedClassVolumeConfig:
-          case pwr_cClass_ClassVolumeConfig: {
+          case pwr_cClass_ClassVolumeConfig:
+          {
             int* dbenum_p = 0;
             char* server_p = 0;
             ldh_eVolRep volrep;
             pwr_tString40 server = "";
 
-            sts = ldh_GetObjectPar(ldhses, envobjid, "RtBody", "Database",
-                (char**)&dbenum_p, &size);
+            sts = ldh_GetObjectPar(ldhses, envobjid, "RtBody", "Database", (char**)&dbenum_p, &size);
             if (EVEN(sts))
               return sts;
 
@@ -1141,22 +1175,25 @@ pwr_tStatus lfu_SaveDirectoryVolume(
               volrep = ldh_eVolRep_Db;
             else if (*dbenum_p == pwr_eClassVolumeDatabaseEnum_MySql)
               volrep = ldh_eVolRep_Dbms;
-            else {
+            else
+            {
               free(dbenum_p);
               break;
             }
             free(dbenum_p);
 
-            if (volrep == ldh_eVolRep_Db) {
+            if (volrep == ldh_eVolRep_Db)
+            {
               /* Check if the databas is created */
               sprintf(filename, "$pwrp_db/%s.db/info", volume_name);
               str_ToLower(filename, filename);
               dcli_translate_filename(filename, filename);
-              sts = dcli_search_file(
-                  filename, found_file, DCLI_DIR_SEARCH_INIT);
+              sts = dcli_search_file(filename, found_file, DCLI_DIR_SEARCH_INIT);
               dcli_search_file(filename, found_file, DCLI_DIR_SEARCH_END);
-              if (EVEN(sts)) {
-                if (wow) {
+              if (EVEN(sts))
+              {
+                if (wow)
+                {
                   lfu_sCreaDb* data;
                   data = (lfu_sCreaDb*)calloc(1, sizeof(*data));
                   strcpy(data->name, volumelist_ptr->volume_name);
@@ -1171,33 +1208,34 @@ pwr_tStatus lfu_SaveDirectoryVolume(
 
                   sprintf(text, "   ClassVolume '%s' is not yet created.\n \n\
    Do you want to create this volume.\n",
-                      volume_name);
+                          volume_name);
                   if (quiet)
                     lfu_creadb_qb_yes(NULL, (void*)data);
                   else
-                    wow->DisplayQuestion(NULL, "Create Classvolume", text,
-                        lfu_creadb_qb_yes, NULL, (void*)data);
+                    wow->DisplayQuestion(NULL, "Create Classvolume", text, lfu_creadb_qb_yes, NULL,
+                                         (void*)data);
                 }
               }
-            } else if (volrep == ldh_eVolRep_Dbms) {
+            }
+            else if (volrep == ldh_eVolRep_Dbms)
+            {
               // MySql...
-              sts = ldh_GetObjectPar(ldhses, envobjid, "RtBody", "Server",
-                  (char**)&server_p, &size);
+              sts = ldh_GetObjectPar(ldhses, envobjid, "RtBody", "Server", (char**)&server_p, &size);
               if (EVEN(sts))
                 return sts;
 
               strcpy(server, server_p);
               free(server_p);
 
-              sprintf(
-                  filename, "$pwrp_db/%s.dbms/connection.dmsql", volume_name);
+              sprintf(filename, "$pwrp_db/%s.dbms/connection.dmsql", volume_name);
               str_ToLower(filename, filename);
               dcli_translate_filename(filename, filename);
-              sts = dcli_search_file(
-                  filename, found_file, DCLI_DIR_SEARCH_INIT);
+              sts = dcli_search_file(filename, found_file, DCLI_DIR_SEARCH_INIT);
               dcli_search_file(filename, found_file, DCLI_DIR_SEARCH_END);
-              if (EVEN(sts)) {
-                if (wow) {
+              if (EVEN(sts))
+              {
+                if (wow)
+                {
                   lfu_sCreaDb* data;
                   data = (lfu_sCreaDb*)calloc(1, sizeof(*data));
                   strcpy(data->name, volumelist_ptr->volume_name);
@@ -1212,15 +1250,17 @@ pwr_tStatus lfu_SaveDirectoryVolume(
 
                   sprintf(text, "   ClassVolume '%s' is not yet created.\n \n\
    Do you want to create this volume.\n",
-                      volume_name);
+                          volume_name);
                   if (quiet)
                     lfu_creadb_qb_yes(NULL, (void*)data);
                   else
-                    wow->DisplayQuestion(NULL, "Create Classvolume", text,
-                        lfu_creadb_qb_yes, NULL, (void*)data);
+                    wow->DisplayQuestion(NULL, "Create Classvolume", text, lfu_creadb_qb_yes, NULL,
+                                         (void*)data);
                 }
               }
-            } else if (volrep == ldh_eVolRep_Wbl) {
+            }
+            else if (volrep == ldh_eVolRep_Wbl)
+            {
               // Check wbload-file...
               FILE* wblfile;
 
@@ -1228,9 +1268,11 @@ pwr_tStatus lfu_SaveDirectoryVolume(
               str_ToLower(fname, fname);
               dcli_translate_filename(fname, fname);
               wblfile = fopen(fname, "r");
-              if (wblfile == 0) {
+              if (wblfile == 0)
+              {
                 wblfile = fopen(fname, "w");
-                if (wblfile == 0) {
+                if (wblfile == 0)
+                {
                   char msg[240];
                   sprintf(msg, "Error, unable to create file %s, ", fname);
                   MsgWindow::message('E', msg, msgw_ePop_Default);
@@ -1238,15 +1280,13 @@ pwr_tStatus lfu_SaveDirectoryVolume(
                 }
 
                 if (vcid == pwr_cClass_DetachedClassVolumeConfig)
-                  fprintf(wblfile, "Volume %s pwr_eClass_DetachedClassVolume "
-                                   "%s\nEndVolume\n",
-                      volume_name, cdh_VolumeIdToString(
-                                       0, 0, volumelist_ptr->volume_id, 0, 0));
-                else
                   fprintf(wblfile,
-                      "Volume %s pwr_eClass_ClassVolume %s\nEndVolume\n",
-                      volume_name, cdh_VolumeIdToString(
-                                       0, 0, volumelist_ptr->volume_id, 0, 0));
+                          "Volume %s pwr_eClass_DetachedClassVolume "
+                          "%s\nEndVolume\n",
+                          volume_name, cdh_VolumeIdToString(0, 0, volumelist_ptr->volume_id, 0, 0));
+                else
+                  fprintf(wblfile, "Volume %s pwr_eClass_ClassVolume %s\nEndVolume\n", volume_name,
+                          cdh_VolumeIdToString(0, 0, volumelist_ptr->volume_id, 0, 0));
                 fclose(wblfile);
               }
             }
@@ -1259,23 +1299,27 @@ pwr_tStatus lfu_SaveDirectoryVolume(
   }
   fclose(file);
 
-  if (!path_file_created) {
+  if (!path_file_created)
+  {
     // Create an empty path file
     dcli_translate_filename(filename, pwr_cNameFilePath);
     fpath = fopen(filename, "w");
-    if (!fpath) {
+    if (!fpath)
+    {
       char msg[230];
       sprintf(msg, "Unable to open path file %s\n", filename);
       MsgWindow::message('E', msg, msgw_ePop_Default);
       syntax_error = 1;
-    } else
+    }
+    else
       fclose(fpath);
   }
 
   /* Generate data for bootfiles */
   dcli_translate_filename(fname, pwr_cNameBootList);
   file = fopen(fname, "w");
-  if (file == 0) {
+  if (file == 0)
+  {
     char tmp[240];
     sprintf(tmp, "** Error, Unable to open file \"%s\"", fname);
     MsgWindow::message('E', tmp, msgw_ePop_Default);
@@ -1284,72 +1328,78 @@ pwr_tStatus lfu_SaveDirectoryVolume(
 
   /* Get the configured nodes */
   sts = ldh_GetRootList(ldhses, &busobjid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = ldh_GetObjectClass(ldhses, busobjid, &cid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       fclose(file);
       return sts;
     }
 
-    if (cid == pwr_cClass_BusConfig) {
+    if (cid == pwr_cClass_BusConfig)
+    {
       /* Check Bus attribute */
-      sts = ldh_GetObjectPar(ldhses, busobjid, "RtBody", "BusNumber",
-          (char**)&bus_number_ptr, &size);
-      if (EVEN(sts)) {
+      sts = ldh_GetObjectPar(ldhses, busobjid, "RtBody", "BusNumber", (char**)&bus_number_ptr, &size);
+      if (EVEN(sts))
+      {
         fclose(file);
         return sts;
       }
-      sts = ldh_GetObjectPar(ldhses, busobjid, "RtBody", "BusNumber",
-          (char**)&bus_number_ptr, &size);
-      if (EVEN(sts)) {
-        fclose(file);
-        return sts;
-      }
-
-      sts = ldh_ObjidToName(ldhses, busobjid, ldh_eName_Object, bus_name,
-          sizeof(bus_name), &size);
-      if (EVEN(sts)) {
+      sts = ldh_GetObjectPar(ldhses, busobjid, "RtBody", "BusNumber", (char**)&bus_number_ptr, &size);
+      if (EVEN(sts))
+      {
         fclose(file);
         return sts;
       }
 
-      if (*bus_number_ptr == 0) {
+      sts = ldh_ObjidToName(ldhses, busobjid, ldh_eName_Object, bus_name, sizeof(bus_name), &size);
+      if (EVEN(sts))
+      {
+        fclose(file);
+        return sts;
+      }
+
+      if (*bus_number_ptr == 0)
+      {
         char msg[200];
-        sprintf(
-            msg, "Error in Bus object '%s', BusNumber is missing", bus_name);
+        sprintf(msg, "Error in Bus object '%s', BusNumber is missing", bus_name);
         MsgWindow::message('E', msg, msgw_ePop_Default);
         syntax_error = 1;
       }
 
       sts = ldh_GetChild(ldhses, busobjid, &nodeobjid);
-      while (ODD(sts)) {
+      while (ODD(sts))
+      {
         sts = ldh_GetObjectClass(ldhses, nodeobjid, &cid);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           fclose(file);
           return sts;
         }
 
-        if (cid == pwr_cClass_NodeConfig || cid == pwr_cClass_SevNodeConfig) {
-          sts = ldh_ObjidToName(ldhses, nodeobjid, ldh_eName_Object,
-              nodeconfig_name, sizeof(nodeconfig_name), &size);
-          if (EVEN(sts)) {
+        if (cid == pwr_cClass_NodeConfig || cid == pwr_cClass_SevNodeConfig)
+        {
+          sts = ldh_ObjidToName(ldhses, nodeobjid, ldh_eName_Object, nodeconfig_name, sizeof(nodeconfig_name),
+                                &size);
+          if (EVEN(sts))
+          {
             fclose(file);
             return sts;
           }
 
           /* Check NodeName attribute */
-          sts = ldh_GetObjectPar(
-              ldhses, nodeobjid, "RtBody", "NodeName", &nodename_ptr, &size);
-          if (EVEN(sts)) {
+          sts = ldh_GetObjectPar(ldhses, nodeobjid, "RtBody", "NodeName", &nodename_ptr, &size);
+          if (EVEN(sts))
+          {
             fclose(file);
             return sts;
           }
 
-          if (!strcmp(nodename_ptr, "")) {
+          if (!strcmp(nodename_ptr, ""))
+          {
             char msg[200];
-            sprintf(msg,
-                "Error in NodeConfig object '%s', NodeName is not valid",
-                nodeconfig_name);
+            sprintf(msg, "Error in NodeConfig object '%s', NodeName is not valid", nodeconfig_name);
             MsgWindow::message('E', msg, msgw_ePop_Default);
             syntax_error = 1;
             free(nodename_ptr);
@@ -1357,98 +1407,108 @@ pwr_tStatus lfu_SaveDirectoryVolume(
           }
 
           /* Check SecondaryNode.NodeName attribute */
-          if (cid == pwr_cClass_NodeConfig) {
-            sts = ldh_GetObjectPar(ldhses, nodeobjid, "RtBody",
-                "SecondaryNode.NodeName", &secondary_nodename_ptr, &size);
-            if (EVEN(sts)) {
+          if (cid == pwr_cClass_NodeConfig)
+          {
+            sts = ldh_GetObjectPar(ldhses, nodeobjid, "RtBody", "SecondaryNode.NodeName",
+                                   &secondary_nodename_ptr, &size);
+            if (EVEN(sts))
+            {
               fclose(file);
               return sts;
             }
-          } else
+          }
+          else
             secondary_nodename_ptr = 0;
 
           /* Check OperatingSystem attribute */
-          sts = ldh_GetObjectPar(ldhses, nodeobjid, "RtBody", "OperatingSystem",
-              (char**)&os_ptr, &size);
-          if (EVEN(sts)) {
+          sts = ldh_GetObjectPar(ldhses, nodeobjid, "RtBody", "OperatingSystem", (char**)&os_ptr, &size);
+          if (EVEN(sts))
+          {
             fclose(file);
             return sts;
           }
 
           os = *os_ptr;
-          if (!(os == pwr_mOpSys_CustomBuild || os == pwr_mOpSys_PPC_LINUX
-		  || os == pwr_mOpSys_X86_LINUX || os == pwr_mOpSys_X86_64_LINUX
-		  || os == pwr_mOpSys_ARM_LINUX || os == pwr_mOpSys_ARM64_LINUX 
-		  || os == pwr_mOpSys_X86_64_MACOS
-		  || os == pwr_mOpSys_X86_64_FREEBSD
-		  || os == pwr_mOpSys_X86_64_OPENBSD
-		  || os == pwr_mOpSys_X86_CYGWIN)) {
+          if (!(os == pwr_mOpSys_CustomBuild || os == pwr_mOpSys_PPC_LINUX || os == pwr_mOpSys_X86_LINUX ||
+                os == pwr_mOpSys_X86_64_LINUX || os == pwr_mOpSys_ARM_LINUX || os == pwr_mOpSys_ARM64_LINUX ||
+                os == pwr_mOpSys_X86_64_MACOS || os == pwr_mOpSys_X86_64_FREEBSD ||
+                os == pwr_mOpSys_X86_64_OPENBSD || os == pwr_mOpSys_X86_CYGWIN))
+          {
             char msg[200];
-            sprintf(msg,
-                "Error in NodeConfig object '%s', OperatingSystem is not valid",
-                nodeconfig_name);
+            sprintf(msg, "Error in NodeConfig object '%s', OperatingSystem is not valid", nodeconfig_name);
             MsgWindow::message('E', msg, msgw_ePop_Default);
             syntax_error = 1;
             os = 0;
           }
 
           /* Check SimulateSingleProcess attribute */
-          if (cid == pwr_cClass_NodeConfig) {
-            sts = ldh_GetObjectPar(ldhses, nodeobjid, "RtBody",
-                "SimulateSingleProcess", (char**)&single_scan_ptr, &size);
-            if (EVEN(sts)) {
+          if (cid == pwr_cClass_NodeConfig)
+          {
+            sts = ldh_GetObjectPar(ldhses, nodeobjid, "RtBody", "SimulateSingleProcess",
+                                   (char**)&single_scan_ptr, &size);
+            if (EVEN(sts))
+            {
               fclose(file);
               return sts;
             }
 
-            if (*single_scan_ptr != 0) {
-              sts = ldh_GetObjectPar(ldhses, nodeobjid, "RtBody",
-                  "SimulateSingleScanTime", (char**)&scantime_ptr, &size);
-              if (EVEN(sts)) {
+            if (*single_scan_ptr != 0)
+            {
+              sts = ldh_GetObjectPar(ldhses, nodeobjid, "RtBody", "SimulateSingleScanTime",
+                                     (char**)&scantime_ptr, &size);
+              if (EVEN(sts))
+              {
                 fclose(file);
                 return sts;
               }
 
-              if (feqf(*scantime_ptr, 0.0f)) {
+              if (feqf(*scantime_ptr, 0.0f))
+              {
                 char msg[200];
-                sprintf(msg, "Error in NodeConfig object '%s', "
-                             "SimulateSingleScanTime is missing",
-                    nodeconfig_name);
+                sprintf(msg,
+                        "Error in NodeConfig object '%s', "
+                        "SimulateSingleScanTime is missing",
+                        nodeconfig_name);
                 MsgWindow::message('E', msg, msgw_ePop_Default);
                 syntax_error = 1;
               }
               scantime = *scantime_ptr;
               free((char*)scantime_ptr);
-            } else
+            }
+            else
               scantime = 0;
             free((char*)single_scan_ptr);
-          } else
+          }
+          else
             scantime = 0;
 
           lfu_check_appl_file(ldhses, nodename_ptr, *bus_number_ptr);
           // lfu_check_opt_file( ldhses, nodename_ptr, *bus_number_ptr,
           // (pwr_mOpSys) os);
 
-          for (int j = 0; j < 2; j++) {
+          for (int j = 0; j < 2; j++)
+          {
             // Loop over primary and secondary node
 
             /* Find the volumes in this node */
             sts = ldh_GetChild(ldhses, nodeobjid, &volobjid);
-            while (ODD(sts)) {
+            while (ODD(sts))
+            {
               sts = ldh_GetObjectClass(ldhses, volobjid, &vcid);
-              if (EVEN(sts)) {
+              if (EVEN(sts))
+              {
                 fclose(file);
                 return sts;
               }
 
-              if (vcid == pwr_cClass_RootVolumeLoad
-                  || vcid == pwr_cClass_SubVolumeLoad
-                  || vcid == pwr_cClass_ClassVolumeLoad
-                  || vcid == pwr_cClass_DetachedClassVolumeLoad
-                  || vcid == pwr_cClass_SharedVolumeLoad) {
-                sts = ldh_ObjidToName(ldhses, volobjid, ldh_eName_Object,
-                    volume_name, sizeof(volume_name), &size);
-                if (EVEN(sts)) {
+              if (vcid == pwr_cClass_RootVolumeLoad || vcid == pwr_cClass_SubVolumeLoad ||
+                  vcid == pwr_cClass_ClassVolumeLoad || vcid == pwr_cClass_DetachedClassVolumeLoad ||
+                  vcid == pwr_cClass_SharedVolumeLoad)
+              {
+                sts = ldh_ObjidToName(ldhses, volobjid, ldh_eName_Object, volume_name, sizeof(volume_name),
+                                      &size);
+                if (EVEN(sts))
+                {
                   fclose(file);
                   return sts;
                 }
@@ -1457,12 +1517,15 @@ pwr_tStatus lfu_SaveDirectoryVolume(
                 /* Check that the name is in the global volume list */
                 found = 0;
                 volumelist_ptr = volumelist;
-                for (i = 0; i < volumecount; i++) {
+                for (i = 0; i < volumecount; i++)
+                {
                   utl_toupper(volname, volumelist_ptr->volume_name);
-                  if (!strcmp(name, volname)) {
+                  if (!strcmp(name, volname))
+                  {
                     found = 1;
 
-                    switch (cid) {
+                    switch (cid)
+                    {
                     case pwr_cClass_RootVolumeLoad:
                       strcpy(classname, "RootVolume");
                       break;
@@ -1482,38 +1545,32 @@ pwr_tStatus lfu_SaveDirectoryVolume(
 
                     if (j == 0)
                       fprintf(file, "%s %s %s %s %d %d %f %d\n", volume_name,
-                          cdh_VolumeIdToString(
-                              0, 0, volumelist_ptr->volume_id, 0, 0),
-                          nodeconfig_name, nodename_ptr, *bus_number_ptr, os,
-                          scantime,
-                          cid == pwr_cClass_SevNodeConfig ? bld_eNodeType_Sev
-                                                          : bld_eNodeType_Node);
+                              cdh_VolumeIdToString(0, 0, volumelist_ptr->volume_id, 0, 0), nodeconfig_name,
+                              nodename_ptr, *bus_number_ptr, os, scantime,
+                              cid == pwr_cClass_SevNodeConfig ? bld_eNodeType_Sev : bld_eNodeType_Node);
                     else if (j == 1)
                       // Secondary node
-                      fprintf(file, "%s %s %s(%s) %s %d %d %f %d\n",
-                          volume_name, cdh_VolumeIdToString(0, 0,
-                                           volumelist_ptr->volume_id, 0, 0),
-                          secondary_nodename_ptr, nodeconfig_name,
-                          secondary_nodename_ptr, *bus_number_ptr, os, scantime,
-                          bld_eNodeType_Node);
+                      fprintf(file, "%s %s %s(%s) %s %d %d %f %d\n", volume_name,
+                              cdh_VolumeIdToString(0, 0, volumelist_ptr->volume_id, 0, 0),
+                              secondary_nodename_ptr, nodeconfig_name, secondary_nodename_ptr,
+                              *bus_number_ptr, os, scantime, bld_eNodeType_Node);
                     break;
                   }
                   volumelist_ptr++;
                 }
-                if (!found) {
+                if (!found)
+                {
                   char msg[200];
-                  sprintf(msg,
-                      "Error in VolumeLoad object,  '%s' is not configured in the global\
+                  sprintf(msg, "Error in VolumeLoad object,  '%s' is not configured in the global\
  volume list",
-                      name);
+                          name);
                   MsgWindow::message('E', msg, msgw_ePop_Default);
                   syntax_error = 1;
                 }
               }
               sts = ldh_GetNextSibling(ldhses, volobjid, &volobjid);
             }
-            if (secondary_nodename_ptr == 0
-                || streq(secondary_nodename_ptr, ""))
+            if (secondary_nodename_ptr == 0 || streq(secondary_nodename_ptr, ""))
               break;
           }
           if (nodename_ptr != null_nodename)
@@ -1537,7 +1594,8 @@ pwr_tStatus lfu_SaveDirectoryVolume(
   wb_session* sp = (wb_session*)ldhses;
   pwr_tUInt32 bus_number;
 
-  for (wb_object buso = sp->object(); buso; buso = buso.after()) {
+  for (wb_object buso = sp->object(); buso; buso = buso.after())
+  {
     if (buso.cid() != pwr_cClass_BusConfig)
       continue;
 
@@ -1563,9 +1621,12 @@ pwr_tStatus lfu_SaveDirectoryVolume(
     // Get all nodeconfig and friendnodes for this bus
     std::vector<lfu_nodeconf> nodevect;
     int node_cnt = 0;
-    for (wb_object nodeo = buso.first(); nodeo; nodeo = nodeo.after()) {
-      switch (nodeo.cid()) {
-      case pwr_cClass_NodeConfig: {
+    for (wb_object nodeo = buso.first(); nodeo; nodeo = nodeo.after())
+    {
+      switch (nodeo.cid())
+      {
+      case pwr_cClass_NodeConfig:
+      {
         pwr_tString80 volstr;
         lfu_nodeconf nc;
 
@@ -1663,12 +1724,14 @@ pwr_tStatus lfu_SaveDirectoryVolume(
 
         if (!streq(nc.secondary_nodename, ""))
           nc.has_secondary = 1;
-        else {
+        else
+        {
           strcpy(nc.secondary_nodename, "-");
           strcpy(nc.secondary_address, "-");
         }
 
-        if (nc.has_secondary) {
+        if (nc.has_secondary)
+        {
           // Get attribute SecondaryNode.Address
           a = sp->attribute(nodeo.oid(), "RtBody", "SecondaryNode.Address");
           if (!a)
@@ -1688,8 +1751,7 @@ pwr_tStatus lfu_SaveDirectoryVolume(
             return sts;
 
           // Get attribute SecondaryNode.RedcomMinResendTime
-          a = sp->attribute(
-              nodeo.oid(), "RtBody", "SecondaryNode.RedcomMinResendTime");
+          a = sp->attribute(nodeo.oid(), "RtBody", "SecondaryNode.RedcomMinResendTime");
           if (!a)
             return a.sts();
 
@@ -1698,8 +1760,7 @@ pwr_tStatus lfu_SaveDirectoryVolume(
             return sts;
 
           // Get attribute SecondaryNode.RedcomMaxResendTime
-          a = sp->attribute(
-              nodeo.oid(), "RtBody", "SecondaryNode.RedcomMaxResendTime");
+          a = sp->attribute(nodeo.oid(), "RtBody", "SecondaryNode.RedcomMaxResendTime");
           if (!a)
             return a.sts();
 
@@ -1708,8 +1769,7 @@ pwr_tStatus lfu_SaveDirectoryVolume(
             return sts;
 
           // Get attribute SecondaryNode.RedcomExportBufSize
-          a = sp->attribute(
-              nodeo.oid(), "RtBody", "SecondaryNode.RedcomExportBufQuota");
+          a = sp->attribute(nodeo.oid(), "RtBody", "SecondaryNode.RedcomExportBufQuota");
           if (!a)
             return a.sts();
 
@@ -1718,8 +1778,7 @@ pwr_tStatus lfu_SaveDirectoryVolume(
             return sts;
 
           // Get attribute SecondaryNode.RedcomAckDelay
-          a = sp->attribute(
-              nodeo.oid(), "RtBody", "SecondaryNode.RedcomAckDelay");
+          a = sp->attribute(nodeo.oid(), "RtBody", "SecondaryNode.RedcomAckDelay");
           if (!a)
             return a.sts();
 
@@ -1728,8 +1787,7 @@ pwr_tStatus lfu_SaveDirectoryVolume(
             return sts;
 
           // Get attribute SecondaryNode.RedcomSegmentSize
-          a = sp->attribute(
-              nodeo.oid(), "RtBody", "SecondaryNode.RedcomSegmentSize");
+          a = sp->attribute(nodeo.oid(), "RtBody", "SecondaryNode.RedcomSegmentSize");
           if (!a)
             return a.sts();
 
@@ -1738,25 +1796,29 @@ pwr_tStatus lfu_SaveDirectoryVolume(
             return sts;
         }
 
-        if (!strcmp(nc.nodename, "")) {
+        if (!strcmp(nc.nodename, ""))
+        {
           char msg[200];
-          sprintf(msg, "Error in NodeConfig object '%s', NodeName is missing\n",
-              nodeo.longName().c_str());
+          sprintf(msg, "Error in NodeConfig object '%s', NodeName is missing\n", nodeo.longName().c_str());
           MsgWindow::message('E', msg, msgw_ePop_Default);
           syntax_error = 1;
         }
 
         // Get rootvolume
         found = 0;
-        for (wb_object volo = nodeo.first(); volo; volo = volo.after()) {
-          if (volo.cid() == pwr_cClass_RootVolumeLoad) {
+        for (wb_object volo = nodeo.first(); volo; volo = volo.after())
+        {
+          if (volo.cid() == pwr_cClass_RootVolumeLoad)
+          {
             strcpy(volstr, volo.name());
 
             /* Check that the name is in the global volume list */
             found = 0;
             volumelist_ptr = volumelist;
-            for (i = 0; i < volumecount; i++) {
-              if (str_NoCaseStrcmp(volstr, volumelist_ptr->volume_name) == 0) {
+            for (i = 0; i < volumecount; i++)
+            {
+              if (str_NoCaseStrcmp(volstr, volumelist_ptr->volume_name) == 0)
+              {
                 nc.vid = volumelist_ptr->volume_id;
                 found = 1;
                 break;
@@ -1765,10 +1827,10 @@ pwr_tStatus lfu_SaveDirectoryVolume(
             }
           }
         }
-        if (!found) {
+        if (!found)
+        {
           char msg[200];
-          sprintf(msg, "No valid RootVolume configured for object '%s'\n",
-              nodeo.longName().c_str());
+          sprintf(msg, "No valid RootVolume configured for object '%s'\n", nodeo.longName().c_str());
           MsgWindow::message('E', msg, msgw_ePop_Default);
           syntax_error = 1;
         }
@@ -1779,7 +1841,8 @@ pwr_tStatus lfu_SaveDirectoryVolume(
         break;
       }
       case pwr_cClass_SevNodeConfig:
-      case pwr_cClass_FriendNodeConfig: {
+      case pwr_cClass_FriendNodeConfig:
+      {
         pwr_tString80 volstr;
         lfu_nodeconf nc;
 
@@ -1813,33 +1876,38 @@ pwr_tStatus lfu_SaveDirectoryVolume(
         if (!a)
           return sts;
 
-        if (nodeo.cid() == pwr_cClass_SevNodeConfig) {
+        if (nodeo.cid() == pwr_cClass_SevNodeConfig)
+        {
           // Qcom only connection
           nc.connection = 1;
 
-	  found = 0;
-	  sts = ldh_GetChild(ldhses, nodeo.oid(), &volobjid);
-	  while (ODD(sts)) {
-	    sts = ldh_GetObjectClass(ldhses, volobjid, &vcid);
-	    if (EVEN(sts))
-	      return sts;
+          found = 0;
+          sts = ldh_GetChild(ldhses, nodeo.oid(), &volobjid);
+          while (ODD(sts))
+          {
+            sts = ldh_GetObjectClass(ldhses, volobjid, &vcid);
+            if (EVEN(sts))
+              return sts;
 
-	    if (vcid == pwr_cClass_RootVolumeLoad) {
-	      sts = ldh_ObjidToName(ldhses, volobjid, ldh_eName_Object,
-				    volstr, sizeof(volstr), &size);
-	      found = 1;
-	      break;
-	    }
+            if (vcid == pwr_cClass_RootVolumeLoad)
+            {
+              sts = ldh_ObjidToName(ldhses, volobjid, ldh_eName_Object, volstr, sizeof(volstr), &size);
+              found = 1;
+              break;
+            }
             sts = ldh_GetNextSibling(ldhses, volobjid, &volobjid);
-	  }
-	  if (!found) {
-	    char msg[200];
+          }
+          if (!found)
+          {
+            char msg[200];
             sprintf(msg, "Error in SevNodeConfig object '%s', no RootVolumeLoad object found",
-		    nodeo.longName().c_str());
-	    MsgWindow::message('E', msg, msgw_ePop_Default);
-	    syntax_error = 1;
-	  }	    
-        } else {
+                    nodeo.longName().c_str());
+            MsgWindow::message('E', msg, msgw_ePop_Default);
+            syntax_error = 1;
+          }
+        }
+        else
+        {
           // Get attribute Connection
           a = sp->attribute(nodeo.oid(), "RtBody", "Connection");
           if (!a)
@@ -1849,14 +1917,14 @@ pwr_tStatus lfu_SaveDirectoryVolume(
           if (!a)
             return sts;
 
-	  // Get attribute Volume
-	  a = sp->attribute(nodeo.oid(), "RtBody", "Volume");
-	  if (!a)
-	    return a.sts();
+          // Get attribute Volume
+          a = sp->attribute(nodeo.oid(), "RtBody", "Volume");
+          if (!a)
+            return a.sts();
 
-	  a.value(volstr);
-	  if (!a)
-	    return sts;
+          a.value(volstr);
+          if (!a)
+            return sts;
         }
 
         // Get attribute QComMinResendTime
@@ -1895,7 +1963,8 @@ pwr_tStatus lfu_SaveDirectoryVolume(
         if (!a)
           return sts;
 
-        if (nodeo.cid() == pwr_cClass_FriendNodeConfig) {
+        if (nodeo.cid() == pwr_cClass_FriendNodeConfig)
+        {
           // Get attribute SecondaryNode.NodeName
           a = sp->attribute(nodeo.oid(), "RtBody", "SecondaryNode.NodeName");
           if (!a)
@@ -1907,12 +1976,14 @@ pwr_tStatus lfu_SaveDirectoryVolume(
 
           if (!streq(nc.secondary_nodename, ""))
             nc.has_secondary = 1;
-          else {
+          else
+          {
             strcpy(nc.secondary_nodename, "-");
             strcpy(nc.secondary_address, "-");
           }
 
-          if (nc.has_secondary) {
+          if (nc.has_secondary)
+          {
             // Get attribute SecondaryNode.Address
             a = sp->attribute(nodeo.oid(), "RtBody", "SecondaryNode.Address");
             if (!a)
@@ -1924,7 +1995,8 @@ pwr_tStatus lfu_SaveDirectoryVolume(
           }
         }
 
-        if (nodeo.cid() == pwr_cClass_SevNodeConfig) {
+        if (nodeo.cid() == pwr_cClass_SevNodeConfig)
+        {
           strcpy(nc.secondary_nodename, "-");
           strcpy(nc.secondary_address, "-");
 
@@ -1941,8 +2013,10 @@ pwr_tStatus lfu_SaveDirectoryVolume(
         /* Check that the name is in the global volume list */
         found = 0;
         volumelist_ptr = volumelist;
-        for (i = 0; i < volumecount; i++) {
-          if (str_NoCaseStrcmp(volstr, volumelist_ptr->volume_name) == 0) {
+        for (i = 0; i < volumecount; i++)
+        {
+          if (str_NoCaseStrcmp(volstr, volumelist_ptr->volume_name) == 0)
+          {
             nc.vid = volumelist_ptr->volume_id;
             found = 1;
             break;
@@ -1950,29 +2024,26 @@ pwr_tStatus lfu_SaveDirectoryVolume(
           volumelist_ptr++;
         }
 
-        if (!found) {
+        if (!found)
+        {
           char msg[200];
           if (nodeo.cid() == pwr_cClass_FriendNodeConfig)
-            sprintf(msg,
-                "Error in FriendNodeConfig object '%s', Unknown volume",
-                nodeo.longName().c_str());
+            sprintf(msg, "Error in FriendNodeConfig object '%s', Unknown volume", nodeo.longName().c_str());
           else
-            sprintf(msg, "Error in SevNodeConfig object '%s', Unknown volume",
-                nodeo.longName().c_str());
+            sprintf(msg, "Error in SevNodeConfig object '%s', Unknown volume", nodeo.longName().c_str());
           MsgWindow::message('E', msg, msgw_ePop_Default);
           syntax_error = 1;
         }
 
-        if (!strcmp(nc.nodename, "")) {
+        if (!strcmp(nc.nodename, ""))
+        {
           char msg[200];
           if (nodeo.cid() == pwr_cClass_FriendNodeConfig)
-            sprintf(msg,
-                "Error in FriendNodeConfig object '%s', NodeName is missing\n",
-                nodeo.longName().c_str());
+            sprintf(msg, "Error in FriendNodeConfig object '%s', NodeName is missing\n",
+                    nodeo.longName().c_str());
           else
-            sprintf(msg,
-                "Error in SevNodeConfig object '%s', NodeName is missing\n",
-                nodeo.longName().c_str());
+            sprintf(msg, "Error in SevNodeConfig object '%s', NodeName is missing\n",
+                    nodeo.longName().c_str());
           MsgWindow::message('E', msg, msgw_ePop_Default);
           syntax_error = 1;
         }
@@ -1985,41 +2056,38 @@ pwr_tStatus lfu_SaveDirectoryVolume(
     }
 
     // Node config syntax check
-    for (int i = 0; i < (int)nodevect.size(); i++) {
-      for (int j = i + 1; j < (int)nodevect.size(); j++) {
-        if (nodevect[i].vid == nodevect[j].vid) {
+    for (int i = 0; i < (int)nodevect.size(); i++)
+    {
+      for (int j = i + 1; j < (int)nodevect.size(); j++)
+      {
+        if (nodevect[i].vid == nodevect[j].vid)
+        {
           char msg[450];
           pwr_tOName oname1, oname2;
-          sts = ldh_ObjidToName(ldhses, nodevect[i].oid, ldh_eName_Hierarchy,
-              oname1, sizeof(oname1), &size);
+          sts = ldh_ObjidToName(ldhses, nodevect[i].oid, ldh_eName_Hierarchy, oname1, sizeof(oname1), &size);
           if (EVEN(sts))
             return sts;
-          sts = ldh_ObjidToName(ldhses, nodevect[j].oid, ldh_eName_Hierarchy,
-              oname2, sizeof(oname2), &size);
+          sts = ldh_ObjidToName(ldhses, nodevect[j].oid, ldh_eName_Hierarchy, oname2, sizeof(oname2), &size);
           if (EVEN(sts))
             return sts;
 
-          sprintf(msg, "Error in node '%s' and '%s', Volume is equal\n", oname1,
-              oname2);
+          sprintf(msg, "Error in node '%s' and '%s', Volume is equal\n", oname1, oname2);
           MsgWindow::message('E', msg, msgw_ePop_Default);
           syntax_error = 1;
         }
-        if (!streq(nodevect[i].address, "0.0.0.0")
-            && !streq(nodevect[i].address, "127.0.0.1")
-            && streq(nodevect[i].address, nodevect[j].address)) {
+        if (!streq(nodevect[i].address, "0.0.0.0") && !streq(nodevect[i].address, "127.0.0.1") &&
+            streq(nodevect[i].address, nodevect[j].address))
+        {
           char msg[450];
           pwr_tOName oname1, oname2;
-          sts = ldh_ObjidToName(ldhses, nodevect[i].oid, ldh_eName_Hierarchy,
-              oname1, sizeof(oname1), &size);
+          sts = ldh_ObjidToName(ldhses, nodevect[i].oid, ldh_eName_Hierarchy, oname1, sizeof(oname1), &size);
           if (EVEN(sts))
             return sts;
-          sts = ldh_ObjidToName(ldhses, nodevect[j].oid, ldh_eName_Hierarchy,
-              oname2, sizeof(oname2), &size);
+          sts = ldh_ObjidToName(ldhses, nodevect[j].oid, ldh_eName_Hierarchy, oname2, sizeof(oname2), &size);
           if (EVEN(sts))
             return sts;
 
-          sprintf(msg, "Error in node '%s' and '%s', Address is equal\n",
-              oname1, oname2);
+          sprintf(msg, "Error in node '%s' and '%s', Address is equal\n", oname1, oname2);
           MsgWindow::message('E', msg, msgw_ePop_Default);
           syntax_error = 1;
         }
@@ -2027,17 +2095,22 @@ pwr_tStatus lfu_SaveDirectoryVolume(
     }
 
     // Print ld_node file
-    for (wb_object nodeo = buso.first(); nodeo; nodeo = nodeo.after()) {
-      switch (nodeo.cid()) {
+    for (wb_object nodeo = buso.first(); nodeo; nodeo = nodeo.after())
+    {
+      switch (nodeo.cid())
+      {
       case pwr_cClass_NodeConfig:
-      case pwr_cClass_SevNodeConfig: {
+      case pwr_cClass_SevNodeConfig:
+      {
         FILE* fp;
         int idx;
         int found = 0;
         int is_secondary;
 
-        for (idx = 0; idx < (int)nodevect.size(); idx++) {
-          if (cdh_ObjidIsEqual(nodevect[idx].oid, nodeo.oid())) {
+        for (idx = 0; idx < (int)nodevect.size(); idx++)
+        {
+          if (cdh_ObjidIsEqual(nodevect[idx].oid, nodeo.oid()))
+          {
             found = 1;
             break;
           }
@@ -2045,188 +2118,205 @@ pwr_tStatus lfu_SaveDirectoryVolume(
         if (!found)
           return 0;
 
-        for (int k = 0; k < 2; k++) {
+        for (int k = 0; k < 2; k++)
+        {
           is_secondary = k;
 
           if (is_secondary && !nodevect[idx].has_secondary)
             break;
 
           if (!is_secondary)
-            sprintf(filename, pwr_cNameNode, load_cDirectory,
-                cdh_Low(nodevect[idx].nodename), bus_number);
+            sprintf(filename, pwr_cNameNode, load_cDirectory, cdh_Low(nodevect[idx].nodename), bus_number);
           else
-            sprintf(filename, pwr_cNameNode, load_cDirectory,
-                cdh_Low(nodevect[idx].secondary_nodename), bus_number);
+            sprintf(filename, pwr_cNameNode, load_cDirectory, cdh_Low(nodevect[idx].secondary_nodename),
+                    bus_number);
 
           dcli_translate_filename(fname, filename);
           fp = fopen(fname, "w");
-          if (!fp) {
+          if (!fp)
+          {
             char tmp[240];
             sprintf(tmp, "Error, Unable to open file \"%s\"\n", fname);
             MsgWindow::message('E', tmp, msgw_ePop_Default);
             return LFU__NOFILE;
           }
 
-          for (int i = 0; i < (int)nodevect.size(); i++) {
+          for (int i = 0; i < (int)nodevect.size(); i++)
+          {
             lfu_nodeconf nc = nodevect[i];
 
             if (qcom_auto_dis == pwr_eYesNoEnum_Yes && i != idx)
               continue;
 
-            if (i == idx) {
+            if (i == idx)
+            {
               if (!is_secondary)
-                fprintf(fp, "%s %s %s %d %d %d %d %d %f %d %d %s %s\n",
-                    nc.nodename, cdh_VolumeIdToString(0, 0, nc.vid, 0, 0),
-                    nc.address, nc.port, nc.connection,
-                    int(nc.qcom_min_resend_time * 1000),
-                    int(nc.qcom_max_resend_time * 1000),
-                    nc.qcom_export_buf_quota, nc.qcom_ack_delay,
-                    nc.qcom_segment_size, is_secondary, "-", "-");
+                fprintf(fp, "%s %s %s %d %d %d %d %d %f %d %d %s %s\n", nc.nodename,
+                        cdh_VolumeIdToString(0, 0, nc.vid, 0, 0), nc.address, nc.port, nc.connection,
+                        int(nc.qcom_min_resend_time * 1000), int(nc.qcom_max_resend_time * 1000),
+                        nc.qcom_export_buf_quota, nc.qcom_ack_delay, nc.qcom_segment_size, is_secondary, "-",
+                        "-");
               else
-                fprintf(fp, "%s %s %s %d %d %d %d %d %f %d %d %s %s\n",
-                    nc.secondary_nodename,
-                    cdh_VolumeIdToString(0, 0, nc.vid, 0, 0),
-                    nc.secondary_address, nc.port, nc.connection,
-                    int(nc.qcom_min_resend_time * 1000),
-                    int(nc.qcom_max_resend_time * 1000),
-                    nc.qcom_export_buf_quota, nc.qcom_ack_delay,
-                    nc.qcom_segment_size, is_secondary, "-", "-");
-            } else
-              fprintf(fp, "%s %s %s %d %d %d %d %d %f %d %d %s %s\n",
-                  nc.nodename, cdh_VolumeIdToString(0, 0, nc.vid, 0, 0),
-                  nc.address, nc.port, nc.connection,
-                  int(nc.qcom_min_resend_time * 1000),
-                  int(nc.qcom_max_resend_time * 1000), nc.qcom_export_buf_quota,
-                  nc.qcom_ack_delay, nc.qcom_segment_size, 0,
-                  nc.secondary_nodename, nc.secondary_address);
+                fprintf(fp, "%s %s %s %d %d %d %d %d %f %d %d %s %s\n", nc.secondary_nodename,
+                        cdh_VolumeIdToString(0, 0, nc.vid, 0, 0), nc.secondary_address, nc.port,
+                        nc.connection, int(nc.qcom_min_resend_time * 1000),
+                        int(nc.qcom_max_resend_time * 1000), nc.qcom_export_buf_quota, nc.qcom_ack_delay,
+                        nc.qcom_segment_size, is_secondary, "-", "-");
+            }
+            else
+              fprintf(fp, "%s %s %s %d %d %d %d %d %f %d %d %s %s\n", nc.nodename,
+                      cdh_VolumeIdToString(0, 0, nc.vid, 0, 0), nc.address, nc.port, nc.connection,
+                      int(nc.qcom_min_resend_time * 1000), int(nc.qcom_max_resend_time * 1000),
+                      nc.qcom_export_buf_quota, nc.qcom_ack_delay, nc.qcom_segment_size, 0,
+                      nc.secondary_nodename, nc.secondary_address);
           }
 
           // Add specific FriendNodes for the node
-          for (wb_object fnodeo = nodeo.first(); fnodeo;
-               fnodeo = fnodeo.after()) {
-            switch (fnodeo.cid()) {
-            case pwr_cClass_FriendNodeConfig: {
+          for (wb_object fnodeo = nodeo.first(); fnodeo; fnodeo = fnodeo.after())
+          {
+            switch (fnodeo.cid())
+            {
+            case pwr_cClass_FriendNodeConfig:
+            {
               pwr_tString80 volstr;
               lfu_nodeconf nc;
 
               nc.isfriend = 1;
 
-	      sts = ldh_ObjidToName(ldhses, fnodeo.oid(), ldh_eName_Object,
-				    nodeconfig_name, sizeof(nodeconfig_name), &size);
+              sts = ldh_ObjidToName(ldhses, fnodeo.oid(), ldh_eName_Object, nodeconfig_name,
+                                    sizeof(nodeconfig_name), &size);
 
               // Get attribute NodeName
               a = sp->attribute(fnodeo.oid(), "RtBody", "NodeName");
-              if (!a) {
+              if (!a)
+              {
                 fclose(fp);
                 return a.sts();
               }
 
               a.value(nc.nodename);
-              if (!a) {
+              if (!a)
+              {
                 fclose(fp);
                 return sts;
               }
 
               // Get attribute Address
               a = sp->attribute(fnodeo.oid(), "RtBody", "Address");
-              if (!a) {
+              if (!a)
+              {
                 fclose(fp);
                 return a.sts();
               }
 
               a.value(nc.address);
-              if (!a) {
+              if (!a)
+              {
                 fclose(fp);
                 return sts;
               }
 
               // Get attribute Port
               a = sp->attribute(fnodeo.oid(), "RtBody", "Port");
-              if (!a) {
+              if (!a)
+              {
                 fclose(fp);
                 return a.sts();
               }
 
               a.value(&nc.port);
-              if (!a) {
+              if (!a)
+              {
                 fclose(fp);
                 return sts;
               }
 
               // Get attribute Connection
               a = sp->attribute(fnodeo.oid(), "RtBody", "Connection");
-              if (!a) {
+              if (!a)
+              {
                 fclose(fp);
                 return a.sts();
               }
 
               a.value(&nc.connection);
-              if (!a) {
+              if (!a)
+              {
                 fclose(fp);
                 return sts;
               }
 
               // Get attribute Volume
               a = sp->attribute(fnodeo.oid(), "RtBody", "Volume");
-              if (!a) {
+              if (!a)
+              {
                 fclose(fp);
                 return a.sts();
               }
 
               a.value(volstr);
-              if (!a) {
+              if (!a)
+              {
                 fclose(fp);
                 return sts;
               }
 
               // Get attribute QComMaxResendTime
               a = sp->attribute(fnodeo.oid(), "RtBody", "QComMinResendTime");
-              if (!a) {
+              if (!a)
+              {
                 fclose(fp);
                 return a.sts();
               }
 
               a.value(&nc.qcom_min_resend_time);
-              if (!a) {
+              if (!a)
+              {
                 fclose(fp);
                 return sts;
               }
 
               // Get attribute QComMaxResendTime
               a = sp->attribute(fnodeo.oid(), "RtBody", "QComMaxResendTime");
-              if (!a) {
+              if (!a)
+              {
                 fclose(fp);
                 return a.sts();
               }
 
               a.value(&nc.qcom_max_resend_time);
-              if (!a) {
+              if (!a)
+              {
                 fclose(fp);
                 return sts;
               }
 
               // Get attribute QComExportBufSize
               a = sp->attribute(nodeo.oid(), "RtBody", "QComExportBufQuota");
-              if (!a) {
+              if (!a)
+              {
                 fclose(fp);
                 return a.sts();
               }
 
               a.value(&nc.qcom_export_buf_quota);
-              if (!a) {
+              if (!a)
+              {
                 fclose(fp);
                 return sts;
               }
 
               // Get attribute QComAckDelay
               a = sp->attribute(nodeo.oid(), "RtBody", "QComAckDelay");
-              if (!a) {
+              if (!a)
+              {
                 fclose(fp);
                 return a.sts();
               }
 
               a.value(&nc.qcom_ack_delay);
-              if (!a) {
+              if (!a)
+              {
                 fclose(fp);
                 return sts;
               }
@@ -2234,9 +2324,10 @@ pwr_tStatus lfu_SaveDirectoryVolume(
               /* Check that the name is in the global volume list */
               found = 0;
               volumelist_ptr = volumelist;
-              for (int j = 0; j < volumecount; j++) {
-                if (str_NoCaseStrcmp(volstr, volumelist_ptr->volume_name)
-                    == 0) {
+              for (int j = 0; j < volumecount; j++)
+              {
+                if (str_NoCaseStrcmp(volstr, volumelist_ptr->volume_name) == 0)
+                {
                   nc.vid = volumelist_ptr->volume_id;
                   found = 1;
                   break;
@@ -2244,23 +2335,19 @@ pwr_tStatus lfu_SaveDirectoryVolume(
                 volumelist_ptr++;
               }
 
-              if (!found) {
+              if (!found)
+              {
                 char msg[200];
-                sprintf(msg,
-                    "Error in FriendNodeConfig object '%s', Unknown volume",
-                    nodeconfig_name);
+                sprintf(msg, "Error in FriendNodeConfig object '%s', Unknown volume", nodeconfig_name);
                 MsgWindow::message('E', msg, msgw_ePop_Default);
                 syntax_error = 1;
               }
 
-              fprintf(fp, "%s %s %s %d %d %d %d %d %f %d %d %s %s\n",
-                  nc.nodename, cdh_VolumeIdToString(0, 0, nc.vid, 0, 0),
-                  nc.address, nc.port, nc.connection,
-                  (int)(nc.qcom_min_resend_time * 1000),
-                  (int)(nc.qcom_max_resend_time * 1000),
-                  nc.qcom_export_buf_quota, nc.qcom_ack_delay,
-                  nc.qcom_segment_size, 0, nc.secondary_nodename,
-                  nc.secondary_address);
+              fprintf(fp, "%s %s %s %d %d %d %d %d %f %d %d %s %s\n", nc.nodename,
+                      cdh_VolumeIdToString(0, 0, nc.vid, 0, 0), nc.address, nc.port, nc.connection,
+                      (int)(nc.qcom_min_resend_time * 1000), (int)(nc.qcom_max_resend_time * 1000),
+                      nc.qcom_export_buf_quota, nc.qcom_ack_delay, nc.qcom_segment_size, 0,
+                      nc.secondary_nodename, nc.secondary_address);
               break;
             }
             default:;
@@ -2275,24 +2362,27 @@ pwr_tStatus lfu_SaveDirectoryVolume(
     }
 
     // Print ld_recom file
-    for (unsigned int i = 0; i < nodevect.size(); i++) {
+    for (unsigned int i = 0; i < nodevect.size(); i++)
+    {
       lfu_nodeconf nc = nodevect[i];
 
-      if (nc.has_secondary) {
-        for (int j = 0; j < 2; j++) {
+      if (nc.has_secondary)
+      {
+        for (int j = 0; j < 2; j++)
+        {
           FILE* fp;
           int is_secondary = j;
 
           if (!is_secondary)
-            sprintf(filename, pwr_cNameRedcom, load_cDirectory,
-                cdh_Low(nodevect[i].nodename), bus_number);
+            sprintf(filename, pwr_cNameRedcom, load_cDirectory, cdh_Low(nodevect[i].nodename), bus_number);
           else
-            sprintf(filename, pwr_cNameRedcom, load_cDirectory,
-                cdh_Low(nodevect[i].secondary_nodename), bus_number);
+            sprintf(filename, pwr_cNameRedcom, load_cDirectory, cdh_Low(nodevect[i].secondary_nodename),
+                    bus_number);
 
           dcli_translate_filename(fname, filename);
           fp = fopen(fname, "w");
-          if (fp == 0) {
+          if (fp == 0)
+          {
             char tmp[240];
             sprintf(tmp, "Error, Unable to open file \"%s\"\n", fname);
             MsgWindow::message('E', tmp, msgw_ePop_Default);
@@ -2300,15 +2390,13 @@ pwr_tStatus lfu_SaveDirectoryVolume(
           }
 
           fprintf(fp, "%s %s %s %d %d %d %d %d %f %d\n", nc.nodename,
-              cdh_VolumeIdToString(0, 0, nc.vid, 0, 0), nc.address,
-              nc.redcom_port, 2, int(nc.redcom_min_resend_time * 1000),
-              int(nc.redcom_max_resend_time * 1000), nc.redcom_export_buf_quota,
-              nc.redcom_ack_delay, nc.redcom_segment_size);
+                  cdh_VolumeIdToString(0, 0, nc.vid, 0, 0), nc.address, nc.redcom_port, 2,
+                  int(nc.redcom_min_resend_time * 1000), int(nc.redcom_max_resend_time * 1000),
+                  nc.redcom_export_buf_quota, nc.redcom_ack_delay, nc.redcom_segment_size);
           fprintf(fp, "%s %s %s %d %d %d %d %d %f %d\n", nc.secondary_nodename,
-              cdh_VolumeIdToString(0, 0, nc.vid, 0, 0), nc.secondary_address,
-              nc.redcom_port, 1, int(nc.redcom_min_resend_time * 1000),
-              int(nc.redcom_max_resend_time * 1000), nc.redcom_export_buf_quota,
-              nc.redcom_ack_delay, nc.redcom_segment_size);
+                  cdh_VolumeIdToString(0, 0, nc.vid, 0, 0), nc.secondary_address, nc.redcom_port, 1,
+                  int(nc.redcom_min_resend_time * 1000), int(nc.redcom_max_resend_time * 1000),
+                  nc.redcom_export_buf_quota, nc.redcom_ack_delay, nc.redcom_segment_size);
           fclose(fp);
         }
       }
@@ -2318,7 +2406,8 @@ pwr_tStatus lfu_SaveDirectoryVolume(
   /* Generate data for distribution, custom build and build options */
   dcli_translate_filename(fname, pwr_cNameDistribute);
   file = fopen(fname, "w");
-  if (file == 0) {
+  if (file == 0)
+  {
     char tmp[240];
     sprintf(tmp, "Error, Unable to open file \"%s\"\n", fname);
     MsgWindow::message('E', tmp, msgw_ePop_Default);
@@ -2327,13 +2416,15 @@ pwr_tStatus lfu_SaveDirectoryVolume(
 
   /* Get the system name */
   sts = utl_get_systemobject(ldhses, &systemobjid, systemname, systemgroup);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     char msg[200];
     sprintf(msg, "Error in System object, object is missing");
     MsgWindow::message('E', msg, msgw_ePop_Default);
     syntax_error = 1;
   }
-  if (!strcmp(systemname, "")) {
+  if (!strcmp(systemname, ""))
+  {
     char msg[200];
     sprintf(msg, "Error in System object, SystemName is missing");
     MsgWindow::message('E', msg, msgw_ePop_Default);
@@ -2344,20 +2435,22 @@ pwr_tStatus lfu_SaveDirectoryVolume(
 
   /* Get the Distribute data of the node config objects */
   sts = ldh_GetRootList(ldhses, &busobjid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = ldh_GetObjectClass(ldhses, busobjid, &cid);
     if (EVEN(sts))
       return sts;
 
-    if (cid == pwr_cClass_BusConfig) {
+    if (cid == pwr_cClass_BusConfig)
+    {
       /* Check DmqBus attribute */
-      sts = ldh_GetObjectPar(ldhses, busobjid, "RtBody", "BusNumber",
-          (char**)&bus_number_ptr, &size);
+      sts = ldh_GetObjectPar(ldhses, busobjid, "RtBody", "BusNumber", (char**)&bus_number_ptr, &size);
       if (EVEN(sts))
         return sts;
 
       sts = ldh_GetChild(ldhses, busobjid, &nodeobjid);
-      while (ODD(sts)) {
+      while (ODD(sts))
+      {
         distr_options = 0;
         distr_disable = 0;
 
@@ -2365,107 +2458,104 @@ pwr_tStatus lfu_SaveDirectoryVolume(
         if (EVEN(sts))
           return sts;
 
-        if (cid == pwr_cClass_NodeConfig || cid == pwr_cClass_SevNodeConfig) {
-          sts = ldh_ObjidToName(ldhses, nodeobjid, ldh_eName_Object,
-              nodeconfig_name, sizeof(nodeconfig_name), &size);
+        if (cid == pwr_cClass_NodeConfig || cid == pwr_cClass_SevNodeConfig)
+        {
+          sts = ldh_ObjidToName(ldhses, nodeobjid, ldh_eName_Object, nodeconfig_name, sizeof(nodeconfig_name),
+                                &size);
           if (EVEN(sts))
             return sts;
 
           /* Check if Disabled attribute */
-          sts = ldh_GetObjectPar(ldhses, nodeobjid, "RtBody",
-              "DistributeDisable", (char**)&distr_disable_ptr, &size);
-          if (ODD(sts)) {
+          sts = ldh_GetObjectPar(ldhses, nodeobjid, "RtBody", "DistributeDisable", (char**)&distr_disable_ptr,
+                                 &size);
+          if (ODD(sts))
+          {
             distr_disable = *distr_disable_ptr;
             free(distr_disable_ptr);
           }
 
           /* Check NodeName attribute */
-          sts = ldh_GetObjectPar(
-              ldhses, nodeobjid, "RtBody", "NodeName", &nodename_ptr, &size);
+          sts = ldh_GetObjectPar(ldhses, nodeobjid, "RtBody", "NodeName", &nodename_ptr, &size);
           if (EVEN(sts))
             return sts;
 
-          if (!strcmp(nodename_ptr, "")) {
+          if (!strcmp(nodename_ptr, ""))
+          {
             free(nodename_ptr);
             nodename_ptr = null_nodename;
           }
 
-          if (cid == pwr_cClass_NodeConfig) {
+          if (cid == pwr_cClass_NodeConfig)
+          {
             /* Check SecondaryNode.NodeName attribute */
-            sts = ldh_GetObjectPar(ldhses, nodeobjid, "RtBody",
-                "SecondaryNode.NodeName", &secondary_nodename_ptr, &size);
+            sts = ldh_GetObjectPar(ldhses, nodeobjid, "RtBody", "SecondaryNode.NodeName",
+                                   &secondary_nodename_ptr, &size);
             if (EVEN(sts))
               return sts;
 
-            if (streq(secondary_nodename_ptr, "")) {
+            if (streq(secondary_nodename_ptr, ""))
+            {
               free(secondary_nodename_ptr);
               secondary_nodename_ptr = null_nodename;
             }
-          } else
+          }
+          else
             secondary_nodename_ptr = null_nodename;
 
           /* Check BootNode attribute */
-          sts = ldh_GetObjectPar(
-              ldhses, nodeobjid, "RtBody", "BootNode", &bootnode_ptr, &size);
+          sts = ldh_GetObjectPar(ldhses, nodeobjid, "RtBody", "BootNode", &bootnode_ptr, &size);
           if (EVEN(sts))
             return sts;
 
-          if (!strcmp(bootnode_ptr, "") || !strcmp(bootnode_ptr, "-")) {
+          if (!strcmp(bootnode_ptr, "") || !strcmp(bootnode_ptr, "-"))
+          {
             free(bootnode_ptr);
             bootnode_ptr = null_nodename;
           }
 
-          if (cid == pwr_cClass_NodeConfig) {
+          if (cid == pwr_cClass_NodeConfig)
+          {
             /* Check SecondaryNode.BootNode attribute */
-            sts = ldh_GetObjectPar(ldhses, nodeobjid, "RtBody",
-                "SecondaryNode.BootNode", &secondary_bootnode_ptr, &size);
+            sts = ldh_GetObjectPar(ldhses, nodeobjid, "RtBody", "SecondaryNode.BootNode",
+                                   &secondary_bootnode_ptr, &size);
             if (EVEN(sts))
               return sts;
 
-            if (!strcmp(secondary_bootnode_ptr, "")
-                || !strcmp(secondary_bootnode_ptr, "-")) {
+            if (!strcmp(secondary_bootnode_ptr, "") || !strcmp(secondary_bootnode_ptr, "-"))
+            {
               free(secondary_bootnode_ptr);
               secondary_bootnode_ptr = null_nodename;
             }
-          } else
+          }
+          else
             secondary_bootnode_ptr = null_nodename;
 
           /* Check OperatingSystem attribute */
-          sts = ldh_GetObjectPar(ldhses, nodeobjid, "RtBody", "OperatingSystem",
-              (char**)&os_ptr, &size);
+          sts = ldh_GetObjectPar(ldhses, nodeobjid, "RtBody", "OperatingSystem", (char**)&os_ptr, &size);
           if (EVEN(sts))
             return sts;
 
           os = *os_ptr;
           sprintf(os_str, "%d", os);
 
-          /* Get RemoteAccessType attribute */
-          sts = ldh_GetObjectPar(ldhses, nodeobjid, "RtBody",
-              "RemoteAccessType", (char**)&remote_access_type_ptr, &size);
-          if (EVEN(sts))
-            return sts;
-
-          if (*remote_access_type_ptr == pwr_eRemoteShellEnum_RSH)
-            distr_options |= lfu_mDistrOpt_RSH;
-          free(remote_access_type_ptr);
-
           /* Check that there is a rootvolume for this node */
           found = 0;
           sts = ldh_GetChild(ldhses, nodeobjid, &volobjid);
-          while (ODD(sts)) {
+          while (ODD(sts))
+          {
             sts = ldh_GetObjectClass(ldhses, volobjid, &ccid);
             if (EVEN(sts))
               return sts;
 
-            if (ccid == pwr_cClass_RootVolumeLoad) {
+            if (ccid == pwr_cClass_RootVolumeLoad)
+            {
               found = 1;
               break;
             }
             sts = ldh_GetNextSibling(ldhses, volobjid, &volobjid);
           }
           if (!found)
-            distr_options = (lfu_mDistrOpt)(
-                (int)distr_options | lfu_mDistrOpt_NoRootVolume);
+            distr_options = (lfu_mDistrOpt)((int)distr_options | lfu_mDistrOpt_NoRootVolume);
 
           strcpy(custom_platform, "-");
           custom_os = pwr_mOpSys__;
@@ -2477,37 +2567,36 @@ pwr_tStatus lfu_SaveDirectoryVolume(
           objcount = 0;
           objlist = 0;
 
-          sts = trv_create_ctx(
-              &trvctx, ldhses, nodeobjid, class_vect, NULL, NULL);
+          sts = trv_create_ctx(&trvctx, ldhses, nodeobjid, class_vect, NULL, NULL);
           if (EVEN(sts))
             return sts;
 
-          sts = trv_object_search(
-              trvctx, &utl_objidlist_insert, &objlist, &objcount, 0, 0, 0);
+          sts = trv_object_search(trvctx, &utl_objidlist_insert, &objlist, &objcount, 0, 0, 0);
           if (EVEN(sts))
             return sts;
 
           sts = trv_delete_ctx(trvctx);
 
-          for (obj_ptr = objlist; obj_ptr; obj_ptr = obj_ptr->next) {
+          for (obj_ptr = objlist; obj_ptr; obj_ptr = obj_ptr->next)
+          {
             applobjid = obj_ptr->objid;
             sts = ldh_GetObjectClass(ldhses, applobjid, &ccid);
             if (EVEN(sts))
               return sts;
 
-            switch (ccid) {
-            case pwr_cClass_CustomBuild: {
+            switch (ccid)
+            {
+            case pwr_cClass_CustomBuild:
+            {
               char* platform_p;
               pwr_tMask* os_p;
 
-              sts = ldh_ObjidToName(ldhses, applobjid, ldh_eName_Object,
-                  appl_name, sizeof(appl_name), &size);
+              sts = ldh_ObjidToName(ldhses, applobjid, ldh_eName_Object, appl_name, sizeof(appl_name), &size);
               if (EVEN(sts))
                 return sts;
 
               /* Get Platform attribute */
-              sts = ldh_GetObjectPar(
-                  ldhses, applobjid, "DevBody", "Platform", &platform_p, &size);
+              sts = ldh_GetObjectPar(ldhses, applobjid, "DevBody", "Platform", &platform_p, &size);
               if (EVEN(sts))
                 return sts;
 
@@ -2516,8 +2605,7 @@ pwr_tStatus lfu_SaveDirectoryVolume(
               free(platform_p);
 
               /* Get OperatingSystem attribute */
-              sts = ldh_GetObjectPar(ldhses, applobjid, "DevBody",
-                  "OperatingSystem", (char**)&os_p, &size);
+              sts = ldh_GetObjectPar(ldhses, applobjid, "DevBody", "OperatingSystem", (char**)&os_p, &size);
               if (EVEN(sts))
                 return sts;
 
@@ -2536,26 +2624,27 @@ pwr_tStatus lfu_SaveDirectoryVolume(
           objcount = 0;
           objlist = 0;
 
-          sts = trv_create_ctx(
-              &trvctx, ldhses, nodeobjid, class_vect, NULL, NULL);
+          sts = trv_create_ctx(&trvctx, ldhses, nodeobjid, class_vect, NULL, NULL);
           if (EVEN(sts))
             return sts;
 
-          sts = trv_object_search(
-              trvctx, &utl_objidlist_insert, &objlist, &objcount, 0, 0, 0);
+          sts = trv_object_search(trvctx, &utl_objidlist_insert, &objlist, &objcount, 0, 0, 0);
           if (EVEN(sts))
             return sts;
 
           sts = trv_delete_ctx(trvctx);
 
-          for (obj_ptr = objlist; obj_ptr; obj_ptr = obj_ptr->next) {
+          for (obj_ptr = objlist; obj_ptr; obj_ptr = obj_ptr->next)
+          {
             applobjid = obj_ptr->objid;
             sts = ldh_GetObjectClass(ldhses, applobjid, &ccid);
             if (EVEN(sts))
               return sts;
 
-            switch (ccid) {
-            case pwr_cClass_BuildOptions: {
+            switch (ccid)
+            {
+            case pwr_cClass_BuildOptions:
+            {
               pwr_sClass_BuildOptions* bop;
               int size;
               pwr_tString80 ar, opt;
@@ -2571,27 +2660,23 @@ pwr_tStatus lfu_SaveDirectoryVolume(
               strcpy(str, "`: Autogenerated options file, Do not edit !!` ");
 #endif
 
-              sts = ldh_ObjidToName(ldhses, applobjid, ldh_eName_Object,
-                  appl_name, sizeof(appl_name), &size);
+              sts = ldh_ObjidToName(ldhses, applobjid, ldh_eName_Object, appl_name, sizeof(appl_name), &size);
               if (EVEN(sts))
                 return sts;
 
-              sts = ldh_GetObjectBody(
-                  ldhses, applobjid, "RtBody", (void**)&bop, &size);
+              sts = ldh_GetObjectBody(ldhses, applobjid, "RtBody", (void**)&bop, &size);
               if (EVEN(sts))
                 return sts;
 
-              for (int i = 0; i < (int)(sizeof(bop->ArchivePath)
-                                      / sizeof(bop->ArchivePath[0]));
-                   i++) {
+              for (int i = 0; i < (int)(sizeof(bop->ArchivePath) / sizeof(bop->ArchivePath[0])); i++)
+              {
                 str_trim(opt, bop->ArchivePath[i]);
                 if (!streq(opt, ""))
                   sprintf(&str[strlen(str)], "-L%s ", opt);
               }
 
-              for (int i = 0; i < (int)(sizeof(bop->ObjectModules)
-                                      / sizeof(bop->ObjectModules[0]));
-                   i++) {
+              for (int i = 0; i < (int)(sizeof(bop->ObjectModules) / sizeof(bop->ObjectModules[0])); i++)
+              {
                 str_trim(opt, bop->ObjectModules[i]);
                 if (!streq(opt, ""))
                   sprintf(&str[strlen(str)], "%s ", opt);
@@ -2599,22 +2684,21 @@ pwr_tStatus lfu_SaveDirectoryVolume(
 
               if (bop->SystemModules & pwr_mBuildOptionsMask_IoUser)
                 sprintf(&str[strlen(str)], "$pwrp_obj/rt_io_user.o ");
-              else {
+              else
+              {
                 if (os == pwr_mOpSys_CustomBuild)
-                  sprintf(&str[strlen(str)],
-                      "$pwrb_root/%s/exp/obj/rt_io_user.o ",
-                      cdh_OpSysToDirStr((pwr_mOpSys)custom_os));
+                  sprintf(&str[strlen(str)], "$pwrb_root/%s/exp/obj/rt_io_user.o ",
+                          cdh_OpSysToDirStr((pwr_mOpSys)custom_os));
                 else
-                  sprintf(&str[strlen(str)],
-                      "$pwrb_root/%s/exp/obj/rt_io_user.o ",
-                      cdh_OpSysToDirStr((pwr_mOpSys)os));
+                  sprintf(&str[strlen(str)], "$pwrb_root/%s/exp/obj/rt_io_user.o ",
+                          cdh_OpSysToDirStr((pwr_mOpSys)os));
               }
 
-              for (int i = 0;
-                   i < (int)(sizeof(bop->Archives) / sizeof(bop->Archives[0]));
-                   i++) {
+              for (int i = 0; i < (int)(sizeof(bop->Archives) / sizeof(bop->Archives[0])); i++)
+              {
                 str_trim(opt, bop->Archives[i]);
-                if (!streq(opt, "")) {
+                if (!streq(opt, ""))
+                {
                   if (str_StartsWith(opt, "lib"))
                     strncpy(ar, &opt[3], sizeof(ar));
                   else
@@ -2651,7 +2735,8 @@ pwr_tStatus lfu_SaveDirectoryVolume(
               sprintf(&str[strlen(str)], "-lpwr_rt ");
 
               if (bop->SystemModules & pwr_mBuildOptionsMask_SoftingPNAK)
-                sprintf(&str[strlen(str)], "-lprofinet ");
+                sprintf(&str[strlen(str)],
+                        "-lprofinet -lsnmp -lnetsnmpagent -lnetsnmpmibs -lnetsnmphelpers -lnetsnmptrapd ");
               else
                 sprintf(&str[strlen(str)], "-lpwr_pnak_dummy ");
 
@@ -2683,61 +2768,65 @@ pwr_tStatus lfu_SaveDirectoryVolume(
               // Powerlink can't be called from plc yet, always use the dummy
               sprintf(&str[strlen(str)], "-lpwr_epl_dummy ");
 
-              if (streq(bop->PlcProcess, "")) {
+              if (streq(bop->PlcProcess, ""))
+              {
                 char msg[200];
-                sprintf(msg, "Error in BuildOptions object '%s', PlcProcess is "
-                             "missing\n",
-                    appl_name);
+                sprintf(msg,
+                        "Error in BuildOptions object '%s', PlcProcess is "
+                        "missing\n",
+                        appl_name);
                 MsgWindow::message('E', msg, msgw_ePop_Default);
                 syntax_error = 1;
                 free((char*)bop);
-              } else {
+              }
+              else
+              {
                 strncpy(plcproc, bop->PlcProcess, sizeof(plcproc));
                 free((char*)bop);
 
                 if (os == pwr_mOpSys_CustomBuild)
-                  sprintf(dir, "$pwrp_root/bld/%s/exe/",
-                      cdh_OpSysToStr((pwr_mOpSys)custom_os));
+                  sprintf(dir, "$pwrp_root/bld/%s/exe/", cdh_OpSysToStr((pwr_mOpSys)custom_os));
                 else
-                  sprintf(dir, "$pwrp_root/bld/%s/exe/",
-                      cdh_OpSysToStr((pwr_mOpSys)os));
+                  sprintf(dir, "$pwrp_root/bld/%s/exe/", cdh_OpSysToStr((pwr_mOpSys)os));
                 str_ToLower(nodename, nodename_ptr);
-                sprintf(fname, pwr_cNameOpt, dir, nodename, *bus_number_ptr,
-                    cdh_Low(plcproc));
+                sprintf(fname, pwr_cNameOpt, dir, nodename, *bus_number_ptr, cdh_Low(plcproc));
                 dcli_translate_filename(fname, fname);
                 optfile = fopen(fname, "w");
-                if (optfile == 0) {
+                if (optfile == 0)
+                {
                   char tmp[240];
                   sprintf(tmp, "Error, Unable to open file \"%s\"\n", fname);
                   MsgWindow::message('E', tmp, msgw_ePop_Default);
-		  syntax_error = 1;
-                } else {
-		  fprintf(optfile, "%s", str);
-		  fclose(optfile);
-		}
+                  syntax_error = 1;
+                }
+                else
+                {
+                  fprintf(optfile, "%s", str);
+                  fclose(optfile);
+                }
 
-                if (secondary_nodename_ptr != null_nodename) {
+                if (secondary_nodename_ptr != null_nodename)
+                {
                   if (os == pwr_mOpSys_CustomBuild)
-                    sprintf(dir, "$pwrp_root/bld/%s/exe/",
-                        cdh_OpSysToStr((pwr_mOpSys)custom_os));
+                    sprintf(dir, "$pwrp_root/bld/%s/exe/", cdh_OpSysToStr((pwr_mOpSys)custom_os));
                   else
-                    sprintf(dir, "$pwrp_root/bld/%s/exe/",
-                        cdh_OpSysToStr((pwr_mOpSys)os));
+                    sprintf(dir, "$pwrp_root/bld/%s/exe/", cdh_OpSysToStr((pwr_mOpSys)os));
                   str_ToLower(nodename, secondary_nodename_ptr);
-                  sprintf(fname, pwr_cNameOpt, dir, nodename, *bus_number_ptr,
-                      cdh_Low(plcproc));
+                  sprintf(fname, pwr_cNameOpt, dir, nodename, *bus_number_ptr, cdh_Low(plcproc));
                   dcli_translate_filename(fname, fname);
                   optfile = fopen(fname, "w");
-                  if (optfile == 0) {
+                  if (optfile == 0)
+                  {
                     char tmp[240];
                     sprintf(tmp, "Error, Unable to open file \"%s\"\n", fname);
                     MsgWindow::message('E', tmp, msgw_ePop_Default);
-		    syntax_error = 1;
+                    syntax_error = 1;
                   }
-		  else {
-		    fprintf(optfile, "%s", str);
-		    fclose(optfile);
-		  }
+                  else
+                  {
+                    fprintf(optfile, "%s", str);
+                    fclose(optfile);
+                  }
                 }
               }
               break;
@@ -2746,18 +2835,18 @@ pwr_tStatus lfu_SaveDirectoryVolume(
             }
           }
 
-          if (distr_disable) {
+          if (distr_disable)
+          {
             /* Distribution is disabled, goto next node */
             sts = ldh_GetNextSibling(ldhses, nodeobjid, &nodeobjid);
             continue;
           }
 
-          fprintf(file, "node %s %s %d %d %s %s\n", nodename_ptr, os_str,
-              *bus_number_ptr, distr_options, bootnode_ptr, custom_platform);
+          fprintf(file, "node %s %s %d %d %s %s\n", nodename_ptr, os_str, *bus_number_ptr, distr_options,
+                  bootnode_ptr, custom_platform);
           if (secondary_nodename_ptr != null_nodename)
-            fprintf(file, "node %s %s %d %d %s %s\n", secondary_nodename_ptr,
-                os_str, *bus_number_ptr, distr_options, secondary_bootnode_ptr,
-                custom_platform);
+            fprintf(file, "node %s %s %d %d %s %s\n", secondary_nodename_ptr, os_str, *bus_number_ptr,
+                    distr_options, secondary_bootnode_ptr, custom_platform);
 
           /* Find the applications for this node */
           class_vect[0] = pwr_cClass_Distribute;
@@ -2768,19 +2857,18 @@ pwr_tStatus lfu_SaveDirectoryVolume(
           objcount = 0;
           objlist = 0;
 
-          sts = trv_create_ctx(
-              &trvctx, ldhses, nodeobjid, class_vect, NULL, NULL);
+          sts = trv_create_ctx(&trvctx, ldhses, nodeobjid, class_vect, NULL, NULL);
           if (EVEN(sts))
             return sts;
 
-          sts = trv_object_search(
-              trvctx, &utl_objidlist_insert, &objlist, &objcount, 0, 0, 0);
+          sts = trv_object_search(trvctx, &utl_objidlist_insert, &objlist, &objcount, 0, 0, 0);
           if (EVEN(sts))
             return sts;
 
           sts = trv_delete_ctx(trvctx);
 
-          for (int k = 0; k < 2; k++) {
+          for (int k = 0; k < 2; k++)
+          {
             char* stored_nodename_ptr = nodename_ptr;
 
             if (k == 1 && secondary_nodename_ptr == null_nodename)
@@ -2788,94 +2876,101 @@ pwr_tStatus lfu_SaveDirectoryVolume(
             if (k == 1)
               nodename_ptr = secondary_nodename_ptr;
 
-            for (obj_ptr = objlist; obj_ptr; obj_ptr = obj_ptr->next) {
+            for (obj_ptr = objlist; obj_ptr; obj_ptr = obj_ptr->next)
+            {
               applobjid = obj_ptr->objid;
               sts = ldh_GetObjectClass(ldhses, applobjid, &ccid);
               if (EVEN(sts))
                 return sts;
 
-              switch (ccid) {
-              case pwr_cClass_Distribute: {
+              switch (ccid)
+              {
+              case pwr_cClass_Distribute:
+              {
                 pwr_mDistrComponentMask* components_ptr;
 
-                sts = ldh_ObjidToName(ldhses, applobjid, ldh_eName_Object,
-                    appl_name, sizeof(appl_name), &size);
+                sts =
+                    ldh_ObjidToName(ldhses, applobjid, ldh_eName_Object, appl_name, sizeof(appl_name), &size);
                 if (EVEN(sts))
                   return sts;
 
                 /* Check Components attribute */
-                sts = ldh_GetObjectPar(ldhses, applobjid, "DevBody",
-                    "Components", (char**)&components_ptr, &size);
+                sts = ldh_GetObjectPar(ldhses, applobjid, "DevBody", "Components", (char**)&components_ptr,
+                                       &size);
                 if (EVEN(sts))
                   return sts;
 
-                if (*components_ptr & pwr_mDistrComponentMask_LoadFiles
-                    && !(distr_options & lfu_mDistrOpt_NoRootVolume)) {
+                if (*components_ptr & pwr_mDistrComponentMask_LoadFiles &&
+                    !(distr_options & lfu_mDistrOpt_NoRootVolume))
+                {
                   fprintf(file, "load %s\n", nodename_ptr);
-                } else if (cid == pwr_cClass_SevNodeConfig)
+                }
+                else if (cid == pwr_cClass_SevNodeConfig)
                   fprintf(file, "boot %s\n", nodename_ptr);
 
                 if (*components_ptr & pwr_mDistrComponentMask_UserDatabase)
-                  fprintf(file, "appl %s W "
-                                "$pwrp_cnf/%s/pwr_user2.dat:$pwra_db/"
-                                "pwr_user2.dat $pwra_db/pwr_user2.dat\n",
-                      nodename_ptr, nodename_ptr);
+                  fprintf(file,
+                          "appl %s W "
+                          "$pwrp_cnf/%s/pwr_user2.dat:$pwra_db/"
+                          "pwr_user2.dat $pwra_db/pwr_user2.dat\n",
+                          nodename_ptr, nodename_ptr);
                 if (*components_ptr & pwr_mDistrComponentMask_ApplFile)
-                  fprintf(file, "appl %s W " pwr_cNameAppl " $pwrp_load/\n",
-                      nodename_ptr, "$pwrp_load/", nodename_ptr,
-                      *bus_number_ptr);
+                  fprintf(file, "appl %s W " pwr_cNameAppl " $pwrp_load/\n", nodename_ptr, "$pwrp_load/",
+                          nodename_ptr, *bus_number_ptr);
                 if (*components_ptr & pwr_mDistrComponentMask_PwrpAliasFile)
-                  fprintf(file, "appl %s W $pwrp_load/pwrp_alias.dat "
-                                "$pwrp_load/pwrp_alias.dat\n",
-                      nodename_ptr);
+                  fprintf(file,
+                          "appl %s W $pwrp_load/pwrp_alias.dat "
+                          "$pwrp_load/pwrp_alias.dat\n",
+                          nodename_ptr);
                 if (*components_ptr & pwr_mDistrComponentMask_IncludeFiles)
                   fprintf(file, "appl %s W $pwrp_inc/*.h\n", nodename_ptr);
                 if (*components_ptr & pwr_mDistrComponentMask_GraphFiles)
                   fprintf(file, "appl %s W $pwrp_exe/*.pwg\n", nodename_ptr);
                 if (*components_ptr & pwr_mDistrComponentMask_XMLFiles)
                   fprintf(file, "appl %s W $pwrp_load/*.xml\n", nodename_ptr);
-                if (*components_ptr & pwr_mDistrComponentMask_XttHelpFile) {
-                  fprintf(file, "appl %s W "
-                                "$pwrp_load/%s/xtt_help.dat:$pwrp_load/"
-                                "xtt_help.dat $pwrp_load/xtt_help.dat\n",
-                      nodename_ptr, nodename_ptr);
-                }
-                if (*components_ptr & pwr_mDistrComponentMask_XttResourceFile) {
-                  fprintf(file, "appl %s W "
-                                "$pwrp_load/%s/b55/Rt_xtt:$pwrp_load/%s/"
-                                "Rt_xtt:$pwrp_load/Rt_xtt /home/b55/Rt_xtt\n",
-                      nodename_ptr, nodename_ptr, nodename_ptr);
+                if (*components_ptr & pwr_mDistrComponentMask_XttHelpFile)
+                {
                   fprintf(file,
-                      "appl %s S $pwrp_load/%s/pwrp/Rt_xtt /home/pwrp/Rt_xtt\n",
-                      nodename_ptr, nodename_ptr);
+                          "appl %s W "
+                          "$pwrp_load/%s/xtt_help.dat:$pwrp_load/"
+                          "xtt_help.dat $pwrp_load/xtt_help.dat\n",
+                          nodename_ptr, nodename_ptr);
                 }
-                if (*components_ptr & pwr_mDistrComponentMask_XttSetupFile) {
+                if (*components_ptr & pwr_mDistrComponentMask_XttResourceFile)
+                {
                   fprintf(file,
-                      "appl %s W "
-                      "$pwrp_load/%s/b55/xtt_setup.rtt_com:$pwrp_load/%s/"
-                      "xtt_setup.rtt_com:$pwrp_load/xtt_setup.rtt_com "
-                      "/home/b55/xtt_setup.rtt_com\n",
-                      nodename_ptr, nodename_ptr, nodename_ptr);
-                  fprintf(file, "appl %s S "
-                                "$pwrp_load/%s/pwrp/xtt_setup.rtt_com "
-                                "/home/pwrp/xtt_setup.rtt_com\n",
-                      nodename_ptr, nodename_ptr);
+                          "appl %s W "
+                          "$pwrp_load/%s/b55/Rt_xtt:$pwrp_load/%s/"
+                          "Rt_xtt:$pwrp_load/Rt_xtt /home/b55/Rt_xtt\n",
+                          nodename_ptr, nodename_ptr, nodename_ptr);
+                  fprintf(file, "appl %s S $pwrp_load/%s/pwrp/Rt_xtt /home/pwrp/Rt_xtt\n", nodename_ptr,
+                          nodename_ptr);
+                }
+                if (*components_ptr & pwr_mDistrComponentMask_XttSetupFile)
+                {
+                  fprintf(file,
+                          "appl %s W "
+                          "$pwrp_load/%s/b55/xtt_setup.rtt_com:$pwrp_load/%s/"
+                          "xtt_setup.rtt_com:$pwrp_load/xtt_setup.rtt_com "
+                          "/home/b55/xtt_setup.rtt_com\n",
+                          nodename_ptr, nodename_ptr, nodename_ptr);
+                  fprintf(file,
+                          "appl %s S "
+                          "$pwrp_load/%s/pwrp/xtt_setup.rtt_com "
+                          "/home/pwrp/xtt_setup.rtt_com\n",
+                          nodename_ptr, nodename_ptr);
                 }
                 if (*components_ptr & pwr_mDistrComponentMask_FlowFiles)
                   fprintf(file, "appl %s W $pwrp_load/*.flw\n", nodename_ptr);
-                if (*components_ptr & pwr_mDistrComponentMask_RHostsFile)
-                  fprintf(file, "appl %s W "
-                                "$pwrp_cnf/%s/.rhosts:$pwra_db/.rhosts "
-                                "/home/pwrp/.rhosts\n",
-                      nodename_ptr, nodename_ptr);
-                if (*components_ptr
-                    & pwr_mDistrComponentMask_AuthorizedKeysFile)
-                  fprintf(file, "appl %s W "
-                                "$pwrp_cnf/%s/authorized_keys:$pwra_db/"
-                                "authorized_keys "
-                                "/home/pwrp/.ssh/authorized_keys\n",
-                      nodename_ptr, nodename_ptr);
-                if (*components_ptr & pwr_mDistrComponentMask_WebFiles) {
+                if (*components_ptr & pwr_mDistrComponentMask_AuthorizedKeysFile)
+                  fprintf(file,
+                          "appl %s W "
+                          "$pwrp_cnf/%s/authorized_keys:$pwra_db/"
+                          "authorized_keys "
+                          "/home/pwrp/.ssh/authorized_keys\n",
+                          nodename_ptr, nodename_ptr);
+                if (*components_ptr & pwr_mDistrComponentMask_WebFiles)
+                {
                   fprintf(file, "appl %s W $pwrp_web/*.html\n", nodename_ptr);
                   fprintf(file, "appl %s S $pwrp_web/*.jar\n", nodename_ptr);
                   fprintf(file, "appl %s S $pwrp_web/*.gif\n", nodename_ptr);
@@ -2886,88 +2981,85 @@ pwr_tStatus lfu_SaveDirectoryVolume(
                   fprintf(file, "appl %s S $pwrp_web/*.flw\n", nodename_ptr);
                 }
                 if (*components_ptr & pwr_mDistrComponentMask_PwrpStop)
-                  fprintf(file, "appl %s W "
-                                "$pwrp_load/%s/pwrp_stop.sh:$pwrp_load/"
-                                "pwrp_stop.sh $pwrp_exe/pwrp_stop.sh\n",
-                      nodename_ptr, nodename_ptr);
+                  fprintf(file,
+                          "appl %s W "
+                          "$pwrp_load/%s/pwrp_stop.sh:$pwrp_load/"
+                          "pwrp_stop.sh $pwrp_exe/pwrp_stop.sh\n",
+                          nodename_ptr, nodename_ptr);
 
                 free(components_ptr);
 
                 break;
               }
               case pwr_cClass_ApplDistribute:
-                sts = ldh_ObjidToName(ldhses, applobjid, ldh_eName_Object,
-                    appl_name, sizeof(appl_name), &size);
+                sts =
+                    ldh_ObjidToName(ldhses, applobjid, ldh_eName_Object, appl_name, sizeof(appl_name), &size);
                 if (EVEN(sts))
                   return sts;
 
                 /* Check Source attribute */
-                sts = ldh_GetObjectPar(
-                    ldhses, applobjid, "DevBody", "Source", &source_ptr, &size);
+                sts = ldh_GetObjectPar(ldhses, applobjid, "DevBody", "Source", &source_ptr, &size);
                 if (EVEN(sts))
                   return sts;
 
-                if (!strcmp(source_ptr, "")) {
+                if (!strcmp(source_ptr, ""))
+                {
                   char msg[200];
                   free(source_ptr);
                   source_ptr = null_nodename;
-                  sprintf(msg,
-                      "Error in ApplDistribute object '%s', Source is missing",
-                      appl_name);
+                  sprintf(msg, "Error in ApplDistribute object '%s', Source is missing", appl_name);
                   MsgWindow::message('E', msg, msgw_ePop_Default);
                   syntax_error = 1;
                 }
                 /* Check Target attribute */
-                sts = ldh_GetObjectPar(
-                    ldhses, applobjid, "DevBody", "Target", &target_ptr, &size);
+                sts = ldh_GetObjectPar(ldhses, applobjid, "DevBody", "Target", &target_ptr, &size);
                 if (EVEN(sts))
                   return sts;
 
                 if (!strcmp(target_ptr, ""))
                   fprintf(file, "appl %s E %s\n", nodename_ptr, source_ptr);
                 else
-                  fprintf(file, "appl %s E %s %s\n", nodename_ptr, source_ptr,
-                      target_ptr);
+                  fprintf(file, "appl %s E %s %s\n", nodename_ptr, source_ptr, target_ptr);
                 if (source_ptr != null_nodename)
                   free(source_ptr);
                 free(target_ptr);
                 break;
-              case pwr_cClass_DistrDependNode: {
+              case pwr_cClass_DistrDependNode:
+              {
                 char* depnodename_ptr;
                 char* project_ptr;
 
-                sts = ldh_ObjidToName(ldhses, applobjid, ldh_eName_Object,
-                    appl_name, sizeof(appl_name), &size);
+                sts =
+                    ldh_ObjidToName(ldhses, applobjid, ldh_eName_Object, appl_name, sizeof(appl_name), &size);
                 if (EVEN(sts))
                   return sts;
 
                 /* Check Node attribute */
-                sts = ldh_GetObjectPar(ldhses, applobjid, "DevBody", "NodeName",
-                    &depnodename_ptr, &size);
+                sts = ldh_GetObjectPar(ldhses, applobjid, "DevBody", "NodeName", &depnodename_ptr, &size);
                 if (EVEN(sts))
                   return sts;
 
-                if (!strcmp(depnodename_ptr, "")) {
+                if (!strcmp(depnodename_ptr, ""))
+                {
                   char msg[200];
                   free(depnodename_ptr);
                   depnodename_ptr = null_nodename;
-                  sprintf(msg, "Error in DistrDependNode object '%s', NodeName "
-                               "is missing",
-                      appl_name);
+                  sprintf(msg,
+                          "Error in DistrDependNode object '%s', NodeName "
+                          "is missing",
+                          appl_name);
                   MsgWindow::message('E', msg, msgw_ePop_Default);
                   syntax_error = 1;
                 }
                 /* Check Project attribute */
-                sts = ldh_GetObjectPar(ldhses, applobjid, "DevBody", "Project",
-                    &project_ptr, &size);
+                sts = ldh_GetObjectPar(ldhses, applobjid, "DevBody", "Project", &project_ptr, &size);
                 if (EVEN(sts))
                   return sts;
 
                 if (!strcmp(project_ptr, ""))
                   project_ptr = systemname;
 
-                fprintf(file, "depnode %s %s %s\n", nodename_ptr,
-                    depnodename_ptr, project_ptr);
+                fprintf(file, "depnode %s %s %s\n", nodename_ptr, depnodename_ptr, project_ptr);
                 if (depnodename_ptr != null_nodename)
                   free(depnodename_ptr);
                 if (project_ptr != systemname)
@@ -2998,17 +3090,17 @@ pwr_tStatus lfu_SaveDirectoryVolume(
 
   /* Get the DbDistribute objects */
   sts = ldh_GetRootList(ldhses, &dbobjid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = ldh_GetObjectClass(ldhses, dbobjid, &cid);
     if (EVEN(sts))
       return sts;
 
-    if (cid == pwr_cClass_RootVolumeConfig || cid == pwr_cClass_SubVolumeConfig
-        || cid == pwr_cClass_ClassVolumeConfig
-        || cid == pwr_cClass_DetachedClassVolumeConfig
-        || cid == pwr_cClass_SharedVolumeConfig) {
-      sts = ldh_ObjidToName(ldhses, volobjid, ldh_eName_Object, volume_name,
-          sizeof(volume_name), &size);
+    if (cid == pwr_cClass_RootVolumeConfig || cid == pwr_cClass_SubVolumeConfig ||
+        cid == pwr_cClass_ClassVolumeConfig || cid == pwr_cClass_DetachedClassVolumeConfig ||
+        cid == pwr_cClass_SharedVolumeConfig)
+    {
+      sts = ldh_ObjidToName(ldhses, volobjid, ldh_eName_Object, volume_name, sizeof(volume_name), &size);
       if (EVEN(sts))
         return sts;
       utl_toupper(name, volume_name);
@@ -3016,9 +3108,11 @@ pwr_tStatus lfu_SaveDirectoryVolume(
       /* Check that the name is in the global volume list */
       found = 0;
       volumelist_ptr = volumelist;
-      for (i = 0; i < volumecount; i++) {
+      for (i = 0; i < volumecount; i++)
+      {
         utl_toupper(volname, volumelist_ptr->volume_name);
-        if (!strcmp(name, volname)) {
+        if (!strcmp(name, volname))
+        {
           volume_id = volumelist_ptr->volume_id;
           found = 1;
           break;
@@ -3027,30 +3121,28 @@ pwr_tStatus lfu_SaveDirectoryVolume(
       }
       /* Get any child of class VolumeDistribute */
       sts = ldh_GetChild(ldhses, volobjid, &distrobjid);
-      while (ODD(sts)) {
+      while (ODD(sts))
+      {
         sts = ldh_GetObjectClass(ldhses, distrobjid, &cid);
         if (EVEN(sts))
           return sts;
 
-        if (cid == pwr_cClass_VolumeDistribute) {
-          sts = ldh_GetObjectPar(ldhses, distrobjid, "RtBody", "TargetNode",
-              &targetnode_ptr, &size);
+        if (cid == pwr_cClass_VolumeDistribute)
+        {
+          sts = ldh_GetObjectPar(ldhses, distrobjid, "RtBody", "TargetNode", &targetnode_ptr, &size);
           if (EVEN(sts))
             return sts;
 
-          sts = ldh_GetObjectPar(ldhses, distrobjid, "RtBody", "TargetProject",
-              &targetproject_ptr, &size);
+          sts = ldh_GetObjectPar(ldhses, distrobjid, "RtBody", "TargetProject", &targetproject_ptr, &size);
           if (EVEN(sts))
             return sts;
 
-          sts = ldh_GetObjectPar(ldhses, distrobjid, "RtBody", "TargetOpSys",
-              (char**)&os_ptr, &size);
+          sts = ldh_GetObjectPar(ldhses, distrobjid, "RtBody", "TargetOpSys", (char**)&os_ptr, &size);
           if (EVEN(sts))
             return sts;
 
-          fprintf(file, "volumedistr %s %s %s %d\n",
-              cdh_VolumeIdToString(0, 0, volume_id, 0, 0), targetnode_ptr,
-              targetproject_ptr, *os_ptr);
+          fprintf(file, "volumedistr %s %s %s %d\n", cdh_VolumeIdToString(0, 0, volume_id, 0, 0),
+                  targetnode_ptr, targetproject_ptr, *os_ptr);
           free(targetnode_ptr);
           free(targetproject_ptr);
         }
@@ -3064,7 +3156,8 @@ pwr_tStatus lfu_SaveDirectoryVolume(
   pwr_tOid exportoid;
 
   for (sts = ldh_GetClassList(ldhses, pwr_cClass_Export, &exportoid); ODD(sts);
-       sts = ldh_GetNextObject(ldhses, exportoid, &exportoid)) {
+       sts = ldh_GetNextObject(ldhses, exportoid, &exportoid))
+  {
     pwr_tFileName dir;
     char* dir_ptr;
     pwr_tMask* options_ptr;
@@ -3072,14 +3165,14 @@ pwr_tStatus lfu_SaveDirectoryVolume(
     pwr_tOid appoid;
     pwr_tMask current_options = 0;
 
-    sts = ldh_GetObjectPar(ldhses, exportoid, "DevBody", "TargetDirectory",
-        (char**)&dir_ptr, &size);
+    sts = ldh_GetObjectPar(ldhses, exportoid, "DevBody", "TargetDirectory", (char**)&dir_ptr, &size);
     if (EVEN(sts))
       return sts;
 
     strncpy(dir, dir_ptr, sizeof(dir));
     free(dir_ptr);
-    if (streq(dir, "")) {
+    if (streq(dir, ""))
+    {
       MsgWindow::message('E', "Export directory is missing", msgw_ePop_Default);
       continue;
     }
@@ -3087,16 +3180,14 @@ pwr_tStatus lfu_SaveDirectoryVolume(
     if (dir[strlen(dir) - 1] != '/')
       strcat(dir, "/");
 
-    sts = ldh_GetObjectPar(
-        ldhses, exportoid, "DevBody", "Options", (char**)&options_ptr, &size);
+    sts = ldh_GetObjectPar(ldhses, exportoid, "DevBody", "Options", (char**)&options_ptr, &size);
     if (EVEN(sts))
       return sts;
 
     current_options = *options_ptr;
     free(options_ptr);
 
-    sts = ldh_GetObjectPar(ldhses, exportoid, "DevBody", "Components",
-        (char**)&components_ptr, &size);
+    sts = ldh_GetObjectPar(ldhses, exportoid, "DevBody", "Components", (char**)&components_ptr, &size);
     if (EVEN(sts))
       return sts;
 
@@ -3106,40 +3197,37 @@ pwr_tStatus lfu_SaveDirectoryVolume(
       fprintf(file, "export %d $pwrp_exe/*.pwg %s\n", current_options, dir);
     if (*components_ptr & pwr_mExportImportMask_FlowFiles)
       fprintf(file, "export %d $pwrp_load/*.flw %s\n", current_options, dir);
-    if (*components_ptr & pwr_mExportImportMask_LoadFiles) {
+    if (*components_ptr & pwr_mExportImportMask_LoadFiles)
+    {
       fprintf(file, "export %d $pwrp_load/*.dbs %s\n", current_options, dir);
-      fprintf(file, "export %d $pwrp_load/rtt_crr_*.dat %s\n", current_options,
-          dir);
-      fprintf(file, "export %d $pwrp_load/rtt_crro_*.dat %s\n", current_options,
-          dir);
-      fprintf(file, "export %d $pwrp_load/rtt_crrs_*.dat %s\n", current_options,
-          dir);
-      fprintf(file, "export %d $pwrp_load/rtt_crrc_*.dat %s\n", current_options,
-          dir);
+      fprintf(file, "export %d $pwrp_load/rtt_crr_*.dat %s\n", current_options, dir);
+      fprintf(file, "export %d $pwrp_load/rtt_crro_*.dat %s\n", current_options, dir);
+      fprintf(file, "export %d $pwrp_load/rtt_crrs_*.dat %s\n", current_options, dir);
+      fprintf(file, "export %d $pwrp_load/rtt_crrc_*.dat %s\n", current_options, dir);
     }
 
     free(components_ptr);
 
     for (sts = ldh_GetChild(ldhses, exportoid, &appoid); ODD(sts);
-         sts = ldh_GetNextSibling(ldhses, appoid, &appoid)) {
+         sts = ldh_GetNextSibling(ldhses, appoid, &appoid))
+    {
       sts = ldh_GetObjectClass(ldhses, appoid, &cid);
       if (EVEN(sts))
         return sts;
 
-      switch (cid) {
-      case pwr_cClass_ApplExport: {
-        sts = ldh_GetObjectPar(
-            ldhses, appoid, "DevBody", "Source", (char**)&source_ptr, &size);
+      switch (cid)
+      {
+      case pwr_cClass_ApplExport:
+      {
+        sts = ldh_GetObjectPar(ldhses, appoid, "DevBody", "Source", (char**)&source_ptr, &size);
         if (EVEN(sts))
           return sts;
 
-        sts = ldh_GetObjectPar(
-            ldhses, appoid, "DevBody", "Target", (char**)&target_ptr, &size);
+        sts = ldh_GetObjectPar(ldhses, appoid, "DevBody", "Target", (char**)&target_ptr, &size);
         if (EVEN(sts))
           return sts;
 
-        fprintf(file, "export %d %s %s%s\n", current_options, source_ptr, dir,
-            target_ptr);
+        fprintf(file, "export %d %s %s%s\n", current_options, source_ptr, dir, target_ptr);
 
         free(source_ptr);
         free(target_ptr);
@@ -3154,7 +3242,8 @@ pwr_tStatus lfu_SaveDirectoryVolume(
   pwr_tOid importoid;
 
   for (sts = ldh_GetClassList(ldhses, pwr_cClass_Import, &importoid); ODD(sts);
-       sts = ldh_GetNextObject(ldhses, importoid, &importoid)) {
+       sts = ldh_GetNextObject(ldhses, importoid, &importoid))
+  {
     pwr_tFileName dir;
     char* dir_ptr;
     pwr_mExportImportMask* components_ptr;
@@ -3162,14 +3251,14 @@ pwr_tStatus lfu_SaveDirectoryVolume(
     pwr_tMask* options_ptr;
     pwr_tMask current_options = 0;
 
-    sts = ldh_GetObjectPar(ldhses, importoid, "DevBody", "SourceDirectory",
-        (char**)&dir_ptr, &size);
+    sts = ldh_GetObjectPar(ldhses, importoid, "DevBody", "SourceDirectory", (char**)&dir_ptr, &size);
     if (EVEN(sts))
       return sts;
 
     strncpy(dir, dir_ptr, sizeof(dir));
     free(dir_ptr);
-    if (streq(dir, "")) {
+    if (streq(dir, ""))
+    {
       MsgWindow::message('E', "Import directory is missing", msgw_ePop_Default);
       continue;
     }
@@ -3177,16 +3266,14 @@ pwr_tStatus lfu_SaveDirectoryVolume(
     if (dir[strlen(dir) - 1] != '/')
       strcat(dir, "/");
 
-    sts = ldh_GetObjectPar(
-        ldhses, importoid, "DevBody", "Options", (char**)&options_ptr, &size);
+    sts = ldh_GetObjectPar(ldhses, importoid, "DevBody", "Options", (char**)&options_ptr, &size);
     if (EVEN(sts))
       return sts;
 
     current_options = *options_ptr;
     free(options_ptr);
 
-    sts = ldh_GetObjectPar(ldhses, importoid, "DevBody", "Components",
-        (char**)&components_ptr, &size);
+    sts = ldh_GetObjectPar(ldhses, importoid, "DevBody", "Components", (char**)&components_ptr, &size);
     if (EVEN(sts))
       return sts;
 
@@ -3196,49 +3283,46 @@ pwr_tStatus lfu_SaveDirectoryVolume(
       fprintf(file, "import %d %s*.pwg $pwrp/exe/\n", current_options, dir);
     if (*components_ptr & pwr_mExportImportMask_FlowFiles)
       fprintf(file, "import %d %s*.flw $pwrp_load/\n", current_options, dir);
-    if (*components_ptr & pwr_mExportImportMask_LoadFiles) {
+    if (*components_ptr & pwr_mExportImportMask_LoadFiles)
+    {
       fprintf(file, "import %d %s*.dbs $pwrp_load/\n", current_options, dir);
-      fprintf(file, "import %d %srtt_crr_*.dat $pwrp_load/\n", current_options,
-          dir);
-      fprintf(file, "import %d %srtt_crro_*.dat $pwrp_load/\n", current_options,
-          dir);
-      fprintf(file, "import %d %srtt_crrs_*.dat $pwrp_load/\n", current_options,
-          dir);
-      fprintf(file, "import %d %srtt_crrc_*.dat $pwrp_load/\n", current_options,
-          dir);
+      fprintf(file, "import %d %srtt_crr_*.dat $pwrp_load/\n", current_options, dir);
+      fprintf(file, "import %d %srtt_crro_*.dat $pwrp_load/\n", current_options, dir);
+      fprintf(file, "import %d %srtt_crrs_*.dat $pwrp_load/\n", current_options, dir);
+      fprintf(file, "import %d %srtt_crrc_*.dat $pwrp_load/\n", current_options, dir);
     }
 
     free(components_ptr);
 
     for (sts = ldh_GetChild(ldhses, importoid, &appoid); ODD(sts);
-         sts = ldh_GetNextSibling(ldhses, appoid, &appoid)) {
+         sts = ldh_GetNextSibling(ldhses, appoid, &appoid))
+    {
       sts = ldh_GetObjectClass(ldhses, appoid, &cid);
       if (EVEN(sts))
         return sts;
 
-      switch (cid) {
-      case pwr_cClass_ApplImport: {
+      switch (cid)
+      {
+      case pwr_cClass_ApplImport:
+      {
         char target_array[10][80];
         int target_cnt;
 
-        sts = ldh_GetObjectPar(
-            ldhses, appoid, "DevBody", "Source", (char**)&source_ptr, &size);
+        sts = ldh_GetObjectPar(ldhses, appoid, "DevBody", "Source", (char**)&source_ptr, &size);
         if (EVEN(sts))
           return sts;
 
-        sts = ldh_GetObjectPar(
-            ldhses, appoid, "DevBody", "Target", (char**)&target_ptr, &size);
+        sts = ldh_GetObjectPar(ldhses, appoid, "DevBody", "Target", (char**)&target_ptr, &size);
         if (EVEN(sts))
           return sts;
 
         // Target can be a list
         target_cnt = dcli_parse(target_ptr, ",", "", (char*)target_array,
-            sizeof(target_array) / sizeof(target_array[0]),
-            sizeof(target_array[0]), 0);
-        for (int i = 0; i < target_cnt; i++) {
+                                sizeof(target_array) / sizeof(target_array[0]), sizeof(target_array[0]), 0);
+        for (int i = 0; i < target_cnt; i++)
+        {
           str_trim(target_array[i], target_array[i]);
-          fprintf(file, "import %d %s%s %s\n", current_options, dir, source_ptr,
-              target_array[i]);
+          fprintf(file, "import %d %s%s %s\n", current_options, dir, source_ptr, target_array[i]);
         }
         free(source_ptr);
         free(target_ptr);
@@ -3259,11 +3343,11 @@ pwr_tStatus lfu_SaveDirectoryVolume(
 
   // Build config object, check version manager
   sts = ldh_GetClassList(ldhses, pwr_cClass_BuildConfig, &buildconfig_oid);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     pwr_tEnum version_manager;
 
-    wb_attribute a
-        = sp->attribute(buildconfig_oid, "DevBody", "VersionManager");
+    wb_attribute a = sp->attribute(buildconfig_oid, "DevBody", "VersionManager");
     if (!a)
       return a.sts();
 
@@ -3272,25 +3356,26 @@ pwr_tStatus lfu_SaveDirectoryVolume(
       return sts;
 
     wb_revision rev(0, 0);
-    if (rev.manager_enum() != version_manager) {
+    if (rev.manager_enum() != version_manager)
+    {
       rev.set_manager_enum((pwr_eVersionManagerEnum)version_manager);
       rev.write_file();
     }
   }
 
-  for (sts = ldh_GetClassList(ldhses, pwr_cClass_BuildDirectory, &builddir_oid);
-       ODD(sts); sts = ldh_GetNextObject(ldhses, builddir_oid, &builddir_oid)) {
+  for (sts = ldh_GetClassList(ldhses, pwr_cClass_BuildDirectory, &builddir_oid); ODD(sts);
+       sts = ldh_GetNextObject(ldhses, builddir_oid, &builddir_oid))
+  {
     pwr_tFileName dir;
     char* dir_ptr;
     char* descr_ptr;
     pwr_tMask* options_ptr;
 
-    sts = ldh_ObjidToName(
-        ldhses, builddir_oid, ldh_eName_Object, oname, sizeof(oname), &size);
+    sts = ldh_ObjidToName(ldhses, builddir_oid, ldh_eName_Object, oname, sizeof(oname), &size);
 
     strcpy(fullname, oname);
-    for (sts = ldh_GetParent(ldhses, builddir_oid, &poid); ODD(sts);
-         sts = ldh_GetParent(ldhses, poid, &poid)) {
+    for (sts = ldh_GetParent(ldhses, builddir_oid, &poid); ODD(sts); sts = ldh_GetParent(ldhses, poid, &poid))
+    {
       pwr_tOName tmp;
       pwr_tCid pcid;
 
@@ -3302,8 +3387,7 @@ pwr_tStatus lfu_SaveDirectoryVolume(
         break;
 
       strcpy(tmp, fullname);
-      sts = ldh_ObjidToName(
-          ldhses, poid, ldh_eName_Object, oname, sizeof(oname), &size);
+      sts = ldh_ObjidToName(ldhses, poid, ldh_eName_Object, oname, sizeof(oname), &size);
       if (EVEN(sts))
         return sts;
 
@@ -3312,14 +3396,14 @@ pwr_tStatus lfu_SaveDirectoryVolume(
       strcat(fullname, tmp);
     }
 
-    sts = ldh_GetObjectPar(
-        ldhses, builddir_oid, "DevBody", "Directory", (char**)&dir_ptr, &size);
+    sts = ldh_GetObjectPar(ldhses, builddir_oid, "DevBody", "Directory", (char**)&dir_ptr, &size);
     if (EVEN(sts))
       return sts;
 
     strncpy(dir, dir_ptr, sizeof(dir));
     free(dir_ptr);
-    if (streq(dir, "")) {
+    if (streq(dir, ""))
+    {
       MsgWindow::message('E', "Build directory is missing", msgw_ePop_Default);
       continue;
     }
@@ -3327,13 +3411,11 @@ pwr_tStatus lfu_SaveDirectoryVolume(
     if (dir[strlen(dir) - 1] != '/')
       strcat(dir, "/");
 
-    sts = ldh_GetObjectPar(ldhses, builddir_oid, "DevBody", "Options",
-        (char**)&options_ptr, &size);
+    sts = ldh_GetObjectPar(ldhses, builddir_oid, "DevBody", "Options", (char**)&options_ptr, &size);
     if (EVEN(sts))
       return sts;
 
-    sts = ldh_GetObjectPar(ldhses, builddir_oid, "DevBody", "Description",
-        (char**)&descr_ptr, &size);
+    sts = ldh_GetObjectPar(ldhses, builddir_oid, "DevBody", "Description", (char**)&descr_ptr, &size);
     if (EVEN(sts))
       return sts;
 
@@ -3342,97 +3424,93 @@ pwr_tStatus lfu_SaveDirectoryVolume(
     free(descr_ptr);
 
     for (sts = ldh_GetChild(ldhses, builddir_oid, &coid); ODD(sts);
-         sts = ldh_GetNextSibling(ldhses, coid, &coid)) {
+         sts = ldh_GetNextSibling(ldhses, coid, &coid))
+    {
       sts = ldh_GetObjectClass(ldhses, coid, &cid);
       if (EVEN(sts))
         return sts;
 
-      switch (cid) {
-      case pwr_cClass_BuildCopy: {
+      switch (cid)
+      {
+      case pwr_cClass_BuildCopy:
+      {
         char target_array[10][80];
         int target_cnt;
 
-        sts = ldh_GetObjectPar(
-            ldhses, coid, "DevBody", "Source", (char**)&source_ptr, &size);
+        sts = ldh_GetObjectPar(ldhses, coid, "DevBody", "Source", (char**)&source_ptr, &size);
         if (EVEN(sts))
           return sts;
 
-        sts = ldh_GetObjectPar(
-            ldhses, coid, "DevBody", "Target", (char**)&target_ptr, &size);
+        sts = ldh_GetObjectPar(ldhses, coid, "DevBody", "Target", (char**)&target_ptr, &size);
         if (EVEN(sts))
           return sts;
 
         // Target can be a list
         target_cnt = dcli_parse(target_ptr, ",", "", (char*)target_array,
-            sizeof(target_array) / sizeof(target_array[0]),
-            sizeof(target_array[0]), 0);
-        for (int i = 0; i < target_cnt; i++) {
+                                sizeof(target_array) / sizeof(target_array[0]), sizeof(target_array[0]), 0);
+        for (int i = 0; i < target_cnt; i++)
+        {
           str_trim(target_array[i], target_array[i]);
-          fprintf(file, "buildcopy %s %s%s %s\n", cdh_Low(fullname), dir,
-              source_ptr, target_array[i]);
+          fprintf(file, "buildcopy %s %s%s %s\n", cdh_Low(fullname), dir, source_ptr, target_array[i]);
         }
         free(source_ptr);
         free(target_ptr);
         break;
       }
-      case pwr_cClass_BuildConvert: {
+      case pwr_cClass_BuildConvert:
+      {
         char target_array[10][80];
         int target_cnt;
-	pwr_tEnum *conversion_ptr;
+        pwr_tEnum* conversion_ptr;
 
-        sts = ldh_GetObjectPar(
-            ldhses, coid, "DevBody", "Conversion", (char**)&conversion_ptr, &size);
+        sts = ldh_GetObjectPar(ldhses, coid, "DevBody", "Conversion", (char**)&conversion_ptr, &size);
         if (EVEN(sts))
           return sts;
 
-        sts = ldh_GetObjectPar(
-            ldhses, coid, "DevBody", "Source", (char**)&source_ptr, &size);
+        sts = ldh_GetObjectPar(ldhses, coid, "DevBody", "Source", (char**)&source_ptr, &size);
         if (EVEN(sts))
           return sts;
 
-        sts = ldh_GetObjectPar(
-            ldhses, coid, "DevBody", "Target", (char**)&target_ptr, &size);
+        sts = ldh_GetObjectPar(ldhses, coid, "DevBody", "Target", (char**)&target_ptr, &size);
         if (EVEN(sts))
           return sts;
 
         // Target can be a list
         target_cnt = dcli_parse(target_ptr, ",", "", (char*)target_array,
-            sizeof(target_array) / sizeof(target_array[0]),
-            sizeof(target_array[0]), 0);
-        for (int i = 0; i < target_cnt; i++) {
+                                sizeof(target_array) / sizeof(target_array[0]), sizeof(target_array[0]), 0);
+        for (int i = 0; i < target_cnt; i++)
+        {
           str_trim(target_array[i], target_array[i]);
-          fprintf(file, "buildconvert %s %d %s%s %s\n", cdh_Low(fullname), *conversion_ptr, dir,
-		  source_ptr, target_array[i]);
+          fprintf(file, "buildconvert %s %d %s%s %s\n", cdh_Low(fullname), *conversion_ptr, dir, source_ptr,
+                  target_array[i]);
         }
-	free(conversion_ptr);
+        free(conversion_ptr);
         free(source_ptr);
         free(target_ptr);
         break;
       }
-      case pwr_cClass_BuildExecute: {
+      case pwr_cClass_BuildExecute:
+      {
         char* command_ptr;
 
-        sts = ldh_GetObjectPar(
-            ldhses, coid, "DevBody", "Command", (char**)&command_ptr, &size);
+        sts = ldh_GetObjectPar(ldhses, coid, "DevBody", "Command", (char**)&command_ptr, &size);
         if (EVEN(sts))
           return sts;
 
-        fprintf(file, "buildexec %s %s \"%s\"\n", cdh_Low(fullname), dir,
-            command_ptr);
+        fprintf(file, "buildexec %s %s \"%s\"\n", cdh_Low(fullname), dir, command_ptr);
 
         free(command_ptr);
         break;
       }
-      case pwr_cClass_BuildMake: {
+      case pwr_cClass_BuildMake:
+      {
         char* makefile_ptr;
 
-        sts = ldh_GetObjectPar(
-            ldhses, coid, "DevBody", "Makefile", (char**)&makefile_ptr, &size);
+        sts = ldh_GetObjectPar(ldhses, coid, "DevBody", "Makefile", (char**)&makefile_ptr, &size);
         if (EVEN(sts))
           return sts;
 
-        fprintf(file, "buildmake %s %s \"%s\"\n", cdh_Low(fullname), dir,
-            makefile_ptr);
+        fprintf(file, "buildmake %s %s \"%s\"\n", cdh_Low(fullname), dir, makefile_ptr);
 
         free(makefile_ptr);
         break;
@@ -3445,17 +3523,19 @@ pwr_tStatus lfu_SaveDirectoryVolume(
   fclose(file);
 
   // Generate custom_build files
-  for (wb_object buso = sp->object(); buso; buso = buso.after()) {
+  for (wb_object buso = sp->object(); buso; buso = buso.after())
+  {
     if (buso.cid() != pwr_cClass_BusConfig)
       continue;
 
     // Get all nodeconfig and friendnodes for this bus
-    for (wb_object nodeo = buso.first(); nodeo; nodeo = nodeo.after()) {
+    for (wb_object nodeo = buso.first(); nodeo; nodeo = nodeo.after())
+    {
       if (nodeo.cid() != pwr_cClass_NodeConfig)
         continue;
 
-      for (wb_object customo = nodeo.first(); customo;
-           customo = customo.after()) {
+      for (wb_object customo = nodeo.first(); customo; customo = customo.after())
+      {
         if (customo.cid() != pwr_cClass_CustomBuild)
           continue;
 
@@ -3532,36 +3612,36 @@ pwr_tStatus lfu_SaveDirectoryVolume(
         if (!a)
           return sts;
 
-        if (!strcmp(nodename, "")) {
+        if (!strcmp(nodename, ""))
+        {
           char msg[200];
-          sprintf(msg, "Error in NodeConfig object '%s', NodeName is missing\n",
-              nodeo.longName().c_str());
+          sprintf(msg, "Error in NodeConfig object '%s', NodeName is missing\n", nodeo.longName().c_str());
           MsgWindow::message('E', msg, msgw_ePop_Default);
           syntax_error = 1;
         }
 
-        if (!((!streq(cc, "") && !streq(cxx, "")
-                  && !streq(ar, ""))
-                || (streq(cc, "") && streq(cxx, "")
-                       && streq(ar, "")))) {
+        if (!((!streq(cc, "") && !streq(cxx, "") && !streq(ar, "")) ||
+              (streq(cc, "") && streq(cxx, "") && streq(ar, ""))))
+        {
           char msg[200];
-          sprintf(msg, "Error in CustomBuild object '%s', all or none of cc, "
-                       "cxx and ar has to be supplied\n",
-              customo.longName().c_str());
+          sprintf(msg,
+                  "Error in CustomBuild object '%s', all or none of cc, "
+                  "cxx and ar has to be supplied\n",
+                  customo.longName().c_str());
           MsgWindow::message('E', msg, msgw_ePop_Default);
           syntax_error = 1;
         }
 
         // Print custom build file
-        if (!(opsys == pwr_mOpSys_PPC_LINUX || opsys == pwr_mOpSys_X86_LINUX
-                || opsys == pwr_mOpSys_ARM_LINUX
-                || opsys == pwr_mOpSys_ARM64_LINUX))
+        if (!(opsys == pwr_mOpSys_PPC_LINUX || opsys == pwr_mOpSys_X86_LINUX ||
+              opsys == pwr_mOpSys_ARM_LINUX || opsys == pwr_mOpSys_ARM64_LINUX))
           continue;
 
         sprintf(fname, pwr_cNameCustomBuild);
         dcli_translate_filename(fname, fname);
         fp = fopen(fname, "w");
-        if (!fp) {
+        if (!fp)
+        {
           char tmp[240];
           sprintf(tmp, "Error, Unable to open file \"%s\"\n", fname);
           MsgWindow::message('E', tmp, msgw_ePop_Default);
@@ -3574,7 +3654,8 @@ pwr_tStatus lfu_SaveDirectoryVolume(
         fprintf(fp, "let OpSys_ARM_LINUX=512\n");
         fprintf(fp, "let OpSys_ARM64_LINUX=8192\n\n");
 
-        switch (opsys) {
+        switch (opsys)
+        {
         case pwr_mOpSys_PPC_LINUX:
           strcpy(expdir, "os_linux/hw_ppc");
           break;
@@ -3592,16 +3673,17 @@ pwr_tStatus lfu_SaveDirectoryVolume(
         }
 
         if (!streq(release, ""))
-          fprintf(fp, "source $pwra_db/pwra_env.sh set base %s %s\n\n", release,
-              expdir);
+          fprintf(fp, "source $pwra_db/pwra_env.sh set base %s %s\n\n", release, expdir);
 
-        if (!streq(cc, "")) {
+        if (!streq(cc, ""))
+        {
           fprintf(fp, "export pwre_cc=%s\n", cc);
           fprintf(fp, "export pwre_cxx=%s\n", cxx);
           fprintf(fp, "export pwre_ar=%s\n\n", ar);
         }
 
-        if (!streq(platform, "")) {
+        if (!streq(platform, ""))
+        {
           fprintf(fp, "if [ ! -e $pwrp_root/bld/%s ]; then\n", platform);
           fprintf(fp, "  mkdir $pwrp_root/bld/%s\n", platform);
           fprintf(fp, "fi\n");
@@ -3623,7 +3705,8 @@ pwr_tStatus lfu_SaveDirectoryVolume(
           fprintf(fp, "export pwrp_exe=$pwrp_root/bld/%s/exe\n\n", platform);
         }
 
-        switch (opsys) {
+        switch (opsys)
+        {
         case pwr_mOpSys_PPC_LINUX:
           fprintf(fp, "$pwrb_root/os_linux/hw_ppc/exp/exe/wb_gcg.sh \"$1\" "
                       "\"$2\" \"$3\" \"$OpSys_PPC_LINUX\" \"$5\" \"$6\" \"$7\" "
@@ -3664,45 +3747,47 @@ pwr_tStatus lfu_SaveDirectoryVolume(
 }
 
 /************************************************************************
-*
-* Name: lfu_creatdb_qb_yes
-*
-* Type: int
-*
-* Type		Parameter	IOGF	Description
-* hier_ctx	hier		I	Context variable
-*
-* Description:
-*	Backcall when yes in the questionbox is activated on the question
-*	"Should a new database be created".
-*
-*************************************************************************/
+ *
+ * Name: lfu_creatdb_qb_yes
+ *
+ * Type: int
+ *
+ * Type		Parameter	IOGF	Description
+ * hier_ctx	hier		I	Context variable
+ *
+ * Description:
+ *	Backcall when yes in the questionbox is activated on the question
+ *	"Should a new database be created".
+ *
+ *************************************************************************/
 static void lfu_creadb_qb_yes(void* ctx, void* d)
 {
   lfu_sCreaDb* data = (lfu_sCreaDb*)d;
   wb_session* sp = (wb_session*)data->ldhses;
 
-  try {
+  try
+  {
     wb_env env = sp->env();
-    wb_volume vdb = env.createVolume(
-        data->vid, data->cid, data->name, data->volrep, data->server, false);
-  } catch (wb_error&) {
+    wb_volume vdb = env.createVolume(data->vid, data->cid, data->name, data->volrep, data->server, false);
+  }
+  catch (wb_error&)
+  {
     MsgWindow::message('E', "Unable to create volume", msgw_ePop_Default);
   }
   free((char*)data);
 }
 
 /*************************************************************************
-*
-* Name:		lfu_create_bootfiles()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description: 	Create bootfiles for a number of nodes.
-*
-**************************************************************************/
+ *
+ * Name:		lfu_create_bootfiles()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description: 	Create bootfiles for a number of nodes.
+ *
+ **************************************************************************/
 
 int lfu_create_bootfiles(char* nodestr, int debug, int allnodes)
 {
@@ -3719,56 +3804,66 @@ int lfu_create_bootfiles(char* nodestr, int debug, int allnodes)
 
   /* Load the bootlist */
   sts = lfu_volumelist_load(pwr_cNameBootList, &volumelist, &volumecount);
-  if (sts == LFU__NOFILE) {
+  if (sts == LFU__NOFILE)
+  {
     MsgWindow::message('E', "Project is not configured", msgw_ePop_Default);
     return sts;
-  } else if (EVEN(sts))
+  }
+  else if (EVEN(sts))
     return sts;
 
   /* Check if nodes */
-  if (nodestr != NULL) {
-    nr = utl_parse(nodestr, ", ", "", (char*)node_array,
-        sizeof(node_array) / sizeof(node_array[0]), sizeof(node_array[0]));
+  if (nodestr != NULL)
+  {
+    nr = utl_parse(nodestr, ", ", "", (char*)node_array, sizeof(node_array) / sizeof(node_array[0]),
+                   sizeof(node_array[0]));
     if ((nr == 0) || (nr > 30))
       return LFU__NODENAME;
 
     /* Check that the node's exist in the bootfile */
-    for (i = 0; i < nr; i++) {
+    for (i = 0; i < nr; i++)
+    {
       found = 0;
       utl_toupper(node_array[i], node_array[i]);
       volumelist_ptr = volumelist;
-      for (j = 0; j < volumecount; j++) {
+      for (j = 0; j < volumecount; j++)
+      {
         utl_toupper(nodeconfigname, volumelist_ptr->p1);
-        if (!strcmp(nodeconfigname, node_array[i])) {
+        if (!strcmp(nodeconfigname, node_array[i]))
+        {
           nodetype[i] = atoi(volumelist_ptr->p6);
           found = 1;
           break;
         }
         volumelist_ptr++;
       }
-      if (!found) {
+      if (!found)
+      {
         return LFU__NODENAME;
       }
     }
     /* Create the bootfiles */
-    for (i = 0; i < nr; i++) {
-      sts = lfu_create_bootfile(
-          node_array[i], nodetype[i], volumelist, volumecount, debug);
+    for (i = 0; i < nr; i++)
+    {
+      sts = lfu_create_bootfile(node_array[i], nodetype[i], volumelist, volumecount, debug);
       if (EVEN(sts))
         return sts;
 
       wb_log::log(wlog_eCategory_NodeBuild, node_array[i], 0);
     }
-  } else if (allnodes) {
+  }
+  else if (allnodes)
+  {
     strcpy(nodeconfigname, "");
     /* Create bootfiles for all created nodes */
     volumelist_ptr = volumelist;
-    for (j = 0; j < volumecount; j++) {
-      if (strcmp(nodeconfigname, volumelist_ptr->p1)) {
+    for (j = 0; j < volumecount; j++)
+    {
+      if (strcmp(nodeconfigname, volumelist_ptr->p1))
+      {
         strcpy(nodeconfigname, volumelist_ptr->p1);
         nodeconfigtype = atoi(volumelist_ptr->p6);
-        sts = lfu_create_bootfile(
-            nodeconfigname, nodeconfigtype, volumelist, volumecount, debug);
+        sts = lfu_create_bootfile(nodeconfigname, nodeconfigtype, volumelist, volumecount, debug);
         if (EVEN(sts))
           return sts;
       }
@@ -3779,19 +3874,19 @@ int lfu_create_bootfiles(char* nodestr, int debug, int allnodes)
 }
 
 /*************************************************************************
-*
-* Name:		lfu_ReadBootFile
-*
-* Type		pwr_tStatus
-*
-* Description:
-*		Returns information in a bootfile.
-*
-**************************************************************************/
+ *
+ * Name:		lfu_ReadBootFile
+ *
+ * Type		pwr_tStatus
+ *
+ * Description:
+ *		Returns information in a bootfile.
+ *
+ **************************************************************************/
 
-pwr_tStatus lfu_ReadBootFile(char* filename, pwr_tTime* date, char* systemname,
-    char* systemgroup, pwr_tVolumeId** vollist, pwr_tString40** volnamelist,
-    int* volcount, pwr_tString80** plclist, int* plccount)
+pwr_tStatus lfu_ReadBootFile(char* filename, pwr_tTime* date, char* systemname, char* systemgroup,
+                             pwr_tVolumeId** vollist, pwr_tString40** volnamelist, int* volcount,
+                             pwr_tString80** plclist, int* plccount)
 {
   FILE* file;
   char timstr[40];
@@ -3808,27 +3903,32 @@ pwr_tStatus lfu_ReadBootFile(char* filename, pwr_tTime* date, char* systemname,
   if (file == 0)
     return LFU__NOFILE;
 
-  if (fgets(timstr, sizeof(timstr), file) == NULL) {
+  if (fgets(timstr, sizeof(timstr), file) == NULL)
+  {
     fclose(file);
     return LFU__FILECRP;
   }
   sts = time_AsciiToA(timstr, date);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     fclose(file);
     return sts;
   }
 
-  if (utl_read_line(systemname, sizeof(pwr_tString80), file, NULL) == 0) {
+  if (utl_read_line(systemname, sizeof(pwr_tString80), file, NULL) == 0)
+  {
     fclose(file);
     return LFU__FILECRP;
   }
 
-  if (utl_read_line(systemgroup, sizeof(pwr_tString80), file, NULL) == 0) {
+  if (utl_read_line(systemgroup, sizeof(pwr_tString80), file, NULL) == 0)
+  {
     fclose(file);
     return LFU__FILECRP;
   }
 
-  if (utl_read_line(buff, sizeof(buff), file, NULL) == 0) {
+  if (utl_read_line(buff, sizeof(buff), file, NULL) == 0)
+  {
     // Sev node bootfile
     fclose(file);
     *volcount = 0;
@@ -3838,27 +3938,33 @@ pwr_tStatus lfu_ReadBootFile(char* filename, pwr_tTime* date, char* systemname,
     return LFU__SUCCESS;
   }
 
-  if (plclist) {
-    if (buff[0] == '-') {
+  if (plclist)
+  {
+    if (buff[0] == '-')
+    {
       *plccount = 0;
       *plclist = (pwr_tString80*)0;
-    } else {
-      *plccount = dcli_parse(buff, ",", "", (char*)plcarray,
-          sizeof(plcarray) / sizeof(plcarray[0]), sizeof(plcarray[0]), 0);
+    }
+    else
+    {
+      *plccount = dcli_parse(buff, ",", "", (char*)plcarray, sizeof(plcarray) / sizeof(plcarray[0]),
+                             sizeof(plcarray[0]), 0);
 
       *plclist = (pwr_tString80*)calloc(*plccount, sizeof(pwr_tString80));
       memcpy(*plclist, plcarray, *plccount * sizeof(pwr_tString80));
     }
   }
 
-  if (vollist) {
+  if (vollist)
+  {
     *volcount = 0;
     *vollist = (pwr_tVolumeId*)calloc(LFU_MAX_NODE_VOLUMES, sizeof(**vollist));
-    *volnamelist
-        = (pwr_tString40*)calloc(LFU_MAX_NODE_VOLUMES, sizeof(**volnamelist));
-    while (fscanf(file, "%s %s", vol_name, vol_str) == 2) {
+    *volnamelist = (pwr_tString40*)calloc(LFU_MAX_NODE_VOLUMES, sizeof(**volnamelist));
+    while (fscanf(file, "%s %s", vol_name, vol_str) == 2)
+    {
       sts = cdh_StringToVolumeId(vol_str, &volid);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         fclose(file);
         return sts;
       }
@@ -3873,10 +3979,9 @@ pwr_tStatus lfu_ReadBootFile(char* filename, pwr_tTime* date, char* systemname,
 }
 
 /****************************************************************************
-* Name:		lfu_GetVolRef()
-**************************************************************************/
-pwr_tStatus lfu_GetVolRef(
-    char* filename, lfu_t_volref** volref, int* volref_count)
+ * Name:		lfu_GetVolRef()
+ **************************************************************************/
+pwr_tStatus lfu_GetVolRef(char* filename, lfu_t_volref** volref, int* volref_count)
 {
   dbs_sEnv dbsenv;
   dbs_sVolRef vref;
@@ -3892,10 +3997,12 @@ pwr_tStatus lfu_GetVolRef(
 
   vr = (lfu_t_volref*)calloc(LFU_MAX_VOLREF, sizeof(lfu_t_volref));
   idx = 0;
-  while (dbs_VolRef(&sts, idx, &vref, &dbsenv)) {
+  while (dbs_VolRef(&sts, idx, &vref, &dbsenv))
+  {
     if (idx >= LFU_MAX_VOLREF)
       break;
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       free((char*)vr);
       return sts;
     }
@@ -3912,10 +4019,10 @@ pwr_tStatus lfu_GetVolRef(
 }
 
 /****************************************************************************
-* Name:		lfu_GetVolume()
-**************************************************************************/
-pwr_tStatus lfu_GetVolume(char* filename, char* name, pwr_tVid* vid,
-    pwr_tCid* cid, pwr_tTime* time, pwr_tUInt32* dvversion)
+ * Name:		lfu_GetVolume()
+ **************************************************************************/
+pwr_tStatus lfu_GetVolume(char* filename, char* name, pwr_tVid* vid, pwr_tCid* cid, pwr_tTime* time,
+                          pwr_tUInt32* dvversion)
 {
   dbs_sEnv dbsenv;
   dbs_sVolume volume;
@@ -3941,8 +4048,7 @@ pwr_tStatus lfu_GetVolume(char* filename, char* name, pwr_tVid* vid,
   return LFU__SUCCESS;
 }
 
-pwr_tStatus lfu_GetVolumeCnf(
-    char* name, pwr_tVid* vid, pwr_tCid* cid, ldh_eVolRep* volrep, char* server)
+pwr_tStatus lfu_GetVolumeCnf(char* name, pwr_tVid* vid, pwr_tCid* cid, ldh_eVolRep* volrep, char* server)
 {
   pwr_tStatus sts;
   pwr_tFileName fname;
@@ -3959,14 +4065,15 @@ pwr_tStatus lfu_GetVolumeCnf(
   if (!fpm)
     return 0;
 
-  while (fpm.getline(line, sizeof(line))) {
+  while (fpm.getline(line, sizeof(line)))
+  {
     int nr;
 
     if (line[0] == '#')
       continue;
 
-    nr = dcli_parse(line, " ", "", (char*)vol_array,
-        sizeof(vol_array) / sizeof(vol_array[0]), sizeof(vol_array[0]), 0);
+    nr = dcli_parse(line, " ", "", (char*)vol_array, sizeof(vol_array) / sizeof(vol_array[0]),
+                    sizeof(vol_array[0]), 0);
 
     if (str_NoCaseStrcmp(vol_array[0], name) != 0)
       continue;
@@ -3988,13 +4095,16 @@ pwr_tStatus lfu_GetVolumeCnf(
     else if (str_NoCaseStrcmp(vol_array[2], "DetachedClassVolume") == 0)
       *cid = pwr_eClass_DetachedClassVolume;
 
-    switch (*cid) {
+    switch (*cid)
+    {
     case pwr_eClass_RootVolume:
     case pwr_eClass_SubVolume:
     case pwr_eClass_SharedVolume:
       *volrep = ldh_eVolRep_Db;
-      if (str_NoCaseStrcmp(vol_array[0], name) == 0) {
-        if (nr > 4 && streq(vol_array[4], "1")) {
+      if (str_NoCaseStrcmp(vol_array[0], name) == 0)
+      {
+        if (nr > 4 && streq(vol_array[4], "1"))
+        {
           *volrep = ldh_eVolRep_Dbms;
           if (nr > 5)
             strcpy(server, vol_array[5]);
@@ -4006,10 +4116,12 @@ pwr_tStatus lfu_GetVolumeCnf(
     case pwr_eClass_ClassVolume:
     case pwr_eClass_DetachedClassVolume:
       *volrep = ldh_eVolRep_Wbl;
-      if (str_NoCaseStrcmp(vol_array[0], name) == 0) {
+      if (str_NoCaseStrcmp(vol_array[0], name) == 0)
+      {
         if (nr > 4 && streq(vol_array[4], "1"))
           *volrep = ldh_eVolRep_Db;
-        else if (nr > 4 && streq(vol_array[4], "2")) {
+        else if (nr > 4 && streq(vol_array[4], "2"))
+        {
           *volrep = ldh_eVolRep_Dbms;
           if (nr > 5)
             strcpy(server, vol_array[5]);
@@ -4044,15 +4156,16 @@ pwr_tStatus lfu_GetVolumeCnfAll(std::vector<lfu_volume_info>& vect)
   if (!fpm)
     return 0;
 
-  while (fpm.getline(line, sizeof(line))) {
+  while (fpm.getline(line, sizeof(line)))
+  {
     int nr;
     lfu_volume_info vol;
 
     if (line[0] == '#')
       continue;
 
-    nr = dcli_parse(line, " ", "", (char*)vol_array,
-        sizeof(vol_array) / sizeof(vol_array[0]), sizeof(vol_array[0]), 0);
+    nr = dcli_parse(line, " ", "", (char*)vol_array, sizeof(vol_array) / sizeof(vol_array[0]),
+                    sizeof(vol_array[0]), 0);
 
     strncpy(vol.name, vol_array[0], sizeof(vol.name));
 
@@ -4073,12 +4186,14 @@ pwr_tStatus lfu_GetVolumeCnfAll(std::vector<lfu_volume_info>& vect)
     else if (str_NoCaseStrcmp(vol_array[2], "DetachedClassVolume") == 0)
       vol.cid = pwr_eClass_DetachedClassVolume;
 
-    switch (vol.cid) {
+    switch (vol.cid)
+    {
     case pwr_eClass_RootVolume:
     case pwr_eClass_SubVolume:
     case pwr_eClass_SharedVolume:
       vol.volrep = ldh_eVolRep_Db;
-      if (nr > 4 && streq(vol_array[4], "1")) {
+      if (nr > 4 && streq(vol_array[4], "1"))
+      {
         vol.volrep = ldh_eVolRep_Dbms;
         if (nr > 5)
           strncpy(vol.server, vol_array[5], sizeof(vol.server));
@@ -4091,7 +4206,8 @@ pwr_tStatus lfu_GetVolumeCnfAll(std::vector<lfu_volume_info>& vect)
       vol.volrep = ldh_eVolRep_Wbl;
       if (nr > 4 && streq(vol_array[4], "1"))
         vol.volrep = ldh_eVolRep_Db;
-      else if (nr > 4 && streq(vol_array[4], "2")) {
+      else if (nr > 4 && streq(vol_array[4], "2"))
+      {
         vol.volrep = ldh_eVolRep_Dbms;
         if (nr > 5)
           strncpy(vol.server, vol_array[5], sizeof(vol.server));
@@ -4126,15 +4242,16 @@ pwr_tStatus lfu_GetBootList(std::vector<lfu_boot_info>& vect, int* nodes)
   if (!fpm)
     return 0;
 
-  while (fpm.getline(line, sizeof(line))) {
+  while (fpm.getline(line, sizeof(line)))
+  {
     int nr;
     lfu_boot_info boot;
 
     if (line[0] == '#')
       continue;
 
-    nr = dcli_parse(line, " ", "", (char*)boot_array,
-        sizeof(boot_array) / sizeof(boot_array[0]), sizeof(boot_array[0]), 0);
+    nr = dcli_parse(line, " ", "", (char*)boot_array, sizeof(boot_array) / sizeof(boot_array[0]),
+                    sizeof(boot_array[0]), 0);
 
     strncpy(boot.volume_name, boot_array[0], sizeof(boot.volume_name));
     strncpy(boot.node_name, boot_array[3], sizeof(boot.node_name));
@@ -4152,8 +4269,10 @@ pwr_tStatus lfu_GetBootList(std::vector<lfu_boot_info>& vect, int* nodes)
       return sts;
 
     bool num_found = false;
-    for (unsigned int j = 0; j < vect.size(); j++) {
-      if (streq(vect[j].node_name, boot.node_name)) {
+    for (unsigned int j = 0; j < vect.size(); j++)
+    {
+      if (streq(vect[j].node_name, boot.node_name))
+      {
         boot.number = vect[j].number;
         num_found = true;
       }
@@ -4172,17 +4291,19 @@ pwr_tStatus lfu_GetBootList(std::vector<lfu_boot_info>& vect, int* nodes)
   return 0;
 }
 
-pwr_tStatus lfu_ParseDbmsServer(
-    char* server, char* user, char* password, unsigned int* port, char* host)
+pwr_tStatus lfu_ParseDbmsServer(char* server, char* user, char* password, unsigned int* port, char* host)
 {
   char lserver[80];
 
-  if (streq(server, "")) {
-    if (!cnf_get_value("mysqlServer", lserver, sizeof(lserver))) {
+  if (streq(server, ""))
+  {
+    if (!cnf_get_value("mysqlServer", lserver, sizeof(lserver)))
+    {
       printf("** mysql Server not defined\n");
       return LDH__NOSERVER;
     }
-  } else
+  }
+  else
     strcpy(lserver, server);
 
   // Parse server string: username:password@port:host
@@ -4193,29 +4314,30 @@ pwr_tStatus lfu_ParseDbmsServer(
   char str2[2][80];
   int nr;
 
-  nr = dcli_parse(lserver, "@", "", (char*)str1, sizeof(str1) / sizeof(str1[0]),
-      sizeof(str1[0]), 0);
+  nr = dcli_parse(lserver, "@", "", (char*)str1, sizeof(str1) / sizeof(str1[0]), sizeof(str1[0]), 0);
 
   if (nr == 1)
     strncpy(lhost, lserver, sizeof(lhost));
-  else if (nr >= 2) {
+  else if (nr >= 2)
+  {
     strncpy(lhost, str1[1], sizeof(lhost));
 
-    nr = dcli_parse(str1[0], ":", "", (char*)str2,
-        sizeof(str2) / sizeof(str2[0]), sizeof(str2[0]), 0);
+    nr = dcli_parse(str1[0], ":", "", (char*)str2, sizeof(str2) / sizeof(str2[0]), sizeof(str2[0]), 0);
 
     if (nr == 1)
       strncpy(luser, str1[0], sizeof(luser));
-    else if (nr >= 2) {
+    else if (nr >= 2)
+    {
       strncpy(luser, str2[0], sizeof(luser));
       strncpy(lpassword, str2[1], sizeof(lpassword));
     }
   }
-  nr = dcli_parse(host, ":", "", (char*)str1, sizeof(str1) / sizeof(str1[0]),
-      sizeof(str1[0]), 0);
-  if (nr >= 2) {
+  nr = dcli_parse(host, ":", "", (char*)str1, sizeof(str1) / sizeof(str1[0]), sizeof(str1[0]), 0);
+  if (nr >= 2)
+  {
     nr = sscanf(str1[0], "%u", port);
-    if (nr != 1) {
+    if (nr != 1)
+    {
       printf("** Syntax error in mysql Server port\n");
       return LDH__NOSERVER;
     }
@@ -4231,8 +4353,7 @@ pwr_tStatus lfu_ParseDbmsServer(
   return LFU__SUCCESS;
 }
 
-pwr_tStatus lfu_check_appl_file(
-    ldh_tSesContext ldhses, char* nodename, int bus_number)
+pwr_tStatus lfu_check_appl_file(ldh_tSesContext ldhses, char* nodename, int bus_number)
 {
   pwr_tFileName fname;
   pwr_tTime t;
@@ -4294,8 +4415,7 @@ pwr_tStatus lfu_check_appl_file(
   return LFU__SUCCESS;
 }
 
-pwr_tStatus lfu_check_opt_file(
-    ldh_tSesContext ldhses, char* nodename, int bus_number, pwr_mOpSys opsys)
+pwr_tStatus lfu_check_opt_file(ldh_tSesContext ldhses, char* nodename, int bus_number, pwr_mOpSys opsys)
 {
   char fname[280];
   pwr_tTime t;
@@ -4308,9 +4428,9 @@ pwr_tStatus lfu_check_opt_file(
   sprintf(dir, "$pwrp_root/%s/exe/", cdh_OpSysToStr(opsys));
 
   for (sts = ldh_GetClassList(ldhses, pwr_cClass_PlcProcess, &oid); ODD(sts);
-       sts = ldh_GetNextObject(ldhses, oid, &oid)) {
-    sts = ldh_ObjidToName(
-        ldhses, oid, ldh_eName_Object, name, sizeof(name), &size);
+       sts = ldh_GetNextObject(ldhses, oid, &oid))
+  {
+    sts = ldh_ObjidToName(ldhses, oid, ldh_eName_Object, name, sizeof(name), &size);
     if (EVEN(sts))
       return sts;
 
@@ -4329,7 +4449,8 @@ pwr_tStatus lfu_check_opt_file(
     if (!fp)
       return LFU__SUCCESS;
 
-    switch (opsys) {
+    switch (opsys)
+    {
     case pwr_mOpSys_PPC_LINUX:
     case pwr_mOpSys_X86_LINUX:
     case pwr_mOpSys_X86_64_LINUX:

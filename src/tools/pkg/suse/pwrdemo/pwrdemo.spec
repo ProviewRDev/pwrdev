@@ -9,8 +9,8 @@
 
 Name:		pwrdemo58
 Summary: 	ProviewR demo project
-Version:        5.8.0
-Release: 	1
+Version: 7.0.0
+Release: 1
 License:        GPL
 BuildArch:      x86_64
 Packager: 	claes.sjofors@proview.se

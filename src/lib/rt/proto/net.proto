@@ -1,0 +1,145 @@
+syntax = "proto3";
+
+package proviewr.net;
+
+// Message types
+enum NetMsgType {
+  NET_MSG_ERROR = 0;
+  NET_MSG_ID = 1;
+  NET_MSG_ID_ACK = 2;
+  NET_MSG_ID_ACK2 = 3;
+  NET_MSG_VOLUMES = 4;
+  NET_MSG_VOLUMES_R = 5;
+  NET_MSG_SUB_ADD = 6;
+  NET_MSG_SUB_REMOVE = 7;
+  NET_MSG_SUB_DATA = 8;
+  NET_MSG_SAN_ADD = 9;
+  NET_MSG_SAN_REMOVE = 10;
+  NET_MSG_SAN_UPDATE = 11;
+  NET_MSG_NAME_TO_OBJECT = 12;
+  NET_MSG_OID_TO_OBJECT = 13;
+  NET_MSG_OBJECT_R = 14;
+  NET_MSG_GET_OBJECT_INFO = 15;
+  NET_MSG_GET_OBJECT_INFO_R = 16;
+  NET_MSG_SET_OBJECT_INFO = 17;
+  NET_MSG_SET_OBJECT_INFO_R = 18;
+  NET_MSG_FLUSH = 19;
+  NET_MSG_CREATE_OBJECT = 20;
+  NET_MSG_DELETE_OBJECT = 21;
+  NET_MSG_MOVE_OBJECT = 22;
+  NET_MSG_RENAME_OBJECT = 23;
+  NET_MSG_NODE_UP = 24;
+  NET_MSG_NODE_DOWN = 25;
+  NET_MSG_GET_CCLASS = 26;
+  NET_MSG_GET_CCLASS_R = 27;
+  NET_MSG_GET_GCLASS = 28;
+  NET_MSG_GET_GCLASS_R = 29;
+  NET_MSG_SERVER_CONNECT = 30;
+  NET_MSG_FILE_LIST = 31;
+  NET_MSG_FILE_LIST_R = 32;
+  NET_MSG_GET_CIRC_BUFFER = 33;
+  NET_MSG_GET_CIRC_BUFFER_R = 34;
+  NET_MSG_UPDATE_CIRC_BUFFER = 35;
+  NET_MSG_UPDATE_CIRC_BUFFER_R = 36;
+  NET_MSG_CLASS_LIST = 37;
+  NET_MSG_CLASS_LIST_R = 38;
+  NET_MSG_INVALID = 39;
+  NET_MSG_VOLUMES7 = 40;
+  NET_MSG_END = 41;
+}
+
+// Link events
+enum NetEventType {
+  NET_EVENT_UNSPECIFIED = -1;
+  NET_EVENT_NODE_UP = 0;
+  NET_EVENT_NODE_DOWN = 1;
+  NET_EVENT_ID = 2;
+  NET_EVENT_ID_ACK = 3;
+  NET_EVENT_ID_ACK2 = 4;
+  NET_EVENT_ERROR = 5;
+  NET_EVENT_OTHER = 6;
+  NET_EVENT_INVALID = 7;
+}
+
+// Bitmask for log flags
+message NetLogMask {
+  uint32 mask = 1; // Use bitwise operations in C++ for flags
+}
+
+// Generic message header
+message NetMessage {
+  bool xdr = 1;
+  uint32 msn = 2;
+  uint32 nid = 3;
+}
+
+// Net error detected
+message NetError {
+  NetMessage hdr = 1;
+  uint32 remqid = 2; // qcom_sQid
+  uint32 sts = 3;
+}
+
+// Nethandler identification
+message NetNode {
+  uint32 handler = 1; // qcom_sQid
+  uint32 netver = 2;
+  uint64 nod_oid = 3; // pwr_tObjid
+  uint64 vol_oid = 4; // pwr_tObjid
+}
+
+message NetId {
+  NetMessage hdr = 1;
+  NetNode node = 2;
+}
+
+message NetIdAck2 {
+  NetMessage hdr = 1;
+}
+
+message NetNodeUp {
+  NetMessage hdr = 1;
+  uint32 nid = 2;
+}
+
+// Link states
+enum NetState {
+  NET_STATE_UNSPECIFIED = -1;
+  NET_STATE_DOWN = 0;
+  NET_STATE_ISTRT = 1;
+  NET_STATE_ASTRRT = 2;
+  NET_STATE_UP = 3;
+  NET_STATE_INVALID = 4;
+}
+
+// Add subscription
+message NetSubSpec {
+  uint32 sid = 1;
+  uint32 dt = 2;
+  bool sub_by_name = 3;
+  uint64 aref = 4; // pwr_sAttrRef
+}
+
+message NetSubAdd {
+  NetMessage hdr = 1;
+  repeated NetSubSpec spec = 2;
+}
+
+service NetMessageHandler {
+  // Send a generic network message
+  rpc SendMessage(NetMessage) returns (NetError);
+
+  // Add a subscription
+  rpc AddSubscription(NetSubAdd) returns (NetError);
+
+  // Notify node up
+  rpc NodeUp(NetNodeUp) returns (NetError);
+
+  // Send an identification message
+  rpc SendId(NetId) returns (NetError);
+
+  // Acknowledge identification
+  rpc SendIdAck(NetIdAck2) returns (NetError);
+
+  // ...add more RPCs as needed for your protocol...
+}

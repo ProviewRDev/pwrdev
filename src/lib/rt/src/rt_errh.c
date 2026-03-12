@@ -64,17 +64,27 @@
 #include "rt_gdh.h"
 #include "rt_errh_msg.h"
 #include "rt_pwr_msg.h"
+#include "co_rfc5424_c.h"
 
-#define UNKNOWN_PROGRAM_NAME "Unknown name   "
+#define UNKNOWN_PROGRAM_NAME "unknown"
+#define ERRH_MAX_ANIX 40
+#define ERRH_MAX_ANIX_NAME_LEN 32
 
 typedef void* aa_list[];
 #define aa_arg(ap, vap, type) (ap ? ((type)*ap++) : va_arg(vap, type))
 
-typedef enum { eArg_sts, eArg_int, eArg_string } eArg;
+typedef enum
+{
+  eArg_sts,
+  eArg_int,
+  eArg_string
+} eArg;
 
-typedef struct {
+typedef struct
+{
   eArg class;
-  union {
+  union
+  {
     pwr_tStatus sts;
     int intval;
     char* string;
@@ -84,28 +94,26 @@ typedef struct {
 #if defined OS_LINUX || defined OS_CYGWIN
 typedef pid_t sPid;
 
-static mqd_t mqid = (mqd_t)-1;
-static unsigned int prio = 0;
-static int mq_send_errno = 0;
+static mqd_t g_mqid = (mqd_t)-1;
+static int g_mq_send_errno = 0;
 #elif defined OS_MACOS || defined OS_FREEBSD || defined OS_OPENBSD
 typedef pid_t sPid;
 
-static int mqid = -1;
-// static unsigned int prio = 0;
-static int mq_send_errno = 0;
+static int g_mqid = -1;
+static int g_mq_send_errno = 0;
 #endif
 
-static const char* indentStr = "  ";
-static char programName[16];
-static int interactive = 0;
-static int initDone = 0;
-static errh_eAnix errh_anix = errh_eNAnix;
+static const char* g_indent_str = "  ";
+static char g_program_name[16];
+static int g_interactive = 0;
+static int g_init_done = 0;
+static errh_eAnix g_errh_anix = errh_eNAnix;
 
 static char* get_header(char, char*);
 static char* get_message(const int, unsigned int, char*, int);
 static char* get_name(char*, int);
 static char get_severity(pwr_tStatus);
-static void openLog();
+static void open_log();
 static void set_name(const char*);
 static void errh_send(char*, char, pwr_tStatus, errh_eMsgType);
 static void log_message(errh_sLog*, char, const char*, va_list);
@@ -117,51 +125,63 @@ static unsigned int do_div(int*, unsigned int);
 static int skip_atoi(const char**);
 static char* number(char*, int, int, int, int, int);
 
-static char anix_name[40][32] = {
-  "rt_init",
-  "rt_qmon",
-  "rt_neth",
-  "rt_neth_acp",
-  "rt_io",
-  "rt_tmon",
-  "rt_emon",
-  "rt_alimserver",
-  "rt_bck",
-  "rt_linksup",
-  "rt_trend",
-  "rt_fast",
-  "rt_elog",
-  "rt_webmon",
-  "rt_webmonmh",
-  "rt_sysmon",
-  "plc",
-  "rs_remotehandler",
-  "opc_server",
-  "rt_statussrv",
-  "rt_post",
-  "rt_report",
-  "rt_sevhistmon",
-  "rt_sim",
-  "rt_powerlink",
-  "rt_videomgm",
-  "rt_redcom",
-  "rt_websocketserver",
-  "rt_maintsupserver",
-  "rt_mqttserver",
+static char anix_name[ERRH_MAX_ANIX][ERRH_MAX_ANIX_NAME_LEN] = {
+    "rt_init",
+    "rt_qmon",
+    "rt_neth",
+    "rt_neth_acp",
+    "rt_io",
+    "rt_tmon",
+    "rt_emon",
+    "rt_alimserver",
+    "rt_bck",
+    "rt_linksup",
+    "rt_trend",
+    "rt_fast",
+    "rt_elog",
+    "rt_webmon",
+    "rt_webmonmh",
+    "rt_sysmon",
+    "plc",
+    "rs_remotehandler",
+    "opc_server",
+    "rt_statussrv",
+    "rt_post",
+    "rt_report",
+    "rt_sevhistmon",
+    "rt_sim",
+    "rt_powerlink",
+    "rt_videomgm",
+    "rt_redcom",
+    "rt_websocketserver",
+    "rt_maintsupserver",
+    "rt_mqttserver",
 };
 
-void errh_AnixName(errh_eAnix anix, char *name)
+/**
+ * @brief Get the name of an application index.
+ *
+ * Copies the name corresponding to the given application index (anix) into the provided buffer.
+ * If the index is out of range, an empty string is copied.
+ *
+ * @param anix Application index.
+ * @param name Buffer to copy the name into.
+ */
+void errh_AnixName(errh_eAnix anix, char* name)
 {
-  if (anix > 0 && anix <= 40)
+  if (anix > 0 && anix <= ERRH_MAX_ANIX)
     strcpy(name, anix_name[anix - 1]);
   else
     strcpy(name, "");
 }
 
-void errh_Interactive(void)
-{
-  interactive = 1;
-}
+/**
+ * @brief Enable interactive mode for error logging.
+ *
+ * When interactive mode is enabled, log messages are printed to stdout instead of being sent to the log
+ * queue.
+ */
+void errh_Interactive(void) { g_interactive = 1; }
 
 /**
  * @brief Initialize errh.
@@ -177,14 +197,15 @@ void errh_Interactive(void)
  */
 pwr_tStatus errh_Init(const char* name, errh_eAnix anix)
 {
-  get_name(programName, sizeof(programName) - 1);
+  get_name(g_program_name, sizeof(g_program_name) - 1);
   if (name != NULL && name[0] != '\0')
     set_name(name);
-  errh_anix = anix;
+  g_errh_anix = anix;
 
-  if (!initDone) {
-    initDone = 1;
-    openLog();
+  if (!g_init_done)
+  {
+    g_init_done = 1;
+    open_log();
   }
 
   return 1;
@@ -209,44 +230,54 @@ void errh_SetStatus(pwr_tStatus sts)
  * @brief Get application index for the process.
  *    \return  Application index.
  */
-errh_eAnix errh_Anix(void)
-{
-  return errh_anix;
-}
+errh_eAnix errh_Anix(void) { return g_errh_anix; }
 
 /**
  * @brief Set application index for the process.
  */
-void errh_SetAnix(errh_eAnix anix)
-{
-  errh_anix = anix;
-}
+void errh_SetAnix(errh_eAnix anix) { g_errh_anix = anix; }
 
 /**
  * @brief Set application name for the process.
  */
-void errh_SetName(char* name)
-{
-  set_name(name);
-}
+void errh_SetName(char* name) { set_name(name); }
 
-/* Check if a given messagenumber exists,
-   return string representation if valid.  */
+/**
+ * @brief Get a formatted message string for a given status code.
+ *
+ * Returns a string representation of the message corresponding to the status code.
+ *
+ * @param sts Status code.
+ * @param buf Buffer to store the message string.
+ * @param bufSize Size of the buffer.
+ * @return Pointer to the buffer containing the message string.
+ */
+char* errh_GetMsg(const int sts, char* buf, int bufSize) { return get_message(sts, 0xf, buf, bufSize); }
 
-char* errh_GetMsg(const int sts, char* buf, int bufSize)
-{
-  return get_message(sts, 0xf, buf, bufSize);
-}
+/**
+ * @brief Get the error name for a given status code.
+ *
+ * Returns the error name string for the specified status code.
+ *
+ * @param sts Status code.
+ * @param buf Buffer to store the error name.
+ * @param bufSize Size of the buffer.
+ * @return Pointer to the buffer containing the error name.
+ */
+char* errh_GetError(const int sts, char* buf, int bufSize) { return get_message(sts, 0x2, buf, bufSize); }
 
-/* Checks if a given messagenumber exists,
-  return string representation if valid.  */
+/**
+ * @brief Get the message text for a given status code.
+ *
+ * Returns the message text string for the specified status code.
+ *
+ * @param sts Status code.
+ * @param buf Buffer to store the message text.
+ * @param bufSize Size of the buffer.
+ * @return Pointer to the buffer containing the message text.
+ */
+char* errh_GetText(const int sts, char* buf, int bufSize) { return get_message(sts, 1, buf, bufSize); }
 
-char* errh_GetText(const int sts, char* buf, int bufSize)
-{
-  return get_message(sts, 1, buf, bufSize);
-}
-
-/* Log a message.  */
 char* errh_Log(char* buff, char severity, const char* msg, ...)
 {
   char* s;
@@ -257,7 +288,7 @@ char* errh_Log(char* buff, char severity, const char* msg, ...)
   msg_vsprintf(s, msg, NULL, ap);
   va_end(ap);
 
-  if (interactive)
+  if (g_interactive)
     printf("%s\n", buff);
   else
     errh_send(buff, severity, 0, errh_eMsgType_Log);
@@ -420,8 +451,15 @@ void errh_LogSuccess(errh_sLog* lp, const char* msg, ...)
   va_end(args);
 }
 
-/* Insert a status message in a message.  */
-
+/**
+ * @brief Create a status argument for error message formatting.
+ *
+ * Allocates and returns a pointer to a status argument structure for use in error message formatting.
+ * Caller is responsible for freeing the returned pointer.
+ *
+ * @param sts Status code to include as an argument.
+ * @return Pointer to the allocated status argument structure.
+ */
 void* errh_ErrArgMsg(pwr_tStatus sts)
 {
   sArg* eap;
@@ -433,8 +471,15 @@ void* errh_ErrArgMsg(pwr_tStatus sts)
   return eap;
 }
 
-/* Insert a string argument in a message.  */
-
+/**
+ * @brief Create a string argument for error message formatting.
+ *
+ * Allocates and returns a pointer to a string argument structure for use in error message formatting.
+ * Caller is responsible for freeing the returned pointer.
+ *
+ * @param str String to include as an argument.
+ * @return Pointer to the allocated string argument structure.
+ */
 void* errh_ErrArgAF(char* str)
 {
   sArg* eap;
@@ -447,8 +492,15 @@ void* errh_ErrArgAF(char* str)
   return eap;
 }
 
-/* Insert a integer value in a message.  */
-
+/**
+ * @brief Create an integer argument for error message formatting.
+ *
+ * Allocates and returns a pointer to an integer argument structure for use in error message formatting.
+ * Caller is responsible for freeing the returned pointer.
+ *
+ * @param val Integer value to include as an argument.
+ * @return Pointer to the allocated integer argument structure.
+ */
 void* errh_ErrArgL(int val)
 {
   sArg* eap;
@@ -461,6 +513,20 @@ void* errh_ErrArgL(int val)
   return eap;
 }
 
+/**
+ * @brief Log a complex error message with multiple arguments.
+ *
+ * Formats and logs an error message using a status code and a variable list of arguments.
+ * Each argument should be created using errh_ErrArgMsg, errh_ErrArgAF, or errh_ErrArgL.
+ * The message is sent to the error log system.
+ *
+ * Warning: Violates principle of least surprise as it takes ownership and arguments are freed by this
+ * function. So do not use arguments after calling this function. Use errh_ErrArg* functions inline to create
+ * arguments as stated above.
+ *
+ * @param sts Status code for the error message.
+ * @param ... Variable list of argument pointers (terminated by NULL).
+ */
 void errh_CErrLog(pwr_tStatus sts, ...)
 {
   va_list ap;
@@ -474,8 +540,10 @@ void errh_CErrLog(pwr_tStatus sts, ...)
   get_message(sts, 0xb, msg, sizeof(msg));
 
   va_start(ap, sts);
-  while ((eap = va_arg(ap, sArg*)) != NULL) {
-    switch (eap->class) {
+  while ((eap = va_arg(ap, sArg*)) != NULL)
+  {
+    switch (eap->class)
+    {
     case eArg_sts:
       args[argno++] = (char*)((long int)eap->u.sts);
       strcat(msg, "\n%m");
@@ -500,8 +568,24 @@ void errh_CErrLog(pwr_tStatus sts, ...)
   errh_send(string, get_severity(sts), sts, errh_eMsgType_Log);
 }
 
-/* Format a string.  */
-
+/**
+ * @brief Formats a log message with severity and variable arguments.
+ *
+ * This function builds a log message string in the provided buffer, starting with a formatted header
+ * (including severity, program name, PID, timestamp), followed by the formatted message using the
+ * supplied format string and arguments. The resulting string is suitable for logging or display.
+ *
+ *
+ * @param string   Buffer where the formatted message will be written.
+ * @param severity Severity character ('E' for error, 'W' for warning, etc.).
+ * @param msg      Format string for the log message (like printf).
+ * @param ...      Variable arguments for formatting the message.
+ * @return         Pointer to the buffer containing the formatted message.
+ *
+ * Example usage:
+ *   char buf[256];
+ *   errh_Message(buf, 'I', "Started process %s (pid %d)", name, pid);
+ */
 char* errh_Message(char* string, char severity, char* msg, ...)
 {
   char* s;
@@ -528,39 +612,63 @@ char* errh_Message(char* string, char severity, char* msg, ...)
 
     any other	gives a combination of above excluding %  */
 
-static char* get_message(
-    const pwr_tStatus sts, unsigned int flags, char* buf, int bufSize)
+/**
+ * @brief Internal: Get a message string for a status code and flags.
+ *
+ * Returns a formatted message string for the given status code and flags.
+ *
+ * @param sts Status code.
+ * @param flags Message formatting flags.
+ * @param buf Buffer to store the message string.
+ * @param bufSize Size of the buffer.
+ * @return Pointer to the buffer containing the message string.
+ */
+static char* get_message(const pwr_tStatus sts, unsigned int flags, char* buf, int bufSize)
 {
   return msg_GetMessage(sts, flags, buf, bufSize);
 }
 
+/**
+ * @brief Internal: Set the program name for logging.
+ *
+ * Copies the given name into the programName buffer, truncating if necessary.
+ *
+ * @param name Program name string.
+ */
 static void set_name(const char* name)
 {
-  strncpy(programName, name, sizeof(programName) - 1);
-  programName[sizeof(programName) - 1] = '\0';
+  strncpy(g_program_name, name, sizeof(g_program_name) - 1);
+  g_program_name[sizeof(g_program_name) - 1] = '\0';
 }
 
-static void openLog()
+/**
+ * @brief Internal: Open the log message queue for error logging.
+ *
+ * Initializes the message queue used for logging errors, depending on the operating system.
+ */
+static void open_log()
 {
 #if defined OS_LINUX || defined OS_CYGWIN
-  if (mqid == (mqd_t)-1) {
+  if (g_mqid == (mqd_t)-1)
+  {
     char name[64];
     char* busid = getenv(pwr_dEnvBusId);
 
     sprintf(name, "%s_%s", LOG_QUEUE_NAME, busid ? busid : "");
-    mqid = mq_open(name, O_WRONLY | O_NONBLOCK, 0, 0);
-    if (mqid == (mqd_t)-1) {
+    g_mqid = mq_open(name, O_WRONLY | O_NONBLOCK, 0, 0);
+    if (g_mqid == (mqd_t)-1)
+    {
       char string[256];
       char* s;
 
-      s = errh_Message(
-          string, 'E', "Open messageQ, mq_open(%s)\n%s", name, strerror(errno));
+      s = errh_Message(string, 'E', "Open messageQ, mq_open(%s)\n%s", name, strerror(errno));
       printf("%s\n", s);
       return;
     }
   }
 #elif defined OS_MACOS || defined OS_FREEBSD || defined OS_OPENBSD
-  if (mqid == (key_t)-1) {
+  if (mqid == (key_t)-1)
+  {
     char name[64];
     char* busid = getenv(pwr_dEnvBusId);
     key_t key;
@@ -570,19 +678,20 @@ static void openLog()
 
     sprintf(name, "%s_%s", LOG_QUEUE_NAME, busid ? busid : "");
     fd = open(name, flags, mode);
-    if (fd == -1) {
+    if (fd == -1)
+    {
       printf("Message Queue, open failed on %s, errno: %d\n", name, errno);
     }
     key = ftok(name, 'm');
     close(fd);
 
     mqid = msgget(key, IPC_CREAT | 0660);
-    if (mqid == -1) {
+    if (mqid == -1)
+    {
       char string[256];
       char* s;
 
-      s = errh_Message(string, 'E', "Open message queue, msgget(%s)\n%s", name,
-          strerror(errno));
+      s = errh_Message(string, 'E', "Open message queue, msgget(%s)\n%s", name, strerror(errno));
       printf("%s\n", s);
       return;
     }
@@ -590,6 +699,15 @@ static void openLog()
 #endif
 }
 
+/**
+ * @brief Internal: Get the default program name.
+ *
+ * Copies the default program name into the provided buffer, truncating if necessary.
+ *
+ * @param name Buffer to copy the name into.
+ * @param size Size of the buffer.
+ * @return Pointer to the buffer containing the name.
+ */
 static char* get_name(char* name, int size)
 {
   int len = strlen(UNKNOWN_PROGRAM_NAME);
@@ -600,62 +718,74 @@ static char* get_name(char* name, int size)
 
   return name;
 }
-static sPid* get_pid(sPid* pid)
-{
-  *pid = getpid();
-
-  return pid;
-}
 
 static char* get_header(char severity, char* s)
 {
-  sPid pid;
-  pwr_tTime time;
-  struct tm tp, *t;
-
-  if (!initDone)
+  if (!g_init_done)
     errh_Init(NULL, 0);
 
-  if (interactive) {
+  if (g_interactive)
+  {
     s += sprintf(s, "%c ", severity);
     return s;
   }
 
-  time_GetTime(&time);
+  // Use RFC5424 formatting for proper syslog compliance
+  char rfc5424_header[512];
+  int header_len =
+      co_rfc5424_format_header_c(severity, g_program_name, rfc5424_header, sizeof(rfc5424_header));
 
-  get_pid(&pid);
-
-  s += sprintf(s, "%c %-*.*s", severity, (int)sizeof(programName),
-      (int)sizeof(programName), programName);
-
-  time_t sec = time.tv_sec;
-  localtime_r(&sec, &tp);
-  t = &tp;
-  s += sprintf(s, " %8d ", pid);
-
-  s += sprintf(s, "%02d-%02d-%02d %02d:%02d:%02d.%02d ", t->tm_year % 100,
-      t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec,
-      (int)(time.tv_nsec / 10000000));
-
-  return s;
+  if (header_len > 0)
+  {
+    // Copy the RFC5424 header and add a space for the message
+    strcpy(s, rfc5424_header);
+    s += header_len;
+    *s++ = ' '; // Add space separator before message content
+    *s = '\0';  // Null terminate
+    return s;
+  }
+  else
+  {
+    // Fallback to simple format if RFC5424 formatting fails
+    s += sprintf(s, "%c %-*.*s ", severity, (int)sizeof(g_program_name), (int)sizeof(g_program_name),
+                 g_program_name);
+    return s;
+  }
 }
 
-/* Format a string and write it to log devices.  */
-
-static void log_message(
-    errh_sLog* lp, char severity, const char* msg, va_list ap)
+/**
+ * @brief Formats and logs an RFC5424 compliant message with severity and variable arguments.
+ *
+ * This function builds an RFC5424 syslog compliant log message header using CoLogger's formatting,
+ * then appends the formatted message content. The result is sent to the error log system.
+ * If interactive mode is enabled, the message is printed to stdout instead of being sent to the log queue.
+ * If a log structure pointer (lp) is provided and lp->send is true, the message is also sent to a custom log
+ * queue.
+ *
+ * RFC5424 format: <PRI>VERSION TIMESTAMP HOSTNAME APP-NAME PROCID MSGID STRUCTURED-DATA MSG
+ *
+ * @param lp       Optional pointer to a log structure (errh_sLog) for custom logging. Can be NULL.
+ * @param severity Severity character ('E' for error, 'W' for warning, etc.).
+ * @param msg      Format string for the log message (like printf).
+ * @param ap       Variable argument list for formatting the message.
+ *
+ * Example usage:
+ *   log_message_rfc5424(NULL, 'E', "Error: %s", args);
+ */
+static void log_message(errh_sLog* lp, char severity, const char* msg, va_list ap)
 {
   char* s;
-  char string[1000];
+  char string[LOG_MAX_MSG_SIZE];
 
   s = get_header(severity, string);
   msg_vsprintf(s, msg, NULL, ap);
-  if (interactive)
+  if (g_interactive)
     printf("%s\n", string);
   else
     errh_send(string, severity, 0, errh_eMsgType_Log);
 
-  if (lp != NULL && lp->send) {
+  if (lp != NULL && lp->send)
+  {
     lp->put.data = string;
     lp->put.size = strlen(string) + 1;
     lp->put.allocate = 1;
@@ -667,7 +797,8 @@ static void log_message(
 
 static char get_severity(pwr_tStatus sts)
 {
-  switch (sts & 7) {
+  switch (sts & 7)
+  {
   case 0:
     return 'W';
   case 1:
@@ -688,13 +819,13 @@ static char get_severity(pwr_tStatus sts)
 /* PWR-version of vsprintf. replaces %m represents
    a message number and is replaced by the string.  */
 
-#define ZEROPAD 1 /* pad with zero */
-#define SIGN 2 /* unsigned/signed long */
-#define PLUS 4 /* show plus */
-#define SPACE 8 /* space if plus */
-#define LEFT 16 /* left justified */
+#define ZEROPAD 1  /* pad with zero */
+#define SIGN 2     /* unsigned/signed long */
+#define PLUS 4     /* show plus */
+#define SPACE 8    /* space if plus */
+#define LEFT 16    /* left justified */
 #define SPECIAL 32 /* 0x */
-#define LARGE 64 /* use 'ABCDEF' instead of 'abcdef' */
+#define LARGE 64   /* use 'ABCDEF' instead of 'abcdef' */
 
 /* We use this so that we can do without the ctype library.  */
 
@@ -712,17 +843,20 @@ static int msg_vsprintf(char* buf, const char* fmt, aa_list ap, va_list vap)
   int flags; /* flags to number() */
 
   long int field_width; /* width of output field */
-  long int precision; /* min. # of digits for integers; max
-                    number of chars for from string */
-  int qualifier; /* 'h', 'l', or 'L' for integer fields */
+  long int precision;   /* min. # of digits for integers; max
+                      number of chars for from string */
+  int qualifier;        /* 'h', 'l', or 'L' for integer fields */
 
-  for (str = buf; *fmt; ++fmt) {
-    if (*fmt != '%') {
+  for (str = buf; *fmt; ++fmt)
+  {
+    if (*fmt != '%')
+    {
       *str++ = *fmt;
-      if (*fmt == '\n') {
+      if (*fmt == '\n')
+      {
         /* I hope we are not running a Fu.. PC */
         /* *str++ ='\r'; */
-        cs = indentStr;
+        cs = g_indent_str;
         while (*cs != '\0')
           *str++ = *cs++;
       }
@@ -735,7 +869,8 @@ static int msg_vsprintf(char* buf, const char* fmt, aa_list ap, va_list vap)
   repeat:
 
     ++fmt; /* this also skips first '%' */
-    switch (*fmt) {
+    switch (*fmt)
+    {
     case '-':
       flags |= LEFT;
       goto repeat;
@@ -755,13 +890,17 @@ static int msg_vsprintf(char* buf, const char* fmt, aa_list ap, va_list vap)
 
     /* get field width */
     field_width = -1;
-    if (is_digit(*fmt)) {
+    if (is_digit(*fmt))
+    {
       field_width = skip_atoi(&fmt);
-    } else if (*fmt == '*') {
+    }
+    else if (*fmt == '*')
+    {
       ++fmt;
       /* it's the next argument */
       field_width = aa_arg(ap, vap, long int);
-      if (field_width < 0) {
+      if (field_width < 0)
+      {
         field_width = -field_width;
         flags |= LEFT;
       }
@@ -769,11 +908,15 @@ static int msg_vsprintf(char* buf, const char* fmt, aa_list ap, va_list vap)
 
     /* get the precision */
     precision = -1;
-    if (*fmt == '.') {
+    if (*fmt == '.')
+    {
       ++fmt;
-      if (is_digit(*fmt)) {
+      if (is_digit(*fmt))
+      {
         precision = skip_atoi(&fmt);
-      } else if (*fmt == '*') {
+      }
+      else if (*fmt == '*')
+      {
         ++fmt;
         /* it's the next argument */
         precision = aa_arg(ap, vap, long int);
@@ -784,7 +927,8 @@ static int msg_vsprintf(char* buf, const char* fmt, aa_list ap, va_list vap)
 
     /* get the conversion qualifier */
     qualifier = -1;
-    if (*fmt == 'h' || *fmt == 'l' || *fmt == 'L') {
+    if (*fmt == 'h' || *fmt == 'l' || *fmt == 'L')
+    {
       qualifier = *fmt;
       ++fmt;
     }
@@ -792,7 +936,8 @@ static int msg_vsprintf(char* buf, const char* fmt, aa_list ap, va_list vap)
     /* default base */
     base = 10;
 
-    switch (*fmt) {
+    switch (*fmt)
+    {
     case 'c':
       if (!(flags & LEFT))
         while (--field_width > 0)
@@ -827,19 +972,22 @@ static int msg_vsprintf(char* buf, const char* fmt, aa_list ap, va_list vap)
       continue;
 
     case 'p':
-      if (field_width == -1) {
+      if (field_width == -1)
+      {
         field_width = 2 * sizeof(void*);
         flags |= ZEROPAD;
       }
-      str = number(str, (unsigned long)aa_arg(ap, vap, void*), 16, field_width,
-          precision, flags);
+      str = number(str, (unsigned long)aa_arg(ap, vap, void*), 16, field_width, precision, flags);
       continue;
 
     case 'n':
-      if (qualifier == 'l') {
+      if (qualifier == 'l')
+      {
         long* ip = aa_arg(ap, vap, long*);
         *ip = (str - buf);
-      } else {
+      }
+      else
+      {
         int* ip = aa_arg(ap, vap, int*);
         *ip = (str - buf);
       }
@@ -919,8 +1067,7 @@ static unsigned int do_div(int* n, unsigned int base)
 
 /* Handle numerics.  */
 
-static char* number(
-    char* str, int num, int base, int size, int precision, int type)
+static char* number(char* str, int num, int base, int size, int precision, int type)
 {
   char c;
   char sign;
@@ -936,20 +1083,27 @@ static char* number(
     return 0;
   c = (type & ZEROPAD) ? '0' : ' ';
   sign = 0;
-  if (type & SIGN) {
-    if (num < 0) {
+  if (type & SIGN)
+  {
+    if (num < 0)
+    {
       sign = '-';
       num = -num;
       size--;
-    } else if (type & PLUS) {
+    }
+    else if (type & PLUS)
+    {
       sign = '+';
       size--;
-    } else if (type & SPACE) {
+    }
+    else if (type & SPACE)
+    {
       sign = ' ';
       size--;
     }
   }
-  if (type & SPECIAL) {
+  if (type & SPECIAL)
+  {
     if (base == 16)
       size -= 2;
     else if (base == 8)
@@ -969,10 +1123,12 @@ static char* number(
       *str++ = ' ';
   if (sign)
     *str++ = sign;
-  if (type & SPECIAL) {
+  if (type & SPECIAL)
+  {
     if (base == 8)
       *str++ = '0';
-    else if (base == 16) {
+    else if (base == 16)
+    {
       *str++ = '0';
       *str++ = digits[33];
     }
@@ -989,43 +1145,45 @@ static char* number(
   return str;
 }
 
-static void errh_send(
-    char* s, char severity, pwr_tStatus sts, errh_eMsgType message_type)
+static void errh_send(char* s, char severity, pwr_tStatus sts, errh_eMsgType message_type)
 {
 #if defined OS_LINUX || defined OS_CYGWIN
 
   int len;
-  if (mqid != (mqd_t)-1) {
+  if (g_mqid != (mqd_t)-1)
+  {
     errh_sMsg msg;
 
-    switch (message_type) {
+    switch (message_type)
+    {
     case errh_eMsgType_Log:
       strncpy(msg.str, s, LOG_MAX_MSG_SIZE);
       msg.str[LOG_MAX_MSG_SIZE - 1] = 0;
       msg.message_type = message_type;
       msg.severity = severity;
       msg.sts = sts;
-      msg.anix = errh_anix;
-      len = sizeof(msg) - sizeof(msg.message_type) - sizeof(msg.str)
-          + strlen(msg.str) + 1;
+      msg.anix = g_errh_anix;
+      len = sizeof(msg) - sizeof(msg.message_type) - sizeof(msg.str) + strlen(msg.str) + 1;
       break;
     case errh_eMsgType_Status:
       msg.message_type = message_type;
       msg.sts = sts;
-      msg.anix = errh_anix;
+      msg.anix = g_errh_anix;
       len = sizeof(msg) - sizeof(msg.message_type) - sizeof(msg.str);
       break;
     }
-    if (prio == 0)
-      prio = sysconf(_SC_MQ_PRIO_MAX) - 1;
-    if (mq_send(mqid, (char*)&msg, MIN(len, LOG_MAX_MSG_SIZE - 1), prio)
-        == -1) {
-      if (mq_send_errno != errno) {
-        mq_send_errno = errno;
+
+    if (mq_send(g_mqid, (char*)&msg, MIN(len, LOG_QUEUE_MAX_MSG_SIZE - 1), 0) == -1)
+    {
+      if (g_mq_send_errno != errno)
+      {
+        g_mq_send_errno = errno;
         perror("mq_send");
       }
     }
-  } else if (s) {
+  }
+  else if (s)
+  {
     puts(s);
     return;
   }
@@ -1033,10 +1191,12 @@ static void errh_send(
 #elif defined OS_MACOS || defined OS_FREEBSD || defined OS_OPENBSD
 
   int len;
-  if (mqid != -1) {
+  if (mqid != -1)
+  {
     errh_sMsg msg;
 
-    switch (message_type) {
+    switch (message_type)
+    {
     case errh_eMsgType_Log:
       strncpy(msg.str, s, LOG_MAX_MSG_SIZE);
       msg.str[LOG_MAX_MSG_SIZE - 1] = 0;
@@ -1044,8 +1204,7 @@ static void errh_send(
       msg.severity = severity;
       msg.sts = sts;
       msg.anix = errh_anix;
-      len = sizeof(msg) - sizeof(msg.message_type) - sizeof(msg.str)
-          + strlen(msg.str) + 1;
+      len = sizeof(msg) - sizeof(msg.message_type) - sizeof(msg.str) + strlen(msg.str) + 1;
       break;
     case errh_eMsgType_Status:
       msg.message_type = message_type;
@@ -1056,13 +1215,17 @@ static void errh_send(
     }
     // if ( prio == 0)
     //  prio = sysconf(_SC_MQ_PRIO_MAX) - 1;
-    if (msgsnd(mqid, (char*)&msg, MIN(len, LOG_MAX_MSG_SIZE - 1), 0) == -1) {
-      if (mq_send_errno != errno) {
+    if (msgsnd(mqid, (char*)&msg, MIN(len, LOG_QUEUE_MAX_MSG_SIZE - 1), 0) == -1)
+    {
+      if (mq_send_errno != errno)
+      {
         mq_send_errno = errno;
         perror("msgsnd");
       }
     }
-  } else if (s) {
+  }
+  else if (s)
+  {
     puts(s);
     return;
   }
@@ -1082,7 +1245,8 @@ errh_eSeverity errh_Severity(pwr_tStatus sts)
   if (sts == 0)
     return errh_eSeverity_Null;
 
-  switch (sts & 7) {
+  switch (sts & 7)
+  {
   case 1:
     return errh_eSeverity_Success;
   case 3:

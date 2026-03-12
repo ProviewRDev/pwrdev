@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -42,102 +42,100 @@
 #include "pwr.h"
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-/* co_dcli.c
-   Command line interpreter. */
+  /* co_dcli.c
+     Command line interpreter. */
 
 #define DCLI_CMD_SIZE 400
 #define DCLI_QUAL_SIZE 400
 #define DCLI_SYM_KEY_SIZE 200
 #define DCLI_SYM_VALUE_SIZE 200
 
-typedef struct {
-  char command[20];
-  int (*func)(void*, void*);
-  char qualifier[60][40];
-} dcli_tCmdTable;
+  typedef struct
+  {
+    char command[20];
+    int (*func)(void*, void*);
+    char qualifier[60][40];
+  } dcli_tCmdTable;
 
-int dcli_parse(const char* string, const char* parse_char,
-    const char* inc_parse_char, char* outstr, int max_rows, int max_cols,
-    int keep_quota);
-int dcli_cli(dcli_tCmdTable* command_table, const char* string, void* userdata1,
-    void* userdata2);
-int dcli_get_qualifier(const char* qualifier, char* value, size_t size);
+  int dcli_parse(const char* string, const char* parse_char, const char* inc_parse_char, char* outstr,
+                 int max_rows, int max_cols, int keep_quota);
+  int dcli_cli(dcli_tCmdTable* command_table, const char* string, void* userdata1, void* userdata2);
+  int dcli_get_qualifier(const char* qualifier, char* value, size_t size);
   int dcli_set_qualifier(const char* qualifier, char* value);
-int dcli_store_symbols(char* filename);
-int dcli_replace_symbol(char* command, char* newcommand, int newsize);
-int dcli_get_symbol(char* key, char* value);
-int dcli_get_symbol_by_index(int index, char* key, char* value);
-int dcli_get_symbol_cmd(char* key, char* value);
-int dcli_define_symbol(char* key, char* arg1, char* arg2, char* arg3);
-int dcli_toupper(char* str_upper, char* str);
-char* dcli_pwr_dir(const char* dir);
-int dcli_wildcard(char* wildname, char* name);
-int dcli_read_line(char* line, int maxsize, FILE* file);
-unsigned int dcli_random();
+  int dcli_store_symbols(char* filename);
+  int dcli_replace_symbol(char* command, char* newcommand, int newsize);
+  int dcli_get_symbol(char* key, char* value);
+  int dcli_get_symbol_by_index(int index, char* key, char* value);
+  int dcli_get_symbol_cmd(char* key, char* value);
+  int dcli_define_symbol(char* key, char* arg1, char* arg2, char* arg3);
+  int dcli_toupper(char* str_upper, char* str);
+  char* dcli_pwr_dir(const char* dir);
+  int dcli_wildcard(char* wildname, char* name);
+  int dcli_read_line(char* line, int maxsize, FILE* file);
+  int dcli_search_line_in_file(FILE* file, const char* target_line, const char* location, char* error_line,
+                               int* error_line_number);
+  unsigned int dcli_random();
 
-/* Functions in module co_dcli_file */
+  /* Functions in module co_dcli_file */
 
-void dcli_set_default_directory(char* dir);
-int dcli_get_defaultfilename(
-    const char* inname, char* outname, const char* ext);
-int dcli_replace_env(const char* str, char* newstr);
-char* dcli_fgetname(FILE* fp, char* name, char* def_name);
-int dcli_translate_filename(char* out, const char* in);
-pwr_tStatus dcli_file_time(char* filename, pwr_tTime* time);
-pwr_tStatus dcli_file_ctime(char* filename, pwr_tTime* time);
-void dcli_save_file_versions(char* fname);
+  void dcli_set_default_directory(char* dir);
+  int dcli_get_defaultfilename(const char* inname, char* outname, const char* ext);
+  int dcli_replace_env(const char* str, char* newstr);
+  char* dcli_fgetname(FILE* fp, char* name, char* def_name);
+  int dcli_translate_filename(char* out, const char* in);
+  pwr_tStatus dcli_file_time(char* filename, pwr_tTime* time);
+  pwr_tStatus dcli_file_ctime(char* filename, pwr_tTime* time);
+  void dcli_save_file_versions(char* fname);
 
-/* Functions in module co_dcli_dir */
+  /* Functions in module co_dcli_dir */
 
 #define DCLI_DIR_SEARCH_NEXT 0
 #define DCLI_DIR_SEARCH_INIT 1
 #define DCLI_DIR_SEARCH_END 2
 
-int dcli_search_file(const char* file_name, char* found_file, int new_search);
+  int dcli_search_file(const char* file_name, char* found_file, int new_search);
 
-int dcli_search_directory(
-    const char* file_name, char* found_file, int new_search);
+  int dcli_search_directory(const char* file_name, char* found_file, int new_search);
 
-int dcli_get_files(
-    char* dir, char* pattern, pwr_tString40* filelist[], int* filecnt);
+  int dcli_get_files(char* dir, char* pattern, pwr_tString40* filelist[], int* filecnt);
 
-int dcli_parse_filename(const char* filename, char* dev, char* dir, char* file,
-    char* type, int* version);
+  int dcli_parse_filename(const char* filename, char* dev, char* dir, char* file, char* type, int* version);
 
-int dcli_create_directory(char* path);
-int dcli_delete_directory(char* path, int force);
+  int dcli_create_directory(char* path);
+  int dcli_delete_directory(char* path, int force);
 
-/* Functions i module co_dcli_struct */
+  /* Functions i module co_dcli_struct */
 
-typedef struct s_element {
-  int type;
-  int size;
-  int elements;
-  int alignment;
-  int undefined;
-  char typestr[40];
-  char struct_begin;
-  char name[256];
-  unsigned int mask;
-  char filename[120];
-  int line_nr;
-  struct s_element* next;
-  struct s_element* prev;
-} dcli_sStructElement;
+  typedef struct s_element
+  {
+    int type;
+    int size;
+    int elements;
+    int alignment;
+    int undefined;
+    char typestr[40];
+    char struct_begin;
+    char name[256];
+    unsigned int mask;
+    char filename[120];
+    int line_nr;
+    struct s_element* next;
+    struct s_element* prev;
+  } dcli_sStructElement;
 
-int dcli_readstruct_find(
-    char* filename, char* struct_name, dcli_sStructElement** e_list);
+  int dcli_readstruct_find(char* filename, char* struct_name, dcli_sStructElement** e_list);
 
-void dcli_readstruct_free(dcli_sStructElement* e_list);
+  void dcli_readstruct_free(dcli_sStructElement* e_list);
 
-int dcli_readstruct_get_message(char** message);
+  int dcli_readstruct_get_message(char** message);
 
-void dcli_execute_flavour_if_exists(char* argv[], const char* flavour);
+  void dcli_execute_flavour_if_exists(char* argv[], const char* flavour);
 
-void dcli_execute_flavour(char* argv[]);
+  void dcli_execute_flavour(char* argv[]);
 
 #ifdef __cplusplus
 }

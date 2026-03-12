@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -404,7 +404,7 @@ ProfinetDevice::ProfinetDevice(pugi::xml_node&& p_pn_device)
 
   for (pugi::xml_node& slot : p_pn_device.children("Slot"))
   {
-    m_slot_list.push_back(ProfinetSlot(std::move(slot)));
+    m_slot_map.emplace(slot.attribute("SlotNumber").as_uint(), ProfinetSlot(std::move(slot)));
   }
 
   for (pugi::xml_node& channel_diag : p_pn_device.child("ChannelDiagnostics").children("ChannelDiag"))
@@ -426,9 +426,9 @@ void ProfinetDevice::build(pugi::xml_node&& p_pn_device) const
 
   m_NetworkSettings.build(p_pn_device.append_child("NetworkSettings"));
 
-  for (auto const& slot : m_slot_list)
+  for (auto const& slot : m_slot_map)
   {
-    slot.build(p_pn_device.append_child("Slot"));
+    slot.second.build(p_pn_device.append_child("Slot"));
   }
 
   // API Section

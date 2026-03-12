@@ -9,7 +9,7 @@
 
 Name: pwrrt
 Summary: ProviewR runtime environment
-Version: 5.8.0
+Version: 7.0.0
 Release: 1
 License: GPL
 BuildArch: x86_64
@@ -40,7 +40,7 @@ For more information please see www.proview.se.
   echo "<b>Proview V%{version}"
   echo "Version V%{version}-%{release}"
   echo ""
-  echo "Copyright © 2005-${d:0:4} SSAB EMEA AB"
+  echo "Copyright ï¿½ 2005-${d:0:4} SSAB EMEA AB"
   echo ""
   echo "This program is free software; you can redistribute it and/or"
   echo "modify it under the terms of the GNU General Public License as"
@@ -74,9 +74,6 @@ co_convert -t -d %{buildroot}/usr/pwrrt/doc %{buildroot}/usr/pwrrt/exe/xtt_versi
   echo "<meta http-equiv=\"Refresh\" content=\"5;../xtt_version_help_version.html\">"
   echo "</head></html>"
 } > %{buildroot}/usr/pwrrt/doc/en_us/package_version.html
-
-# Print rt version file
-echo "Version: %{version}-%{release}" > %{buildroot}/usr/pwrrt/exe/rt_version.dat
 
 %clean
 

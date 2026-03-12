@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -37,13 +37,19 @@
 #ifndef rt_xtt_main_h
 #define rt_xtt_main_h
 
+#include <signal.h>
+
 /* rt_xtt_main.h -- Simple navigator */
+
+extern volatile sig_atomic_t g_xtt_exit_process;
 
 #include "xtt_xnav.h"
 
 class CoWow;
 class CoWowTimer;
 class XttMethodToolbar;
+
+void signal_handler(int);
 
 class Xtt {
 public:

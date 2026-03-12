@@ -43,7 +43,7 @@ main()
 
   x1 = x0 + 1;
   y1 = y0 + 1;
-  id = CreateText("StatusColor", x1, y1, 4, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("StatusColor", x1, y1, 4, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # Status indicator
   ym = 2.4;
@@ -71,7 +71,7 @@ main()
   ym += 3.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Use color theme", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Use color theme", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # Status indicator
   ym += 1;

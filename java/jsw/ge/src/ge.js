@@ -15099,9 +15099,9 @@ function DynPulldownMenu(dyn) {
           }
 
           // Get fillcolor, and textattributes from object
-          var text_drawtype = 0,
-            text_color = 0,
-            bg_color = 0;
+          var text_drawtype = 0;
+          var text_color = 0;
+          var bg_color = 0;
           var text_size = 0;
           var sts;
           var scale = 1;
@@ -15111,7 +15111,7 @@ function DynPulldownMenu(dyn) {
           if ((sts & 1) == 0) {
             text_size = 3;
             text_drawtype = Glow.eDrawType_TextHelvetica;
-            text_font = Glow.eFont_LucidaSans;
+            text_font = Glow.eFont_Helvetica;
             text_color = Glow.eDrawType_Line;
             bg_color = Glow.eDrawType_LightGray;
           } else if (
@@ -17068,7 +17068,7 @@ function DynMethodPulldownMenu(dyn) {
     if ((sts & 1) == 0) {
       text_size = 3;
       text_drawtype = Glow.eDrawType_TextHelvetica;
-      text_font = Glow.eFont_LucidaSans;
+      text_font = Glow.eFont_Helvetica;
       text_color = Glow.eDrawType_Line;
       bg_color = Glow.eDrawType_LightGray;
     } else if (

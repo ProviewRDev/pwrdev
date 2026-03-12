@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -159,23 +159,23 @@ int goen_create_nodetype_m3(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
   switch (text_attribute) {
   case 0:
     text_size = GOEN_F_TEXTSIZE;
-    text_type = flow_eDrawType_TextHelveticaBold;
+    text_type = flow_eDrawType_TextRobotoBold;
     break;
   case 1:
     text_size = GOEN_F_TEXTSIZE;
-    text_type = flow_eDrawType_TextHelvetica;
+    text_type = flow_eDrawType_TextRoboto;
     break;
   case 2:
     text_size = 5;
-    text_type = flow_eDrawType_TextHelveticaBold;
+    text_type = flow_eDrawType_TextRobotoBold;
     break;
   case 3:
     text_size = 8;
-    text_type = flow_eDrawType_TextHelveticaBold;
+    text_type = flow_eDrawType_TextRobotoBold;
     break;
   default:
     text_size = GOEN_F_TEXTSIZE;
-    text_type = flow_eDrawType_TextHelveticaBold;
+    text_type = flow_eDrawType_TextRobotoBold;
     break;
   }
   switch (frame_attribute) {

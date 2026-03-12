@@ -43,13 +43,13 @@ main()
 
   xm = x0 + 1;
   ym = y0 + 1;
-  id = CreateText("ToolTip", xm, ym, 4, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("ToolTip", xm, ym, 4, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # Indicator with tooltip
   ym += 1.6;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Indicator with tooltip 'This is an indicator'", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Indicator with tooltip 'This is an indicator'", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   x1 = xm;
   y1 = ym + 0.8;

@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -152,7 +152,7 @@ int goen_create_nodetype_m14(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
   if (EVEN(sts))
     return sts;
 
-  flow_MeasureAnnotText(ctx, parvalue, flow_eDrawType_TextHelvetica,
+  flow_MeasureAnnotText(ctx, parvalue, flow_eDrawType_TextRoboto,
       GOEN_F_TEXTSIZE, flow_eAnnotType_MultiLine, &code_width, &code_height,
       &annot_rows);
   free(parvalue);
@@ -213,7 +213,7 @@ int goen_create_nodetype_m14(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
 
   /* Draw the objname */
   flow_AddText(nc_pid, graphbody->graphname, f_namepos,
-      f_repeat / 2 + f_strheight / 2 - f_yoffs, flow_eDrawType_TextHelvetica,
+      f_repeat / 2 + f_strheight / 2 - f_yoffs, flow_eDrawType_TextRoboto,
       GOEN_F_TEXTSIZE);
 
   /* Draw the leadnames and lines */
@@ -228,7 +228,7 @@ int goen_create_nodetype_m14(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
       if ((*inmask_pointer & inpointmask) != 0) {
         flow_AddText(nc_pid, bodydef[i].Par->Input.Graph.GraphName, f_nameoffin,
             f_repeat * (1.5 + i_inpoints) + f_strheight / 2 - f_yoffs,
-            flow_eDrawType_TextHelvetica, 2);
+            flow_eDrawType_TextRoboto, 2);
 
         if ((*invertmask_pointer & inpointmask) == 0) {
           flow_AddLine(nc_pid, 0, f_repeat * (1.5 + i_inpoints) - f_yoffs,
@@ -259,7 +259,7 @@ int goen_create_nodetype_m14(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
           flow_AddText(nc_pid, bodydef[i].Par->Output.Graph.GraphName,
               f_width - f_nameoffout - f_namelength,
               f_repeat * (1.5 + i_outpoints) + f_strheight / 2 - f_yoffs,
-              flow_eDrawType_TextHelvetica, 2);
+              flow_eDrawType_TextRoboto, 2);
         }
         flow_AddLine(nc_pid, f_width, f_repeat * (1.5 + i_outpoints) - f_yoffs,
             f_width + f_pinlength, f_repeat * (1.5 + i_outpoints) - f_yoffs,
@@ -289,11 +289,11 @@ int goen_create_nodetype_m14(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
     f_node_width = 6;
   flow_AddAnnot(nc_pid, f_strlength,
       f_height - (f_repeat - f_strheight) / 2 - f_yoffs, 2,
-      flow_eDrawType_TextHelvetica, GOEN_F_TEXTSIZE, flow_eAnnotType_OneLine,
+      flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE, flow_eAnnotType_OneLine,
       flow_mDisplayLevel_1);
   flow_AddAnnot(nc_pid, f_strlength, f_height - (f_repeat - f_strheight) / 2
           - f_repeat - code_height + code_height / annot_rows - f_yoffs,
-      0, flow_eDrawType_TextHelvetica, GOEN_F_TEXTSIZE,
+      0, flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE,
       flow_eAnnotType_MultiLine, flow_mDisplayLevel_1);
 
   /* Add execute order display */
@@ -305,7 +305,7 @@ int goen_create_nodetype_m14(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
       flow_mDisplayLevel_2);
   flow_AddAnnot(nc_pid, f_width - GOEN_DISPLAYNODEWIDTH + f_strlength,
       (GOEN_DISPLAYNODEHEIGHT + f_strheight) / 2.0 - f_yoffs,
-      GOEN_DISPLAYNODE_ANNOT, flow_eDrawType_TextHelvetica, GOEN_F_TEXTSIZE,
+      GOEN_DISPLAYNODE_ANNOT, flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE,
       flow_eAnnotType_OneLine, flow_mDisplayLevel_2);
 
   free((char*)bodydef);

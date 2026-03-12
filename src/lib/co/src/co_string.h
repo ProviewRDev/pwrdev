@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -48,7 +48,7 @@
     strcmp returns 0 (i.e. false) if the strings are equal, which is not obvious
     streq(a,b) is more readable and easier to understand than strcmp(a,b) == 0
  */
-#define streq(a,b) (strcmp((a),(b)) == 0)
+#define streq(a, b) (strcmp((a), (b)) == 0)
 
 /*! \def str_StartsWith(str,prefix)
     \brief Checks if the \a str starts with the substring \a prefix
@@ -56,101 +56,103 @@
 #define str_StartsWith(str, prefix) (strncmp(str, prefix, strlen(prefix)) == 0)
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-/*! \fn char* str_ToLower(char* dst, const char* src)
-    \brief Converts the string \a src to lower case,
-    puts the result in \a dst and returns \a dst
+  /*! \fn char* str_ToLower(char* dst, const char* src)
+      \brief Converts the string \a src to lower case,
+      puts the result in \a dst and returns \a dst
 
-    Handles all ISO 8859-1 characters, not only ASCII.
-    If src is NULL, dst is used also as input string.
+      Handles all ISO 8859-1 characters, not only ASCII.
+      If src is NULL, dst is used also as input string.
 
-    \param dst	Output string.
-    \param src	Input string.
-    \return 	Returns dst.
-*/
-char* str_ToLower(char* dst, const char* src);
+      \param dst	Output string.
+      \param src	Input string.
+      \return 	Returns dst.
+  */
+  char* str_ToLower(char* dst, const char* src);
 
-/*! \fn char* str_ToUpper(char* dst, const char* src)
-    \brief Converts the string \a src to upper case,
-    puts the result in \a dst and returns \a dst
+  /*! \fn char* str_ToUpper(char* dst, const char* src)
+      \brief Converts the string \a src to upper case,
+      puts the result in \a dst and returns \a dst
 
-    Handles all ISO 8859-1 characters, not only ASCII.
-    If src is NULL, dst is used also as input string.
+      Handles all ISO 8859-1 characters, not only ASCII.
+      If src is NULL, dst is used also as input string.
 
-    \param dst	Output string.
-    \param src	Input string.
-    \return 	Returns dst.
-*/
-char* str_ToUpper(char* dst, const char* src);
+      \param dst	Output string.
+      \param src	Input string.
+      \return 	Returns dst.
+  */
+  char* str_ToUpper(char* dst, const char* src);
 
-/*! \fn int str_NoCaseStrcmp(const char* s, const char* t)
-    \brief Compares two strings \a s and \a t, disregarding their case.
+  /*! \fn int str_NoCaseStrcmp(const char* s, const char* t)
+      \brief Compares two strings \a s and \a t, disregarding their case.
 
-     This routine works only on alphabetic characters.
-     It works on the standard ascii a-z and on the
-     DEC multinational extensions.
+       This routine works only on alphabetic characters.
+       It works on the standard ascii a-z and on the
+       DEC multinational extensions.
 
-     The function exploits the fact that only bit 5 changes
-     when you change the case of a character.
+       The function exploits the fact that only bit 5 changes
+       when you change the case of a character.
 
-     \return The uppercase offset between the two first differing characters.
-*/
-int str_NoCaseStrcmp(const char* s, const char* t);
+       \return The uppercase offset between the two first differing characters.
+  */
+  int str_NoCaseStrcmp(const char* s, const char* t);
 
-/*! \fn int str_NoCaseStrncmp(const char* s, const char* t, size_t n)
-    \brief Compares the first n (at most) characters of two strings
-    \a s and \a t, disregarding their case.
+  /*! \fn int str_NoCaseStrncmp(const char* s, const char* t, size_t n)
+      \brief Compares the first n (at most) characters of two strings
+      \a s and \a t, disregarding their case.
 
-    This routine works only on alphabetic characters.
-    It works on the standard ascii a-z and on the
-    DEC multinational extensions.
+      This routine works only on alphabetic characters.
+      It works on the standard ascii a-z and on the
+      DEC multinational extensions.
 
-    The function exploits the fact that only bit 5 changes
-    when you change the case of a character.
+      The function exploits the fact that only bit 5 changes
+      when you change the case of a character.
 
-    \return The uppercase offset between the two first differing characters.
-*/
-int str_NoCaseStrncmp(const char* s, const char* t, size_t n);
+      \return The uppercase offset between the two first differing characters.
+  */
+  int str_NoCaseStrncmp(const char* s, const char* t, size_t n);
 
-/*! \fn char* str_Strcpy(char* dst, const char* src)
-    \brief Copies \a src into \a dst character by character to allow
-    overlapping source and destination buffers.
-*/
-char* str_Strcpy(char* dst, const char* src);
+  /*! \fn char* str_Strcpy(char* dst, const char* src)
+      \brief Copies \a src into \a dst character by character to allow
+      overlapping source and destination buffers.
+  */
+  char* str_Strcpy(char* dst, const char* src);
 
-/*! \fn char* str_Strncpy(char* dst, const char* src, size_t n)
-    \brief Copies the first n (at most) characters of \a src into \a dst
-    character by character to allow overlapping source and destination buffers.
-*/
-char* str_Strncpy(char* dst, const char* src, size_t n);
+  /*! \fn char* str_Strncpy(char* dst, const char* src, size_t n)
+      \brief Copies the first n (at most) characters of \a src into \a dst
+      character by character to allow overlapping source and destination buffers.
+  */
+  char* str_Strncpy(char* dst, const char* src, size_t n);
 
-/*! \fn int str_StrncpyCutOff(char* dst, const char* src, size_t n, int cutleft)
-    \brief Copies the first n (at most) characters of \a src into \a dst
-    character by character to allow overlapping source and destination buffers.
-    Cuts of the string if it is to long, and replaces the ending with '...'
+  /*! \fn int str_StrncpyCutOff(char* dst, const char* src, size_t n, int cutleft)
+      \brief Copies the first n (at most) characters of \a src into \a dst
+      character by character to allow overlapping source and destination buffers.
+      Cuts of the string if it is to long, and replaces the ending with '...'
 
-    For example str_StrncpyCutOff(dst, '0123456789', 8) will return '0123...',
-    which is 8 characters including the terminating NULL character.
+      For example str_StrncpyCutOff(dst, '0123456789', 8) will return '0123...',
+      which is 8 characters including the terminating NULL character.
 
-    \param src Input string.
-    \param dst Output string.
-    \param n Size of out string.
-    \param cutleft Whether to cut the first characters of the string instead of the last.
-    \return 1 if the string was cut off, else 0.
-*/
-int str_StrncpyCutOff(char* dst, const char* src, size_t n, int cutleft);
+      \param src Input string.
+      \param dst Output string.
+      \param n Size of out string.
+      \param cutleft Whether to cut the first characters of the string instead of the last.
+      \return 1 if the string was cut off, else 0.
+  */
+  int str_StrncpyCutOff(char* dst, const char* src, size_t n, int cutleft);
 
-/*! \fn int str_trim(char* dst, const char* src)
-    \brief Copies \a src to \a dst trimming leading and trailing whitespace
+  /*! \fn int str_trim(char* dst, const char* src)
+      \brief Copies \a src to \a dst trimming leading and trailing whitespace
 
-    For example: after str_trim(dst, '  test  '), dst will be 'test'.
+      For example: after str_trim(dst, '  test  '), dst will be 'test'.
 
-    \param src Input string.
-    \param dst Output string.
-*/
-void str_trim(char *dst, const char *src);
+      \param src Input string.
+      \param dst Output string.
+  */
+  void str_trim(char* dst, const char* src);
+  const char* str_trim_rtn(const char* src);
 
 #ifdef __cplusplus
 }

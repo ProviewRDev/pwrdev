@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -36,6 +36,7 @@
 
 #include <sys/stat.h>
 #include <errno.h>
+#include <stdio.h>
 #include <string>
 
 #include "pwr_names.h"
@@ -958,6 +959,7 @@ void pkg_node::fetchFiles(bool distribute)
 void pkg_node::copyPackage(char* pkg_name)
 {
   char pack_fname[200];
+  char pack_log[240];
   char bootnodes[10][80];
   int bootnode_cnt;
   int sts;
@@ -978,28 +980,23 @@ void pkg_node::copyPackage(char* pkg_name)
   {
     sprintf(pack_fname, "$pwrp_tmp/pkg_pack_%s.sh", m_name);
     dcli_translate_filename(pack_fname, pack_fname);
+    sprintf(pack_log, "$pwrp_tmp/pkg_copy_%s_%s.log", m_name, bootnodes[i]);
+    dcli_translate_filename(pack_log, pack_log);
     std::ofstream of(pack_fname);
-    if (m_dstatus & lfu_mDistrOpt_RSH)
-    {
-      // Use ftp and rsh
-      of << "cd $pwrp_load\n"
-         << "ftp -vin " << bootnodes[i] << " << EOF &>$pwrp_tmp/ftp_" << bootnodes[i] << ".log\n"
-         << "user " << m_user << " pwrp\n"
-         << "binary\n"
-         << "put " << pkg_name << '\n'
-         << "quit\n"
-         << "EOF\n"
-         << "rsh -l " << m_user << " " << bootnodes[i] << " \\$pwr_exe/pwr_pkg.sh -i " << pkg_name << '\n';
-    }
-    else
-    {
-      // Use scp and SSH
-      of << "#!/bin/bash\n"
-         << "set -eu" << '\n'
-         << "cd $pwrp_load\n"
-         << "scp " << pkg_name << " " << m_user << "@" << bootnodes[i] << ":" << '\n'
-         << "ssh " << m_user << "@" << bootnodes[i] << " \\$pwr_exe/pwr_pkg.sh -i " << pkg_name << '\n';
-    }
+    if (!of)
+      throw wb_error_str(std::string("Unable to open file \"") + pack_fname + "\"");
+
+    of << "#!/bin/sh\n"
+       << "set -eu" << '\n'
+       << "exec > " << pack_log << " 2>&1\n"
+       << "echo \"-- Distribute package " << pkg_name << " to " << bootnodes[i] << " with SSH\"\n"
+       << "date \"+-- Started %Y-%m-%d %H:%M:%S\"\n"
+       << "cd $pwrp_load\n"
+       << "echo \"-- Copy package with scp\"\n"
+       << "scp " << pkg_name << " " << m_user << "@" << bootnodes[i] << ":" << '\n'
+       << "echo \"-- Install package with ssh\"\n"
+       << "ssh " << m_user << "@" << bootnodes[i] << " \\$pwr_exe/pwr_pkg.sh -i " << pkg_name << '\n'
+       << "date \"+-- Finished %Y-%m-%d %H:%M:%S\"\n";
     of.close();
 
     // Execute the pack file
@@ -1008,18 +1005,17 @@ void pkg_node::copyPackage(char* pkg_name)
 
     if ((sts = system(cmd)))
     {
-      // For some reason errno is set to 0 (Success) when execution path is that from
-      // when you distribute a selected package. Even though it's the exact same script
-      // executing. If you choose a node errno is set appropriate to for instance
-      // resource not available which is the case when scp or ssh can't find a route to
-      // the host...
-      // TODO investigate why that is... Would be neat to use strerror instead of a
-      // general message like the one below...
-      throw co_error_str(std::string("Distribute command failed!"));
+      throw co_error_str(std::string("Distribute command failed for boot node \"")
+          + bootnodes[i] + "\" (status " + std::to_string(sts) + "), see "
+          + pack_log);
     }
     else
     {
-      wb_log::log(wlog_eCategory_CopyPackage, m_name, pkg_name);
+      char log_msg[320];
+
+      snprintf(log_msg, sizeof(log_msg), "%s via SSH to %s (log %s)", pkg_name,
+          bootnodes[i], pack_log);
+      wb_log::log(wlog_eCategory_CopyPackage, m_name, log_msg);
     }
   }
 }

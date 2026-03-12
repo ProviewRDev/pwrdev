@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -38,15 +38,18 @@
 #define co_error_h
 
 #include "co_status.h"
+#include <map>
 
-class co_error : public co_status {
+class co_error : public co_status
+{
 public:
   co_error();
   co_error(pwr_tStatus sts);
   virtual std::string what() const;
 };
 
-class co_error_str : public co_error {
+class co_error_str : public co_error
+{
   std::string m_error_str;
 
 public:
@@ -56,4 +59,20 @@ public:
   std::string what() const;
 };
 
+
+
+// Struct to represent error_reason (the innermost map)
+struct ErrorReason {
+    std::map<std::string, int> reason_map; // Error reason: string line and error code
+};
+
+// Struct to represent error_place (the middle map)
+struct ErrorPlace {
+    std::map<int, ErrorReason> place_map; // Error reason mapped by int keys, line number
+};
+
+// Struct to represent error_log (the outermost map)
+struct ErrorLog {
+    std::map<std::string, ErrorPlace> log_map; // Error places mapped by string keys, FileName
+};
 #endif

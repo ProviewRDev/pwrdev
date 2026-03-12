@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -42,7 +42,7 @@
 class FlowAnnot : public FlowArrayElem {
 public:
   FlowAnnot(FlowCtx* flow_ctx, double x = 0, double y = 0, int annot_num = 0,
-      flow_eDrawType d_type = flow_eDrawType_TextHelveticaBold, int t_size = 2,
+      flow_eDrawType d_type = flow_eDrawType_TextRobotoBold, int t_size = 2,
       flow_eAnnotType a_type = flow_eAnnotType_OneLine, int rel_pos = 0,
       flow_mDisplayLevel display_lev = flow_mDisplayLevel_1)
       : ctx(flow_ctx), number(annot_num), p(flow_ctx, x, y), draw_type(d_type),

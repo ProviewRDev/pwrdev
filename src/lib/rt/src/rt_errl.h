@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -37,21 +37,11 @@
 #ifndef rt_errl_h
 #define rt_errl_h
 
-#include "pwr.h"
-
-#if defined OS_FREEBSD || defined OS_MACOS
-#define LOG_QUEUE_NAME "/tmp/pwrlogqueue"
-#elif defined _POSIX_MESSAGE_PASSING
-#define LOG_QUEUE_NAME "/pwrlogqueue"
-#else
-#define LOG_QUEUE_NAME "/tmp/pwrlogqueue"
-#endif
-
-#define LOG_MAX_MSG_SIZE 256 /* length of logstring */
+#include "rt_errh_types.h"
 
 pwr_tStatus errl_Exit(void);
 void errl_Init(const char* termname,
-    void (*log_cb)(void*, char*, char, pwr_tStatus, int, int), void* userdata);
+               void (*log_cb)(void*, char*, char, pwr_tStatus, errh_eAnix, errh_eMsgType), void* ctx);
 void errl_SetTerm(const char* termname);
 void errl_SetFile(const char* filename);
 

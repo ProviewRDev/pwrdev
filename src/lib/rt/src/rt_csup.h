@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -41,7 +41,8 @@
 
 #include "rt_lst.h"
 
-typedef struct {
+typedef struct
+{
   lst_sEntry le;
   pwr_sClass_CycleSup* o;
   pwr_sAttrRef aref;
@@ -51,7 +52,7 @@ typedef struct {
 
 void csup_Exit(pwr_tStatus*, lst_sEntry*);
 lst_sEntry* csup_Init(pwr_tStatus*, pwr_tObjid, float);
-int csup_Exec(
-    pwr_tStatus*, lst_sEntry*, pwr_tDeltaTime*, pwr_tDeltaTime*, pwr_tTime*);
+int csup_Exec(pwr_tStatus* status, lst_sEntry* lh, pwr_tDeltaTime* next_start, pwr_tDeltaTime* stop,
+              pwr_tTime* now, pwr_tObjid* delayed_thread_objid);
 
 #endif

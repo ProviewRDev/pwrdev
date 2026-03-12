@@ -56,11 +56,7 @@ main()
         sprintf(text, "Courier%d", j);
         font = eFont_Courier;
       endif
-      if (i == 4)
-        sprintf(text, "Lucida%d", j);
-        font = eFont_LucidaSans;
-      endif
-
+      
       id = CreateText(text, x, y, j, font, 0, eDrawType_Color1);
       y += delta;
       id = CreateText(text, x, y, j, font, 1, eDrawType_Color1);

@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -38,8 +38,6 @@
 #include <unistd.h>
 #include <net/if.h>
 
-#include <fstream>
-
 #include "pwr_version.h"
 #include "pwr_baseclasses.h"
 
@@ -62,11 +60,10 @@
 #define APPL_OFFSET 20
 #define APPL_SIZE 20
 
-class status_server {
-  public:
-  status_server() : m_grant_all(true), m_config(0), m_node(0), qid(qcom_cNQid)
-  {
-  }
+class status_server
+{
+public:
+  status_server() : m_grant_all(true), m_config(0), m_node(0), qid(qcom_cNQid) {}
 
   bool m_grant_all;
   pwr_sClass_StatusServerConfig* m_config;
@@ -92,20 +89,23 @@ int main(int argc, char* argv[])
   int restarts = 10;
   int ignore_config = 0;
 
-  for (int i = 1; i < argc; i++) {
+  for (int i = 1; i < argc; i++)
+  {
     if (streq(argv[i], "-i"))
       ignore_config = 1;
   }
 
   sts = gdh_Init("statusserver59");
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     exit(sts);
   }
 
   errh_Init("status_server", errh_eAnix_statussrv);
   errh_SetStatus(PWR__SRVSTARTUP);
 
-  if (!qcom_Init(&sts, 0, "statusserver59")) {
+  if (!qcom_Init(&sts, 0, "statusserver59"))
+  {
     errh_Fatal("qcom_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -113,14 +113,16 @@ int main(int argc, char* argv[])
 
   qAttr.type = qcom_eQtype_private;
   qAttr.quota = 100;
-  if (!qcom_CreateQ(&sts, &qid, &qAttr, "events")) {
+  if (!qcom_CreateQ(&sts, &qid, &qAttr, "events"))
+  {
     errh_Fatal("qcom_CreateQ, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
   }
 
   qini = qcom_cQini;
-  if (!qcom_Bind(&sts, &qid, &qini)) {
+  if (!qcom_Bind(&sts, &qid, &qini))
+  {
     errh_Fatal("qcom_Bind(Qini), %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(-1);
@@ -131,40 +133,48 @@ int main(int argc, char* argv[])
 
   // Link to $Node object
   sts = gdh_GetNodeObject(0, &node_oid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_SetStatus(sts);
     exit(-1);
   }
 
   sts = gdh_ObjidToPointer(node_oid, (void**)&statussrv->m_node);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_SetStatus(sts);
     exit(-1);
   }
 
   // Get application names
-  for (int i = 0; i < APPL_SIZE; i++) {
-    if (cdh_ObjidIsNotNull(statussrv->m_node->ProcObject[i + APPL_OFFSET])) {
-      sts = gdh_ObjidToName(statussrv->m_node->ProcObject[i + APPL_OFFSET],
-          statussrv->m_appl[i], sizeof(statussrv->m_appl[0]), cdh_mName_object);
+  for (int i = 0; i < APPL_SIZE; i++)
+  {
+    if (cdh_ObjidIsNotNull(statussrv->m_node->ProcObject[i + APPL_OFFSET]))
+    {
+      sts = gdh_ObjidToName(statussrv->m_node->ProcObject[i + APPL_OFFSET], statussrv->m_appl[i],
+                            sizeof(statussrv->m_appl[0]), cdh_mName_object);
       if (EVEN(sts))
         strcpy(statussrv->m_appl[i], "");
-    } else
+    }
+    else
       strcpy(statussrv->m_appl[i], "");
   }
 
-  if (!ignore_config) {
+  if (!ignore_config)
+  {
     // Get StatusServerConfig object
     pwr_tOid config_oid;
     sts = gdh_GetClassList(pwr_cClass_StatusServerConfig, &config_oid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       // Not configured
       errh_SetStatus(0);
       exit(sts);
     }
 
     sts = gdh_ObjidToPointer(config_oid, (void**)&statussrv->m_config);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       errh_SetStatus(sts);
       exit(sts);
     }
@@ -172,22 +182,7 @@ int main(int argc, char* argv[])
     aproc_RegisterObject(config_oid);
   }
 
-  // Read version file
-
-  char buff[100];
-  pwr_tFileName fname;
-
-  dcli_translate_filename(fname, "$pwr_exe/rt_version.dat");
-
-  std::ifstream fp(fname);
-
-  if (fp) {
-    fp.getline(buff, sizeof(buff));
-    strcpy(statussrv->version, "V");
-    strcat(statussrv->version, &buff[9]);
-    fp.close();
-  } else
-    strcpy(statussrv->version, "");
+  strncpy(statussrv->version, pwrv_cPwrVersionStr, sizeof(statussrv->version));
 
   // Create a cyclic tread to receive swap and terminate events
   pthread_t thread;
@@ -198,22 +193,29 @@ int main(int argc, char* argv[])
   soap_init(&soap);
   statussrv_soap = &soap;
 
-  for (int i = 0; i < restarts + 1; i++) {
+  for (int i = 0; i < restarts + 1; i++)
+  {
     m = soap_bind(&soap, NULL, 18084, 100);
-    if (m < 0) {
-      if (i == restarts) {
+    if (m < 0)
+    {
+      if (i == restarts)
+      {
         soap_print_fault(&soap, stderr);
         break;
       }
       printf("Soap bind failed, retrying...\n");
       sleep(10);
-    } else {
+    }
+    else
+    {
       // fprintf( stderr, "Socket connection successfull: master socket = %d\n",
       // m);
 
-      for (int i = 1;; i++) {
+      for (int i = 1;; i++)
+      {
         s = soap_accept(&soap);
-        if (s < 0) {
+        if (s < 0)
+        {
           soap_print_fault(&soap, stderr);
           break;
         }
@@ -226,7 +228,7 @@ int main(int argc, char* argv[])
         if (soap_serve(&soap) != SOAP_OK) // Process RPC request
           soap_print_fault(&soap, stderr);
         soap_destroy(&soap); // Clean up class instances
-        soap_end(&soap); // Clean up everything and close socket
+        soap_end(&soap);     // Clean up everything and close socket
       }
     }
   }
@@ -243,25 +245,34 @@ static void* statussrv_cyclic(void* arg)
   qcom_sGet get;
   pwr_tStatus sts;
 
-  for (;;) {
+  for (;;)
+  {
     time_GetTime(&current_time);
     aproc_TimeStamp(((float)tmo) / 1000, 5);
 
     get.maxSize = sizeof(mp);
     get.data = mp;
     qcom_Get(&sts, &statussrv->qid, &get, tmo);
-    if (sts == QCOM__TMO || sts == QCOM__QEMPTY) {
+    if (sts == QCOM__TMO || sts == QCOM__QEMPTY)
+    {
       // Do nothing...
-    } else {
+    }
+    else
+    {
       ini_mEvent new_event;
       qcom_sEvent* ep = (qcom_sEvent*)get.data;
 
       new_event.m = ep->mask;
-      if (new_event.b.oldPlcStop) {
+      if (new_event.b.oldPlcStop)
+      {
         errh_SetStatus(PWR__SRVRESTART);
-      } else if (new_event.b.swapDone) {
+      }
+      else if (new_event.b.swapDone)
+      {
         errh_SetStatus(PWR__SRUN);
-      } else if (new_event.b.terminate) {
+      }
+      else if (new_event.b.terminate)
+      {
         // if ( statussrv_soap)
         //   soap_done( statussrv_soap);
         exit(0);
@@ -278,9 +289,8 @@ void statussrv_GetText(pwr_tStatus sts, char* buf, int size)
     msg_GetText(sts, buf, size);
 }
 
-SOAP_FMAC5 int SOAP_FMAC6 __s0__GetStatus(struct soap* soap,
-    _s0__GetStatus* s0__GetStatus,
-    _s0__GetStatusResponse* s0__GetStatusResponse)
+SOAP_FMAC5 int SOAP_FMAC6 __s0__GetStatus(struct soap* soap, _s0__GetStatus* s0__GetStatus,
+                                          _s0__GetStatusResponse* s0__GetStatusResponse)
 {
   pwr_tTime current_time;
   char msg[200];
@@ -288,10 +298,10 @@ SOAP_FMAC5 int SOAP_FMAC6 __s0__GetStatus(struct soap* soap,
 
   time_GetTime(&current_time);
 
-  if (s0__GetStatus->ClientRequestHandle) {
+  if (s0__GetStatus->ClientRequestHandle)
+  {
     s0__GetStatusResponse->ClientRequestHandle = soap_new_std__string(soap, -1);
-    s0__GetStatusResponse->ClientRequestHandle->assign(
-        *s0__GetStatus->ClientRequestHandle);
+    s0__GetStatusResponse->ClientRequestHandle->assign(*s0__GetStatus->ClientRequestHandle);
   }
 
   if (!streq(statussrv->version, ""))
@@ -303,58 +313,47 @@ SOAP_FMAC5 int SOAP_FMAC6 __s0__GetStatus(struct soap* soap,
   s0__GetStatusResponse->SystemStatusStr.assign(msg);
   s0__GetStatusResponse->Description = soap_new_std__string(soap, -1);
   s0__GetStatusResponse->Description->assign(statussrv->m_node->Description);
-  time_AtoAscii(&statussrv->m_node->SystemTime, time_eFormat_DateAndTime,
-      timstr, sizeof(timstr));
+  time_AtoAscii(&statussrv->m_node->SystemTime, time_eFormat_DateAndTime, timstr, sizeof(timstr));
   s0__GetStatusResponse->SystemTime = soap_new_std__string(soap, -1);
   s0__GetStatusResponse->SystemTime->assign(timstr);
-  time_AtoAscii(&statussrv->m_node->BootTime, time_eFormat_DateAndTime, timstr,
-      sizeof(timstr));
+  time_AtoAscii(&statussrv->m_node->BootTime, time_eFormat_DateAndTime, timstr, sizeof(timstr));
   s0__GetStatusResponse->BootTime = soap_new_std__string(soap, -1);
   s0__GetStatusResponse->BootTime->assign(timstr);
-  time_AtoAscii(&statussrv->m_node->RestartTime, time_eFormat_DateAndTime,
-      timstr, sizeof(timstr));
+  time_AtoAscii(&statussrv->m_node->RestartTime, time_eFormat_DateAndTime, timstr, sizeof(timstr));
   s0__GetStatusResponse->RestartTime = soap_new_std__string(soap, -1);
   s0__GetStatusResponse->RestartTime->assign(timstr);
-  s0__GetStatusResponse->Restarts
-      = (int*)soap_malloc(soap, sizeof(s0__GetStatusResponse->Restarts));
+  s0__GetStatusResponse->Restarts = (int*)soap_malloc(soap, sizeof(s0__GetStatusResponse->Restarts));
   *s0__GetStatusResponse->Restarts = statussrv->m_node->Restarts;
 
   s0__GetStatusResponse->UserStatus1 = statussrv->m_config->UserStatus[0];
   s0__GetStatusResponse->UserStatusStr1 = soap_new_std__string(soap, -1);
-  s0__GetStatusResponse->UserStatusStr1->assign(
-      statussrv->m_config->UserStatusStr[0]);
+  s0__GetStatusResponse->UserStatusStr1->assign(statussrv->m_config->UserStatusStr[0]);
 
   s0__GetStatusResponse->UserStatus2 = statussrv->m_config->UserStatus[1];
   s0__GetStatusResponse->UserStatusStr2 = soap_new_std__string(soap, -1);
-  s0__GetStatusResponse->UserStatusStr2->assign(
-      statussrv->m_config->UserStatusStr[1]);
+  s0__GetStatusResponse->UserStatusStr2->assign(statussrv->m_config->UserStatusStr[1]);
 
   s0__GetStatusResponse->UserStatus3 = statussrv->m_config->UserStatus[2];
   s0__GetStatusResponse->UserStatusStr3 = soap_new_std__string(soap, -1);
-  s0__GetStatusResponse->UserStatusStr3->assign(
-      statussrv->m_config->UserStatusStr[2]);
+  s0__GetStatusResponse->UserStatusStr3->assign(statussrv->m_config->UserStatusStr[2]);
 
   s0__GetStatusResponse->UserStatus4 = statussrv->m_config->UserStatus[3];
   s0__GetStatusResponse->UserStatusStr4 = soap_new_std__string(soap, -1);
-  s0__GetStatusResponse->UserStatusStr4->assign(
-      statussrv->m_config->UserStatusStr[3]);
+  s0__GetStatusResponse->UserStatusStr4->assign(statussrv->m_config->UserStatusStr[3]);
 
   s0__GetStatusResponse->UserStatus5 = statussrv->m_config->UserStatus[4];
   s0__GetStatusResponse->UserStatusStr5 = soap_new_std__string(soap, -1);
-  s0__GetStatusResponse->UserStatusStr5->assign(
-      statussrv->m_config->UserStatusStr[4]);
+  s0__GetStatusResponse->UserStatusStr5->assign(statussrv->m_config->UserStatusStr[4]);
   return SOAP_OK;
 }
 
-SOAP_FMAC5 int SOAP_FMAC6 __s0__GetExtStatus(struct soap* soap,
-    _s0__GetExtStatus* s0__GetExtStatus,
-    _s0__GetExtStatusResponse* s0__GetExtStatusResponse)
+SOAP_FMAC5 int SOAP_FMAC6 __s0__GetExtStatus(struct soap* soap, _s0__GetExtStatus* s0__GetExtStatus,
+                                             _s0__GetExtStatusResponse* s0__GetExtStatusResponse)
 {
   char msg[200];
 
   if (s0__GetExtStatus->ClientRequestHandle)
-    s0__GetExtStatusResponse->ClientRequestHandle
-        = new std::string(*s0__GetExtStatus->ClientRequestHandle);
+    s0__GetExtStatusResponse->ClientRequestHandle = new std::string(*s0__GetExtStatus->ClientRequestHandle);
 
   s0__GetExtStatusResponse->ServerSts1 = statussrv->m_node->ProcStatus[0];
   statussrv_GetText(statussrv->m_node->ProcStatus[0], msg, sizeof(msg));
@@ -559,22 +558,22 @@ SOAP_FMAC5 int SOAP_FMAC6 __s0__GetExtStatus(struct soap* soap,
   return SOAP_OK;
 }
 
-SOAP_FMAC5 int SOAP_FMAC6 __s0__Restart(struct soap* soap,
-    _s0__Restart* s0__Restart, _s0__RestartResponse* s0__RestartResponse)
+SOAP_FMAC5 int SOAP_FMAC6 __s0__Restart(struct soap* soap, _s0__Restart* s0__Restart,
+                                        _s0__RestartResponse* s0__RestartResponse)
 {
   pwr_tCmd cmd = "rt_ini -r &";
 
-  if (s0__Restart->ClientRequestHandle) {
+  if (s0__Restart->ClientRequestHandle)
+  {
     s0__RestartResponse->ClientRequestHandle = soap_new_std__string(soap, -1);
-    s0__RestartResponse->ClientRequestHandle->assign(
-        *s0__Restart->ClientRequestHandle);
+    s0__RestartResponse->ClientRequestHandle->assign(*s0__Restart->ClientRequestHandle);
   }
   system(cmd);
   return SOAP_OK;
 }
 
-SOAP_FMAC5 int SOAP_FMAC6 __s0__XttStart(struct soap* soap,
-    _s0__XttStart* s0__XttStart, _s0__XttStartResponse* s0__XttStartResponse)
+SOAP_FMAC5 int SOAP_FMAC6 __s0__XttStart(struct soap* soap, _s0__XttStart* s0__XttStart,
+                                         _s0__XttStartResponse* s0__XttStartResponse)
 {
   char lang[40] = "";
   pwr_tOName opplace = "";
@@ -586,12 +585,12 @@ SOAP_FMAC5 int SOAP_FMAC6 __s0__XttStart(struct soap* soap,
   char sw_q[] = "-q";
   char sw_c[] = "-c";
   char sw_f[] = "-f";
-  char* argv[] = { prog, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  char* argv[] = {prog, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-  if (s0__XttStart->ClientRequestHandle) {
+  if (s0__XttStart->ClientRequestHandle)
+  {
     s0__XttStartResponse->ClientRequestHandle = soap_new_std__string(soap, -1);
-    s0__XttStartResponse->ClientRequestHandle->assign(
-        *s0__XttStart->ClientRequestHandle);
+    s0__XttStartResponse->ClientRequestHandle->assign(*s0__XttStart->ClientRequestHandle);
   }
   if (s0__XttStart->Language)
     strncpy(lang, s0__XttStart->Language->c_str(), sizeof(lang));
@@ -605,33 +604,35 @@ SOAP_FMAC5 int SOAP_FMAC6 __s0__XttStart(struct soap* soap,
   if (s0__XttStart->GUI)
     strncpy(gui, s0__XttStart->GUI->c_str(), sizeof(gui));
 
-  if (streq(gui, "motif"))
-    strcpy(sw_d, "-d");
-
   int i = 1;
   if (!streq(opplace, ""))
     argv[i++] = opplace;
   argv[i++] = sw_q;
   argv[i++] = sw_c;
-  if (!streq(display, "")) {
+  if (!streq(display, ""))
+  {
     argv[i++] = sw_d;
     argv[i++] = display;
   }
-  if (!streq(lang, "")) {
+  if (!streq(lang, ""))
+  {
     argv[i++] = sw_l;
     argv[i++] = lang;
   }
-  if (!streq(gui, "")) {
+  if (!streq(gui, ""))
+  {
     argv[i++] = sw_f;
     argv[i++] = gui;
   }
 
   pid_t pid = fork();
-  switch (pid) {
+  switch (pid)
+  {
   case -1:
     printf("rt_statussrv: fork failed\n");
     break;
-  case 0: {
+  case 0:
+  {
     // Child process
 
     // Socket open after fork, close
@@ -645,9 +646,8 @@ SOAP_FMAC5 int SOAP_FMAC6 __s0__XttStart(struct soap* soap,
   return SOAP_OK;
 }
 
-SOAP_FMAC5 int SOAP_FMAC6 __s0__RtMonStart(struct soap* soap,
-    _s0__RtMonStart* s0__RtMonStart,
-    _s0__RtMonStartResponse* s0__RtMonStartResponse)
+SOAP_FMAC5 int SOAP_FMAC6 __s0__RtMonStart(struct soap* soap, _s0__RtMonStart* s0__RtMonStart,
+                                           _s0__RtMonStartResponse* s0__RtMonStartResponse)
 {
   char lang[40] = "";
   char display[80] = "";
@@ -656,13 +656,12 @@ SOAP_FMAC5 int SOAP_FMAC6 __s0__RtMonStart(struct soap* soap,
   char sw_l[] = "-l";
   char sw_d[] = "--display";
   char sw_f[] = "-f";
-  char* argv[] = { prog, sw_d, 0, 0, 0, 0, 0 };
+  char* argv[] = {prog, sw_d, 0, 0, 0, 0, 0};
 
-  if (s0__RtMonStart->ClientRequestHandle) {
-    s0__RtMonStartResponse->ClientRequestHandle
-        = soap_new_std__string(soap, -1);
-    s0__RtMonStartResponse->ClientRequestHandle->assign(
-        *s0__RtMonStart->ClientRequestHandle);
+  if (s0__RtMonStart->ClientRequestHandle)
+  {
+    s0__RtMonStartResponse->ClientRequestHandle = soap_new_std__string(soap, -1);
+    s0__RtMonStartResponse->ClientRequestHandle->assign(*s0__RtMonStart->ClientRequestHandle);
   }
   if (s0__RtMonStart->Language)
     strncpy(lang, s0__RtMonStart->Language->c_str(), sizeof(lang));
@@ -674,25 +673,30 @@ SOAP_FMAC5 int SOAP_FMAC6 __s0__RtMonStart(struct soap* soap,
     strncpy(gui, s0__RtMonStart->GUI->c_str(), sizeof(gui));
 
   int i = 1;
-  if (!streq(display, "")) {
+  if (!streq(display, ""))
+  {
     argv[i++] = sw_d;
     argv[i++] = display;
   }
-  if (!streq(lang, "")) {
+  if (!streq(lang, ""))
+  {
     argv[i++] = sw_l;
     argv[i++] = lang;
   }
-  if (!streq(gui, "")) {
+  if (!streq(gui, ""))
+  {
     argv[i++] = sw_f;
     argv[i++] = gui;
   }
 
   pid_t pid = fork();
-  switch (pid) {
+  switch (pid)
+  {
   case -1:
     printf("rt_statussrv: fork failed\n");
     break;
-  case 0: {
+  case 0:
+  {
     // Child process
 
     // Socket open after fork, close

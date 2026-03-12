@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # ProviewR   Open Source Process Control.
-# Copyright (C) 2005-2024 SSAB EMEA AB.
+# Copyright (C) 2005-2026 SSAB EMEA AB.
 #
 # This file is part of ProviewR.
 #
@@ -93,7 +93,7 @@ pwrc_get_variables()
     if [ -z $pwr_dbversion ]; then
       echo "Unable to get pwr db version"
     fi
-    pwr_dbversion=${pwr_dbversion:1:3}
+    pwr_dbversion=$(echo "$pwr_dbversion" | tr -d '"')
   fi
 }
 

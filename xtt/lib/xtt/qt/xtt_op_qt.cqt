@@ -1264,7 +1264,7 @@ void OpQt::set_color_theme(int idx)
 
 void OpQt::set_text_size()
 {
-  QFont fd("Lucida Sans", FONT_SCALE * (text_size + 2));
+  QFont fd("Helvetica", FONT_SCALE * (text_size + 2));
 
   for (unsigned int i = 0; i < 25; i++) {
     if (appl_buttons[i]) {

@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -45,15 +45,15 @@ typedef struct _io_sPnRackLocal
   unsigned short bytes_of_output;
   unsigned char* inputs;
   unsigned char* outputs;
-  void* userdata;
+  //  void* userdata;
   unsigned int start_time;
   unsigned int start_cnt;
 } io_sPnRackLocal;
 
 typedef struct _io_sPnCardLocal
 {
-  unsigned int input_area_size;
-  unsigned int output_area_size;
+  // unsigned int input_area_size;
+  // unsigned int output_area_size;
   unsigned char* input_area;
   unsigned char* output_area;
 } io_sPnCardLocal;

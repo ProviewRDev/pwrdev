@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -37,227 +37,104 @@
 #ifndef rt_errh_h
 #define rt_errh_h
 
-#include "rt_qcom.h"
-#include "rt_errl.h"
+#include "rt_errh_types.h"
+#include "co_log_severity.h"
 
 #if defined __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-/*! \file rt_errh.h
-    \brief Include file for \ref Errh.
-*/
+  /*! \file rt_errh.h
+      \brief Include file for \ref Errh.
+  */
 
-/** \addtogroup Errh */
-/** @{ */
+  /** \addtogroup Errh */
+  /** @{ */
 
 #ifndef errh_Bugcheck
-#define errh_Bugcheck(sts, str)                                                \
-  (errh_Fatal("pwr bugcheck: <%s>, in file %s, at line %d\n%m", (str),         \
-       __FILE__, __LINE__, sts),                                               \
-      (exit(sts)))
+#define errh_Bugcheck(sts, str)                                                                              \
+  (errh_Fatal("pwr bugcheck: <%s>, in file %s, at line %d\n%m", (str), __FILE__, __LINE__, sts), (exit(sts)))
 #endif
 
 #ifndef errh_ReturnOrBugcheck
-#define errh_ReturnOrBugcheck(a, sts, lsts, str)                               \
-  return (                                                                     \
-      ((long int)(sts)                                                         \
-              ? ((*sts) = (lsts))                                              \
-              : (EVEN(lsts) ? (errh_Bugcheck(lsts, (str)), (lsts)) : (lsts))), \
+#define errh_ReturnOrBugcheck(a, sts, lsts, str)                                                             \
+  return (                                                                                                   \
+      ((long int)(sts) ? ((*sts) = (lsts)) : (EVEN(lsts) ? (errh_Bugcheck(lsts, (str)), (lsts)) : (lsts))),  \
       a)
 #endif
 
-/** \defgroup Errh_DS Errh Data Structures
- *  @{
- */
+  /** \defgroup Errh_DS Errh Data Structures
+   *  @{
+   */
 
-#define errh_SeveritySuccess(sts) (((sts)&7) == 3)
-#define errh_SeverityInfo(sts) (((sts)&7) == 1)
-#define errh_SeverityWarning(sts) (((sts)&7) == 0)
-#define errh_SeverityError(sts) (((sts)&7) == 2)
-#define errh_SeverityFatal(sts) (((sts)&7) == 4)
+#define errh_SeveritySuccess(sts) (((sts) & 7) == 3)
+#define errh_SeverityInfo(sts) (((sts) & 7) == 1)
+#define errh_SeverityWarning(sts) (((sts) & 7) == 0)
+#define errh_SeverityError(sts) (((sts) & 7) == 2)
+#define errh_SeverityFatal(sts) (((sts) & 7) == 4)
 
-/**
- * Severity enumeration
- */
-typedef enum {
-  errh_eSeverity_Null,
-  errh_eSeverity_Success,
-  errh_eSeverity_Info,
-  errh_eSeverity_Warning,
-  errh_eSeverity_Error,
-  errh_eSeverity_Fatal
-} errh_eSeverity;
+  /**
+   * Severity enumeration - now using common ProviewR severity
+   */
+  typedef pwr_eSeverity errh_eSeverity;
 
-#define errh_cAnix_SrvSize 40
-#define errh_cAnix_PlcSize 20
+/* Compatibility definitions for existing code */
+#define errh_eSeverity_Null pwr_eSeverity_Null
+#define errh_eSeverity_Success pwr_eSeverity_Success
+#define errh_eSeverity_Info pwr_eSeverity_Info
+#define errh_eSeverity_Warning pwr_eSeverity_Warning
+#define errh_eSeverity_Error pwr_eSeverity_Error
+#define errh_eSeverity_Fatal pwr_eSeverity_Fatal
 
+  /** @} */
 
-/**
- * Application index
- */
-typedef enum {
-  errh_eNAnix = 0,
-  errh_eAnix_ini = 1,
-  errh_eAnix_qmon = 2,
-  errh_eAnix_neth = 3,
-  errh_eAnix_neth_acp = 4,
-  errh_eAnix_io = 5,
-  errh_eAnix_tmon = 6,
-  errh_eAnix_emon = 7,
-  errh_eAnix_alim = 8,
-  errh_eAnix_bck = 9,
-  errh_eAnix_linksup = 10,
-  errh_eAnix_trend = 11,
-  errh_eAnix_fast = 12,
-  errh_eAnix_elog = 13,
-  errh_eAnix_webmon = 14,
-  errh_eAnix_webmonmh = 15,
-  errh_eAnix_sysmon = 16,
-  errh_eAnix_plc = 17,
-  errh_eAnix_remote = 18,
-  errh_eAnix_opc_server = 19,
-  errh_eAnix_statussrv = 20,
-  errh_eAnix_post = 21,
-  errh_eAnix_report = 22,
-  errh_eAnix_sevhistmon = 23,
-  errh_eAnix_sim = 24,
-  errh_eAnix_powerlink = 25,
-  errh_eAnix_videomgm = 26,
-  errh_eAnix_redcom = 27,
-  errh_eAnix_websocketserver = 28,
-  errh_eAnix_maintsupserver = 29,
-  errh_eAnix_mqtt_server = 30,
-  errh_eAnix_plc1 = 41,
-  errh_eAnix_plc2 = 42,
-  errh_eAnix_plc3 = 43,
-  errh_eAnix_plc4 = 44,
-  errh_eAnix_plc5 = 45,
-  errh_eAnix_plc6 = 46,
-  errh_eAnix_plc7 = 47,
-  errh_eAnix_plc8 = 48,
-  errh_eAnix_plc9 = 49,
-  errh_eAnix_plc10 = 50,
-  errh_eAnix_plc11 = 51,
-  errh_eAnix_plc12 = 52,
-  errh_eAnix_plc13 = 53,
-  errh_eAnix_plc14 = 54,
-  errh_eAnix_plc15 = 55,
-  errh_eAnix_plc16 = 56,
-  errh_eAnix_plc17 = 57,
-  errh_eAnix_plc18 = 58,
-  errh_eAnix_plc19 = 59,
-  errh_eAnix_plc20 = 60,
-  errh_eAnix_appl1 = 61,
-  errh_eAnix_appl2 = 62,
-  errh_eAnix_appl3 = 63,
-  errh_eAnix_appl4 = 64,
-  errh_eAnix_appl5 = 65,
-  errh_eAnix_appl6 = 66,
-  errh_eAnix_appl7 = 67,
-  errh_eAnix_appl8 = 68,
-  errh_eAnix_appl9 = 69,
-  errh_eAnix_appl10 = 70,
-  errh_eAnix_appl11 = 71,
-  errh_eAnix_appl12 = 72,
-  errh_eAnix_appl13 = 73,
-  errh_eAnix_appl14 = 74,
-  errh_eAnix_appl15 = 75,
-  errh_eAnix_appl16 = 76,
-  errh_eAnix_appl17 = 77,
-  errh_eAnix_appl18 = 78,
-  errh_eAnix_appl19 = 79,
-  errh_eAnix_appl20 = 80,
-  errh_eAnix_appl21 = 81,
-  errh_eAnix_appl22 = 82,
-  errh_eAnix_appl23 = 83,
-  errh_eAnix_appl24 = 84,
-  errh_eAnix_appl25 = 85,
-  errh_eAnix_appl26 = 86,
-  errh_eAnix_appl27 = 87,
-  errh_eAnix_appl28 = 88,
-  errh_eAnix_appl29 = 89,
-  errh_eAnix_appl30 = 90,
-  errh_eAnix_appl31 = 91,
-  errh_eAnix_appl32 = 92,
-  errh_eAnix_appl33 = 93,
-  errh_eAnix_appl34 = 94,
-  errh_eAnix_appl35 = 95,
-  errh_eAnix_appl36 = 96,
-  errh_eAnix_appl37 = 97,
-  errh_eAnix_appl38 = 98,
-  errh_eAnix_appl39 = 99,
-  errh_eAnix_appl40 = 100,
-  errh_eAnix_appl41 = 101,
-  errh_eAnix_appl42 = 102,
-  errh_eAnix_appl43 = 103,
-  errh_eAnix_appl44 = 104,
-  errh_eAnix_appl45 = 105,
-  errh_eAnix_appl46 = 106,
-  errh_eAnix_appl47 = 107,
-  errh_eAnix_appl48 = 108,
-  errh_eAnix_appl49 = 109,
-  errh_eAnix_appl50 = 110,
-  errh_eAnix__ = 111
-} errh_eAnix;
+  /** \defgroup Errh_FC Errh Functions
+   *  @{
+   */
 
-/**
- * Message type
- */
-typedef enum {
-  errh_eMsgType_Log = 1, /**< Write to console log */
-  errh_eMsgType_Status = 2 /**< Set application status */
-} errh_eMsgType;
+  /* NOTE! errh_Init MUST always be called before any other
+           errh-function is called.  */
 
-typedef struct {
-  pwr_tBoolean send;
-  qcom_sQid logQ;
-  qcom_sPut put;
-} errh_sLog;
+  pwr_tStatus errh_Init(const char* programName, errh_eAnix anix);
 
-typedef struct {
-  long int message_type;
-  pwr_tStatus sts;
-  errh_eAnix anix;
-  char severity;
-  char str[LOG_MAX_MSG_SIZE];
-} errh_sMsg;
+  // Application info functions
+  errh_eAnix errh_Anix(void);
+  void errh_SetAnix(errh_eAnix anix);
+  void errh_SetName(char* name);
+  void errh_AnixName(errh_eAnix anix, char* name);
+  void errh_SetStatus(pwr_tStatus sts);
 
-/** @} */
+  // Interactive mode
+  void errh_Interactive(void);
 
-/** \defgroup Errh_FC Errh Functions
- *  @{
- */
+  // Logging functions
+  char* errh_GetMsg(const pwr_tStatus sts, char* buf, int bufSize);
+  char* errh_GetError(const pwr_tStatus sts, char* buf, int bufSize);
+  char* errh_GetText(const pwr_tStatus sts, char* buf, int bufSize);
+  char* errh_Log(char* buff, char severity, const char* msg, ...);
 
-/* NOTE! errh_Init MUST always be called before any other
-         errh-function is called.  */
+  // Standard log functions
+  void errh_Fatal(const char* msg, ...);
+  void errh_Error(const char* msg, ...);
+  void errh_Warning(const char* msg, ...);
+  void errh_Info(const char* msg, ...);
+  void errh_Success(const char* msg, ...);
+  void errh_LogFatal(errh_sLog*, const char* msg, ...);
+  void errh_LogError(errh_sLog*, const char* msg, ...);
+  void errh_LogWarning(errh_sLog*, const char* msg, ...);
+  void errh_LogInfo(errh_sLog*, const char* msg, ...);
+  void errh_LogSuccess(errh_sLog*, const char* msg, ...);
 
-pwr_tStatus errh_Init(const char* programName, errh_eAnix anix);
-void errh_AnixName(errh_eAnix anix, char *name);
-void errh_SetStatus(pwr_tStatus sts);
-void errh_Interactive(void);
-char* errh_GetMsg(const pwr_tStatus sts, char* buf, int bufSize);
-char* errh_GetText(const pwr_tStatus sts, char* buf, int bufSize);
-char* errh_Log(char* buff, char severity, const char* msg, ...);
-void errh_Fatal(const char* msg, ...);
-void errh_Error(const char* msg, ...);
-void errh_Warning(const char* msg, ...);
-void errh_Info(const char* msg, ...);
-void errh_Success(const char* msg, ...);
-void errh_LogFatal(errh_sLog*, const char* msg, ...);
-void errh_LogError(errh_sLog*, const char* msg, ...);
-void errh_LogWarning(errh_sLog*, const char* msg, ...);
-void errh_LogInfo(errh_sLog*, const char* msg, ...);
-void errh_LogSuccess(errh_sLog*, const char* msg, ...);
-void* errh_ErrArgMsg(pwr_tStatus sts);
-void* errh_ErrArgAF(char* s);
-void* errh_ErrArgL(int val);
-void errh_CErrLog(pwr_tStatus sts, ...);
-char* errh_Message(char* string, char severity, char* msg, ...);
-errh_eAnix errh_Anix(void);
-void errh_SetAnix(errh_eAnix anix);
-void errh_SetName(char* name);
-errh_eSeverity errh_Severity(pwr_tStatus);
+  // Extended log functions
+  void* errh_ErrArgMsg(pwr_tStatus sts);
+  void* errh_ErrArgAF(char* s);
+  void* errh_ErrArgL(int val);
+  void errh_CErrLog(pwr_tStatus sts, ...);
+  char* errh_Message(char* string, char severity, char* msg, ...);
+
+  // Utility functions
+  errh_eSeverity errh_Severity(pwr_tStatus);
 
 #if defined __cplusplus
 }

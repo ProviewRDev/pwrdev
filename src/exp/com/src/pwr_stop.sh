@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # ProviewR   Open Source Process Control.
-# Copyright (C) 2005-2024 SSAB EMEA AB.
+# Copyright (C) 2005-2026 SSAB EMEA AB.
 #
 # This file is part of ProviewR.
 #
@@ -123,6 +123,7 @@
   fi
 
   rm -f /tmp/pwr*$PWR_BUS_ID
+  unlink /dev/mqueue/pwrlogqueue_${PWR_BUS_ID}
 
   #rm -f /tmp/pwr*
   #id=`ipcs -s | grep $user | awk '{print $2}'`

@@ -22,13 +22,13 @@ chgrp -R pwrp /usr/pwr$ver
 
 # Insert base in projectlist
 #if [ ! -e $aroot/db/pwr_projectlist.dat ]; then
-#  echo "%base V${ver:0:1}.${ver:1:1}rpi /usr/pwr$ver" > $aroot/db/pwr_projectlist.dat
+#  echo "%base $vermajminrpi /usr/pwr$ver" > $aroot/db/pwr_projectlist.dat
 #else
 #  set +e
-#  ptst=`eval grep "^%base" $aroot/db/pwr_projectlist.dat | grep "\bV${ver:0:1}.${ver:1:1}rpi\b"`
+#  ptst=`eval grep "^%base" $aroot/db/pwr_projectlist.dat | grep "\b$vermajminrpi\b"`
 #  set -e
 #  if [ "$ptst" = "" ]; then
-#    echo "%base V${ver:0:1}.${ver:1:1}rpi /usr/pwr$ver" >> $aroot/db/pwr_projectlist.dat
+#    echo "%base $vermajminrpi /usr/pwr$ver" >> $aroot/db/pwr_projectlist.dat
 #  fi
 #fi
 

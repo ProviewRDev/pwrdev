@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -46,9 +46,10 @@
 class CoWowRecall;
 class CoWowEntryGtk;
 
-class XttLogGtk : public XttLog {
+class XttLogGtk : public XttLog
+{
 public:
-  XttLogGtk(GtkWidget* a_parent_wid, void* a_parent_ctx, LogNav_hier *a_tree);
+  XttLogGtk(GtkWidget* a_parent_wid, void* a_parent_ctx, LogNav_hier* a_tree);
   GtkWidget* parent_wid;
   GtkWidget* brow_widget;
   GtkWidget* form_widget;
@@ -60,7 +61,7 @@ public:
   CoWowRecall* cmd_recall;
   CoWowEntryGtk* cmd_entry;
 
-  void message(char severity, char* message);
+  void message(char severity, const char* message);
   void set_prompt(const char* prompt);
 
   static void activate_command(GtkWidget* w, gpointer data);

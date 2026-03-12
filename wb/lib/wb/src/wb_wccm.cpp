@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -69,14 +69,11 @@ int (*wccm_get_wnav_cb)(void*, WNav**);
 
 /*____Local function prototypes_______________________________________*/
 
-static int wccm_attribute_func(char* name, int* return_decl,
-    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string);
+static int wccm_attribute_func(char* name, int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
+                               char* return_string);
 static int wccm_cut_segments(char* outname, char* name, int segments);
 
-void wccm_store_client(void* client_data)
-{
-  stored_client_data = client_data;
-}
+void wccm_store_client(void* client_data) { stored_client_data = client_data; }
 
 void wccm_store_ldhses(void* client_data, ldh_tSesContext ldhsession)
 {
@@ -90,7 +87,8 @@ int wccm_get_ldhses(ldh_tSesContext* ldhses)
 {
   int sts;
 
-  if (!stored_ldhses) {
+  if (!stored_ldhses)
+  {
     sts = (wccm_get_ldhsession_cb)(stored_client_data, &stored_ldhses);
     if (EVEN(sts))
       return sts;
@@ -103,7 +101,8 @@ int wccm_get_wbctx(ldh_tWBContext* wbctx)
 {
   int sts;
 
-  if (!stored_wbctx) {
+  if (!stored_wbctx)
+  {
     sts = (wccm_get_wbctx_cb)(stored_client_data, &stored_wbctx);
     if (EVEN(sts))
       return sts;
@@ -119,9 +118,8 @@ int wccm_get_wnav(WNav** wnav)
   return 0;
 }
 
-static int wccm_getattribute_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_getattribute_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                  ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   ccm_sArg* arg_p2;
   int sts;
@@ -139,27 +137,36 @@ static int wccm_getattribute_func(void* filectx, ccm_sArg* arg_list,
   if (arg_count == 2 && arg_p2->value_decl != CCM_DECL_INT)
     return CCM__ARGMISM;
 
-  sts = wccm_attribute_func(arg_list->value_string, &value_decl, &value_float,
-      &value_int, value_string);
-  if (EVEN(sts)) {
-    if (arg_count == 2) {
+  sts = wccm_attribute_func(arg_list->value_string, &value_decl, &value_float, &value_int, value_string);
+  if (EVEN(sts))
+  {
+    if (arg_count == 2)
+    {
       arg_p2->value_int = 0;
       arg_p2->value_returned = 1;
       arg_p2->var_decl = arg_p2->value_decl;
     }
     *return_decl = CCM_DECL_UNKNOWN;
-  } else {
-    if (value_decl == CCM_DECL_INT) {
+  }
+  else
+  {
+    if (value_decl == CCM_DECL_INT)
+    {
       *return_int = value_int;
       *return_decl = CCM_DECL_INT;
-    } else if (value_decl == CCM_DECL_FLOAT) {
+    }
+    else if (value_decl == CCM_DECL_FLOAT)
+    {
       *return_float = value_float;
       *return_decl = CCM_DECL_FLOAT;
-    } else if (value_decl == CCM_DECL_STRING) {
+    }
+    else if (value_decl == CCM_DECL_STRING)
+    {
       strcpy(return_string, value_string);
       *return_decl = CCM_DECL_STRING;
     }
-    if (arg_count == 2) {
+    if (arg_count == 2)
+    {
       arg_p2->value_int = 1;
       arg_p2->value_returned = 1;
       arg_p2->var_decl = arg_p2->value_decl;
@@ -169,9 +176,8 @@ static int wccm_getattribute_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int wccm_getchild_func(void* filectx, ccm_sArg* arg_list, int arg_count,
-    int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
-    char* return_string)
+static int wccm_getchild_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                              ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
   pwr_tOName name;
@@ -181,7 +187,8 @@ static int wccm_getchild_func(void* filectx, ccm_sArg* arg_list, int arg_count,
   ldh_tSesContext ldhses;
 
   sts = wccm_get_ldhses(&ldhses);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     strcpy(return_string, "");
     *return_decl = CCM_DECL_STRING;
     return CMD__NOVOLATTACHED;
@@ -194,11 +201,11 @@ static int wccm_getchild_func(void* filectx, ccm_sArg* arg_list, int arg_count,
     return CCM__ARGMISM;
 
   sts = ldh_NameToObjid(ldhses, &parent_objid, arg_list->value_string);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sts = ldh_GetChild(ldhses, parent_objid, &child_objid);
     if (ODD(sts))
-      sts = ldh_ObjidToName(
-          ldhses, child_objid, ldh_eName_Hierarchy, name, sizeof(name), &size);
+      sts = ldh_ObjidToName(ldhses, child_objid, ldh_eName_Hierarchy, name, sizeof(name), &size);
   }
   if (ODD(sts))
     strcpy(return_string, name);
@@ -209,9 +216,8 @@ static int wccm_getchild_func(void* filectx, ccm_sArg* arg_list, int arg_count,
   return 1;
 }
 
-static int wccm_getparent_func(void* filectx, ccm_sArg* arg_list, int arg_count,
-    int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
-    char* return_string)
+static int wccm_getparent_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                               ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
   pwr_tOName name;
@@ -221,7 +227,8 @@ static int wccm_getparent_func(void* filectx, ccm_sArg* arg_list, int arg_count,
   ldh_tSesContext ldhses;
 
   sts = wccm_get_ldhses(&ldhses);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     strcpy(return_string, "");
     *return_decl = CCM_DECL_STRING;
     return CMD__NOVOLATTACHED;
@@ -234,11 +241,11 @@ static int wccm_getparent_func(void* filectx, ccm_sArg* arg_list, int arg_count,
     return CCM__ARGMISM;
 
   sts = ldh_NameToObjid(ldhses, &child_objid, arg_list->value_string);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sts = ldh_GetParent(ldhses, child_objid, &parent_objid);
     if (ODD(sts))
-      sts = ldh_ObjidToName(
-          ldhses, parent_objid, ldh_eName_Hierarchy, name, sizeof(name), &size);
+      sts = ldh_ObjidToName(ldhses, parent_objid, ldh_eName_Hierarchy, name, sizeof(name), &size);
   }
 
   if (ODD(sts))
@@ -250,9 +257,8 @@ static int wccm_getparent_func(void* filectx, ccm_sArg* arg_list, int arg_count,
   return 1;
 }
 
-static int wccm_getnextsibling_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_getnextsibling_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
   pwr_tOName name;
@@ -262,7 +268,8 @@ static int wccm_getnextsibling_func(void* filectx, ccm_sArg* arg_list,
   ldh_tSesContext ldhses;
 
   sts = wccm_get_ldhses(&ldhses);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     strcpy(return_string, "");
     *return_decl = CCM_DECL_STRING;
     return CMD__NOVOLATTACHED;
@@ -275,11 +282,11 @@ static int wccm_getnextsibling_func(void* filectx, ccm_sArg* arg_list,
     return CCM__ARGMISM;
 
   sts = ldh_NameToObjid(ldhses, &objid, arg_list->value_string);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sts = ldh_GetNextSibling(ldhses, objid, &next_objid);
     if (ODD(sts))
-      sts = ldh_ObjidToName(
-          ldhses, next_objid, ldh_eName_Hierarchy, name, sizeof(name), &size);
+      sts = ldh_ObjidToName(ldhses, next_objid, ldh_eName_Hierarchy, name, sizeof(name), &size);
   }
 
   if (ODD(sts))
@@ -291,9 +298,8 @@ static int wccm_getnextsibling_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int wccm_getclasslist_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_getclasslist_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                  ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
   pwr_tOName name;
@@ -303,7 +309,8 @@ static int wccm_getclasslist_func(void* filectx, ccm_sArg* arg_list,
   ldh_tSesContext ldhses;
 
   sts = wccm_get_ldhses(&ldhses);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     strcpy(return_string, "");
     *return_decl = CCM_DECL_STRING;
     return CMD__NOVOLATTACHED;
@@ -316,11 +323,11 @@ static int wccm_getclasslist_func(void* filectx, ccm_sArg* arg_list,
     return CCM__ARGMISM;
 
   sts = ldh_ClassNameToId(ldhses, &cid, arg_list->value_string);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sts = ldh_GetClassList(ldhses, cid, &oid);
     if (ODD(sts))
-      sts = ldh_ObjidToName(
-          ldhses, oid, ldh_eName_Hierarchy, name, sizeof(name), &size);
+      sts = ldh_ObjidToName(ldhses, oid, ldh_eName_Hierarchy, name, sizeof(name), &size);
   }
 
   if (ODD(sts))
@@ -332,9 +339,8 @@ static int wccm_getclasslist_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int wccm_gettemplateobject_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_gettemplateobject_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                       ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
   pwr_tOName name;
@@ -344,7 +350,8 @@ static int wccm_gettemplateobject_func(void* filectx, ccm_sArg* arg_list,
   ldh_tSesContext ldhses;
 
   sts = wccm_get_ldhses(&ldhses);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     strcpy(return_string, "");
     *return_decl = CCM_DECL_STRING;
     return CMD__NOVOLATTACHED;
@@ -357,11 +364,11 @@ static int wccm_gettemplateobject_func(void* filectx, ccm_sArg* arg_list,
     return CCM__ARGMISM;
 
   sts = ldh_ClassNameToId(ldhses, &cid, arg_list->value_string);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sts = ldh_GetTemplateObject(ldhses, cid, &oid);
     if (ODD(sts))
-      sts = ldh_ObjidToName(
-          ldhses, oid, cdh_mName_volumeStrict, name, sizeof(name), &size);
+      sts = ldh_ObjidToName(ldhses, oid, cdh_mName_volumeStrict, name, sizeof(name), &size);
   }
 
   if (ODD(sts))
@@ -373,9 +380,8 @@ static int wccm_gettemplateobject_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int wccm_getnextobject_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_getnextobject_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                   ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
   pwr_tOName name;
@@ -385,7 +391,8 @@ static int wccm_getnextobject_func(void* filectx, ccm_sArg* arg_list,
   ldh_tSesContext ldhses;
 
   sts = wccm_get_ldhses(&ldhses);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     strcpy(return_string, "");
     *return_decl = CCM_DECL_STRING;
     return CMD__NOVOLATTACHED;
@@ -398,11 +405,11 @@ static int wccm_getnextobject_func(void* filectx, ccm_sArg* arg_list,
     return CCM__ARGMISM;
 
   sts = ldh_NameToObjid(ldhses, &objid, arg_list->value_string);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sts = ldh_GetNextObject(ldhses, objid, &next_objid);
     if (ODD(sts))
-      sts = ldh_ObjidToName(
-          ldhses, next_objid, ldh_eName_Hierarchy, name, sizeof(name), &size);
+      sts = ldh_ObjidToName(ldhses, next_objid, ldh_eName_Hierarchy, name, sizeof(name), &size);
   }
 
   if (ODD(sts))
@@ -414,9 +421,8 @@ static int wccm_getnextobject_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int wccm_getclasslistattrref_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_getclasslistattrref_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                         ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
   char* name = NULL;
@@ -426,7 +432,8 @@ static int wccm_getclasslistattrref_func(void* filectx, ccm_sArg* arg_list,
   ldh_tSesContext ldhses;
 
   sts = wccm_get_ldhses(&ldhses);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     strcpy(return_string, "");
     *return_decl = CCM_DECL_STRING;
     return CMD__NOVOLATTACHED;
@@ -439,7 +446,8 @@ static int wccm_getclasslistattrref_func(void* filectx, ccm_sArg* arg_list,
     return CCM__ARGMISM;
 
   sts = ldh_ClassNameToId(ldhses, &cid, arg_list->value_string);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sts = ldh_GetClassListAttrRef(ldhses, cid, &aref);
     if (ODD(sts))
       sts = ldh_AttrRefToName(ldhses, &aref, ldh_eName_Hierarchy, &name, &size);
@@ -454,9 +462,8 @@ static int wccm_getclasslistattrref_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int wccm_getnextattrref_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_getnextattrref_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
   char* name = NULL;
@@ -468,7 +475,8 @@ static int wccm_getnextattrref_func(void* filectx, ccm_sArg* arg_list,
   ccm_sArg* arg_p2;
 
   sts = wccm_get_ldhses(&ldhses);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     strcpy(return_string, "");
     *return_decl = CCM_DECL_STRING;
     return CMD__NOVOLATTACHED;
@@ -484,13 +492,14 @@ static int wccm_getnextattrref_func(void* filectx, ccm_sArg* arg_list,
     return CCM__ARGMISM;
 
   sts = ldh_ClassNameToId(ldhses, &cid, arg_list->value_string);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sts = ldh_NameToAttrRef(ldhses, arg_p2->value_string, &aref);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       sts = ldh_GetNextAttrRef(ldhses, cid, &aref, &next_aref);
       if (ODD(sts))
-        sts = ldh_AttrRefToName(
-            ldhses, &next_aref, ldh_eName_Hierarchy, &name, &size);
+        sts = ldh_AttrRefToName(ldhses, &next_aref, ldh_eName_Hierarchy, &name, &size);
     }
   }
   if (ODD(sts))
@@ -502,9 +511,9 @@ static int wccm_getnextattrref_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int wccm_getnexttemplateattrref_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_getnexttemplateattrref_func(void* filectx, ccm_sArg* arg_list, int arg_count,
+                                            int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
+                                            char* return_string)
 {
   int sts;
   char* name = NULL;
@@ -516,7 +525,8 @@ static int wccm_getnexttemplateattrref_func(void* filectx, ccm_sArg* arg_list,
   ccm_sArg* arg_p2;
 
   sts = wccm_get_ldhses(&ldhses);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     strcpy(return_string, "");
     *return_decl = CCM_DECL_STRING;
     return CMD__NOVOLATTACHED;
@@ -532,13 +542,14 @@ static int wccm_getnexttemplateattrref_func(void* filectx, ccm_sArg* arg_list,
     return CCM__ARGMISM;
 
   sts = ldh_ClassNameToId(ldhses, &cid, arg_list->value_string);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sts = ldh_NameToAttrRef(ldhses, arg_p2->value_string, &aref);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       sts = ldh_GetNextTemplateAttrRef(ldhses, cid, &aref, &next_aref);
       if (ODD(sts))
-        sts = ldh_AttrRefToName(
-            ldhses, &next_aref, cdh_mName_volumeStrict, &name, &size);
+        sts = ldh_AttrRefToName(ldhses, &next_aref, cdh_mName_volumeStrict, &name, &size);
     }
   }
   if (ODD(sts))
@@ -550,9 +561,8 @@ static int wccm_getnexttemplateattrref_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int wccm_getrootlist_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_getrootlist_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                 ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
   pwr_tOName name;
@@ -561,7 +571,8 @@ static int wccm_getrootlist_func(void* filectx, ccm_sArg* arg_list,
   ldh_tSesContext ldhses;
 
   sts = wccm_get_ldhses(&ldhses);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     strcpy(return_string, "");
     *return_decl = CCM_DECL_STRING;
     return CMD__NOVOLATTACHED;
@@ -572,8 +583,7 @@ static int wccm_getrootlist_func(void* filectx, ccm_sArg* arg_list,
 
   sts = ldh_GetRootList(ldhses, &objid);
   if (ODD(sts))
-    sts = ldh_ObjidToName(
-        ldhses, objid, ldh_eName_Hierarchy, name, sizeof(name), &size);
+    sts = ldh_ObjidToName(ldhses, objid, ldh_eName_Hierarchy, name, sizeof(name), &size);
 
   if (ODD(sts))
     strcpy(return_string, name);
@@ -584,9 +594,8 @@ static int wccm_getrootlist_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int wccm_getobjectclass_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_getobjectclass_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
   char name[80];
@@ -596,7 +605,8 @@ static int wccm_getobjectclass_func(void* filectx, ccm_sArg* arg_list,
   ldh_tSesContext ldhses;
 
   sts = wccm_get_ldhses(&ldhses);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     strcpy(return_string, "");
     *return_decl = CCM_DECL_STRING;
     return CMD__NOVOLATTACHED;
@@ -609,11 +619,11 @@ static int wccm_getobjectclass_func(void* filectx, ccm_sArg* arg_list,
     return CCM__ARGMISM;
 
   sts = ldh_NameToObjid(ldhses, &objid, arg_list->value_string);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sts = ldh_GetObjectClass(ldhses, objid, &cid);
     if (ODD(sts))
-      sts = ldh_ObjidToName(ldhses, cdh_ClassIdToObjid(cid), ldh_eName_Object,
-          name, sizeof(name), &size);
+      sts = ldh_ObjidToName(ldhses, cdh_ClassIdToObjid(cid), ldh_eName_Object, name, sizeof(name), &size);
   }
   if (ODD(sts))
     strcpy(return_string, name);
@@ -624,9 +634,8 @@ static int wccm_getobjectclass_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int wccm_renameobject_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_renameobject_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                  ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
   pwr_tObjid objid;
@@ -634,7 +643,8 @@ static int wccm_renameobject_func(void* filectx, ccm_sArg* arg_list,
   ccm_sArg* arg_p2;
 
   sts = wccm_get_ldhses(&ldhses);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     *return_int = 0;
     *return_decl = CCM_DECL_INT;
     return CMD__NOVOLATTACHED;
@@ -659,9 +669,8 @@ static int wccm_renameobject_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int wccm_moveobject_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_moveobject_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
   pwr_tObjid objid;
@@ -672,7 +681,8 @@ static int wccm_moveobject_func(void* filectx, ccm_sArg* arg_list,
   ldh_eDest dcode = ldh_eDest_Before;
 
   sts = wccm_get_ldhses(&ldhses);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     *return_int = 0;
     *return_decl = CCM_DECL_INT;
     return CMD__NOVOLATTACHED;
@@ -688,7 +698,8 @@ static int wccm_moveobject_func(void* filectx, ccm_sArg* arg_list,
   if (arg_p2->value_decl != CCM_DECL_STRING)
     return CCM__ARGMISM;
 
-  switch (arg_p3->value_int) {
+  switch (arg_p3->value_int)
+  {
   case 1:
     dcode = ldh_eDest_IntoFirst;
     break;
@@ -704,7 +715,8 @@ static int wccm_moveobject_func(void* filectx, ccm_sArg* arg_list,
   }
 
   sts = ldh_NameToObjid(ldhses, &objid, arg_list->value_string);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sts = ldh_NameToObjid(ldhses, &dest_objid, arg_p2->value_string);
     if (ODD(sts))
       sts = ldh_MoveObject(ldhses, objid, dest_objid, dcode);
@@ -715,16 +727,16 @@ static int wccm_moveobject_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int wccm_objectexist_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_objectexist_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                 ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
   pwr_tObjid objid;
   ldh_tSesContext ldhses;
 
   sts = wccm_get_ldhses(&ldhses);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     *return_int = 0;
     *return_decl = CCM_DECL_INT;
     return CMD__NOVOLATTACHED;
@@ -743,9 +755,8 @@ static int wccm_objectexist_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int wccm_getvolumelist_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_getvolumelist_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                   ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
   char name[80];
@@ -754,7 +765,8 @@ static int wccm_getvolumelist_func(void* filectx, ccm_sArg* arg_list,
   ldh_tWBContext wbctx;
 
   sts = wccm_get_wbctx(&wbctx);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     strcpy(return_string, "");
     *return_decl = CCM_DECL_STRING;
     return CMD__NOWBATTACHED;
@@ -776,9 +788,8 @@ static int wccm_getvolumelist_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int wccm_getnextvolume_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_getnextvolume_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                   ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
   char name[80];
@@ -788,7 +799,8 @@ static int wccm_getnextvolume_func(void* filectx, ccm_sArg* arg_list,
   ldh_tWBContext wbctx;
 
   sts = wccm_get_wbctx(&wbctx);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     strcpy(return_string, "");
     *return_decl = CCM_DECL_STRING;
     return CMD__NOWBATTACHED;
@@ -801,7 +813,8 @@ static int wccm_getnextvolume_func(void* filectx, ccm_sArg* arg_list,
     return CCM__ARGMISM;
 
   sts = ldh_VolumeNameToId(wbctx, arg_list->value_string, &volid);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sts = ldh_GetNextVolume(wbctx, volid, &next_volid);
     if (ODD(sts))
       sts = ldh_VolumeIdToName(wbctx, next_volid, name, sizeof(name), &size);
@@ -816,9 +829,8 @@ static int wccm_getnextvolume_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int wccm_getvolumeclass_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_getvolumeclass_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
   char name[80];
@@ -828,7 +840,8 @@ static int wccm_getvolumeclass_func(void* filectx, ccm_sArg* arg_list,
   ldh_tSesContext ldhses;
 
   sts = wccm_get_ldhses(&ldhses);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     strcpy(return_string, "");
     *return_decl = CCM_DECL_STRING;
     return CMD__NOVOLATTACHED;
@@ -840,13 +853,12 @@ static int wccm_getvolumeclass_func(void* filectx, ccm_sArg* arg_list,
   if (arg_list->value_decl != CCM_DECL_STRING)
     return CCM__ARGMISM;
 
-  sts = ldh_VolumeNameToId(
-      ldh_SessionToWB(ldhses), arg_list->value_string, &volid);
-  if (ODD(sts)) {
+  sts = ldh_VolumeNameToId(ldh_SessionToWB(ldhses), arg_list->value_string, &volid);
+  if (ODD(sts))
+  {
     sts = ldh_GetVolumeClass(ldh_SessionToWB(ldhses), volid, &cid);
     if (ODD(sts))
-      sts = ldh_ObjidToName(ldhses, cdh_ClassIdToObjid(cid), ldh_eName_Object,
-          name, sizeof(name), &size);
+      sts = ldh_ObjidToName(ldhses, cdh_ClassIdToObjid(cid), ldh_eName_Object, name, sizeof(name), &size);
   }
   if (ODD(sts))
     strcpy(return_string, name);
@@ -857,9 +869,8 @@ static int wccm_getvolumeclass_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int wccm_cutobjectname_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_cutobjectname_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                   ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   ccm_sArg* arg_p2;
 
@@ -879,9 +890,8 @@ static int wccm_cutobjectname_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int wccm_getnodeobject_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_getnodeobject_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                   ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
   pwr_tOName name;
@@ -891,7 +901,8 @@ static int wccm_getnodeobject_func(void* filectx, ccm_sArg* arg_list,
   ldh_tSesContext ldhses;
 
   sts = wccm_get_ldhses(&ldhses);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     strcpy(return_string, "");
     *return_decl = CCM_DECL_STRING;
     return CMD__NOVOLATTACHED;
@@ -901,12 +912,14 @@ static int wccm_getnodeobject_func(void* filectx, ccm_sArg* arg_list,
     return CCM__ARGMISM;
 
   sts = trv_get_rtnodes(ldhses, &node_count, &nodelist);
-  if (ODD(sts)) {
-    if (node_count > 0) {
-      sts = ldh_ObjidToName(
-          ldhses, *nodelist, ldh_eName_Hierarchy, name, sizeof(name), &size);
+  if (ODD(sts))
+  {
+    if (node_count > 0)
+    {
+      sts = ldh_ObjidToName(ldhses, *nodelist, ldh_eName_Hierarchy, name, sizeof(name), &size);
       free((char*)nodelist);
-    } else
+    }
+    else
       sts = 0;
   }
 
@@ -919,9 +932,8 @@ static int wccm_getnodeobject_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int wccm_getprojectname_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_getprojectname_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
   char projectname[80];
@@ -939,9 +951,8 @@ static int wccm_getprojectname_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int wccm_setattribute_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_setattribute_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                  ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   ccm_sArg* arg_p2;
   int sts;
@@ -952,7 +963,8 @@ static int wccm_setattribute_func(void* filectx, ccm_sArg* arg_list,
   ldh_tSesContext ldhses;
 
   sts = wccm_get_ldhses(&ldhses);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     strcpy(return_string, "");
     *return_decl = CCM_DECL_STRING;
     return CMD__NOVOLATTACHED;
@@ -964,7 +976,8 @@ static int wccm_setattribute_func(void* filectx, ccm_sArg* arg_list,
   arg_p2 = arg_list->next;
   if (arg_list->value_decl != CCM_DECL_STRING)
     return CCM__VARTYPE;
-  switch (arg_p2->value_decl) {
+  switch (arg_p2->value_decl)
+  {
   case CCM_DECL_STRING:
     strcpy(buf, arg_p2->value_string);
     break;
@@ -977,10 +990,12 @@ static int wccm_setattribute_func(void* filectx, ccm_sArg* arg_list,
   }
 
   strcpy(name, arg_list->value_string);
-  if ((s = strrchr(name, '.'))) {
+  if ((s = strrchr(name, '.')))
+  {
     *s = 0;
     strcpy(attr, s + 1);
-  } else
+  }
+  else
     return CMD__ATTRIBUTE;
 
   sts = utl_set_object_parameter(ldhses, 0, 0, name, attr, buf, 0, "", 0, 0);
@@ -991,9 +1006,8 @@ static int wccm_setattribute_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int wccm_checksystemgroup_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_checksystemgroup_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                      ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
   if (arg_count != 1)
@@ -1010,9 +1024,8 @@ static int wccm_checksystemgroup_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int wccm_getnextfreeuservid_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_getnextfreeuservid_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                        ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
   pwr_tVid next_vid;
@@ -1021,7 +1034,8 @@ static int wccm_getnextfreeuservid_func(void* filectx, ccm_sArg* arg_list,
   if (arg_count > 1)
     return CCM__ARGMISM;
 
-  if (arg_count > 0) {
+  if (arg_count > 0)
+  {
     if (arg_list->value_decl != CCM_DECL_INT)
       return CCM__VARTYPE;
 
@@ -1040,9 +1054,8 @@ static int wccm_getnextfreeuservid_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int wccm_checknewvid_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_checknewvid_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                 ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
 
@@ -1063,9 +1076,8 @@ static int wccm_checknewvid_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int wccm_checknewvolumename_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_checknewvolumename_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                        ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
 
@@ -1086,9 +1098,8 @@ static int wccm_checknewvolumename_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int wccm_getcurrentvolume_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_getcurrentvolume_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                      ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
   char name[80];
@@ -1098,14 +1109,16 @@ static int wccm_getcurrentvolume_func(void* filectx, ccm_sArg* arg_list,
   ldh_tWBContext wbctx;
 
   sts = wccm_get_wbctx(&wbctx);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     strcpy(return_string, "");
     *return_decl = CCM_DECL_STRING;
     return CMD__NOWBATTACHED;
   }
 
   sts = wccm_get_ldhses(&ldhses);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     strcpy(return_string, "");
     *return_decl = CCM_DECL_STRING;
     return CMD__NOVOLATTACHED;
@@ -1127,9 +1140,8 @@ static int wccm_getcurrentvolume_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int wccm_stringtoobjectname_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_stringtoobjectname_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                        ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   if (arg_count != 1)
     return CCM__ARGMISM;
@@ -1144,9 +1156,8 @@ static int wccm_stringtoobjectname_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int wccm_getopsys_func(void* filectx, ccm_sArg* arg_list, int arg_count,
-    int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
-    char* return_string)
+static int wccm_getopsys_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                              ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   if (arg_count != 0)
     return CCM__ARGMISM;
@@ -1157,23 +1168,20 @@ static int wccm_getopsys_func(void* filectx, ccm_sArg* arg_list, int arg_count,
   return 1;
 }
 
-static int wccm_getversion_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_getversion_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   if (arg_count != 0)
     return CCM__ARGMISM;
 
-  *return_int = 10000 * PWRV_VERSION_MAJOR + 100 * PWRV_VERSION_MINOR
-      + PWRV_VERSION_RELEASE;
+  *return_int = 10000 * PWRV_VERSION_MAJOR + 100 * PWRV_VERSION_MINOR + PWRV_VERSION_PATCH;
   *return_decl = CCM_DECL_INT;
 
   return 1;
 }
 
-static int wccm_gethardware_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_gethardware_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                 ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   if (arg_count != 0)
     return CCM__ARGMISM;
@@ -1184,9 +1192,8 @@ static int wccm_gethardware_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int wccm_createobject_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_createobject_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                  ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   ccm_sArg *arg_p2, *arg_p3, *arg_p4;
   int sts;
@@ -1199,7 +1206,8 @@ static int wccm_createobject_func(void* filectx, ccm_sArg* arg_list,
   ldh_tSesContext ldhses;
 
   sts = wccm_get_ldhses(&ldhses);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     *return_int = CMD__NOVOLATTACHED;
     *return_decl = CCM_DECL_INT;
     return CMD__NOVOLATTACHED;
@@ -1226,30 +1234,30 @@ static int wccm_createobject_func(void* filectx, ccm_sArg* arg_list,
   dest_code = arg_p4->value_int;
 
   sts = ldh_NameToObjid(ldhses, &dest_oid, dest);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     *return_int = sts;
     *return_decl = CCM_DECL_INT;
     return 1;
   }
 
   sts = ldh_ClassNameToId(ldhses, &cid, classname);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     *return_int = sts;
     *return_decl = CCM_DECL_INT;
     return 1;
   }
 
-  sts = ldh_CreateObject(
-      ldhses, &oid, name, cid, dest_oid, (ldh_eDest)dest_code);
+  sts = ldh_CreateObject(ldhses, &oid, name, cid, dest_oid, (ldh_eDest)dest_code);
   *return_int = sts;
   *return_decl = CCM_DECL_INT;
 
   return 1;
 }
 
-static int wccm_openplcpgm_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_openplcpgm_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
   pwr_tOName name;
@@ -1262,14 +1270,16 @@ static int wccm_openplcpgm_func(void* filectx, ccm_sArg* arg_list,
   int new_plc = 0;
 
   sts = wccm_get_wbctx(&wbctx);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     *return_int = CMD__NOWBATTACHED;
     *return_decl = CCM_DECL_INT;
     return CMD__NOWBATTACHED;
   }
 
   sts = wccm_get_ldhses(&ldhses);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     *return_int = CMD__NOVOLATTACHED;
     *return_decl = CCM_DECL_INT;
     return CMD__NOVOLATTACHED;
@@ -1286,7 +1296,8 @@ static int wccm_openplcpgm_func(void* filectx, ccm_sArg* arg_list,
     return sts;
   if (info.Access != ldh_eAccess_ReadWrite)
     return CCM__NOACCESS;
-  if (!info.Empty) {
+  if (!info.Empty)
+  {
     return GSX__NOTSAVED;
   }
 
@@ -1299,7 +1310,8 @@ static int wccm_openplcpgm_func(void* filectx, ccm_sArg* arg_list,
   strncpy(name, arg_list->value_string, sizeof(name));
 
   sts = ldh_NameToObjid(ldhses, &oid, name);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     *return_int = sts;
     *return_decl = CCM_DECL_INT;
     return 1;
@@ -1316,29 +1328,32 @@ static int wccm_openplcpgm_func(void* filectx, ccm_sArg* arg_list,
   if (!wnav->has_window())
     utl->create_mainwindow(0, NULL);
 
-  sts = utl->utl_foe_new("CmdEdit", oid, wbctx, ldhses, &stored_foe, 0,
-      ldh_eAccess_SharedReadWrite);
+  sts = utl->utl_foe_new("CmdEdit", oid, wbctx, ldhses, &stored_foe, 0, ldh_eAccess_SharedReadWrite);
   delete utl;
 
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     // Store the window object
     int lsts = ldh_GetChild(ldhses, oid, &windoid);
     if (EVEN(lsts))
       return sts;
 
-    lsts = ldh_ObjidToName(ldhses, windoid, ldh_eName_Hierarchy,
-        stored_foe_window, sizeof(stored_foe_window), &size);
+    lsts = ldh_ObjidToName(ldhses, windoid, ldh_eName_Hierarchy, stored_foe_window, sizeof(stored_foe_window),
+                           &size);
     if (EVEN(lsts))
       return sts;
 
-    if (new_plc) {
+    if (new_plc)
+    {
       // Delete the document object
       lsts = ldh_GetChild(ldhses, windoid, &docoid);
       if (EVEN(lsts))
         return sts;
 
       stored_foe->cmd_delete_node(docoid);
-    } else {
+    }
+    else
+    {
       // Enter edit mode
       stored_foe->change_mode(EDIT);
     }
@@ -1361,9 +1376,8 @@ void wccm_foe_close(ldh_tSesContext ldhses)
   ldh_SetSession(ldhses, ldh_eAccess_ReadWrite);
 }
 
-static int wccm_closeplcpgm_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_closeplcpgm_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                 ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   ldh_tSesContext ldhses;
   int sts;
@@ -1371,14 +1385,16 @@ static int wccm_closeplcpgm_func(void* filectx, ccm_sArg* arg_list,
   if (arg_count != 0)
     return CCM__ARGMISM;
 
-  if (!stored_foe) {
+  if (!stored_foe)
+  {
     *return_int = 0;
     *return_decl = CCM_DECL_INT;
     return 1;
   }
 
   sts = wccm_get_ldhses(&ldhses);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     *return_int = CMD__NOVOLATTACHED;
     *return_decl = CCM_DECL_INT;
     return CMD__NOVOLATTACHED;
@@ -1397,12 +1413,10 @@ static int wccm_closeplcpgm_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int wccm_createplcobject_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_createplcobject_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                     ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
-  ccm_sArg *arg_p2, *arg_p3, *arg_p4, *arg_p5 = NULL, *arg_p6 = NULL,
-                                      *arg_p7 = NULL, *arg_p8;
+  ccm_sArg *arg_p2, *arg_p3, *arg_p4, *arg_p5 = NULL, *arg_p6 = NULL, *arg_p7 = NULL, *arg_p8;
   int sts;
   pwr_tObjName dest;
   pwr_tObjName classname, name;
@@ -1418,20 +1432,23 @@ static int wccm_createplcobject_func(void* filectx, ccm_sArg* arg_list,
 
   // Arguments name, class, document, x, y, document, inputmask, outputmask,
   // invertmask
-  if (!stored_foe) {
+  if (!stored_foe)
+  {
     *return_int = 0;
     *return_decl = CCM_DECL_INT;
     return 1;
   }
 
   sts = wccm_get_ldhses(&ldhses);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     *return_int = CMD__NOVOLATTACHED;
     *return_decl = CCM_DECL_INT;
     return CMD__NOVOLATTACHED;
   }
 
-  if (!(arg_count == 4 || arg_count == 5 || arg_count == 8)) {
+  if (!(arg_count == 4 || arg_count == 5 || arg_count == 8))
+  {
     wccm_foe_close(ldhses);
     return CCM__ARGMISM;
   }
@@ -1439,54 +1456,67 @@ static int wccm_createplcobject_func(void* filectx, ccm_sArg* arg_list,
   arg_p2 = arg_list->next;
   arg_p3 = arg_p2->next;
   arg_p4 = arg_p3->next;
-  if (arg_list->value_decl != CCM_DECL_STRING) {
+  if (arg_list->value_decl != CCM_DECL_STRING)
+  {
     wccm_foe_close(ldhses);
     return CCM__VARTYPE;
   }
-  if (arg_p2->value_decl != CCM_DECL_STRING) {
+  if (arg_p2->value_decl != CCM_DECL_STRING)
+  {
     wccm_foe_close(ldhses);
     return CCM__VARTYPE;
   }
-  if (arg_p3->value_decl != CCM_DECL_FLOAT) {
+  if (arg_p3->value_decl != CCM_DECL_FLOAT)
+  {
     wccm_foe_close(ldhses);
     return CCM__VARTYPE;
   }
-  if (arg_p4->value_decl != CCM_DECL_FLOAT) {
+  if (arg_p4->value_decl != CCM_DECL_FLOAT)
+  {
     wccm_foe_close(ldhses);
     return CCM__VARTYPE;
   }
-  if (arg_count >= 5) {
+  if (arg_count >= 5)
+  {
     arg_p5 = arg_p4->next;
-    if (arg_p5->value_decl != CCM_DECL_STRING) {
+    if (arg_p5->value_decl != CCM_DECL_STRING)
+    {
       wccm_foe_close(ldhses);
       return CCM__VARTYPE;
     }
-    if (!streq(arg_p5->value_string, "")) {
+    if (!streq(arg_p5->value_string, ""))
+    {
       strncpy(dest, stored_foe_window, sizeof(dest));
       strncat(dest, "-", sizeof(dest) - strlen(dest) - 1);
       strncat(dest, arg_p5->value_string, sizeof(dest) - strlen(dest) - 1);
       dest_found = 1;
     }
   }
-  if (arg_count >= 6) {
+  if (arg_count >= 6)
+  {
     arg_p6 = arg_p5->next;
-    if (arg_p6->value_decl != CCM_DECL_INT) {
+    if (arg_p6->value_decl != CCM_DECL_INT)
+    {
       wccm_foe_close(ldhses);
       return CCM__VARTYPE;
     }
     inputmask = arg_p6->value_int;
   }
-  if (arg_count >= 7) {
+  if (arg_count >= 7)
+  {
     arg_p7 = arg_p6->next;
-    if (arg_p7->value_decl != CCM_DECL_INT) {
+    if (arg_p7->value_decl != CCM_DECL_INT)
+    {
       wccm_foe_close(ldhses);
       return CCM__VARTYPE;
     }
     outputmask = arg_p7->value_int;
   }
-  if (arg_count >= 8) {
+  if (arg_count >= 8)
+  {
     arg_p8 = arg_p7->next;
-    if (arg_p8->value_decl != CCM_DECL_INT) {
+    if (arg_p8->value_decl != CCM_DECL_INT)
+    {
       wccm_foe_close(ldhses);
       return CCM__VARTYPE;
     }
@@ -1500,33 +1530,36 @@ static int wccm_createplcobject_func(void* filectx, ccm_sArg* arg_list,
   y = arg_p4->value_float;
 
   sts = ldh_ClassNameToId(ldhses, &cid, classname);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     *return_int = sts;
     *return_decl = CCM_DECL_INT;
     return 1;
   }
 
-  if (dest_found) {
+  if (dest_found)
+  {
     sts = ldh_NameToObjid(ldhses, &dest_oid, dest);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       *return_int = sts;
       *return_decl = CCM_DECL_INT;
       return 1;
     }
-  } else
+  }
+  else
     dest_oid_p = 0;
 
-  sts = stored_foe->cmd_create_node(name, cid, dest_oid_p, x, y,
-      use_default_masks, inputmask, outputmask, invertmask);
+  sts = stored_foe->cmd_create_node(name, cid, dest_oid_p, x, y, use_default_masks, inputmask, outputmask,
+                                    invertmask);
   *return_int = sts;
   *return_decl = CCM_DECL_INT;
 
   return 1;
 }
 
-static int wccm_setplcobjectattr_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_setplcobjectattr_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                      ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   ccm_sArg* arg_p2;
   int sts;
@@ -1536,29 +1569,34 @@ static int wccm_setplcobjectattr_func(void* filectx, ccm_sArg* arg_list,
   char* s;
   ldh_tSesContext ldhses;
 
-  if (!stored_foe) {
+  if (!stored_foe)
+  {
     *return_int = 0;
     *return_decl = CCM_DECL_INT;
     return 1;
   }
 
   sts = wccm_get_ldhses(&ldhses);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     strcpy(return_string, "");
     *return_decl = CCM_DECL_STRING;
     return CMD__NOVOLATTACHED;
   }
 
-  if (arg_count != 2) {
+  if (arg_count != 2)
+  {
     wccm_foe_close(ldhses);
     return CCM__ARGMISM;
   }
   arg_p2 = arg_list->next;
-  if (arg_list->value_decl != CCM_DECL_STRING) {
+  if (arg_list->value_decl != CCM_DECL_STRING)
+  {
     wccm_foe_close(ldhses);
     return CCM__VARTYPE;
   }
-  switch (arg_p2->value_decl) {
+  switch (arg_p2->value_decl)
+  {
   case CCM_DECL_STRING:
     strcpy(buf, arg_p2->value_string);
     break;
@@ -1573,10 +1611,13 @@ static int wccm_setplcobjectattr_func(void* filectx, ccm_sArg* arg_list,
   strcpy(name, stored_foe_window);
   strcat(name, "-");
   strncat(name, arg_list->value_string, sizeof(name) - strlen(name) - 1);
-  if ((s = strrchr(name, '.'))) {
+  if ((s = strrchr(name, '.')))
+  {
     *s = 0;
     strcpy(attr, s + 1);
-  } else {
+  }
+  else
+  {
     wccm_foe_close(ldhses);
     return CMD__ATTRIBUTE;
   }
@@ -1590,9 +1631,8 @@ static int wccm_setplcobjectattr_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int wccm_createplcconnection_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_createplcconnection_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                         ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   ccm_sArg *arg_p2, *arg_p3, *arg_p4, *arg_p5;
   int sts;
@@ -1604,20 +1644,23 @@ static int wccm_createplcconnection_func(void* filectx, ccm_sArg* arg_list,
 
   // Arguments souce, source attribute, destination, destination attribute,
   // feedback
-  if (!stored_foe) {
+  if (!stored_foe)
+  {
     *return_int = 0;
     *return_decl = CCM_DECL_INT;
     return 1;
   }
 
   sts = wccm_get_ldhses(&ldhses);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     *return_int = CMD__NOVOLATTACHED;
     *return_decl = CCM_DECL_INT;
     return CMD__NOVOLATTACHED;
   }
 
-  if (!(arg_count == 4 || arg_count == 5)) {
+  if (!(arg_count == 4 || arg_count == 5))
+  {
     wccm_foe_close(ldhses);
     return CCM__ARGMISM;
   }
@@ -1625,25 +1668,31 @@ static int wccm_createplcconnection_func(void* filectx, ccm_sArg* arg_list,
   arg_p2 = arg_list->next;
   arg_p3 = arg_p2->next;
   arg_p4 = arg_p3->next;
-  if (arg_list->value_decl != CCM_DECL_STRING) {
+  if (arg_list->value_decl != CCM_DECL_STRING)
+  {
     wccm_foe_close(ldhses);
     return CCM__VARTYPE;
   }
-  if (arg_p2->value_decl != CCM_DECL_STRING) {
+  if (arg_p2->value_decl != CCM_DECL_STRING)
+  {
     wccm_foe_close(ldhses);
     return CCM__VARTYPE;
   }
-  if (arg_p3->value_decl != CCM_DECL_STRING) {
+  if (arg_p3->value_decl != CCM_DECL_STRING)
+  {
     wccm_foe_close(ldhses);
     return CCM__VARTYPE;
   }
-  if (arg_p4->value_decl != CCM_DECL_STRING) {
+  if (arg_p4->value_decl != CCM_DECL_STRING)
+  {
     wccm_foe_close(ldhses);
     return CCM__VARTYPE;
   }
-  if (arg_count > 4) {
+  if (arg_count > 4)
+  {
     arg_p5 = arg_p4->next;
-    if (arg_p5->value_decl != CCM_DECL_INT) {
+    if (arg_p5->value_decl != CCM_DECL_INT)
+    {
       wccm_foe_close(ldhses);
       return CCM__VARTYPE;
     }
@@ -1652,40 +1701,38 @@ static int wccm_createplcconnection_func(void* filectx, ccm_sArg* arg_list,
 
   strcpy(srcname, stored_foe_window);
   strcat(srcname, "-");
-  strncat(
-      srcname, arg_list->value_string, sizeof(srcname) - strlen(srcname) - 1);
+  strncat(srcname, arg_list->value_string, sizeof(srcname) - strlen(srcname) - 1);
   strncpy(srcattr, arg_p2->value_string, sizeof(srcattr));
   strcpy(destname, stored_foe_window);
   strcat(destname, "-");
-  strncat(
-      destname, arg_p3->value_string, sizeof(destname) - strlen(destname) - 1);
+  strncat(destname, arg_p3->value_string, sizeof(destname) - strlen(destname) - 1);
   strncpy(destattr, arg_p4->value_string, sizeof(destattr));
 
   sts = ldh_NameToObjid(ldhses, &srcoid, srcname);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     *return_int = sts;
     *return_decl = CCM_DECL_INT;
     return 1;
   }
 
   sts = ldh_NameToObjid(ldhses, &destoid, destname);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     *return_int = sts;
     *return_decl = CCM_DECL_INT;
     return 1;
   }
 
-  sts = stored_foe->cmd_create_con(
-      srcoid, srcattr, destoid, destattr, feedback);
+  sts = stored_foe->cmd_create_con(srcoid, srcattr, destoid, destattr, feedback);
   *return_int = sts;
   *return_decl = CCM_DECL_INT;
 
   return 1;
 }
 
-static int wccm_plcconnect_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int wccm_plcconnect_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   ccm_sArg* arg_p2;
   int sts;
@@ -1696,49 +1743,55 @@ static int wccm_plcconnect_func(void* filectx, ccm_sArg* arg_list,
   ldh_tSesContext ldhses;
 
   // Arguments plcnode, attribute
-  if (!stored_foe) {
+  if (!stored_foe)
+  {
     *return_int = 0;
     *return_decl = CCM_DECL_INT;
     return 1;
   }
 
   sts = wccm_get_ldhses(&ldhses);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     *return_int = CMD__NOVOLATTACHED;
     *return_decl = CCM_DECL_INT;
     return CMD__NOVOLATTACHED;
   }
 
-  if (arg_count != 2) {
+  if (arg_count != 2)
+  {
     wccm_foe_close(ldhses);
     return CCM__ARGMISM;
   }
 
   arg_p2 = arg_list->next;
-  if (arg_list->value_decl != CCM_DECL_STRING) {
+  if (arg_list->value_decl != CCM_DECL_STRING)
+  {
     wccm_foe_close(ldhses);
     return CCM__VARTYPE;
   }
-  if (arg_p2->value_decl != CCM_DECL_STRING) {
+  if (arg_p2->value_decl != CCM_DECL_STRING)
+  {
     wccm_foe_close(ldhses);
     return CCM__VARTYPE;
   }
 
   strcpy(nodename, stored_foe_window);
   strcat(nodename, "-");
-  strncat(nodename, arg_list->value_string,
-      sizeof(nodename) - strlen(nodename) - 1);
+  strncat(nodename, arg_list->value_string, sizeof(nodename) - strlen(nodename) - 1);
   strncpy(attrname, arg_p2->value_string, sizeof(attrname));
 
   sts = ldh_NameToObjid(ldhses, &nodeoid, nodename);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     *return_int = sts;
     *return_decl = CCM_DECL_INT;
     return 1;
   }
 
   sts = ldh_NameToAttrRef(ldhses, attrname, &aref);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     *return_int = sts;
     *return_decl = CCM_DECL_INT;
     return 1;
@@ -1751,9 +1804,8 @@ static int wccm_plcconnect_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int wccm_inlib_func(void* filectx, ccm_sArg* arg_list, int arg_count,
-    int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
-    char* return_string)
+static int wccm_inlib_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                           ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
   pwr_tObjid oid;
@@ -1762,7 +1814,8 @@ static int wccm_inlib_func(void* filectx, ccm_sArg* arg_list, int arg_count,
   int in_lib;
 
   sts = wccm_get_ldhses(&ldhses);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     strcpy(return_string, "");
     *return_decl = CCM_DECL_STRING;
     return CMD__NOVOLATTACHED;
@@ -1776,9 +1829,11 @@ static int wccm_inlib_func(void* filectx, ccm_sArg* arg_list, int arg_count,
 
   in_lib = 0;
   for (sts = ldh_NameToObjid(ldhses, &oid, arg_list->value_string); ODD(sts);
-       sts = ldh_GetParent(ldhses, oid, &oid)) {
+       sts = ldh_GetParent(ldhses, oid, &oid))
+  {
     sts = ldh_GetObjectClass(ldhses, oid, &cid);
-    if (ODD(sts) && cid == pwr_eClass_LibHier) {
+    if (ODD(sts) && cid == pwr_eClass_LibHier)
+    {
       in_lib = 1;
       break;
     }
@@ -1790,20 +1845,19 @@ static int wccm_inlib_func(void* filectx, ccm_sArg* arg_list, int arg_count,
 }
 
 /*************************************************************************
-*
-* Name:		wccm_register()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		wccm_register()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
 
 int wccm_register(int (*get_wbctx_cb)(void*, ldh_tWBContext*),
-    int (*get_ldhsession_cb)(void*, ldh_tSesContext*),
-    int (*get_wnav_cb)(void*, WNav**))
+                  int (*get_ldhsession_cb)(void*, ldh_tSesContext*), int (*get_wnav_cb)(void*, WNav**))
 {
   int sts;
 
@@ -1811,7 +1865,8 @@ int wccm_register(int (*get_wbctx_cb)(void*, ldh_tWBContext*),
   wccm_get_ldhsession_cb = get_ldhsession_cb;
   wccm_get_wnav_cb = get_wnav_cb;
 
-  if (!wccm_ccm_func_registred) {
+  if (!wccm_ccm_func_registred)
+  {
     sts = ccm_register_function("Wb", "GetAttribute", wccm_getattribute_func);
     if (EVEN(sts))
       return sts;
@@ -1821,8 +1876,7 @@ int wccm_register(int (*get_wbctx_cb)(void*, ldh_tWBContext*),
     sts = ccm_register_function("Wb", "GetParent", wccm_getparent_func);
     if (EVEN(sts))
       return sts;
-    sts = ccm_register_function(
-        "Wb", "GetNextSibling", wccm_getnextsibling_func);
+    sts = ccm_register_function("Wb", "GetNextSibling", wccm_getnextsibling_func);
     if (EVEN(sts))
       return sts;
     sts = ccm_register_function("Wb", "GetClassList", wccm_getclasslist_func);
@@ -1831,19 +1885,16 @@ int wccm_register(int (*get_wbctx_cb)(void*, ldh_tWBContext*),
     sts = ccm_register_function("Wb", "GetNextObject", wccm_getnextobject_func);
     if (EVEN(sts))
       return sts;
-    sts = ccm_register_function(
-        "Wb", "GetClassListAttrRef", wccm_getclasslistattrref_func);
+    sts = ccm_register_function("Wb", "GetClassListAttrRef", wccm_getclasslistattrref_func);
     if (EVEN(sts))
       return sts;
-    sts = ccm_register_function(
-        "Wb", "GetNextAttrRef", wccm_getnextattrref_func);
+    sts = ccm_register_function("Wb", "GetNextAttrRef", wccm_getnextattrref_func);
     if (EVEN(sts))
       return sts;
     sts = ccm_register_function("Wb", "GetRootList", wccm_getrootlist_func);
     if (EVEN(sts))
       return sts;
-    sts = ccm_register_function(
-        "Wb", "GetObjectClass", wccm_getobjectclass_func);
+    sts = ccm_register_function("Wb", "GetObjectClass", wccm_getobjectclass_func);
     if (EVEN(sts))
       return sts;
     sts = ccm_register_function("Wb", "RenameObject", wccm_renameobject_func);
@@ -1852,12 +1903,10 @@ int wccm_register(int (*get_wbctx_cb)(void*, ldh_tWBContext*),
     sts = ccm_register_function("Wb", "MoveObject", wccm_moveobject_func);
     if (EVEN(sts))
       return sts;
-    sts = ccm_register_function(
-        "Wb", "GetTemplateObject", wccm_gettemplateobject_func);
+    sts = ccm_register_function("Wb", "GetTemplateObject", wccm_gettemplateobject_func);
     if (EVEN(sts))
       return sts;
-    sts = ccm_register_function(
-        "Wb", "GetNextTemplateAttrRef", wccm_getnexttemplateattrref_func);
+    sts = ccm_register_function("Wb", "GetNextTemplateAttrRef", wccm_getnexttemplateattrref_func);
     if (EVEN(sts))
       return sts;
     sts = ccm_register_function("Wb", "GetVolumeList", wccm_getvolumelist_func);
@@ -1866,8 +1915,7 @@ int wccm_register(int (*get_wbctx_cb)(void*, ldh_tWBContext*),
     sts = ccm_register_function("Wb", "GetNextVolume", wccm_getnextvolume_func);
     if (EVEN(sts))
       return sts;
-    sts = ccm_register_function(
-        "Wb", "GetVolumeClass", wccm_getvolumeclass_func);
+    sts = ccm_register_function("Wb", "GetVolumeClass", wccm_getvolumeclass_func);
     if (EVEN(sts))
       return sts;
     sts = ccm_register_function("Wb", "CutObjectName", wccm_cutobjectname_func);
@@ -1879,34 +1927,28 @@ int wccm_register(int (*get_wbctx_cb)(void*, ldh_tWBContext*),
     sts = ccm_register_function("Wb", "ObjectExist", wccm_objectexist_func);
     if (EVEN(sts))
       return sts;
-    sts = ccm_register_function(
-        "Wb", "GetProjectName", wccm_getprojectname_func);
+    sts = ccm_register_function("Wb", "GetProjectName", wccm_getprojectname_func);
     if (EVEN(sts))
       return sts;
     sts = ccm_register_function("Wb", "SetAttribute", wccm_setattribute_func);
     if (EVEN(sts))
       return sts;
-    sts = ccm_register_function(
-        "Wb", "CheckSystemGroup", wccm_checksystemgroup_func);
+    sts = ccm_register_function("Wb", "CheckSystemGroup", wccm_checksystemgroup_func);
     if (EVEN(sts))
       return sts;
-    sts = ccm_register_function(
-        "Wb", "GetNextFreeUserVid", wccm_getnextfreeuservid_func);
+    sts = ccm_register_function("Wb", "GetNextFreeUserVid", wccm_getnextfreeuservid_func);
     if (EVEN(sts))
       return sts;
     sts = ccm_register_function("Wb", "CheckNewVid", wccm_checknewvid_func);
     if (EVEN(sts))
       return sts;
-    sts = ccm_register_function(
-        "Wb", "CheckNewVolumeName", wccm_checknewvolumename_func);
+    sts = ccm_register_function("Wb", "CheckNewVolumeName", wccm_checknewvolumename_func);
     if (EVEN(sts))
       return sts;
-    sts = ccm_register_function(
-        "Wb", "GetCurrentVolume", wccm_getcurrentvolume_func);
+    sts = ccm_register_function("Wb", "GetCurrentVolume", wccm_getcurrentvolume_func);
     if (EVEN(sts))
       return sts;
-    sts = ccm_register_function(
-        "Wb", "StringToObjectName", wccm_stringtoobjectname_func);
+    sts = ccm_register_function("Wb", "StringToObjectName", wccm_stringtoobjectname_func);
     if (EVEN(sts))
       return sts;
     sts = ccm_register_function("Wb", "GetHardware", wccm_gethardware_func);
@@ -1927,16 +1969,13 @@ int wccm_register(int (*get_wbctx_cb)(void*, ldh_tWBContext*),
     sts = ccm_register_function("Wb", "ClosePlcPgm", wccm_closeplcpgm_func);
     if (EVEN(sts))
       return sts;
-    sts = ccm_register_function(
-        "Wb", "CreatePlcObject", wccm_createplcobject_func);
+    sts = ccm_register_function("Wb", "CreatePlcObject", wccm_createplcobject_func);
     if (EVEN(sts))
       return sts;
-    sts = ccm_register_function(
-        "Wb", "SetPlcObjectAttr", wccm_setplcobjectattr_func);
+    sts = ccm_register_function("Wb", "SetPlcObjectAttr", wccm_setplcobjectattr_func);
     if (EVEN(sts))
       return sts;
-    sts = ccm_register_function(
-        "Wb", "CreatePlcConnection", wccm_createplcconnection_func);
+    sts = ccm_register_function("Wb", "CreatePlcConnection", wccm_createplcconnection_func);
     if (EVEN(sts))
       return sts;
     sts = ccm_register_function("Wb", "PlcConnect", wccm_plcconnect_func);
@@ -1955,16 +1994,16 @@ int wccm_register(int (*get_wbctx_cb)(void*, ldh_tWBContext*),
 }
 
 /*************************************************************************
-*
-* Name:		wccm_set_status()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		wccm_set_status()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
 
 void wccm_set_status(pwr_tStatus sts)
 {
@@ -1978,19 +2017,19 @@ void wccm_set_status(pwr_tStatus sts)
 }
 
 /*************************************************************************
-*
-* Name:		wccm_attribute_func()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		wccm_attribute_func()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-static int wccm_attribute_func(char* name, int* return_decl,
-    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
+static int wccm_attribute_func(char* name, int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
+                               char* return_string)
 {
   int sts, size;
   pwr_tAName hier_name;
@@ -2003,7 +2042,8 @@ static int wccm_attribute_func(char* name, int* return_decl,
   ldh_tSesContext ldhses;
 
   sts = wccm_get_ldhses(&ldhses);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     strcpy(return_string, "");
     *return_decl = CCM_DECL_STRING;
     return CMD__NOVOLATTACHED;
@@ -2012,7 +2052,8 @@ static int wccm_attribute_func(char* name, int* return_decl,
   wb_session* sp = (wb_session*)ldhses;
 
   wb_attribute a = sp->attribute(name);
-  if (!a) {
+  if (!a)
+  {
     strcpy(return_string, "");
     *return_decl = CCM_DECL_STRING;
     return a.sts();
@@ -2021,53 +2062,64 @@ static int wccm_attribute_func(char* name, int* return_decl,
   valuep = (char*)calloc(1, a.size());
   a.value(valuep);
 
-  switch (a.type()) {
-  case pwr_eType_Boolean: {
+  switch (a.type())
+  {
+  case pwr_eType_Boolean:
+  {
     int_val = *(pwr_tBoolean*)valuep;
     decl = CCM_DECL_INT;
     break;
   }
-  case pwr_eType_Float32: {
+  case pwr_eType_Float32:
+  {
     float_val = *(pwr_tFloat32*)valuep;
     decl = CCM_DECL_FLOAT;
     break;
   }
-  case pwr_eType_Float64: {
+  case pwr_eType_Float64:
+  {
     float_val = *(pwr_tFloat64*)valuep;
     decl = CCM_DECL_FLOAT;
     break;
   }
-  case pwr_eType_Char: {
+  case pwr_eType_Char:
+  {
     int_val = *(pwr_tChar*)valuep;
     decl = CCM_DECL_INT;
     break;
   }
-  case pwr_eType_Int8: {
+  case pwr_eType_Int8:
+  {
     int_val = *(pwr_tInt8*)valuep;
     decl = CCM_DECL_INT;
     break;
   }
-  case pwr_eType_Int16: {
+  case pwr_eType_Int16:
+  {
     int_val = *(pwr_tInt16*)valuep;
     decl = CCM_DECL_INT;
     break;
   }
-  case pwr_eType_Int32: {
+  case pwr_eType_Int32:
+  {
     int_val = *(pwr_tInt32*)valuep;
     decl = CCM_DECL_INT;
     break;
   }
-  case pwr_eType_Int64: {
+  case pwr_eType_Int64:
+  {
     int_val = *(pwr_tInt64*)valuep;
     decl = CCM_DECL_INT;
     break;
   }
-  case pwr_eType_UInt8: {
+  case pwr_eType_UInt8:
+  {
     int_val = *(pwr_tUInt8*)valuep;
     decl = CCM_DECL_INT;
     break;
   }
-  case pwr_eType_UInt16: {
+  case pwr_eType_UInt16:
+  {
     int_val = *(pwr_tUInt16*)valuep;
     decl = CCM_DECL_INT;
     break;
@@ -2078,32 +2130,37 @@ static int wccm_attribute_func(char* name, int* return_decl,
   case pwr_eType_ClassId:
   case pwr_eType_TypeId:
   case pwr_eType_VolumeId:
-  case pwr_eType_ObjectIx: {
+  case pwr_eType_ObjectIx:
+  {
     int_val = *(pwr_tUInt32*)valuep;
     decl = CCM_DECL_INT;
     break;
   }
-  case pwr_eType_UInt64: {
+  case pwr_eType_UInt64:
+  {
     int_val = *(pwr_tUInt64*)valuep;
     decl = CCM_DECL_INT;
     break;
   }
-  case pwr_eType_String: {
+  case pwr_eType_String:
+  {
     strncpy(string_val, valuep, sizeof(string_val));
     string_val[sizeof(string_val) - 1] = 0;
     decl = CCM_DECL_STRING;
     break;
   }
-  case pwr_eType_Text: {
+  case pwr_eType_Text:
+  {
     strncpy(string_val, valuep, sizeof(string_val));
     string_val[sizeof(string_val) - 1] = 0;
     decl = CCM_DECL_STRING;
     break;
   }
-  case pwr_eType_ObjDId: {
+  case pwr_eType_ObjDId:
+  {
     /* Get the object name from ldh */
-    sts = ldh_ObjidToName(ldhses, *(pwr_tObjid*)valuep, ldh_eName_Hierarchy,
-        hier_name, sizeof(hier_name), &size);
+    sts = ldh_ObjidToName(ldhses, *(pwr_tObjid*)valuep, ldh_eName_Hierarchy, hier_name, sizeof(hier_name),
+                          &size);
     if (EVEN(sts))
       strcpy(string_val, "Undefined Object");
     else
@@ -2112,10 +2169,10 @@ static int wccm_attribute_func(char* name, int* return_decl,
     decl = CCM_DECL_STRING;
     break;
   }
-  case pwr_eType_AttrRef: {
+  case pwr_eType_AttrRef:
+  {
     /* Get the object name from ldh */
-    sts = ldh_AttrRefToName(
-        ldhses, (pwr_sAttrRef*)valuep, ldh_eName_Aref, &hier_name_p, &size);
+    sts = ldh_AttrRefToName(ldhses, (pwr_sAttrRef*)valuep, ldh_eName_Aref, &hier_name_p, &size);
     if (EVEN(sts))
       strcpy(string_val, "Undefined attribute");
     else
@@ -2124,18 +2181,18 @@ static int wccm_attribute_func(char* name, int* return_decl,
     decl = CCM_DECL_STRING;
     break;
   }
-  case pwr_eType_Time: {
+  case pwr_eType_Time:
+  {
     /* Convert time to ascii */
-    sts = time_AtoAscii((pwr_tTime*)valuep, time_eFormat_DateAndTime,
-        string_val, sizeof(string_val));
+    sts = time_AtoAscii((pwr_tTime*)valuep, time_eFormat_DateAndTime, string_val, sizeof(string_val));
     string_val[20] = 0;
     decl = CCM_DECL_STRING;
     break;
   }
-  case pwr_eType_DeltaTime: {
+  case pwr_eType_DeltaTime:
+  {
     /* Convert time to ascii */
-    sts = time_DtoAscii(
-        (pwr_tDeltaTime*)valuep, 1, string_val, sizeof(string_val));
+    sts = time_DtoAscii((pwr_tDeltaTime*)valuep, 1, string_val, sizeof(string_val));
     string_val[20] = 0;
     decl = CCM_DECL_STRING;
     break;
@@ -2156,32 +2213,35 @@ static int wccm_attribute_func(char* name, int* return_decl,
 }
 
 /*************************************************************************
-*
-* Name:		wccm_cut_segments()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		wccm_cut_segments()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
 
 static int wccm_cut_segments(char* outname, char* name, int segments)
 {
   char* s[20];
   int i, j, last_i = 0;
 
-  for (i = 0; i < segments; i++) {
+  for (i = 0; i < segments; i++)
+  {
     s[i] = strrchr(name, '-');
-    if (s[i] == 0) {
+    if (s[i] == 0)
+    {
       last_i = i;
       break;
     }
     *s[i] = '+';
     last_i = i;
   }
-  for (j = 0; j <= last_i; j++) {
+  for (j = 0; j <= last_i; j++)
+  {
     if (s[j] != 0)
       *s[j] = '-';
   }

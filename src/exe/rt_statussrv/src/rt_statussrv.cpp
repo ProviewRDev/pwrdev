@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -50,7 +50,6 @@
 #include <sys/socket.h>
 #include <signal.h>
 #include <iostream>
-#include <fstream>
 
 #include "co_cdh.h"
 #include "co_dcli.h"
@@ -70,18 +69,18 @@
 
 class status_server;
 
-
 static char rcv_buffer[65536];
-static status_server *statussrv_p = 0;
+static status_server* statussrv_p = 0;
 
 #define MAX_CONNECTIONS 20
 
-
-typedef struct {
+typedef struct
+{
   int idx;
 } sCondata;
 
-typedef struct {
+typedef struct
+{
   pwr_tTime last_req_time;
   thread_s t;
   int c_socket;
@@ -90,11 +89,10 @@ typedef struct {
   int occupied;
 } sServerConnection;
 
-class status_server {
-  public:
-  status_server() : m_grant_all(true), m_config(0), m_node(0), m_qid(qcom_cNQid), m_sock(0)
-  {
-  }
+class status_server
+{
+public:
+  status_server() : m_grant_all(true), m_config(0), m_node(0), m_qid(qcom_cNQid), m_sock(0) {}
   pwr_tStatus init(int ignore_config);
   void close_connection(int l_idx);
   static void get_text(pwr_tStatus sts, char* buf, int size);
@@ -112,23 +110,21 @@ class status_server {
 };
 
 static void* srv_connect(void* arg);
-static void signal_callback_handler(int signum)
-{
-  printf("Caught signal SIGPIPE %d\n", signum);
-}
+static void signal_callback_handler(int signum) { printf("Caught signal SIGPIPE %d\n", signum); }
 
 int main(int argc, char* argv[])
 {
   pwr_tStatus sts;
   qcom_sQid qid = qcom_cNQid;
   int ignore_config = 0;
-  status_server *srv;
+  status_server* srv;
   pwr_tTime current_time;
   int tmo = 2000;
   char mp[2000];
   qcom_sGet get;
 
-  for (int i = 1; i < argc; i++) {
+  for (int i = 1; i < argc; i++)
+  {
     if (streq(argv[i], "-i"))
       ignore_config = 1;
   }
@@ -138,32 +134,42 @@ int main(int argc, char* argv[])
   srv->m_qid = qid;
 
   sts = srv->init(ignore_config);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
   }
 
   errh_SetStatus(PWR__SRUN);
 
-  for (;;) {
+  for (;;)
+  {
     time_GetTime(&current_time);
     aproc_TimeStamp(((float)tmo) / 1000, 5);
 
     get.maxSize = sizeof(mp);
     get.data = mp;
     qcom_Get(&sts, &srv->m_qid, &get, tmo);
-    if (sts == QCOM__TMO || sts == QCOM__QEMPTY) {
+    if (sts == QCOM__TMO || sts == QCOM__QEMPTY)
+    {
       // Do nothing...
-    } else {
+    }
+    else
+    {
       ini_mEvent new_event;
       qcom_sEvent* ep = (qcom_sEvent*)get.data;
 
       new_event.m = ep->mask;
-      if (new_event.b.oldPlcStop) {
+      if (new_event.b.oldPlcStop)
+      {
         errh_SetStatus(PWR__SRVRESTART);
-      } else if (new_event.b.swapDone) {
+      }
+      else if (new_event.b.swapDone)
+      {
         errh_SetStatus(PWR__SRUN);
-      } else if (new_event.b.terminate) {
+      }
+      else if (new_event.b.terminate)
+      {
         exit(0);
       }
     }
@@ -189,30 +195,33 @@ pwr_tStatus status_server::init(int ignore_config)
   int i;
   unsigned short port;
 
-
   sts = gdh_Init("status_server");
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     exit(sts);
   }
 
   errh_Init("status_server", errh_eAnix_statussrv);
   errh_SetStatus(PWR__SRVSTARTUP);
 
-  if (!qcom_Init(&sts, 0, "status_server")) {
+  if (!qcom_Init(&sts, 0, "status_server"))
+  {
     errh_Fatal("qcom_Init, %m", sts);
     return sts;
   }
 
   qAttr.type = qcom_eQtype_private;
   qAttr.quota = 100;
-  if (!qcom_CreateQ(&sts, &qid, &qAttr, "events")) {
+  if (!qcom_CreateQ(&sts, &qid, &qAttr, "events"))
+  {
     errh_Fatal("qcom_CreateQ, %m", sts);
     return sts;
   }
   m_qid = qid;
 
   qini = qcom_cQini;
-  if (!qcom_Bind(&sts, &qid, &qini)) {
+  if (!qcom_Bind(&sts, &qid, &qini))
+  {
     errh_Fatal("qcom_Bind(Qini), %m", sts);
     return sts;
   }
@@ -227,21 +236,26 @@ pwr_tStatus status_server::init(int ignore_config)
     return sts;
 
   // Get application names
-  for (int i = 0; i < stssrv_cApplSize; i++) {
-    if (cdh_ObjidIsNotNull(m_node->ProcObject[i + stssrv_cApplOffset])) {
-      sts = gdh_ObjidToName(m_node->ProcObject[i + stssrv_cApplOffset],
-          m_appl[i], sizeof(m_appl[0]), cdh_mName_object);
+  for (int i = 0; i < stssrv_cApplSize; i++)
+  {
+    if (cdh_ObjidIsNotNull(m_node->ProcObject[i + stssrv_cApplOffset]))
+    {
+      sts = gdh_ObjidToName(m_node->ProcObject[i + stssrv_cApplOffset], m_appl[i], sizeof(m_appl[0]),
+                            cdh_mName_object);
       if (EVEN(sts))
         strcpy(m_appl[i], "");
-    } else
+    }
+    else
       strcpy(m_appl[i], "");
   }
 
-  if (!ignore_config) {
+  if (!ignore_config)
+  {
     // Get StatusServerConfig object
     pwr_tOid config_oid;
     sts = gdh_GetClassList(pwr_cClass_StatusServerConfig, &config_oid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       // Not configured
       return PWR__SRVNOTCONF;
     }
@@ -254,36 +268,23 @@ pwr_tStatus status_server::init(int ignore_config)
     m_config->Connections = 0;
   }
   else
-    m_config = (pwr_sClass_StatusServerConfig *) calloc(1, sizeof(*m_config));
+    m_config = (pwr_sClass_StatusServerConfig*)calloc(1, sizeof(*m_config));
 
-  // Read version file
-
-  char buff[100];
-  pwr_tFileName fname;
-
-  dcli_translate_filename(fname, "$pwr_exe/rt_version.dat");
-
-  std::ifstream fp(fname);
-
-  if (fp) {
-    fp.getline(buff, sizeof(buff));
-    strcpy(m_version, "V");
-    strcat(m_version, &buff[9]);
-    fp.close();
-  } else
-    strcpy(m_version, "");
+  strncpy(m_version, pwrv_cPwrVersionStr, sizeof(m_version));
 
   // Ignore SIGPIPE signal
   signal(SIGPIPE, signal_callback_handler);
 
   sts = thread_MutexInit(&thread_mutex);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Error("Error creating mutex, %m", sts);
     return 0;
   }
 
   int bus = syi_Busid(&sts);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Error("Error creating port, %m", sts);
     return 0;
   }
@@ -293,10 +294,11 @@ pwr_tStatus status_server::init(int ignore_config)
   /* Create socket */
   uid_t ruid;
   ruid = getuid();
-  //printf("ruid: %d\n", ruid);
+  // printf("ruid: %d\n", ruid);
 
   m_sock = socket(AF_INET, SOCK_STREAM, 0);
-  if (m_sock < 0) {
+  if (m_sock < 0)
+  {
     errh_Error("Error creating socket, %d", m_sock);
     return 0;
   }
@@ -304,14 +306,16 @@ pwr_tStatus status_server::init(int ignore_config)
 
   m_loc_addr.sin_family = AF_INET;
   m_loc_addr.sin_port = htons(port);
-  for (i = 0; i < 10; i++) {
+  for (i = 0; i < 10; i++)
+  {
     sts = bind(m_sock, (struct sockaddr*)&m_loc_addr, sizeof(m_loc_addr));
     if (sts == 0)
       break;
     perror("Status server, bind socket failure, retrying... ");
     sleep(10);
   }
-  if (sts != 0) {
+  if (sts != 0)
+  {
     printf("Status server, Bind socket failure, exiting\n");
     errh_Error("Error bind socket to port, %d", m_sock);
     return 0;
@@ -341,7 +345,7 @@ void status_server::close_connection(int l_idx)
 
 static void* srv_receive(void* data)
 {
-  status_server *srv = statussrv_p;
+  status_server* srv = statussrv_p;
   int l_idx = ((sCondata*)data)->idx;
   int c_socket = srv->m_connections[l_idx].c_socket;
   ssize_t data_size;
@@ -353,15 +357,18 @@ static void* srv_receive(void* data)
   free(data);
   srv->m_config->Connections++;
 
-  while (1) {
+  while (1)
+  {
     size_of_msg = 0;
 
     data_size = recv(c_socket, rcv_buffer, sizeof(stssrv_sRequest), 0);
-    if (data_size < 0) {
+    if (data_size < 0)
+    {
       srv->m_config->ErrorCount++;
       continue;
-    }    
-    if (data_size == 0) {
+    }
+    if (data_size == 0)
+    {
       /* Disconnected */
       srv->m_config->Connections--;
       close(c_socket);
@@ -370,11 +377,12 @@ static void* srv_receive(void* data)
       return 0;
     }
 
-    while (data_size > 0) {
+    while (data_size > 0)
+    {
       if (data_size < sizeof(stssrv_sRequest))
         break;
 
-      rb = (stssrv_sRequest *)&rcv_buffer[size_of_msg];
+      rb = (stssrv_sRequest*)&rcv_buffer[size_of_msg];
 
       if (rb->head.length == 0)
         break;
@@ -385,39 +393,41 @@ static void* srv_receive(void* data)
       time_GetTime(&srv->m_connections[l_idx].last_req_time);
       exception_code = 0;
 
-      switch (rb->head.type) {
-      case stssrv_eMsgType_Status: {
+      switch (rb->head.type)
+      {
+      case stssrv_eMsgType_Status:
+      {
         stssrv_sRespondStatus msg;
-	
-	msg.head.length = sizeof(msg);
-	msg.head.version = stssrv_cVersion;
-	msg.head.type = stssrv_eMsgType_Status;
-	msg.head.id = rb->head.id;
-	msg.Sts = 1;
-	strncpy(msg.Version, srv->m_version, sizeof(msg.Version));
-	msg.SystemStatus = srv->m_node->SystemStatus;
-	srv->get_text(srv->m_node->SystemStatus, msg.SystemStatusStr, sizeof(msg.SystemStatusStr));
-	strncpy(msg.Description, srv->m_node->Description, sizeof(msg.Description));
-	time_AtoAscii(&srv->m_node->SystemTime, time_eFormat_DateAndTime,
-	    msg.SystemTime, sizeof(msg.SystemTime));
-	time_AtoAscii(&srv->m_node->BootTime, time_eFormat_DateAndTime,
-	    msg.BootTime, sizeof(msg.BootTime));
-	time_AtoAscii(&srv->m_node->RestartTime, time_eFormat_DateAndTime,
-	    msg.RestartTime, sizeof(msg.RestartTime));
-	msg.Restarts = srv->m_node->Restarts;
-	msg.UserStatus1 = srv->m_config->UserStatus[0];
-	strncpy(msg.UserStatus1Str, srv->m_config->UserStatusStr[0], sizeof(msg.UserStatus1Str));
-	msg.UserStatus2 = srv->m_config->UserStatus[1];
-	strncpy(msg.UserStatus2Str, srv->m_config->UserStatusStr[1], sizeof(msg.UserStatus2Str));
-	msg.UserStatus3 = srv->m_config->UserStatus[2];
-	strncpy(msg.UserStatus3Str, srv->m_config->UserStatusStr[2], sizeof(msg.UserStatus3Str));
-	msg.UserStatus4 = srv->m_config->UserStatus[3];
-	strncpy(msg.UserStatus4Str, srv->m_config->UserStatusStr[3], sizeof(msg.UserStatus4Str));	
-	msg.UserStatus5 = srv->m_config->UserStatus[4];
-	strncpy(msg.UserStatus5Str, srv->m_config->UserStatusStr[4], sizeof(msg.UserStatus5Str));	
+
+        msg.head.length = sizeof(msg);
+        msg.head.version = stssrv_cVersion;
+        msg.head.type = stssrv_eMsgType_Status;
+        msg.head.id = rb->head.id;
+        msg.Sts = 1;
+        strncpy(msg.Version, srv->m_version, sizeof(msg.Version));
+        msg.SystemStatus = srv->m_node->SystemStatus;
+        srv->get_text(srv->m_node->SystemStatus, msg.SystemStatusStr, sizeof(msg.SystemStatusStr));
+        strncpy(msg.Description, srv->m_node->Description, sizeof(msg.Description));
+        time_AtoAscii(&srv->m_node->SystemTime, time_eFormat_DateAndTime, msg.SystemTime,
+                      sizeof(msg.SystemTime));
+        time_AtoAscii(&srv->m_node->BootTime, time_eFormat_DateAndTime, msg.BootTime, sizeof(msg.BootTime));
+        time_AtoAscii(&srv->m_node->RestartTime, time_eFormat_DateAndTime, msg.RestartTime,
+                      sizeof(msg.RestartTime));
+        msg.Restarts = srv->m_node->Restarts;
+        msg.UserStatus1 = srv->m_config->UserStatus[0];
+        strncpy(msg.UserStatus1Str, srv->m_config->UserStatusStr[0], sizeof(msg.UserStatus1Str));
+        msg.UserStatus2 = srv->m_config->UserStatus[1];
+        strncpy(msg.UserStatus2Str, srv->m_config->UserStatusStr[1], sizeof(msg.UserStatus2Str));
+        msg.UserStatus3 = srv->m_config->UserStatus[2];
+        strncpy(msg.UserStatus3Str, srv->m_config->UserStatusStr[2], sizeof(msg.UserStatus3Str));
+        msg.UserStatus4 = srv->m_config->UserStatus[3];
+        strncpy(msg.UserStatus4Str, srv->m_config->UserStatusStr[3], sizeof(msg.UserStatus4Str));
+        msg.UserStatus5 = srv->m_config->UserStatus[4];
+        strncpy(msg.UserStatus5Str, srv->m_config->UserStatusStr[4], sizeof(msg.UserStatus5Str));
 
         ssts = send(c_socket, &msg, msg.head.length, MSG_DONTWAIT);
-        if (ssts < 0) {
+        if (ssts < 0)
+        {
           srv->m_config->Connections--;
           close(c_socket);
           srv->m_connections[l_idx].occupied = 0;
@@ -426,44 +436,52 @@ static void* srv_receive(void* data)
         }
         break;
       }
-      case stssrv_eMsgType_ExtStatus: {
+      case stssrv_eMsgType_ExtStatus:
+      {
         stssrv_sRespondExtStatus msg;
-	
-	msg.head.length = sizeof(msg);
-	msg.head.version = stssrv_cVersion;
-	msg.head.type = stssrv_eMsgType_ExtStatus;
-	msg.head.id = rb->head.id;
 
-	for (int i = 0; i < stssrv_cServerSize; i++) {
-	  msg.Server[i].Sts = srv->m_node->ProcStatus[i];
-	  srv->get_text(srv->m_node->ProcStatus[i], msg.Server[i].StsStr, sizeof(msg.Server[0].StsStr));
-	  errh_AnixName((errh_eAnix)(i + 1), msg.Server[i].Name);
-	}
-	for (int i = 0; i < stssrv_cPlcSize; i++) {
-	  msg.Plc[i].Sts = srv->m_node->ProcStatus[stssrv_cServerSize + i];
-	  srv->get_text(srv->m_node->ProcStatus[stssrv_cServerSize + i], msg.Plc[i].StsStr, sizeof(msg.Plc[0].StsStr));
-	  sprintf(msg.Plc[i].Name, "Plc%d", i+1);
-	}
-	for (int i = 0; i < stssrv_cApplSize; i++) {
-	  msg.Appl[i].Sts = srv->m_node->ProcStatus[stssrv_cApplOffset + i];
-	  srv->get_text(srv->m_node->ProcStatus[stssrv_cApplOffset + i], msg.Appl[i].StsStr, sizeof(msg.Appl[0].StsStr));
-	  strcpy(msg.Appl[i].Name, srv->m_appl[i]);
-	}
+        msg.head.length = sizeof(msg);
+        msg.head.version = stssrv_cVersion;
+        msg.head.type = stssrv_eMsgType_ExtStatus;
+        msg.head.id = rb->head.id;
+
+        for (int i = 0; i < stssrv_cServerSize; i++)
+        {
+          msg.Server[i].Sts = srv->m_node->ProcStatus[i];
+          srv->get_text(srv->m_node->ProcStatus[i], msg.Server[i].StsStr, sizeof(msg.Server[0].StsStr));
+          errh_AnixName((errh_eAnix)(i + 1), msg.Server[i].Name);
+        }
+        for (int i = 0; i < stssrv_cPlcSize; i++)
+        {
+          msg.Plc[i].Sts = srv->m_node->ProcStatus[stssrv_cServerSize + i];
+          srv->get_text(srv->m_node->ProcStatus[stssrv_cServerSize + i], msg.Plc[i].StsStr,
+                        sizeof(msg.Plc[0].StsStr));
+          sprintf(msg.Plc[i].Name, "Plc%d", i + 1);
+        }
+        for (int i = 0; i < stssrv_cApplSize; i++)
+        {
+          msg.Appl[i].Sts = srv->m_node->ProcStatus[stssrv_cApplOffset + i];
+          srv->get_text(srv->m_node->ProcStatus[stssrv_cApplOffset + i], msg.Appl[i].StsStr,
+                        sizeof(msg.Appl[0].StsStr));
+          strcpy(msg.Appl[i].Name, srv->m_appl[i]);
+        }
         ssts = send(c_socket, &msg, msg.head.length, MSG_DONTWAIT);
-        if (ssts < 0) {
+        if (ssts < 0)
+        {
           srv->m_config->Connections--;
           close(c_socket);
           srv->m_connections[l_idx].occupied = 0;
           errh_Error("Status server, connection lost, %d", c_socket);
           return 0;
         }
-	break;
+        break;
       }
       default:
         exception_code = 1;
       }
 
-      if (exception_code) {
+      if (exception_code)
+      {
         errh_Error("Status sever, unknown message type received %d", rb->head.type);
       }
     }
@@ -472,7 +490,7 @@ static void* srv_receive(void* data)
 
 static void* srv_connect(void* arg)
 {
-  status_server *srv = statussrv_p;
+  status_server* srv = statussrv_p;
   int sts;
   struct sockaddr_in r_addr;
   socklen_t r_addr_len;
@@ -482,14 +500,15 @@ static void* srv_connect(void* arg)
   int found;
   int i;
 
-  while (1) {
+  while (1)
+  {
     /* Wait for client connect request */
     r_addr_len = sizeof(r_addr);
 
     c_socket = accept(srv->m_sock, (struct sockaddr*)&r_addr, &r_addr_len);
-    if (c_socket < 0) {
-      errh_Error(
-          "Status server, accept error, %d", srv->m_sock);
+    if (c_socket < 0)
+    {
+      errh_Error("Status server, accept error, %d", srv->m_sock);
       continue;
     }
 
@@ -498,27 +517,29 @@ static void* srv_connect(void* arg)
     /* Find next empty in connection list */
     found = 0;
     thread_MutexLock(&srv->thread_mutex);
-    for (i = 0; i < MAX_CONNECTIONS; i++) {
-      if (!srv->m_connections[i].occupied) {
+    for (i = 0; i < MAX_CONNECTIONS; i++)
+    {
+      if (!srv->m_connections[i].occupied)
+      {
         found = 1;
         idx = i;
         break;
       }
     }
 
-    if (!found) {
+    if (!found)
+    {
       /* Remove the oldest connection */
       int oldest_idx = 0;
 
-      for (i = 1; i < MAX_CONNECTIONS; i++) {
-        if (time_Acomp(&srv->m_connections[i].last_req_time,
-                &srv->m_connections[oldest_idx].last_req_time)
-            < 0)
+      for (i = 1; i < MAX_CONNECTIONS; i++)
+      {
+        if (time_Acomp(&srv->m_connections[i].last_req_time, &srv->m_connections[oldest_idx].last_req_time) <
+            0)
           oldest_idx = i;
       }
       srv->close_connection(oldest_idx);
-      errh_Info(
-          "Status server, connection closed, %d", srv->m_sock);
+      errh_Info("Status server, connection closed, %d", srv->m_sock);
       idx = oldest_idx;
     }
 
@@ -533,9 +554,9 @@ static void* srv_connect(void* arg)
     condata = (sCondata*)malloc(sizeof(sCondata));
     condata->idx = idx;
 
-    sts = pthread_create(
-        &srv->m_connections[idx].t, NULL, srv_receive, (void*)condata);
-    if (sts != 0) {
+    sts = pthread_create(&srv->m_connections[idx].t, NULL, srv_receive, (void*)condata);
+    if (sts != 0)
+    {
       srv->m_connections[idx].occupied = 0;
       errh_Error("Status server, error creating thread %d", srv->m_sock);
       free(condata);
@@ -544,4 +565,3 @@ static void* srv_connect(void* arg)
   }
   return NULL;
 }
-

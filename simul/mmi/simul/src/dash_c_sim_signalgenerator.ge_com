@@ -30,25 +30,25 @@ string object, string text, float min_value, float max_value)
 
   if (gh < 7)
     tsize = 0;
-    GetTextExtent("ABCD", tsize, eFont_LucidaSans, 0, twidth, theight);
+    GetTextExtent("ABCD", tsize, eFont_Helvetica, 0, twidth, theight);
     theight = theight * 0.9;
   else
     tsize = 2;
-    GetTextExtent("ABCD", tsize, eFont_LucidaSans, 0, twidth, theight);
+    GetTextExtent("ABCD", tsize, eFont_Helvetica, 0, twidth, theight);
     theight = theight * 1.1;
   endif
 
-  GetTextExtent(title, 3, eFont_LucidaSans, 0, twidth);
+  GetTextExtent(title, 3, eFont_Helvetica, 0, twidth);
   x2 = (gx1 + gx2)/2 - twidth/2;
   y2 = gy1 + 1;
-  id = CreateText(title, x2, y2, 3, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText(title, x2, y2, 3, eFont_Helvetica, 0, eDrawType_CustomColor5);
   DashInsertObject(g, id);
 
   gh -= 1.5;
 
   tx = gx1 + 0.3;
   ty = gy1 + 2.1;
-  id = CreateText("Type", tx, ty, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Type", tx, ty, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
   DashInsertObject(g, id);
 
   x1 = gx1 + 2.5;
@@ -72,7 +72,7 @@ string object, string text, float min_value, float max_value)
   DashInsertObject(g, id);
   
   ty += 1.2;
-  id = CreateText("Amplitude", tx, ty, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Amplitude", tx, ty, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
   DashInsertObject(g, id);
 
   y1 += 1.2;
@@ -86,7 +86,7 @@ string object, string text, float min_value, float max_value)
   DashInsertObject(g, id);
 
   ty += 1.0;
-  id = CreateText("Period", tx, ty, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Period", tx, ty, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
   DashInsertObject(g, id);
 
   y1 += 1.0;
@@ -99,7 +99,7 @@ string object, string text, float min_value, float max_value)
   DashInsertObject(g, id);
 
   ty += 1.0;
-  id = CreateText("Bias", tx, ty, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Bias", tx, ty, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
   DashInsertObject(g, id);
 
   y1 += 1.0;
@@ -113,7 +113,7 @@ string object, string text, float min_value, float max_value)
 
   if (rows > 1)
     ty += 1.0;
-    id = CreateText("PulseWidth", tx, ty, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+    id = CreateText("PulseWidth", tx, ty, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
     DashInsertObject(g, id);
 
     y1 += 1.0;
@@ -126,7 +126,7 @@ string object, string text, float min_value, float max_value)
     DashInsertObject(g, id);
 
     ty += 1.5;
-    id = CreateText("ActualValue", tx, ty, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+    id = CreateText("ActualValue", tx, ty, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
     DashInsertObject(g, id);
 
     x1 += 0.15;

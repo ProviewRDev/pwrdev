@@ -40,9 +40,9 @@
 
 #if defined PWRE_CONF_RABBITMQ
 
-#include <amqp.h>
-#include <amqp_framing.h>
-#include <amqp_tcp_socket.h>
+#include <rabbitmq-c/amqp.h>
+#include <rabbitmq-c/framing.h>
+#include <rabbitmq-c/tcp_socket.h>
 #include <stdio.h>
 #include <errno.h>
 #include <unistd.h>
@@ -69,7 +69,8 @@
 #define debug 0
 #define remote_cMsgClass 204
 
-typedef struct {
+typedef struct
+{
   amqp_connection_state_t conn;
   amqp_socket_t* socket;
   amqp_channel_t channel;
@@ -78,19 +79,21 @@ typedef struct {
   int is_consumer;
 } rabbit_sCtx, *rabbit_tCtx;
 
-typedef struct {
+typedef struct
+{
   unsigned int msg_size;
   unsigned short int msg_id[2];
 } rabbit_header;
 
-typedef enum {
+typedef enum
+{
   rabbit_mOpt_KeepAll = 1,
   rabbit_mOpt_MsgOrder = 2
 } rabbit_mOpt;
 
 static rabbit_tCtx ctx = 0;
 static remnode_item rn;
-static remtrans_item *rcv_remtrans = 0;
+static remtrans_item* rcv_remtrans = 0;
 static int rcv_remtrans_locking = 0;
 static pwr_sClass_RemnodeRabbitMQ* rn_rmq;
 
@@ -114,15 +117,18 @@ void RemoteSleep(float time)
 
 void rmq_close(int destroy)
 {
-  if (ctx->channel) {
+  if (ctx->channel)
+  {
     amqp_channel_close(ctx->conn, ctx->channel, AMQP_REPLY_SUCCESS);
     ctx->channel = 0;
   }
-  if (ctx->socket) {
+  if (ctx->socket)
+  {
     amqp_connection_close(ctx->conn, AMQP_REPLY_SUCCESS);
     ctx->socket = 0;
   }
-  if (destroy) {
+  if (destroy)
+  {
     amqp_destroy_connection(ctx->conn);
     ctx->conn = 0;
   }
@@ -147,123 +153,142 @@ int rmq_connect(int msg_order)
   amqp_rpc_reply_t rep;
   amqp_channel_open_ok_t* co;
 
-  if (!ctx->conn) {
+  if (!ctx->conn)
+  {
     ctx->conn = amqp_new_connection();
     // printf( "Connection : %u\n", (unsigned int)ctx->conn);
   }
 
-  if (!ctx->socket) {
+  if (!ctx->socket)
+  {
     ctx->socket = (amqp_socket_t*)amqp_tcp_socket_new(ctx->conn);
-    if (!ctx->socket) {
+    if (!ctx->socket)
+    {
       errh_Error("Socket error");
       return 0;
     }
 
-    while (1) {
+    while (1)
+    {
       sts = amqp_socket_open(ctx->socket, ctx->op->Server, ctx->op->Port);
-      if (sts) {
+      if (sts)
+      {
         errh_Error("Socket open error %d", sts);
-	sleep(10);
+        sleep(10);
       }
-      else {
-	errh_Info("Socket opened");
-	break;
+      else
+      {
+        errh_Info("Socket opened");
+        break;
       }
     }
   }
 
-  rep = amqp_login(ctx->conn, "/", 0, 131072, ctx->op->Heartbeat, 
-      AMQP_SASL_METHOD_PLAIN, ctx->op->User, ctx->op->Password);
-  if (rep.reply_type != AMQP_RESPONSE_NORMAL) {
-    if (rep.reply_type == AMQP_RESPONSE_LIBRARY_EXCEPTION) {
-      errh_Error("Login failure, not authorized? %d library_error %d %s", rep.reply_type, 
-		 rep.library_error, amqp_error_string2(rep.library_error));
+  rep = amqp_login(ctx->conn, "/", 0, 131072, ctx->op->Heartbeat, AMQP_SASL_METHOD_PLAIN, ctx->op->User,
+                   ctx->op->Password);
+  if (rep.reply_type != AMQP_RESPONSE_NORMAL)
+  {
+    if (rep.reply_type == AMQP_RESPONSE_LIBRARY_EXCEPTION)
+    {
+      errh_Error("Login failure, not authorized? %d library_error %d %s", rep.reply_type, rep.library_error,
+                 amqp_error_string2(rep.library_error));
     }
     else
       errh_Error("Login failure: %d", rep.reply_type);
     return 0;
   }
 
-  if (!ctx->channel) {
+  if (!ctx->channel)
+  {
     if (ctx->op->Channel == 0)
       ctx->channel = 1;
     else
       ctx->channel = ctx->op->Channel;
 
     co = amqp_channel_open(ctx->conn, ctx->channel);
-    if (!co) {
+    if (!co)
+    {
       printf("Channel not open\n");
       ctx->channel = 0;
-    } else {
+    }
+    else
+    {
       if (debug)
-	printf("Channel open %s\n", (char*)co->channel_id.bytes);
+        printf("Channel open %s\n", (char*)co->channel_id.bytes);
     }
   }
 
   /* Declare send queue */
-  if (ctx->is_producer) {
+  if (ctx->is_producer)
+  {
     // 0 passive 0 durable 0 exclusive 0 auto-delete
-    amqp_queue_declare_ok_t* qd = amqp_queue_declare(ctx->conn, ctx->channel,
-        amqp_cstring_bytes(ctx->op->SendQueue), 0, ctx->op->Durable, 0, 0,
-        amqp_empty_table);
-    if (!qd) {
+    amqp_queue_declare_ok_t* qd =
+        amqp_queue_declare(ctx->conn, ctx->channel, amqp_cstring_bytes(ctx->op->SendQueue), 0,
+                           ctx->op->Durable, 0, 0, amqp_empty_table);
+    if (!qd)
+    {
       if (debug)
-	printf("SendQueue not declared\n");
-    } else {
+        printf("SendQueue not declared\n");
+    }
+    else
+    {
       if (debug)
-	printf("SendQueue %s message cnt %d, consumer cnt %d\n",
-            (char*)qd->queue.bytes, qd->message_count, qd->consumer_count);
+        printf("SendQueue %s message cnt %d, consumer cnt %d\n", (char*)qd->queue.bytes, qd->message_count,
+               qd->consumer_count);
     }
   }
 
   /* Declare receive queue */
-  if (ctx->is_consumer) {
+  if (ctx->is_consumer)
+  {
     // 0 passive 0 durable 0 exclusive 0 auto-delete
-    amqp_queue_declare_ok_t* qd = amqp_queue_declare(ctx->conn, ctx->channel,
-        amqp_cstring_bytes(ctx->op->ReceiveQueue), 0, ctx->op->Durable, 0, 0,
-        amqp_empty_table);
-    if (!qd) {
+    amqp_queue_declare_ok_t* qd =
+        amqp_queue_declare(ctx->conn, ctx->channel, amqp_cstring_bytes(ctx->op->ReceiveQueue), 0,
+                           ctx->op->Durable, 0, 0, amqp_empty_table);
+    if (!qd)
+    {
       if (debug)
-	printf("ReceiveQueue not declared\n");
-    } else {
+        printf("ReceiveQueue not declared\n");
+    }
+    else
+    {
       if (debug)
-	printf("ReceiveQueue %s message cnt %d, consumer cnt %d\n",
-            (char*)qd->queue.bytes, qd->message_count, qd->consumer_count);
+        printf("ReceiveQueue %s message cnt %d, consumer cnt %d\n", (char*)qd->queue.bytes, qd->message_count,
+               qd->consumer_count);
     }
   }
 
   if (ctx->is_producer && !streq(ctx->op->Exchange, ""))
 #if AMQP_VERSION_MAJOR == 0 && AMQP_VERSION_MINOR < 6
-    amqp_exchange_declare(ctx->conn, ctx->channel,
-        amqp_cstring_bytes(ctx->op->Exchange), amqp_cstring_bytes("fanout"), 0,
-        ctx->op->Durable, amqp_empty_table);
+    amqp_exchange_declare(ctx->conn, ctx->channel, amqp_cstring_bytes(ctx->op->Exchange),
+                          amqp_cstring_bytes("fanout"), 0, ctx->op->Durable, amqp_empty_table);
 #else
-    amqp_exchange_declare(ctx->conn, ctx->channel,
-        amqp_cstring_bytes(ctx->op->Exchange), amqp_cstring_bytes("fanout"), 0,
-        ctx->op->Durable, 0, 0, amqp_empty_table);
+    amqp_exchange_declare(ctx->conn, ctx->channel, amqp_cstring_bytes(ctx->op->Exchange),
+                          amqp_cstring_bytes("fanout"), 0, ctx->op->Durable, 0, 0, amqp_empty_table);
 #endif
 
   if (ctx->is_producer && !streq(ctx->op->Exchange, ""))
-    amqp_queue_bind(ctx->conn, ctx->channel,
-        amqp_cstring_bytes(ctx->op->SendQueue),
-        amqp_cstring_bytes(ctx->op->Exchange),
-        amqp_cstring_bytes("exchange-key"), amqp_empty_table);
+    amqp_queue_bind(ctx->conn, ctx->channel, amqp_cstring_bytes(ctx->op->SendQueue),
+                    amqp_cstring_bytes(ctx->op->Exchange), amqp_cstring_bytes("exchange-key"),
+                    amqp_empty_table);
 
   amqp_basic_consume_ok_t* bc;
   // 0 no-local 1 no-ack 0 exclusive
-  if (ctx->is_consumer) {
-    bc = amqp_basic_consume(ctx->conn, ctx->channel,
-        amqp_cstring_bytes(ctx->op->ReceiveQueue), amqp_empty_bytes, 0,
-        !ctx->op->Acknowledge, 0, amqp_empty_table);
+  if (ctx->is_consumer)
+  {
+    bc = amqp_basic_consume(ctx->conn, ctx->channel, amqp_cstring_bytes(ctx->op->ReceiveQueue),
+                            amqp_empty_bytes, 0, !ctx->op->Acknowledge, 0, amqp_empty_table);
     if (!bc)
       errh_Error("Consumer error");
-    else {
+    else
+    {
       if (debug)
-	printf("Consumer tag: %s\n", (char*)bc->consumer_tag.bytes);
+        printf("Consumer tag: %s\n", (char*)bc->consumer_tag.bytes);
     }
   }
 
-  if (msg_order) {
+  if (msg_order)
+  {
     if (!amqp_basic_qos(ctx->conn, ctx->channel, 0, 1, 0))
       errh_Error("amqp_basic_qos error\n");
   }
@@ -297,19 +322,20 @@ unsigned int rmq_receive()
   int msg_received = 0;
   int restart = 0;
 
-  if (rcv_remtrans && 
-      rcv_remtrans->objp->Address[2] & rabbit_mOpt_KeepAll &&
-      rcv_remtrans->objp->DataValid)
+  if (rcv_remtrans && rcv_remtrans->objp->Address[2] & rabbit_mOpt_KeepAll && rcv_remtrans->objp->DataValid)
     return 1;
-  if (rcv_remtrans_locking) {
+  if (rcv_remtrans_locking)
+  {
     rcv_remtrans = 0;
     rcv_remtrans_locking = 0;
-  }  
+  }
 
   amqp_maybe_release_buffers(ctx->conn);
   ret = amqp_consume_message(ctx->conn, &envelope, &t, 0);
-  switch (ret.reply_type) {
-  case AMQP_RESPONSE_NORMAL: {
+  switch (ret.reply_type)
+  {
+  case AMQP_RESPONSE_NORMAL:
+  {
     break;
   }
   case AMQP_RESPONSE_NONE:
@@ -317,39 +343,48 @@ unsigned int rmq_receive()
   case AMQP_RESPONSE_SERVER_EXCEPTION:
     return REM__EXCEPTION;
   case AMQP_RESPONSE_LIBRARY_EXCEPTION:
-    switch (ret.library_error) {
-    case AMQP_STATUS_TIMEOUT: {
+    switch (ret.library_error)
+    {
+    case AMQP_STATUS_TIMEOUT:
+    {
       amqp_destroy_envelope(&envelope);
       return REM__TIMEOUT;
     }
-    case AMQP_STATUS_UNEXPECTED_STATE: {
+    case AMQP_STATUS_UNEXPECTED_STATE:
+    {
       amqp_frame_t frame;
 
       sts = amqp_simple_wait_frame_noblock(ctx->conn, &frame, &t);
-      if (sts == AMQP_STATUS_TIMEOUT) {
+      if (sts == AMQP_STATUS_TIMEOUT)
+      {
         printf("Wait frame timeout\n");
         return REM__EXCEPTION;
-      } else if (sts == AMQP_STATUS_OK) {
-        if (frame.frame_type == AMQP_FRAME_METHOD) {
-          switch (frame.payload.method.id) {
+      }
+      else if (sts == AMQP_STATUS_OK)
+      {
+        if (frame.frame_type == AMQP_FRAME_METHOD)
+        {
+          switch (frame.payload.method.id)
+          {
           case AMQP_BASIC_ACK_METHOD:
             errh_Error("Exception: Basic ack method called");
-	    return REM__EXCEPTION;
+            return REM__EXCEPTION;
           case AMQP_BASIC_RETURN_METHOD:
             errh_Error("Exception: Basic return method called");
-	    return REM__EXCEPTION;
+            return REM__EXCEPTION;
           case AMQP_CHANNEL_CLOSE_METHOD:
-	    restart = 1;
+            restart = 1;
             errh_Error("Exception: Channel close method called");
             break;
           case AMQP_CONNECTION_CLOSE_METHOD:
-	    restart = 1;
+            restart = 1;
             errh_Error("Exception: Connection close method called");
             break;
           default:;
           }
         }
-      } else
+      }
+      else
         return REM__EXCEPTION;
       break;
     }
@@ -365,7 +400,8 @@ unsigned int rmq_receive()
       errh_Error("Exception: TCP error");
       return REM__EXCEPTION;
     }
-    if (restart) {
+    if (restart)
+    {
       // Reconnect...
       rmq_close(1);
       exit(0);
@@ -378,27 +414,32 @@ unsigned int rmq_receive()
   if (debug)
     printf("Received message %d\n", (int)envelope.message.body.len);
 
-  if (envelope.message.body.len > 0 && rn_rmq->DisableHeader) {
+  if (envelope.message.body.len > 0 && rn_rmq->DisableHeader)
+  {
     /* Header disabled, take the first receive remtrans object */
 
     remtrans = rn.remtrans;
     search_remtrans = 1;
 
-    while (remtrans && search_remtrans) {
+    while (remtrans && search_remtrans)
+    {
       /* Match? */
-      if (remtrans->objp->Direction == REMTRANS_IN) {
+      if (remtrans->objp->Direction == REMTRANS_IN)
+      {
         search_remtrans = false;
-        sts = RemTrans_Receive(remtrans, (char*)envelope.message.body.bytes,
-            envelope.message.body.len);
+        sts = RemTrans_Receive(remtrans, (char*)envelope.message.body.bytes, envelope.message.body.len);
         msg_received = 1;
       }
       remtrans = (remtrans_item*)remtrans->next;
     }
-    if (search_remtrans) {
+    if (search_remtrans)
+    {
       rn_rmq->ErrCount++;
       errh_Info("RabbitMQ Receive no remtrans %s", rn_rmq->ReceiveQueue);
     }
-  } else if (envelope.message.body.len >= sizeof(rabbit_header)) {
+  }
+  else if (envelope.message.body.len >= sizeof(rabbit_header))
+  {
     memcpy(&header, envelope.message.body.bytes, sizeof(rabbit_header));
 
     /* Convert the header to host byte order */
@@ -408,41 +449,43 @@ unsigned int rmq_receive()
 
     search_remtrans = 1;
     remtrans = rn.remtrans;
-    while (remtrans && search_remtrans) {
-      if (remtrans->objp->Address[0] == header.msg_id[0]
-          && remtrans->objp->Address[1] == header.msg_id[1]
-          && remtrans->objp->Direction == REMTRANS_IN) {
-	if (remtrans->objp->Address[2] & rabbit_mOpt_KeepAll && 
-	    remtrans->objp->DataValid) {
-	  /* Not ready, requeue the message */
-	  amqp_basic_nack(ctx->conn, ctx->channel, envelope.delivery_tag, 0, 1);
-	  if (!rcv_remtrans && !rcv_remtrans_locking) {
-	    rcv_remtrans_locking = 1;
-	    rcv_remtrans = remtrans;
-	  }
-	  return 1;
-	}
+    while (remtrans && search_remtrans)
+    {
+      if (remtrans->objp->Address[0] == header.msg_id[0] && remtrans->objp->Address[1] == header.msg_id[1] &&
+          remtrans->objp->Direction == REMTRANS_IN)
+      {
+        if (remtrans->objp->Address[2] & rabbit_mOpt_KeepAll && remtrans->objp->DataValid)
+        {
+          /* Not ready, requeue the message */
+          amqp_basic_nack(ctx->conn, ctx->channel, envelope.delivery_tag, 0, 1);
+          if (!rcv_remtrans && !rcv_remtrans_locking)
+          {
+            rcv_remtrans_locking = 1;
+            rcv_remtrans = remtrans;
+          }
+          return 1;
+        }
         search_remtrans = false;
-        sts = RemTrans_Receive(remtrans,
-            (char*)envelope.message.body.bytes + sizeof(rabbit_header),
-            envelope.message.body.len);
+        sts = RemTrans_Receive(remtrans, (char*)envelope.message.body.bytes + sizeof(rabbit_header),
+                               envelope.message.body.len - sizeof(rabbit_header));
         if (sts != STATUS_OK && sts != STATUS_BUFF)
-          errh_Error("Error from RemTrans_Receive, queue %s, status %d",
-              rn_rmq->ReceiveQueue, sts, 0);
+          errh_Error("Error from RemTrans_Receive, queue %s, status %d", rn_rmq->ReceiveQueue, sts, 0);
         msg_received = 1;
         break;
       }
       remtrans = (remtrans_item*)remtrans->next;
     }
-    if (search_remtrans) {
+    if (search_remtrans)
+    {
       rn_rmq->ErrCount++;
       msg_received = 1;
-      errh_Info("No remtrans for received message, queue %s, class %d, type %d",
-          rn_rmq->ReceiveQueue, header.msg_id[0], header.msg_id[1]);
+      errh_Info("No remtrans for received message, queue %s, class %d, type %d", rn_rmq->ReceiveQueue,
+                header.msg_id[0], header.msg_id[1]);
     }
   }
 
-  if (ctx->op->Acknowledge) {
+  if (ctx->op->Acknowledge)
+  {
     if (msg_received)
       amqp_basic_ack(ctx->conn, ctx->channel, envelope.delivery_tag, 0);
     else
@@ -468,8 +511,7 @@ unsigned int rmq_receive()
 **************************************************************************
 **************************************************************************/
 
-unsigned int rmq_send(remnode_item* remnode, pwr_sClass_RemTrans* remtrans,
-    char* buf, int buf_size)
+unsigned int rmq_send(remnode_item* remnode, pwr_sClass_RemTrans* remtrans, char* buf, int buf_size)
 {
   int sts;
   amqp_basic_properties_t prop;
@@ -477,10 +519,13 @@ unsigned int rmq_send(remnode_item* remnode, pwr_sClass_RemTrans* remtrans,
   char* tmpbuf;
   unsigned int tmpbuf_size;
 
-  if (rn_rmq->DisableHeader) {
+  if (rn_rmq->DisableHeader)
+  {
     msg.bytes = buf;
     msg.len = buf_size;
-  } else {
+  }
+  else
+  {
     tmpbuf_size = sizeof(rabbit_header) + buf_size;
     tmpbuf = malloc(tmpbuf_size);
     memcpy(tmpbuf + sizeof(rabbit_header), buf, buf_size);
@@ -493,7 +538,7 @@ unsigned int rmq_send(remnode_item* remnode, pwr_sClass_RemTrans* remtrans,
     msg.len = tmpbuf_size;
   }
 
-  if ( remtrans->Address[3] == 2)
+  if (remtrans->Address[3] == 2)
     prop.delivery_mode = 2;
   else
     prop.delivery_mode = 1;
@@ -501,17 +546,15 @@ unsigned int rmq_send(remnode_item* remnode, pwr_sClass_RemTrans* remtrans,
 
   // 0 mandatory 0 immediate
   if (!streq(ctx->op->Exchange, ""))
-    sts = amqp_basic_publish(ctx->conn, ctx->channel,
-        amqp_cstring_bytes(ctx->op->Exchange), amqp_cstring_bytes(""), 0, 0,
-        &prop, msg);
+    sts = amqp_basic_publish(ctx->conn, ctx->channel, amqp_cstring_bytes(ctx->op->Exchange),
+                             amqp_cstring_bytes(""), 0, 0, &prop, msg);
   else
-    sts = amqp_basic_publish(ctx->conn, ctx->channel,
-        amqp_cstring_bytes(ctx->op->Exchange),
-        amqp_cstring_bytes(ctx->op->SendQueue), 0, 0, &prop, msg);
-  if (sts) {
+    sts = amqp_basic_publish(ctx->conn, ctx->channel, amqp_cstring_bytes(ctx->op->Exchange),
+                             amqp_cstring_bytes(ctx->op->SendQueue), 0, 0, &prop, msg);
+  if (sts)
+  {
     remtrans->ErrCount++;
-    errh_Error("Send failed, queue %s, RabbitMQ status %d",
-        rn_rmq->SendQueue, sts, 0);
+    errh_Error("Send failed, queue %s, RabbitMQ status %d", rn_rmq->SendQueue, sts, 0);
     if (debug)
       printf("Send failed sts:%d\n", (int)sts);
   }
@@ -560,7 +603,8 @@ int main(int argc, char* argv[])
   if (debug)
     printf("Before gdh_init\n");
   sts = gdh_Init((char*)pname);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("gdh_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -572,7 +616,8 @@ int main(int argc, char* argv[])
   sts = 0;
   if (argc >= 3)
     sts = cdh_StringToObjid(argv[2], &rn.objid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("cdh_StringToObjid, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -580,16 +625,16 @@ int main(int argc, char* argv[])
 
   /* Get pointer to RemnodeRabbitMQ object and store locally */
   sts = gdh_ObjidToPointer(rn.objid, (pwr_tAddress*)&rn_rmq);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("cdh_ObjidToPointer, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
   }
 
-  if (streq(rn_rmq->ReceiveQueue, "")
-      && streq(rn_rmq->SendQueue, "")) {
-    errh_Fatal(
-        "Process terminated, neither send or receive queue configured, %s", id);
+  if (streq(rn_rmq->ReceiveQueue, "") && streq(rn_rmq->SendQueue, ""))
+  {
+    errh_Fatal("Process terminated, neither send or receive queue configured, %s", id);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
   }
@@ -612,7 +657,8 @@ int main(int argc, char* argv[])
 
   sts = RemTrans_Init(&rn);
 
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("RemTrans_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -621,10 +667,10 @@ int main(int argc, char* argv[])
   /* Store remtrans objects objid in remnode_qcom object */
   remtrans = rn.remtrans;
   i = 0;
-  while (remtrans) {
+  while (remtrans)
+  {
     rn_rmq->RemTransObjects[i++] = remtrans->objid;
-    if (i >= (int)(sizeof(rn_rmq->RemTransObjects)
-                 / sizeof(rn_rmq->RemTransObjects[0])))
+    if (i >= (int)(sizeof(rn_rmq->RemTransObjects) / sizeof(rn_rmq->RemTransObjects[0])))
       break;
     remtrans = (remtrans_item*)remtrans->next;
   }
@@ -632,14 +678,16 @@ int main(int argc, char* argv[])
   /* Find single receive remtrans */
   remtrans = rn.remtrans;
   i = 0;
-  while (remtrans) {
-    if (remtrans->objp->Direction == REMTRANS_IN) {
+  while (remtrans)
+  {
+    if (remtrans->objp->Direction == REMTRANS_IN)
+    {
       rcv_remtrans = remtrans;
       i++;
       if (rn_rmq->DisableHeader)
-	break;
+        break;
       if (remtrans->objp->Address[2] & rabbit_mOpt_MsgOrder)
-	msg_order = 1;
+        msg_order = 1;
     }
     remtrans = (remtrans_item*)remtrans->next;
   }
@@ -648,7 +696,8 @@ int main(int argc, char* argv[])
 
   /* Connect to rabbitmq broker */
   sts = rmq_connect(msg_order);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     rmq_close(1);
     errh_Fatal("Process terminated, unable to connect to RabbitMQ, %s", id);
     errh_SetStatus(PWR__SRVTERM);
@@ -665,8 +714,10 @@ int main(int argc, char* argv[])
 
   /* Loop forever */
 
-  while (!doomsday) {
-    if (rn_rmq->Disable == 1) {
+  while (!doomsday)
+  {
+    if (rn_rmq->Disable == 1)
+    {
       errh_Fatal("Disabled, exiting");
       errh_SetStatus(PWR__SRVTERM);
       exit(0);
@@ -677,7 +728,8 @@ int main(int argc, char* argv[])
     RemoteSleep(TIME_INCR);
 
     time_since_scan += TIME_INCR;
-    if (time_since_scan >= rn_rmq->ScanTime) {
+    if (time_since_scan >= rn_rmq->ScanTime)
+    {
       if (ctx->is_producer)
         sts = RemTrans_Cyclic(&rn, &rmq_send);
       time_since_scan = 0.0;

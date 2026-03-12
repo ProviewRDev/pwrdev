@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -1364,7 +1364,7 @@ int RtTrace::trace_start()
       flow_AddRect(trace_analyse_nc, 0, 0, f_width, f_height,
           flow_eDrawType_Line, 1, flow_mDisplayLevel_1);
       flow_AddAnnot(trace_analyse_nc, 0.07 * f_width, 0.75 * f_height, 0,
-          flow_eDrawType_TextHelvetica, 3, flow_eAnnotType_OneLine,
+          flow_eDrawType_TextRoboto, 3, flow_eAnnotType_OneLine,
           flow_mDisplayLevel_1);
       flow_AddConPoint(
           trace_analyse_nc, 0, 0.5 * f_height, 0, flow_eDirection_Left);

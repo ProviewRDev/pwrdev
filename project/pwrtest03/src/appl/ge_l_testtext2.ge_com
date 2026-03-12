@@ -67,12 +67,7 @@ main()
         adjustment = "Right";
         font = eFont_Courier;
       endif
-      if (i == 4)
-        sprintf(text, "Lucida%d", j);
-        adjustment ="Right";
-        font = eFont_LucidaSans;
-      endif
-
+      
       color += 30;
       if (color > 300)
         color = eDrawType_Color89;

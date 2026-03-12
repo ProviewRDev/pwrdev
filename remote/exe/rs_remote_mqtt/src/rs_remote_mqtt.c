@@ -268,7 +268,7 @@ void message_cb(struct mosquitto *mosq, void *obj,
         search_remtrans = false;
         sts = RemTrans_Receive(remtrans,
             (char*)msg->payload + sizeof(mqtt_header),
-            msg->payloadlen);
+            msg->payloadlen - sizeof(mqtt_header));
         if (sts != STATUS_OK && sts != STATUS_BUFF)
           errh_Error("Error from RemTrans_Receive, topic %s, status %d",
               rn_mqtt->SubscribeTopic, sts, 0);

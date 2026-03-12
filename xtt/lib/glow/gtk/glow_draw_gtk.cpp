@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -51,6 +51,7 @@
 #include "glow_colpalctx.h"
 #include "glow_curvectx.h"
 #include "glow_customcolors_gtk.h"
+#include "glow_growwidget_gtk.h"
 #include "glow_keyboardctx.h"
 #include "glow_msg.h"
 
@@ -91,7 +92,7 @@ typedef struct
 } draw_sColor;
 
 char GlowDrawGtk::font_names[glow_eFont__][40] = {"Helvetica", "Times", "New century schoolbook", "Courier",
-                                                  "Lucida Sans"};
+                                                  "Roboto"};
 
 static GdkEvent last_event;
 
@@ -4052,4 +4053,9 @@ void GlowDrawGtk::reset_customcolors(GlowCustomColors* cc)
   memset(((GlowCustomColorsGtk*)cc)->gcs, 0, sizeof(((GlowCustomColorsGtk*)cc)->gcs));
 
   memset(((GlowCustomColorsGtk*)cc)->color_vect, 0, sizeof(((GlowCustomColorsGtk*)cc)->color_vect));
+}
+
+void GlowDrawGtk::set_text_inputfocus(int focus)
+{
+  growwidgetgtk_set_text_inputfocus(m_wind.toplevel, focus);
 }

@@ -50,14 +50,14 @@ main()
 
   xm = x0 + 1;
   ym = y0 + 1;
-  id = CreateText("FillLevel", xm, ym, 4, eFont_LucidaSans, 0, eDrawType_CustomColor34);
+  id = CreateText("FillLevel", xm, ym, 4, eFont_Helvetica, 0, eDrawType_CustomColor34);
 
 # Direction Down
   xm = x0 + 1;
   ym += 1;
   x2 = xm;
   y2 = ym + 0.6;
-  id = CreateText("Direction Down", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Direction Down", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   y1 = ym + 1.1;
   x1 = xm;
@@ -92,7 +92,7 @@ main()
   ym += 6;
   x2 = xm;
   y2 = ym + 0.6;
-  id = CreateText("Direction Up", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Direction Up", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   y1 = ym + 1.1;
   x1 = xm;
@@ -127,7 +127,7 @@ main()
   ym += 6;
   x2 = xm;
   y2 = ym + 0.6;
-  id = CreateText("Direction Right", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Direction Right", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   y1 = ym + 1.1;
   x1 = xm;
@@ -164,7 +164,7 @@ main()
   ym += 6.8;
   x2 = xm;
   y2 = ym + 0.6;
-  id = CreateText("Direction Left", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Direction Left", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   y1 = ym + 1.1;
   x1 = xm;
@@ -202,7 +202,7 @@ main()
   ym = y0 + 2;
   x2 = xm;
   y2 = ym + 0.6;
-  id = CreateText("Direction Down, Min/MaxValueAttr", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Direction Down, Min/MaxValueAttr", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   y1 = ym + 1.1;
   x1 = xm;
@@ -237,7 +237,7 @@ main()
   ym += 6;
   x2 = xm;
   y2 = ym + 0.6;
-  id = CreateText("Direction Up, Min/MaxValueAttr", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Direction Up, Min/MaxValueAttr", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   y1 = ym + 1.1;
   x1 = xm;
@@ -272,7 +272,7 @@ main()
   ym += 6;
   x2 = xm;
   y2 = ym + 0.6;
-  id = CreateText("Direction Right, Min/MaxValueAttr", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Direction Right, Min/MaxValueAttr", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   y1 = ym + 1.1;
   x1 = xm;
@@ -309,7 +309,7 @@ main()
   ym += 6.8;
   x2 = xm;
   y2 = ym + 0.6;
-  id = CreateText("Direction Left, Min/MaxValueAttr", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Direction Left, Min/MaxValueAttr", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   y1 = ym + 1.1;
   x1 = xm;

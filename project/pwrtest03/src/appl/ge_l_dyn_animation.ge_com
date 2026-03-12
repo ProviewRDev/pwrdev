@@ -48,14 +48,14 @@ main()
 
   xm = x0 + 1;
   ym = y0 + 1;
-  id = CreateText("Animation", xm, ym, 4, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Animation", xm, ym, 4, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # Sequence Dig
 
   ym += 1.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Sequence Dig", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Sequence Dig", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   x1 = xm + 6.5;
   y1 = ym - 0.5;
@@ -82,7 +82,7 @@ main()
   ym += 4.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Sequence Cyclic", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Sequence Cyclic", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   x1 = xm + 6.5;
   y1 = ym - 0.5;
@@ -109,7 +109,7 @@ main()
   ym += 4.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Sequence ForwBack", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Sequence ForwBack", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   x1 = xm + 6.5;
   y1 = ym - 0.5;

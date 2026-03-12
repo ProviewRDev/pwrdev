@@ -44,7 +44,7 @@ main()
 
   x = x0 + 1;
   y = y0 + 1;
-  id = CreateText("DigColor", x, y, 4, eFont_LucidaSans, 0, eDrawType_CustomColor34);
+  id = CreateText("DigColor", x, y, 4, eFont_Helvetica, 0, eDrawType_CustomColor34);
 
 #  x1 = x + 2.5;
 #  y1 = y + 0.92;
@@ -58,7 +58,7 @@ main()
   y += 1.4;
   x2 = x;
   y2 = y;
-  id = CreateText("One instance", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("One instance", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   y1 = y + 0.5;
   x1 = x;
@@ -95,7 +95,7 @@ main()
   y += 3.5;
   x2 = x;
   y2 = y;
-  id = CreateText("Two instances", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Two instances", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   y1 = y + 0.5;
   x1 = x;
@@ -141,7 +141,7 @@ main()
   y += 3.5;
   x2 = x;
   y2 = y;
-  id = CreateText("Three instances", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Three instances", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   y1 = y + 0.5;
   x1 = x;
@@ -197,7 +197,7 @@ main()
   y += 3.5;
   x2 = x;
   y2 = y;
-  id = CreateText("Four instances", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Four instances", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   y1 = y + 0.5;
   x1 = x;

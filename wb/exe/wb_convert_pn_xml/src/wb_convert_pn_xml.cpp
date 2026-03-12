@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -327,6 +327,12 @@ int main(int argc, char* argv[])
                           .node()
                           .attribute("ID")
                           .as_string();
+                  if (std::string(new_subslot.attribute("ID").as_string()).empty())
+                  {
+                    std::cerr << "Could not find the ID for the submodule with subslot number "
+                              << subslot_number << " in the DAP module! Removing!" << std::endl;
+                    new_slot.remove_child(new_subslot);
+                  }
                   break;
                 default: // Virtual Submodule
                   new_subslot.append_attribute("ID") =
@@ -350,7 +356,7 @@ int main(int argc, char* argv[])
                 new_subslot.append_attribute("ID") = submodule_id;
               }
             } // Subslots
-          }   // Slots
+          } // Slots
 
           // APIs and IOCRs
           auto apis = pn_device.append_child("APIs");

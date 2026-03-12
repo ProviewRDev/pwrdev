@@ -16,22 +16,12 @@ ifndef rules_mk
  include $(pwre_kroot)/tools/bld/src/rules.mk
 endif
 
-vpath %.uil $(co_source)
 vpath %.pwg $(co_source)
 vpath %.pwsg $(co_source)
 vpath %.png $(co_source)
 vpath %.pbm $(co_source)
 
 source_dirs := $(co_source)
-
-uil_sources := $(sort \
-             $(foreach file, \
-               $(foreach dir, \
-                 $(source_dirs), \
-                 $(wildcard $(dir)/$(comp_name)*.uil) \
-               ), $(notdir $(file)) \
-             ) \
-           )
 
 pwg_c_sources := $(sort \
              $(foreach file, \
@@ -87,7 +77,6 @@ ge_com_sources := $(sort \
              ) \
            )
 
-export_uid := $(addprefix $(exe_dir)/, $(patsubst %.uil, %.uid, $(uil_sources)))
 export_c_pwg := $(addprefix $(exe_dir)/, $(pwg_c_sources))
 export_pwg := $(addprefix $(exe_dir)/, $(pwg_sources))
 export_pwsg := $(addprefix $(exe_dir)/, $(pwsg_sources))
@@ -95,11 +84,6 @@ export_png := $(addprefix $(exe_dir)/, $(png_sources))
 export_pbm := $(addprefix $(exe_dir)/, $(pbm_sources))
 export_ge_com := $(addprefix $(exe_dir)/, $(ge_com_sources))
 
-$(exe_dir)/%.uid : %.uil
-	@ $(log_uil_uid)
-	@ export LANG; uil -o $(target) $(source)
-
-clean_uid := $(patsubst %.uil,clean_%.uid,$(uil_sources))
 clean_c_pwg := $(patsubst %.pwg,clean_%.pwg,$(pwg_c_sources))
 clean_pwg := $(patsubst %.pwg,clean_%.pwg,$(pwg_sources))
 clean_pwsg := $(patsubst %.pwsg,clean_%.pwsg,$(pwsg_sources))
@@ -108,19 +92,19 @@ clean_pbm := $(patsubst %.pbm,clean_%.pbm,$(pbm_sources))
 clean_ge_com := $(patsubst %.ge_com,clean_%.ge_com,$(ge_com_sources))
 
 .PHONY : all init copy lib exe clean realclean\
-         dirs clean_bld clean_dirs $(clean_uid)
+         dirs clean_bld clean_dirs
 
 all : init copy | silent
 
 init : dirs | silent
 
-copy : $(export_uid) $(export_c_pwg) $(export_pwg) $(export_pwsg) $(export_png) $(export_pbm) $(export_ge_com) | silent
+copy : $(export_c_pwg) $(export_pwg) $(export_pwsg) $(export_png) $(export_pbm) $(export_ge_com) | silent
 
 lib :
 
 exe :
 
-clean : $(clean_uid) $(clean_pwg) $(clean_pwsg) $(clean_png) $(clean_pbm) $(clean_ge_com)
+clean : $(clean_pwg) $(clean_pwsg) $(clean_png) $(clean_pbm) $(clean_ge_com)
 
 realclean : clean
 
@@ -128,10 +112,6 @@ dirs :
 
 silent :
 	@ :
-
-$(clean_uid) : clean_%.uid : %.uil
-	@ echo "Removing uid"
-	@ $(rm) $(rmflags) $(exe_dir)/$*.uid
 
 $(clean_pwg) : clean_%.pwg : %.pwg
 	@ echo "Removing pwg"

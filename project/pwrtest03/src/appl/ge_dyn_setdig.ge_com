@@ -43,13 +43,13 @@ main()
 
   xm = x0 + 1;
   ym = y0 + 1;
-  id = CreateText("SetDig / ResetDig", xm, ym, 4, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("SetDig / ResetDig", xm, ym, 4, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # Button
   ym += 1.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Click to set", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Click to set", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   ym += 0.0;
   x1 = xm;
@@ -84,7 +84,7 @@ main()
   ym += 3.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Three instances", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Three instances", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   ym += 0.0;
   x1 = xm;

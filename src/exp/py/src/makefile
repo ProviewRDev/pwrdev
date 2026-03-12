@@ -46,15 +46,30 @@ clean_py := $(patsubst %.py, clean_%.py, $(py_sources))
 clean_mplstyle := $(patsubst %.mplstyle, clean_%.mplstyle, $(mplstyle_sources))
 clean_png := $(patsubst %.png, clean_%.png, $(png_sources))
 
+# Python package files
+py_packages := pwr_upgrade
+
+package_files := $(sort \
+	             $(foreach pkg, \
+	               $(py_packages), \
+		               $(patsubst $(co_source)/%,%, \
+	                 $(shell find $(co_source)/$(pkg) -type f ! -path '*/__pycache__/*' ! -name '*.pyc') \
+	               ) \
+	             ) \
+	           )
+
+export_pkg := $(patsubst %, $(exe_dir)/%, $(package_files))
+clean_pkg_files := $(patsubst %, clean_%, $(package_files))
+clean_pkg := $(patsubst %, clean_dir_%, $(py_packages))
 
 .PHONY : all init copy lib exe clean realclean\
-         $(clean_py)
+         $(clean_py) $(clean_pkg_files) $(clean_pkg)
 
 all : init copy | silent
 
 init : silent
 
-copy : $(export_py) $(export_mplstyle) $(export_png) | silent
+copy : $(export_py) $(export_mplstyle) $(export_png) $(export_pkg) | silent
 
 lib : silent
 
@@ -62,7 +77,7 @@ exe : silent
 
 clean :
 
-realclean : clean $(clean_py) $(clean_mplstyle) $(clean_png)
+realclean : clean $(clean_py) $(clean_mplstyle) $(clean_png) $(clean_pkg_files) $(clean_pkg)
 
 silent :
 	@ :
@@ -79,6 +94,11 @@ $(export_png) : $(exe_dir)/%.png : %.png
 	@ $(log_exp)
 	@ $(cp) $(cpflags) $(source) $(target)
 
+$(export_pkg) : $(exe_dir)/% : $(co_source)/%
+	@ $(log_exp)
+	@ mkdir -p $(dir $@)
+	@ $(cp) $(cpflags) $< $@
+
 $(clean_py) : clean_%.py : %.py
 	@ rm $(exe_dir)/$*.py
 
@@ -87,3 +107,9 @@ $(clean_mplstyle) : clean_%.mplstyle : %.mplstyle
 
 $(clean_png) : clean_%.png : %.png
 	@ rm $(exe_dir)/$*.png
+
+$(clean_pkg_files) : clean_% :
+	@ rm -f $(exe_dir)/$*
+
+$(clean_pkg) : clean_dir_% :
+	@ rm -rf $(exe_dir)/$*

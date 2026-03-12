@@ -390,11 +390,18 @@ static pwr_tStatus sendAndReceive(
 
   get.data = NULL;
 
+  /* TODO:
+   * Keep mh_cSendRcvTmo under watch in production. If MH__TMO starts to
+   * occur under normal load, raise the timeout instead of going back to
+   * extremely long blocking waits here.
+   */
   rvoid = qcom_Request(
-      &sts, &lAppl.handler, &put, &lAppl.head.qid, &get, 1000 * 3600, 0);
+      &sts, &lAppl.handler, &put, &lAppl.head.qid, &get, mh_cSendRcvTmo, 0);
   if (EVEN(sts)) {
-    errh_Error("mhAppl, sendAndReceive, qcom_Get failed\n%m", sts);
+    errh_Error("mhAppl, sendAndReceive, qcom_Request failed\n%m", sts);
     qcom_Free(NULL, put.data);
+    if (sts == QCOM__TMO)
+      return MH__TMO;
     return MH__QCOMRCVMSG;
   }
 

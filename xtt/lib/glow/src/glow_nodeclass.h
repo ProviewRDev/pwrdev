@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -59,7 +59,8 @@ class GlowPoint;
   a GrowNode, it is drawn through the GrowNodes transform as well.
 */
 
-class GlowNodeClass : public GlowArrayElem {
+class GlowNodeClass : public GlowArrayElem
+{
 public:
   //! Constructor
   /*!
@@ -67,8 +68,7 @@ public:
     \param name		Name of the nodeclass.
     \param grp		Node group.
   */
-  GlowNodeClass(GrowCtx* glow_ctx, const char* name,
-      glow_eNodeGroup grp = glow_eNodeGroup_Common);
+  GlowNodeClass(GrowCtx* glow_ctx, const char* name, glow_eNodeGroup grp = glow_eNodeGroup_Common);
 
   //! Copy constructor
   /*!
@@ -83,29 +83,14 @@ public:
   /*!
     \param element	New element to insert.
   */
-  void insert(GlowArrayElem* element)
-  {
-    a.insert(element);
-  }
+  void insert(GlowArrayElem* element) { a.insert(element); }
 
-  void zoom()
-  {
-    a.zoom();
-  }
-  void nav_zoom()
-  {
-    a.nav_zoom();
-  }
-  void print_zoom()
-  {
-    a.print_zoom();
-  }
-  void traverse(int x, int y)
-  {
-    a.traverse(x, y);
-  }
-  void get_borders(double pos_x, double pos_y, double* x_right, double* x_left,
-      double* y_high, double* y_low, void* node)
+  void zoom() { a.zoom(); }
+  void nav_zoom() { a.nav_zoom(); }
+  void print_zoom() { a.print_zoom(); }
+  void traverse(int x, int y) { a.traverse(x, y); }
+  void get_borders(double pos_x, double pos_y, double* x_right, double* x_left, double* y_high, double* y_low,
+                   void* node)
   {
     a.get_borders(pos_x, pos_y, x_right, x_left, y_high, y_low, node);
   }
@@ -121,13 +106,11 @@ public:
     Loops trough all elements, which extend the size of the borders, if it
     exceeds the border.
   */
-  void get_borders(GlowTransform* t, double* x_right, double* x_left,
-      double* y_high, double* y_low);
+  void get_borders(GlowTransform* t, double* x_right, double* x_left, double* y_high, double* y_low);
 
-  void get_obstacle_borders(double pos_x, double pos_y, double* x_right,
-      double* x_left, double* y_high, double* y_low, void* node);
-  int event_handler(
-      GlowWind* w, void* pos, glow_eEvent event, int x, int y, void* node);
+  void get_obstacle_borders(double pos_x, double pos_y, double* x_right, double* x_left, double* y_high,
+                            double* y_low, void* node);
+  int event_handler(GlowWind* w, void* pos, glow_eEvent event, int x, int y, void* node);
 
   //! Event handler
   /*!
@@ -140,6 +123,7 @@ public:
   int event_handler(GlowWind* w, glow_eEvent event, double fx, double fy);
 
   //! Print as postscript. Not used.
+  using GlowArrayElem::print;
   void print(GlowPoint* pos, void* node);
 
   //! Save the content of the object to file.
@@ -167,8 +151,8 @@ public:
 
     Call the draw function for each element.
   */
-  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node,
-      void* colornode, void *transpnode);
+  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node, void* colornode,
+            void* transpnode);
 
   //! Erase the calling node.
   /*!
@@ -193,15 +177,12 @@ public:
     \param y		y coordinate for connection point.
     \param dir		Direction of the connection point.
   */
-  int get_conpoint(GlowTransform* t, int num, bool flip_horizontal,
-      bool flip_vertical, double* x, double* y, glow_eDirection* dir);
+  int get_conpoint(GlowTransform* t, int num, bool flip_horizontal, bool flip_vertical, double* x, double* y,
+                   glow_eDirection* dir);
 
   //! Get the object type
   /*! \return The type of the object. */
-  glow_eObjectType type()
-  {
-    return glow_eObjectType_NodeClass;
-  }
+  glow_eObjectType type() { return glow_eObjectType_NodeClass; }
   void erase_annotation(void* pos, int highlight, int hot, void* node, int num);
   void draw_annotation(void* pos, int highlight, int hot, void* node, int num);
 
@@ -213,8 +194,7 @@ public:
     \param node		Parent node. Can be zero.
     \param num		Annotation number.
   */
-  void erase_annotation(
-      GlowTransform* t, int highlight, int hot, void* node, int num);
+  void erase_annotation(GlowTransform* t, int highlight, int hot, void* node, int num);
 
   //! Draw an annotation
   /*!
@@ -224,8 +204,7 @@ public:
     \param node		Parent node. Can be zero.
     \param num		Annotation number.
   */
-  void draw_annotation(
-      GlowTransform* t, int highlight, int hot, void* node, int num);
+  void draw_annotation(GlowTransform* t, int highlight, int hot, void* node, int num);
 
   //! Get width and height for the text of an annotation.
   /*!
@@ -270,10 +249,7 @@ public:
 
   //! Check if nodeclass is a slider.
   /*! \return Returns 1 if nodeclass i a slider, else 0. */
-  int is_slider()
-  {
-    return slider;
-  }
+  int is_slider() { return slider; }
 
   //! Find and redraw the background rectangle for an annotation
   /*!
@@ -290,8 +266,7 @@ public:
     \param node		Node.
     \param background	Returned background object.
   */
-  int get_annot_background(
-      GlowTransform* t, void* node, glow_eDrawType* background);
+  int get_annot_background(GlowTransform* t, void* node, glow_eDrawType* background);
 
   //! Set java name for the nodeclass.
   /*! \param name	Java name. */
@@ -321,29 +296,19 @@ public:
     \param pix_y_high		High border in pixel.
     \param pix_y_low		Low border in pixel.
   */
-  void measure_javabean(double* pix_x_right, double* pix_x_left,
-      double* pix_y_high, double* pix_y_low);
+  void measure_javabean(double* pix_x_right, double* pix_x_left, double* pix_y_high, double* pix_y_low);
 
   //! Mark if there are unsaved changes in the nodeclass.
   /*! \param value	1: There are no changes, 0: There are changes. */
-  void set_saved(int value)
-  {
-    saved = value;
-  }
+  void set_saved(int value) { saved = value; }
 
   //! Check if this is a next page
   /*! \return 1 if this is a next page, 0 if this is the first page. */
-  int is_next()
-  {
-    return prev_nc != 0;
-  }
+  int is_next() { return prev_nc != 0; }
 
   //! Check if this is the last page
   /*! \return 1 if this is the last page, else 0 */
-  int is_last()
-  {
-    return next_nc == 0;
-  }
+  int is_last() { return next_nc == 0; }
 
   //! Get number of pages.
   /*! \return Number of pages for this nodeclass. */
@@ -376,7 +341,7 @@ public:
   {
     if (streq(n_name, "mbtoolbar"))
       return;
-	
+
     nc_extern = ext;
   }
 
@@ -408,63 +373,52 @@ public:
     \param t_color	Annotation text color.
     \return		0 if annotation doesn't exist, else 1.
   */
-  int get_annotation_info(void* node, int num, int* t_size,
-      glow_eDrawType* t_drawtype, glow_eDrawType* t_color, glow_eFont* t_font,
-      glow_eAnnotType* t_type);
+  int get_annotation_info(void* node, int num, int* t_size, glow_eDrawType* t_drawtype,
+                          glow_eDrawType* t_color, glow_eFont* t_font, glow_eAnnotType* t_type);
 
   int get_annotation_text_size(GlowTransform* t, int num, double* tsize);
 
-  void get_annotation_text_extent(
-      GlowTransform* t, void* node, int num, double* width, double* height);
+  void get_annotation_text_extent(GlowTransform* t, void* node, int num, double* width, double* height);
 
   //! Set user data.
   /*!
     \param data User data.
   */
-  void set_user_data(void* data)
-  {
-    user_data = data;
-  }
+  void set_user_data(void* data) { user_data = data; }
 
   //! Get user data.
   /*!
     \param data User data.
   */
-  void get_user_data(void** data)
-  {
-    *data = user_data;
-  }
+  void get_user_data(void** data) { *data = user_data; }
 
   //! Get grow context.
   /*!
     \return The context.
   */
-  void* get_ctx()
-  {
-    return this->ctx;
-  }
+  void* get_ctx() { return this->ctx; }
 
-  GlowArray a; //!< Array of nodeclass elements.
-  glow_eNodeGroup group; //!< Group the nodeclass belongs to.
-  char* dynamic; //!< Dynamic code.
-  int dynamicsize; //!< Size of dynamic code.
-  int arg_cnt; //!< Number of arguments to dynamic code.
-  char argname[20][32]; //!< Arguments to dynamic code.
-  int argtype[20]; //!< Type of arguments to dynamic code.
-  int nc_extern; //!< Nodeclass is extern, i.e loaded from pwsg file.
-  int dyn_type1; //!< Dynamic type mask 1.
-  int dyn_type2; //!< Dynamic type mask 2.
-  int dyn_action_type1; //!< Action type mask 1.
-  int dyn_action_type2; //!< Action type mask 2.
+  GlowArray a;                 //!< Array of nodeclass elements.
+  glow_eNodeGroup group;       //!< Group the nodeclass belongs to.
+  char* dynamic;               //!< Dynamic code.
+  int dynamicsize;             //!< Size of dynamic code.
+  int arg_cnt;                 //!< Number of arguments to dynamic code.
+  char argname[20][32];        //!< Arguments to dynamic code.
+  int argtype[20];             //!< Type of arguments to dynamic code.
+  int nc_extern;               //!< Nodeclass is extern, i.e loaded from pwsg file.
+  int dyn_type1;               //!< Dynamic type mask 1.
+  int dyn_type2;               //!< Dynamic type mask 2.
+  int dyn_action_type1;        //!< Action type mask 1.
+  int dyn_action_type2;        //!< Action type mask 2.
   glow_eDrawType dyn_color[4]; //!< Dynamic colors.
-  int dyn_attr[4]; //!< Dynamic attributes.
-  int no_con_obstacle; //!< Node of this nodeclass are not obstacles for routed
+  int dyn_attr[4];             //!< Dynamic attributes.
+  int no_con_obstacle;         //!< Node of this nodeclass are not obstacles for routed
   //! connections.
-  int slider; //!< Nodeclass i a slider.
+  int slider;         //!< Nodeclass i a slider.
   char java_name[40]; //!< Name of java bean, when the nodeclass is exported as
   //! java.
   char next_nodeclass[40]; //!< Name of nodeclass for the next page.
-  int animation_count; //!< Number of scans in an animation, that this page will
+  int animation_count;     //!< Number of scans in an animation, that this page will
   //! be displayed.
 
   //! I the extension is larger than its elements, y0 is the low border.
@@ -482,14 +436,13 @@ public:
   //! border.
   double x1; //!< I the extension is larger than its elements, x1 is the right
   //! border.
-  GlowArrayElem* next_nc; //!< Pointer to nodeclass of next page.
-  GlowArrayElem* prev_nc; //!< Pointer to nodeclass of previous page.
-  int saved; //!< The nodeclass doesn't have any unsaved changes.
-  glow_eCycle
-      cycle; //!< Cycle, i.e. if dynamics is executed at fast or slow scantime.
+  GlowArrayElem* next_nc;                //!< Pointer to nodeclass of next page.
+  GlowArrayElem* prev_nc;                //!< Pointer to nodeclass of previous page.
+  int saved;                             //!< The nodeclass doesn't have any unsaved changes.
+  glow_eCycle cycle;                     //!< Cycle, i.e. if dynamics is executed at fast or slow scantime.
   glow_eInputFocusMark input_focus_mark; //!< How input focus in marked.
-  void* user_data; //!< User data.
-  int recursive_trace; //!< Call trace callback also for nodeclass elements.
+  void* user_data;                       //!< User data.
+  int recursive_trace;                   //!< Call trace callback also for nodeclass elements.
 };
 
 /*@}*/

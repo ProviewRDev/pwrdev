@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -40,29 +40,12 @@
 
 #include "cnv_image.h"
 
-//#define PWRE_CONF_GTK 1
-
 #if defined PWRE_CONF_GTK
 
 #include <gdk/gdk.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
 static int gdk_init_done = 0;
-
-#elif defined PWRE_IMLIB
-
-#include <Xm/Xm.h>
-#include <Mrm/MrmPublic.h>
-#ifndef _XtIntrinsic_h
-#include <X11/Intrinsic.h>
-#endif
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <X11/extensions/shape.h>
-#include <Imlib.h>
-
-static ImlibData* imlib = 0;
-static Display* display = 0;
 
 #endif
 
@@ -78,16 +61,6 @@ int cnv_get_image(char* fname, cnv_tImImage* image, cnv_tPixmap* pixmap)
   if (!*image)
     return 0;
 
-#elif defined PWRE_IMLIB
-  if (!imlib) {
-    display = XOpenDisplay(NULL);
-    imlib = Imlib_init(display);
-  }
-
-  *image = (cnv_tImImage)Imlib_load_image(imlib, fname);
-  if (!*image)
-    return 0;
-  *pixmap = (cnv_tPixmap)Imlib_move_image(imlib, (ImlibImage*)*image);
 #endif
 
   return 1;
@@ -97,11 +70,6 @@ void cnv_free_image(cnv_tImImage image, cnv_tPixmap pixmap)
 {
 #if defined PWRE_CONF_GTK
   g_object_unref((GdkPixbuf*)image);
-
-#elif defined PWRE_IMLIB
-
-  Imlib_free_pixmap(imlib, (Pixmap)pixmap);
-  Imlib_destroy_image(imlib, (ImlibImage*)image);
 #endif
 }
 
@@ -124,8 +92,6 @@ void cnv_print_image(cnv_tImImage image, char* filename)
   else
     gdk_pixbuf_save((GdkPixbuf*)image, filename, type, &error, NULL);
 
-#elif defined PWRE_IMLIB
-  Imlib_save_image(imlib, (ImlibImage*)image, filename, 0);
 #endif
 }
 
@@ -133,8 +99,6 @@ int cnv_image_width(cnv_tImImage image)
 {
 #if defined PWRE_CONF_GTK
   return gdk_pixbuf_get_width((GdkPixbuf*)image);
-#elif defined PWRE_IMLIB
-  return ((ImlibImage*)image)->rgb_width;
 #else
   return 0;
 #endif
@@ -144,8 +108,6 @@ int cnv_image_height(cnv_tImImage image)
 {
 #if defined PWRE_CONF_GTK
   return gdk_pixbuf_get_height((GdkPixbuf*)image);
-#elif defined PWRE_IMLIB
-  return ((ImlibImage*)image)->rgb_height;
 #else
   return 0;
 #endif
@@ -185,18 +147,5 @@ void cnv_image_pixel_iter(cnv_tImImage image,
     rgb_row += rowstride;
   }
 
-#elif defined PWRE_IMLIB
-  unsigned char* rgb;
-  int rgb_height;
-  int rgb_width;
-
-  rgb = ((ImlibImage*)image)->rgb_data;
-  rgb_height = cnv_image_height(image);
-  rgb_width = cnv_image_width(image);
-
-  for (int i = 0; i < rgb_height * rgb_width * 3; i += 3) {
-    (pixel_cb)(userdata, fp, rgb);
-    rgb += 3;
-  }
 #endif
 }

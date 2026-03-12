@@ -1,6 +1,6 @@
 /* 
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -210,9 +210,8 @@ public class Glow {
     public static final int eFont_Helvetica		= 0;
     public static final int eFont_Times			= 1;
     public static final int eFont_NewCenturySchoolbook 	= 2;
-    public static final int eFont_Courier		= 3;
-    public static final int eFont_LucidaSans		= 4;
-    public static final int eFont__			= 5;
+    public static final int eFont_Courier		= 3;    
+    public static final int eFont__			= 4;
     public static final int eFont_No 			= 9999;
 
     public static final int eRelief_Up			= 0;

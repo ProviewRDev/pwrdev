@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -41,23 +41,18 @@
 #include "glow_growctx.h"
 
 #define GROWWIDGETGTK_TYPE (growwidgetgtk_get_type())
-#define GROWWIDGETGTK(obj)                                                     \
-  (G_TYPE_CHECK_INSTANCE_CAST((obj), GROWWIDGETGTK_TYPE, GrowWidgetGtk))
-#define GROWWIDGETGTK_CLASS(obj)                                               \
-  (G_TYPE_CHECK_CLASS_CAST((obj), GROWWIDGETGTK, GrowWidgetGtkClass))
-#define IS_GROWWIDGETGTK(obj)                                                  \
-  (G_TYPE_CHECK_INSTANCE_TYPE((obj), GROWWIDGETGTK_TYPE))
-#define IS_GROWWIDGETGTK_CLASS(obj)                                            \
-  (G_TYPE_CHECK_CLASS_TYPE((obj), GROWWIDGETGTK_TYPE))
-#define GROWWIDGETGTK_GET_CLASS                                                \
-  (G_TYPE_INSTANCE_GET_CLASS((obj), GROWWIDGETGTK, GrowWidgetGtkClass))
+#define GROWWIDGETGTK(obj) (G_TYPE_CHECK_INSTANCE_CAST((obj), GROWWIDGETGTK_TYPE, GrowWidgetGtk))
+#define GROWWIDGETGTK_CLASS(obj) (G_TYPE_CHECK_CLASS_CAST((obj), GROWWIDGETGTK, GrowWidgetGtkClass))
+#define IS_GROWWIDGETGTK(obj) (G_TYPE_CHECK_INSTANCE_TYPE((obj), GROWWIDGETGTK_TYPE))
+#define IS_GROWWIDGETGTK_CLASS(obj) (G_TYPE_CHECK_CLASS_TYPE((obj), GROWWIDGETGTK_TYPE))
+#define GROWWIDGETGTK_GET_CLASS (G_TYPE_INSTANCE_GET_CLASS((obj), GROWWIDGETGTK, GrowWidgetGtkClass))
 
 GType growwidgetgtk_get_type(void);
 
-GtkWidget* growwidgetgtk_new(
-    int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data);
-GtkWidget* scrolledgrowwidgetgtk_new(
-    int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data,
-    GtkWidget** growwidget);
+GtkWidget* growwidgetgtk_new(int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data);
+GtkWidget* scrolledgrowwidgetgtk_new(int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data,
+                                     GtkWidget** growwidget);
 
 GtkWidget* grownavwidgetgtk_new(GtkWidget* main_grow);
+
+void growwidgetgtk_set_text_inputfocus(GtkWidget* widget, int focus);

@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -626,16 +626,20 @@ int WGre::node_annot_message(
       case pwr_eType_AttrRef: {
         /* Get the object name from ldh */
         pwr_tAttrRef* arp = (pwr_tAttrRef*)parvalue;
-        char* name;
+        char* name = 0;
 
         if (cdh_ObjidIsNull(arp->Objid))
           annot_str[0] = '\0';
         else {
           sts = ldh_AttrRefToName((node->hn.wind)->hw.ldhses, arp,
               ldh_eName_ArefObject, &name, &size);
-          if (EVEN(sts))
+          if (EVEN(sts) || !name)
             annot_str[0] = '\0';
-          strcpy(annot_str, name);
+          else {
+            strncpy(annot_str, name,
+                MIN((int)sizeof(annot_str), annot_max_size));
+            annot_str[MIN((int)sizeof(annot_str), annot_max_size) - 1] = 0;
+          }
         }
         break;
       }
@@ -3051,6 +3055,8 @@ int WGre::set_trace_attributes(char* host)
       case pwr_cClass_CStoBoInt32:
       case pwr_cClass_CStoBoFloat32:
       case pwr_cClass_CStoBoString80:
+      case pwr_cClass_GetConstAv:
+      case pwr_cClass_GetConstIv:
         sts = ldh_GetObjectBodyDef(wind->hw.ldhses, (*node_ptr)->ln.cid,
             "DevBody", 1, &bodydef, &rows);
         if (EVEN(sts))
@@ -3144,6 +3150,8 @@ int WGre::set_trace_attributes(char* host)
       case pwr_cClass_cstoii:
       case pwr_cClass_cstoio:
       case pwr_cClass_cstoiv:
+      case pwr_cClass_GetConstAv:
+      case pwr_cClass_GetConstIv:
         strcpy(attr_str, "ActualValue");
         break;
       default:;

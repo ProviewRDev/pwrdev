@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -45,6 +45,7 @@ void kafka_init(pwr_sClass_Ssab_ExportRtdbServer* a_confobj, char* a_topic, char
 void kafka_open();
 void kafka_exit();
 void kafka_flush(int tmo);
+int kafka_reconnect(); // New function for reconnection
 const char* kafka_err_to_str(int e);
 
 #endif

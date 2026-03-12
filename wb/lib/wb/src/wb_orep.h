@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -44,11 +44,74 @@ class wb_erep;
 class wb_vrep;
 class wb_name;
 
-class wb_orep {
+/**
+ * @class wb_orep
+ * @brief Object Representation - abstract interface to a volume object
+ *
+ * Provides a unified interface to objects stored in different volume types
+ * (Berkeley DB, wb_load files, in-memory, etc.). Each volume representation
+ * (wb_vrep subclass) has a corresponding orep implementation:
+ *
+ * - wb_orepdbs:  Objects in .dbs files (compiled class definitions)
+ * - wb_orepdb:   Objects in .db files (Berkeley DB runtime volumes)
+ * - wb_orepwbl:  Objects in .wb_load files (workbench source format)
+ * - wb_orepmem:  Objects in memory (temporary/transient objects)
+ *
+ * @section object_identity Object Identity
+ * Each object has multiple identifiers:
+ * - OID (Object ID): Unique within a volume (VID + OIX)
+ * - VID (Volume ID): Which volume contains this object
+ * - OIX (Object Index): Index within volume (unique per volume)
+ * - CID (Class ID): What class this object is an instance of
+ *
+ * @section object_hierarchy Object Hierarchy
+ * Objects form a tree structure with these relationships:
+ * - poid(): Parent object ID
+ * - foid(): First child object ID
+ * - loid(): Last child object ID
+ * - boid(): Before sibling (previous sibling in parent's child list)
+ * - aoid(): After sibling (next sibling in parent's child list)
+ *
+ * @section database_storage Database Storage (Berkeley DB)
+ * For wb_orepdbs/wb_orepdb, object metadata is stored in ohead table:
+ * @code
+ * struct db_sObject {
+ *     pwr_tOid oid;              // Object identifier
+ *     pwr_tCid cid;              // Class identifier
+ *     pwr_tOid poid;             // Parent object
+ *     pwr_tObjName name;         // Object name
+ *     pwr_tObjName normname;     // Normalized name (lowercase)
+ *     pwr_tTime time;            // Object header timestamp
+ *     pwr_tOid boid;             // Before (previous sibling)
+ *     pwr_tOid aoid;             // After (next sibling)
+ *     pwr_tOid foid;             // First child
+ *     pwr_tOid loid;             // Last child
+ *     pwr_mClassDef flags;       // Object flags
+ *     struct {
+ *         pwr_tTime time;        // Body modification time
+ *         pwr_tUInt32 size;      // Body size in bytes
+ *     } body[2];                 // [0]=RtBody, [1]=DevBody
+ * };
+ * @endcode
+ *
+ * Actual attribute data is stored separately in rbody/dbody tables.
+ *
+ * @section navigation Navigation Methods
+ * - parent(): Get parent object
+ * - first()/last(): Get first/last child
+ * - after()/before(): Navigate siblings
+ * - child(name): Find child by name
+ * - next()/previous(): Navigate objects of same class in volume
+ * - ancestor(): Get root object of hierarchy
+ */
+class wb_orep
+{
 protected:
+  /** @brief Volume representation this object belongs to */
   wb_vrep* m_vrep;
 
 public:
+  /** @brief Reference count for memory management */
   int m_nRef;
 
 public:
@@ -56,55 +119,144 @@ public:
   wb_orep();
   virtual ~wb_orep();
 
+  /** @brief Decrement reference count, delete if zero */
   void unref();
+
+  /** @brief Increment reference count and return this */
   wb_orep* ref();
 
+  // Object Identity Methods
+
+  /** @brief Get object ID (unique within volume) */
   virtual pwr_tOid oid() const = 0;
+
+  /** @brief Get volume ID this object belongs to */
   virtual pwr_tVid vid() const = 0;
+
+  /** @brief Get object index within volume */
   virtual pwr_tOix oix() const = 0;
 
+  /** @brief Get class ID (what class this object instantiates) */
   virtual pwr_tCid cid() const = 0;
+
+  /** @brief Get parent object ID (pwr_cNOid if root) */
   virtual pwr_tOid poid() const = 0;
+
+  /** @brief Get first child object ID (pwr_cNOid if no children) */
   virtual pwr_tOid foid() const = 0;
+
+  /** @brief Get last child object ID (pwr_cNOid if no children) */
   virtual pwr_tOid loid() const = 0;
+
+  /** @brief Get previous sibling object ID (pwr_cNOid if first) */
   virtual pwr_tOid boid() const = 0;
+
+  /** @brief Get next sibling object ID (pwr_cNOid if last) */
   virtual pwr_tOid aoid() const = 0;
 
+  // Object Properties
+
+  /** @brief Get object name (short name, not full path) */
   virtual const char* name() const = 0;
+
+  /** @brief Get full hierarchical name (e.g., "RootObject-Child1-Child2") */
   virtual wb_name longName() = 0;
+
+  /** @brief Get object header timestamp (when object structure changed) */
   virtual pwr_tTime ohTime() const = 0;
+
+  /** @brief Get RtBody timestamp (when runtime attribute data changed) */
   virtual pwr_tTime rbTime() const = 0;
+
+  /** @brief Get DevBody timestamp (when devbody attribute data changed) */
   virtual pwr_tTime dbTime() const = 0;
+
+  /** @brief Get object flags (pwr_mClassDef_*: DevOnly, System, Template, etc.) */
   virtual pwr_mClassDef flags() const = 0;
 
+  /**
+   * @brief Check if this object is a descendant of another
+   * @param o Potential ancestor object
+   * @return true if this object is a child/grandchild/etc. of o
+   */
   virtual bool isOffspringOf(const wb_orep* o) const = 0;
 
-  // Navigational operations
+  // Navigational Operations
+  //
+  // All navigation methods return NULL and set *sts to appropriate error
+  // if the requested object doesn't exist (e.g., no parent, no siblings)
 
-  virtual wb_orep* ancestor(pwr_tStatus* sts)
-      = 0; ///< get object at top of hierarchy
+  /** @brief Get root object of this object's hierarchy */
+  virtual wb_orep* ancestor(pwr_tStatus* sts) = 0;
+
+  /** @brief Get parent object (NULL if root) */
   virtual wb_orep* parent(pwr_tStatus* sts) = 0;
-  virtual wb_orep* after(pwr_tStatus* sts) = 0; ///< get next sibling
-  virtual wb_orep* before(pwr_tStatus* sts) = 0; ///< get previous sibling
-  virtual wb_orep* first(pwr_tStatus* sts) = 0; ///< get first child
-  virtual wb_orep* child(pwr_tStatus* sts, wb_name& name)
-      = 0; ///< get named child
-  virtual wb_orep* last(pwr_tStatus* sts) = 0; ///< get last child
-  virtual wb_orep* next(pwr_tStatus* sts)
-      = 0; ///< get next in list of objects of same class in one volume
-  virtual wb_orep* previous(pwr_tStatus* sts)
-      = 0; ///< get previous in list of objects of same class in one volume
 
+  /** @brief Get next sibling (NULL if this is last child) */
+  virtual wb_orep* after(pwr_tStatus* sts) = 0;
+
+  /** @brief Get previous sibling (NULL if this is first child) */
+  virtual wb_orep* before(pwr_tStatus* sts) = 0;
+
+  /** @brief Get first child (NULL if no children) */
+  virtual wb_orep* first(pwr_tStatus* sts) = 0;
+
+  /** @brief Get named child (NULL if not found) */
+  virtual wb_orep* child(pwr_tStatus* sts, wb_name& name) = 0;
+
+  /** @brief Get last child (NULL if no children) */
+  virtual wb_orep* last(pwr_tStatus* sts) = 0;
+
+  /** @brief Get next object of same class in volume (for iteration) */
+  virtual wb_orep* next(pwr_tStatus* sts) = 0;
+
+  /** @brief Get previous object of same class in volume (for iteration) */
+  virtual wb_orep* previous(pwr_tStatus* sts) = 0;
+
+  // Attribute Access
+
+  /** @brief Get attribute definition by name */
   virtual wb_adrep* attribute(pwr_tStatus*, const char* name) = 0;
+
+  /** @brief Get first attribute definition (for iteration) */
   virtual wb_adrep* attribute(pwr_tStatus*) = 0;
+
+  /**
+   * @brief Get documentation block text
+   * @param block Output: allocated string with doc text (caller must free)
+   * @param size Output: size of doc text
+   * @return true if doc block exists
+   */
   virtual bool docBlock(char** block, int* size) const;
+
+  /**
+   * @brief Set documentation block text
+   * @param block Doc text to store with object
+   * @return true if successful
+   */
   virtual bool docBlock(char* block);
 
+  // Backend Access
+
+  /** @brief Get environment representation (wb session context) */
   virtual wb_erep* erep() const = 0;
+
+  /** @brief Get volume representation (storage backend) */
   virtual wb_vrep* vrep() const = 0;
+
+  /** @brief Get volume type (ldh_eVolRep_Db, ldh_eVolRep_Wb, etc.) */
   virtual ldh_eVolRep vtype() const = 0;
 
+  /**
+   * @brief Get most recent modification time (max of ohTime/rbTime/dbTime)
+   * @return Latest timestamp across all object components
+   */
   pwr_tTime modTime();
+
+  /**
+   * @brief Get most recent modification in entire subtree
+   * @return Latest timestamp of this object and all descendants
+   */
   pwr_tTime treeModTime();
 };
 

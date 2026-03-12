@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -146,10 +146,10 @@ void GlowExportFlow::text(GrowText* o)
 
   switch (o->draw_type) {
   case glow_eDrawType_TextHelveticaBold:
-    draw_type = flow_eDrawType_TextHelveticaBold;
+    draw_type = flow_eDrawType_TextRobotoBold;
     break;
   default:
-    draw_type = flow_eDrawType_TextHelvetica;
+    draw_type = flow_eDrawType_TextRoboto;
   }
 
   fp << int(flow_eSave_Text) << '\n';
@@ -167,10 +167,10 @@ void GlowExportFlow::annot(GrowSubAnnot* o)
 
   switch (o->draw_type) {
   case glow_eDrawType_TextHelveticaBold:
-    draw_type = flow_eDrawType_TextHelveticaBold;
+    draw_type = flow_eDrawType_TextRobotoBold;
     break;
   default:
-    draw_type = flow_eDrawType_TextHelvetica;
+    draw_type = flow_eDrawType_TextRoboto;
   }
 
   fp << int(flow_eSave_Annot) << '\n';

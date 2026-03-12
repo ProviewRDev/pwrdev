@@ -6116,13 +6116,6 @@ this.script_func_register = function () {
     Glow.eFont_Courier,
     0,
   );
-  sts = this.ccm.create_external_var(
-    "eFont_LucidaSans",
-    CcmC.K_DECL_INT,
-    0,
-    Glow.eFont_LucidaSans,
-    0,
-  );
 
   sts = this.ccm.create_external_var(
     "eDirection_Center",

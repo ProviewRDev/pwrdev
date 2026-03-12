@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -44,24 +44,12 @@
 
 #include "rt_io_base.h"
 #include "rt_pn_runtime_data.h"
-#include "rt_profinet.h"
-#include "rt_pnak.h"
+#include "profinet.h"
+#include "pnak.h"
 
 /* rt_io_pnak_locals.h -- Profinet io handling locals. */
 
 class ProfinetDevice;
-
-class PnApiData
-{
-public:
-  PnApiData() : api(0) {}
-  PnApiData(unsigned int api) : api(api) {}
-
-  unsigned int api;
-  std::set<unsigned int> module_index;
-
-  ~PnApiData() {}
-};
 
 typedef struct _agent_args
 {
@@ -78,8 +66,6 @@ public:
   T_PNAK_SERVICE_CON service_con;
 
   std::vector<std::shared_ptr<ProfinetDevice>> device_list;
-  ProfinetDevice controller; // Used by profinet viewer. Proview Runtime populates the controller within
-                             // device_list above
 
   pthread_t handle_events;
   agent_args args;

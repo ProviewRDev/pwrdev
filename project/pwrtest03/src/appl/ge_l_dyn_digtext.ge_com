@@ -47,7 +47,7 @@ main()
 
   xm = x0 + 1;
   ym = y0 + 1;
-  id = CreateText("DigText", xm, ym, 4, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("DigText", xm, ym, 4, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # Green/Dark
   ym += 1.5;
@@ -78,7 +78,7 @@ main()
   ym += 3.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Orange text", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Orange text", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   ym += 0.5;
   x1 = xm + 0.2;

@@ -64,8 +64,8 @@ lst_sEntry* csup_Init(pwr_tStatus* status, pwr_tObjid tid, float scanTime)
 
   lst_Init(NULL, lh, NULL);
 
-  for (*sts = gdh_GetClassList(pwr_cClass_CycleSup, &cid); ODD(*sts);
-       *sts = gdh_GetNextObject(cid, &cid)) {
+  for (*sts = gdh_GetClassList(pwr_cClass_CycleSup, &cid); ODD(*sts); *sts = gdh_GetNextObject(cid, &cid))
+  {
     cp = calloc(1, sizeof(*cp));
     cp->aref = cdh_ObjidToAref(cid);
     *sts = gdh_DLRefObjectInfoAttrref(&cp->aref, (void**)&cp->o, &cp->dlid);
@@ -78,8 +78,7 @@ lst_sEntry* csup_Init(pwr_tStatus* status, pwr_tObjid tid, float scanTime)
     lst_InsertSucc(NULL, lh, &cp->le, cp);
     max_delay = cp->o->MaxDelay;
     cp->o->DelayLimit.tv_sec = tv_sec = (int)max_delay;
-    cp->o->DelayLimit.tv_nsec
-        = (int)((max_delay - (float)tv_sec + FLT_EPSILON) * 1.0e9);
+    cp->o->DelayLimit.tv_nsec = (int)((max_delay - (float)tv_sec + FLT_EPSILON) * 1.0e9);
     // errh_Info("maxdelay: %f, tv_sec: %d, tv_nsec: %d", cp->o->MaxDelay,
     //  cp->o->DelayLimit.tv_sec, cp->o->DelayLimit.tv_nsec);
   }
@@ -94,71 +93,64 @@ error:
   return NULL;
 }
 
-int csup_Exec(pwr_tStatus* status, lst_sEntry* lh, pwr_tDeltaTime* next_start,
-    pwr_tDeltaTime* stop, pwr_tTime* now)
+int csup_Exec(pwr_tStatus* status, lst_sEntry* lh, pwr_tDeltaTime* next_start, pwr_tDeltaTime* stop,
+              pwr_tTime* now, pwr_tObjid* delayed_cyclesup_objid)
 {
   int action = 0;
   csup_sObject* cp;
-  pwr_tDeltaTime nextLimit;
 
   pwr_dStatus(sts, status, CSUP__SUCCESS);
 
-  if (lh == NULL || next_start == NULL || now == NULL || stop == NULL)
+  if (lh == NULL || next_start == NULL || now == NULL || stop == NULL || delayed_cyclesup_objid == NULL)
     pwr_Return(NO, sts, CSUP__NULPOINT);
 
-  while ((cp = lst_Succ(NULL, lh, &lh)) != NULL) {
+  while ((cp = lst_Succ(NULL, lh, &lh)) != NULL)
+  {
     pwr_sClass_CycleSup* o = cp->o;
 
-    if (cp->is_owner) {
-      if (time_Dcomp(&o->NextLimit, NULL) > 0) {
-        if (time_Dcomp(stop, &o->NextLimit) > 0) {
-          if (!o->Delayed) {
-            o->DelayedTime = *now;
-            o->Delayed = TRUE;
-            o->Timely = FALSE;
-          }
-          o->DelayCount++;
-          o->LastDelay = *now;
-          action = MAX(action, o->DelayAction);
-        } else if (!o->Timely) {
-          o->Timely = TRUE;
-          o->TimelyTime = *now;
+    if (cp->is_owner)
+    {
+      if (time_Dcomp(&o->NextLimit, NULL) > 0 && time_Dcomp(stop, &o->NextLimit) > 0)
+      {
+        if (!o->Delayed)
+        {
+          o->DelayedTime = *now;
+          o->Delayed = TRUE;
+          o->Timely = FALSE;
         }
-      }
-      if ((o->DelayLimit.tv_sec & 1 << 31)
-          != (o->DelayLimit.tv_nsec & 1 << 31)) {
-        // printf("DelayLimit.tv_sec: %d, DelayLimit.tv_nsec: %d\n",
-        // o->DelayLimit.tv_sec, o->DelayLimit.tv_nsec);
-        errh_Info("DelayLimit.tv_sec: %d, DelayLimit.tv_nsec: %d",
-            o->DelayLimit.tv_sec, o->DelayLimit.tv_nsec);
-      }
-      if ((next_start->tv_sec & 1 << 31) != (next_start->tv_nsec & 1 << 31)) {
-        // printf("next_start->tv_sec: %d, next_start->tv_nsec: %d\n",
-        // next_start->tv_sec, next_start->tv_nsec);
-        errh_Info("next_start->tv_sec: %d, next_start->tv_nsec: %d",
-            next_start->tv_sec, next_start->tv_nsec);
-      }
-      time_Dadd(&nextLimit, next_start, &o->DelayLimit);
+        o->DelayCount++;
+        o->LastDelay = *now;
+        action = MAX(action, o->DelayAction);
 
-      /* If we update the tv_nsec field first it is
-         possible that emon will detect a slip even if it is not. */
+        // Store delayed thread information we do not care about
+        // the previous delayed thread information as long as we
+        // have a delayed thread.
+        *delayed_cyclesup_objid = cp->aref.Objid;
+      }
+      else if (!o->Timely)
+      {
+        o->Timely = TRUE;
+        o->TimelyTime = *now;
+      }
 
-      o->NextLimit.tv_sec = nextLimit.tv_sec;
-      o->NextLimit.tv_nsec = nextLimit.tv_nsec;
+      // Add delay limit to next start time
+      time_Dadd(&o->NextLimit, next_start, &o->DelayLimit);
 
       o->CycleCount++;
-    } else {
-      /* Not owner, check stall delay */
-      if (o->DelayAction == pwr_eSupDelayActionEnum_EmergencyBreak)
+    }
+    else
+    {
+      // Handle delays for non-owner threads
+      if (time_Dcomp(&o->NextLimit, NULL) > 0 && time_Dcomp(stop, &o->NextLimit) > 0)
       {
-        nextLimit.tv_nsec = o->NextLimit.tv_nsec;
-        nextLimit.tv_sec = o->NextLimit.tv_sec;
-        if (time_Dcomp(&nextLimit, NULL) > 0
-            && time_Dcomp(stop, &nextLimit) > 0) {
-          o->DelayCount++;
-          o->LastDelay = *now;
-          action = MAX(action, o->DelayAction);
-        }
+        o->DelayCount++;
+        o->LastDelay = *now;
+        action = MAX(action, o->DelayAction);
+
+        // Store delayed thread information we do not care about
+        // the previous delayed thread information as long as we
+        // have a delayed thread.
+        *delayed_cyclesup_objid = cp->aref.Objid;
       }
     }
   }
@@ -175,7 +167,8 @@ void csup_Exit(pwr_tStatus* status, lst_sEntry* lh)
   if (lh == NULL)
     return;
 
-  while ((cp = lst_Succ(NULL, lh, NULL)) != NULL) {
+  while ((cp = lst_Succ(NULL, lh, NULL)) != NULL)
+  {
     lst_Remove(NULL, &cp->le);
     free(cp);
   }

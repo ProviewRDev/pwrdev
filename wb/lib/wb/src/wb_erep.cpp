@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -417,6 +417,8 @@ void wb_erep::load(pwr_tStatus* sts, char* db)
       return;
     }
     loadMeta(sts, db);
+    if (EVEN(*sts))
+      return;
     bindMethods();
     loadLocalWb(sts);
     wb_vrepref* vrep = new wb_vrepref(this, ldh_cPlcMainVolume);
@@ -434,6 +436,8 @@ void wb_erep::load(pwr_tStatus* sts, char* db)
     return;
 
   loadMeta(sts, db);
+  if (EVEN(*sts))
+    return;
   bindMethods();
   loadLocalWb(sts);
 
@@ -792,8 +796,10 @@ void wb_erep::loadMeta(pwr_tStatus* status, char* db)
                 msg, "Database %s is locked by user %s", vol_array[0], uname);
             MsgWindow::message('E', msg, msgw_ePop_No);
 
-            if (!MsgWindow::has_window())
-              exit(0);
+            if (!MsgWindow::has_window()) {
+              *status = LDH__DBLOCKED;
+              return;
+            }
 
             CoWow* wow = MsgWindow::get_wow();
             int res = wow->CreateModalDialog("Database Locked", msg, "Exit",
@@ -801,7 +807,8 @@ void wb_erep::loadMeta(pwr_tStatus* status, char* db)
             switch (res) {
             case wow_eModalDialogReturn_Button1:
             case wow_eModalDialogReturn_Deleted:
-              exit(0);
+              *status = LDH__DBLOCKED;
+              return;
             case wow_eModalDialogReturn_Button3:
               // Remove lock
               wb_dblock::dbunlock(vname);
@@ -922,14 +929,17 @@ void wb_erep::loadMeta(pwr_tStatus* status, char* db)
         case wow_eModalDialogReturn_Button2:
         case wow_eModalDialogReturn_Button1:
         case wow_eModalDialogReturn_Deleted:
-          exit(0);
+          *status = LDH__DBLOCKED;
+          return;
         case wow_eModalDialogReturn_Button3:
           // Remove lock
           wb_dblock::dbunlock(vname);
           break;
         }
-      } else
-        exit(0);
+      } else {
+        *status = LDH__DBLOCKED;
+        return;
+      }
     }
 
     wb_vrepmem* vrepmem = new wb_vrepmem(this);

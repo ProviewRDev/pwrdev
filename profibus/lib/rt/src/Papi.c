@@ -871,8 +871,11 @@ version
 {
   LOCAL_VARIABLES
 
-  char DeviceName[64];
+  char DeviceName[64];    
+  #if defined(WIN32) || defined(_WIN32) || defined(WIN16) || defined(_WIN16)
   USIGN32 ReadWriteTimeout[2];
+  #endif
+  
 
 #if defined(WIN32) || defined(_WIN32) || defined(WIN16) || defined(_WIN16)
 
@@ -1011,8 +1014,8 @@ version
 #endif
 
 #ifdef _LINUX
-  ReadWriteTimeout[0] = ReadTimeout;
-  ReadWriteTimeout[1] = WriteTimeout;
+  // ReadWriteTimeout[0] = ReadTimeout;
+  // ReadWriteTimeout[1] = WriteTimeout;
 
   // get service device name
   sprintf(DeviceName, "/dev/pbservice%u", Board + Channel);

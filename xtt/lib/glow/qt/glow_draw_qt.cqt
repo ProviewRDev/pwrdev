@@ -145,7 +145,7 @@ static QFont get_font(int font_idx, int painter_type, double size)
     res = QFont("Courier 10 pitch");
     break;
   default:
-    res = QFont("Lucida Sans");
+    res = QFont("Helvetica");
     break;
   }
 

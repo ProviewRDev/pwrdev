@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -65,8 +65,7 @@
   Configure the slave from gsd file.
 \*----------------------------------------------------------------------------*/
 
-static void get_subcid(ldh_tSession ldhses, pwr_tCid cid,
-                       std::vector<pwr_tCid>& v)
+static void get_subcid(ldh_tSession ldhses, pwr_tCid cid, std::vector<pwr_tCid>& v)
 {
   pwr_tCid subcid;
   pwr_tStatus sts;
@@ -110,8 +109,7 @@ int pb_dp_slave_save_cb(void* sctx)
   int found;
   pwr_tOid oid;
 
-  sts = ldh_ObjidToName(ctx->ldhses, ctx->aref.Objid, ldh_eName_Hierarchy, name,
-                        sizeof(name), &size);
+  sts = ldh_ObjidToName(ctx->ldhses, ctx->aref.Objid, ldh_eName_Hierarchy, name, sizeof(name), &size);
   if (EVEN(sts))
     return sts;
 
@@ -131,8 +129,7 @@ int pb_dp_slave_save_cb(void* sctx)
   if (EVEN(sts))
     return sts;
 
-  sts =
-      ldh_WriteAttribute(ctx->ldhses, &aaref, &byte_order, sizeof(byte_order));
+  sts = ldh_WriteAttribute(ctx->ldhses, &aaref, &byte_order, sizeof(byte_order));
   if (EVEN(sts))
     return sts;
 
@@ -144,8 +141,7 @@ int pb_dp_slave_save_cb(void* sctx)
     if (EVEN(sts))
       return sts;
 
-    sts = ldh_WriteAttribute(ctx->ldhses, &aaref, svalue,
-                             sizeof(slave->VendorName));
+    sts = ldh_WriteAttribute(ctx->ldhses, &aaref, svalue, sizeof(slave->VendorName));
     if (EVEN(sts))
       return sts;
   }
@@ -158,8 +154,7 @@ int pb_dp_slave_save_cb(void* sctx)
     if (EVEN(sts))
       return sts;
 
-    sts = ldh_WriteAttribute(ctx->ldhses, &aaref, svalue,
-                             sizeof(slave->ModelName));
+    sts = ldh_WriteAttribute(ctx->ldhses, &aaref, svalue, sizeof(slave->ModelName));
     if (EVEN(sts))
       return sts;
   }
@@ -172,8 +167,7 @@ int pb_dp_slave_save_cb(void* sctx)
     if (EVEN(sts))
       return sts;
 
-    sts = ldh_WriteAttribute(ctx->ldhses, &aaref, svalue,
-                             sizeof(slave->Revision));
+    sts = ldh_WriteAttribute(ctx->ldhses, &aaref, svalue, sizeof(slave->Revision));
     if (EVEN(sts))
       return sts;
   }
@@ -182,13 +176,11 @@ int pb_dp_slave_save_cb(void* sctx)
   sts = ctx->gsd->get_svalue("Hardware_Release", svalue, sizeof(svalue));
   if (ODD(sts))
   {
-    sts =
-        ldh_ArefANameToAref(ctx->ldhses, &ctx->aref, "HardwareRelease", &aaref);
+    sts = ldh_ArefANameToAref(ctx->ldhses, &ctx->aref, "HardwareRelease", &aaref);
     if (EVEN(sts))
       return sts;
 
-    sts = ldh_WriteAttribute(ctx->ldhses, &aaref, svalue,
-                             sizeof(slave->HardwareRelease));
+    sts = ldh_WriteAttribute(ctx->ldhses, &aaref, svalue, sizeof(slave->HardwareRelease));
     if (EVEN(sts))
       return sts;
   }
@@ -197,13 +189,11 @@ int pb_dp_slave_save_cb(void* sctx)
   sts = ctx->gsd->get_svalue("Software_Release", svalue, sizeof(svalue));
   if (ODD(sts))
   {
-    sts =
-        ldh_ArefANameToAref(ctx->ldhses, &ctx->aref, "SoftwareRelease", &aaref);
+    sts = ldh_ArefANameToAref(ctx->ldhses, &ctx->aref, "SoftwareRelease", &aaref);
     if (EVEN(sts))
       return sts;
 
-    sts = ldh_WriteAttribute(ctx->ldhses, &aaref, svalue,
-                             sizeof(slave->SoftwareRelease));
+    sts = ldh_WriteAttribute(ctx->ldhses, &aaref, svalue, sizeof(slave->SoftwareRelease));
     if (EVEN(sts))
       return sts;
   }
@@ -227,22 +217,20 @@ int pb_dp_slave_save_cb(void* sctx)
   int len;
 
   memset(user_prm_data, 0, sizeof(user_prm_data));
-  // Get ExtUserPrmData
-  ctx->gsd->pack_ext_user_prm_data((char*)user_prm_data, &len);
+  // Get ExtUserPrmData (include Jokerblocks for runtime use)
+  ctx->gsd->pack_ext_user_prm_data((char*)user_prm_data, &len, 1);
 
   if (!len)
   {
     // Get UserPrmData instead
-    ctx->gsd->get_user_prm_data((char*)user_prm_data, &len,
-                                sizeof(user_prm_data));
+    ctx->gsd->get_user_prm_data((char*)user_prm_data, &len, sizeof(user_prm_data));
   }
 
   sts = ldh_ArefANameToAref(ctx->ldhses, &ctx->aref, "PrmUserData", &aaref);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_WriteAttribute(ctx->ldhses, &aaref, user_prm_data,
-                           sizeof(slave->PrmUserData));
+  sts = ldh_WriteAttribute(ctx->ldhses, &aaref, user_prm_data, sizeof(slave->PrmUserData));
   if (EVEN(sts))
     return sts;
 
@@ -253,8 +241,7 @@ int pb_dp_slave_save_cb(void* sctx)
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_WriteAttribute(ctx->ldhses, &aaref, &user_prm_data_len,
-                           sizeof(slave->PrmUserDataLen));
+  sts = ldh_WriteAttribute(ctx->ldhses, &aaref, &user_prm_data_len, sizeof(slave->PrmUserDataLen));
   if (EVEN(sts))
     return sts;
 
@@ -270,8 +257,7 @@ int pb_dp_slave_save_cb(void* sctx)
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_WriteAttribute(ctx->ldhses, &aaref, config_data,
-                           sizeof(slave->ConfigData));
+  sts = ldh_WriteAttribute(ctx->ldhses, &aaref, config_data, sizeof(slave->ConfigData));
   if (EVEN(sts))
     return sts;
 
@@ -280,8 +266,7 @@ int pb_dp_slave_save_cb(void* sctx)
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_WriteAttribute(ctx->ldhses, &aaref, &config_data_len,
-                           sizeof(slave->ConfigDataLen));
+  sts = ldh_WriteAttribute(ctx->ldhses, &aaref, &config_data_len, sizeof(slave->ConfigDataLen));
   if (EVEN(sts))
     return sts;
 
@@ -289,8 +274,7 @@ int pb_dp_slave_save_cb(void* sctx)
   for (sts = ldh_GetChild(ctx->ldhses, ctx->aref.Objid, &oid); ODD(sts);
        sts = ldh_GetNextSibling(ctx->ldhses, oid, &oid))
   {
-    sts = ldh_ObjidToName(ctx->ldhses, oid, cdh_mName_object, name,
-                          sizeof(name), &size);
+    sts = ldh_ObjidToName(ctx->ldhses, oid, cdh_mName_object, name, sizeof(name), &size);
     if (EVEN(sts))
       return sts;
     strcat(name, "__tmp");
@@ -321,8 +305,7 @@ int pb_dp_slave_save_cb(void* sctx)
           found = 1;
 
           // Check if name is changed
-          sts = ldh_ObjidToName(ctx->ldhses, m->oid, cdh_mName_object, name,
-                                sizeof(name), &size);
+          sts = ldh_ObjidToName(ctx->ldhses, m->oid, cdh_mName_object, name, sizeof(name), &size);
           if (EVEN(sts))
             return sts;
 
@@ -342,20 +325,15 @@ int pb_dp_slave_save_cb(void* sctx)
             if (ODD(sts))
             {
               // Move to first sibling
-              sts = ldh_MoveObject(ctx->ldhses, m->oid, ctx->aref.Objid,
-                                   ldh_eDest_IntoFirst);
+              sts = ldh_MoveObject(ctx->ldhses, m->oid, ctx->aref.Objid, ldh_eDest_IntoFirst);
             }
           }
           else
           {
-            if ((ODD(sts) &&
-                 cdh_ObjidIsNotEqual(ctx->gsd->module_conf[i - 1].oid, prev)) ||
-                EVEN(sts))
+            if ((ODD(sts) && cdh_ObjidIsNotEqual(ctx->gsd->module_conf[i - 1].oid, prev)) || EVEN(sts))
             {
               // Move to next to i-1
-              sts = ldh_MoveObject(ctx->ldhses, m->oid,
-                                   ctx->gsd->module_conf[i - 1].oid,
-                                   ldh_eDest_After);
+              sts = ldh_MoveObject(ctx->ldhses, m->oid, ctx->gsd->module_conf[i - 1].oid, ldh_eDest_After);
             }
           }
         }
@@ -370,12 +348,10 @@ int pb_dp_slave_save_cb(void* sctx)
     {
       // Create a new module object
       if (i == 0)
-        sts = ldh_CreateObject(ctx->ldhses, &m->oid, m->name, m->cid,
-                               ctx->aref.Objid, ldh_eDest_IntoFirst);
+        sts = ldh_CreateObject(ctx->ldhses, &m->oid, m->name, m->cid, ctx->aref.Objid, ldh_eDest_IntoFirst);
       else
-        sts =
-            ldh_CreateObject(ctx->ldhses, &m->oid, m->name, m->cid,
-                             ctx->gsd->module_conf[i - 1].oid, ldh_eDest_After);
+        sts = ldh_CreateObject(ctx->ldhses, &m->oid, m->name, m->cid, ctx->gsd->module_conf[i - 1].oid,
+                               ldh_eDest_After);
       if (EVEN(sts))
       {
         printf("Error creating module object, %d\n", sts);
@@ -397,8 +373,7 @@ int pb_dp_slave_save_cb(void* sctx)
       if (EVEN(sts))
         return sts;
     }
-    sts = ldh_WriteAttribute(ctx->ldhses, &aaref, m->module->Mod_Name,
-                             sizeof(module->ModuleName));
+    sts = ldh_WriteAttribute(ctx->ldhses, &aaref, m->module->Mod_Name, sizeof(module->ModuleName));
     if (EVEN(sts))
       return sts;
 
@@ -419,8 +394,7 @@ int pb_dp_slave_save_cb(void* sctx)
     found = 0;
     for (int i = 0; i < ctx->gsd->module_conf_cnt; i++)
     {
-      if (ctx->gsd->module_conf[i].module &&
-          cdh_ObjidIsEqual(ctx->gsd->module_conf[i].oid, oid))
+      if (ctx->gsd->module_conf[i].module && cdh_ObjidIsEqual(ctx->gsd->module_conf[i].oid, oid))
       {
         found = 1;
         break;
@@ -475,8 +449,7 @@ static pwr_tStatus load_modules(slave_sCtx* ctx)
       continue;
 
     // Get name
-    sts = ldh_ObjidToName(ctx->ldhses, oid, cdh_mName_object, name,
-                          sizeof(name), &size);
+    sts = ldh_ObjidToName(ctx->ldhses, oid, cdh_mName_object, name, sizeof(name), &size);
     if (EVEN(sts))
       return sts;
 
@@ -487,8 +460,7 @@ static pwr_tStatus load_modules(slave_sCtx* ctx)
     if (EVEN(sts))
       return sts;
 
-    sts = ldh_ReadAttribute(ctx->ldhses, &aaref, module_name,
-                            sizeof(module_name));
+    sts = ldh_ReadAttribute(ctx->ldhses, &aaref, module_name, sizeof(module_name));
     if (EVEN(sts))
       return sts;
 
@@ -530,8 +502,7 @@ static pwr_tStatus load_modules(slave_sCtx* ctx)
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_ReadAttribute(ctx->ldhses, &aaref, prm_user_data,
-                          sizeof(prm_user_data));
+  sts = ldh_ReadAttribute(ctx->ldhses, &aaref, prm_user_data, sizeof(prm_user_data));
   if (EVEN(sts))
     return sts;
 
@@ -539,8 +510,7 @@ static pwr_tStatus load_modules(slave_sCtx* ctx)
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_ReadAttribute(ctx->ldhses, &aaref, &prm_user_data_len,
-                          sizeof(prm_user_data_len));
+  sts = ldh_ReadAttribute(ctx->ldhses, &aaref, &prm_user_data_len, sizeof(prm_user_data_len));
   if (EVEN(sts))
     return sts;
 
@@ -554,8 +524,8 @@ static pwr_tStatus load_modules(slave_sCtx* ctx)
   return 1;
 }
 
-pwr_tStatus pb_dp_slave_create_ctx(ldh_tSession ldhses, pwr_tAttrRef aref,
-                                   void* editor_ctx, slave_sCtx** ctxp)
+pwr_tStatus pb_dp_slave_create_ctx(ldh_tSession ldhses, pwr_tAttrRef aref, void* editor_ctx,
+                                   slave_sCtx** ctxp)
 {
   pwr_tOName name;
   char* gsdfile;
@@ -568,13 +538,11 @@ pwr_tStatus pb_dp_slave_create_ctx(ldh_tSession ldhses, pwr_tAttrRef aref,
 
   sts = ldh_GetSessionInfo(ldhses, &Info);
 
-  sts = ldh_ObjidToName(ldhses, aref.Objid, ldh_eName_Hierarchy, name,
-                        sizeof(name), &size);
+  sts = ldh_ObjidToName(ldhses, aref.Objid, ldh_eName_Hierarchy, name, sizeof(name), &size);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetObjectPar(ldhses, aref.Objid, "RtBody", "GSDfile", &gsdfile,
-                         &size);
+  sts = ldh_GetObjectPar(ldhses, aref.Objid, "RtBody", "GSDfile", &gsdfile, &size);
   if (EVEN(sts))
     return sts;
   if (streq(gsdfile, ""))
@@ -587,15 +555,13 @@ pwr_tStatus pb_dp_slave_create_ctx(ldh_tSession ldhses, pwr_tAttrRef aref,
   ctx->ldhses = ldhses;
   ctx->aref = aref;
   ctx->editor_ctx = editor_ctx;
-  ctx->edit_mode = (ODD(sts) && Info.Access == ldh_eAccess_ReadWrite) &&
-                   ldh_LocalObject(ldhses, aref.Objid);
+  ctx->edit_mode = (ODD(sts) && Info.Access == ldh_eAccess_ReadWrite) && ldh_LocalObject(ldhses, aref.Objid);
 
   get_subcid(ctx->ldhses, pwr_cClass_Pb_Module, mcv);
   ctx->mc = (gsd_sModuleClass*)calloc(mcv.size() + 2, sizeof(gsd_sModuleClass));
 
   ctx->mc[0].cid = pwr_cClass_Pb_Module;
-  sts = ldh_ObjidToName(ctx->ldhses, cdh_ClassIdToObjid(ctx->mc[0].cid),
-                        cdh_mName_object, ctx->mc[0].name,
+  sts = ldh_ObjidToName(ctx->ldhses, cdh_ClassIdToObjid(ctx->mc[0].cid), cdh_mName_object, ctx->mc[0].name,
                         sizeof(ctx->mc[0].name), &size);
   if (EVEN(sts))
   {
@@ -606,8 +572,7 @@ pwr_tStatus pb_dp_slave_create_ctx(ldh_tSession ldhses, pwr_tAttrRef aref,
   for (int i = 1; i <= (int)mcv.size(); i++)
   {
     ctx->mc[i].cid = mcv[i - 1];
-    sts = ldh_ObjidToName(ctx->ldhses, cdh_ClassIdToObjid(ctx->mc[i].cid),
-                          cdh_mName_object, ctx->mc[i].name,
+    sts = ldh_ObjidToName(ctx->ldhses, cdh_ClassIdToObjid(ctx->mc[i].cid), cdh_mName_object, ctx->mc[i].name,
                           sizeof(ctx->mc[0].name), &size);
     if (EVEN(sts))
     {

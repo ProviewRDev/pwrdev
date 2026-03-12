@@ -1,7 +1,7 @@
 /* packet-qcom.c
  * Routines for Interlink protocol packet disassembly
- * By Claes Sjöfors <claes.sjofors@proview.se>
- * Copyright 2010 Claes Sjöfors
+ * By Claes Sjofors <claes.sjofors@proview.se>
+ * Copyright 2010 Claes Sjofors
  *
  * $Id$
  *
@@ -31,8 +31,8 @@
 #include <stdio.h>
 #include <glib.h>
 #include <epan/packet.h>
-
-#include "co_string.h"
+#include <epan/prefs.h>
+#include <string.h>
 
 #include "packet-qcom.h"
 #include "pwr_def.h"
@@ -47,9 +47,6 @@ static int proto_qcom = -1;
 
 static dissector_handle_t data_handle = 0;
 static dissector_handle_t qcom_handle;
-
-static const value_string packettypenames[]
-    = { { 0, "TEXT" }, { 1, "SOMETHING_ELSE" }, { 0, 0 } };
 
 static gint hf_qcom = -1;
 static gint hf_qcom_header = -1;
@@ -1030,14 +1027,15 @@ void proto_register_qcom(void)
 
   };
 
+  proto_qcom = proto_register_protocol("QCom ProviewR", "QCom", "qcom");
+
   proto_register_field_array(proto_qcom, hf, array_length(hf));
   proto_register_subtree_array(ett, array_length(ett));
   register_dissector("qcom", dissect_qcom, proto_qcom);
 
-  proto_qcom = proto_register_protocol("QCom Proview", "QCom", "qcom");
 }
 
-void dissect_qcom(tvbuff_t* tvb, packet_info* pinfo, proto_tree* tree)
+int dissect_qcom(tvbuff_t* tvb, packet_info* pinfo, proto_tree* tree, void*)
 {
   proto_item* qcom_item = NULL;
   proto_item* qcom_sub_item = NULL;
@@ -1074,7 +1072,6 @@ void dissect_qcom(tvbuff_t* tvb, packet_info* pinfo, proto_tree* tree)
   int is_mhblock;
   int is_mhack;
   int is_mhreturn;
-  int is_sev;
   guint32 receiver_qix;
   guint32 reply_qix;
   guint32 btype;
@@ -1159,7 +1156,6 @@ void dissect_qcom(tvbuff_t* tvb, packet_info* pinfo, proto_tree* tree)
   is_mhblock = 0;
   is_mhack = 0;
   is_mhreturn = 0;
-  is_sev = 0;
   if (is_user) {
     if (msg_flags & mSeg_middle && !(msg_flags & mSeg_first))
       strcpy(info, "Middle segment");
@@ -1316,7 +1312,6 @@ void dissect_qcom(tvbuff_t* tvb, packet_info* pinfo, proto_tree* tree)
         case net_eMsg_objectR: {
           gchar name[200];
           guint32 poid_oix;
-          guint32 prev_oid_oix;
           guint32 prev_poid_oix = 0;
           strcpy(info, "ObjectR");
           is_netobjectr = 1;
@@ -1342,7 +1337,7 @@ void dissect_qcom(tvbuff_t* tvb, packet_info* pinfo, proto_tree* tree)
             else
               oid_oix = tvb_get_letohl(tvb, offs);
             offs += 12;
-            strncat(name, tvb_get_string(tvb, offs, 32), sizeof(name));
+            strncat(name, tvb_get_string_enc(pinfo->pool, tvb, offs, 32, ENC_ASCII), sizeof(name)-1);
             offs += 68;
             if (net_endian == ENC_BIG_ENDIAN)
               poid_oix = tvb_get_ntohl(tvb, offs);
@@ -1353,11 +1348,10 @@ void dissect_qcom(tvbuff_t* tvb, packet_info* pinfo, proto_tree* tree)
             if (i != 0 && poid_oix != prev_poid_oix)
               break;
 
-            prev_oid_oix = oid_oix;
             prev_poid_oix = poid_oix;
           }
 
-          if (!streq(name, ""))
+          if (strcmp(name, "") != 0)
             sprintf(info, "ObjectR         name %s", name);
 
           if (net_gobject_count > 10)
@@ -1604,8 +1598,8 @@ void dissect_qcom(tvbuff_t* tvb, packet_info* pinfo, proto_tree* tree)
                 mh_id = tvb_get_letohl(tvb, qcommsg_size + mh_header_size + 12);
 
               snprintf(&info[16], sizeof(info) - 16, "id   %-5d  \"%s\"", mh_id,
-                  tvb_get_string(tvb,
-                      qcommsg_size + mh_header_size + mh_msginfo_size, 80));
+		       tvb_get_string_enc(pinfo->pool, tvb,
+		       qcommsg_size + mh_header_size + mh_msginfo_size, 80, ENC_ASCII));
               break;
             default:
               strcpy(info, "Unknown Mh EventType");
@@ -1673,7 +1667,6 @@ void dissect_qcom(tvbuff_t* tvb, packet_info* pinfo, proto_tree* tree)
         protostrp = protostr[5]; /* QCOM-Sev */
 
         if (msg_size >= 4) {
-          is_sev = 1;
           sev_type = tvb_get_ntohl(tvb, header_size + info_size);
 
           // printf( "sev_type: %d %d\n", header_size + info_size, sev_type);
@@ -1731,17 +1724,13 @@ void dissect_qcom(tvbuff_t* tvb, packet_info* pinfo, proto_tree* tree)
       strcat(info, " First segment");
   }
 
-  if (check_col(pinfo->cinfo, COL_PROTOCOL)) {
-    col_set_str(pinfo->cinfo, COL_PROTOCOL, protostrp);
-  }
+  col_set_str(pinfo->cinfo, COL_PROTOCOL, protostrp);
 
   /* Clear out stuff in the info column */
-  if (check_col(pinfo->cinfo, COL_INFO)) {
-    if (!streq(info, ""))
-      col_add_fstr(pinfo->cinfo, COL_INFO, "%s", info);
-    else
-      col_clear(pinfo->cinfo, COL_INFO);
-  }
+  if (strcmp(info, "") != 0)
+    col_add_fstr(pinfo->cinfo, COL_INFO, "%s", info);
+  else
+    col_clear(pinfo->cinfo, COL_INFO);
 
   // Here we check to see if the INFO column is present. If it is we output
   // which ports the packet came from and went to. Also, we indicate the type
@@ -1972,28 +1961,28 @@ void dissect_qcom(tvbuff_t* tvb, packet_info* pinfo, proto_tree* tree)
           qcom_net_getobjectinfor_tree
               = proto_item_add_subtree(qcom_sub_item, ett_qcom);
 
-          qcom_sub_item = proto_tree_add_item(qcom_net_getobjectinfo_tree,
+          qcom_sub_item = proto_tree_add_item(qcom_net_getobjectinfor_tree,
               hf_net_getobjectinfor_sts, tvb, offset, 4, net_endian);
           offset += 4;
-          qcom_sub_item = proto_tree_add_item(qcom_net_getobjectinfo_tree,
+          qcom_sub_item = proto_tree_add_item(qcom_net_getobjectinfor_tree,
               hf_net_getobjectinfor_arefoix, tvb, offset, 4, net_endian);
           offset += 4;
-          qcom_sub_item = proto_tree_add_item(qcom_net_getobjectinfo_tree,
+          qcom_sub_item = proto_tree_add_item(qcom_net_getobjectinfor_tree,
               hf_net_getobjectinfor_arefvid, tvb, offset, 4, net_endian);
           offset += 4;
-          qcom_sub_item = proto_tree_add_item(qcom_net_getobjectinfo_tree,
+          qcom_sub_item = proto_tree_add_item(qcom_net_getobjectinfor_tree,
               hf_net_getobjectinfor_arefbody, tvb, offset, 4, net_endian);
           offset += 4;
-          qcom_sub_item = proto_tree_add_item(qcom_net_getobjectinfo_tree,
+          qcom_sub_item = proto_tree_add_item(qcom_net_getobjectinfor_tree,
               hf_net_getobjectinfor_arefoffset, tvb, offset, 4, net_endian);
           offset += 4;
-          qcom_sub_item = proto_tree_add_item(qcom_net_getobjectinfo_tree,
+          qcom_sub_item = proto_tree_add_item(qcom_net_getobjectinfor_tree,
               hf_net_getobjectinfor_arefsize, tvb, offset, 4, net_endian);
           offset += 4;
-          qcom_sub_item = proto_tree_add_item(qcom_net_getobjectinfo_tree,
+          qcom_sub_item = proto_tree_add_item(qcom_net_getobjectinfor_tree,
               hf_net_getobjectinfor_arefflags, tvb, offset, 4, net_endian);
           offset += 4;
-          qcom_sub_item = proto_tree_add_item(qcom_net_getobjectinfo_tree,
+          qcom_sub_item = proto_tree_add_item(qcom_net_getobjectinfor_tree,
               hf_net_getobjectinfor_size, tvb, offset, 4, net_endian);
           offset += 4;
         }
@@ -2367,6 +2356,7 @@ void dissect_qcom(tvbuff_t* tvb, packet_info* pinfo, proto_tree* tree)
       }
     }
   }
+  return tvb_reported_length(tvb);
 }
 
 void proto_register_handoff_qcom(void)

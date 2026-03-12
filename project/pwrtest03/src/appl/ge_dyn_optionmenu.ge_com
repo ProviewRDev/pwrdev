@@ -40,13 +40,13 @@ main()
 
   xm = x0 + 1;
   ym = y0 + 1;
-  id = CreateText("OptionMenu", xm, ym, 4, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("OptionMenu", xm, ym, 4, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # Static 20 items
   ym += 2;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Static 20 items", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Static 20 items", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   ym += 0.8;
   x1 = xm;
@@ -80,7 +80,7 @@ main()
   ym += 2;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Static 10 items", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Static 10 items", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   ym += 0.8;
   x1 = xm;
@@ -114,7 +114,7 @@ main()
   ym += 2;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Dynamic", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Dynamic", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   ym += 0.8;
   x1 = xm;

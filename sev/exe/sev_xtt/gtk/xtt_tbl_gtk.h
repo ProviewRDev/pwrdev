@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -46,10 +46,11 @@
 class CoWowRecall;
 class CoWowEntryGtk;
 
-class XttTblGtk : public XttTbl {
+class XttTblGtk : public XttTbl
+{
 public:
-  XttTblGtk(GtkWidget* a_parent_wid, void* a_parent_ctx, sevcli_tCtx a_sevcli,
-      sevcli_sHistItem* itemlist, int item_cnt);
+  XttTblGtk(GtkWidget* a_parent_wid, void* a_parent_ctx, sevcli_tCtx a_sevcli, sevcli_sHistItem* itemlist,
+            int item_cnt);
   GtkWidget* parent_wid;
   GtkWidget* brow_widget;
   GtkWidget* form_widget;
@@ -61,12 +62,11 @@ public:
   CoWowRecall* cmd_recall;
   CoWowEntryGtk* cmd_entry;
 
-  void message(char severity, char* message);
-  XttSevHist* sevhist_new(pwr_tOid* oidv, pwr_tOName* anamev,
-      pwr_tOName* onamev, bool* sevhistobjectv, pwr_tStatus* sts);
-  CoLogin* login_new(const char* wl_name, const char* wl_groupname,
-      void (*wl_bc_success)(void*), void (*wl_bc_cancel)(void*),
-      pwr_tStatus* status);
+  void message(char severity, const char* message);
+  XttSevHist* sevhist_new(pwr_tOid* oidv, pwr_tOName* anamev, pwr_tOName* onamev, bool* sevhistobjectv,
+                          pwr_tStatus* sts);
+  CoLogin* login_new(const char* wl_name, const char* wl_groupname, void (*wl_bc_success)(void*),
+                     void (*wl_bc_cancel)(void*), pwr_tStatus* status);
   void set_prompt(const char* prompt);
 
   static void activate_command(GtkWidget* w, gpointer data);

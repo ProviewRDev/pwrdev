@@ -17,7 +17,12 @@ merge_dir_func()
 
   if [ ! -z "$files" ]; then
     for file in $files; do
-      if [ ! -d $fromdir/$file ]; then
+      if [ -d $fromdir/$file ]; then
+        if [ ! -e $todir/$file ]; then
+          mkdir -p $todir/$file
+        fi
+        merge_dir_func $todir/$file $fromdir/$file
+      else
         if [ -e $todir/$file ]; then
           if [ $todir/$file -ot $fromdir/$file ]; then
             if [ $ver -eq 1 ]; then
@@ -78,7 +83,7 @@ else
   for lib in $libraries; do
 
     arname=${lib##/*/}
-    if [ $arname = "libpwr_rt.a" ] || [ $arname = "libpwr_cow.a" ] || [ $arname = "libpwr_cow_motif.a" ] || [ $arname = "libpwr_cow_gtk.a" ] || [ $arname = "libpwr_cow_qt.a" ] || [ $arname = "libpwr_wb.a" ] || [ $arname = "libpwr_wb_motif.a" ] || [ $arname = "libpwr_wb_gtk.a" ] || [ $arname = "libpwr_wb_qt.a" ] || [ $arname = "libpwr_xtt.a" ] || [ $arname = "libpwr_xtt_motif.a" ] || [ $arname = "libpwr_xtt_gtk.a" ] || [ $arname = "libpwr_xtt_qt.a" ]; then
+    if [ $arname = "libpwr_rt.a" ] || [ $arname = "libpwr_cow.a" ] || [ $arname = "libpwr_cow_gtk.a" ] || [ $arname = "libpwr_cow_qt.a" ] || [ $arname = "libpwr_wb.a" ] || [ $arname = "libpwr_wb_gtk.a" ] || [ $arname = "libpwr_wb_qt.a" ] || [ $arname = "libpwr_xtt.a" ] || [ $arname = "libpwr_xtt_gtk.a" ] || [ $arname = "libpwr_xtt_qt.a" ]; then
       if [ $ver -eq 1 ]; then
 	  echo "Merge $lib"
       fi

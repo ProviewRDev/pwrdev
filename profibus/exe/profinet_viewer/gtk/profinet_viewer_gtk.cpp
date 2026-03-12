@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -34,116 +34,57 @@
  * General Public License plus this exception.
  */
 
-/* profinet_viewer.cpp -- Profinet viewer */
+/* profinet_viewer2_gtk.cpp -- PROFINET DCP Tool GTK main */
 
-#ifdef PWRE_CONF_PNAK
+#include "pn_dcp_tool_gtk.h"
+#include <iostream>
+#include "co_dcli.h"
 
-#include <locale.h>
-
-#include <stdlib.h>
-
-#include "co_error.h"
-#include "co_string.h"
-
-#include "cow_xhelp_gtk.h"
-
-#include "pn_viewer_gtk.h"
-
-typedef struct
+// Load CSS styling for modern UI
+static void loadCSS()
 {
-  GtkWidget* toplevel;
-  PnViewer* viewer;
-} tViewer;
+  GtkCssProvider* provider = gtk_css_provider_new();
+  GdkDisplay* display = gdk_display_get_default();
+  GdkScreen* screen = gdk_display_get_default_screen(display);
 
-static void usage()
-{
-  printf("\nUsage: profinet_viewer [-l language] [device]\n");
-}
+  // Try to load from file first
+  GError* error = nullptr;
+  char css_path[256];
+  dcli_translate_filename(css_path, "$pwr_exe/pn_dcp_tool_style.css");
+  if (!gtk_css_provider_load_from_path(provider, css_path, &error))
+  {
+    if (error)
+    {
+      std::cerr << "Warning: Failed to load CSS file: " << error->message << std::endl;
+      g_error_free(error);
+    }
+    // Note: CSS file not found, using default GTK theme
+  }
+  else
+  {
+    gtk_style_context_add_provider_for_screen(screen, GTK_STYLE_PROVIDER(provider),
+                                              GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+  }
 
-static void viewer_close(void* c)
-{
-  delete ((tViewer*)c)->viewer;
-  exit(0);
+  g_object_unref(provider);
 }
 
 int main(int argc, char* argv[])
 {
-  int i;
-  int sts;
-  tViewer* ctx;
-  char dev_name[20] = "eth1";
-
-  ctx = (tViewer*)calloc(1, sizeof(tViewer));
-
   gtk_init(&argc, &argv);
 
-  setlocale(LC_NUMERIC, "POSIX");
-  setlocale(LC_TIME, "en_US");
+  // Load custom CSS styling
+  loadCSS();
 
-  ctx->toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height",
-                                           100, "default-width", 100, "title",
-                                           "Profinet Viewer", NULL);
-
-  // Create help window
-  CoXHelpGtk* xhelp =
-      new CoXHelpGtk(ctx->toplevel, 0, xhelp_eUtility_Wtt, (int*)&sts);
-  CoXHelpGtk::set_default(xhelp);
-
-  for (i = 1; i < argc; i++)
+  ProfinetDCP::ProfinetDCPWindow window;
+  if (!window.create())
   {
-    if (streq(argv[i], "-h"))
-    {
-      usage();
-      exit(0);
-    }
-    else if (streq(argv[i], "-l"))
-    {
-      if (i + 1 >= argc)
-      {
-        usage();
-        exit(0);
-      }
-      Lng::set(argv[i + 1]);
-      i++;
-    }
-    else if (str_StartsWith(argv[i], "eth"))
-    {
-      snprintf(dev_name, sizeof(dev_name), "%s", argv[i]);
-    }
+    std::cerr << "Failed to create main window" << std::endl;
+    return 1;
   }
 
-  // Open window
-  try
-  {
-    ctx->viewer =
-        new PnViewerGtk(ctx, ctx->toplevel, "Profinet Viewer", dev_name, &sts);
-    ctx->viewer->close_cb = viewer_close;
-  }
-  catch (co_error& e)
-  {
-    printf("** Exception: %s\n", e.what().c_str());
-    exit(0);
-  }
+  window.show();
+  window.run();
 
-  gtk_widget_show_all(ctx->toplevel);
-
-  g_object_set(ctx->toplevel, "visible", FALSE, NULL);
-
-  try
-  {
-    ctx->viewer->update_devices();
-  }
-  catch (co_error& e)
-  {
-    printf("** Exception: %s\n", e.what().c_str());
-  }
-
-  gtk_main();
-  return (0);
+  return 0;
 }
-
-#else
-#include <stdio.h>
-
-int main() { printf("Softing PNAK not built with this Proview release\n"); }
-#endif

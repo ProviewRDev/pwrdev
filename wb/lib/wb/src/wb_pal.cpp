@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -1053,7 +1053,7 @@ void Pal::create_nodeclasses()
 
   brow_CreateNodeClass(brow_ctx, "PaletteDefault", flow_eNodeGroup_Common, &nc);
   brow_AddAnnotPixmap(nc, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc, 1.2, 0.6, 0, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc, 1.2, 0.6, 0, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 0);
   brow_AddAnnotPixmap(nc, 1, 7, 0.1, flow_eDrawType_Line, 2, 1);
   brow_AddFrame(nc, 0, 0, 10, 0.83, flow_eDrawType_LineGray, -1, 1);

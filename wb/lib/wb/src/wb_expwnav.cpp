@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -82,11 +82,11 @@ void WbExpWNavBrow::create_nodeclasses()
 
   brow_CreateNodeClass(ctx, "LogDefault", flow_eNodeGroup_Common, &nc_exp);
   brow_AddAnnotPixmap(nc_exp, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_exp, 2.8, 0.6, 0, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_exp, 2.8, 0.6, 0, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_exp, 35, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_exp, 35, 0.6, 1, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_exp, 45, 0.6, 2, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_exp, 45, 0.6, 2, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_exp, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
@@ -95,11 +95,11 @@ void WbExpWNavBrow::create_nodeclasses()
   brow_CreateNodeClass(ctx, "LogDefault", flow_eNodeGroup_Common, &nc_eexp);
   brow_AddAnnotPixmap(nc_eexp, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddRadiobutton(nc_eexp, 1.4, 0.03, 0.7, 0.7, 0, flow_eDrawType_Line, 1);
-  brow_AddAnnot(nc_eexp, 2.8, 0.6, 0, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_eexp, 2.8, 0.6, 0, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_eexp, 35, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_eexp, 35, 0.6, 1, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_eexp, 45, 0.6, 2, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_eexp, 45, 0.6, 2, flow_eDrawType_TextRoboto, 2,
       flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_eexp, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 }

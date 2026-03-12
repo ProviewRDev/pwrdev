@@ -60,6 +60,7 @@ static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
 
   op = (pwr_sClass_Pb_Do*)cp->op;
   local = (io_sCardLocal*)cp->Local;
+  (void)local; // Do nothing
 
   if (op->NumberOfChannels != 8 && op->NumberOfChannels != 16 &&
       op->NumberOfChannels != 32)

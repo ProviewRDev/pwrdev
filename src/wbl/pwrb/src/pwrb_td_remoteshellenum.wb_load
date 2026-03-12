@@ -39,7 +39,7 @@ SObject pwrb:Type
 !/**
 !  @Version 1.0
 !  @Group Types
-!  Enumeration for remote shell access. 
+!  Enumeration for remote access.
 !*/
   Object RemoteShellEnum $TypeDef 42
     Body SysBody
@@ -54,16 +54,6 @@ SObject pwrb:Type
        Attr PgmName = "SSH"
        Attr Text = "SSH"
        Attr Value = 0
-     EndBody
-    EndObject
-    !/**
-    !  RSH.
-    !*/
-    Object RSH $Value
-     Body SysBody
-       Attr PgmName = "RSH"
-       Attr Text = "RSH"
-       Attr Value = 1
      EndBody
     EndObject
   EndObject

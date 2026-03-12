@@ -81,11 +81,13 @@ pwr_tInt32 GetChanSize(pwr_eDataRepEnum rep)
   case pwr_eDataRepEnum_Int64:
   case pwr_eDataRepEnum_UInt64:
   case pwr_eDataRepEnum_Float64:
+  case pwr_eDataRepEnum_BitField64:
     return 8;
   case pwr_eDataRepEnum_Bit32:
   case pwr_eDataRepEnum_Int32:
   case pwr_eDataRepEnum_UInt32:
   case pwr_eDataRepEnum_Float32:
+  case pwr_eDataRepEnum_BitField32:
     return 4;
   case pwr_eDataRepEnum_Int24:
   case pwr_eDataRepEnum_UInt24:
@@ -93,6 +95,7 @@ pwr_tInt32 GetChanSize(pwr_eDataRepEnum rep)
   case pwr_eDataRepEnum_Bit16:
   case pwr_eDataRepEnum_Int16:
   case pwr_eDataRepEnum_UInt16:
+  case pwr_eDataRepEnum_BitField16:
     return 2;
   default:
     return 1;
@@ -636,18 +639,21 @@ void io_bus_card_read(io_tCtx ctx, io_sRack* rp, io_sCard* cp, void* input_area,
         switch (chan_di->Representation)
         {
         case pwr_eDataRepEnum_Bit8:
+        case pwr_eDataRepEnum_BitField8:
           udata8p = input_area + cp->offset + chanp->offset;
           *(pwr_tUInt16*)(chanp->vbp) =
               chan_di->InvertOn ? ((*udata8p & chanp->mask) == 0) : ((*udata8p & chanp->mask) != 0);
           break;
 
         case pwr_eDataRepEnum_Bit16:
+        case pwr_eDataRepEnum_BitField16:
           udata16p = input_area + cp->offset + chanp->offset;
           *(pwr_tUInt16*)(chanp->vbp) =
               chan_di->InvertOn ? ((*udata16p & chanp->mask) == 0) : ((*udata16p & chanp->mask) != 0);
           break;
 
         case pwr_eDataRepEnum_Bit32:
+        case pwr_eDataRepEnum_BitField32:
           udata32p = input_area + cp->offset + chanp->offset;
           *(pwr_tUInt16*)(chanp->vbp) =
               chan_di->InvertOn ? ((*udata32p & chanp->mask) == 0) : ((*udata32p & chanp->mask) != 0);
@@ -666,18 +672,21 @@ void io_bus_card_read(io_tCtx ctx, io_sRack* rp, io_sCard* cp, void* input_area,
           switch (chan_d->Representation)
           {
           case pwr_eDataRepEnum_Bit8:
+          case pwr_eDataRepEnum_BitField8:
             udata8p = input_area + cp->offset + chanp->offset;
             *(pwr_tUInt16*)(chanp->vbp) =
                 chan_d->InvertOn ? ((*udata8p & chanp->mask) == 0) : ((*udata8p & chanp->mask) != 0);
             break;
 
           case pwr_eDataRepEnum_Bit16:
+          case pwr_eDataRepEnum_BitField16:
             udata16p = input_area + cp->offset + chanp->offset;
             *(pwr_tUInt16*)(chanp->vbp) =
                 chan_d->InvertOn ? ((*udata16p & chanp->mask) == 0) : ((*udata16p & chanp->mask) != 0);
             break;
 
           case pwr_eDataRepEnum_Bit32:
+          case pwr_eDataRepEnum_BitField32:
             udata32p = input_area + cp->offset + chanp->offset;
             *(pwr_tUInt16*)(chanp->vbp) =
                 chan_d->InvertOn ? ((*udata32p & chanp->mask) == 0) : ((*udata32p & chanp->mask) != 0);
@@ -1174,6 +1183,7 @@ void io_bus_card_write(io_tCtx ctx, io_sCard* cp, void* output_area, pwr_tByteOr
         switch (chan_do->Representation)
         {
         case pwr_eDataRepEnum_Bit8:
+        case pwr_eDataRepEnum_BitField8:
           udata8p = output_area + cp->offset + chanp->offset;
           if (do_actval ^ chan_do->InvertOn)
             *udata8p |= chanp->mask;
@@ -1182,6 +1192,7 @@ void io_bus_card_write(io_tCtx ctx, io_sCard* cp, void* output_area, pwr_tByteOr
           break;
 
         case pwr_eDataRepEnum_Bit16:
+        case pwr_eDataRepEnum_BitField16:
           udata16p = output_area + cp->offset + chanp->offset;
           if (do_actval ^ chan_do->InvertOn)
             *udata16p |= chanp->mask;
@@ -1190,6 +1201,7 @@ void io_bus_card_write(io_tCtx ctx, io_sCard* cp, void* output_area, pwr_tByteOr
           break;
 
         case pwr_eDataRepEnum_Bit32:
+        case pwr_eDataRepEnum_BitField32:
           udata32p = output_area + cp->offset + chanp->offset;
           if (do_actval ^ chan_do->InvertOn)
             *udata32p |= chanp->mask;
@@ -1218,6 +1230,7 @@ void io_bus_card_write(io_tCtx ctx, io_sCard* cp, void* output_area, pwr_tByteOr
           switch (chan_d->Representation)
           {
           case pwr_eDataRepEnum_Bit8:
+          case pwr_eDataRepEnum_BitField8:
             udata8p = output_area + cp->offset + chanp->offset;
             if (do_actval ^ chan_d->InvertOn)
               *udata8p |= chanp->mask;
@@ -1226,6 +1239,7 @@ void io_bus_card_write(io_tCtx ctx, io_sCard* cp, void* output_area, pwr_tByteOr
             break;
 
           case pwr_eDataRepEnum_Bit16:
+          case pwr_eDataRepEnum_BitField16:
             udata16p = output_area + cp->offset + chanp->offset;
             if (do_actval ^ chan_d->InvertOn)
               *udata16p |= chanp->mask;
@@ -1234,6 +1248,7 @@ void io_bus_card_write(io_tCtx ctx, io_sCard* cp, void* output_area, pwr_tByteOr
             break;
 
           case pwr_eDataRepEnum_Bit32:
+          case pwr_eDataRepEnum_BitField32:
             udata32p = output_area + cp->offset + chanp->offset;
             if (do_actval ^ chan_d->InvertOn)
               *udata32p |= chanp->mask;

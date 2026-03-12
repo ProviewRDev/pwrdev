@@ -44,6 +44,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
+#include "co_cdh.h"
 #include "pwr_basecomponentclasses.h"
 #include "pwr_ssaboxclasses.h"
 #include "rt_io_base.h"
@@ -51,7 +52,13 @@
 #include "rt_io_m_ssab_locals.h"
 #include "rt_io_msg.h"
 
+#define BFB_COMMERR_SOFT_LIMIT 15
+#define BFB_COMMERR_HARD_LIMIT 50
+#define BFB_COMMERR_LINK_FASTTRACK (BFB_COMMERR_HARD_LIMIT + 1)
+
 static void udp_reset(int socket);
+static void udp_reset_inputs(io_sRackLocal* local);
+static int udp_is_link_send_error(int errnum);
 
 /*----------------------------------------------------------------------------*\
 
@@ -95,6 +102,7 @@ static pwr_tStatus IoRackInitSwap(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 
   local->next_read_req_item = 0;
   local->next_write_req_item = 0;
+  local->comm_error_count = 0;
 
   op->RX_packets = 0;
   op->TX_packets = 0;
@@ -164,6 +172,7 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 
   local->next_read_req_item = 0;
   local->next_write_req_item = 0;
+  local->comm_error_count = 0;
 
   op->RX_packets = 0;
   op->TX_packets = 0;
@@ -191,7 +200,8 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   local->read_req.service = BFB_SERVICE_READ;
   local->read_req.length = local->next_read_req_item * 4 + 4;
   sts = send(local->s, &local->read_req, local->read_req.length, 0);
-  op->TX_packets++;
+  if (sts > 0)
+    op->TX_packets++;
   local->next_read_req_item = 0;
   bzero(&local->read_area, sizeof(local->read_area));
 
@@ -233,7 +243,8 @@ static pwr_tStatus IoRackSwap(
     local->read_req.service = BFB_SERVICE_READ;
     local->read_req.length = local->next_read_req_item * 4 + 4;
     sts = send(local->s, &local->read_req, local->read_req.length, 0);
-    op->TX_packets++;
+    if (sts > 0)
+      op->TX_packets++;
     local->next_read_req_item = 0;
     bzero(&local->read_area, sizeof(local->read_area));
 
@@ -246,6 +257,8 @@ static pwr_tStatus IoRackSwap(
       sts = select(32, &fds, NULL, NULL, &tv);
       if (sts > 0) {
         size = recv(local->s, &rbuf, sizeof(rbuf), 0);
+        if (size <= 0)
+          continue;
         if (rbuf.service == BFB_SERVICE_READ) {
           bzero(&local->read_area, sizeof(local->read_area));
           memcpy(&local->read_area, &rbuf, size);
@@ -279,6 +292,9 @@ static pwr_tStatus IoRackRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   pwr_sClass_Ssab_RemoteRack* op = (pwr_sClass_Ssab_RemoteRack*)rp->op;
   struct bfb_buf rbuf;
   int size;
+  int rx_packets = 0;
+  int old_comm_error_count;
+  int send_link_error = 0;
 
   if (ctx->read_reset) {
     udp_reset(local->s);
@@ -289,7 +305,10 @@ static pwr_tStatus IoRackRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   local->write_req.service = BFB_SERVICE_WRITE;
   local->write_req.length = local->next_write_req_item * 4 + 4;
   sts = send(local->s, &local->write_req, local->write_req.length, 0);
-  op->TX_packets++;
+  if (sts > 0)
+    op->TX_packets++;
+  else if (sts < 0 && udp_is_link_send_error(errno))
+    send_link_error = 1;
   local->next_write_req_item = 0;
   bzero(&local->write_area, sizeof(local->write_area));
 
@@ -302,6 +321,8 @@ static pwr_tStatus IoRackRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
     sts = select(32, &fds, NULL, NULL, &tv);
     if (sts > 0) {
       size = recv(local->s, &rbuf, sizeof(rbuf), 0);
+      if (size <= 0)
+        continue;
       if (rbuf.service == BFB_SERVICE_READ) {
         bzero(&local->read_area, sizeof(local->read_area));
         memcpy(&local->read_area, &rbuf, size);
@@ -310,7 +331,42 @@ static pwr_tStatus IoRackRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
         memcpy(&local->write_area, &rbuf, size);
       }
       op->RX_packets++;
+      rx_packets++;
     }
+  }
+
+  if (rx_packets > 0) {
+    local->comm_error_count = 0;
+    op->Status = IO__NORMAL;
+  } else {
+    old_comm_error_count = local->comm_error_count;
+    if (send_link_error && local->comm_error_count < BFB_COMMERR_LINK_FASTTRACK)
+      local->comm_error_count = BFB_COMMERR_LINK_FASTTRACK;
+    else
+      local->comm_error_count++;
+
+    if (old_comm_error_count < BFB_COMMERR_SOFT_LIMIT
+        && local->comm_error_count >= BFB_COMMERR_SOFT_LIMIT) {
+      errh_Error("IO Error soft limit reached on rack '%s'", rp->Name);
+      ctx->IOHandler->CardErrorSoftLimit = 1;
+      ctx->IOHandler->ErrorSoftLimitObject = cdh_ObjidToAref(rp->Objid);
+    }
+    if (old_comm_error_count < BFB_COMMERR_HARD_LIMIT
+        && local->comm_error_count >= BFB_COMMERR_HARD_LIMIT) {
+      errh_Error("IO Error hard limit reached on rack '%s', stall action %d",
+          rp->Name, op->StallAction);
+      ctx->IOHandler->CardErrorHardLimit = 1;
+      ctx->IOHandler->ErrorHardLimitObject = cdh_ObjidToAref(rp->Objid);
+    }
+
+    if (local->comm_error_count > BFB_COMMERR_HARD_LIMIT) {
+      if (op->StallAction == pwr_eSsabStallAction_ResetInputs)
+        udp_reset_inputs(local);
+      else if (op->StallAction == pwr_eSsabStallAction_EmergencyBreak)
+        ctx->Node->EmergBreakTrue = 1;
+    }
+
+    op->Status = IO__ERRDEVICE;
   }
 
   return IO__SUCCESS;
@@ -326,7 +382,11 @@ static pwr_tStatus IoRackWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   local->read_req.service = BFB_SERVICE_READ;
   local->read_req.length = local->next_read_req_item * 4 + 4;
   sts = send(local->s, &local->read_req, local->read_req.length, 0);
-  op->TX_packets++;
+  if (sts > 0)
+    op->TX_packets++;
+  else if (sts < 0 && udp_is_link_send_error(errno)
+      && local->comm_error_count < BFB_COMMERR_LINK_FASTTRACK)
+    local->comm_error_count = BFB_COMMERR_LINK_FASTTRACK;
   local->next_read_req_item = 0;
   bzero(&local->read_area, sizeof(local->read_area));
 
@@ -352,6 +412,31 @@ static void udp_reset(int socket)
     if (sts > 0)
       size = recv(socket, &rbuf, sizeof(rbuf), 0);
   }
+}
+
+static int udp_is_link_send_error(int errnum)
+{
+  return errnum == ENETDOWN || errnum == ENETUNREACH || errnum == EHOSTUNREACH;
+}
+
+/* Build an empty read area from the latest request so input channels are reset
+   to zero while communication is stalled. */
+static void udp_reset_inputs(io_sRackLocal* local)
+{
+  int i;
+  int item_cnt;
+  int max_items = (int)(sizeof(local->read_area.item) / sizeof(local->read_area.item[0]));
+
+  item_cnt = local->read_req.length >= 4 ? (local->read_req.length - 4) / 4 : 0;
+  if (item_cnt > max_items)
+    item_cnt = max_items;
+
+  bzero(&local->read_area, sizeof(local->read_area));
+  local->read_area.service = BFB_SERVICE_READ;
+  local->read_area.length = item_cnt * 4 + 4;
+
+  for (i = 0; i < item_cnt; i++)
+    local->read_area.item[i].address = local->read_req.item[i].address;
 }
 
 /*----------------------------------------------------------------------------*\

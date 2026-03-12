@@ -1,6 +1,6 @@
 /* 
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -12167,7 +12167,7 @@ public class Dyn {
 		    if ( (sts & 1) == 0) {
 			text_size = 3;
 			text_drawtype = Glow.eDrawType_TextHelvetica;
-			text_font = Glow.eFont_LucidaSans;
+			text_font = Glow.eFont_Helvetica;
 			text_color = Glow.eDrawType_Line;
 			bg_color = Glow.eDrawType_LightGray;
 		    }
@@ -13883,7 +13883,7 @@ public class Dyn {
 		    if ( (sts & 1) == 0) {
 			text_size = 3;
 			text_drawtype = Glow.eDrawType_TextHelvetica;
-			text_font = Glow.eFont_LucidaSans;
+			text_font = Glow.eFont_Helvetica;
 			text_color = Glow.eDrawType_Line;
 			bg_color = Glow.eDrawType_LightGray;
 		    }

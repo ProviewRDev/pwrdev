@@ -47,13 +47,13 @@ main()
 
   xm = x0 + 1;
   ym = y0 + 1;
-  id = CreateText("IncrAnalog", xm, ym, 4, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("IncrAnalog", xm, ym, 4, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # Increase by 1, 0-5
   ym += 1.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Increase and decrease by 1 (0 - 5)", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Increase and decrease by 1 (0 - 5)", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   ym += 0.0;
   x1 = xm;
@@ -95,7 +95,7 @@ main()
   ym += 5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Increase and decrease by 5 (-25 - 25)", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Increase and decrease by 5 (-25 - 25)", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   ym += 0.0;
   x1 = xm;
@@ -137,7 +137,7 @@ main()
   ym += 5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Increase and decrease integer by 2 (-10 - 10)", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Increase and decrease integer by 2 (-10 - 10)", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   ym += 0.0;
   x1 = xm;

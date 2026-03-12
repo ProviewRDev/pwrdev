@@ -47,13 +47,13 @@ main()
 
   xm = x0 + 1;
   ym = y0 + 1;
-  id = CreateText("Help", xm, ym, 4, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Help", xm, ym, 4, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # Help button
   ym += 1.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Click to open help window", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Click to open help window", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   ym += 0.0;
   x1 = xm;
@@ -70,7 +70,7 @@ main()
   ym += 4;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Help with bookmark", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Help with bookmark", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   x1 = xm;
   y1 = ym + 1.2;
@@ -87,7 +87,7 @@ main()
   ym += 4;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Help Object Referens Manual (And)", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Help Object Referens Manual (And)", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   x1 = xm;
   y1 = ym + 1.2;
@@ -103,7 +103,7 @@ main()
   ym += 4;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Help Operator's Guide (Navigator)", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Help Operator's Guide (Navigator)", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   x1 = xm;
   y1 = ym + 1.2;

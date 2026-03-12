@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -39,7 +39,8 @@
 
 #include "wb_error.h"
 
-typedef enum {
+typedef enum
+{
   wbl_mState_InDocBlock = 1 << 0,
   wbl_mState_InVolume = 1 << 1,
   wbl_mState_InSObject = 1 << 2,
@@ -48,7 +49,8 @@ typedef enum {
   wbl_mState_InBuffer = 1 << 5
 } wbl_mState;
 
-typedef enum {
+typedef enum
+{
   wbl_eToken_DocBlock,
   wbl_eToken_Volume,
   wbl_eToken_SObject,
@@ -67,50 +69,50 @@ typedef enum {
   wbl_eToken_Buffer
 } wbl_eToken;
 
-class wbl_ast_node {
+/**
+ * @brief Node in the syntax tree built from a WBL source file.
+ *
+ * The parser stores the result as a simple linked tree:
+ * `fch` points to the first child, `lch` to the last child,
+ * `fws` to the next sibling, and `fth` to the parent node.
+ *
+ * The member names are historical abbreviations that are also used in other
+ * Workbench data structures, so the names are kept even though they are terse.
+ */
+class wbl_ast_node
+{
 public:
-  wbl_ast_node()
-      : size(0), line_number(0), fws(0), fch(0), lch(0), fth(0), text(0)
-  {
-  }
+  wbl_ast_node() : size(0), line_number(0), fws(0), fch(0), lch(0), fth(0), text(0) {}
   ~wbl_ast_node()
   {
     if (text)
       free(text);
     wbl_ast_node* next;
-    for (wbl_ast_node* n = fch; n;) {
+    for (wbl_ast_node* n = fch; n;)
+    {
       next = n->fws;
       delete n;
       n = next;
     }
   }
-  void setType(int type)
-  {
-    token = type;
-  }
-  unsigned int getType()
-  {
-    return token;
-  }
-  char* getText()
-  {
-    return text;
-  }
+  void setType(int type) { token = type; }
+  unsigned int getType() { return token; }
+  char* getText() { return text; }
   void setText(char* t);
-  // wbl_ast_node *getFirstChild() { return fch;}
-  // wbl_ast_node *getNextSibling() { return fws;}
+  // Accessors can be added if the raw tree links should be hidden later.
 
   int token;
   int size;
   unsigned int line_number;
-  wbl_ast_node* fws;
-  wbl_ast_node* fch;
-  wbl_ast_node* lch;
-  wbl_ast_node* fth;
+  wbl_ast_node* fws; // Forward sibling, i.e. the next node at the same level.
+  wbl_ast_node* fch; // First child node.
+  wbl_ast_node* lch; // Last child node, used for fast append.
+  wbl_ast_node* fth; // Parent node ("father" in the original naming scheme).
   char* text;
 };
 
-class wb_wbl_parser {
+class wb_wbl_parser
+{
 public:
   wb_wbl_parser();
   ~wb_wbl_parser();
@@ -118,22 +120,14 @@ public:
   void print();
   void print_node(wbl_ast_node* n, int level);
   void print_error(wb_error_str& e);
-  wbl_ast_node* new_ast_node(wbl_eToken token, char* text, unsigned int len,
-      unsigned int line, int allocated);
-  int next_token(std::ifstream& is, char* line, const char* start_delim,
-      const char* end_delim, wbl_eToken type, char** start, unsigned int* len,
-      int* allocated);
-  int read_docblock(
-      std::ifstream& is, char* line, char** start, unsigned int* len);
+  wbl_ast_node* new_ast_node(wbl_eToken token, char* text, unsigned int len, unsigned int line,
+                             int allocated);
+  int next_token(std::ifstream& is, char* line, const char* start_delim, const char* end_delim,
+                 wbl_eToken type, char** start, unsigned int* len, int* allocated);
+  int read_docblock(std::ifstream& is, char* line, char** start, unsigned int* len);
   void ast_node_insert_lch(wbl_ast_node* fth, wbl_ast_node* n);
-  wbl_ast_node* get_root_ast()
-  {
-    return m_tree;
-  }
-  unsigned int get_line()
-  {
-    return m_line_cnt;
-  }
+  wbl_ast_node* get_root_ast() { return m_tree; }
+  unsigned int get_line() { return m_line_cnt; }
   void print_line();
   int check_operator(wbl_ast_node* n);
 

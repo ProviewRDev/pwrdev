@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -45,6 +45,45 @@
 #include "glow_grownode.h"
 #include "glow_draw.h"
 #include "glow_growscrollbar.h"
+
+// Table cells are stored as fixed-width slices, so rendering must stay
+// within the configured column size even when the slice has no trailing NUL.
+static int growtable_cell_offset(const GrowTable* table, int column, int row)
+{
+  int offs = 0;
+
+  for (int i = 0; i < column; i++)
+    offs += table->rows * table->column_size[i];
+  offs += row * table->column_size[column];
+  return offs;
+}
+
+static int growtable_cell_length(const GrowTable* table, int column, int row)
+{
+  int offs = growtable_cell_offset(table, column, row);
+  int len = 0;
+
+  while (len < table->column_size[column] && table->cell_value[offs + len])
+    len++;
+  return len;
+}
+
+static int growtable_cell_is_empty(const GrowTable* table, int column, int row)
+{
+  return growtable_cell_length(table, column, row) == 0;
+}
+
+static int growtable_cell_is_zero(const GrowTable* table, int column, int row)
+{
+  int offs = growtable_cell_offset(table, column, row);
+  int len = growtable_cell_length(table, column, row);
+  int i = 0;
+
+  while (i < len && table->cell_value[offs + i] == ' ')
+    i++;
+
+  return i < len && table->cell_value[offs + i] == '0' && i + 1 == len;
+}
 
 GrowTable::GrowTable(GrowCtx* glow_ctx, const char* name, double x, double y,
     double w, double h, glow_eDrawType border_d_type, int line_w, int fill_rect,
@@ -712,15 +751,17 @@ void GrowTable::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
         ctx->gdraw->line(
             w, ll_x, int(y), ll_x + header_w, int(y), drawtype, idx, 0);
 
-        offs = column_size[0] * i;
-        if (text_idx >= 0 && !streq(cell_value + offs, "")) {
+        offs = growtable_cell_offset(this, 0, i);
+        int text_len = growtable_cell_length(this, 0, i);
+
+        if (text_idx >= 0 && text_len != 0) {
           int text_x = int(x) + text_offs;
 
           if (column_adjustment[0] == glow_eAdjustment_Right
               || column_adjustment[0] == glow_eAdjustment_Center) {
             int width, height, descent;
             ctx->gdraw->get_text_extent(cell_value + offs,
-                strlen(cell_value + offs), text_drawtype, text_idx, font,
+                text_len, text_drawtype, text_idx, font,
                 &width, &height, &descent, tsize, 0);
 
             switch (column_adjustment[0]) {
@@ -735,8 +776,8 @@ void GrowTable::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
             }
           }
           ctx->gdraw->text(w, text_x, int(y - 5), cell_value + offs,
-              strlen(cell_value + offs), text_drawtype, text_color_drawtype,
-              text_idx, highlight, 0, font, tsize, 0);
+              text_len, text_drawtype, text_color_drawtype, text_idx,
+              highlight, 0, font, tsize, 0);
         }
       }
     }
@@ -816,7 +857,9 @@ void GrowTable::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   }
 
   // Draw text values
-  int column_offs = header_column * column_size[0] * rows;
+  int column_offs = 0;
+  for (int i = 0; i < header_column; i++)
+    column_offs += column_size[i] * rows;
   x = t_ll_x;
   int x_border = ll_x - int(column_width[0] * w->zoom_factor_x);
   for (int i = header_column; i < columns; i++) {
@@ -833,28 +876,27 @@ void GrowTable::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
 
         if (options & glow_mTableOptions_ZeroIfHeader) {
           // Don't draw the row if the value in the first column is zero
-          if (streq(cell_value + j * column_size[0], ""))
+          if (growtable_cell_is_empty(this, 0, j))
             continue;
         }
         if (options & glow_mTableOptions_ZeroIfHeaderIs0) {
           // Don't draw the row if the value in the first column is zero
-          char* s;
-          for (s = cell_value + j * column_size[0]; *s && *s == ' '; s++)
-            ;
-          if (streq(s, "0"))
+          if (growtable_cell_is_zero(this, 0, j))
             continue;
         }
 
         if (y > ll_y) {
           offs = column_offs + column_size[i] * j;
-          if (text_idx >= 0 && !streq(cell_value + offs, "")) {
+          int text_len = growtable_cell_length(this, i, j);
+
+          if (text_idx >= 0 && text_len != 0) {
             int text_x = int(x) + text_offs;
 
             if (column_adjustment[i] == glow_eAdjustment_Right
                 || column_adjustment[i] == glow_eAdjustment_Center) {
               int width, height, descent;
               ctx->gdraw->get_text_extent(cell_value + offs,
-                  strlen(cell_value + offs), text_drawtype, text_idx, font,
+                  text_len, text_drawtype, text_idx, font,
                   &width, &height, &descent, tsize, 0);
 
               switch (column_adjustment[i]) {
@@ -872,8 +914,8 @@ void GrowTable::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
             }
 
             ctx->gdraw->text(w, text_x, int(y - 5), cell_value + offs,
-                strlen(cell_value + offs), text_drawtype, text_color_drawtype,
-                text_idx, highlight, 0, font, tsize, 0);
+                text_len, text_drawtype, text_color_drawtype, text_idx,
+                highlight, 0, font, tsize, 0);
           }
         }
       }
@@ -1362,11 +1404,13 @@ void GrowTable::set_table_info(glow_sTableInfo* info)
 
 void GrowTable::set_cell_value(int column, int row, char* value)
 {
-  int offs = 0;
-  for (int i = 0; i < column; i++)
-    offs += rows * column_size[i];
-  offs += row * column_size[column];
-  strncpy(cell_value + offs, value, column_size[column]);
+  int offs = growtable_cell_offset(this, column, row);
+  size_t len = strlen(value);
+
+  memset(cell_value + offs, 0, column_size[column]);
+  if (len > (size_t)column_size[column])
+    len = column_size[column];
+  memcpy(cell_value + offs, value, len);
 
   draw();
 }

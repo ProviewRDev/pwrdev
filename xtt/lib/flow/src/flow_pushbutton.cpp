@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -46,7 +46,7 @@ FlowPushButton::FlowPushButton(FlowCtx* flow_ctx, char* p_name, double x1,
     double y1, double width, double height)
     : ctx(flow_ctx), pos(flow_ctx, x1, y1),
       r(flow_ctx, x1, y1, width, height, flow_eDrawType_Line, 1),
-      t(flow_ctx, p_name, x1, y1 + height / 2, flow_eDrawType_TextHelvetica, 1)
+      t(flow_ctx, p_name, x1, y1 + height / 2, flow_eDrawType_TextRoboto, 1)
 {
   strcpy(name, p_name);
   zoom_factor = ctx->zoom_factor;

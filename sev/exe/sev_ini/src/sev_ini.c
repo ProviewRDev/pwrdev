@@ -45,11 +45,14 @@
 #include "co_dcli.h"
 #include "co_string.h"
 #include "co_ver.h"
+#include "pwr_version.h"
 
 #include "rt_errh_msg.h"
 #include "rt_ini_event.h"
 #include "rt_ini_msg.h"
 #include "rt_pwr_msg.h"
+#include "rt_errl.h"
+#include "rt_errh.h"
 
 #include "ini.h"
 
@@ -60,8 +63,8 @@ static pwr_tStatus stop(int argc, char** argv, ini_sContext* cp);
 static pwr_tStatus terminate(ini_sContext* cp);
 static pwr_tStatus start(ini_sContext* cp);
 static void usage(char*);
-static void ini_errl_cb(void* userdata, char* str, char severity,
-    pwr_tStatus sts, int anix, int message_type);
+static void ini_errl_cb(void* userdata, char* str, char severity, pwr_tStatus sts, errh_eAnix anix,
+                        errh_eMsgType message_type);
 
 int main(int argc, char** argv)
 {
@@ -72,9 +75,12 @@ int main(int argc, char** argv)
 
   ver_WriteVersionInfo("Proview/R Storage Environment");
 
-  if (cp->flags.b.stop) {
+  if (cp->flags.b.stop)
+  {
     sts = stop(argc, argv, cp);
-  } else {
+  }
+  else
+  {
     // Set our ambient set so that our currently cap unaware processes may inherit and set the effective bit
     prctl(PR_CAP_AMBIENT, PR_CAP_AMBIENT_RAISE, CAP_NET_ADMIN, 0, 0);
     prctl(PR_CAP_AMBIENT, PR_CAP_AMBIENT_RAISE, CAP_NET_BROADCAST, 0, 0);
@@ -102,7 +108,8 @@ static pwr_tStatus start(ini_sContext* cp)
     strcpy(console, cp->console);
   if ((fd = open(console, O_APPEND | O_WRONLY)) == -1)
     errl_Init(NULL, ini_errl_cb, cp);
-  else {
+  else
+  {
     close(fd);
     errl_Init(console, ini_errl_cb, cp);
   }
@@ -117,23 +124,25 @@ static pwr_tStatus start(ini_sContext* cp)
   ini_ReadBootFile(&sts, cp);
   ini_ReadNodeFile(&sts, cp);
 
-  for (nep = tree_Minimum(&sts, cp->nid_t); nep != NULL;
-       nep = tree_Successor(&sts, cp->nid_t, nep)) {
-    if (streq(cp->nodename, nep->name)) {
+  for (nep = tree_Minimum(&sts, cp->nid_t); nep != NULL; nep = tree_Successor(&sts, cp->nid_t, nep))
+  {
+    if (streq(cp->nodename, nep->name))
+    {
       cp->me = nep;
       break;
     }
   }
-  if (cp->me == NULL) {
-    errh_LogFatal(
-        &cp->log, "Cannot find my own node in %s\n", cp->nodefile.name);
+  if (cp->me == NULL)
+  {
+    errh_LogFatal(&cp->log, "Cannot find my own node in %s\n", cp->nodefile.name);
     exit(QCOM__WEIRD);
   }
 
   if (!checkErrors(cp))
     exit(0);
 
-  if (cp->flags.b.rootvolume) {
+  if (cp->flags.b.rootvolume)
+  {
     ini_CreateDb(&sts, cp);
     ini_LoadNode(&sts, cp);
     ini_BuildNode(&sts, cp);
@@ -161,13 +170,15 @@ static pwr_tStatus start(ini_sContext* cp)
   ini_ProcIter(&sts, cp, proc_mProcess_user, 0, ini_ProcPrio);
 
   qcom_Init(&sts, &aid, "pwr_sev_init");
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_LogFatal(&cp->log, "qcom_Init, %m", sts);
     exit(sts);
   }
 
   qcom_CreateQ(&sts, &cp->eventQ, NULL, "iniEvent");
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_LogFatal(&cp->log, "qcom_CreateQ, %m", sts);
     exit(sts);
   }
@@ -186,7 +197,8 @@ static pwr_tStatus stop(int argc, char** argv, ini_sContext* cp)
   qcom_sPut put;
   char data[] = "Shutdown you fool!";
 
-  if (!qcom_Init(&sts, 0, "pwr_ini_stop")) {
+  if (!qcom_Init(&sts, 0, "pwr_ini_stop"))
+  {
     exit(sts);
   }
 
@@ -240,37 +252,45 @@ static int checkErrors(ini_sContext* cp)
   if (cp->warnings == 0 && cp->errors == 0 && cp->fatals == 0)
     return 1;
 
-  if (cp->fatals > 0) {
-    errh_LogFatal(&cp->log,
-        "Found %d warning(s), %d error(s) and %d fatal error(s)", cp->warnings,
-        cp->errors, cp->fatals);
-    if (cp->flags.b.ignoreFatal) {
-      errh_LogInfo(
-          &cp->log, "Ignoring fatal errors, errors and warnings, continued...");
+  if (cp->fatals > 0)
+  {
+    errh_LogFatal(&cp->log, "Found %d warning(s), %d error(s) and %d fatal error(s)", cp->warnings,
+                  cp->errors, cp->fatals);
+    if (cp->flags.b.ignoreFatal)
+    {
+      errh_LogInfo(&cp->log, "Ignoring fatal errors, errors and warnings, continued...");
       return 1;
-    } else {
+    }
+    else
+    {
       return ask_yes_no("Do you want to continue");
     }
   }
-  if (cp->errors > 0) {
-    errh_LogError(&cp->log,
-        "Found %d warning(s), %d error(s) and %d fatal error(s)", cp->warnings,
-        cp->errors, cp->fatals);
-    if (cp->flags.b.ignoreError) {
+  if (cp->errors > 0)
+  {
+    errh_LogError(&cp->log, "Found %d warning(s), %d error(s) and %d fatal error(s)", cp->warnings,
+                  cp->errors, cp->fatals);
+    if (cp->flags.b.ignoreError)
+    {
       errh_LogInfo(&cp->log, "Ignoring errors and warnings, continued...");
       return 1;
-    } else {
+    }
+    else
+    {
       return ask_yes_no("Do you want to continue");
     }
   }
-  if (cp->warnings > 0) {
-    errh_LogWarning(&cp->log,
-        "Found %d warning(s), %d error(s) and %d fatal error(s)", cp->warnings,
-        cp->errors, cp->fatals);
-    if (cp->flags.b.ignoreWarning) {
+  if (cp->warnings > 0)
+  {
+    errh_LogWarning(&cp->log, "Found %d warning(s), %d error(s) and %d fatal error(s)", cp->warnings,
+                    cp->errors, cp->fatals);
+    if (cp->flags.b.ignoreWarning)
+    {
       errh_LogInfo(&cp->log, "Ignoring warnings, continued...");
       return 1;
-    } else {
+    }
+    else
+    {
       return ask_yes_no("Do you want to continue");
     }
   }
@@ -283,25 +303,29 @@ static ini_sContext* createContext(int argc, char** argv)
   ini_sContext* cp;
   pwr_tStatus sts;
 
-  if (argc > 1 && streq(argv[1], "--version")) {
-    system("cat $pwr_exe/rt_version.dat");
-    exit(1);
+  if (argc > 1 && streq(argv[1], "--version"))
+  {
+    printf("Version: %s\n", pwrv_cPwrVersionStr);
+    exit(0);
   }
-  if (!(cp = ini_CreateContext(&sts))) {
+  if (!(cp = ini_CreateContext(&sts)))
+  {
     fprintf(stderr, "%s: could not allocate context\n", argv[0]);
     exit(1);
   }
 
-  for (i = 1; i < argc; i++) {
-    if (argv[i][0] == '-') {
+  for (i = 1; i < argc; i++)
+  {
+    if (argv[i][0] == '-')
+    {
       int i_incr = 0;
-      for (j = 1;
-           argv[i][j] != 0 && argv[i][j] != ' ' && argv[i][j] != '	';
-           j++) {
-        switch (argv[i][j]) {
+      for (j = 1; argv[i][j] != 0 && argv[i][j] != ' ' && argv[i][j] != '	'; j++)
+      {
+        switch (argv[i][j])
+        {
         case 'a':
-          if (i + 1 >= argc
-              || !(argv[i][j + 1] == ' ' || argv[i][j + 1] != '	')) {
+          if (i + 1 >= argc || !(argv[i][j + 1] == ' ' || argv[i][j + 1] != '	'))
+          {
             usage(argv[0]);
             exit(0);
           }
@@ -311,8 +335,8 @@ static ini_sContext* createContext(int argc, char** argv)
           i_incr = 1;
           break;
         case 'c':
-          if (i + 1 >= argc
-              || !(argv[i][j + 1] == ' ' || argv[i][j + 1] != '	')) {
+          if (i + 1 >= argc || !(argv[i][j + 1] == ' ' || argv[i][j + 1] != '	'))
+          {
             usage(argv[0]);
             exit(0);
           }
@@ -321,8 +345,8 @@ static ini_sContext* createContext(int argc, char** argv)
           i_incr = 1;
           break;
         case 'd':
-          if (i + 1 >= argc
-              || !(argv[i][j + 1] == ' ' || argv[i][j + 1] != '	')) {
+          if (i + 1 >= argc || !(argv[i][j + 1] == ' ' || argv[i][j + 1] != '	'))
+          {
             usage(argv[0]);
             exit(0);
           }
@@ -337,8 +361,8 @@ static ini_sContext* createContext(int argc, char** argv)
           cp->flags.b.ignoreFatal = 1;
           break;
         case 'h':
-          if (i + 1 >= argc
-              || !(argv[i][j + 1] == ' ' || argv[i][j + 1] != '	')) {
+          if (i + 1 >= argc || !(argv[i][j + 1] == ' ' || argv[i][j + 1] != '	'))
+          {
             usage(argv[0]);
             exit(0);
           }
@@ -351,8 +375,8 @@ static ini_sContext* createContext(int argc, char** argv)
           cp->flags.b.interactive = 1;
           break;
         case 'n':
-          if (i + 1 >= argc
-              || !(argv[i][j + 1] == ' ' || argv[i][j + 1] != '	')) {
+          if (i + 1 >= argc || !(argv[i][j + 1] == ' ' || argv[i][j + 1] != '	'))
+          {
             usage(argv[0]);
             exit(0);
           }
@@ -362,8 +386,8 @@ static ini_sContext* createContext(int argc, char** argv)
           i_incr = 1;
           break;
         case 'q':
-          if (i + 1 >= argc
-              || !(argv[i][j + 1] == ' ' || argv[i][j + 1] != '	')) {
+          if (i + 1 >= argc || !(argv[i][j + 1] == ' ' || argv[i][j + 1] != '	'))
+          {
             usage(argv[0]);
             exit(0);
           }
@@ -384,8 +408,8 @@ static ini_sContext* createContext(int argc, char** argv)
           cp->flags.b.ignoreWarning = 1;
           break;
         case 'A':
-          if (i + 1 >= argc
-              || !(argv[i][j + 1] == ' ' || argv[i][j + 1] != '	')) {
+          if (i + 1 >= argc || !(argv[i][j + 1] == ' ' || argv[i][j + 1] != '	'))
+          {
             usage(argv[0]);
             exit(0);
           }
@@ -411,9 +435,10 @@ static ini_sContext* createContext(int argc, char** argv)
 }
 static void usage(char* name)
 {
-  fprintf(stderr, "usage: %s -a arg -b arg -d arg -efg arg -hip arg -q arg -ru "
-                  "arg -s arg -vwA arg -H arg\n",
-      name);
+  fprintf(stderr,
+          "usage: %s -a arg -b arg -d arg -efg arg -hip arg -q arg -ru "
+          "arg -s arg -vwA arg -H arg\n",
+          name);
   fprintf(stderr, "  -?    : give help\n");
   fprintf(stderr, "  -a arg: use 'arg' as application file\n");
   fprintf(stderr, "  -b arg: use 'arg' as boot file\n");
@@ -446,17 +471,20 @@ static pwr_tStatus events(ini_sContext* cp)
   cp->myQ.nid = 0;
 
   qcom_CreateQ(&sts, &cp->myQ, NULL, "events");
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_LogFatal(&cp->log, "qcom_CreateQ, %m", sts);
     exit(sts);
   }
 
-  for (;;) {
+  for (;;)
+  {
     get.data = NULL;
     qcom_Get(&sts, &cp->myQ, &get, tmo_ms);
 
     /* Request for termination ?? */
-    if (sts != QCOM__TMO && sts != QCOM__QEMPTY && get.type.b == 11) {
+    if (sts != QCOM__TMO && sts != QCOM__QEMPTY && get.type.b == 11)
+    {
       sts = terminate(cp);
       return sts;
     }
@@ -464,7 +492,7 @@ static pwr_tStatus events(ini_sContext* cp)
   return INI__SUCCESS;
 }
 
-static void ini_errl_cb(void* userdata, char* str, char severity,
-    pwr_tStatus sts, int anix, int message_type)
+static void ini_errl_cb(void* userdata, char* str, char severity, pwr_tStatus sts, errh_eAnix anix,
+                        errh_eMsgType message_type)
 {
 }

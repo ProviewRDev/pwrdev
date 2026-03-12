@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -52,1448 +52,1298 @@
 #include "ge_msg.h"
 
 #define ATTRNAV__INPUT_SYNTAX 2
-//#define ATTRNAV__OBJNOTFOUND 4
+// #define ATTRNAV__OBJNOTFOUND 4
 #define ATTRNAV__STRINGTOLONG 6
-//#define ATTRNAV__ITEM_NOCREA 8
+// #define ATTRNAV__ITEM_NOCREA 8
 #define ATTRNAV__SUCCESS 1
 
-static attrnav_sEnumElement elem_dyn_type1[]
-    = { { (unsigned int)ge_mDynType1_Inherit, "Inherit" },
-        { (unsigned int)ge_mDynType1_Tone, "Tone" },
-        { (unsigned int)ge_mDynType1_DigLowColor, "DigLowColor" },
-        { (unsigned int)ge_mDynType1_DigColor, "DigColor" },
-        { (unsigned int)ge_mDynType1_AnalogColor, "AnalogColor" },
-        { (unsigned int)ge_mDynType1_StatusColor, "StatusColor" },
-        { (unsigned int)ge_mDynType1_DigWarning, "DigWarning" },
-        { (unsigned int)ge_mDynType1_DigError, "DigError" },
-        { (unsigned int)ge_mDynType1_DigFlash, "DigFlash" },
-        { (unsigned int)ge_mDynType1_FillLevel, "FillLevel" },
-        { (unsigned int)ge_mDynType1_Invisible, "Invisible" },
-        { (unsigned int)ge_mDynType1_DigBorder, "DigBorder" },
-        { (unsigned int)ge_mDynType1_DigText, "DigText" },
-        { (unsigned int)ge_mDynType1_AnalogText, "AnalogText" },
-        { (unsigned int)ge_mDynType1_Value, "Value" },
-        { (unsigned int)ge_mDynType1_Rotate, "Rotate" },
-        { (unsigned int)ge_mDynType1_Move, "Move" },
-        { (unsigned int)ge_mDynType1_AnalogShift, "AnalogShift" },
-        { (unsigned int)ge_mDynType1_DigShift, "DigShift" },
-        { (unsigned int)ge_mDynType1_Animation, "Animation" },
-        { (unsigned int)ge_mDynType1_Bar, "Bar" },
-        { (unsigned int)ge_mDynType1_Trend, "Trend" },
-        { (unsigned int)ge_mDynType1_FastCurve, "FastCurve" },
-        { (unsigned int)ge_mDynType1_XY_Curve, "XY_Curve" },
-        { (unsigned int)ge_mDynType1_SliderBackground, "SliderBackground" },
-        { (unsigned int)ge_mDynType1_Video, "Video" },
-        { (unsigned int)ge_mDynType1_Table, "Table" },
-        { (unsigned int)ge_mDynType1_HostObject, "HostObject" },
-        { (unsigned int)ge_mDynType1_DigSound, "DigSound" },
-        { (unsigned int)ge_mDynType1_DigCommand, "DigCommand" }, { 0, "" } };
+static attrnav_sEnumElement elem_dyn_type1[] = {
+    {(unsigned int)ge_mDynType1_Inherit, "Inherit"},
+    {(unsigned int)ge_mDynType1_Tone, "Tone"},
+    {(unsigned int)ge_mDynType1_DigLowColor, "DigLowColor"},
+    {(unsigned int)ge_mDynType1_DigColor, "DigColor"},
+    {(unsigned int)ge_mDynType1_AnalogColor, "AnalogColor"},
+    {(unsigned int)ge_mDynType1_StatusColor, "StatusColor"},
+    {(unsigned int)ge_mDynType1_DigWarning, "DigWarning"},
+    {(unsigned int)ge_mDynType1_DigError, "DigError"},
+    {(unsigned int)ge_mDynType1_DigFlash, "DigFlash"},
+    {(unsigned int)ge_mDynType1_FillLevel, "FillLevel"},
+    {(unsigned int)ge_mDynType1_Invisible, "Invisible"},
+    {(unsigned int)ge_mDynType1_DigBorder, "DigBorder"},
+    {(unsigned int)ge_mDynType1_DigText, "DigText"},
+    {(unsigned int)ge_mDynType1_AnalogText, "AnalogText"},
+    {(unsigned int)ge_mDynType1_Value, "Value"},
+    {(unsigned int)ge_mDynType1_Rotate, "Rotate"},
+    {(unsigned int)ge_mDynType1_Move, "Move"},
+    {(unsigned int)ge_mDynType1_AnalogShift, "AnalogShift"},
+    {(unsigned int)ge_mDynType1_DigShift, "DigShift"},
+    {(unsigned int)ge_mDynType1_Animation, "Animation"},
+    {(unsigned int)ge_mDynType1_Bar, "Bar"},
+    {(unsigned int)ge_mDynType1_Trend, "Trend"},
+    {(unsigned int)ge_mDynType1_FastCurve, "FastCurve"},
+    {(unsigned int)ge_mDynType1_XY_Curve, "XY_Curve"},
+    {(unsigned int)ge_mDynType1_SliderBackground, "SliderBackground"},
+    {(unsigned int)ge_mDynType1_Video, "Video"},
+    {(unsigned int)ge_mDynType1_Table, "Table"},
+    {(unsigned int)ge_mDynType1_HostObject, "HostObject"},
+    {(unsigned int)ge_mDynType1_DigSound, "DigSound"},
+    {(unsigned int)ge_mDynType1_DigCommand, "DigCommand"},
+    {0, ""}};
 
 static attrnav_sEnumElement elem_dyn_type2[] = {
-  { (unsigned int)ge_mDynType2_DigTextColor, "DigTextColor" },
-  { (unsigned int)ge_mDynType2_TimeoutColor, "TimeoutColor" },
-  { (unsigned int)ge_mDynType2_DigFourShift, "DigFourShift" },
-  { (unsigned int)ge_mDynType2_ScrollingText, "ScrollingText" },
-  { (unsigned int)ge_mDynType2_ColorThemeLightness, "ColorThemeLightness" },
-  { (unsigned int)ge_mDynType2_DigBackgroundColor, "DigBackgroundColor" },
-  { (unsigned int)ge_mDynType2_DigSwap, "DigSwap" },
-  { (unsigned int)ge_mDynType2_DigScript, "DigScript" },
-  { (unsigned int)ge_mDynType2_RefUpdate, "RefUpdate" }, 
-  { (unsigned int)ge_mDynType2_DigTransparency, "DigTransparency" },
-  { (unsigned int)ge_mDynType2_AnalogTransparency, "AnalogTransparency" },
-  { (unsigned int)ge_mDynType2_UnitConvert, "UnitConvert" },
-  { (unsigned int)ge_mDynType2_DigLowShift, "DigLowShift" },
-  { 0, "" }
-};
+    {(unsigned int)ge_mDynType2_DigTextColor, "DigTextColor"},
+    {(unsigned int)ge_mDynType2_TimeoutColor, "TimeoutColor"},
+    {(unsigned int)ge_mDynType2_DigFourShift, "DigFourShift"},
+    {(unsigned int)ge_mDynType2_ScrollingText, "ScrollingText"},
+    {(unsigned int)ge_mDynType2_ColorThemeLightness, "ColorThemeLightness"},
+    {(unsigned int)ge_mDynType2_DigBackgroundColor, "DigBackgroundColor"},
+    {(unsigned int)ge_mDynType2_DigSwap, "DigSwap"},
+    {(unsigned int)ge_mDynType2_DigScript, "DigScript"},
+    {(unsigned int)ge_mDynType2_RefUpdate, "RefUpdate"},
+    {(unsigned int)ge_mDynType2_DigTransparency, "DigTransparency"},
+    {(unsigned int)ge_mDynType2_AnalogTransparency, "AnalogTransparency"},
+    {(unsigned int)ge_mDynType2_UnitConvert, "UnitConvert"},
+    {(unsigned int)ge_mDynType2_DigLowShift, "DigLowShift"},
+    {0, ""}};
 
-static attrnav_sEnumElement elem_dyn_type1_tone[]
-    = { { (unsigned int)ge_mDynType1_Inherit, "Inherit" },
-        { (unsigned int)ge_mDynType1_Tone, "Tone" },
-        { (unsigned int)ge_mDynType1_DigLowColor, "DigLowTone" },
-        { (unsigned int)ge_mDynType1_DigColor, "DigTone" },
-        { (unsigned int)ge_mDynType1_AnalogColor, "AnalogTone" },
-        { (unsigned int)ge_mDynType1_StatusColor, "StatusTone" },
-        { (unsigned int)ge_mDynType1_DigWarning, "DigToneWarning" },
-        { (unsigned int)ge_mDynType1_DigError, "DigToneError" },
-        { (unsigned int)ge_mDynType1_DigFlash, "DigFlash" },
-        { (unsigned int)ge_mDynType1_FillLevel, "FillLevel" },
-        { (unsigned int)ge_mDynType1_Invisible, "Invisible" },
-        { (unsigned int)ge_mDynType1_DigBorder, "DigBorder" },
-        { (unsigned int)ge_mDynType1_DigText, "DigText" },
-        { (unsigned int)ge_mDynType1_AnalogText, "AnalogText" },
-        { (unsigned int)ge_mDynType1_Value, "Value" },
-        { (unsigned int)ge_mDynType1_Rotate, "Rotate" },
-        { (unsigned int)ge_mDynType1_Move, "Move" },
-        { (unsigned int)ge_mDynType1_AnalogShift, "AnalogShift" },
-        { (unsigned int)ge_mDynType1_DigShift, "DigShift" },
-        { (unsigned int)ge_mDynType1_Animation, "Animation" },
-        { (unsigned int)ge_mDynType1_Bar, "Bar" },
-        { (unsigned int)ge_mDynType1_Trend, "Trend" },
-        { (unsigned int)ge_mDynType1_FastCurve, "FastCurve" },
-        { (unsigned int)ge_mDynType1_XY_Curve, "XY_Curve" },
-        { (unsigned int)ge_mDynType1_SliderBackground, "SliderBackground" },
-        { (unsigned int)ge_mDynType1_Video, "Video" },
-        { (unsigned int)ge_mDynType1_Table, "Table" },
-        { (unsigned int)ge_mDynType1_HostObject, "HostObject" },
-        { (unsigned int)ge_mDynType1_DigSound, "DigSound" },
-        { (unsigned int)ge_mDynType1_DigCommand, "DigCommand" }, { 0, "" } };
+static attrnav_sEnumElement elem_dyn_type1_tone[] = {
+    {(unsigned int)ge_mDynType1_Inherit, "Inherit"},
+    {(unsigned int)ge_mDynType1_Tone, "Tone"},
+    {(unsigned int)ge_mDynType1_DigLowColor, "DigLowTone"},
+    {(unsigned int)ge_mDynType1_DigColor, "DigTone"},
+    {(unsigned int)ge_mDynType1_AnalogColor, "AnalogTone"},
+    {(unsigned int)ge_mDynType1_StatusColor, "StatusTone"},
+    {(unsigned int)ge_mDynType1_DigWarning, "DigToneWarning"},
+    {(unsigned int)ge_mDynType1_DigError, "DigToneError"},
+    {(unsigned int)ge_mDynType1_DigFlash, "DigFlash"},
+    {(unsigned int)ge_mDynType1_FillLevel, "FillLevel"},
+    {(unsigned int)ge_mDynType1_Invisible, "Invisible"},
+    {(unsigned int)ge_mDynType1_DigBorder, "DigBorder"},
+    {(unsigned int)ge_mDynType1_DigText, "DigText"},
+    {(unsigned int)ge_mDynType1_AnalogText, "AnalogText"},
+    {(unsigned int)ge_mDynType1_Value, "Value"},
+    {(unsigned int)ge_mDynType1_Rotate, "Rotate"},
+    {(unsigned int)ge_mDynType1_Move, "Move"},
+    {(unsigned int)ge_mDynType1_AnalogShift, "AnalogShift"},
+    {(unsigned int)ge_mDynType1_DigShift, "DigShift"},
+    {(unsigned int)ge_mDynType1_Animation, "Animation"},
+    {(unsigned int)ge_mDynType1_Bar, "Bar"},
+    {(unsigned int)ge_mDynType1_Trend, "Trend"},
+    {(unsigned int)ge_mDynType1_FastCurve, "FastCurve"},
+    {(unsigned int)ge_mDynType1_XY_Curve, "XY_Curve"},
+    {(unsigned int)ge_mDynType1_SliderBackground, "SliderBackground"},
+    {(unsigned int)ge_mDynType1_Video, "Video"},
+    {(unsigned int)ge_mDynType1_Table, "Table"},
+    {(unsigned int)ge_mDynType1_HostObject, "HostObject"},
+    {(unsigned int)ge_mDynType1_DigSound, "DigSound"},
+    {(unsigned int)ge_mDynType1_DigCommand, "DigCommand"},
+    {0, ""}};
 
 static attrnav_sEnumElement elem_action_type[] = {
-  { (unsigned int)ge_mActionType1_Inherit, "Inherit" },
-  { (unsigned int)ge_mActionType1_PopupMenu, "PopupMenu" },
-  { (unsigned int)ge_mActionType1_SetDig, "SetDig" },
-  { (unsigned int)ge_mActionType1_ResetDig, "ResetDig" },
-  { (unsigned int)ge_mActionType1_ToggleDig, "ToggleDig" },
-  { (unsigned int)ge_mActionType1_StoDig, "StoDig" },
-  { (unsigned int)ge_mActionType1_SetValue, "SetValue" },
-  { (unsigned int)ge_mActionType1_Command, "Command" },
-  { (unsigned int)ge_mActionType1_CommandDoubleClick, "CommandDoubleClick" },
-  { (unsigned int)ge_mActionType1_Script, "Script" },
-  { (unsigned int)ge_mActionType1_Help, "Help" },
-  { (unsigned int)ge_mActionType1_OpenGraph, "OpenGraph" },
-  { (unsigned int)ge_mActionType1_CloseGraph, "CloseGraph" },
-  { (unsigned int)ge_mActionType1_OpenURL, "OpenURL" },
-  { (unsigned int)ge_mActionType1_Confirm, "Confirm" },
-  { (unsigned int)ge_mActionType1_IncrAnalog, "IncrAnalog" },
-  { (unsigned int)ge_mActionType1_RadioButton, "RadioButton" },
-  { (unsigned int)ge_mActionType1_ValueInput, "ValueInput" },
-  { (unsigned int)ge_mActionType1_TipText, "ToolTip" },
-  { (unsigned int)ge_mActionType1_InputFocus, "InputFocus" },
-  { (unsigned int)ge_mActionType1_PulldownMenu, "PulldownMenu" },
-  { (unsigned int)ge_mActionType1_OptionMenu, "OptionMenu" },
-  { (unsigned int)ge_mActionType1_MethodPulldownMenu, "MethodPulldownMenu" },
-  { (unsigned int)ge_mActionType1_Slider, "Slider" },
-  { (unsigned int)ge_mActionType1_CatchSignal, "CatchSignal" },
-  { (unsigned int)ge_mActionType1_EmitSignal, "EmitSignal" }, 
-  { (unsigned int)ge_mActionType1_ContextMenu, "ContextMenu" },
-  { 0, "" }
-};
+    {(unsigned int)ge_mActionType1_Inherit, "Inherit"},
+    {(unsigned int)ge_mActionType1_PopupMenu, "PopupMenu"},
+    {(unsigned int)ge_mActionType1_SetDig, "SetDig"},
+    {(unsigned int)ge_mActionType1_ResetDig, "ResetDig"},
+    {(unsigned int)ge_mActionType1_ToggleDig, "ToggleDig"},
+    {(unsigned int)ge_mActionType1_StoDig, "StoDig"},
+    {(unsigned int)ge_mActionType1_SetValue, "SetValue"},
+    {(unsigned int)ge_mActionType1_Command, "Command"},
+    {(unsigned int)ge_mActionType1_CommandDoubleClick, "CommandDoubleClick"},
+    {(unsigned int)ge_mActionType1_Script, "Script"},
+    {(unsigned int)ge_mActionType1_Help, "Help"},
+    {(unsigned int)ge_mActionType1_OpenGraph, "OpenGraph"},
+    {(unsigned int)ge_mActionType1_CloseGraph, "CloseGraph"},
+    {(unsigned int)ge_mActionType1_OpenURL, "OpenURL"},
+    {(unsigned int)ge_mActionType1_Confirm, "Confirm"},
+    {(unsigned int)ge_mActionType1_IncrAnalog, "IncrAnalog"},
+    {(unsigned int)ge_mActionType1_RadioButton, "RadioButton"},
+    {(unsigned int)ge_mActionType1_ValueInput, "ValueInput"},
+    {(unsigned int)ge_mActionType1_TipText, "ToolTip"},
+    {(unsigned int)ge_mActionType1_InputFocus, "InputFocus"},
+    {(unsigned int)ge_mActionType1_PulldownMenu, "PulldownMenu"},
+    {(unsigned int)ge_mActionType1_OptionMenu, "OptionMenu"},
+    {(unsigned int)ge_mActionType1_MethodPulldownMenu, "MethodPulldownMenu"},
+    {(unsigned int)ge_mActionType1_Slider, "Slider"},
+    {(unsigned int)ge_mActionType1_CatchSignal, "CatchSignal"},
+    {(unsigned int)ge_mActionType1_EmitSignal, "EmitSignal"},
+    {(unsigned int)ge_mActionType1_ContextMenu, "ContextMenu"},
+    {0, ""}};
 
-static attrnav_sEnumElement elem_color[]
-    = { { (unsigned int)glow_eDrawType_Line, "Black" },
-        { (unsigned int)glow_eDrawType_LineRed, "Red" },
-        { (unsigned int)glow_eDrawType_LineGray, "Grey" },
-        { (unsigned int)glow_eDrawType_Color4, "White" },
-        { (unsigned int)glow_eDrawType_Color5, "YellowGreen" },
-        { (unsigned int)glow_eDrawType_Color6, "Yellow" },
-        { (unsigned int)glow_eDrawType_Color7, "Gold" },
-        { (unsigned int)glow_eDrawType_Color8, "Orange" },
-        { (unsigned int)glow_eDrawType_Color9, "OrangeRed" },
-        { (unsigned int)glow_eDrawType_Color10, "Red" },
-        { (unsigned int)glow_eDrawType_Color11, "RedViolet" },
-        { (unsigned int)glow_eDrawType_Color12, "Violet" },
-        { (unsigned int)glow_eDrawType_Color13, "BlueViolet" },
-        { (unsigned int)glow_eDrawType_Color14, "BlueBlueViolet" },
-        { (unsigned int)glow_eDrawType_Color15, "Blue" },
-        { (unsigned int)glow_eDrawType_Color16, "BlueBlueGreen" },
-        { (unsigned int)glow_eDrawType_Color17, "BlueGreen" },
-        { (unsigned int)glow_eDrawType_Color18, "GreenGreenBlue" },
-        { (unsigned int)glow_eDrawType_Color19, "Green" },
-        { (unsigned int)glow_eDrawType_Color20, "GreenGreenYellow" },
-        { (unsigned int)glow_eDrawType_Color21, "GrayFix1" },
-        { (unsigned int)glow_eDrawType_Color22, "GrayFix2" },
-        { (unsigned int)glow_eDrawType_Color23, "GrayFix3" },
-        { (unsigned int)glow_eDrawType_Color24, "GrayFix4" },
-        { (unsigned int)glow_eDrawType_Color25, "GrayFix5" },
-        { (unsigned int)glow_eDrawType_Color26, "GrayFix6" },
-        { (unsigned int)glow_eDrawType_Color27, "GrayFix7" },
-        { (unsigned int)glow_eDrawType_Color28, "GrayFix8" },
-        { (unsigned int)glow_eDrawType_Color29, "GrayFix9" },
-        { (unsigned int)glow_eDrawType_Color30, "GrayFix10" },
-        { (unsigned int)glow_eDrawType_Color31, "GrayLow1" },
-        { (unsigned int)glow_eDrawType_Color32, "GrayLow2" },
-        { (unsigned int)glow_eDrawType_Color33, "GrayLow3" },
-        { (unsigned int)glow_eDrawType_Color34, "GrayLow4" },
-        { (unsigned int)glow_eDrawType_Color35, "GrayLow5" },
-        { (unsigned int)glow_eDrawType_Color36, "GrayLow6" },
-        { (unsigned int)glow_eDrawType_Color37, "GrayLow7" },
-        { (unsigned int)glow_eDrawType_Color38, "GrayLow8" },
-        { (unsigned int)glow_eDrawType_Color39, "GrayLow9" },
-        { (unsigned int)glow_eDrawType_Color40, "GrayLow10" },
-        { (unsigned int)glow_eDrawType_Color41, "GrayMedium1" },
-        { (unsigned int)glow_eDrawType_Color42, "GrayMedium2" },
-        { (unsigned int)glow_eDrawType_Color43, "GrayMedium3" },
-        { (unsigned int)glow_eDrawType_Color44, "GrayMedium4" },
-        { (unsigned int)glow_eDrawType_Color45, "GrayMedium5" },
-        { (unsigned int)glow_eDrawType_Color46, "GrayMedium6" },
-        { (unsigned int)glow_eDrawType_Color47, "GrayMedium7" },
-        { (unsigned int)glow_eDrawType_Color48, "GrayMedium8" },
-        { (unsigned int)glow_eDrawType_Color49, "GrayMedium9" },
-        { (unsigned int)glow_eDrawType_Color50, "GrayMedium10" },
-        { (unsigned int)glow_eDrawType_Color51, "GrayHigh1" },
-        { (unsigned int)glow_eDrawType_Color52, "GrayHigh2" },
-        { (unsigned int)glow_eDrawType_Color53, "GrayHigh3" },
-        { (unsigned int)glow_eDrawType_Color54, "GrayHigh4" },
-        { (unsigned int)glow_eDrawType_Color55, "GrayHigh5" },
-        { (unsigned int)glow_eDrawType_Color56, "GrayHigh6" },
-        { (unsigned int)glow_eDrawType_Color57, "GrayHigh7" },
-        { (unsigned int)glow_eDrawType_Color58, "GrayHigh8" },
-        { (unsigned int)glow_eDrawType_Color59, "GrayHigh9" },
-        { (unsigned int)glow_eDrawType_Color60, "GrayHigh10" },
-        { (unsigned int)glow_eDrawType_Color61, "YellowGreenLow1" },
-        { (unsigned int)glow_eDrawType_Color62, "YellowGreenLow2" },
-        { (unsigned int)glow_eDrawType_Color63, "YellowGreenLow3" },
-        { (unsigned int)glow_eDrawType_Color64, "YellowGreenLow4" },
-        { (unsigned int)glow_eDrawType_Color65, "YellowGreenLow5" },
-        { (unsigned int)glow_eDrawType_Color66, "YellowGreenLow6" },
-        { (unsigned int)glow_eDrawType_Color67, "YellowGreenLow7" },
-        { (unsigned int)glow_eDrawType_Color68, "YellowGreenLow8" },
-        { (unsigned int)glow_eDrawType_Color69, "YellowGreenLow9" },
-        { (unsigned int)glow_eDrawType_Color70, "YellowGreenLow10" },
-        { (unsigned int)glow_eDrawType_Color71, "YellowGreenMedium1" },
-        { (unsigned int)glow_eDrawType_Color72, "YellowGreenMedium2" },
-        { (unsigned int)glow_eDrawType_Color73, "YellowGreenMedium3" },
-        { (unsigned int)glow_eDrawType_Color74, "YellowGreenMedium4" },
-        { (unsigned int)glow_eDrawType_Color75, "YellowGreenMedium5" },
-        { (unsigned int)glow_eDrawType_Color76, "YellowGreenMedium6" },
-        { (unsigned int)glow_eDrawType_Color77, "YellowGreenMedium7" },
-        { (unsigned int)glow_eDrawType_Color78, "YellowGreenMedium8" },
-        { (unsigned int)glow_eDrawType_Color79, "YellowGreenMedium9" },
-        { (unsigned int)glow_eDrawType_Color80, "YellowGreenMedium10" },
-        { (unsigned int)glow_eDrawType_Color81, "YellowGreenHigh1" },
-        { (unsigned int)glow_eDrawType_Color82, "YellowGreenHigh2" },
-        { (unsigned int)glow_eDrawType_Color83, "YellowGreenHigh3" },
-        { (unsigned int)glow_eDrawType_Color84, "YellowGreenHigh4" },
-        { (unsigned int)glow_eDrawType_Color85, "YellowGreenHigh5" },
-        { (unsigned int)glow_eDrawType_Color86, "YellowGreenHigh6" },
-        { (unsigned int)glow_eDrawType_Color87, "YellowGreenHigh7" },
-        { (unsigned int)glow_eDrawType_Color88, "YellowGreenHigh8" },
-        { (unsigned int)glow_eDrawType_Color89, "YellowGreenHigh9" },
-        { (unsigned int)glow_eDrawType_Color90, "YellowGreenHigh10" },
-        { (unsigned int)glow_eDrawType_Color91, "YellowLow1" },
-        { (unsigned int)glow_eDrawType_Color92, "YellowLow2" },
-        { (unsigned int)glow_eDrawType_Color93, "YellowLow3" },
-        { (unsigned int)glow_eDrawType_Color94, "YellowLow4" },
-        { (unsigned int)glow_eDrawType_Color95, "YellowLow5" },
-        { (unsigned int)glow_eDrawType_Color96, "YellowLow6" },
-        { (unsigned int)glow_eDrawType_Color97, "YellowLow7" },
-        { (unsigned int)glow_eDrawType_Color98, "YellowLow8" },
-        { (unsigned int)glow_eDrawType_Color99, "YellowLow9" },
-        { (unsigned int)glow_eDrawType_Color100, "YellowLow10" },
-        { (unsigned int)glow_eDrawType_Color101, "YellowMedium1" },
-        { (unsigned int)glow_eDrawType_Color102, "YellowMedium2" },
-        { (unsigned int)glow_eDrawType_Color103, "YellowMedium3" },
-        { (unsigned int)glow_eDrawType_Color104, "YellowMedium4" },
-        { (unsigned int)glow_eDrawType_Color105, "YellowMedium5" },
-        { (unsigned int)glow_eDrawType_Color106, "YellowMedium6" },
-        { (unsigned int)glow_eDrawType_Color107, "YellowMedium7" },
-        { (unsigned int)glow_eDrawType_Color108, "YellowMedium8" },
-        { (unsigned int)glow_eDrawType_Color109, "YellowMedium9" },
-        { (unsigned int)glow_eDrawType_Color110, "YellowMedium10" },
-        { (unsigned int)glow_eDrawType_Color111, "YellowHigh1" },
-        { (unsigned int)glow_eDrawType_Color112, "YellowHigh2" },
-        { (unsigned int)glow_eDrawType_Color113, "YellowHigh3" },
-        { (unsigned int)glow_eDrawType_Color114, "YellowHigh4" },
-        { (unsigned int)glow_eDrawType_Color115, "YellowHigh5" },
-        { (unsigned int)glow_eDrawType_Color116, "YellowHigh6" },
-        { (unsigned int)glow_eDrawType_Color117, "YellowHigh7" },
-        { (unsigned int)glow_eDrawType_Color118, "YellowHigh8" },
-        { (unsigned int)glow_eDrawType_Color119, "YellowHigh9" },
-        { (unsigned int)glow_eDrawType_Color120, "YellowHigh10" },
-        { (unsigned int)glow_eDrawType_Color121, "OrangeLow1" },
-        { (unsigned int)glow_eDrawType_Color122, "OrangeLow2" },
-        { (unsigned int)glow_eDrawType_Color123, "OrangeLow3" },
-        { (unsigned int)glow_eDrawType_Color124, "OrangeLow4" },
-        { (unsigned int)glow_eDrawType_Color125, "OrangeLow5" },
-        { (unsigned int)glow_eDrawType_Color126, "OrangeLow6" },
-        { (unsigned int)glow_eDrawType_Color127, "OrangeLow7" },
-        { (unsigned int)glow_eDrawType_Color128, "OrangeLow8" },
-        { (unsigned int)glow_eDrawType_Color129, "OrangeLow9" },
-        { (unsigned int)glow_eDrawType_Color130, "OrangeLow10" },
-        { (unsigned int)glow_eDrawType_Color131, "OrangeMedium1" },
-        { (unsigned int)glow_eDrawType_Color132, "OrangeMedium2" },
-        { (unsigned int)glow_eDrawType_Color133, "OrangeMedium3" },
-        { (unsigned int)glow_eDrawType_Color134, "OrangeMedium4" },
-        { (unsigned int)glow_eDrawType_Color135, "OrangeMedium5" },
-        { (unsigned int)glow_eDrawType_Color136, "OrangeMedium6" },
-        { (unsigned int)glow_eDrawType_Color137, "OrangeMedium7" },
-        { (unsigned int)glow_eDrawType_Color138, "OrangeMedium8" },
-        { (unsigned int)glow_eDrawType_Color139, "OrangeMedium9" },
-        { (unsigned int)glow_eDrawType_Color140, "OrangeMedium10" },
-        { (unsigned int)glow_eDrawType_Color141, "OrangeHigh1" },
-        { (unsigned int)glow_eDrawType_Color142, "OrangeHigh2" },
-        { (unsigned int)glow_eDrawType_Color143, "OrangeHigh3" },
-        { (unsigned int)glow_eDrawType_Color144, "OrangeHigh4" },
-        { (unsigned int)glow_eDrawType_Color145, "OrangeHigh5" },
-        { (unsigned int)glow_eDrawType_Color146, "OrangeHigh6" },
-        { (unsigned int)glow_eDrawType_Color147, "OrangeHigh7" },
-        { (unsigned int)glow_eDrawType_Color148, "OrangeHigh8" },
-        { (unsigned int)glow_eDrawType_Color149, "OrangeHigh9" },
-        { (unsigned int)glow_eDrawType_Color150, "OrangeHigh10" },
-        { (unsigned int)glow_eDrawType_Color151, "RedLow1" },
-        { (unsigned int)glow_eDrawType_Color152, "RedLow2" },
-        { (unsigned int)glow_eDrawType_Color153, "RedLow3" },
-        { (unsigned int)glow_eDrawType_Color154, "RedLow4" },
-        { (unsigned int)glow_eDrawType_Color155, "RedLow5" },
-        { (unsigned int)glow_eDrawType_Color156, "RedLow6" },
-        { (unsigned int)glow_eDrawType_Color157, "RedLow7" },
-        { (unsigned int)glow_eDrawType_Color158, "RedLow8" },
-        { (unsigned int)glow_eDrawType_Color159, "RedLow9" },
-        { (unsigned int)glow_eDrawType_Color160, "RedLow10" },
-        { (unsigned int)glow_eDrawType_Color161, "RedMedium1" },
-        { (unsigned int)glow_eDrawType_Color162, "RedMedium2" },
-        { (unsigned int)glow_eDrawType_Color163, "RedMedium3" },
-        { (unsigned int)glow_eDrawType_Color164, "RedMedium4" },
-        { (unsigned int)glow_eDrawType_Color165, "RedMedium5" },
-        { (unsigned int)glow_eDrawType_Color166, "RedMedium6" },
-        { (unsigned int)glow_eDrawType_Color167, "RedMedium7" },
-        { (unsigned int)glow_eDrawType_Color168, "RedMedium8" },
-        { (unsigned int)glow_eDrawType_Color169, "RedMedium9" },
-        { (unsigned int)glow_eDrawType_Color170, "RedMedium10" },
-        { (unsigned int)glow_eDrawType_Color171, "RedHigh1" },
-        { (unsigned int)glow_eDrawType_Color172, "RedHigh2" },
-        { (unsigned int)glow_eDrawType_Color173, "RedHigh3" },
-        { (unsigned int)glow_eDrawType_Color174, "RedHigh4" },
-        { (unsigned int)glow_eDrawType_Color175, "RedHigh5" },
-        { (unsigned int)glow_eDrawType_Color176, "RedHigh6" },
-        { (unsigned int)glow_eDrawType_Color177, "RedHigh7" },
-        { (unsigned int)glow_eDrawType_Color178, "RedHigh8" },
-        { (unsigned int)glow_eDrawType_Color179, "RedHigh9" },
-        { (unsigned int)glow_eDrawType_Color180, "RedHigh10" },
-        { (unsigned int)glow_eDrawType_Color181, "MagentaLow1" },
-        { (unsigned int)glow_eDrawType_Color182, "MagentaLow2" },
-        { (unsigned int)glow_eDrawType_Color183, "MagentaLow3" },
-        { (unsigned int)glow_eDrawType_Color184, "MagentaLow4" },
-        { (unsigned int)glow_eDrawType_Color185, "MagentaLow5" },
-        { (unsigned int)glow_eDrawType_Color186, "MagentaLow6" },
-        { (unsigned int)glow_eDrawType_Color187, "MagentaLow7" },
-        { (unsigned int)glow_eDrawType_Color188, "MagentaLow8" },
-        { (unsigned int)glow_eDrawType_Color189, "MagentaLow9" },
-        { (unsigned int)glow_eDrawType_Color190, "MagentaLow10" },
-        { (unsigned int)glow_eDrawType_Color191, "MagentaMedium1" },
-        { (unsigned int)glow_eDrawType_Color192, "MagentaMedium2" },
-        { (unsigned int)glow_eDrawType_Color193, "MagentaMedium3" },
-        { (unsigned int)glow_eDrawType_Color194, "MagentaMedium4" },
-        { (unsigned int)glow_eDrawType_Color195, "MagentaMedium5" },
-        { (unsigned int)glow_eDrawType_Color196, "MagentaMedium6" },
-        { (unsigned int)glow_eDrawType_Color197, "MagentaMedium7" },
-        { (unsigned int)glow_eDrawType_Color198, "MagentaMedium8" },
-        { (unsigned int)glow_eDrawType_Color199, "MagentaMedium9" },
-        { (unsigned int)glow_eDrawType_Color200, "MagentaMedium10" },
-        { (unsigned int)glow_eDrawType_Color201, "MagentaHigh1" },
-        { (unsigned int)glow_eDrawType_Color202, "MagentaHigh2" },
-        { (unsigned int)glow_eDrawType_Color203, "MagentaHigh3" },
-        { (unsigned int)glow_eDrawType_Color204, "MagentaHigh4" },
-        { (unsigned int)glow_eDrawType_Color205, "MagentaHigh5" },
-        { (unsigned int)glow_eDrawType_Color206, "MagentaHigh6" },
-        { (unsigned int)glow_eDrawType_Color207, "MagentaHigh7" },
-        { (unsigned int)glow_eDrawType_Color208, "MagentaHigh8" },
-        { (unsigned int)glow_eDrawType_Color209, "MagentaHigh9" },
-        { (unsigned int)glow_eDrawType_Color210, "MagentaHigh10" },
-        { (unsigned int)glow_eDrawType_Color211, "BlueLow1" },
-        { (unsigned int)glow_eDrawType_Color212, "BlueLow2" },
-        { (unsigned int)glow_eDrawType_Color213, "BlueLow3" },
-        { (unsigned int)glow_eDrawType_Color214, "BlueLow4" },
-        { (unsigned int)glow_eDrawType_Color215, "BlueLow5" },
-        { (unsigned int)glow_eDrawType_Color216, "BlueLow6" },
-        { (unsigned int)glow_eDrawType_Color217, "BlueLow7" },
-        { (unsigned int)glow_eDrawType_Color218, "BlueLow8" },
-        { (unsigned int)glow_eDrawType_Color219, "BlueLow9" },
-        { (unsigned int)glow_eDrawType_Color220, "BlueLow10" },
-        { (unsigned int)glow_eDrawType_Color221, "BlueMedium1" },
-        { (unsigned int)glow_eDrawType_Color222, "BlueMedium2" },
-        { (unsigned int)glow_eDrawType_Color223, "BlueMedium3" },
-        { (unsigned int)glow_eDrawType_Color224, "BlueMedium4" },
-        { (unsigned int)glow_eDrawType_Color225, "BlueMedium5" },
-        { (unsigned int)glow_eDrawType_Color226, "BlueMedium6" },
-        { (unsigned int)glow_eDrawType_Color227, "BlueMedium7" },
-        { (unsigned int)glow_eDrawType_Color228, "BlueMedium8" },
-        { (unsigned int)glow_eDrawType_Color229, "BlueMedium9" },
-        { (unsigned int)glow_eDrawType_Color230, "BlueMedium10" },
-        { (unsigned int)glow_eDrawType_Color231, "BlueHigh1" },
-        { (unsigned int)glow_eDrawType_Color232, "BlueHigh2" },
-        { (unsigned int)glow_eDrawType_Color233, "BlueHigh3" },
-        { (unsigned int)glow_eDrawType_Color234, "BlueHigh4" },
-        { (unsigned int)glow_eDrawType_Color235, "BlueHigh5" },
-        { (unsigned int)glow_eDrawType_Color236, "BlueHigh6" },
-        { (unsigned int)glow_eDrawType_Color237, "BlueHigh7" },
-        { (unsigned int)glow_eDrawType_Color238, "BlueHigh8" },
-        { (unsigned int)glow_eDrawType_Color239, "BlueHigh9" },
-        { (unsigned int)glow_eDrawType_Color240, "BlueHigh10" },
-        { (unsigned int)glow_eDrawType_Color241, "SeaBlueLow1" },
-        { (unsigned int)glow_eDrawType_Color242, "SeaBlueLow2" },
-        { (unsigned int)glow_eDrawType_Color243, "SeaBlueLow3" },
-        { (unsigned int)glow_eDrawType_Color244, "SeaBlueLow4" },
-        { (unsigned int)glow_eDrawType_Color245, "SeaBlueLow5" },
-        { (unsigned int)glow_eDrawType_Color246, "SeaBlueLow6" },
-        { (unsigned int)glow_eDrawType_Color247, "SeaBlueLow7" },
-        { (unsigned int)glow_eDrawType_Color248, "SeaBlueLow8" },
-        { (unsigned int)glow_eDrawType_Color249, "SeaBlueLow9" },
-        { (unsigned int)glow_eDrawType_Color250, "SeaBlueLow10" },
-        { (unsigned int)glow_eDrawType_Color251, "SeaBlueMedium1" },
-        { (unsigned int)glow_eDrawType_Color252, "SeaBlueMedium2" },
-        { (unsigned int)glow_eDrawType_Color253, "SeaBlueMedium3" },
-        { (unsigned int)glow_eDrawType_Color224, "SeaBlueMedium4" },
-        { (unsigned int)glow_eDrawType_Color255, "SeaBlueMedium5" },
-        { (unsigned int)glow_eDrawType_Color256, "SeaBlueMedium6" },
-        { (unsigned int)glow_eDrawType_Color257, "SeaBlueMedium7" },
-        { (unsigned int)glow_eDrawType_Color258, "SeaBlueMedium8" },
-        { (unsigned int)glow_eDrawType_Color259, "SeaBlueMedium9" },
-        { (unsigned int)glow_eDrawType_Color260, "SeaBlueMedium10" },
-        { (unsigned int)glow_eDrawType_Color261, "SeaBlueHigh1" },
-        { (unsigned int)glow_eDrawType_Color262, "SeaBlueHigh2" },
-        { (unsigned int)glow_eDrawType_Color263, "SeaBlueHigh3" },
-        { (unsigned int)glow_eDrawType_Color264, "SeaBlueHigh4" },
-        { (unsigned int)glow_eDrawType_Color265, "SeaBlueHigh5" },
-        { (unsigned int)glow_eDrawType_Color266, "SeaBlueHigh6" },
-        { (unsigned int)glow_eDrawType_Color267, "SeaBlueHigh7" },
-        { (unsigned int)glow_eDrawType_Color268, "SeaBlueHigh8" },
-        { (unsigned int)glow_eDrawType_Color269, "SeaBlueHigh9" },
-        { (unsigned int)glow_eDrawType_Color270, "SeaBlueHigh10" },
-        { (unsigned int)glow_eDrawType_Color271, "GreenLow1" },
-        { (unsigned int)glow_eDrawType_Color272, "GreenLow2" },
-        { (unsigned int)glow_eDrawType_Color273, "GreenLow3" },
-        { (unsigned int)glow_eDrawType_Color274, "GreenLow4" },
-        { (unsigned int)glow_eDrawType_Color275, "GreenLow5" },
-        { (unsigned int)glow_eDrawType_Color276, "GreenLow6" },
-        { (unsigned int)glow_eDrawType_Color277, "GreenLow7" },
-        { (unsigned int)glow_eDrawType_Color278, "GreenLow8" },
-        { (unsigned int)glow_eDrawType_Color279, "GreenLow9" },
-        { (unsigned int)glow_eDrawType_Color280, "GreenLow10" },
-        { (unsigned int)glow_eDrawType_Color281, "GreenMedium1" },
-        { (unsigned int)glow_eDrawType_Color282, "GreenMedium2" },
-        { (unsigned int)glow_eDrawType_Color283, "GreenMedium3" },
-        { (unsigned int)glow_eDrawType_Color284, "GreenMedium4" },
-        { (unsigned int)glow_eDrawType_Color285, "GreenMedium5" },
-        { (unsigned int)glow_eDrawType_Color286, "GreenMedium6" },
-        { (unsigned int)glow_eDrawType_Color287, "GreenMedium7" },
-        { (unsigned int)glow_eDrawType_Color288, "GreenMedium8" },
-        { (unsigned int)glow_eDrawType_Color289, "GreenMedium9" },
-        { (unsigned int)glow_eDrawType_Color290, "GreenMedium10" },
-        { (unsigned int)glow_eDrawType_Color291, "GreenHigh1" },
-        { (unsigned int)glow_eDrawType_Color292, "GreenHigh2" },
-        { (unsigned int)glow_eDrawType_Color293, "GreenHigh3" },
-        { (unsigned int)glow_eDrawType_Color294, "GreenHigh4" },
-        { (unsigned int)glow_eDrawType_Color295, "GreenHigh5" },
-        { (unsigned int)glow_eDrawType_Color296, "GreenHigh6" },
-        { (unsigned int)glow_eDrawType_Color297, "GreenHigh7" },
-        { (unsigned int)glow_eDrawType_Color298, "GreenHigh8" },
-        { (unsigned int)glow_eDrawType_Color299, "GreenHigh9" },
-        { (unsigned int)glow_eDrawType_Color300, "GreenHigh10" },
-        { (unsigned int)glow_eDrawType_LineErase, "Background" },
-        { (unsigned int)glow_eDrawType_CustomColor1, "CustomColor1" },
-        { (unsigned int)glow_eDrawType_CustomColor2, "CustomColor2" },
-        { (unsigned int)glow_eDrawType_CustomColor3, "CustomColor3" },
-        { (unsigned int)glow_eDrawType_CustomColor4, "CustomColor4" },
-        { (unsigned int)glow_eDrawType_CustomColor5, "CustomColor5" },
-        { (unsigned int)glow_eDrawType_CustomColor6, "CustomColor6" },
-        { (unsigned int)glow_eDrawType_CustomColor7, "CustomColor7" },
-        { (unsigned int)glow_eDrawType_CustomColor8, "CustomColor8" },
-        { (unsigned int)glow_eDrawType_CustomColor9, "CustomColor9" },
-        { (unsigned int)glow_eDrawType_CustomColor10, "CustomColor10" },
-        { (unsigned int)glow_eDrawType_CustomColor11, "CustomColor11" },
-        { (unsigned int)glow_eDrawType_CustomColor12, "CustomColor12" },
-        { (unsigned int)glow_eDrawType_CustomColor13, "CustomColor13" },
-        { (unsigned int)glow_eDrawType_CustomColor14, "CustomColor14" },
-        { (unsigned int)glow_eDrawType_CustomColor15, "CustomColor15" },
-        { (unsigned int)glow_eDrawType_CustomColor16, "CustomColor16" },
-        { (unsigned int)glow_eDrawType_CustomColor17, "CustomColor17" },
-        { (unsigned int)glow_eDrawType_CustomColor18, "CustomColor18" },
-        { (unsigned int)glow_eDrawType_CustomColor19, "CustomColor19" },
-        { (unsigned int)glow_eDrawType_CustomColor20, "CustomColor20" },
-        { (unsigned int)glow_eDrawType_CustomColor21, "CustomColor21" },
-        { (unsigned int)glow_eDrawType_CustomColor22, "CustomColor22" },
-        { (unsigned int)glow_eDrawType_CustomColor23, "CustomColor23" },
-        { (unsigned int)glow_eDrawType_CustomColor24, "CustomColor24" },
-        { (unsigned int)glow_eDrawType_CustomColor25, "CustomColor25" },
-        { (unsigned int)glow_eDrawType_CustomColor26, "CustomColor26" },
-        { (unsigned int)glow_eDrawType_CustomColor27, "CustomColor27" },
-        { (unsigned int)glow_eDrawType_CustomColor28, "CustomColor28" },
-        { (unsigned int)glow_eDrawType_CustomColor29, "CustomColor29" },
-        { (unsigned int)glow_eDrawType_CustomColor30, "CustomColor30" },
-        { (unsigned int)glow_eDrawType_CustomColor31, "CustomColor31" },
-        { (unsigned int)glow_eDrawType_CustomColor32, "CustomColor32" },
-        { (unsigned int)glow_eDrawType_CustomColor33, "CustomColor33" },
-        { (unsigned int)glow_eDrawType_CustomColor34, "CustomColor34" },
-        { (unsigned int)glow_eDrawType_CustomColor35, "CustomColor35" },
-        { (unsigned int)glow_eDrawType_CustomColor36, "CustomColor36" },
-        { (unsigned int)glow_eDrawType_CustomColor37, "CustomColor37" },
-        { (unsigned int)glow_eDrawType_CustomColor38, "CustomColor38" },
-        { (unsigned int)glow_eDrawType_CustomColor39, "CustomColor39" },
-        { (unsigned int)glow_eDrawType_CustomColor40, "CustomColor40" },
-        { (unsigned int)glow_eDrawType_CustomColor41, "CustomColor41" },
-        { (unsigned int)glow_eDrawType_CustomColor42, "CustomColor42" },
-        { (unsigned int)glow_eDrawType_CustomColor43, "CustomColor43" },
-        { (unsigned int)glow_eDrawType_CustomColor44, "CustomColor44" },
-        { (unsigned int)glow_eDrawType_CustomColor45, "CustomColor45" },
-        { (unsigned int)glow_eDrawType_CustomColor46, "CustomColor46" },
-        { (unsigned int)glow_eDrawType_CustomColor47, "CustomColor47" },
-        { (unsigned int)glow_eDrawType_CustomColor48, "CustomColor48" },
-        { (unsigned int)glow_eDrawType_CustomColor49, "CustomColor49" },
-        { (unsigned int)glow_eDrawType_CustomColor50, "CustomColor50" },
-        { (unsigned int)glow_eDrawType_CustomColor51, "CustomColor51" },
-        { (unsigned int)glow_eDrawType_CustomColor52, "CustomColor52" },
-        { (unsigned int)glow_eDrawType_CustomColor53, "CustomColor53" },
-        { (unsigned int)glow_eDrawType_CustomColor54, "CustomColor54" },
-        { (unsigned int)glow_eDrawType_CustomColor55, "CustomColor55" },
-        { (unsigned int)glow_eDrawType_CustomColor56, "CustomColor56" },
-        { (unsigned int)glow_eDrawType_CustomColor57, "CustomColor57" },
-        { (unsigned int)glow_eDrawType_CustomColor58, "CustomColor58" },
-        { (unsigned int)glow_eDrawType_CustomColor59, "CustomColor59" },
-        { (unsigned int)glow_eDrawType_CustomColor60, "CustomColor60" },
-        { (unsigned int)glow_eDrawType_CustomColor61, "CustomColor61" },
-        { (unsigned int)glow_eDrawType_CustomColor62, "CustomColor62" },
-        { (unsigned int)glow_eDrawType_CustomColor63, "CustomColor63" },
-        { (unsigned int)glow_eDrawType_CustomColor64, "CustomColor64" },
-        { (unsigned int)glow_eDrawType_CustomColor65, "CustomColor65" },
-        { (unsigned int)glow_eDrawType_CustomColor66, "CustomColor66" },
-        { (unsigned int)glow_eDrawType_CustomColor67, "CustomColor67" },
-        { (unsigned int)glow_eDrawType_CustomColor68, "CustomColor68" },
-        { (unsigned int)glow_eDrawType_CustomColor69, "CustomColor69" },
-        { (unsigned int)glow_eDrawType_CustomColor70, "CustomColor70" },
-        { (unsigned int)glow_eDrawType_CustomColor71, "CustomColor71" },
-        { (unsigned int)glow_eDrawType_CustomColor72, "CustomColor72" },
-        { (unsigned int)glow_eDrawType_CustomColor73, "CustomColor73" },
-        { (unsigned int)glow_eDrawType_CustomColor74, "CustomColor74" },
-        { (unsigned int)glow_eDrawType_CustomColor75, "CustomColor75" },
-        { (unsigned int)glow_eDrawType_CustomColor76, "CustomColor76" },
-        { (unsigned int)glow_eDrawType_CustomColor77, "CustomColor77" },
-        { (unsigned int)glow_eDrawType_CustomColor78, "CustomColor78" },
-        { (unsigned int)glow_eDrawType_CustomColor79, "CustomColor79" },
-        { (unsigned int)glow_eDrawType_CustomColor80, "CustomColor80" },
-        { (unsigned int)glow_eDrawType_CustomColor81, "CustomColor81" },
-        { (unsigned int)glow_eDrawType_CustomColor82, "CustomColor82" },
-        { (unsigned int)glow_eDrawType_CustomColor83, "CustomColor83" },
-        { (unsigned int)glow_eDrawType_CustomColor84, "CustomColor84" },
-        { (unsigned int)glow_eDrawType_CustomColor85, "CustomColor85" },
-        { (unsigned int)glow_eDrawType_CustomColor86, "CustomColor86" },
-        { (unsigned int)glow_eDrawType_CustomColor87, "CustomColor87" },
-        { (unsigned int)glow_eDrawType_CustomColor88, "CustomColor88" },
-        { (unsigned int)glow_eDrawType_CustomColor89, "CustomColor89" },
-        { (unsigned int)glow_eDrawType_CustomColor90, "CustomColor90" },
-        { (unsigned int)glow_eDrawType_Inherit, "Inherit" }, { 0, "" } };
+static attrnav_sEnumElement elem_color[] = {{(unsigned int)glow_eDrawType_Line, "Black"},
+                                            {(unsigned int)glow_eDrawType_LineRed, "Red"},
+                                            {(unsigned int)glow_eDrawType_LineGray, "Grey"},
+                                            {(unsigned int)glow_eDrawType_Color4, "White"},
+                                            {(unsigned int)glow_eDrawType_Color5, "YellowGreen"},
+                                            {(unsigned int)glow_eDrawType_Color6, "Yellow"},
+                                            {(unsigned int)glow_eDrawType_Color7, "Gold"},
+                                            {(unsigned int)glow_eDrawType_Color8, "Orange"},
+                                            {(unsigned int)glow_eDrawType_Color9, "OrangeRed"},
+                                            {(unsigned int)glow_eDrawType_Color10, "Red"},
+                                            {(unsigned int)glow_eDrawType_Color11, "RedViolet"},
+                                            {(unsigned int)glow_eDrawType_Color12, "Violet"},
+                                            {(unsigned int)glow_eDrawType_Color13, "BlueViolet"},
+                                            {(unsigned int)glow_eDrawType_Color14, "BlueBlueViolet"},
+                                            {(unsigned int)glow_eDrawType_Color15, "Blue"},
+                                            {(unsigned int)glow_eDrawType_Color16, "BlueBlueGreen"},
+                                            {(unsigned int)glow_eDrawType_Color17, "BlueGreen"},
+                                            {(unsigned int)glow_eDrawType_Color18, "GreenGreenBlue"},
+                                            {(unsigned int)glow_eDrawType_Color19, "Green"},
+                                            {(unsigned int)glow_eDrawType_Color20, "GreenGreenYellow"},
+                                            {(unsigned int)glow_eDrawType_Color21, "GrayFix1"},
+                                            {(unsigned int)glow_eDrawType_Color22, "GrayFix2"},
+                                            {(unsigned int)glow_eDrawType_Color23, "GrayFix3"},
+                                            {(unsigned int)glow_eDrawType_Color24, "GrayFix4"},
+                                            {(unsigned int)glow_eDrawType_Color25, "GrayFix5"},
+                                            {(unsigned int)glow_eDrawType_Color26, "GrayFix6"},
+                                            {(unsigned int)glow_eDrawType_Color27, "GrayFix7"},
+                                            {(unsigned int)glow_eDrawType_Color28, "GrayFix8"},
+                                            {(unsigned int)glow_eDrawType_Color29, "GrayFix9"},
+                                            {(unsigned int)glow_eDrawType_Color30, "GrayFix10"},
+                                            {(unsigned int)glow_eDrawType_Color31, "GrayLow1"},
+                                            {(unsigned int)glow_eDrawType_Color32, "GrayLow2"},
+                                            {(unsigned int)glow_eDrawType_Color33, "GrayLow3"},
+                                            {(unsigned int)glow_eDrawType_Color34, "GrayLow4"},
+                                            {(unsigned int)glow_eDrawType_Color35, "GrayLow5"},
+                                            {(unsigned int)glow_eDrawType_Color36, "GrayLow6"},
+                                            {(unsigned int)glow_eDrawType_Color37, "GrayLow7"},
+                                            {(unsigned int)glow_eDrawType_Color38, "GrayLow8"},
+                                            {(unsigned int)glow_eDrawType_Color39, "GrayLow9"},
+                                            {(unsigned int)glow_eDrawType_Color40, "GrayLow10"},
+                                            {(unsigned int)glow_eDrawType_Color41, "GrayMedium1"},
+                                            {(unsigned int)glow_eDrawType_Color42, "GrayMedium2"},
+                                            {(unsigned int)glow_eDrawType_Color43, "GrayMedium3"},
+                                            {(unsigned int)glow_eDrawType_Color44, "GrayMedium4"},
+                                            {(unsigned int)glow_eDrawType_Color45, "GrayMedium5"},
+                                            {(unsigned int)glow_eDrawType_Color46, "GrayMedium6"},
+                                            {(unsigned int)glow_eDrawType_Color47, "GrayMedium7"},
+                                            {(unsigned int)glow_eDrawType_Color48, "GrayMedium8"},
+                                            {(unsigned int)glow_eDrawType_Color49, "GrayMedium9"},
+                                            {(unsigned int)glow_eDrawType_Color50, "GrayMedium10"},
+                                            {(unsigned int)glow_eDrawType_Color51, "GrayHigh1"},
+                                            {(unsigned int)glow_eDrawType_Color52, "GrayHigh2"},
+                                            {(unsigned int)glow_eDrawType_Color53, "GrayHigh3"},
+                                            {(unsigned int)glow_eDrawType_Color54, "GrayHigh4"},
+                                            {(unsigned int)glow_eDrawType_Color55, "GrayHigh5"},
+                                            {(unsigned int)glow_eDrawType_Color56, "GrayHigh6"},
+                                            {(unsigned int)glow_eDrawType_Color57, "GrayHigh7"},
+                                            {(unsigned int)glow_eDrawType_Color58, "GrayHigh8"},
+                                            {(unsigned int)glow_eDrawType_Color59, "GrayHigh9"},
+                                            {(unsigned int)glow_eDrawType_Color60, "GrayHigh10"},
+                                            {(unsigned int)glow_eDrawType_Color61, "YellowGreenLow1"},
+                                            {(unsigned int)glow_eDrawType_Color62, "YellowGreenLow2"},
+                                            {(unsigned int)glow_eDrawType_Color63, "YellowGreenLow3"},
+                                            {(unsigned int)glow_eDrawType_Color64, "YellowGreenLow4"},
+                                            {(unsigned int)glow_eDrawType_Color65, "YellowGreenLow5"},
+                                            {(unsigned int)glow_eDrawType_Color66, "YellowGreenLow6"},
+                                            {(unsigned int)glow_eDrawType_Color67, "YellowGreenLow7"},
+                                            {(unsigned int)glow_eDrawType_Color68, "YellowGreenLow8"},
+                                            {(unsigned int)glow_eDrawType_Color69, "YellowGreenLow9"},
+                                            {(unsigned int)glow_eDrawType_Color70, "YellowGreenLow10"},
+                                            {(unsigned int)glow_eDrawType_Color71, "YellowGreenMedium1"},
+                                            {(unsigned int)glow_eDrawType_Color72, "YellowGreenMedium2"},
+                                            {(unsigned int)glow_eDrawType_Color73, "YellowGreenMedium3"},
+                                            {(unsigned int)glow_eDrawType_Color74, "YellowGreenMedium4"},
+                                            {(unsigned int)glow_eDrawType_Color75, "YellowGreenMedium5"},
+                                            {(unsigned int)glow_eDrawType_Color76, "YellowGreenMedium6"},
+                                            {(unsigned int)glow_eDrawType_Color77, "YellowGreenMedium7"},
+                                            {(unsigned int)glow_eDrawType_Color78, "YellowGreenMedium8"},
+                                            {(unsigned int)glow_eDrawType_Color79, "YellowGreenMedium9"},
+                                            {(unsigned int)glow_eDrawType_Color80, "YellowGreenMedium10"},
+                                            {(unsigned int)glow_eDrawType_Color81, "YellowGreenHigh1"},
+                                            {(unsigned int)glow_eDrawType_Color82, "YellowGreenHigh2"},
+                                            {(unsigned int)glow_eDrawType_Color83, "YellowGreenHigh3"},
+                                            {(unsigned int)glow_eDrawType_Color84, "YellowGreenHigh4"},
+                                            {(unsigned int)glow_eDrawType_Color85, "YellowGreenHigh5"},
+                                            {(unsigned int)glow_eDrawType_Color86, "YellowGreenHigh6"},
+                                            {(unsigned int)glow_eDrawType_Color87, "YellowGreenHigh7"},
+                                            {(unsigned int)glow_eDrawType_Color88, "YellowGreenHigh8"},
+                                            {(unsigned int)glow_eDrawType_Color89, "YellowGreenHigh9"},
+                                            {(unsigned int)glow_eDrawType_Color90, "YellowGreenHigh10"},
+                                            {(unsigned int)glow_eDrawType_Color91, "YellowLow1"},
+                                            {(unsigned int)glow_eDrawType_Color92, "YellowLow2"},
+                                            {(unsigned int)glow_eDrawType_Color93, "YellowLow3"},
+                                            {(unsigned int)glow_eDrawType_Color94, "YellowLow4"},
+                                            {(unsigned int)glow_eDrawType_Color95, "YellowLow5"},
+                                            {(unsigned int)glow_eDrawType_Color96, "YellowLow6"},
+                                            {(unsigned int)glow_eDrawType_Color97, "YellowLow7"},
+                                            {(unsigned int)glow_eDrawType_Color98, "YellowLow8"},
+                                            {(unsigned int)glow_eDrawType_Color99, "YellowLow9"},
+                                            {(unsigned int)glow_eDrawType_Color100, "YellowLow10"},
+                                            {(unsigned int)glow_eDrawType_Color101, "YellowMedium1"},
+                                            {(unsigned int)glow_eDrawType_Color102, "YellowMedium2"},
+                                            {(unsigned int)glow_eDrawType_Color103, "YellowMedium3"},
+                                            {(unsigned int)glow_eDrawType_Color104, "YellowMedium4"},
+                                            {(unsigned int)glow_eDrawType_Color105, "YellowMedium5"},
+                                            {(unsigned int)glow_eDrawType_Color106, "YellowMedium6"},
+                                            {(unsigned int)glow_eDrawType_Color107, "YellowMedium7"},
+                                            {(unsigned int)glow_eDrawType_Color108, "YellowMedium8"},
+                                            {(unsigned int)glow_eDrawType_Color109, "YellowMedium9"},
+                                            {(unsigned int)glow_eDrawType_Color110, "YellowMedium10"},
+                                            {(unsigned int)glow_eDrawType_Color111, "YellowHigh1"},
+                                            {(unsigned int)glow_eDrawType_Color112, "YellowHigh2"},
+                                            {(unsigned int)glow_eDrawType_Color113, "YellowHigh3"},
+                                            {(unsigned int)glow_eDrawType_Color114, "YellowHigh4"},
+                                            {(unsigned int)glow_eDrawType_Color115, "YellowHigh5"},
+                                            {(unsigned int)glow_eDrawType_Color116, "YellowHigh6"},
+                                            {(unsigned int)glow_eDrawType_Color117, "YellowHigh7"},
+                                            {(unsigned int)glow_eDrawType_Color118, "YellowHigh8"},
+                                            {(unsigned int)glow_eDrawType_Color119, "YellowHigh9"},
+                                            {(unsigned int)glow_eDrawType_Color120, "YellowHigh10"},
+                                            {(unsigned int)glow_eDrawType_Color121, "OrangeLow1"},
+                                            {(unsigned int)glow_eDrawType_Color122, "OrangeLow2"},
+                                            {(unsigned int)glow_eDrawType_Color123, "OrangeLow3"},
+                                            {(unsigned int)glow_eDrawType_Color124, "OrangeLow4"},
+                                            {(unsigned int)glow_eDrawType_Color125, "OrangeLow5"},
+                                            {(unsigned int)glow_eDrawType_Color126, "OrangeLow6"},
+                                            {(unsigned int)glow_eDrawType_Color127, "OrangeLow7"},
+                                            {(unsigned int)glow_eDrawType_Color128, "OrangeLow8"},
+                                            {(unsigned int)glow_eDrawType_Color129, "OrangeLow9"},
+                                            {(unsigned int)glow_eDrawType_Color130, "OrangeLow10"},
+                                            {(unsigned int)glow_eDrawType_Color131, "OrangeMedium1"},
+                                            {(unsigned int)glow_eDrawType_Color132, "OrangeMedium2"},
+                                            {(unsigned int)glow_eDrawType_Color133, "OrangeMedium3"},
+                                            {(unsigned int)glow_eDrawType_Color134, "OrangeMedium4"},
+                                            {(unsigned int)glow_eDrawType_Color135, "OrangeMedium5"},
+                                            {(unsigned int)glow_eDrawType_Color136, "OrangeMedium6"},
+                                            {(unsigned int)glow_eDrawType_Color137, "OrangeMedium7"},
+                                            {(unsigned int)glow_eDrawType_Color138, "OrangeMedium8"},
+                                            {(unsigned int)glow_eDrawType_Color139, "OrangeMedium9"},
+                                            {(unsigned int)glow_eDrawType_Color140, "OrangeMedium10"},
+                                            {(unsigned int)glow_eDrawType_Color141, "OrangeHigh1"},
+                                            {(unsigned int)glow_eDrawType_Color142, "OrangeHigh2"},
+                                            {(unsigned int)glow_eDrawType_Color143, "OrangeHigh3"},
+                                            {(unsigned int)glow_eDrawType_Color144, "OrangeHigh4"},
+                                            {(unsigned int)glow_eDrawType_Color145, "OrangeHigh5"},
+                                            {(unsigned int)glow_eDrawType_Color146, "OrangeHigh6"},
+                                            {(unsigned int)glow_eDrawType_Color147, "OrangeHigh7"},
+                                            {(unsigned int)glow_eDrawType_Color148, "OrangeHigh8"},
+                                            {(unsigned int)glow_eDrawType_Color149, "OrangeHigh9"},
+                                            {(unsigned int)glow_eDrawType_Color150, "OrangeHigh10"},
+                                            {(unsigned int)glow_eDrawType_Color151, "RedLow1"},
+                                            {(unsigned int)glow_eDrawType_Color152, "RedLow2"},
+                                            {(unsigned int)glow_eDrawType_Color153, "RedLow3"},
+                                            {(unsigned int)glow_eDrawType_Color154, "RedLow4"},
+                                            {(unsigned int)glow_eDrawType_Color155, "RedLow5"},
+                                            {(unsigned int)glow_eDrawType_Color156, "RedLow6"},
+                                            {(unsigned int)glow_eDrawType_Color157, "RedLow7"},
+                                            {(unsigned int)glow_eDrawType_Color158, "RedLow8"},
+                                            {(unsigned int)glow_eDrawType_Color159, "RedLow9"},
+                                            {(unsigned int)glow_eDrawType_Color160, "RedLow10"},
+                                            {(unsigned int)glow_eDrawType_Color161, "RedMedium1"},
+                                            {(unsigned int)glow_eDrawType_Color162, "RedMedium2"},
+                                            {(unsigned int)glow_eDrawType_Color163, "RedMedium3"},
+                                            {(unsigned int)glow_eDrawType_Color164, "RedMedium4"},
+                                            {(unsigned int)glow_eDrawType_Color165, "RedMedium5"},
+                                            {(unsigned int)glow_eDrawType_Color166, "RedMedium6"},
+                                            {(unsigned int)glow_eDrawType_Color167, "RedMedium7"},
+                                            {(unsigned int)glow_eDrawType_Color168, "RedMedium8"},
+                                            {(unsigned int)glow_eDrawType_Color169, "RedMedium9"},
+                                            {(unsigned int)glow_eDrawType_Color170, "RedMedium10"},
+                                            {(unsigned int)glow_eDrawType_Color171, "RedHigh1"},
+                                            {(unsigned int)glow_eDrawType_Color172, "RedHigh2"},
+                                            {(unsigned int)glow_eDrawType_Color173, "RedHigh3"},
+                                            {(unsigned int)glow_eDrawType_Color174, "RedHigh4"},
+                                            {(unsigned int)glow_eDrawType_Color175, "RedHigh5"},
+                                            {(unsigned int)glow_eDrawType_Color176, "RedHigh6"},
+                                            {(unsigned int)glow_eDrawType_Color177, "RedHigh7"},
+                                            {(unsigned int)glow_eDrawType_Color178, "RedHigh8"},
+                                            {(unsigned int)glow_eDrawType_Color179, "RedHigh9"},
+                                            {(unsigned int)glow_eDrawType_Color180, "RedHigh10"},
+                                            {(unsigned int)glow_eDrawType_Color181, "MagentaLow1"},
+                                            {(unsigned int)glow_eDrawType_Color182, "MagentaLow2"},
+                                            {(unsigned int)glow_eDrawType_Color183, "MagentaLow3"},
+                                            {(unsigned int)glow_eDrawType_Color184, "MagentaLow4"},
+                                            {(unsigned int)glow_eDrawType_Color185, "MagentaLow5"},
+                                            {(unsigned int)glow_eDrawType_Color186, "MagentaLow6"},
+                                            {(unsigned int)glow_eDrawType_Color187, "MagentaLow7"},
+                                            {(unsigned int)glow_eDrawType_Color188, "MagentaLow8"},
+                                            {(unsigned int)glow_eDrawType_Color189, "MagentaLow9"},
+                                            {(unsigned int)glow_eDrawType_Color190, "MagentaLow10"},
+                                            {(unsigned int)glow_eDrawType_Color191, "MagentaMedium1"},
+                                            {(unsigned int)glow_eDrawType_Color192, "MagentaMedium2"},
+                                            {(unsigned int)glow_eDrawType_Color193, "MagentaMedium3"},
+                                            {(unsigned int)glow_eDrawType_Color194, "MagentaMedium4"},
+                                            {(unsigned int)glow_eDrawType_Color195, "MagentaMedium5"},
+                                            {(unsigned int)glow_eDrawType_Color196, "MagentaMedium6"},
+                                            {(unsigned int)glow_eDrawType_Color197, "MagentaMedium7"},
+                                            {(unsigned int)glow_eDrawType_Color198, "MagentaMedium8"},
+                                            {(unsigned int)glow_eDrawType_Color199, "MagentaMedium9"},
+                                            {(unsigned int)glow_eDrawType_Color200, "MagentaMedium10"},
+                                            {(unsigned int)glow_eDrawType_Color201, "MagentaHigh1"},
+                                            {(unsigned int)glow_eDrawType_Color202, "MagentaHigh2"},
+                                            {(unsigned int)glow_eDrawType_Color203, "MagentaHigh3"},
+                                            {(unsigned int)glow_eDrawType_Color204, "MagentaHigh4"},
+                                            {(unsigned int)glow_eDrawType_Color205, "MagentaHigh5"},
+                                            {(unsigned int)glow_eDrawType_Color206, "MagentaHigh6"},
+                                            {(unsigned int)glow_eDrawType_Color207, "MagentaHigh7"},
+                                            {(unsigned int)glow_eDrawType_Color208, "MagentaHigh8"},
+                                            {(unsigned int)glow_eDrawType_Color209, "MagentaHigh9"},
+                                            {(unsigned int)glow_eDrawType_Color210, "MagentaHigh10"},
+                                            {(unsigned int)glow_eDrawType_Color211, "BlueLow1"},
+                                            {(unsigned int)glow_eDrawType_Color212, "BlueLow2"},
+                                            {(unsigned int)glow_eDrawType_Color213, "BlueLow3"},
+                                            {(unsigned int)glow_eDrawType_Color214, "BlueLow4"},
+                                            {(unsigned int)glow_eDrawType_Color215, "BlueLow5"},
+                                            {(unsigned int)glow_eDrawType_Color216, "BlueLow6"},
+                                            {(unsigned int)glow_eDrawType_Color217, "BlueLow7"},
+                                            {(unsigned int)glow_eDrawType_Color218, "BlueLow8"},
+                                            {(unsigned int)glow_eDrawType_Color219, "BlueLow9"},
+                                            {(unsigned int)glow_eDrawType_Color220, "BlueLow10"},
+                                            {(unsigned int)glow_eDrawType_Color221, "BlueMedium1"},
+                                            {(unsigned int)glow_eDrawType_Color222, "BlueMedium2"},
+                                            {(unsigned int)glow_eDrawType_Color223, "BlueMedium3"},
+                                            {(unsigned int)glow_eDrawType_Color224, "BlueMedium4"},
+                                            {(unsigned int)glow_eDrawType_Color225, "BlueMedium5"},
+                                            {(unsigned int)glow_eDrawType_Color226, "BlueMedium6"},
+                                            {(unsigned int)glow_eDrawType_Color227, "BlueMedium7"},
+                                            {(unsigned int)glow_eDrawType_Color228, "BlueMedium8"},
+                                            {(unsigned int)glow_eDrawType_Color229, "BlueMedium9"},
+                                            {(unsigned int)glow_eDrawType_Color230, "BlueMedium10"},
+                                            {(unsigned int)glow_eDrawType_Color231, "BlueHigh1"},
+                                            {(unsigned int)glow_eDrawType_Color232, "BlueHigh2"},
+                                            {(unsigned int)glow_eDrawType_Color233, "BlueHigh3"},
+                                            {(unsigned int)glow_eDrawType_Color234, "BlueHigh4"},
+                                            {(unsigned int)glow_eDrawType_Color235, "BlueHigh5"},
+                                            {(unsigned int)glow_eDrawType_Color236, "BlueHigh6"},
+                                            {(unsigned int)glow_eDrawType_Color237, "BlueHigh7"},
+                                            {(unsigned int)glow_eDrawType_Color238, "BlueHigh8"},
+                                            {(unsigned int)glow_eDrawType_Color239, "BlueHigh9"},
+                                            {(unsigned int)glow_eDrawType_Color240, "BlueHigh10"},
+                                            {(unsigned int)glow_eDrawType_Color241, "SeaBlueLow1"},
+                                            {(unsigned int)glow_eDrawType_Color242, "SeaBlueLow2"},
+                                            {(unsigned int)glow_eDrawType_Color243, "SeaBlueLow3"},
+                                            {(unsigned int)glow_eDrawType_Color244, "SeaBlueLow4"},
+                                            {(unsigned int)glow_eDrawType_Color245, "SeaBlueLow5"},
+                                            {(unsigned int)glow_eDrawType_Color246, "SeaBlueLow6"},
+                                            {(unsigned int)glow_eDrawType_Color247, "SeaBlueLow7"},
+                                            {(unsigned int)glow_eDrawType_Color248, "SeaBlueLow8"},
+                                            {(unsigned int)glow_eDrawType_Color249, "SeaBlueLow9"},
+                                            {(unsigned int)glow_eDrawType_Color250, "SeaBlueLow10"},
+                                            {(unsigned int)glow_eDrawType_Color251, "SeaBlueMedium1"},
+                                            {(unsigned int)glow_eDrawType_Color252, "SeaBlueMedium2"},
+                                            {(unsigned int)glow_eDrawType_Color253, "SeaBlueMedium3"},
+                                            {(unsigned int)glow_eDrawType_Color224, "SeaBlueMedium4"},
+                                            {(unsigned int)glow_eDrawType_Color255, "SeaBlueMedium5"},
+                                            {(unsigned int)glow_eDrawType_Color256, "SeaBlueMedium6"},
+                                            {(unsigned int)glow_eDrawType_Color257, "SeaBlueMedium7"},
+                                            {(unsigned int)glow_eDrawType_Color258, "SeaBlueMedium8"},
+                                            {(unsigned int)glow_eDrawType_Color259, "SeaBlueMedium9"},
+                                            {(unsigned int)glow_eDrawType_Color260, "SeaBlueMedium10"},
+                                            {(unsigned int)glow_eDrawType_Color261, "SeaBlueHigh1"},
+                                            {(unsigned int)glow_eDrawType_Color262, "SeaBlueHigh2"},
+                                            {(unsigned int)glow_eDrawType_Color263, "SeaBlueHigh3"},
+                                            {(unsigned int)glow_eDrawType_Color264, "SeaBlueHigh4"},
+                                            {(unsigned int)glow_eDrawType_Color265, "SeaBlueHigh5"},
+                                            {(unsigned int)glow_eDrawType_Color266, "SeaBlueHigh6"},
+                                            {(unsigned int)glow_eDrawType_Color267, "SeaBlueHigh7"},
+                                            {(unsigned int)glow_eDrawType_Color268, "SeaBlueHigh8"},
+                                            {(unsigned int)glow_eDrawType_Color269, "SeaBlueHigh9"},
+                                            {(unsigned int)glow_eDrawType_Color270, "SeaBlueHigh10"},
+                                            {(unsigned int)glow_eDrawType_Color271, "GreenLow1"},
+                                            {(unsigned int)glow_eDrawType_Color272, "GreenLow2"},
+                                            {(unsigned int)glow_eDrawType_Color273, "GreenLow3"},
+                                            {(unsigned int)glow_eDrawType_Color274, "GreenLow4"},
+                                            {(unsigned int)glow_eDrawType_Color275, "GreenLow5"},
+                                            {(unsigned int)glow_eDrawType_Color276, "GreenLow6"},
+                                            {(unsigned int)glow_eDrawType_Color277, "GreenLow7"},
+                                            {(unsigned int)glow_eDrawType_Color278, "GreenLow8"},
+                                            {(unsigned int)glow_eDrawType_Color279, "GreenLow9"},
+                                            {(unsigned int)glow_eDrawType_Color280, "GreenLow10"},
+                                            {(unsigned int)glow_eDrawType_Color281, "GreenMedium1"},
+                                            {(unsigned int)glow_eDrawType_Color282, "GreenMedium2"},
+                                            {(unsigned int)glow_eDrawType_Color283, "GreenMedium3"},
+                                            {(unsigned int)glow_eDrawType_Color284, "GreenMedium4"},
+                                            {(unsigned int)glow_eDrawType_Color285, "GreenMedium5"},
+                                            {(unsigned int)glow_eDrawType_Color286, "GreenMedium6"},
+                                            {(unsigned int)glow_eDrawType_Color287, "GreenMedium7"},
+                                            {(unsigned int)glow_eDrawType_Color288, "GreenMedium8"},
+                                            {(unsigned int)glow_eDrawType_Color289, "GreenMedium9"},
+                                            {(unsigned int)glow_eDrawType_Color290, "GreenMedium10"},
+                                            {(unsigned int)glow_eDrawType_Color291, "GreenHigh1"},
+                                            {(unsigned int)glow_eDrawType_Color292, "GreenHigh2"},
+                                            {(unsigned int)glow_eDrawType_Color293, "GreenHigh3"},
+                                            {(unsigned int)glow_eDrawType_Color294, "GreenHigh4"},
+                                            {(unsigned int)glow_eDrawType_Color295, "GreenHigh5"},
+                                            {(unsigned int)glow_eDrawType_Color296, "GreenHigh6"},
+                                            {(unsigned int)glow_eDrawType_Color297, "GreenHigh7"},
+                                            {(unsigned int)glow_eDrawType_Color298, "GreenHigh8"},
+                                            {(unsigned int)glow_eDrawType_Color299, "GreenHigh9"},
+                                            {(unsigned int)glow_eDrawType_Color300, "GreenHigh10"},
+                                            {(unsigned int)glow_eDrawType_LineErase, "Background"},
+                                            {(unsigned int)glow_eDrawType_CustomColor1, "CustomColor1"},
+                                            {(unsigned int)glow_eDrawType_CustomColor2, "CustomColor2"},
+                                            {(unsigned int)glow_eDrawType_CustomColor3, "CustomColor3"},
+                                            {(unsigned int)glow_eDrawType_CustomColor4, "CustomColor4"},
+                                            {(unsigned int)glow_eDrawType_CustomColor5, "CustomColor5"},
+                                            {(unsigned int)glow_eDrawType_CustomColor6, "CustomColor6"},
+                                            {(unsigned int)glow_eDrawType_CustomColor7, "CustomColor7"},
+                                            {(unsigned int)glow_eDrawType_CustomColor8, "CustomColor8"},
+                                            {(unsigned int)glow_eDrawType_CustomColor9, "CustomColor9"},
+                                            {(unsigned int)glow_eDrawType_CustomColor10, "CustomColor10"},
+                                            {(unsigned int)glow_eDrawType_CustomColor11, "CustomColor11"},
+                                            {(unsigned int)glow_eDrawType_CustomColor12, "CustomColor12"},
+                                            {(unsigned int)glow_eDrawType_CustomColor13, "CustomColor13"},
+                                            {(unsigned int)glow_eDrawType_CustomColor14, "CustomColor14"},
+                                            {(unsigned int)glow_eDrawType_CustomColor15, "CustomColor15"},
+                                            {(unsigned int)glow_eDrawType_CustomColor16, "CustomColor16"},
+                                            {(unsigned int)glow_eDrawType_CustomColor17, "CustomColor17"},
+                                            {(unsigned int)glow_eDrawType_CustomColor18, "CustomColor18"},
+                                            {(unsigned int)glow_eDrawType_CustomColor19, "CustomColor19"},
+                                            {(unsigned int)glow_eDrawType_CustomColor20, "CustomColor20"},
+                                            {(unsigned int)glow_eDrawType_CustomColor21, "CustomColor21"},
+                                            {(unsigned int)glow_eDrawType_CustomColor22, "CustomColor22"},
+                                            {(unsigned int)glow_eDrawType_CustomColor23, "CustomColor23"},
+                                            {(unsigned int)glow_eDrawType_CustomColor24, "CustomColor24"},
+                                            {(unsigned int)glow_eDrawType_CustomColor25, "CustomColor25"},
+                                            {(unsigned int)glow_eDrawType_CustomColor26, "CustomColor26"},
+                                            {(unsigned int)glow_eDrawType_CustomColor27, "CustomColor27"},
+                                            {(unsigned int)glow_eDrawType_CustomColor28, "CustomColor28"},
+                                            {(unsigned int)glow_eDrawType_CustomColor29, "CustomColor29"},
+                                            {(unsigned int)glow_eDrawType_CustomColor30, "CustomColor30"},
+                                            {(unsigned int)glow_eDrawType_CustomColor31, "CustomColor31"},
+                                            {(unsigned int)glow_eDrawType_CustomColor32, "CustomColor32"},
+                                            {(unsigned int)glow_eDrawType_CustomColor33, "CustomColor33"},
+                                            {(unsigned int)glow_eDrawType_CustomColor34, "CustomColor34"},
+                                            {(unsigned int)glow_eDrawType_CustomColor35, "CustomColor35"},
+                                            {(unsigned int)glow_eDrawType_CustomColor36, "CustomColor36"},
+                                            {(unsigned int)glow_eDrawType_CustomColor37, "CustomColor37"},
+                                            {(unsigned int)glow_eDrawType_CustomColor38, "CustomColor38"},
+                                            {(unsigned int)glow_eDrawType_CustomColor39, "CustomColor39"},
+                                            {(unsigned int)glow_eDrawType_CustomColor40, "CustomColor40"},
+                                            {(unsigned int)glow_eDrawType_CustomColor41, "CustomColor41"},
+                                            {(unsigned int)glow_eDrawType_CustomColor42, "CustomColor42"},
+                                            {(unsigned int)glow_eDrawType_CustomColor43, "CustomColor43"},
+                                            {(unsigned int)glow_eDrawType_CustomColor44, "CustomColor44"},
+                                            {(unsigned int)glow_eDrawType_CustomColor45, "CustomColor45"},
+                                            {(unsigned int)glow_eDrawType_CustomColor46, "CustomColor46"},
+                                            {(unsigned int)glow_eDrawType_CustomColor47, "CustomColor47"},
+                                            {(unsigned int)glow_eDrawType_CustomColor48, "CustomColor48"},
+                                            {(unsigned int)glow_eDrawType_CustomColor49, "CustomColor49"},
+                                            {(unsigned int)glow_eDrawType_CustomColor50, "CustomColor50"},
+                                            {(unsigned int)glow_eDrawType_CustomColor51, "CustomColor51"},
+                                            {(unsigned int)glow_eDrawType_CustomColor52, "CustomColor52"},
+                                            {(unsigned int)glow_eDrawType_CustomColor53, "CustomColor53"},
+                                            {(unsigned int)glow_eDrawType_CustomColor54, "CustomColor54"},
+                                            {(unsigned int)glow_eDrawType_CustomColor55, "CustomColor55"},
+                                            {(unsigned int)glow_eDrawType_CustomColor56, "CustomColor56"},
+                                            {(unsigned int)glow_eDrawType_CustomColor57, "CustomColor57"},
+                                            {(unsigned int)glow_eDrawType_CustomColor58, "CustomColor58"},
+                                            {(unsigned int)glow_eDrawType_CustomColor59, "CustomColor59"},
+                                            {(unsigned int)glow_eDrawType_CustomColor60, "CustomColor60"},
+                                            {(unsigned int)glow_eDrawType_CustomColor61, "CustomColor61"},
+                                            {(unsigned int)glow_eDrawType_CustomColor62, "CustomColor62"},
+                                            {(unsigned int)glow_eDrawType_CustomColor63, "CustomColor63"},
+                                            {(unsigned int)glow_eDrawType_CustomColor64, "CustomColor64"},
+                                            {(unsigned int)glow_eDrawType_CustomColor65, "CustomColor65"},
+                                            {(unsigned int)glow_eDrawType_CustomColor66, "CustomColor66"},
+                                            {(unsigned int)glow_eDrawType_CustomColor67, "CustomColor67"},
+                                            {(unsigned int)glow_eDrawType_CustomColor68, "CustomColor68"},
+                                            {(unsigned int)glow_eDrawType_CustomColor69, "CustomColor69"},
+                                            {(unsigned int)glow_eDrawType_CustomColor70, "CustomColor70"},
+                                            {(unsigned int)glow_eDrawType_CustomColor71, "CustomColor71"},
+                                            {(unsigned int)glow_eDrawType_CustomColor72, "CustomColor72"},
+                                            {(unsigned int)glow_eDrawType_CustomColor73, "CustomColor73"},
+                                            {(unsigned int)glow_eDrawType_CustomColor74, "CustomColor74"},
+                                            {(unsigned int)glow_eDrawType_CustomColor75, "CustomColor75"},
+                                            {(unsigned int)glow_eDrawType_CustomColor76, "CustomColor76"},
+                                            {(unsigned int)glow_eDrawType_CustomColor77, "CustomColor77"},
+                                            {(unsigned int)glow_eDrawType_CustomColor78, "CustomColor78"},
+                                            {(unsigned int)glow_eDrawType_CustomColor79, "CustomColor79"},
+                                            {(unsigned int)glow_eDrawType_CustomColor80, "CustomColor80"},
+                                            {(unsigned int)glow_eDrawType_CustomColor81, "CustomColor81"},
+                                            {(unsigned int)glow_eDrawType_CustomColor82, "CustomColor82"},
+                                            {(unsigned int)glow_eDrawType_CustomColor83, "CustomColor83"},
+                                            {(unsigned int)glow_eDrawType_CustomColor84, "CustomColor84"},
+                                            {(unsigned int)glow_eDrawType_CustomColor85, "CustomColor85"},
+                                            {(unsigned int)glow_eDrawType_CustomColor86, "CustomColor86"},
+                                            {(unsigned int)glow_eDrawType_CustomColor87, "CustomColor87"},
+                                            {(unsigned int)glow_eDrawType_CustomColor88, "CustomColor88"},
+                                            {(unsigned int)glow_eDrawType_CustomColor89, "CustomColor89"},
+                                            {(unsigned int)glow_eDrawType_CustomColor90, "CustomColor90"},
+                                            {(unsigned int)glow_eDrawType_Inherit, "Inherit"},
+                                            {0, ""}};
 
-static attrnav_sEnumElement elem_tone[]
-    = { { (unsigned int)glow_eDrawTone_No, "No" },
-        { (unsigned int)glow_eDrawTone_Gray, "Gray" },
-        { (unsigned int)glow_eDrawTone_YellowGreen, "YellowGreen" },
-        { (unsigned int)glow_eDrawTone_Yellow, "Yellow" },
-        { (unsigned int)glow_eDrawTone_Orange, "Orange" },
-        { (unsigned int)glow_eDrawTone_Red, "Red" },
-        { (unsigned int)glow_eDrawTone_Magenta, "Magenta" },
-        { (unsigned int)glow_eDrawTone_Blue, "Blue" },
-        { (unsigned int)glow_eDrawTone_Seablue, "Seablue" },
-        { (unsigned int)glow_eDrawTone_Green, "Green" },
-        { (unsigned int)glow_eDrawTone_DarkGray, "DarkGray" }, { 0, "" } };
+static attrnav_sEnumElement elem_tone[] = {{(unsigned int)glow_eDrawTone_No, "No"},
+                                           {(unsigned int)glow_eDrawTone_Gray, "Gray"},
+                                           {(unsigned int)glow_eDrawTone_YellowGreen, "YellowGreen"},
+                                           {(unsigned int)glow_eDrawTone_Yellow, "Yellow"},
+                                           {(unsigned int)glow_eDrawTone_Orange, "Orange"},
+                                           {(unsigned int)glow_eDrawTone_Red, "Red"},
+                                           {(unsigned int)glow_eDrawTone_Magenta, "Magenta"},
+                                           {(unsigned int)glow_eDrawTone_Blue, "Blue"},
+                                           {(unsigned int)glow_eDrawTone_Seablue, "Seablue"},
+                                           {(unsigned int)glow_eDrawTone_Green, "Green"},
+                                           {(unsigned int)glow_eDrawTone_DarkGray, "DarkGray"},
+                                           {0, ""}};
 
 static attrnav_sEnumElement elem_tone_or_color[] = {
-  { (unsigned int)glow_eDrawTone_No, "NoTone" },
-  { (unsigned int)glow_eDrawTone_Gray, "ToneGray" },
-  { (unsigned int)glow_eDrawTone_YellowGreen, "ToneYellowGreen" },
-  { (unsigned int)glow_eDrawTone_Yellow, "ToneYellow" },
-  { (unsigned int)glow_eDrawTone_Orange, "ToneOrange" },
-  { (unsigned int)glow_eDrawTone_Red, "ToneRed" },
-  { (unsigned int)glow_eDrawTone_Magenta, "ToneMagenta" },
-  { (unsigned int)glow_eDrawTone_Blue, "ToneBlue" },
-  { (unsigned int)glow_eDrawTone_Seablue, "ToneSeablue" },
-  { (unsigned int)glow_eDrawTone_Green, "ToneGreen" },
-  { (unsigned int)glow_eDrawTone_DarkGray, "ToneDarkGray" },
-  { (unsigned int)glow_eDrawTone_LightGray, "ToneLightGray" },
-  { (unsigned int)glow_eDrawTone_LightGrayHighSaturation,
-      "ToneLightLightGray" },
-  { (unsigned int)glow_eDrawTone_DarkGrayHighSaturation, "ToneDarkDarkGray" },
-  { (unsigned int)glow_eDrawTone_DarkYellowGreen, "ToneDarkYellowGreen" },
-  { (unsigned int)glow_eDrawTone_LightYellowGreen, "ToneLightYellowGreen" },
-  { (unsigned int)glow_eDrawTone_YellowGreenHighSaturation,
-      "ToneYellowGreenHighSaturation" },
-  { (unsigned int)glow_eDrawTone_YellowGreenLowSaturation,
-      "ToneYellowGreenLowSaturation" },
-  { (unsigned int)glow_eDrawTone_DarkYellowGreenHighSaturation,
-      "ToneDarkYellowGreenHighSaturation" },
-  { (unsigned int)glow_eDrawTone_DarkYellowGreenLowSaturation,
-      "ToneDarkYellowGreenLowSaturation" },
-  { (unsigned int)glow_eDrawTone_LightYellowGreenHighSaturation,
-      "ToneLightYellowGreenHighSaturation" },
-  { (unsigned int)glow_eDrawTone_LightYellowGreenLowSaturation,
-      "ToneLightYellowGreenLowSaturation" },
-  { (unsigned int)glow_eDrawTone_DarkYellow, "ToneDarkYellow" },
-  { (unsigned int)glow_eDrawTone_LightYellow, "ToneLightYellow" },
-  { (unsigned int)glow_eDrawTone_YellowHighSaturation,
-      "ToneYellowHighSaturation" },
-  { (unsigned int)glow_eDrawTone_YellowLowSaturation,
-      "ToneYellowLowSaturation" },
-  { (unsigned int)glow_eDrawTone_DarkYellowHighSaturation,
-      "ToneDarkYellowHighSaturation" },
-  { (unsigned int)glow_eDrawTone_DarkYellowLowSaturation,
-      "ToneDarkYellowLowSaturation" },
-  { (unsigned int)glow_eDrawTone_LightYellowHighSaturation,
-      "ToneLightYellowHighSaturation" },
-  { (unsigned int)glow_eDrawTone_LightYellowLowSaturation,
-      "ToneLightYellowLowSaturation" },
-  { (unsigned int)glow_eDrawTone_DarkOrange, "ToneDarkOrange" },
-  { (unsigned int)glow_eDrawTone_LightOrange, "ToneLightOrange" },
-  { (unsigned int)glow_eDrawTone_OrangeHighSaturation,
-      "ToneOrangeHighSaturation" },
-  { (unsigned int)glow_eDrawTone_OrangeLowSaturation,
-      "ToneOrangeLowSaturation" },
-  { (unsigned int)glow_eDrawTone_DarkOrangeHighSaturation,
-      "ToneDarkOrangeHighSaturation" },
-  { (unsigned int)glow_eDrawTone_DarkOrangeLowSaturation,
-      "ToneDarkOrangeLowSaturation" },
-  { (unsigned int)glow_eDrawTone_LightOrangeHighSaturation,
-      "ToneLightOrangeHighSaturation" },
-  { (unsigned int)glow_eDrawTone_LightOrangeLowSaturation,
-      "ToneLightOrangeLowSaturation" },
-  { (unsigned int)glow_eDrawTone_DarkRed, "ToneDarkRed" },
-  { (unsigned int)glow_eDrawTone_LightRed, "ToneLightRed" },
-  { (unsigned int)glow_eDrawTone_RedHighSaturation, "ToneRedHighSaturation" },
-  { (unsigned int)glow_eDrawTone_RedLowSaturation, "ToneRedLowSaturation" },
-  { (unsigned int)glow_eDrawTone_DarkRedHighSaturation,
-      "ToneDarkRedHighSaturation" },
-  { (unsigned int)glow_eDrawTone_DarkRedLowSaturation,
-      "ToneDarkRedLowSaturation" },
-  { (unsigned int)glow_eDrawTone_LightRedHighSaturation,
-      "ToneLightRedHighSaturation" },
-  { (unsigned int)glow_eDrawTone_LightRedLowSaturation,
-      "ToneLightRedLowSaturation" },
-  { (unsigned int)glow_eDrawTone_DarkMagenta, "ToneDarkMagenta" },
-  { (unsigned int)glow_eDrawTone_LightMagenta, "ToneLightMagenta" },
-  { (unsigned int)glow_eDrawTone_MagentaHighSaturation,
-      "ToneMagentaHighSaturation" },
-  { (unsigned int)glow_eDrawTone_MagentaLowSaturation,
-      "ToneMagentaLowSaturation" },
-  { (unsigned int)glow_eDrawTone_DarkMagentaHighSaturation,
-      "ToneDarkMagentaHighSaturation" },
-  { (unsigned int)glow_eDrawTone_DarkMagentaLowSaturation,
-      "ToneDarkMagentaLowSaturation" },
-  { (unsigned int)glow_eDrawTone_LightMagentaHighSaturation,
-      "ToneLightMagentaHighSaturation" },
-  { (unsigned int)glow_eDrawTone_LightMagentaLowSaturation,
-      "ToneLightMagentaLowSaturation" },
-  { (unsigned int)glow_eDrawTone_DarkBlue, "ToneDarkBlue" },
-  { (unsigned int)glow_eDrawTone_LightBlue, "ToneLightBlue" },
-  { (unsigned int)glow_eDrawTone_BlueHighSaturation, "ToneBlueHighSaturation" },
-  { (unsigned int)glow_eDrawTone_BlueLowSaturation, "ToneBlueLowSaturation" },
-  { (unsigned int)glow_eDrawTone_DarkBlueHighSaturation,
-      "ToneDarkBlueHighSaturation" },
-  { (unsigned int)glow_eDrawTone_DarkBlueLowSaturation,
-      "ToneDarkBlueLowSaturation" },
-  { (unsigned int)glow_eDrawTone_LightBlueHighSaturation,
-      "ToneLightBlueHighSaturation" },
-  { (unsigned int)glow_eDrawTone_LightBlueLowSaturation,
-      "ToneLightBlueLowSaturation" },
-  { (unsigned int)glow_eDrawTone_DarkSeablue, "ToneDarkSeablue" },
-  { (unsigned int)glow_eDrawTone_LightSeablue, "ToneLightSeablue" },
-  { (unsigned int)glow_eDrawTone_SeablueHighSaturation,
-      "ToneSeablueHighSaturation" },
-  { (unsigned int)glow_eDrawTone_SeablueLowSaturation,
-      "ToneSeablueLowSaturation" },
-  { (unsigned int)glow_eDrawTone_DarkSeablueHighSaturation,
-      "ToneDarkSeablueHighSaturation" },
-  { (unsigned int)glow_eDrawTone_DarkSeablueLowSaturation,
-      "ToneDarkSeablueLowSaturation" },
-  { (unsigned int)glow_eDrawTone_LightSeablueHighSaturation,
-      "ToneLightSeablueHighSaturation" },
-  { (unsigned int)glow_eDrawTone_LightSeablueLowSaturation,
-      "ToneLightSeablueLowSaturation" },
-  { (unsigned int)glow_eDrawTone_DarkGreen, "ToneDarkGreen" },
-  { (unsigned int)glow_eDrawTone_LightGreen, "ToneLightGreen" },
-  { (unsigned int)glow_eDrawTone_GreenHighSaturation,
-      "ToneGreenHighSaturation" },
-  { (unsigned int)glow_eDrawTone_GreenLowSaturation, "ToneGreenLowSaturation" },
-  { (unsigned int)glow_eDrawTone_DarkGreenHighSaturation,
-      "ToneDarkGreenHighSaturation" },
-  { (unsigned int)glow_eDrawTone_DarkGreenLowSaturation,
-      "ToneDarkGreenLowSaturation" },
-  { (unsigned int)glow_eDrawTone_LightGreenHighSaturation,
-      "ToneLightGreenHighSaturation" },
-  { (unsigned int)glow_eDrawTone_LightGreenLowSaturation,
-      "ToneLightGreenLowSaturation" },
-  { (unsigned int)glow_eDrawType_Color82, "YellowGreenHigh2" },
-  { (unsigned int)glow_eDrawType_Color83, "YellowGreenHigh3" },
-  { (unsigned int)glow_eDrawType_Color84, "YellowGreenHigh4" },
-  { (unsigned int)glow_eDrawType_Color85, "YellowGreenHigh5" },
-  { (unsigned int)glow_eDrawType_Color86, "YellowGreenHigh6" },
-  { (unsigned int)glow_eDrawType_Color87, "YellowGreenHigh7" },
-  { (unsigned int)glow_eDrawType_Color88, "YellowGreenHigh8" },
-  { (unsigned int)glow_eDrawType_Color89, "YellowGreenHigh9" },
-  { (unsigned int)glow_eDrawType_Color90, "YellowGreenHigh10" },
-  { (unsigned int)glow_eDrawType_Color91, "YellowLow1" },
-  { (unsigned int)glow_eDrawType_Color92, "YellowLow2" },
-  { (unsigned int)glow_eDrawType_Color93, "YellowLow3" },
-  { (unsigned int)glow_eDrawType_Color94, "YellowLow4" },
-  { (unsigned int)glow_eDrawType_Color95, "YellowLow5" },
-  { (unsigned int)glow_eDrawType_Color96, "YellowLow6" },
-  { (unsigned int)glow_eDrawType_Color97, "YellowLow7" },
-  { (unsigned int)glow_eDrawType_Color98, "YellowLow8" },
-  { (unsigned int)glow_eDrawType_Color99, "YellowLow9" },
-  { (unsigned int)glow_eDrawType_Color100, "YellowLow10" },
-  { (unsigned int)glow_eDrawType_Color101, "YellowMedium1" },
-  { (unsigned int)glow_eDrawType_Color102, "YellowMedium2" },
-  { (unsigned int)glow_eDrawType_Color103, "YellowMedium3" },
-  { (unsigned int)glow_eDrawType_Color104, "YellowMedium4" },
-  { (unsigned int)glow_eDrawType_Color105, "YellowMedium5" },
-  { (unsigned int)glow_eDrawType_Color106, "YellowMedium6" },
-  { (unsigned int)glow_eDrawType_Color107, "YellowMedium7" },
-  { (unsigned int)glow_eDrawType_Color108, "YellowMedium8" },
-  { (unsigned int)glow_eDrawType_Color109, "YellowMedium9" },
-  { (unsigned int)glow_eDrawType_Color110, "YellowMedium10" },
-  { (unsigned int)glow_eDrawType_Color111, "YellowHigh1" },
-  { (unsigned int)glow_eDrawType_Color112, "YellowHigh2" },
-  { (unsigned int)glow_eDrawType_Color113, "YellowHigh3" },
-  { (unsigned int)glow_eDrawType_Color114, "YellowHigh4" },
-  { (unsigned int)glow_eDrawType_Color115, "YellowHigh5" },
-  { (unsigned int)glow_eDrawType_Color116, "YellowHigh6" },
-  { (unsigned int)glow_eDrawType_Color117, "YellowHigh7" },
-  { (unsigned int)glow_eDrawType_Color118, "YellowHigh8" },
-  { (unsigned int)glow_eDrawType_Color119, "YellowHigh9" },
-  { (unsigned int)glow_eDrawType_Color120, "YellowHigh10" },
-  { (unsigned int)glow_eDrawType_Color121, "OrangeLow1" },
-  { (unsigned int)glow_eDrawType_Color122, "OrangeLow2" },
-  { (unsigned int)glow_eDrawType_Color123, "OrangeLow3" },
-  { (unsigned int)glow_eDrawType_Color124, "OrangeLow4" },
-  { (unsigned int)glow_eDrawType_Color125, "OrangeLow5" },
-  { (unsigned int)glow_eDrawType_Color126, "OrangeLow6" },
-  { (unsigned int)glow_eDrawType_Color127, "OrangeLow7" },
-  { (unsigned int)glow_eDrawType_Color128, "OrangeLow8" },
-  { (unsigned int)glow_eDrawType_Color129, "OrangeLow9" },
-  { (unsigned int)glow_eDrawType_Color130, "OrangeLow10" },
-  { (unsigned int)glow_eDrawType_Color131, "OrangeMedium1" },
-  { (unsigned int)glow_eDrawType_Color132, "OrangeMedium2" },
-  { (unsigned int)glow_eDrawType_Color133, "OrangeMedium3" },
-  { (unsigned int)glow_eDrawType_Color134, "OrangeMedium4" },
-  { (unsigned int)glow_eDrawType_Color135, "OrangeMedium5" },
-  { (unsigned int)glow_eDrawType_Color136, "OrangeMedium6" },
-  { (unsigned int)glow_eDrawType_Color137, "OrangeMedium7" },
-  { (unsigned int)glow_eDrawType_Color138, "OrangeMedium8" },
-  { (unsigned int)glow_eDrawType_Color139, "OrangeMedium9" },
-  { (unsigned int)glow_eDrawType_Color140, "OrangeMedium10" },
-  { (unsigned int)glow_eDrawType_Color141, "OrangeHigh1" },
-  { (unsigned int)glow_eDrawType_Color142, "OrangeHigh2" },
-  { (unsigned int)glow_eDrawType_Color143, "OrangeHigh3" },
-  { (unsigned int)glow_eDrawType_Color144, "OrangeHigh4" },
-  { (unsigned int)glow_eDrawType_Color145, "OrangeHigh5" },
-  { (unsigned int)glow_eDrawType_Color146, "OrangeHigh6" },
-  { (unsigned int)glow_eDrawType_Color147, "OrangeHigh7" },
-  { (unsigned int)glow_eDrawType_Color148, "OrangeHigh8" },
-  { (unsigned int)glow_eDrawType_Color149, "OrangeHigh9" },
-  { (unsigned int)glow_eDrawType_Color150, "OrangeHigh10" },
-  { (unsigned int)glow_eDrawType_Color151, "RedLow1" },
-  { (unsigned int)glow_eDrawType_Color152, "RedLow2" },
-  { (unsigned int)glow_eDrawType_Color153, "RedLow3" },
-  { (unsigned int)glow_eDrawType_Color154, "RedLow4" },
-  { (unsigned int)glow_eDrawType_Color155, "RedLow5" },
-  { (unsigned int)glow_eDrawType_Color156, "RedLow6" },
-  { (unsigned int)glow_eDrawType_Color157, "RedLow7" },
-  { (unsigned int)glow_eDrawType_Color158, "RedLow8" },
-  { (unsigned int)glow_eDrawType_Color159, "RedLow9" },
-  { (unsigned int)glow_eDrawType_Color160, "RedLow10" },
-  { (unsigned int)glow_eDrawType_Color161, "RedMedium1" },
-  { (unsigned int)glow_eDrawType_Color162, "RedMedium2" },
-  { (unsigned int)glow_eDrawType_Color163, "RedMedium3" },
-  { (unsigned int)glow_eDrawType_Color164, "RedMedium4" },
-  { (unsigned int)glow_eDrawType_Color165, "RedMedium5" },
-  { (unsigned int)glow_eDrawType_Color166, "RedMedium6" },
-  { (unsigned int)glow_eDrawType_Color167, "RedMedium7" },
-  { (unsigned int)glow_eDrawType_Color168, "RedMedium8" },
-  { (unsigned int)glow_eDrawType_Color169, "RedMedium9" },
-  { (unsigned int)glow_eDrawType_Color170, "RedMedium10" },
-  { (unsigned int)glow_eDrawType_Color171, "RedHigh1" },
-  { (unsigned int)glow_eDrawType_Color172, "RedHigh2" },
-  { (unsigned int)glow_eDrawType_Color173, "RedHigh3" },
-  { (unsigned int)glow_eDrawType_Color174, "RedHigh4" },
-  { (unsigned int)glow_eDrawType_Color175, "RedHigh5" },
-  { (unsigned int)glow_eDrawType_Color176, "RedHigh6" },
-  { (unsigned int)glow_eDrawType_Color177, "RedHigh7" },
-  { (unsigned int)glow_eDrawType_Color178, "RedHigh8" },
-  { (unsigned int)glow_eDrawType_Color179, "RedHigh9" },
-  { (unsigned int)glow_eDrawType_Color180, "RedHigh10" },
-  { (unsigned int)glow_eDrawType_Color181, "MagentaLow1" },
-  { (unsigned int)glow_eDrawType_Color182, "MagentaLow2" },
-  { (unsigned int)glow_eDrawType_Color183, "MagentaLow3" },
-  { (unsigned int)glow_eDrawType_Color184, "MagentaLow4" },
-  { (unsigned int)glow_eDrawType_Color185, "MagentaLow5" },
-  { (unsigned int)glow_eDrawType_Color186, "MagentaLow6" },
-  { (unsigned int)glow_eDrawType_Color187, "MagentaLow7" },
-  { (unsigned int)glow_eDrawType_Color188, "MagentaLow8" },
-  { (unsigned int)glow_eDrawType_Color189, "MagentaLow9" },
-  { (unsigned int)glow_eDrawType_Color190, "MagentaLow10" },
-  { (unsigned int)glow_eDrawType_Color191, "MagentaMedium1" },
-  { (unsigned int)glow_eDrawType_Color192, "MagentaMedium2" },
-  { (unsigned int)glow_eDrawType_Color193, "MagentaMedium3" },
-  { (unsigned int)glow_eDrawType_Color194, "MagentaMedium4" },
-  { (unsigned int)glow_eDrawType_Color195, "MagentaMedium5" },
-  { (unsigned int)glow_eDrawType_Color196, "MagentaMedium6" },
-  { (unsigned int)glow_eDrawType_Color197, "MagentaMedium7" },
-  { (unsigned int)glow_eDrawType_Color198, "MagentaMedium8" },
-  { (unsigned int)glow_eDrawType_Color199, "MagentaMedium9" },
-  { (unsigned int)glow_eDrawType_Color200, "MagentaMedium10" },
-  { (unsigned int)glow_eDrawType_Color201, "MagentaHigh1" },
-  { (unsigned int)glow_eDrawType_Color202, "MagentaHigh2" },
-  { (unsigned int)glow_eDrawType_Color203, "MagentaHigh3" },
-  { (unsigned int)glow_eDrawType_Color204, "MagentaHigh4" },
-  { (unsigned int)glow_eDrawType_Color205, "MagentaHigh5" },
-  { (unsigned int)glow_eDrawType_Color206, "MagentaHigh6" },
-  { (unsigned int)glow_eDrawType_Color207, "MagentaHigh7" },
-  { (unsigned int)glow_eDrawType_Color208, "MagentaHigh8" },
-  { (unsigned int)glow_eDrawType_Color209, "MagentaHigh9" },
-  { (unsigned int)glow_eDrawType_Color210, "MagentaHigh10" },
-  { (unsigned int)glow_eDrawType_Color211, "BlueLow1" },
-  { (unsigned int)glow_eDrawType_Color212, "BlueLow2" },
-  { (unsigned int)glow_eDrawType_Color213, "BlueLow3" },
-  { (unsigned int)glow_eDrawType_Color214, "BlueLow4" },
-  { (unsigned int)glow_eDrawType_Color215, "BlueLow5" },
-  { (unsigned int)glow_eDrawType_Color216, "BlueLow6" },
-  { (unsigned int)glow_eDrawType_Color217, "BlueLow7" },
-  { (unsigned int)glow_eDrawType_Color218, "BlueLow8" },
-  { (unsigned int)glow_eDrawType_Color219, "BlueLow9" },
-  { (unsigned int)glow_eDrawType_Color220, "BlueLow10" },
-  { (unsigned int)glow_eDrawType_Color221, "BlueMedium1" },
-  { (unsigned int)glow_eDrawType_Color222, "BlueMedium2" },
-  { (unsigned int)glow_eDrawType_Color223, "BlueMedium3" },
-  { (unsigned int)glow_eDrawType_Color224, "BlueMedium4" },
-  { (unsigned int)glow_eDrawType_Color225, "BlueMedium5" },
-  { (unsigned int)glow_eDrawType_Color226, "BlueMedium6" },
-  { (unsigned int)glow_eDrawType_Color227, "BlueMedium7" },
-  { (unsigned int)glow_eDrawType_Color228, "BlueMedium8" },
-  { (unsigned int)glow_eDrawType_Color229, "BlueMedium9" },
-  { (unsigned int)glow_eDrawType_Color230, "BlueMedium10" },
-  { (unsigned int)glow_eDrawType_Color231, "BlueHigh1" },
-  { (unsigned int)glow_eDrawType_Color232, "BlueHigh2" },
-  { (unsigned int)glow_eDrawType_Color233, "BlueHigh3" },
-  { (unsigned int)glow_eDrawType_Color234, "BlueHigh4" },
-  { (unsigned int)glow_eDrawType_Color235, "BlueHigh5" },
-  { (unsigned int)glow_eDrawType_Color236, "BlueHigh6" },
-  { (unsigned int)glow_eDrawType_Color237, "BlueHigh7" },
-  { (unsigned int)glow_eDrawType_Color238, "BlueHigh8" },
-  { (unsigned int)glow_eDrawType_Color239, "BlueHigh9" },
-  { (unsigned int)glow_eDrawType_Color240, "BlueHigh10" },
-  { (unsigned int)glow_eDrawType_Color241, "SeaBlueLow1" },
-  { (unsigned int)glow_eDrawType_Color242, "SeaBlueLow2" },
-  { (unsigned int)glow_eDrawType_Color243, "SeaBlueLow3" },
-  { (unsigned int)glow_eDrawType_Color244, "SeaBlueLow4" },
-  { (unsigned int)glow_eDrawType_Color245, "SeaBlueLow5" },
-  { (unsigned int)glow_eDrawType_Color246, "SeaBlueLow6" },
-  { (unsigned int)glow_eDrawType_Color247, "SeaBlueLow7" },
-  { (unsigned int)glow_eDrawType_Color248, "SeaBlueLow8" },
-  { (unsigned int)glow_eDrawType_Color249, "SeaBlueLow9" },
-  { (unsigned int)glow_eDrawType_Color250, "SeaBlueLow10" },
-  { (unsigned int)glow_eDrawType_Color251, "SeaBlueMedium1" },
-  { (unsigned int)glow_eDrawType_Color252, "SeaBlueMedium2" },
-  { (unsigned int)glow_eDrawType_Color253, "SeaBlueMedium3" },
-  { (unsigned int)glow_eDrawType_Color224, "SeaBlueMedium4" },
-  { (unsigned int)glow_eDrawType_Color255, "SeaBlueMedium5" },
-  { (unsigned int)glow_eDrawType_Color256, "SeaBlueMedium6" },
-  { (unsigned int)glow_eDrawType_Color257, "SeaBlueMedium7" },
-  { (unsigned int)glow_eDrawType_Color258, "SeaBlueMedium8" },
-  { (unsigned int)glow_eDrawType_Color259, "SeaBlueMedium9" },
-  { (unsigned int)glow_eDrawType_Color260, "SeaBlueMedium10" },
-  { (unsigned int)glow_eDrawType_Color261, "SeaBlueHigh1" },
-  { (unsigned int)glow_eDrawType_Color262, "SeaBlueHigh2" },
-  { (unsigned int)glow_eDrawType_Color263, "SeaBlueHigh3" },
-  { (unsigned int)glow_eDrawType_Color264, "SeaBlueHigh4" },
-  { (unsigned int)glow_eDrawType_Color265, "SeaBlueHigh5" },
-  { (unsigned int)glow_eDrawType_Color266, "SeaBlueHigh6" },
-  { (unsigned int)glow_eDrawType_Color267, "SeaBlueHigh7" },
-  { (unsigned int)glow_eDrawType_Color268, "SeaBlueHigh8" },
-  { (unsigned int)glow_eDrawType_Color269, "SeaBlueHigh9" },
-  { (unsigned int)glow_eDrawType_Color270, "SeaBlueHigh10" },
-  { (unsigned int)glow_eDrawType_Color271, "GreenLow1" },
-  { (unsigned int)glow_eDrawType_Color272, "GreenLow2" },
-  { (unsigned int)glow_eDrawType_Color273, "GreenLow3" },
-  { (unsigned int)glow_eDrawType_Color274, "GreenLow4" },
-  { (unsigned int)glow_eDrawType_Color275, "GreenLow5" },
-  { (unsigned int)glow_eDrawType_Color276, "GreenLow6" },
-  { (unsigned int)glow_eDrawType_Color277, "GreenLow7" },
-  { (unsigned int)glow_eDrawType_Color278, "GreenLow8" },
-  { (unsigned int)glow_eDrawType_Color279, "GreenLow9" },
-  { (unsigned int)glow_eDrawType_Color280, "GreenLow10" },
-  { (unsigned int)glow_eDrawType_Color281, "GreenMedium1" },
-  { (unsigned int)glow_eDrawType_Color282, "GreenMedium2" },
-  { (unsigned int)glow_eDrawType_Color283, "GreenMedium3" },
-  { (unsigned int)glow_eDrawType_Color284, "GreenMedium4" },
-  { (unsigned int)glow_eDrawType_Color285, "GreenMedium5" },
-  { (unsigned int)glow_eDrawType_Color286, "GreenMedium6" },
-  { (unsigned int)glow_eDrawType_Color287, "GreenMedium7" },
-  { (unsigned int)glow_eDrawType_Color288, "GreenMedium8" },
-  { (unsigned int)glow_eDrawType_Color289, "GreenMedium9" },
-  { (unsigned int)glow_eDrawType_Color290, "GreenMedium10" },
-  { (unsigned int)glow_eDrawType_Color291, "GreenHigh1" },
-  { (unsigned int)glow_eDrawType_Color292, "GreenHigh2" },
-  { (unsigned int)glow_eDrawType_Color293, "GreenHigh3" },
-  { (unsigned int)glow_eDrawType_Color294, "GreenHigh4" },
-  { (unsigned int)glow_eDrawType_Color295, "GreenHigh5" },
-  { (unsigned int)glow_eDrawType_Color296, "GreenHigh6" },
-  { (unsigned int)glow_eDrawType_Color297, "GreenHigh7" },
-  { (unsigned int)glow_eDrawType_Color298, "GreenHigh8" },
-  { (unsigned int)glow_eDrawType_Color299, "GreenHigh9" },
-  { (unsigned int)glow_eDrawType_Color300, "GreenHigh10" },
-  { (unsigned int)glow_eDrawType_LineErase, "Background" },
-  { (unsigned int)glow_eDrawType_CustomColor1, "CustomColor1" },
-  { (unsigned int)glow_eDrawType_CustomColor2, "CustomColor2" },
-  { (unsigned int)glow_eDrawType_CustomColor3, "CustomColor3" },
-  { (unsigned int)glow_eDrawType_CustomColor4, "CustomColor4" },
-  { (unsigned int)glow_eDrawType_CustomColor5, "CustomColor5" },
-  { (unsigned int)glow_eDrawType_CustomColor6, "CustomColor6" },
-  { (unsigned int)glow_eDrawType_CustomColor7, "CustomColor7" },
-  { (unsigned int)glow_eDrawType_CustomColor8, "CustomColor8" },
-  { (unsigned int)glow_eDrawType_CustomColor9, "CustomColor9" },
-  { (unsigned int)glow_eDrawType_CustomColor10, "CustomColor10" },
-  { (unsigned int)glow_eDrawType_CustomColor11, "CustomColor11" },
-  { (unsigned int)glow_eDrawType_CustomColor12, "CustomColor12" },
-  { (unsigned int)glow_eDrawType_CustomColor13, "CustomColor13" },
-  { (unsigned int)glow_eDrawType_CustomColor14, "CustomColor14" },
-  { (unsigned int)glow_eDrawType_CustomColor15, "CustomColor15" },
-  { (unsigned int)glow_eDrawType_CustomColor16, "CustomColor16" },
-  { (unsigned int)glow_eDrawType_CustomColor17, "CustomColor17" },
-  { (unsigned int)glow_eDrawType_CustomColor18, "CustomColor18" },
-  { (unsigned int)glow_eDrawType_CustomColor19, "CustomColor19" },
-  { (unsigned int)glow_eDrawType_CustomColor20, "CustomColor20" },
-  { (unsigned int)glow_eDrawType_CustomColor21, "CustomColor21" },
-  { (unsigned int)glow_eDrawType_CustomColor22, "CustomColor22" },
-  { (unsigned int)glow_eDrawType_CustomColor23, "CustomColor23" },
-  { (unsigned int)glow_eDrawType_CustomColor24, "CustomColor24" },
-  { (unsigned int)glow_eDrawType_CustomColor25, "CustomColor25" },
-  { (unsigned int)glow_eDrawType_CustomColor26, "CustomColor26" },
-  { (unsigned int)glow_eDrawType_CustomColor27, "CustomColor27" },
-  { (unsigned int)glow_eDrawType_CustomColor28, "CustomColor28" },
-  { (unsigned int)glow_eDrawType_CustomColor29, "CustomColor29" },
-  { (unsigned int)glow_eDrawType_CustomColor30, "CustomColor30" },
-  { (unsigned int)glow_eDrawType_Inherit, "Inherit" }, { 0, "" }
-};
+    {(unsigned int)glow_eDrawTone_No, "NoTone"},
+    {(unsigned int)glow_eDrawTone_Gray, "ToneGray"},
+    {(unsigned int)glow_eDrawTone_YellowGreen, "ToneYellowGreen"},
+    {(unsigned int)glow_eDrawTone_Yellow, "ToneYellow"},
+    {(unsigned int)glow_eDrawTone_Orange, "ToneOrange"},
+    {(unsigned int)glow_eDrawTone_Red, "ToneRed"},
+    {(unsigned int)glow_eDrawTone_Magenta, "ToneMagenta"},
+    {(unsigned int)glow_eDrawTone_Blue, "ToneBlue"},
+    {(unsigned int)glow_eDrawTone_Seablue, "ToneSeablue"},
+    {(unsigned int)glow_eDrawTone_Green, "ToneGreen"},
+    {(unsigned int)glow_eDrawTone_DarkGray, "ToneDarkGray"},
+    {(unsigned int)glow_eDrawTone_LightGray, "ToneLightGray"},
+    {(unsigned int)glow_eDrawTone_LightGrayHighSaturation, "ToneLightLightGray"},
+    {(unsigned int)glow_eDrawTone_DarkGrayHighSaturation, "ToneDarkDarkGray"},
+    {(unsigned int)glow_eDrawTone_DarkYellowGreen, "ToneDarkYellowGreen"},
+    {(unsigned int)glow_eDrawTone_LightYellowGreen, "ToneLightYellowGreen"},
+    {(unsigned int)glow_eDrawTone_YellowGreenHighSaturation, "ToneYellowGreenHighSaturation"},
+    {(unsigned int)glow_eDrawTone_YellowGreenLowSaturation, "ToneYellowGreenLowSaturation"},
+    {(unsigned int)glow_eDrawTone_DarkYellowGreenHighSaturation, "ToneDarkYellowGreenHighSaturation"},
+    {(unsigned int)glow_eDrawTone_DarkYellowGreenLowSaturation, "ToneDarkYellowGreenLowSaturation"},
+    {(unsigned int)glow_eDrawTone_LightYellowGreenHighSaturation, "ToneLightYellowGreenHighSaturation"},
+    {(unsigned int)glow_eDrawTone_LightYellowGreenLowSaturation, "ToneLightYellowGreenLowSaturation"},
+    {(unsigned int)glow_eDrawTone_DarkYellow, "ToneDarkYellow"},
+    {(unsigned int)glow_eDrawTone_LightYellow, "ToneLightYellow"},
+    {(unsigned int)glow_eDrawTone_YellowHighSaturation, "ToneYellowHighSaturation"},
+    {(unsigned int)glow_eDrawTone_YellowLowSaturation, "ToneYellowLowSaturation"},
+    {(unsigned int)glow_eDrawTone_DarkYellowHighSaturation, "ToneDarkYellowHighSaturation"},
+    {(unsigned int)glow_eDrawTone_DarkYellowLowSaturation, "ToneDarkYellowLowSaturation"},
+    {(unsigned int)glow_eDrawTone_LightYellowHighSaturation, "ToneLightYellowHighSaturation"},
+    {(unsigned int)glow_eDrawTone_LightYellowLowSaturation, "ToneLightYellowLowSaturation"},
+    {(unsigned int)glow_eDrawTone_DarkOrange, "ToneDarkOrange"},
+    {(unsigned int)glow_eDrawTone_LightOrange, "ToneLightOrange"},
+    {(unsigned int)glow_eDrawTone_OrangeHighSaturation, "ToneOrangeHighSaturation"},
+    {(unsigned int)glow_eDrawTone_OrangeLowSaturation, "ToneOrangeLowSaturation"},
+    {(unsigned int)glow_eDrawTone_DarkOrangeHighSaturation, "ToneDarkOrangeHighSaturation"},
+    {(unsigned int)glow_eDrawTone_DarkOrangeLowSaturation, "ToneDarkOrangeLowSaturation"},
+    {(unsigned int)glow_eDrawTone_LightOrangeHighSaturation, "ToneLightOrangeHighSaturation"},
+    {(unsigned int)glow_eDrawTone_LightOrangeLowSaturation, "ToneLightOrangeLowSaturation"},
+    {(unsigned int)glow_eDrawTone_DarkRed, "ToneDarkRed"},
+    {(unsigned int)glow_eDrawTone_LightRed, "ToneLightRed"},
+    {(unsigned int)glow_eDrawTone_RedHighSaturation, "ToneRedHighSaturation"},
+    {(unsigned int)glow_eDrawTone_RedLowSaturation, "ToneRedLowSaturation"},
+    {(unsigned int)glow_eDrawTone_DarkRedHighSaturation, "ToneDarkRedHighSaturation"},
+    {(unsigned int)glow_eDrawTone_DarkRedLowSaturation, "ToneDarkRedLowSaturation"},
+    {(unsigned int)glow_eDrawTone_LightRedHighSaturation, "ToneLightRedHighSaturation"},
+    {(unsigned int)glow_eDrawTone_LightRedLowSaturation, "ToneLightRedLowSaturation"},
+    {(unsigned int)glow_eDrawTone_DarkMagenta, "ToneDarkMagenta"},
+    {(unsigned int)glow_eDrawTone_LightMagenta, "ToneLightMagenta"},
+    {(unsigned int)glow_eDrawTone_MagentaHighSaturation, "ToneMagentaHighSaturation"},
+    {(unsigned int)glow_eDrawTone_MagentaLowSaturation, "ToneMagentaLowSaturation"},
+    {(unsigned int)glow_eDrawTone_DarkMagentaHighSaturation, "ToneDarkMagentaHighSaturation"},
+    {(unsigned int)glow_eDrawTone_DarkMagentaLowSaturation, "ToneDarkMagentaLowSaturation"},
+    {(unsigned int)glow_eDrawTone_LightMagentaHighSaturation, "ToneLightMagentaHighSaturation"},
+    {(unsigned int)glow_eDrawTone_LightMagentaLowSaturation, "ToneLightMagentaLowSaturation"},
+    {(unsigned int)glow_eDrawTone_DarkBlue, "ToneDarkBlue"},
+    {(unsigned int)glow_eDrawTone_LightBlue, "ToneLightBlue"},
+    {(unsigned int)glow_eDrawTone_BlueHighSaturation, "ToneBlueHighSaturation"},
+    {(unsigned int)glow_eDrawTone_BlueLowSaturation, "ToneBlueLowSaturation"},
+    {(unsigned int)glow_eDrawTone_DarkBlueHighSaturation, "ToneDarkBlueHighSaturation"},
+    {(unsigned int)glow_eDrawTone_DarkBlueLowSaturation, "ToneDarkBlueLowSaturation"},
+    {(unsigned int)glow_eDrawTone_LightBlueHighSaturation, "ToneLightBlueHighSaturation"},
+    {(unsigned int)glow_eDrawTone_LightBlueLowSaturation, "ToneLightBlueLowSaturation"},
+    {(unsigned int)glow_eDrawTone_DarkSeablue, "ToneDarkSeablue"},
+    {(unsigned int)glow_eDrawTone_LightSeablue, "ToneLightSeablue"},
+    {(unsigned int)glow_eDrawTone_SeablueHighSaturation, "ToneSeablueHighSaturation"},
+    {(unsigned int)glow_eDrawTone_SeablueLowSaturation, "ToneSeablueLowSaturation"},
+    {(unsigned int)glow_eDrawTone_DarkSeablueHighSaturation, "ToneDarkSeablueHighSaturation"},
+    {(unsigned int)glow_eDrawTone_DarkSeablueLowSaturation, "ToneDarkSeablueLowSaturation"},
+    {(unsigned int)glow_eDrawTone_LightSeablueHighSaturation, "ToneLightSeablueHighSaturation"},
+    {(unsigned int)glow_eDrawTone_LightSeablueLowSaturation, "ToneLightSeablueLowSaturation"},
+    {(unsigned int)glow_eDrawTone_DarkGreen, "ToneDarkGreen"},
+    {(unsigned int)glow_eDrawTone_LightGreen, "ToneLightGreen"},
+    {(unsigned int)glow_eDrawTone_GreenHighSaturation, "ToneGreenHighSaturation"},
+    {(unsigned int)glow_eDrawTone_GreenLowSaturation, "ToneGreenLowSaturation"},
+    {(unsigned int)glow_eDrawTone_DarkGreenHighSaturation, "ToneDarkGreenHighSaturation"},
+    {(unsigned int)glow_eDrawTone_DarkGreenLowSaturation, "ToneDarkGreenLowSaturation"},
+    {(unsigned int)glow_eDrawTone_LightGreenHighSaturation, "ToneLightGreenHighSaturation"},
+    {(unsigned int)glow_eDrawTone_LightGreenLowSaturation, "ToneLightGreenLowSaturation"},
+    {(unsigned int)glow_eDrawType_Color82, "YellowGreenHigh2"},
+    {(unsigned int)glow_eDrawType_Color83, "YellowGreenHigh3"},
+    {(unsigned int)glow_eDrawType_Color84, "YellowGreenHigh4"},
+    {(unsigned int)glow_eDrawType_Color85, "YellowGreenHigh5"},
+    {(unsigned int)glow_eDrawType_Color86, "YellowGreenHigh6"},
+    {(unsigned int)glow_eDrawType_Color87, "YellowGreenHigh7"},
+    {(unsigned int)glow_eDrawType_Color88, "YellowGreenHigh8"},
+    {(unsigned int)glow_eDrawType_Color89, "YellowGreenHigh9"},
+    {(unsigned int)glow_eDrawType_Color90, "YellowGreenHigh10"},
+    {(unsigned int)glow_eDrawType_Color91, "YellowLow1"},
+    {(unsigned int)glow_eDrawType_Color92, "YellowLow2"},
+    {(unsigned int)glow_eDrawType_Color93, "YellowLow3"},
+    {(unsigned int)glow_eDrawType_Color94, "YellowLow4"},
+    {(unsigned int)glow_eDrawType_Color95, "YellowLow5"},
+    {(unsigned int)glow_eDrawType_Color96, "YellowLow6"},
+    {(unsigned int)glow_eDrawType_Color97, "YellowLow7"},
+    {(unsigned int)glow_eDrawType_Color98, "YellowLow8"},
+    {(unsigned int)glow_eDrawType_Color99, "YellowLow9"},
+    {(unsigned int)glow_eDrawType_Color100, "YellowLow10"},
+    {(unsigned int)glow_eDrawType_Color101, "YellowMedium1"},
+    {(unsigned int)glow_eDrawType_Color102, "YellowMedium2"},
+    {(unsigned int)glow_eDrawType_Color103, "YellowMedium3"},
+    {(unsigned int)glow_eDrawType_Color104, "YellowMedium4"},
+    {(unsigned int)glow_eDrawType_Color105, "YellowMedium5"},
+    {(unsigned int)glow_eDrawType_Color106, "YellowMedium6"},
+    {(unsigned int)glow_eDrawType_Color107, "YellowMedium7"},
+    {(unsigned int)glow_eDrawType_Color108, "YellowMedium8"},
+    {(unsigned int)glow_eDrawType_Color109, "YellowMedium9"},
+    {(unsigned int)glow_eDrawType_Color110, "YellowMedium10"},
+    {(unsigned int)glow_eDrawType_Color111, "YellowHigh1"},
+    {(unsigned int)glow_eDrawType_Color112, "YellowHigh2"},
+    {(unsigned int)glow_eDrawType_Color113, "YellowHigh3"},
+    {(unsigned int)glow_eDrawType_Color114, "YellowHigh4"},
+    {(unsigned int)glow_eDrawType_Color115, "YellowHigh5"},
+    {(unsigned int)glow_eDrawType_Color116, "YellowHigh6"},
+    {(unsigned int)glow_eDrawType_Color117, "YellowHigh7"},
+    {(unsigned int)glow_eDrawType_Color118, "YellowHigh8"},
+    {(unsigned int)glow_eDrawType_Color119, "YellowHigh9"},
+    {(unsigned int)glow_eDrawType_Color120, "YellowHigh10"},
+    {(unsigned int)glow_eDrawType_Color121, "OrangeLow1"},
+    {(unsigned int)glow_eDrawType_Color122, "OrangeLow2"},
+    {(unsigned int)glow_eDrawType_Color123, "OrangeLow3"},
+    {(unsigned int)glow_eDrawType_Color124, "OrangeLow4"},
+    {(unsigned int)glow_eDrawType_Color125, "OrangeLow5"},
+    {(unsigned int)glow_eDrawType_Color126, "OrangeLow6"},
+    {(unsigned int)glow_eDrawType_Color127, "OrangeLow7"},
+    {(unsigned int)glow_eDrawType_Color128, "OrangeLow8"},
+    {(unsigned int)glow_eDrawType_Color129, "OrangeLow9"},
+    {(unsigned int)glow_eDrawType_Color130, "OrangeLow10"},
+    {(unsigned int)glow_eDrawType_Color131, "OrangeMedium1"},
+    {(unsigned int)glow_eDrawType_Color132, "OrangeMedium2"},
+    {(unsigned int)glow_eDrawType_Color133, "OrangeMedium3"},
+    {(unsigned int)glow_eDrawType_Color134, "OrangeMedium4"},
+    {(unsigned int)glow_eDrawType_Color135, "OrangeMedium5"},
+    {(unsigned int)glow_eDrawType_Color136, "OrangeMedium6"},
+    {(unsigned int)glow_eDrawType_Color137, "OrangeMedium7"},
+    {(unsigned int)glow_eDrawType_Color138, "OrangeMedium8"},
+    {(unsigned int)glow_eDrawType_Color139, "OrangeMedium9"},
+    {(unsigned int)glow_eDrawType_Color140, "OrangeMedium10"},
+    {(unsigned int)glow_eDrawType_Color141, "OrangeHigh1"},
+    {(unsigned int)glow_eDrawType_Color142, "OrangeHigh2"},
+    {(unsigned int)glow_eDrawType_Color143, "OrangeHigh3"},
+    {(unsigned int)glow_eDrawType_Color144, "OrangeHigh4"},
+    {(unsigned int)glow_eDrawType_Color145, "OrangeHigh5"},
+    {(unsigned int)glow_eDrawType_Color146, "OrangeHigh6"},
+    {(unsigned int)glow_eDrawType_Color147, "OrangeHigh7"},
+    {(unsigned int)glow_eDrawType_Color148, "OrangeHigh8"},
+    {(unsigned int)glow_eDrawType_Color149, "OrangeHigh9"},
+    {(unsigned int)glow_eDrawType_Color150, "OrangeHigh10"},
+    {(unsigned int)glow_eDrawType_Color151, "RedLow1"},
+    {(unsigned int)glow_eDrawType_Color152, "RedLow2"},
+    {(unsigned int)glow_eDrawType_Color153, "RedLow3"},
+    {(unsigned int)glow_eDrawType_Color154, "RedLow4"},
+    {(unsigned int)glow_eDrawType_Color155, "RedLow5"},
+    {(unsigned int)glow_eDrawType_Color156, "RedLow6"},
+    {(unsigned int)glow_eDrawType_Color157, "RedLow7"},
+    {(unsigned int)glow_eDrawType_Color158, "RedLow8"},
+    {(unsigned int)glow_eDrawType_Color159, "RedLow9"},
+    {(unsigned int)glow_eDrawType_Color160, "RedLow10"},
+    {(unsigned int)glow_eDrawType_Color161, "RedMedium1"},
+    {(unsigned int)glow_eDrawType_Color162, "RedMedium2"},
+    {(unsigned int)glow_eDrawType_Color163, "RedMedium3"},
+    {(unsigned int)glow_eDrawType_Color164, "RedMedium4"},
+    {(unsigned int)glow_eDrawType_Color165, "RedMedium5"},
+    {(unsigned int)glow_eDrawType_Color166, "RedMedium6"},
+    {(unsigned int)glow_eDrawType_Color167, "RedMedium7"},
+    {(unsigned int)glow_eDrawType_Color168, "RedMedium8"},
+    {(unsigned int)glow_eDrawType_Color169, "RedMedium9"},
+    {(unsigned int)glow_eDrawType_Color170, "RedMedium10"},
+    {(unsigned int)glow_eDrawType_Color171, "RedHigh1"},
+    {(unsigned int)glow_eDrawType_Color172, "RedHigh2"},
+    {(unsigned int)glow_eDrawType_Color173, "RedHigh3"},
+    {(unsigned int)glow_eDrawType_Color174, "RedHigh4"},
+    {(unsigned int)glow_eDrawType_Color175, "RedHigh5"},
+    {(unsigned int)glow_eDrawType_Color176, "RedHigh6"},
+    {(unsigned int)glow_eDrawType_Color177, "RedHigh7"},
+    {(unsigned int)glow_eDrawType_Color178, "RedHigh8"},
+    {(unsigned int)glow_eDrawType_Color179, "RedHigh9"},
+    {(unsigned int)glow_eDrawType_Color180, "RedHigh10"},
+    {(unsigned int)glow_eDrawType_Color181, "MagentaLow1"},
+    {(unsigned int)glow_eDrawType_Color182, "MagentaLow2"},
+    {(unsigned int)glow_eDrawType_Color183, "MagentaLow3"},
+    {(unsigned int)glow_eDrawType_Color184, "MagentaLow4"},
+    {(unsigned int)glow_eDrawType_Color185, "MagentaLow5"},
+    {(unsigned int)glow_eDrawType_Color186, "MagentaLow6"},
+    {(unsigned int)glow_eDrawType_Color187, "MagentaLow7"},
+    {(unsigned int)glow_eDrawType_Color188, "MagentaLow8"},
+    {(unsigned int)glow_eDrawType_Color189, "MagentaLow9"},
+    {(unsigned int)glow_eDrawType_Color190, "MagentaLow10"},
+    {(unsigned int)glow_eDrawType_Color191, "MagentaMedium1"},
+    {(unsigned int)glow_eDrawType_Color192, "MagentaMedium2"},
+    {(unsigned int)glow_eDrawType_Color193, "MagentaMedium3"},
+    {(unsigned int)glow_eDrawType_Color194, "MagentaMedium4"},
+    {(unsigned int)glow_eDrawType_Color195, "MagentaMedium5"},
+    {(unsigned int)glow_eDrawType_Color196, "MagentaMedium6"},
+    {(unsigned int)glow_eDrawType_Color197, "MagentaMedium7"},
+    {(unsigned int)glow_eDrawType_Color198, "MagentaMedium8"},
+    {(unsigned int)glow_eDrawType_Color199, "MagentaMedium9"},
+    {(unsigned int)glow_eDrawType_Color200, "MagentaMedium10"},
+    {(unsigned int)glow_eDrawType_Color201, "MagentaHigh1"},
+    {(unsigned int)glow_eDrawType_Color202, "MagentaHigh2"},
+    {(unsigned int)glow_eDrawType_Color203, "MagentaHigh3"},
+    {(unsigned int)glow_eDrawType_Color204, "MagentaHigh4"},
+    {(unsigned int)glow_eDrawType_Color205, "MagentaHigh5"},
+    {(unsigned int)glow_eDrawType_Color206, "MagentaHigh6"},
+    {(unsigned int)glow_eDrawType_Color207, "MagentaHigh7"},
+    {(unsigned int)glow_eDrawType_Color208, "MagentaHigh8"},
+    {(unsigned int)glow_eDrawType_Color209, "MagentaHigh9"},
+    {(unsigned int)glow_eDrawType_Color210, "MagentaHigh10"},
+    {(unsigned int)glow_eDrawType_Color211, "BlueLow1"},
+    {(unsigned int)glow_eDrawType_Color212, "BlueLow2"},
+    {(unsigned int)glow_eDrawType_Color213, "BlueLow3"},
+    {(unsigned int)glow_eDrawType_Color214, "BlueLow4"},
+    {(unsigned int)glow_eDrawType_Color215, "BlueLow5"},
+    {(unsigned int)glow_eDrawType_Color216, "BlueLow6"},
+    {(unsigned int)glow_eDrawType_Color217, "BlueLow7"},
+    {(unsigned int)glow_eDrawType_Color218, "BlueLow8"},
+    {(unsigned int)glow_eDrawType_Color219, "BlueLow9"},
+    {(unsigned int)glow_eDrawType_Color220, "BlueLow10"},
+    {(unsigned int)glow_eDrawType_Color221, "BlueMedium1"},
+    {(unsigned int)glow_eDrawType_Color222, "BlueMedium2"},
+    {(unsigned int)glow_eDrawType_Color223, "BlueMedium3"},
+    {(unsigned int)glow_eDrawType_Color224, "BlueMedium4"},
+    {(unsigned int)glow_eDrawType_Color225, "BlueMedium5"},
+    {(unsigned int)glow_eDrawType_Color226, "BlueMedium6"},
+    {(unsigned int)glow_eDrawType_Color227, "BlueMedium7"},
+    {(unsigned int)glow_eDrawType_Color228, "BlueMedium8"},
+    {(unsigned int)glow_eDrawType_Color229, "BlueMedium9"},
+    {(unsigned int)glow_eDrawType_Color230, "BlueMedium10"},
+    {(unsigned int)glow_eDrawType_Color231, "BlueHigh1"},
+    {(unsigned int)glow_eDrawType_Color232, "BlueHigh2"},
+    {(unsigned int)glow_eDrawType_Color233, "BlueHigh3"},
+    {(unsigned int)glow_eDrawType_Color234, "BlueHigh4"},
+    {(unsigned int)glow_eDrawType_Color235, "BlueHigh5"},
+    {(unsigned int)glow_eDrawType_Color236, "BlueHigh6"},
+    {(unsigned int)glow_eDrawType_Color237, "BlueHigh7"},
+    {(unsigned int)glow_eDrawType_Color238, "BlueHigh8"},
+    {(unsigned int)glow_eDrawType_Color239, "BlueHigh9"},
+    {(unsigned int)glow_eDrawType_Color240, "BlueHigh10"},
+    {(unsigned int)glow_eDrawType_Color241, "SeaBlueLow1"},
+    {(unsigned int)glow_eDrawType_Color242, "SeaBlueLow2"},
+    {(unsigned int)glow_eDrawType_Color243, "SeaBlueLow3"},
+    {(unsigned int)glow_eDrawType_Color244, "SeaBlueLow4"},
+    {(unsigned int)glow_eDrawType_Color245, "SeaBlueLow5"},
+    {(unsigned int)glow_eDrawType_Color246, "SeaBlueLow6"},
+    {(unsigned int)glow_eDrawType_Color247, "SeaBlueLow7"},
+    {(unsigned int)glow_eDrawType_Color248, "SeaBlueLow8"},
+    {(unsigned int)glow_eDrawType_Color249, "SeaBlueLow9"},
+    {(unsigned int)glow_eDrawType_Color250, "SeaBlueLow10"},
+    {(unsigned int)glow_eDrawType_Color251, "SeaBlueMedium1"},
+    {(unsigned int)glow_eDrawType_Color252, "SeaBlueMedium2"},
+    {(unsigned int)glow_eDrawType_Color253, "SeaBlueMedium3"},
+    {(unsigned int)glow_eDrawType_Color224, "SeaBlueMedium4"},
+    {(unsigned int)glow_eDrawType_Color255, "SeaBlueMedium5"},
+    {(unsigned int)glow_eDrawType_Color256, "SeaBlueMedium6"},
+    {(unsigned int)glow_eDrawType_Color257, "SeaBlueMedium7"},
+    {(unsigned int)glow_eDrawType_Color258, "SeaBlueMedium8"},
+    {(unsigned int)glow_eDrawType_Color259, "SeaBlueMedium9"},
+    {(unsigned int)glow_eDrawType_Color260, "SeaBlueMedium10"},
+    {(unsigned int)glow_eDrawType_Color261, "SeaBlueHigh1"},
+    {(unsigned int)glow_eDrawType_Color262, "SeaBlueHigh2"},
+    {(unsigned int)glow_eDrawType_Color263, "SeaBlueHigh3"},
+    {(unsigned int)glow_eDrawType_Color264, "SeaBlueHigh4"},
+    {(unsigned int)glow_eDrawType_Color265, "SeaBlueHigh5"},
+    {(unsigned int)glow_eDrawType_Color266, "SeaBlueHigh6"},
+    {(unsigned int)glow_eDrawType_Color267, "SeaBlueHigh7"},
+    {(unsigned int)glow_eDrawType_Color268, "SeaBlueHigh8"},
+    {(unsigned int)glow_eDrawType_Color269, "SeaBlueHigh9"},
+    {(unsigned int)glow_eDrawType_Color270, "SeaBlueHigh10"},
+    {(unsigned int)glow_eDrawType_Color271, "GreenLow1"},
+    {(unsigned int)glow_eDrawType_Color272, "GreenLow2"},
+    {(unsigned int)glow_eDrawType_Color273, "GreenLow3"},
+    {(unsigned int)glow_eDrawType_Color274, "GreenLow4"},
+    {(unsigned int)glow_eDrawType_Color275, "GreenLow5"},
+    {(unsigned int)glow_eDrawType_Color276, "GreenLow6"},
+    {(unsigned int)glow_eDrawType_Color277, "GreenLow7"},
+    {(unsigned int)glow_eDrawType_Color278, "GreenLow8"},
+    {(unsigned int)glow_eDrawType_Color279, "GreenLow9"},
+    {(unsigned int)glow_eDrawType_Color280, "GreenLow10"},
+    {(unsigned int)glow_eDrawType_Color281, "GreenMedium1"},
+    {(unsigned int)glow_eDrawType_Color282, "GreenMedium2"},
+    {(unsigned int)glow_eDrawType_Color283, "GreenMedium3"},
+    {(unsigned int)glow_eDrawType_Color284, "GreenMedium4"},
+    {(unsigned int)glow_eDrawType_Color285, "GreenMedium5"},
+    {(unsigned int)glow_eDrawType_Color286, "GreenMedium6"},
+    {(unsigned int)glow_eDrawType_Color287, "GreenMedium7"},
+    {(unsigned int)glow_eDrawType_Color288, "GreenMedium8"},
+    {(unsigned int)glow_eDrawType_Color289, "GreenMedium9"},
+    {(unsigned int)glow_eDrawType_Color290, "GreenMedium10"},
+    {(unsigned int)glow_eDrawType_Color291, "GreenHigh1"},
+    {(unsigned int)glow_eDrawType_Color292, "GreenHigh2"},
+    {(unsigned int)glow_eDrawType_Color293, "GreenHigh3"},
+    {(unsigned int)glow_eDrawType_Color294, "GreenHigh4"},
+    {(unsigned int)glow_eDrawType_Color295, "GreenHigh5"},
+    {(unsigned int)glow_eDrawType_Color296, "GreenHigh6"},
+    {(unsigned int)glow_eDrawType_Color297, "GreenHigh7"},
+    {(unsigned int)glow_eDrawType_Color298, "GreenHigh8"},
+    {(unsigned int)glow_eDrawType_Color299, "GreenHigh9"},
+    {(unsigned int)glow_eDrawType_Color300, "GreenHigh10"},
+    {(unsigned int)glow_eDrawType_LineErase, "Background"},
+    {(unsigned int)glow_eDrawType_CustomColor1, "CustomColor1"},
+    {(unsigned int)glow_eDrawType_CustomColor2, "CustomColor2"},
+    {(unsigned int)glow_eDrawType_CustomColor3, "CustomColor3"},
+    {(unsigned int)glow_eDrawType_CustomColor4, "CustomColor4"},
+    {(unsigned int)glow_eDrawType_CustomColor5, "CustomColor5"},
+    {(unsigned int)glow_eDrawType_CustomColor6, "CustomColor6"},
+    {(unsigned int)glow_eDrawType_CustomColor7, "CustomColor7"},
+    {(unsigned int)glow_eDrawType_CustomColor8, "CustomColor8"},
+    {(unsigned int)glow_eDrawType_CustomColor9, "CustomColor9"},
+    {(unsigned int)glow_eDrawType_CustomColor10, "CustomColor10"},
+    {(unsigned int)glow_eDrawType_CustomColor11, "CustomColor11"},
+    {(unsigned int)glow_eDrawType_CustomColor12, "CustomColor12"},
+    {(unsigned int)glow_eDrawType_CustomColor13, "CustomColor13"},
+    {(unsigned int)glow_eDrawType_CustomColor14, "CustomColor14"},
+    {(unsigned int)glow_eDrawType_CustomColor15, "CustomColor15"},
+    {(unsigned int)glow_eDrawType_CustomColor16, "CustomColor16"},
+    {(unsigned int)glow_eDrawType_CustomColor17, "CustomColor17"},
+    {(unsigned int)glow_eDrawType_CustomColor18, "CustomColor18"},
+    {(unsigned int)glow_eDrawType_CustomColor19, "CustomColor19"},
+    {(unsigned int)glow_eDrawType_CustomColor20, "CustomColor20"},
+    {(unsigned int)glow_eDrawType_CustomColor21, "CustomColor21"},
+    {(unsigned int)glow_eDrawType_CustomColor22, "CustomColor22"},
+    {(unsigned int)glow_eDrawType_CustomColor23, "CustomColor23"},
+    {(unsigned int)glow_eDrawType_CustomColor24, "CustomColor24"},
+    {(unsigned int)glow_eDrawType_CustomColor25, "CustomColor25"},
+    {(unsigned int)glow_eDrawType_CustomColor26, "CustomColor26"},
+    {(unsigned int)glow_eDrawType_CustomColor27, "CustomColor27"},
+    {(unsigned int)glow_eDrawType_CustomColor28, "CustomColor28"},
+    {(unsigned int)glow_eDrawType_CustomColor29, "CustomColor29"},
+    {(unsigned int)glow_eDrawType_CustomColor30, "CustomColor30"},
+    {(unsigned int)glow_eDrawType_Inherit, "Inherit"},
+    {0, ""}};
 
 static attrnav_sEnumElement elem_instance_mask[] = {
-  // { (unsigned int) ge_mInstance_1, 	"1"},
-  { (unsigned int)ge_mInstance_2, "2" }, { (unsigned int)ge_mInstance_3, "3" },
-  { (unsigned int)ge_mInstance_4, "4" }, { (unsigned int)ge_mInstance_5, "5" },
-  { (unsigned int)ge_mInstance_6, "6" }, { (unsigned int)ge_mInstance_7, "7" },
-  { (unsigned int)ge_mInstance_8, "8" }, { (unsigned int)ge_mInstance_9, "9" },
-  { (unsigned int)ge_mInstance_10, "10" },
-  { (unsigned int)ge_mInstance_11, "11" },
-  { (unsigned int)ge_mInstance_12, "12" },
-  { (unsigned int)ge_mInstance_13, "13" },
-  { (unsigned int)ge_mInstance_14, "14" },
-  { (unsigned int)ge_mInstance_15, "15" },
-  { (unsigned int)ge_mInstance_16, "16" },
-  { (unsigned int)ge_mInstance_17, "17" },
-  { (unsigned int)ge_mInstance_18, "18" },
-  { (unsigned int)ge_mInstance_19, "19" },
-  { (unsigned int)ge_mInstance_20, "20" },
-  { (unsigned int)ge_mInstance_21, "21" },
-  { (unsigned int)ge_mInstance_22, "22" },
-  { (unsigned int)ge_mInstance_23, "23" },
-  { (unsigned int)ge_mInstance_24, "24" },
-  { (unsigned int)ge_mInstance_25, "25" },
-  { (unsigned int)ge_mInstance_26, "26" },
-  { (unsigned int)ge_mInstance_27, "27" },
-  { (unsigned int)ge_mInstance_28, "28" },
-  { (unsigned int)ge_mInstance_29, "29" },
-  { (unsigned int)ge_mInstance_30, "30" },
-  { (unsigned int)ge_mInstance_31, "31" },
-  { (unsigned int)ge_mInstance_32, "32" }, { 0, "" }
-};
+    // { (unsigned int) ge_mInstance_1, 	"1"},
+    {(unsigned int)ge_mInstance_2, "2"},   {(unsigned int)ge_mInstance_3, "3"},
+    {(unsigned int)ge_mInstance_4, "4"},   {(unsigned int)ge_mInstance_5, "5"},
+    {(unsigned int)ge_mInstance_6, "6"},   {(unsigned int)ge_mInstance_7, "7"},
+    {(unsigned int)ge_mInstance_8, "8"},   {(unsigned int)ge_mInstance_9, "9"},
+    {(unsigned int)ge_mInstance_10, "10"}, {(unsigned int)ge_mInstance_11, "11"},
+    {(unsigned int)ge_mInstance_12, "12"}, {(unsigned int)ge_mInstance_13, "13"},
+    {(unsigned int)ge_mInstance_14, "14"}, {(unsigned int)ge_mInstance_15, "15"},
+    {(unsigned int)ge_mInstance_16, "16"}, {(unsigned int)ge_mInstance_17, "17"},
+    {(unsigned int)ge_mInstance_18, "18"}, {(unsigned int)ge_mInstance_19, "19"},
+    {(unsigned int)ge_mInstance_20, "20"}, {(unsigned int)ge_mInstance_21, "21"},
+    {(unsigned int)ge_mInstance_22, "22"}, {(unsigned int)ge_mInstance_23, "23"},
+    {(unsigned int)ge_mInstance_24, "24"}, {(unsigned int)ge_mInstance_25, "25"},
+    {(unsigned int)ge_mInstance_26, "26"}, {(unsigned int)ge_mInstance_27, "27"},
+    {(unsigned int)ge_mInstance_28, "28"}, {(unsigned int)ge_mInstance_29, "29"},
+    {(unsigned int)ge_mInstance_30, "30"}, {(unsigned int)ge_mInstance_31, "31"},
+    {(unsigned int)ge_mInstance_32, "32"}, {0, ""}};
 
-static attrnav_sEnumElement elem_inputfocus_mask[]
-    = { { (unsigned int)ge_mInputFocus_InitialFocus, "InitialFocus" },
-        { (unsigned int)ge_mInputFocus_FirstHorizontal, "FirstHorizontal" },
-        { (unsigned int)ge_mInputFocus_FirstVertical, "FirstVertical" },
-        { (unsigned int)ge_mInputFocus_FirstTab, "FirstTab" },
-        { (unsigned int)ge_mInputFocus_LastHorizontal, "LastHorizontal" },
-        { (unsigned int)ge_mInputFocus_LastVertical, "LastVertical" },
-        { 0, "" } };
+static attrnav_sEnumElement elem_inputfocus_mask[] = {
+    {(unsigned int)ge_mInputFocus_InitialFocus, "InitialFocus"},
+    {(unsigned int)ge_mInputFocus_FirstHorizontal, "FirstHorizontal"},
+    {(unsigned int)ge_mInputFocus_FirstVertical, "FirstVertical"},
+    {(unsigned int)ge_mInputFocus_FirstTab, "FirstTab"},
+    {(unsigned int)ge_mInputFocus_LastHorizontal, "LastHorizontal"},
+    {(unsigned int)ge_mInputFocus_LastVertical, "LastVertical"},
+    {0, ""}};
 
-static attrnav_sEnumElement elem_direction[]
-    = { { (unsigned int)glow_eDirection_Right, "Right" },
-        { (unsigned int)glow_eDirection_Left, "Left" },
-	// Note !! Up and down are shifted !!
-        { (unsigned int)glow_eDirection_Up, "Down" }, 
-        { (unsigned int)glow_eDirection_Down, "Up" }, { 0, "" } };
+static attrnav_sEnumElement elem_direction[] = {{(unsigned int)glow_eDirection_Right, "Right"},
+                                                {(unsigned int)glow_eDirection_Left, "Left"},
+                                                // Note !! Up and down are shifted !!
+                                                {(unsigned int)glow_eDirection_Up, "Down"},
+                                                {(unsigned int)glow_eDirection_Down, "Up"},
+                                                {0, ""}};
 
-static attrnav_sEnumElement elem_horizdirection[]
-    = { { (unsigned int)glow_eHorizDirection_Left, "Left" },
-        { (unsigned int)glow_eHorizDirection_Right, "Right" }, { 0, "" } };
+static attrnav_sEnumElement elem_horizdirection[] = {{(unsigned int)glow_eHorizDirection_Left, "Left"},
+                                                     {(unsigned int)glow_eHorizDirection_Right, "Right"},
+                                                     {0, ""}};
 
-static attrnav_sEnumElement elem_adjustment[]
-    = { { (unsigned int)glow_eAdjustment_Center, "Center" },
-        { (unsigned int)glow_eAdjustment_Right, "Right" },
-        { (unsigned int)glow_eAdjustment_Left, "Left" }, { 0, "" } };
+static attrnav_sEnumElement elem_adjustment[] = {{(unsigned int)glow_eAdjustment_Center, "Center"},
+                                                 {(unsigned int)glow_eAdjustment_Right, "Right"},
+                                                 {(unsigned int)glow_eAdjustment_Left, "Left"},
+                                                 {0, ""}};
 
 static attrnav_sEnumElement elem_font[] = {
-  { (unsigned int)glow_eFont_Helvetica, "Helvetica" },
-  { (unsigned int)glow_eFont_Times, "Times" },
-  { (unsigned int)glow_eFont_NewCenturySchoolbook, "New Century Schoolbook" },
-  { (unsigned int)glow_eFont_Courier, "Courier" },
-  { (unsigned int)glow_eFont_LucidaSans, "LucidaSans" }, { 0, "" }
-};
+    {(unsigned int)glow_eFont_Helvetica, "Helvetica"},
+    {(unsigned int)glow_eFont_Times, "Times"},
+    {(unsigned int)glow_eFont_NewCenturySchoolbook, "New Century Schoolbook"},
+    {(unsigned int)glow_eFont_Courier, "Courier"},
+    {(unsigned int)glow_eFont_Roboto, "Roboto"},
+    {0, ""}};
 
-static attrnav_sEnumElement elem_hot_indication[]
-    = { { (unsigned int)glow_eHotIndication_No, "No" },
-        { (unsigned int)glow_eHotIndication_LineWidth, "LineWidth" },
-        { (unsigned int)glow_eHotIndication_DarkColor, "DarkColor" },
-        { (unsigned int)glow_eHotIndication_LightColor, "LightColor" },
-        { 0, "" } };
+static attrnav_sEnumElement elem_hot_indication[] = {
+    {(unsigned int)glow_eHotIndication_No, "No"},
+    {(unsigned int)glow_eHotIndication_LineWidth, "LineWidth"},
+    {(unsigned int)glow_eHotIndication_DarkColor, "DarkColor"},
+    {(unsigned int)glow_eHotIndication_LightColor, "LightColor"},
+    {0, ""}};
 
-static attrnav_sEnumElement elem_app_motion[]
-    = { { (unsigned int)glow_eAppMotion_Scroll, "Scroll" },
-        { (unsigned int)glow_eAppMotion_Slider, "Slider" },
-        { (unsigned int)glow_eAppMotion_Both, "Both" }, { 0, "" } };
+static attrnav_sEnumElement elem_app_motion[] = {{(unsigned int)glow_eAppMotion_Scroll, "Scroll"},
+                                                 {(unsigned int)glow_eAppMotion_Slider, "Slider"},
+                                                 {(unsigned int)glow_eAppMotion_Both, "Both"},
+                                                 {0, ""}};
 
-static attrnav_sEnumElement elem_annot_type[]
-    = { { (unsigned int)glow_eAnnotType_OneLine, "OneLine" },
-        { (unsigned int)glow_eAnnotType_MultiLine, "MultiLine" }, { 0, "" } };
+static attrnav_sEnumElement elem_annot_type[] = {{(unsigned int)glow_eAnnotType_OneLine, "OneLine"},
+                                                 {(unsigned int)glow_eAnnotType_MultiLine, "MultiLine"},
+                                                 {0, ""}};
 
-static attrnav_sEnumElement elem_access[]
-    = { { (unsigned int)pwr_mPrv_RtRead, "RtRead" },
-        { (unsigned int)pwr_mPrv_RtWrite, "RtWrite" },
-        { (unsigned int)pwr_mPrv_System, "System" },
-        { (unsigned int)pwr_mPrv_Maintenance, "Maintenance" },
-        { (unsigned int)pwr_mPrv_Process, "Process" },
-        { (unsigned int)pwr_mPrv_Instrument, "Instrument" },
-        { (unsigned int)pwr_mPrv_Operator1, "Operator1" },
-        { (unsigned int)pwr_mPrv_Operator2, "Operator2" },
-        { (unsigned int)pwr_mPrv_Operator3, "Operator3" },
-        { (unsigned int)pwr_mPrv_Operator4, "Operator4" },
-        { (unsigned int)pwr_mPrv_Operator5, "Operator5" },
-        { (unsigned int)pwr_mPrv_Operator6, "Operator6" },
-        { (unsigned int)pwr_mPrv_Operator7, "Operator7" },
-        { (unsigned int)pwr_mPrv_Operator8, "Operator8" },
-        { (unsigned int)pwr_mPrv_Operator9, "Operator9" },
-        { (unsigned int)pwr_mPrv_Operator10, "Operator10" },
-        { (unsigned int)pwr_mPrv_RtEventsAck, "RtEventsAck" },
-        { (unsigned int)pwr_mPrv_RtPlc, "RtPlc" },
-        { (unsigned int)pwr_mPrv_RtNavigator, "RtNavigator" },
-        { (unsigned int)pwr_mPrv_RtEventsBlock, "RtEventsBlock" },
-        { (unsigned int)pwr_mAccess_Default, "Default" }, { 0, "" } };
+static attrnav_sEnumElement elem_access[] = {{(unsigned int)pwr_mPrv_RtRead, "RtRead"},
+                                             {(unsigned int)pwr_mPrv_RtWrite, "RtWrite"},
+                                             {(unsigned int)pwr_mPrv_System, "System"},
+                                             {(unsigned int)pwr_mPrv_Maintenance, "Maintenance"},
+                                             {(unsigned int)pwr_mPrv_Process, "Process"},
+                                             {(unsigned int)pwr_mPrv_Instrument, "Instrument"},
+                                             {(unsigned int)pwr_mPrv_Operator1, "Operator1"},
+                                             {(unsigned int)pwr_mPrv_Operator2, "Operator2"},
+                                             {(unsigned int)pwr_mPrv_Operator3, "Operator3"},
+                                             {(unsigned int)pwr_mPrv_Operator4, "Operator4"},
+                                             {(unsigned int)pwr_mPrv_Operator5, "Operator5"},
+                                             {(unsigned int)pwr_mPrv_Operator6, "Operator6"},
+                                             {(unsigned int)pwr_mPrv_Operator7, "Operator7"},
+                                             {(unsigned int)pwr_mPrv_Operator8, "Operator8"},
+                                             {(unsigned int)pwr_mPrv_Operator9, "Operator9"},
+                                             {(unsigned int)pwr_mPrv_Operator10, "Operator10"},
+                                             {(unsigned int)pwr_mPrv_RtEventsAck, "RtEventsAck"},
+                                             {(unsigned int)pwr_mPrv_RtPlc, "RtPlc"},
+                                             {(unsigned int)pwr_mPrv_RtNavigator, "RtNavigator"},
+                                             {(unsigned int)pwr_mPrv_RtEventsBlock, "RtEventsBlock"},
+                                             {(unsigned int)pwr_mAccess_Default, "Default"},
+                                             {0, ""}};
 
-static attrnav_sEnumElement elem_cycle[]
-    = { { (unsigned int)glow_eCycle_Inherit, "Inherit" },
-        { (unsigned int)glow_eCycle_Slow, "Slow" },
-        { (unsigned int)glow_eCycle_Fast, "Fast" }, { 0, "" } };
+static attrnav_sEnumElement elem_cycle[] = {{(unsigned int)glow_eCycle_Inherit, "Inherit"},
+                                            {(unsigned int)glow_eCycle_Slow, "Slow"},
+                                            {(unsigned int)glow_eCycle_Fast, "Fast"},
+                                            {0, ""}};
 
-static attrnav_sEnumElement elem_mb3_action[]
-    = { { (unsigned int)glow_eMB3Action_No, "No" },
-        { (unsigned int)glow_eMB3Action_Close, "Close" },
-        { (unsigned int)glow_eMB3Action_PopupMenu, "PopupMenu" },
-        { (unsigned int)glow_eMB3Action_Both, "Both" }, { 0, "" } };
+static attrnav_sEnumElement elem_mb3_action[] = {{(unsigned int)glow_eMB3Action_No, "No"},
+                                                 {(unsigned int)glow_eMB3Action_Close, "Close"},
+                                                 {(unsigned int)glow_eMB3Action_PopupMenu, "PopupMenu"},
+                                                 {(unsigned int)glow_eMB3Action_Both, "Both"},
+                                                 {0, ""}};
 
-static attrnav_sEnumElement elem_input_focus_mark[]
-    = { { (unsigned int)glow_eInputFocusMark_Relief, "Relief" },
-        { (unsigned int)glow_eInputFocusMark_No, "No" }, { 0, "" } };
+static attrnav_sEnumElement elem_input_focus_mark[] = {{(unsigned int)glow_eInputFocusMark_Relief, "Relief"},
+                                                       {(unsigned int)glow_eInputFocusMark_No, "No"},
+                                                       {0, ""}};
 
-static attrnav_sEnumElement elem_anim_sequence[]
-    = { { (unsigned int)ge_eAnimSequence_Inherit, "Inherit" },
-        { (unsigned int)ge_eAnimSequence_Cycle, "Cyclic" },
-        { (unsigned int)ge_eAnimSequence_Dig, "Dig" },
-        { (unsigned int)ge_eAnimSequence_ForwBack, "ForwBack" }, 
-        { (unsigned int)ge_eAnimSequence_CycleLast, "CyclicLast" }, { 0, "" } };
+static attrnav_sEnumElement elem_anim_sequence[] = {{(unsigned int)ge_eAnimSequence_Inherit, "Inherit"},
+                                                    {(unsigned int)ge_eAnimSequence_Cycle, "Cyclic"},
+                                                    {(unsigned int)ge_eAnimSequence_Dig, "Dig"},
+                                                    {(unsigned int)ge_eAnimSequence_ForwBack, "ForwBack"},
+                                                    {(unsigned int)ge_eAnimSequence_CycleLast, "CyclicLast"},
+                                                    {0, ""}};
 
-static attrnav_sEnumElement elem_limit_type[]
-    = { { (unsigned int)ge_eLimitType_Gt, "GreaterThan" },
-        { (unsigned int)ge_eLimitType_Lt, "LessThan" },
-        { (unsigned int)ge_eLimitType_Ge, "GreaterEqual" },
-        { (unsigned int)ge_eLimitType_Le, "LessEqual" },
-        { (unsigned int)ge_eLimitType_Eq, "Equal" }, { 0, "" } };
+static attrnav_sEnumElement elem_limit_type[] = {
+    {(unsigned int)ge_eLimitType_Gt, "GreaterThan"},  {(unsigned int)ge_eLimitType_Lt, "LessThan"},
+    {(unsigned int)ge_eLimitType_Ge, "GreaterEqual"}, {(unsigned int)ge_eLimitType_Le, "LessEqual"},
+    {(unsigned int)ge_eLimitType_Eq, "Equal"},        {0, ""}};
 
-static attrnav_sEnumElement elem_relief[]
-    = { { (unsigned int)glow_eRelief_Up, "Up" },
-        { (unsigned int)glow_eRelief_Down, "Down" }, { 0, "" } };
+static attrnav_sEnumElement elem_relief[] = {
+    {(unsigned int)glow_eRelief_Up, "Up"}, {(unsigned int)glow_eRelief_Down, "Down"}, {0, ""}};
 
-static attrnav_sEnumElement elem_text_size[]
-    = { { (unsigned int)glow_eTextSize_8, "8" },
-        { (unsigned int)glow_eTextSize_10, "10" },
-        { (unsigned int)glow_eTextSize_12, "12" },
-        { (unsigned int)glow_eTextSize_14, "14" },
-        { (unsigned int)glow_eTextSize_18, "18" },
-        { (unsigned int)glow_eTextSize_24, "24" }, { 0, "" } };
+static attrnav_sEnumElement elem_text_size[] = {{(unsigned int)glow_eTextSize_8, "8"},
+                                                {(unsigned int)glow_eTextSize_10, "10"},
+                                                {(unsigned int)glow_eTextSize_12, "12"},
+                                                {(unsigned int)glow_eTextSize_14, "14"},
+                                                {(unsigned int)glow_eTextSize_18, "18"},
+                                                {(unsigned int)glow_eTextSize_24, "24"},
+                                                {0, ""}};
 
-static attrnav_sEnumElement elem_scale_type[]
-    = { { (unsigned int)glow_eScaleType_LowerLeft, "UpperLeft" },
-        { (unsigned int)glow_eScaleType_LowerRight, "UpperRight" },
-        { (unsigned int)glow_eScaleType_UpperLeft, "LowerLeft" },
-        { (unsigned int)glow_eScaleType_UpperRight, "LowerRight" },
-        { (unsigned int)glow_eScaleType_Center, "Center" }, { 0, "" } };
+static attrnav_sEnumElement elem_scale_type[] = {{(unsigned int)glow_eScaleType_LowerLeft, "UpperLeft"},
+                                                 {(unsigned int)glow_eScaleType_LowerRight, "UpperRight"},
+                                                 {(unsigned int)glow_eScaleType_UpperLeft, "LowerLeft"},
+                                                 {(unsigned int)glow_eScaleType_UpperRight, "LowerRight"},
+                                                 {(unsigned int)glow_eScaleType_Center, "Center"},
+                                                 {0, ""}};
 
-static attrnav_sEnumElement elem_curve_datatype[]
-    = { { (unsigned int)ge_eCurveDataType_XYArrays, "XYArrays" },
-        { (unsigned int)ge_eCurveDataType_PointArray, "PointArray" },
-        { (unsigned int)ge_eCurveDataType_TableObject, "TableObject" },
-        { 0, "" } };
+static attrnav_sEnumElement elem_curve_datatype[] = {
+    {(unsigned int)ge_eCurveDataType_XYArrays, "XYArrays"},
+    {(unsigned int)ge_eCurveDataType_PointArray, "PointArray"},
+    {(unsigned int)ge_eCurveDataType_TableObject, "TableObject"},
+    {0, ""}};
 
 static attrnav_sEnumElement elem_gradient[] = {
-  { (unsigned int)glow_eGradient_No, "No" },
-  { (unsigned int)glow_eGradient_HorizontalUp, "HorizontalUp" },
-  { (unsigned int)glow_eGradient_HorizontalDown, "HorizontalDown" },
-  { (unsigned int)glow_eGradient_HorizontalTube1, "HorizontalTube1" },
-  { (unsigned int)glow_eGradient_HorizontalTube2, "HorizontalTube2" },
-  { (unsigned int)glow_eGradient_VerticalLeft, "VerticalLeft" },
-  { (unsigned int)glow_eGradient_VerticalRight, "VerticalRight" },
-  { (unsigned int)glow_eGradient_VerticalTube1, "VerticalTube1" },
-  { (unsigned int)glow_eGradient_VerticalTube2, "VerticalTube2" },
-  { (unsigned int)glow_eGradient_DiagonalUpperLeft, "DiagonalUpperLeft" },
-  { (unsigned int)glow_eGradient_DiagonalLowerLeft, "DiagonalLowerLeft" },
-  { (unsigned int)glow_eGradient_DiagonalUpperRight, "DiagonalUpperRight" },
-  { (unsigned int)glow_eGradient_DiagonalLowerRight, "DiagonalLowerRight" },
-  { (unsigned int)glow_eGradient_DiagonalUpTube, "DiagonalUpTube" },
-  { (unsigned int)glow_eGradient_DiagonalDownTube, "DiagonalDownTube" },
-  { (unsigned int)glow_eGradient_Globe, "Globe" },
-  { (unsigned int)glow_eGradient_RadialCenter, "RadialCenter" },
-  { (unsigned int)glow_eGradient_RadialUpperLeft, "RadialUpperLeft" },
-  { (unsigned int)glow_eGradient_RadialLowerLeft, "RadialLowerLeft" },
-  { (unsigned int)glow_eGradient_RadialUpperRight, "RadialUpperRight" },
-  { (unsigned int)glow_eGradient_RadialLowerRight, "RadialLowerRight" },
-  { 0, "" }
-};
+    {(unsigned int)glow_eGradient_No, "No"},
+    {(unsigned int)glow_eGradient_HorizontalUp, "HorizontalUp"},
+    {(unsigned int)glow_eGradient_HorizontalDown, "HorizontalDown"},
+    {(unsigned int)glow_eGradient_HorizontalTube1, "HorizontalTube1"},
+    {(unsigned int)glow_eGradient_HorizontalTube2, "HorizontalTube2"},
+    {(unsigned int)glow_eGradient_VerticalLeft, "VerticalLeft"},
+    {(unsigned int)glow_eGradient_VerticalRight, "VerticalRight"},
+    {(unsigned int)glow_eGradient_VerticalTube1, "VerticalTube1"},
+    {(unsigned int)glow_eGradient_VerticalTube2, "VerticalTube2"},
+    {(unsigned int)glow_eGradient_DiagonalUpperLeft, "DiagonalUpperLeft"},
+    {(unsigned int)glow_eGradient_DiagonalLowerLeft, "DiagonalLowerLeft"},
+    {(unsigned int)glow_eGradient_DiagonalUpperRight, "DiagonalUpperRight"},
+    {(unsigned int)glow_eGradient_DiagonalLowerRight, "DiagonalLowerRight"},
+    {(unsigned int)glow_eGradient_DiagonalUpTube, "DiagonalUpTube"},
+    {(unsigned int)glow_eGradient_DiagonalDownTube, "DiagonalDownTube"},
+    {(unsigned int)glow_eGradient_Globe, "Globe"},
+    {(unsigned int)glow_eGradient_RadialCenter, "RadialCenter"},
+    {(unsigned int)glow_eGradient_RadialUpperLeft, "RadialUpperLeft"},
+    {(unsigned int)glow_eGradient_RadialLowerLeft, "RadialLowerLeft"},
+    {(unsigned int)glow_eGradient_RadialUpperRight, "RadialUpperRight"},
+    {(unsigned int)glow_eGradient_RadialLowerRight, "RadialLowerRight"},
+    {0, ""}};
 
-static attrnav_sEnumElement elem_optionmenu_type[]
-    = { { (unsigned int)ge_eOptionMenuType_Static, "Static" },
-        { (unsigned int)ge_eOptionMenuType_Dynamic, "Dynamic" }, { 0, "" } };
+static attrnav_sEnumElement elem_optionmenu_type[] = {{(unsigned int)ge_eOptionMenuType_Static, "Static"},
+                                                      {(unsigned int)ge_eOptionMenuType_Dynamic, "Dynamic"},
+                                                      {0, ""}};
 
-static attrnav_sEnumElement elem_methodsmenu_type[]
-    = { { (unsigned int)ge_eMethodsMenuType_Object, "Object" },
-        { (unsigned int)ge_eMethodsMenuType_Help, "Help" },
-        { (unsigned int)ge_eMethodsMenuType_Simulate, "Simulate" }, { 0, "" } };
+static attrnav_sEnumElement elem_methodsmenu_type[] = {
+    {(unsigned int)ge_eMethodsMenuType_Object, "Object"},
+    {(unsigned int)ge_eMethodsMenuType_Help, "Help"},
+    {(unsigned int)ge_eMethodsMenuType_Simulate, "Simulate"},
+    {0, ""}};
 
-static attrnav_sEnumElement elem_methodtoolbar_type[]
-    = { { (unsigned int)ge_eMethodToolbarType_Object, "Object" },
-        { (unsigned int)ge_eMethodToolbarType_Simulate, "Simulate" },
-        { 0, "" } };
+static attrnav_sEnumElement elem_methodtoolbar_type[] = {
+    {(unsigned int)ge_eMethodToolbarType_Object, "Object"},
+    {(unsigned int)ge_eMethodToolbarType_Simulate, "Simulate"},
+    {0, ""}};
 
 static attrnav_sEnumElement elem_keyboard_type[] = {
-  { (unsigned int)graph_eKeyboard_Standard, "Standard" },
-  { (unsigned int)graph_eKeyboard_StandardShifted, "StandardShifted" },
-  { (unsigned int)graph_eKeyboard_Numeric, "Numeric" },
-  { (unsigned int)graph_eKeyboard_Alphabetic, "Alphabetic" },
-  { (unsigned int)graph_eKeyboard_AlphabeticShifted, "AlphabeticShifted" },
-  { 0, "" }
-};
+    {(unsigned int)graph_eKeyboard_Standard, "Standard"},
+    {(unsigned int)graph_eKeyboard_StandardShifted, "StandardShifted"},
+    {(unsigned int)graph_eKeyboard_Numeric, "Numeric"},
+    {(unsigned int)graph_eKeyboard_Alphabetic, "Alphabetic"},
+    {(unsigned int)graph_eKeyboard_AlphabeticShifted, "AlphabeticShifted"},
+    {0, ""}};
 
-static attrnav_sEnumElement elem_dash_type[] = {
-  { (unsigned int)ge_eDashType_, "No" },
-  { (unsigned int)ge_eDashType_UserDefined, "UserDefined" },
-  { (unsigned int)ge_eDashType_ObjectGraph, "ObjectGraph" },
-  { (unsigned int)ge_eDashType_Bar, "Bar" },
-  { (unsigned int)ge_eDashType_BarArc, "BarArc" },
-  { (unsigned int)ge_eDashType_Trend, "Trend" },
-  { (unsigned int)ge_eDashType_Gauge, "Gauge" },
-  { (unsigned int)ge_eDashType_Gauge2, "Gauge2" },
-  { (unsigned int)ge_eDashType_Slider, "Slider" },
-  { (unsigned int)ge_eDashType_Pie, "Pie" },
-  { (unsigned int)ge_eDashType_Indicator, "Indicator" },
-  { (unsigned int)ge_eDashType_DigitalTrend, "DigitalTrend" },
-  { 0, "" }
-};
+static attrnav_sEnumElement elem_dash_type[] = {{(unsigned int)ge_eDashType_, "No"},
+                                                {(unsigned int)ge_eDashType_UserDefined, "UserDefined"},
+                                                {(unsigned int)ge_eDashType_ObjectGraph, "ObjectGraph"},
+                                                {(unsigned int)ge_eDashType_Bar, "Bar"},
+                                                {(unsigned int)ge_eDashType_BarArc, "BarArc"},
+                                                {(unsigned int)ge_eDashType_Trend, "Trend"},
+                                                {(unsigned int)ge_eDashType_Gauge, "Gauge"},
+                                                {(unsigned int)ge_eDashType_Gauge2, "Gauge2"},
+                                                {(unsigned int)ge_eDashType_Slider, "Slider"},
+                                                {(unsigned int)ge_eDashType_Pie, "Pie"},
+                                                {(unsigned int)ge_eDashType_Indicator, "Indicator"},
+                                                {(unsigned int)ge_eDashType_DigitalTrend, "DigitalTrend"},
+                                                {0, ""}};
 
-static attrnav_sEnumElement elem_dash_elements[]
-    = { { 0, "0" },
-	{ 1, "1" },
-	{ 2, "2" },
-	{ 3, "3" },
-	{ 4, "4" },
-	{ 5, "5" },
-	{ 6, "6" },
-	{ 0, "" } };
+static attrnav_sEnumElement elem_dash_elements[] = {{0, "0"}, {1, "1"}, {2, "2"}, {3, "3"},
+                                                    {4, "4"}, {5, "5"}, {6, "6"}, {0, ""}};
 
-static attrnav_sEnumElement elem_indicator_color[]
-    = { { glow_eDrawType_CustomColor26, "Green" },
-	{ glow_eDrawType_CustomColor41, "Yellow" },
-	{ glow_eDrawType_CustomColor11, "Red" },
-	{ glow_eDrawType_CustomColor71, "Orange" },
-	{ glow_eDrawType_CustomColor56, "Blue" },
-	{ glow_eDrawType_CustomColor86, "Magenta" },
-	{ 0, "" } };
+static attrnav_sEnumElement elem_indicator_color[] = {{glow_eDrawType_CustomColor26, "Green"},
+                                                      {glow_eDrawType_CustomColor41, "Yellow"},
+                                                      {glow_eDrawType_CustomColor11, "Red"},
+                                                      {glow_eDrawType_CustomColor71, "Orange"},
+                                                      {glow_eDrawType_CustomColor56, "Blue"},
+                                                      {glow_eDrawType_CustomColor86, "Magenta"},
+                                                      {0, ""}};
 
-static attrnav_sEnumElement elem_script_trigger_event[]
-    = { { ge_eScriptTriggerEvent_ClickMB1, "ClickMB1" },
-	{ ge_eScriptTriggerEvent_Open, "Open" },
-	{ ge_eScriptTriggerEvent_Close, "Close" },
-	{ 0, "" } };
+static attrnav_sEnumElement elem_script_trigger_event[] = {{ge_eScriptTriggerEvent_ClickMB1, "ClickMB1"},
+                                                           {ge_eScriptTriggerEvent_Open, "Open"},
+                                                           {ge_eScriptTriggerEvent_Close, "Close"},
+                                                           {0, ""}};
 
-static attrnav_sEnumElement elem_ucentity[]
-    = { { graph_eUcEntity_Acceleration, "Acceleration" },
-	{ graph_eUcEntity_Angle, "Angle" },
-	{ graph_eUcEntity_Area, "Area" },
-        { graph_eUcEntity_Energy, "Energy" },
-        { graph_eUcEntity_Force, "Force" },
-        { graph_eUcEntity_Frequency, "Frequency" },
-        { graph_eUcEntity_General, "General" },
-	{ graph_eUcEntity_Length, "Length" },
-	{ graph_eUcEntity_Mass, "Mass" },
-	{ graph_eUcEntity_MassFlow, "MassFlow" },
-        { graph_eUcEntity_Power, "Power" },
-        { graph_eUcEntity_Pressure, "Pressure" },
-	{ graph_eUcEntity_Speed, "Speed" },
-	{ graph_eUcEntity_Temperature, "Temperature" },
-	{ graph_eUcEntity_Time, "Time" },
-	{ graph_eUcEntity_Volume, "Volume" },
-	{ graph_eUcEntity_VolumeFlow, "VolumeFlow" },
-	{ 0, "" } };
+static attrnav_sEnumElement elem_ucentity[] = {{graph_eUcEntity_Acceleration, "Acceleration"},
+                                               {graph_eUcEntity_Angle, "Angle"},
+                                               {graph_eUcEntity_Area, "Area"},
+                                               {graph_eUcEntity_Energy, "Energy"},
+                                               {graph_eUcEntity_Force, "Force"},
+                                               {graph_eUcEntity_Frequency, "Frequency"},
+                                               {graph_eUcEntity_General, "General"},
+                                               {graph_eUcEntity_Length, "Length"},
+                                               {graph_eUcEntity_Mass, "Mass"},
+                                               {graph_eUcEntity_MassFlow, "MassFlow"},
+                                               {graph_eUcEntity_Power, "Power"},
+                                               {graph_eUcEntity_Pressure, "Pressure"},
+                                               {graph_eUcEntity_Speed, "Speed"},
+                                               {graph_eUcEntity_Temperature, "Temperature"},
+                                               {graph_eUcEntity_Time, "Time"},
+                                               {graph_eUcEntity_Volume, "Volume"},
+                                               {graph_eUcEntity_VolumeFlow, "VolumeFlow"},
+                                               {0, ""}};
 
-static attrnav_sEnumElement elem_ucacceleration[]
-    = { { graph_eUcAcceleration_m_s2, "m/s2" },
-	{ graph_eUcAcceleration_ft_s2, "ft/s2" },
-	{ graph_eUcAcceleration_in_s2, "in/s2" },
-	{ 0, "" } };
+static attrnav_sEnumElement elem_ucacceleration[] = {{graph_eUcAcceleration_m_s2, "m/s2"},
+                                                     {graph_eUcAcceleration_ft_s2, "ft/s2"},
+                                                     {graph_eUcAcceleration_in_s2, "in/s2"},
+                                                     {0, ""}};
 
-static attrnav_sEnumElement elem_ucangle[]
-    = { { graph_eUcAngle_rad, "rad" },
-	{ graph_eUcAngle_degree, "degree" },
-	{ graph_eUcAngle_min, "min" },
-	{ graph_eUcAngle_mrad, "mrad" },
-	{ graph_eUcAngle_percent, "percent" },
-	{ graph_eUcAngle_sec, "sec" },
-	{ 0, "" } };
+static attrnav_sEnumElement elem_ucangle[] = {{graph_eUcAngle_rad, "rad"},
+                                              {graph_eUcAngle_degree, "degree"},
+                                              {graph_eUcAngle_min, "min"},
+                                              {graph_eUcAngle_mrad, "mrad"},
+                                              {graph_eUcAngle_percent, "percent"},
+                                              {graph_eUcAngle_sec, "sec"},
+                                              {0, ""}};
 
-static attrnav_sEnumElement elem_ucarea[]
-    = { { graph_eUcArea_m2, "m2" },
-	{ graph_eUcArea_a, "a" },
-	{ graph_eUcArea_ac, "ac" },
-	{ graph_eUcArea_cm2, "cm2" },
-	{ graph_eUcArea_ha, "ha" },
-	{ graph_eUcArea_km2, "km2" },
-	{ graph_eUcArea_mm2, "mm2" },
-	{ graph_eUcArea_sq_in, "sq in" },
-	{ graph_eUcArea_sq_mi, "sq mi" },
-	{ graph_eUcArea_sq_ft, "sq ft" },
-	{ graph_eUcArea_sq_yd, "sq yd" },
-	{ 0, "" } };
+static attrnav_sEnumElement elem_ucarea[] = {
+    {graph_eUcArea_m2, "m2"},       {graph_eUcArea_a, "a"},         {graph_eUcArea_ac, "ac"},
+    {graph_eUcArea_cm2, "cm2"},     {graph_eUcArea_ha, "ha"},       {graph_eUcArea_km2, "km2"},
+    {graph_eUcArea_mm2, "mm2"},     {graph_eUcArea_sq_in, "sq in"}, {graph_eUcArea_sq_mi, "sq mi"},
+    {graph_eUcArea_sq_ft, "sq ft"}, {graph_eUcArea_sq_yd, "sq yd"}, {0, ""}};
 
-static attrnav_sEnumElement elem_ucenergy[]
-    = { { graph_eUcEnergy_J, "J" },
-	{ graph_eUcEnergy_cal, "cal" },
-	{ graph_eUcEnergy_kJ, "kJ" },
-	{ 0, "" } };
+static attrnav_sEnumElement elem_ucenergy[] = {
+    {graph_eUcEnergy_J, "J"}, {graph_eUcEnergy_cal, "cal"}, {graph_eUcEnergy_kJ, "kJ"}, {0, ""}};
 
-static attrnav_sEnumElement elem_ucforce[]
-    = { { graph_eUcForce_N, "N" },
-	{ graph_eUcForce_kN, "kN" },
-	{ graph_eUcForce_kp, "kp" },
-	{ graph_eUcForce_MN, "MN" },
-	{ graph_eUcForce_p, "p" },
-	{ 0, "" } };
+static attrnav_sEnumElement elem_ucforce[] = {{graph_eUcForce_N, "N"},   {graph_eUcForce_kN, "kN"},
+                                              {graph_eUcForce_kp, "kp"}, {graph_eUcForce_MN, "MN"},
+                                              {graph_eUcForce_p, "p"},   {0, ""}};
 
-static attrnav_sEnumElement elem_ucfrequency[]
-    = { { graph_eUcFrequency_Hz, "Hz" },
-	{ graph_eUcFrequency_kHz, "kHz" },
-	{ graph_eUcFrequency_MHz, "MHz" },
-	{ graph_eUcFrequency_rad_min, "rad/min" },
-	{ graph_eUcFrequency_rad_s, "rad/s" },
-	{ graph_eUcFrequency_RPM, "RPM" },
-	{ 0, "" } };
+static attrnav_sEnumElement elem_ucfrequency[] = {{graph_eUcFrequency_Hz, "Hz"},
+                                                  {graph_eUcFrequency_kHz, "kHz"},
+                                                  {graph_eUcFrequency_MHz, "MHz"},
+                                                  {graph_eUcFrequency_rad_min, "rad/min"},
+                                                  {graph_eUcFrequency_rad_s, "rad/s"},
+                                                  {graph_eUcFrequency_RPM, "RPM"},
+                                                  {0, ""}};
 
-static attrnav_sEnumElement elem_ucgeneral[]
-    = { { graph_eUcGeneral_1_1, "1:1" },
-	{ graph_eUcGeneral_Tera, "Tera" },
-	{ graph_eUcGeneral_Giga, "Giga" },
-	{ graph_eUcGeneral_Mega, "Mega" },
-	{ graph_eUcGeneral_Kilo, "Kilo" },
-	{ graph_eUcGeneral_Hecto, "Hecto" },
-	{ graph_eUcGeneral_Deca, "Deca" },
-	{ graph_eUcGeneral_Deci, "Deci" },
-	{ graph_eUcGeneral_Centi, "Centi" },
-	{ graph_eUcGeneral_Milli, "Milli" },
-	{ graph_eUcGeneral_Micro, "Micro" },
-	{ graph_eUcGeneral_Nano, "Nano" },
-	{ graph_eUcGeneral_Pico, "Pico" },
-	{ 0, "" } };
+static attrnav_sEnumElement elem_ucgeneral[] = {
+    {graph_eUcGeneral_1_1, "1:1"},     {graph_eUcGeneral_Tera, "Tera"},
+    {graph_eUcGeneral_Giga, "Giga"},   {graph_eUcGeneral_Mega, "Mega"},
+    {graph_eUcGeneral_Kilo, "Kilo"},   {graph_eUcGeneral_Hecto, "Hecto"},
+    {graph_eUcGeneral_Deca, "Deca"},   {graph_eUcGeneral_Deci, "Deci"},
+    {graph_eUcGeneral_Centi, "Centi"}, {graph_eUcGeneral_Milli, "Milli"},
+    {graph_eUcGeneral_Micro, "Micro"}, {graph_eUcGeneral_Nano, "Nano"},
+    {graph_eUcGeneral_Pico, "Pico"},   {0, ""}};
 
-static attrnav_sEnumElement elem_uclength[]
-    = { { graph_eUcLength_m, "m" },
-	{ graph_eUcLength_cm, "cm" },
-	{ graph_eUcLength_dm, "dm" },
-	{ graph_eUcLength_ft, "ft" },
-	{ graph_eUcLength_in, "in" },
-	{ graph_eUcLength_km, "km" },
-	{ graph_eUcLength_mi, "mi" },
-	{ graph_eUcLength_mm, "mm" },
-	{ graph_eUcLength_nm, "nm" },
-	{ graph_eUcLength_NM, "NM" },
-	{ graph_eUcLength_um, "um" },
-	{ graph_eUcLength_yd, "yd" },
-	{ 0, "" } };
+static attrnav_sEnumElement elem_uclength[] = {{graph_eUcLength_m, "m"},
+                                               {graph_eUcLength_cm, "cm"},
+                                               {graph_eUcLength_dm, "dm"},
+                                               {graph_eUcLength_ft, "ft"},
+                                               {graph_eUcLength_in, "in"},
+                                               {graph_eUcLength_km, "km"},
+                                               {graph_eUcLength_mi, "mi"},
+                                               {graph_eUcLength_mm, "mm"},
+                                               {graph_eUcLength_nm, "nm"},
+                                               {graph_eUcLength_NM, "NM"},
+                                               {graph_eUcLength_um, "um"},
+                                               {graph_eUcLength_yd, "yd"},
+                                               {0, ""}};
 
-static attrnav_sEnumElement elem_ucmass[]
-    = { { graph_eUcMass_kg, "kg" },
-	{ graph_eUcMass_g, "g" },
-	{ graph_eUcMass_hg, "hg" },
-	{ graph_eUcMass_kt, "kt" },
-	{ graph_eUcMass_lb, "lb" },
-	{ graph_eUcMass_mg, "mg" },
-	{ graph_eUcMass_oz, "oz" },
-	{ graph_eUcMass_st, "st" },
-	{ graph_eUcMass_t, "t" },
-	{ graph_eUcMass_ug, "ug" },
-	{ 0, "" } };
+static attrnav_sEnumElement elem_ucmass[] = {{graph_eUcMass_kg, "kg"},
+                                             {graph_eUcMass_g, "g"},
+                                             {graph_eUcMass_hg, "hg"},
+                                             {graph_eUcMass_kt, "kt"},
+                                             {graph_eUcMass_lb, "lb"},
+                                             {graph_eUcMass_mg, "mg"},
+                                             {graph_eUcMass_oz, "oz"},
+                                             {graph_eUcMass_st, "st"},
+                                             {graph_eUcMass_t, "t"},
+                                             {graph_eUcMass_ug, "ug"},
+                                             {0, ""}};
 
-static attrnav_sEnumElement elem_ucmassflow[]
-    = { { graph_eUcMassFlow_kg_s, "kg/s" },
-	{ graph_eUcMassFlow_g_min, "g/min" },
-	{ graph_eUcMassFlow_g_s, "g/s" },
-	{ graph_eUcMassFlow_kg_min, "kg/min" },
-	{ graph_eUcMassFlow_lb_min, "lb/min" },
-	{ graph_eUcMassFlow_lb_s, "lb/s" },
-	{ graph_eUcMassFlow_mg_min, "mg/min" },
-	{ graph_eUcMassFlow_mg_s, "mg/s" },
-	{ graph_eUcMassFlow_oz_min, "oz/min" },
-	{ graph_eUcMassFlow_oz_s, "oz/s" },
-	{ 0, "" } };
+static attrnav_sEnumElement elem_ucmassflow[] = {{graph_eUcMassFlow_kg_s, "kg/s"},
+                                                 {graph_eUcMassFlow_g_min, "g/min"},
+                                                 {graph_eUcMassFlow_g_s, "g/s"},
+                                                 {graph_eUcMassFlow_kg_min, "kg/min"},
+                                                 {graph_eUcMassFlow_lb_min, "lb/min"},
+                                                 {graph_eUcMassFlow_lb_s, "lb/s"},
+                                                 {graph_eUcMassFlow_mg_min, "mg/min"},
+                                                 {graph_eUcMassFlow_mg_s, "mg/s"},
+                                                 {graph_eUcMassFlow_oz_min, "oz/min"},
+                                                 {graph_eUcMassFlow_oz_s, "oz/s"},
+                                                 {0, ""}};
 
-static attrnav_sEnumElement elem_ucpower[]
-    = { { graph_eUcPower_W, "W" },
-	{ graph_eUcPower_hp, "hp" },
-	{ graph_eUcPower_GW, "GW" },
-	{ graph_eUcPower_kW, "kW" },
-	{ graph_eUcPower_mW, "mW" },
-	{ graph_eUcPower_MW, "MW" },
-	{ graph_eUcPower_TW, "TW" },
-	{ graph_eUcPower_uW, "uW" },
-	{ 0, "" } };
+static attrnav_sEnumElement elem_ucpower[] = {
+    {graph_eUcPower_W, "W"},   {graph_eUcPower_hp, "hp"}, {graph_eUcPower_GW, "GW"},
+    {graph_eUcPower_kW, "kW"}, {graph_eUcPower_mW, "mW"}, {graph_eUcPower_MW, "MW"},
+    {graph_eUcPower_TW, "TW"}, {graph_eUcPower_uW, "uW"}, {0, ""}};
 
-static attrnav_sEnumElement elem_ucpressure[]
-    = { { graph_eUcPressure_Pa, "Pa" },
-	{ graph_eUcPressure_atm, "atm" },
-	{ graph_eUcPressure_b, "b" },
-	{ graph_eUcPressure_kPa, "kPa" },
-	{ graph_eUcPressure_lb_ft2, "lb/ft2" },
-	{ graph_eUcPressure_lb_in2, "lb/in2" },
-	{ graph_eUcPressure_mb, "mb" },
-	{ graph_eUcPressure_mPa, "mPa" },
-	{ graph_eUcPressure_mmHg, "mmHg" },
-	{ graph_eUcPressure_MPa, "MPa" },
-	{ 0, "" } };
+static attrnav_sEnumElement elem_ucpressure[] = {{graph_eUcPressure_Pa, "Pa"},
+                                                 {graph_eUcPressure_atm, "atm"},
+                                                 {graph_eUcPressure_b, "b"},
+                                                 {graph_eUcPressure_kPa, "kPa"},
+                                                 {graph_eUcPressure_lb_ft2, "lb/ft2"},
+                                                 {graph_eUcPressure_lb_in2, "lb/in2"},
+                                                 {graph_eUcPressure_mb, "mb"},
+                                                 {graph_eUcPressure_mPa, "mPa"},
+                                                 {graph_eUcPressure_mmHg, "mmHg"},
+                                                 {graph_eUcPressure_MPa, "MPa"},
+                                                 {0, ""}};
 
-static attrnav_sEnumElement elem_ucspeed[]
-    = { { graph_eUcSpeed_m_s, "m/s" },
-	{ graph_eUcSpeed_ft_min, "ft/min" },
-	{ graph_eUcSpeed_ft_s, "ft/s" },
-	{ graph_eUcSpeed_in_min, "in/min" },
-	{ graph_eUcSpeed_in_s, "in/s" },
-	{ graph_eUcSpeed_km_h, "km/h" },
-	{ graph_eUcSpeed_kn, "kn" },
-	{ graph_eUcSpeed_m_min, "m/min" },
-	{ graph_eUcSpeed_mm_s, "mm/s" },
-	{ graph_eUcSpeed_mi_h, "mi/h" },
-	{ graph_eUcSpeed_yd_min, "yd/min" },
-	{ graph_eUcSpeed_yd_s, "yd/s" },
-	{ 0, "" } };
+static attrnav_sEnumElement elem_ucspeed[] = {{graph_eUcSpeed_m_s, "m/s"},
+                                              {graph_eUcSpeed_ft_min, "ft/min"},
+                                              {graph_eUcSpeed_ft_s, "ft/s"},
+                                              {graph_eUcSpeed_in_min, "in/min"},
+                                              {graph_eUcSpeed_in_s, "in/s"},
+                                              {graph_eUcSpeed_km_h, "km/h"},
+                                              {graph_eUcSpeed_kn, "kn"},
+                                              {graph_eUcSpeed_m_min, "m/min"},
+                                              {graph_eUcSpeed_mm_s, "mm/s"},
+                                              {graph_eUcSpeed_mi_h, "mi/h"},
+                                              {graph_eUcSpeed_yd_min, "yd/min"},
+                                              {graph_eUcSpeed_yd_s, "yd/s"},
+                                              {0, ""}};
 
-static attrnav_sEnumElement elem_uctemperature[]
-    = { { graph_eUcTemperature_K, "K" },
-	{ graph_eUcTemperature_C, "C" },
-	{ graph_eUcTemperature_F, "F" },
-	{ graph_eUcTemperature_R, "R" },
-	{ 0, "" } };
+static attrnav_sEnumElement elem_uctemperature[] = {{graph_eUcTemperature_K, "K"},
+                                                    {graph_eUcTemperature_C, "C"},
+                                                    {graph_eUcTemperature_F, "F"},
+                                                    {graph_eUcTemperature_R, "R"},
+                                                    {0, ""}};
 
-static attrnav_sEnumElement elem_uctime[]
-    = { { graph_eUcTime_s, "s" },
-	{ graph_eUcTime_d, "d" },
-	{ graph_eUcTime_h, "h" },
-	{ graph_eUcTime_min, "min" },
-	{ graph_eUcTime_ms, "ms" },
-	{ graph_eUcTime_ns, "ns" },
-	{ graph_eUcTime_us, "us" },
-	{ graph_eUcTime_wk, "wk" },
-	{ graph_eUcTime_y, "y" },
-	{ 0, "" } };
+static attrnav_sEnumElement elem_uctime[] = {{graph_eUcTime_s, "s"},   {graph_eUcTime_d, "d"},
+                                             {graph_eUcTime_h, "h"},   {graph_eUcTime_min, "min"},
+                                             {graph_eUcTime_ms, "ms"}, {graph_eUcTime_ns, "ns"},
+                                             {graph_eUcTime_us, "us"}, {graph_eUcTime_wk, "wk"},
+                                             {graph_eUcTime_y, "y"},   {0, ""}};
 
-static attrnav_sEnumElement elem_ucvolume[]
-    = { { graph_eUcVolume_m3, "m3" },
-	{ graph_eUcVolume_cm3, "cm3" },
-	{ graph_eUcVolume_dm3, "dm3" },
-	{ graph_eUcVolume_ft3, "ft3" },
-	{ graph_eUcVolume_in3, "in3" },
-	{ graph_eUcVolume_mm3, "mm3" },
-	{ 0, "" } };
+static attrnav_sEnumElement elem_ucvolume[] = {{graph_eUcVolume_m3, "m3"},
+                                               {graph_eUcVolume_cm3, "cm3"},
+                                               {graph_eUcVolume_dm3, "dm3"},
+                                               {graph_eUcVolume_ft3, "ft3"},
+                                               {graph_eUcVolume_in3, "in3"},
+                                               {graph_eUcVolume_mm3, "mm3"},
+                                               {0, ""}};
 
-static attrnav_sEnumElement elem_ucvolumeflow[]
-    = { { graph_eUcVolumeFlow_m3_s, "m3/s" },
-	{ graph_eUcVolumeFlow_cl_s, "cl/s" },
-	{ graph_eUcVolumeFlow_in3_min, "in3/min" },
-	{ graph_eUcVolumeFlow_in3_s, "in3/s" },
-	{ graph_eUcVolumeFlow_ft3_min, "ft3/min" },
-	{ graph_eUcVolumeFlow_ft3_s, "ft3/s" },
-	{ graph_eUcVolumeFlow_l_s, "l/s" },
-	{ graph_eUcVolumeFlow_m3_min, "m3/min" },
-	{ graph_eUcVolumeFlow_mm3_s, "mm3/s" },
-	{ graph_eUcVolumeFlow_yd3_min, "yd3/min" },
-	{ graph_eUcVolumeFlow_yd3_s, "yd3/s" },
-	{ 0, "" } };
+static attrnav_sEnumElement elem_ucvolumeflow[] = {
+    {graph_eUcVolumeFlow_m3_s, "m3/s"},       {graph_eUcVolumeFlow_cl_s, "cl/s"},
+    {graph_eUcVolumeFlow_in3_min, "in3/min"}, {graph_eUcVolumeFlow_in3_s, "in3/s"},
+    {graph_eUcVolumeFlow_ft3_min, "ft3/min"}, {graph_eUcVolumeFlow_ft3_s, "ft3/s"},
+    {graph_eUcVolumeFlow_l_s, "l/s"},         {graph_eUcVolumeFlow_m3_min, "m3/min"},
+    {graph_eUcVolumeFlow_mm3_s, "mm3/s"},     {graph_eUcVolumeFlow_yd3_min, "yd3/min"},
+    {graph_eUcVolumeFlow_yd3_s, "yd3/s"},     {0, ""}};
 
 static attrnav_sEnum enum_types[] = {
-  { (unsigned int)glow_eType_Direction,
-      (attrnav_sEnumElement*)&elem_direction },
-  { (unsigned int)glow_eType_HorizDirection,
-      (attrnav_sEnumElement*)&elem_horizdirection },
-  { (unsigned int)glow_eType_Color, (attrnav_sEnumElement*)&elem_color },
-  { (unsigned int)glow_eType_Tone, (attrnav_sEnumElement*)&elem_tone },
-  { (unsigned int)glow_eType_ToneOrColor,
-      (attrnav_sEnumElement*)&elem_tone_or_color },
-  { (unsigned int)glow_eType_Cycle, (attrnav_sEnumElement*)&elem_cycle },
-  { (unsigned int)glow_eType_MB3Action,
-      (attrnav_sEnumElement*)&elem_mb3_action },
-  { (unsigned int)ge_eAttrType_AnimSequence,
-      (attrnav_sEnumElement*)&elem_anim_sequence },
-  { (unsigned int)ge_eAttrType_LimitType,
-      (attrnav_sEnumElement*)&elem_limit_type },
-  { (unsigned int)glow_eType_Relief, (attrnav_sEnumElement*)&elem_relief },
-  { (unsigned int)glow_eType_TextSize, (attrnav_sEnumElement*)&elem_text_size },
-  { (unsigned int)glow_eType_InputFocusMark,
-      (attrnav_sEnumElement*)&elem_input_focus_mark },
-  { (unsigned int)ge_eAttrType_ScaleType,
-      (attrnav_sEnumElement*)&elem_scale_type },
-  { (unsigned int)glow_eType_Adjustment,
-      (attrnav_sEnumElement*)&elem_adjustment },
-  { (unsigned int)glow_eType_Font, (attrnav_sEnumElement*)&elem_font },
-  { (unsigned int)ge_eAttrType_CurveDataType,
-      (attrnav_sEnumElement*)&elem_curve_datatype },
-  { (unsigned int)glow_eType_Gradient, (attrnav_sEnumElement*)&elem_gradient },
-  { (unsigned int)glow_eType_HotIndication,
-      (attrnav_sEnumElement*)&elem_hot_indication },
-  { (unsigned int)glow_eType_AppMotion,
-      (attrnav_sEnumElement*)&elem_app_motion },
-  { (unsigned int)glow_eType_AnnotType,
-      (attrnav_sEnumElement*)&elem_annot_type },
-  { (unsigned int)ge_eAttrType_OptionMenuType,
-      (attrnav_sEnumElement*)&elem_optionmenu_type },
-  { (unsigned int)ge_eAttrType_MethodsMenuType,
-      (attrnav_sEnumElement*)&elem_methodsmenu_type },
-  { (unsigned int)ge_eAttrType_MethodToolbarType,
-      (attrnav_sEnumElement*)&elem_methodtoolbar_type },
-  { (unsigned int)ge_eAttrType_KeyboardType,
-      (attrnav_sEnumElement*)&elem_keyboard_type },
-  { (unsigned int)ge_eAttrType_DashType,
-      (attrnav_sEnumElement*)&elem_dash_type },
-  { (unsigned int)ge_eAttrType_DashElements,
-      (attrnav_sEnumElement*)&elem_dash_elements },
-  { (unsigned int)ge_eAttrType_IndicatorColor,
-      (attrnav_sEnumElement*)&elem_indicator_color },
-  { (unsigned int)ge_eAttrType_ScriptTriggerEvent,
-      (attrnav_sEnumElement*)&elem_script_trigger_event },
-  { (unsigned int)ge_eAttrType_UcEntity, (attrnav_sEnumElement*)&elem_ucentity },
-  { (unsigned int)ge_eAttrType_UcAcceleration, (attrnav_sEnumElement*)&elem_ucacceleration },
-  { (unsigned int)ge_eAttrType_UcAngle, (attrnav_sEnumElement*)&elem_ucangle },
-  { (unsigned int)ge_eAttrType_UcArea, (attrnav_sEnumElement*)&elem_ucarea },
-  { (unsigned int)ge_eAttrType_UcEnergy, (attrnav_sEnumElement*)&elem_ucenergy },
-  { (unsigned int)ge_eAttrType_UcGeneral, (attrnav_sEnumElement*)&elem_ucgeneral },
-  { (unsigned int)ge_eAttrType_UcForce, (attrnav_sEnumElement*)&elem_ucforce },
-  { (unsigned int)ge_eAttrType_UcFrequency, (attrnav_sEnumElement*)&elem_ucfrequency },
-  { (unsigned int)ge_eAttrType_UcLength, (attrnav_sEnumElement*)&elem_uclength },
-  { (unsigned int)ge_eAttrType_UcMass, (attrnav_sEnumElement*)&elem_ucmass },
-  { (unsigned int)ge_eAttrType_UcMassFlow, (attrnav_sEnumElement*)&elem_ucmassflow },
-  { (unsigned int)ge_eAttrType_UcPower, (attrnav_sEnumElement*)&elem_ucpower },
-  { (unsigned int)ge_eAttrType_UcPressure, (attrnav_sEnumElement*)&elem_ucpressure },
-  { (unsigned int)ge_eAttrType_UcSpeed, (attrnav_sEnumElement*)&elem_ucspeed },
-  { (unsigned int)ge_eAttrType_UcTemperature, (attrnav_sEnumElement*)&elem_uctemperature },
-  { (unsigned int)ge_eAttrType_UcTime, (attrnav_sEnumElement*)&elem_uctime },
-  { (unsigned int)ge_eAttrType_UcVolume, (attrnav_sEnumElement*)&elem_ucvolume },
-  { (unsigned int)ge_eAttrType_UcVolumeFlow, (attrnav_sEnumElement*)&elem_ucvolumeflow },
-  { 0, NULL }
-};
+    {(unsigned int)glow_eType_Direction, (attrnav_sEnumElement*)&elem_direction},
+    {(unsigned int)glow_eType_HorizDirection, (attrnav_sEnumElement*)&elem_horizdirection},
+    {(unsigned int)glow_eType_Color, (attrnav_sEnumElement*)&elem_color},
+    {(unsigned int)glow_eType_Tone, (attrnav_sEnumElement*)&elem_tone},
+    {(unsigned int)glow_eType_ToneOrColor, (attrnav_sEnumElement*)&elem_tone_or_color},
+    {(unsigned int)glow_eType_Cycle, (attrnav_sEnumElement*)&elem_cycle},
+    {(unsigned int)glow_eType_MB3Action, (attrnav_sEnumElement*)&elem_mb3_action},
+    {(unsigned int)ge_eAttrType_AnimSequence, (attrnav_sEnumElement*)&elem_anim_sequence},
+    {(unsigned int)ge_eAttrType_LimitType, (attrnav_sEnumElement*)&elem_limit_type},
+    {(unsigned int)glow_eType_Relief, (attrnav_sEnumElement*)&elem_relief},
+    {(unsigned int)glow_eType_TextSize, (attrnav_sEnumElement*)&elem_text_size},
+    {(unsigned int)glow_eType_InputFocusMark, (attrnav_sEnumElement*)&elem_input_focus_mark},
+    {(unsigned int)ge_eAttrType_ScaleType, (attrnav_sEnumElement*)&elem_scale_type},
+    {(unsigned int)glow_eType_Adjustment, (attrnav_sEnumElement*)&elem_adjustment},
+    {(unsigned int)glow_eType_Font, (attrnav_sEnumElement*)&elem_font},
+    {(unsigned int)ge_eAttrType_CurveDataType, (attrnav_sEnumElement*)&elem_curve_datatype},
+    {(unsigned int)glow_eType_Gradient, (attrnav_sEnumElement*)&elem_gradient},
+    {(unsigned int)glow_eType_HotIndication, (attrnav_sEnumElement*)&elem_hot_indication},
+    {(unsigned int)glow_eType_AppMotion, (attrnav_sEnumElement*)&elem_app_motion},
+    {(unsigned int)glow_eType_AnnotType, (attrnav_sEnumElement*)&elem_annot_type},
+    {(unsigned int)ge_eAttrType_OptionMenuType, (attrnav_sEnumElement*)&elem_optionmenu_type},
+    {(unsigned int)ge_eAttrType_MethodsMenuType, (attrnav_sEnumElement*)&elem_methodsmenu_type},
+    {(unsigned int)ge_eAttrType_MethodToolbarType, (attrnav_sEnumElement*)&elem_methodtoolbar_type},
+    {(unsigned int)ge_eAttrType_KeyboardType, (attrnav_sEnumElement*)&elem_keyboard_type},
+    {(unsigned int)ge_eAttrType_DashType, (attrnav_sEnumElement*)&elem_dash_type},
+    {(unsigned int)ge_eAttrType_DashElements, (attrnav_sEnumElement*)&elem_dash_elements},
+    {(unsigned int)ge_eAttrType_IndicatorColor, (attrnav_sEnumElement*)&elem_indicator_color},
+    {(unsigned int)ge_eAttrType_ScriptTriggerEvent, (attrnav_sEnumElement*)&elem_script_trigger_event},
+    {(unsigned int)ge_eAttrType_UcEntity, (attrnav_sEnumElement*)&elem_ucentity},
+    {(unsigned int)ge_eAttrType_UcAcceleration, (attrnav_sEnumElement*)&elem_ucacceleration},
+    {(unsigned int)ge_eAttrType_UcAngle, (attrnav_sEnumElement*)&elem_ucangle},
+    {(unsigned int)ge_eAttrType_UcArea, (attrnav_sEnumElement*)&elem_ucarea},
+    {(unsigned int)ge_eAttrType_UcEnergy, (attrnav_sEnumElement*)&elem_ucenergy},
+    {(unsigned int)ge_eAttrType_UcGeneral, (attrnav_sEnumElement*)&elem_ucgeneral},
+    {(unsigned int)ge_eAttrType_UcForce, (attrnav_sEnumElement*)&elem_ucforce},
+    {(unsigned int)ge_eAttrType_UcFrequency, (attrnav_sEnumElement*)&elem_ucfrequency},
+    {(unsigned int)ge_eAttrType_UcLength, (attrnav_sEnumElement*)&elem_uclength},
+    {(unsigned int)ge_eAttrType_UcMass, (attrnav_sEnumElement*)&elem_ucmass},
+    {(unsigned int)ge_eAttrType_UcMassFlow, (attrnav_sEnumElement*)&elem_ucmassflow},
+    {(unsigned int)ge_eAttrType_UcPower, (attrnav_sEnumElement*)&elem_ucpower},
+    {(unsigned int)ge_eAttrType_UcPressure, (attrnav_sEnumElement*)&elem_ucpressure},
+    {(unsigned int)ge_eAttrType_UcSpeed, (attrnav_sEnumElement*)&elem_ucspeed},
+    {(unsigned int)ge_eAttrType_UcTemperature, (attrnav_sEnumElement*)&elem_uctemperature},
+    {(unsigned int)ge_eAttrType_UcTime, (attrnav_sEnumElement*)&elem_uctime},
+    {(unsigned int)ge_eAttrType_UcVolume, (attrnav_sEnumElement*)&elem_ucvolume},
+    {(unsigned int)ge_eAttrType_UcVolumeFlow, (attrnav_sEnumElement*)&elem_ucvolumeflow},
+    {0, NULL}};
 
-static attrnav_sEnum mask_types[] = { { (unsigned int)glow_eType_Access,
-                                          (attrnav_sEnumElement*)&elem_access },
-  { (unsigned int)ge_eAttrType_DynType1,
-      (attrnav_sEnumElement*)&elem_dyn_type1 },
-  { (unsigned int)ge_eAttrType_DynType2,
-      (attrnav_sEnumElement*)&elem_dyn_type2 },
-  { (unsigned int)ge_eAttrType_DynTypeTone,
-      (attrnav_sEnumElement*)&elem_dyn_type1_tone },
-  { (unsigned int)ge_eAttrType_ActionType1,
-      (attrnav_sEnumElement*)&elem_action_type },
-  { (unsigned int)ge_eAttrType_InstanceMask,
-      (attrnav_sEnumElement*)&elem_instance_mask },
-  { (unsigned int)ge_eAttrType_InputFocus,
-      (attrnav_sEnumElement*)&elem_inputfocus_mask },
-  { 0, NULL } };
+static attrnav_sEnum mask_types[] = {
+    {(unsigned int)glow_eType_Access, (attrnav_sEnumElement*)&elem_access},
+    {(unsigned int)ge_eAttrType_DynType1, (attrnav_sEnumElement*)&elem_dyn_type1},
+    {(unsigned int)ge_eAttrType_DynType2, (attrnav_sEnumElement*)&elem_dyn_type2},
+    {(unsigned int)ge_eAttrType_DynTypeTone, (attrnav_sEnumElement*)&elem_dyn_type1_tone},
+    {(unsigned int)ge_eAttrType_ActionType1, (attrnav_sEnumElement*)&elem_action_type},
+    {(unsigned int)ge_eAttrType_InstanceMask, (attrnav_sEnumElement*)&elem_instance_mask},
+    {(unsigned int)ge_eAttrType_InputFocus, (attrnav_sEnumElement*)&elem_inputfocus_mask},
+    {0, NULL}};
 
 int AttrNav::string_to_mask(int type_id, char* str, pwr_tMask* mask)
 {
@@ -1504,11 +1354,12 @@ int AttrNav::string_to_mask(int type_id, char* str, pwr_tMask* mask)
   int nr;
   unsigned int m = 0;
 
-  nr = dcli_parse(str, "|", "", (char*)vect, sizeof(vect) / sizeof(vect[0]),
-      sizeof(vect[0]), 0);
+  nr = dcli_parse(str, "|", "", (char*)vect, sizeof(vect) / sizeof(vect[0]), sizeof(vect[0]), 0);
 
-  for (enum_p = mask_types; enum_p->elements; enum_p++) {
-    if (enum_p->num == (unsigned int)type_id) {
+  for (enum_p = mask_types; enum_p->elements; enum_p++)
+  {
+    if (enum_p->num == (unsigned int)type_id)
+    {
       found = 1;
       break;
     }
@@ -1516,11 +1367,14 @@ int AttrNav::string_to_mask(int type_id, char* str, pwr_tMask* mask)
   if (!found)
     return 1;
 
-  for (int i = 0; i < nr; i++) {
+  for (int i = 0; i < nr; i++)
+  {
     found = 0;
     elem_p = enum_p->elements;
-    for (; elem_p->name[0] != 0; elem_p++) {
-      if (str_NoCaseStrcmp(elem_p->name, vect[i]) == 0) {
+    for (; elem_p->name[0] != 0; elem_p++)
+    {
+      if (str_NoCaseStrcmp(elem_p->name, vect[i]) == 0)
+      {
         m |= elem_p->num;
         found = 1;
         break;
@@ -1539,8 +1393,10 @@ int AttrNav::string_to_enum(int type_id, char* str, pwr_tEnum* enumval)
   attrnav_sEnum* enum_p;
   int found = 0;
 
-  for (enum_p = enum_types; enum_p->elements; enum_p++) {
-    if (enum_p->num == (unsigned int)type_id) {
+  for (enum_p = enum_types; enum_p->elements; enum_p++)
+  {
+    if (enum_p->num == (unsigned int)type_id)
+    {
       found = 1;
       break;
     }
@@ -1549,8 +1405,10 @@ int AttrNav::string_to_enum(int type_id, char* str, pwr_tEnum* enumval)
     return 1;
 
   elem_p = enum_p->elements;
-  for (; elem_p->name[0] != 0; elem_p++) {
-    if (str_NoCaseStrcmp(elem_p->name, str) == 0) {
+  for (; elem_p->name[0] != 0; elem_p++)
+  {
+    if (str_NoCaseStrcmp(elem_p->name, str) == 0)
+    {
       *enumval = elem_p->num;
       return 1;
     }
@@ -1558,15 +1416,16 @@ int AttrNav::string_to_enum(int type_id, char* str, pwr_tEnum* enumval)
   return 0;
 }
 
-int AttrNav::enum_to_string(
-    int type_id, pwr_tEnum enumval, char* str, int strsize)
+int AttrNav::enum_to_string(int type_id, pwr_tEnum enumval, char* str, int strsize)
 {
   attrnav_sEnumElement* elem_p;
   attrnav_sEnum* enum_p;
   int found = 0;
 
-  for (enum_p = enum_types; enum_p->elements; enum_p++) {
-    if (enum_p->num == (unsigned int)type_id) {
+  for (enum_p = enum_types; enum_p->elements; enum_p++)
+  {
+    if (enum_p->num == (unsigned int)type_id)
+    {
       found = 1;
       break;
     }
@@ -1575,8 +1434,10 @@ int AttrNav::enum_to_string(
     return 1;
 
   elem_p = enum_p->elements;
-  for (; elem_p->name[0] != 0; elem_p++) {
-    if (enumval == (int)elem_p->num) {
+  for (; elem_p->name[0] != 0; elem_p++)
+  {
+    if (enumval == (int)elem_p->num)
+    {
       strncpy(str, elem_p->name, strsize);
       return 1;
     }
@@ -1587,31 +1448,34 @@ int AttrNav::enum_to_string(
 static char null_str[] = "";
 
 static int attrnav_trace_scan_bc(brow_tObject object, void* p);
-static int attrnav_trace_connect_bc(brow_tObject object, char* name, char* attr,
-    flow_eTraceType type, /* flow_eDrawType color, */ void** p);
+static int attrnav_trace_connect_bc(brow_tObject object, char* name, char* attr, flow_eTraceType type,
+                                    /* flow_eDrawType color, */ void** p);
 static int attrnav_trace_disconnect_bc(brow_tObject object);
 static char* attrnav_mask_to_string(int type_id, int value);
 
 //
 // Convert attribute string to value
 //
-int attrnav_attr_string_to_value(int type_id, char* value_str, void* buffer_ptr,
-    int buff_size, int attr_size)
+int attrnav_attr_string_to_value(int type_id, char* value_str, void* buffer_ptr, int buff_size, int attr_size)
 {
-  switch (type_id) {
-  case glow_eType_Boolean: {
+  switch (type_id)
+  {
+  case glow_eType_Boolean:
+  {
     if (sscanf(value_str, "%d", (pwr_tBoolean*)buffer_ptr) != 1)
       return ATTRNAV__INPUT_SYNTAX;
     if (*(pwr_tBoolean*)buffer_ptr > 1)
       return ATTRNAV__INPUT_SYNTAX;
     break;
   }
-  case glow_eType_Float: {
+  case glow_eType_Float:
+  {
     if (sscanf(value_str, "%f", (pwr_tFloat32*)buffer_ptr) != 1)
       return ATTRNAV__INPUT_SYNTAX;
     break;
   }
-  case glow_eType_Double: {
+  case glow_eType_Double:
+  {
     pwr_tFloat32 f;
     pwr_tFloat64 d;
     if (sscanf(value_str, "%f", &f) != 1)
@@ -1674,12 +1538,14 @@ int attrnav_attr_string_to_value(int type_id, char* value_str, void* buffer_ptr,
   case ge_eAttrType_UcTemperature:
   case ge_eAttrType_UcTime:
   case ge_eAttrType_UcVolume:
-  case ge_eAttrType_UcVolumeFlow: {
+  case ge_eAttrType_UcVolumeFlow:
+  {
     if (sscanf(value_str, "%u", (int*)buffer_ptr) != 1)
       return ATTRNAV__INPUT_SYNTAX;
     break;
   }
-  case glow_eType_String: {
+  case glow_eType_String:
+  {
     if ((int)strlen(value_str) >= attr_size)
       return ATTRNAV__STRINGTOLONG;
     strncpy((char*)buffer_ptr, value_str, MIN(attr_size, buff_size));
@@ -1692,44 +1558,50 @@ int attrnav_attr_string_to_value(int type_id, char* value_str, void* buffer_ptr,
 //
 // Convert attribute value to string
 //
-void attrnav_attrvalue_to_string(
-    int type_id, void* value_ptr, char* str, int size, int* len, char* format)
+void attrnav_attrvalue_to_string(int type_id, void* value_ptr, char* str, int size, int* len, char* format)
 {
-  if (value_ptr == 0) {
+  if (value_ptr == 0)
+  {
     strcpy(str, "UNDEFINED");
     return;
   }
 
-  switch (type_id) {
-  case glow_eType_Boolean: {
+  switch (type_id)
+  {
+  case glow_eType_Boolean:
+  {
     if (!format)
       *len = snprintf(str, size, "%d", *(pwr_tBoolean*)value_ptr);
     else
       *len = snprintf(str, size, format, *(pwr_tBoolean*)value_ptr);
     break;
   }
-  case glow_eType_Float: {
+  case glow_eType_Float:
+  {
     if (!format)
       *len = snprintf(str, size, "%g", *(float*)value_ptr);
     else
       *len = snprintf(str, size, format, *(float*)value_ptr);
     break;
   }
-  case glow_eType_Double: {
+  case glow_eType_Double:
+  {
     if (!format)
       *len = snprintf(str, size, "%g", *(double*)value_ptr);
     else
       *len = snprintf(str, size, format, *(double*)value_ptr);
     break;
   }
-  case glow_eType_Int: {
+  case glow_eType_Int:
+  {
     if (!format)
       *len = snprintf(str, size, "%d", *(int*)value_ptr);
     else
       *len = snprintf(str, size, format, *(int*)value_ptr);
     break;
   }
-  case glow_eType_String: {
+  case glow_eType_String:
+  {
     strncpy(str, (char*)value_ptr, size);
     str[size - 1] = 0;
     *len = strlen(str);
@@ -1780,28 +1652,33 @@ void attrnav_attrvalue_to_string(
   case ge_eAttrType_UcTemperature:
   case ge_eAttrType_UcTime:
   case ge_eAttrType_UcVolume:
-  case ge_eAttrType_UcVolumeFlow: {
+  case ge_eAttrType_UcVolumeFlow:
+  {
     attrnav_sEnumElement* elem_p = NULL;
     attrnav_sEnum* enum_p;
     int found;
 
     found = 0;
-    for (enum_p = enum_types; enum_p->elements; enum_p++) {
-      if (enum_p->num == (unsigned int)type_id) {
+    for (enum_p = enum_types; enum_p->elements; enum_p++)
+    {
+      if (enum_p->num == (unsigned int)type_id)
+      {
         elem_p = enum_p->elements;
         found = 1;
         break;
       }
     }
-    if (!found) {
-      attrnav_attrvalue_to_string(
-          glow_eType_Int, value_ptr, str, size, len, format);
+    if (!found)
+    {
+      attrnav_attrvalue_to_string(glow_eType_Int, value_ptr, str, size, len, format);
       return;
     }
 
     found = 0;
-    for (; elem_p->name[0] != 0; elem_p++) {
-      if (elem_p->num == *(unsigned int*)value_ptr) {
+    for (; elem_p->name[0] != 0; elem_p++)
+    {
+      if (elem_p->num == *(unsigned int*)value_ptr)
+      {
         strncpy(str, elem_p->name, size);
         str[size - 1] = 0;
         *len = strlen(str);
@@ -1810,9 +1687,9 @@ void attrnav_attrvalue_to_string(
       }
     }
 
-    if (!found) {
-      attrnav_attrvalue_to_string(
-          glow_eType_Int, value_ptr, str, size, len, format);
+    if (!found)
+    {
+      attrnav_attrvalue_to_string(glow_eType_Int, value_ptr, str, size, len, format);
       return;
     }
     break;
@@ -1824,7 +1701,8 @@ void attrnav_attrvalue_to_string(
   case ge_eAttrType_ActionType1:
   case ge_eAttrType_ActionType2:
   case ge_eAttrType_InstanceMask:
-  case ge_eAttrType_InputFocus: {
+  case ge_eAttrType_InputFocus:
+  {
     strncpy(str, attrnav_mask_to_string(type_id, *(int*)value_ptr), size);
     str[size - 1] = 0;
     *len = strlen(str);
@@ -1833,10 +1711,7 @@ void attrnav_attrvalue_to_string(
   }
 }
 
-void AttrNav::message(int popup, char sev, const char* text)
-{
-  (message_cb)(parent_ctx, popup, sev, text);
-}
+void AttrNav::message(int popup, char sev, const char* text) { (message_cb)(parent_ctx, popup, sev, text); }
 
 //
 //  Free pixmaps
@@ -1871,15 +1746,13 @@ void AttrNavBrow::allocate_pixmaps()
 //
 // Create the navigator widget
 //
-AttrNav::AttrNav(void* xn_parent_ctx, attr_eType xn_type, const char* xn_name,
-    attr_sItem* xn_itemlist, int xn_item_cnt, 
-    void (*xn_get_object_list_cb)(void*, unsigned int, grow_tObject**, int*, 
-    grow_tObject*, int), pwr_tStatus* status)
-      : parent_ctx(xn_parent_ctx), type(xn_type), brow(0), itemlist(xn_itemlist),
-      item_cnt(xn_item_cnt), trace_started(0), graph(0), last_selected(0),
-      last_selected_id(0), filter_type(attr_eFilterType_No), 
-      layer_highlighted(0), message_cb(NULL),
-      get_object_list_cb(xn_get_object_list_cb), set_inputfocus_cb(0), 
+AttrNav::AttrNav(void* xn_parent_ctx, attr_eType xn_type, const char* xn_name, attr_sItem* xn_itemlist,
+                 int xn_item_cnt,
+                 void (*xn_get_object_list_cb)(void*, unsigned int, grow_tObject**, int*, grow_tObject*, int),
+                 pwr_tStatus* status)
+    : parent_ctx(xn_parent_ctx), type(xn_type), brow(0), itemlist(xn_itemlist), item_cnt(xn_item_cnt),
+      trace_started(0), graph(0), last_selected(0), last_selected_id(0), filter_type(attr_eFilterType_No),
+      layer_highlighted(0), message_cb(NULL), get_object_list_cb(xn_get_object_list_cb), set_inputfocus_cb(0),
       traverse_inputfocus_cb(0)
 {
   strcpy(name, xn_name);
@@ -1889,20 +1762,14 @@ AttrNav::AttrNav(void* xn_parent_ctx, attr_eType xn_type, const char* xn_name,
 //
 //  Delete a nav context
 //
-AttrNav::~AttrNav()
-{
-}
+AttrNav::~AttrNav() {}
 
-AttrNavBrow::~AttrNavBrow()
-{
-  free_pixmaps();
-}
+AttrNavBrow::~AttrNavBrow() { free_pixmaps(); }
 
 //
 // Set attribute value
 //
-int AttrNav::set_attr_value(
-    char* value_str, grow_tObject* id, void** client_data)
+int AttrNav::set_attr_value(char* value_str, grow_tObject* id, void** client_data)
 {
   brow_tNode* node_list;
   int node_count;
@@ -1925,16 +1792,19 @@ int AttrNav::set_attr_value(
   brow_GetUserData(node_list[0], (void**)&item);
   free(node_list);
 
-  switch (item->type) {
-  case attrnav_eItemType_Local: {
-    sts = attrnav_attr_string_to_value(
-        item->type_id, value_str, buffer, sizeof(buffer), item->size);
+  switch (item->type)
+  {
+  case attrnav_eItemType_Local:
+  {
+    sts = attrnav_attr_string_to_value(item->type_id, value_str, buffer, sizeof(buffer), item->size);
     if (EVEN(sts))
       return sts;
 
-    if (item->input_validation_cb) {
+    if (item->input_validation_cb)
+    {
       sts = (item->input_validation_cb)(item->validation_ctx, (void*)buffer);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         char msg[200];
 
         msg_GetMsg(sts, msg, sizeof(msg));
@@ -1943,22 +1813,28 @@ int AttrNav::set_attr_value(
       }
     }
 
-    if (!feq(item->max_limit, 0.0) || !feq(item->min_limit, 0.0)) {
-      if (item->type_id == glow_eType_Double) {
-        if (*(double*)&buffer < item->min_limit
-            || *(double*)&buffer > item->max_limit) {
+    if (!feq(item->max_limit, 0.0) || !feq(item->min_limit, 0.0))
+    {
+      if (item->type_id == glow_eType_Double)
+      {
+        if (*(double*)&buffer < item->min_limit || *(double*)&buffer > item->max_limit)
+        {
           message(0, 'E', "Min or maxvalue exceeded");
           return 0;
         }
-      } else if (item->type_id == glow_eType_Float) {
-        if (*(float*)&buffer < item->min_limit
-            || *(float*)&buffer > item->max_limit) {
+      }
+      else if (item->type_id == glow_eType_Float)
+      {
+        if (*(float*)&buffer < item->min_limit || *(float*)&buffer > item->max_limit)
+        {
           message(0, 'E', "Min or maxvalue exceeded");
           return 0;
         }
-      } else if (item->type_id == glow_eType_Int) {
-        if (*(int*)&buffer < item->min_limit
-            || *(int*)&buffer > item->max_limit) {
+      }
+      else if (item->type_id == glow_eType_Int)
+      {
+        if (*(int*)&buffer < item->min_limit || *(int*)&buffer > item->max_limit)
+        {
           message(0, 'E', "Min or maxvalue exceeded");
           return 0;
         }
@@ -1966,28 +1842,32 @@ int AttrNav::set_attr_value(
     }
     memcpy(item->value_p, buffer, item->size);
 
-    if ((str_NoCaseStrcmp(item->name, "Subgraph") == 0
-	 || str_NoCaseStrcmp(item->name, "AnalogColor.CommonAttribute") == 0)
-        && reconfigure_attr_cb) {
-      switch(type) {
+    if ((str_NoCaseStrcmp(item->name, "Subgraph") == 0 ||
+         str_NoCaseStrcmp(item->name, "AnalogColor.CommonAttribute") == 0) &&
+        reconfigure_attr_cb)
+    {
+      switch (type)
+      {
       case attr_eType_Attributes:
         (reconfigure_attr_cb)(parent_ctx);
-	break;
+        break;
       case attr_eType_ObjectTree:
         refresh_objects(attr_mRefresh_Objects);
-	break;
-      default:
-	;
+        break;
+      default:;
       }
       return FLOW__DESTROYED;
     }
 
-    if (type == attr_eType_ObjectTree) {
+    if (type == attr_eType_ObjectTree)
+    {
       // Redraw graph object
       sts = brow_GetParent(brow->ctx, item->node, &parent);
-      if (ODD(sts)) {
+      if (ODD(sts))
+      {
         brow_GetUserData(parent, (void**)&oitem);
-        if (oitem->type == attrnav_eItemType_Object) {
+        if (oitem->type == attrnav_eItemType_Object)
+        {
           // grow_DrawObject( oitem->id);
           if (client_data)
             *client_data = oitem->attr_client_data;
@@ -1996,11 +1876,12 @@ int AttrNav::set_attr_value(
 
           // Check if name is changed
           grow_GetObjectName(oitem->id, name, sizeof(name), glow_eName_Object);
-          if (!streq(oitem->name, name)) {
+          if (!streq(oitem->name, name))
+          {
             strcpy(oitem->name, name);
             brow_SetAnnotation(oitem->node, 0, name, strlen(name));
-	    if (oitem->is_layer())
-	      graph->refresh_objects(attr_mRefresh_Objects);
+            if (oitem->is_layer())
+              graph->refresh_objects(attr_mRefresh_Objects);
           }
         }
       }
@@ -2031,13 +1912,16 @@ int AttrNav::check_attr_value(int* multiline, int* size, char** value)
   brow_GetUserData(node_list[0], (void**)&base_item);
   free(node_list);
 
-  switch (base_item->type) {
-  case attrnav_eItemType_Local: {
+  switch (base_item->type)
+  {
+  case attrnav_eItemType_Local:
+  {
     AItemLocal* item;
 
     item = (AItemLocal*)base_item;
 
-    if (base_item->noedit) {
+    if (base_item->noedit)
+    {
       *multiline = 0;
       *size = base_item->size;
       *value = 0;
@@ -2046,8 +1930,7 @@ int AttrNav::check_attr_value(int* multiline, int* size, char** value)
     *multiline = base_item->multiline;
     *size = base_item->size;
     // if ( base_item->type_id == glow_eType_String)
-    attrnav_attrvalue_to_string(
-        item->type_id, item->value_p, buf, sizeof(buf), &len, NULL);
+    attrnav_attrvalue_to_string(item->type_id, item->value_p, buf, sizeof(buf), &len, NULL);
     *value = buf;
 
     // *value = (char *) base_item->value_p;
@@ -2070,7 +1953,8 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
   AttrNav* attrnav;
   AItemLocal* item;
 
-  if (event->event == flow_eEvent_ObjectDeleted) {
+  if (event->event == flow_eEvent_ObjectDeleted)
+  {
     brow_GetUserData(event->object.object, (void**)&item);
     delete item;
     return 1;
@@ -2078,61 +1962,75 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
 
   brow_GetCtxUserData((BrowCtx*)ctx, (void**)&attrnav);
   attrnav->message(0, ' ', null_str);
-  switch (event->event) {
-  case flow_eEvent_Key_PageDown: {
+  switch (event->event)
+  {
+  case flow_eEvent_Key_PageDown:
+  {
     brow_Page(attrnav->brow->ctx, 0.8);
     break;
   }
-  case flow_eEvent_Key_PageUp: {
+  case flow_eEvent_Key_PageUp:
+  {
     brow_Page(attrnav->brow->ctx, -0.8);
     break;
   }
-  case flow_eEvent_ScrollDown: {
+  case flow_eEvent_ScrollDown:
+  {
     brow_Page(attrnav->brow->ctx, 0.1);
     break;
   }
-  case flow_eEvent_ScrollUp: {
+  case flow_eEvent_ScrollUp:
+  {
     brow_Page(attrnav->brow->ctx, -0.1);
     break;
   }
   case flow_eEvent_Key_Up:
-  case flow_eEvent_Key_ShiftUp: {
+  case flow_eEvent_Key_ShiftUp:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object, parent, current;
     int sts;
 
-    if (event->event == flow_eEvent_Key_ShiftUp
-        && attrnav->type != attr_eType_ObjectTree)
+    if (event->event == flow_eEvent_Key_ShiftUp && attrnav->type != attr_eType_ObjectTree)
       return 1;
 
     brow_GetSelectedNodes(attrnav->brow->ctx, &node_list, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       current = 0;
-      if (attrnav->last_selected_id) {
+      if (attrnav->last_selected_id)
+      {
         object = attrnav->gobject_to_bobject(attrnav->last_selected_id);
-        if (!object) {
+        if (!object)
+        {
           sts = brow_GetLastVisible(attrnav->brow->ctx, &object);
           if (EVEN(sts))
             return 1;
         }
-        if (!brow_IsVisible(
-                attrnav->brow->ctx, object, flow_eVisible_Partial)) {
+        if (!brow_IsVisible(attrnav->brow->ctx, object, flow_eVisible_Partial))
+        {
           sts = brow_GetLastVisible(attrnav->brow->ctx, &object);
           if (EVEN(sts))
             return 1;
         }
-      } else {
+      }
+      else
+      {
         sts = brow_GetLastVisible(attrnav->brow->ctx, &object);
         if (EVEN(sts))
           return 1;
       }
-    } else {
+    }
+    else
+    {
       if (node_count == 1)
         current = node_list[0];
-      else {
+      else
+      {
         bool found = false;
-        for (int i = 0; i < node_count; i++) {
+        for (int i = 0; i < node_count; i++)
+        {
           if (node_list[i] == attrnav->last_selected)
             found = true;
         }
@@ -2141,30 +2039,37 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
         else
           current = node_list[0];
       }
-      if (!brow_IsVisible(
-              attrnav->brow->ctx, node_list[0], flow_eVisible_Partial)
-          && event->event == flow_eEvent_Key_Up) {
+      if (!brow_IsVisible(attrnav->brow->ctx, node_list[0], flow_eVisible_Partial) &&
+          event->event == flow_eEvent_Key_Up)
+      {
         sts = brow_GetLastVisible(attrnav->brow->ctx, &object);
         if (EVEN(sts))
           return 1;
-      } else {
+      }
+      else
+      {
         sts = brow_GetPrevious(attrnav->brow->ctx, current, &object);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           if (node_count)
             free(node_list);
           return 1;
         }
       }
     }
-    if (event->event == flow_eEvent_Key_ShiftUp) {
+    if (event->event == flow_eEvent_Key_ShiftUp)
+    {
       bool found = false;
-      for (int i = 0; i < node_count; i++) {
+      for (int i = 0; i < node_count; i++)
+      {
         if (node_list[i] == object)
           found = true;
       }
-      if (found) {
+      if (found)
+      {
         // Next object is already selected, unselect current
-        if (current) {
+        if (current)
+        {
           brow_SetInverse(current, 0);
           brow_SelectRemove(attrnav->brow->ctx, current);
           attrnav->last_selected = object;
@@ -2173,25 +2078,28 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
             brow_CenterObject(attrnav->brow->ctx, object, 0.75);
 
           brow_GetUserData(current, (void**)&item);
-          if (item->type == attrnav_eItemType_Object) {
+          if (item->type == attrnav_eItemType_Object)
+          {
             if (attrnav->type == attr_eType_ObjectTree)
-	      if (!((AItemObject*)item)->is_layer())
-		attrnav->graph->add_select_object(((AItemObject*)item)->id, 0);
+              if (!((AItemObject*)item)->is_layer())
+                attrnav->graph->add_select_object(((AItemObject*)item)->id, 0);
           }
           if (node_count)
             free(node_list);
           return 1;
         }
-      } else {
+      }
+      else
+      {
         brow_SetInverse(object, 1);
         brow_SelectInsert(attrnav->brow->ctx, object);
         attrnav->last_selected = object;
 
         brow_GetUserData(object, (void**)&item);
-        if (item->type == attrnav_eItemType_Object
-            && attrnav->type == attr_eType_ObjectTree) {
-	  if (!((AItemObject*)item)->is_layer())
-	    attrnav->graph->add_select_object(((AItemObject*)item)->id, 1);
+        if (item->type == attrnav_eItemType_Object && attrnav->type == attr_eType_ObjectTree)
+        {
+          if (!((AItemObject*)item)->is_layer())
+            attrnav->graph->add_select_object(((AItemObject*)item)->id, 1);
           attrnav->last_selected_id = ((AItemObject*)item)->id;
         }
         if (!brow_IsVisible(attrnav->brow->ctx, object, flow_eVisible_Full))
@@ -2200,11 +2108,14 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
           free(node_list);
         return 1;
       }
-    } else {
+    }
+    else
+    {
       brow_SelectClear(attrnav->brow->ctx);
-      if (attrnav->layer_highlighted) {
-	grow_ResetHighlightAll(attrnav->graph->grow->ctx);
-	attrnav->layer_highlighted = 0;
+      if (attrnav->layer_highlighted)
+      {
+        grow_ResetHighlightAll(attrnav->graph->grow->ctx);
+        attrnav->layer_highlighted = 0;
       }
       brow_SetInverse(object, 1);
       brow_SelectInsert(attrnav->brow->ctx, object);
@@ -2217,19 +2128,25 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
     brow_GetUserData(object, (void**)&item);
 
     attrnav->last_selected = object;
-    if (item->type == attrnav_eItemType_Object) {
-      if (attrnav->type == attr_eType_ObjectTree) {
-	if (((AItemObject*)item)->is_layer())
-	  attrnav->graph->select_clear();
-	else
-	  attrnav->graph->select_object(((AItemObject*)item)->id);
+    if (item->type == attrnav_eItemType_Object)
+    {
+      if (attrnav->type == attr_eType_ObjectTree)
+      {
+        if (((AItemObject*)item)->is_layer())
+          attrnav->graph->select_clear();
+        else
+          attrnav->graph->select_object(((AItemObject*)item)->id);
       }
       attrnav->last_selected_id = ((AItemObject*)item)->id;
-    } else {
+    }
+    else
+    {
       for (sts = brow_GetParent(attrnav->brow->ctx, object, &parent); ODD(sts);
-           sts = brow_GetParent(attrnav->brow->ctx, parent, &parent)) {
+           sts = brow_GetParent(attrnav->brow->ctx, parent, &parent))
+      {
         brow_GetUserData(parent, (void**)&item);
-        if (item->type == attrnav_eItemType_Object) {
+        if (item->type == attrnav_eItemType_Object)
+        {
           attrnav->last_selected_id = ((AItemObject*)item)->id;
           break;
         }
@@ -2238,43 +2155,52 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
     break;
   }
   case flow_eEvent_Key_Down:
-  case flow_eEvent_Key_ShiftDown: {
+  case flow_eEvent_Key_ShiftDown:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object, parent, current;
     int sts;
 
-    if (event->event == flow_eEvent_Key_ShiftDown
-        && attrnav->type != attr_eType_ObjectTree)
+    if (event->event == flow_eEvent_Key_ShiftDown && attrnav->type != attr_eType_ObjectTree)
       return 1;
 
     brow_GetSelectedNodes(attrnav->brow->ctx, &node_list, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       current = 0;
-      if (attrnav->last_selected_id) {
+      if (attrnav->last_selected_id)
+      {
         object = attrnav->gobject_to_bobject(attrnav->last_selected_id);
-        if (!object) {
+        if (!object)
+        {
           sts = brow_GetFirstVisible(attrnav->brow->ctx, &object);
           if (EVEN(sts))
             return 1;
         }
-        if (!brow_IsVisible(
-                attrnav->brow->ctx, object, flow_eVisible_Partial)) {
+        if (!brow_IsVisible(attrnav->brow->ctx, object, flow_eVisible_Partial))
+        {
           sts = brow_GetFirstVisible(attrnav->brow->ctx, &object);
           if (EVEN(sts))
             return 1;
         }
-      } else {
+      }
+      else
+      {
         sts = brow_GetFirstVisible(attrnav->brow->ctx, &object);
         if (EVEN(sts))
           return 1;
       }
-    } else {
+    }
+    else
+    {
       if (node_count == 1)
         current = node_list[0];
-      else {
+      else
+      {
         bool found = false;
-        for (int i = 0; i < node_count; i++) {
+        for (int i = 0; i < node_count; i++)
+        {
           if (node_list[i] == attrnav->last_selected)
             found = true;
         }
@@ -2283,29 +2209,37 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
         else
           current = node_list[0];
       }
-      if (!brow_IsVisible(attrnav->brow->ctx, current, flow_eVisible_Partial)
-          && event->event == flow_eEvent_Key_Down) {
+      if (!brow_IsVisible(attrnav->brow->ctx, current, flow_eVisible_Partial) &&
+          event->event == flow_eEvent_Key_Down)
+      {
         sts = brow_GetFirstVisible(attrnav->brow->ctx, &object);
         if (EVEN(sts))
           return 1;
-      } else {
+      }
+      else
+      {
         sts = brow_GetNext(attrnav->brow->ctx, current, &object);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           if (node_count)
             free(node_list);
           return 1;
         }
       }
     }
-    if (event->event == flow_eEvent_Key_ShiftDown) {
+    if (event->event == flow_eEvent_Key_ShiftDown)
+    {
       bool found = false;
-      for (int i = 0; i < node_count; i++) {
+      for (int i = 0; i < node_count; i++)
+      {
         if (node_list[i] == object)
           found = true;
       }
-      if (found) {
+      if (found)
+      {
         // Next object is already selected, unselect current
-        if (current) {
+        if (current)
+        {
           brow_SetInverse(current, 0);
           brow_SelectRemove(attrnav->brow->ctx, current);
           attrnav->last_selected = object;
@@ -2314,7 +2248,8 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
             brow_CenterObject(attrnav->brow->ctx, object, 0.25);
 
           brow_GetUserData(current, (void**)&item);
-          if (item->type == attrnav_eItemType_Object) {
+          if (item->type == attrnav_eItemType_Object)
+          {
             if (attrnav->type == attr_eType_ObjectTree)
               attrnav->graph->add_select_object(((AItemObject*)item)->id, 0);
           }
@@ -2322,14 +2257,16 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
             free(node_list);
           return 1;
         }
-      } else {
+      }
+      else
+      {
         brow_SetInverse(object, 1);
         brow_SelectInsert(attrnav->brow->ctx, object);
         attrnav->last_selected = object;
 
         brow_GetUserData(object, (void**)&item);
-        if (item->type == attrnav_eItemType_Object
-            && attrnav->type == attr_eType_ObjectTree) {
+        if (item->type == attrnav_eItemType_Object && attrnav->type == attr_eType_ObjectTree)
+        {
           attrnav->graph->add_select_object(((AItemObject*)item)->id, 1);
           attrnav->last_selected_id = ((AItemObject*)item)->id;
         }
@@ -2339,11 +2276,14 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
           free(node_list);
         return 1;
       }
-    } else {
+    }
+    else
+    {
       brow_SelectClear(attrnav->brow->ctx);
-      if (attrnav->layer_highlighted) {
-	grow_ResetHighlightAll(attrnav->graph->grow->ctx);
-	attrnav->layer_highlighted = 0;
+      if (attrnav->layer_highlighted)
+      {
+        grow_ResetHighlightAll(attrnav->graph->grow->ctx);
+        attrnav->layer_highlighted = 0;
       }
       brow_SetInverse(object, 1);
       brow_SelectInsert(attrnav->brow->ctx, object);
@@ -2356,19 +2296,25 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
     brow_GetUserData(object, (void**)&item);
 
     attrnav->last_selected = object;
-    if (item->type == attrnav_eItemType_Object) {
-      if (attrnav->type == attr_eType_ObjectTree) {
-	if (((AItemObject*)item)->is_layer())
-	  attrnav->graph->select_clear();
-	else
-	  attrnav->graph->select_object(((AItemObject*)item)->id);
+    if (item->type == attrnav_eItemType_Object)
+    {
+      if (attrnav->type == attr_eType_ObjectTree)
+      {
+        if (((AItemObject*)item)->is_layer())
+          attrnav->graph->select_clear();
+        else
+          attrnav->graph->select_object(((AItemObject*)item)->id);
       }
       attrnav->last_selected_id = ((AItemObject*)item)->id;
-    } else {
+    }
+    else
+    {
       for (sts = brow_GetParent(attrnav->brow->ctx, object, &parent); ODD(sts);
-           sts = brow_GetParent(attrnav->brow->ctx, parent, &parent)) {
+           sts = brow_GetParent(attrnav->brow->ctx, parent, &parent))
+      {
         brow_GetUserData(parent, (void**)&item);
-        if (item->type == attrnav_eItemType_Object) {
+        if (item->type == attrnav_eItemType_Object)
+        {
           attrnav->last_selected_id = ((AItemObject*)item)->id;
           break;
         }
@@ -2379,7 +2325,8 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
   case flow_eEvent_SelectClear:
     brow_ResetSelectInverse(attrnav->brow->ctx);
     break;
-  case flow_eEvent_MB2Click: {
+  case flow_eEvent_MB2Click:
+  {
     brow_tObject* list;
     int list_cnt;
     AItemObject *dest_item, *sel_item, *parent_item;
@@ -2420,37 +2367,34 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
     if (parent != sel_parent)
       break;
 
-    if (parent == 0) {
-      attrnav->graph->journal_store(journal_eAction_AnteOrderObject, 
-	  sel_item->id);
-      grow_OrderObject(attrnav->graph->grow->ctx, sel_item->id, dest_item->id,
-          glow_eDest_Before);
-      attrnav->graph->journal_store(journal_eAction_PostOrderObject, 
-	  sel_item->id);
+    if (parent == 0)
+    {
+      attrnav->graph->journal_store(journal_eAction_AnteOrderObject, sel_item->id);
+      grow_OrderObject(attrnav->graph->grow->ctx, sel_item->id, dest_item->id, glow_eDest_Before);
+      attrnav->graph->journal_store(journal_eAction_PostOrderObject, sel_item->id);
     }
-    else {
+    else
+    {
       brow_GetUserData(parent, (void**)&parent_item);
       if (parent_item->type != attrnav_eItemType_Object)
         break;
 
-      if (grow_GetObjectType(parent_item->id) == glow_eObjectType_GrowLayer) {
-	attrnav->graph->journal_store(journal_eAction_AnteOrderObject, 
-	    sel_item->id);
-	grow_OrderObject(attrnav->graph->grow->ctx, sel_item->id, 
-            dest_item->id, glow_eDest_Before);
-        attrnav->graph->journal_store(journal_eAction_PostOrderObject, 
-	    sel_item->id);
+      if (grow_GetObjectType(parent_item->id) == glow_eObjectType_GrowLayer)
+      {
+        attrnav->graph->journal_store(journal_eAction_AnteOrderObject, sel_item->id);
+        grow_OrderObject(attrnav->graph->grow->ctx, sel_item->id, dest_item->id, glow_eDest_Before);
+        attrnav->graph->journal_store(journal_eAction_PostOrderObject, sel_item->id);
       }
       else
-	grow_OrderGroupObject(
-	    parent_item->id, sel_item->id, dest_item->id, glow_eDest_Before);
+        grow_OrderGroupObject(parent_item->id, sel_item->id, dest_item->id, glow_eDest_Before);
     }
     grow_DrawObject(sel_item->id);
     grow_DrawObject(dest_item->id);
     attrnav->refresh_objects(attr_mRefresh_Objects);
     break;
   }
-  case flow_eEvent_MB1Click: {
+  case flow_eEvent_MB1Click:
+  {
     // Select
     double ll_x, ll_y, ur_x, ur_y;
     int sts;
@@ -2460,10 +2404,12 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
     else
       attrnav->set_inputfocus();
 
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_MeasureNode(event->object.object, &ll_x, &ll_y, &ur_x, &ur_y);
-      if (event->object.x < ll_x + 1.0) {
+      if (event->object.x < ll_x + 1.0)
+      {
         // Simulate doubleclick
         flow_tEvent doubleclick_event;
 
@@ -2475,46 +2421,59 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
         return sts;
       }
 
-      if (brow_FindSelectedObject(attrnav->brow->ctx, event->object.object)) {
+      if (brow_FindSelectedObject(attrnav->brow->ctx, event->object.object))
+      {
         brow_SelectClear(attrnav->brow->ctx);
-	if (attrnav->layer_highlighted) {
-	  grow_ResetHighlightAll(attrnav->graph->grow->ctx);
-	  attrnav->layer_highlighted = 0;
-	}
+        if (attrnav->layer_highlighted)
+        {
+          grow_ResetHighlightAll(attrnav->graph->grow->ctx);
+          attrnav->layer_highlighted = 0;
+        }
         if (attrnav->type == attr_eType_Layers || attrnav->type == attr_eType_ObjectTree)
-	  attrnav->graph->select_clear();
-        if (attrnav->type == attr_eType_Layers) {
+          attrnav->graph->select_clear();
+        if (attrnav->type == attr_eType_Layers)
+        {
           brow_GetUserData(event->object.object, (void**)&item);
-          if (item->type == attrnav_eItemType_Object) {
+          if (item->type == attrnav_eItemType_Object)
+          {
             attrnav->graph->select_layer(((AItemObject*)item)->id, 0);
           }
         }
-      } else {
+      }
+      else
+      {
         brow_SelectClear(attrnav->brow->ctx);
-	if (attrnav->type == attr_eType_Layers && attrnav->layer_highlighted) {
-	  grow_ResetHighlightAll(attrnav->graph->grow->ctx);
-	  attrnav->layer_highlighted = 0;
-	}
+        if (attrnav->type == attr_eType_Layers && attrnav->layer_highlighted)
+        {
+          grow_ResetHighlightAll(attrnav->graph->grow->ctx);
+          attrnav->layer_highlighted = 0;
+        }
         brow_SetInverse(event->object.object, 1);
         brow_SelectInsert(attrnav->brow->ctx, event->object.object);
 
         attrnav->last_selected = event->object.object;
 
-        if (attrnav->type == attr_eType_ObjectTree) {
+        if (attrnav->type == attr_eType_ObjectTree)
+        {
           brow_GetUserData(event->object.object, (void**)&item);
-          if (item->type == attrnav_eItemType_Object) {
-	    if (((AItemObject*)item)->is_layer()) {
-	      attrnav->graph->select_clear(1);
-	      grow_SetHighlight(((AItemObject*)item)->id, 1);
-	      attrnav->layer_highlighted = 1;
-	    }
-	    else
-	      attrnav->graph->select_object(((AItemObject*)item)->id);
+          if (item->type == attrnav_eItemType_Object)
+          {
+            if (((AItemObject*)item)->is_layer())
+            {
+              attrnav->graph->select_clear(1);
+              grow_SetHighlight(((AItemObject*)item)->id, 1);
+              attrnav->layer_highlighted = 1;
+            }
+            else
+              attrnav->graph->select_object(((AItemObject*)item)->id);
             attrnav->last_selected_id = ((AItemObject*)item)->id;
           }
-        } else if (attrnav->type == attr_eType_Layers) {
+        }
+        else if (attrnav->type == attr_eType_Layers)
+        {
           brow_GetUserData(event->object.object, (void**)&item);
-          if (item->type == attrnav_eItemType_Object) {
+          if (item->type == attrnav_eItemType_Object)
+          {
             attrnav->graph->select_layer(((AItemObject*)item)->id, 1);
             attrnav->last_selected_id = ((AItemObject*)item)->id;
           }
@@ -2522,17 +2481,20 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
       }
       break;
     default:
-      if (attrnav->type != attr_eType_Layers) {
-	brow_SelectClear(attrnav->brow->ctx);
-	if (attrnav->layer_highlighted) {
-	  grow_ResetHighlightAll(attrnav->graph->grow->ctx);
-	  attrnav->layer_highlighted = 0;
-	}
+      if (attrnav->type != attr_eType_Layers)
+      {
+        brow_SelectClear(attrnav->brow->ctx);
+        if (attrnav->layer_highlighted)
+        {
+          grow_ResetHighlightAll(attrnav->graph->grow->ctx);
+          attrnav->layer_highlighted = 0;
+        }
       }
     }
     break;
   }
-  case flow_eEvent_MB1ClickShift: {
+  case flow_eEvent_MB1ClickShift:
+  {
     // Add select
     double ll_x, ll_y, ur_x, ur_y;
     int sts;
@@ -2542,10 +2504,12 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
     else
       attrnav->set_inputfocus();
 
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_MeasureNode(event->object.object, &ll_x, &ll_y, &ur_x, &ur_y);
-      if (event->object.x < ll_x + 1.0) {
+      if (event->object.x < ll_x + 1.0)
+      {
         // Simulate doubleclick
         flow_tEvent doubleclick_event;
 
@@ -2559,20 +2523,25 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
       if (attrnav->type != attr_eType_ObjectTree)
         return 1;
 
-      if (brow_FindSelectedObject(attrnav->brow->ctx, event->object.object)) {
+      if (brow_FindSelectedObject(attrnav->brow->ctx, event->object.object))
+      {
         brow_SetInverse(event->object.object, 0);
         brow_SelectRemove(attrnav->brow->ctx, event->object.object);
 
-        if (attrnav->type == attr_eType_ObjectTree) {
+        if (attrnav->type == attr_eType_ObjectTree)
+        {
           brow_GetUserData(event->object.object, (void**)&item);
           if (item->type == attrnav_eItemType_Object)
             attrnav->graph->add_select_object(((AItemObject*)item)->id, 0);
         }
-      } else {
+      }
+      else
+      {
         brow_SetInverse(event->object.object, 1);
         brow_SelectInsert(attrnav->brow->ctx, event->object.object);
 
-        if (attrnav->type == attr_eType_ObjectTree) {
+        if (attrnav->type == attr_eType_ObjectTree)
+        {
           brow_GetUserData(event->object.object, (void**)&item);
           if (item->type == attrnav_eItemType_Object)
             attrnav->graph->add_select_object(((AItemObject*)item)->id, 1);
@@ -2583,7 +2552,8 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
     }
     break;
   }
-  case flow_eEvent_Key_Left: {
+  case flow_eEvent_Key_Left:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
@@ -2596,16 +2566,19 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
     if (brow_IsOpen(node_list[0]))
       // Close this node
       object = node_list[0];
-    else {
+    else
+    {
       // Close parent
       sts = brow_GetParent(attrnav->brow->ctx, node_list[0], &object);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         free(node_list);
         return 1;
       }
     }
     brow_GetUserData(object, (void**)&item);
-    switch (item->type) {
+    switch (item->type)
+    {
     case attrnav_eItemType_Local:
       ((AItemLocal*)item)->close(attrnav, 0, 0);
       break;
@@ -2615,7 +2588,8 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
     default:;
     }
     brow_SelectClear(attrnav->brow->ctx);
-    if (attrnav->layer_highlighted) {
+    if (attrnav->layer_highlighted)
+    {
       grow_ResetHighlightAll(attrnav->graph->grow->ctx);
       attrnav->layer_highlighted = 0;
     }
@@ -2626,7 +2600,8 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
     free(node_list);
     break;
   }
-  case flow_eEvent_Key_Right: {
+  case flow_eEvent_Key_Right:
+  {
     brow_tNode* node_list;
     int node_count;
 
@@ -2635,61 +2610,68 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
       return 1;
 
     brow_GetUserData(node_list[0], (void**)&item);
-    switch (item->type) {
+    switch (item->type)
+    {
     case attrnav_eItemType_Local:
-      if (((AItemLocal*)item)->parent || ((AItemLocal*)item)->subgraph
-          || item->type_id == ge_eAttrType_Dyn)
+      if (((AItemLocal*)item)->parent || ((AItemLocal*)item)->subgraph || item->type_id == ge_eAttrType_Dyn)
         ((AItemLocal*)item)->open_children(attrnav, 0, 0);
       else if (!((AItemLocal*)item)->parent && attrnav->change_value_cb)
         (attrnav->change_value_cb)(attrnav->parent_ctx);
       break;
-    case attrnav_eItemType_Enum: {
+    case attrnav_eItemType_Enum:
+    {
       int value;
 
       brow_GetRadiobutton(node_list[0], 0, &value);
-      if (!value) {
+      if (!value)
+      {
         brow_SetRadiobutton(node_list[0], 0, 1);
         *(int*)((AItemEnum*)item)->value_p = ((AItemEnum*)item)->num;
       }
-      if ((((AItemEnum*)item)->type_id == ge_eAttrType_OptionMenuType
-	  || ((AItemEnum*)item)->type_id == ge_eAttrType_UcEntity)
-          && attrnav->reconfigure_attr_cb) {
+      if ((((AItemEnum*)item)->type_id == ge_eAttrType_OptionMenuType ||
+           ((AItemEnum*)item)->type_id == ge_eAttrType_UcEntity) &&
+          attrnav->reconfigure_attr_cb)
+      {
         if (attrnav->type == attr_eType_Attributes)
           (attrnav->reconfigure_attr_cb)(attrnav->parent_ctx);
         else
           attrnav->refresh_objects(attr_mRefresh_Objects);
         return FLOW__DESTROYED;
       }
-      else if ((((AItemEnum*)item)->type_id == ge_eAttrType_DashType)
-          && attrnav->reconfigure_attr_cb) {
-	(attrnav->reconfigure_attr_cb)(attrnav->parent_ctx);
+      else if ((((AItemEnum*)item)->type_id == ge_eAttrType_DashType) && attrnav->reconfigure_attr_cb)
+      {
+        (attrnav->reconfigure_attr_cb)(attrnav->parent_ctx);
         return FLOW__DESTROYED;
       }
-      else if ((((AItemEnum*)item)->type_id == ge_eAttrType_DashElements)
-          && attrnav->reconfigure_attr_cb) {
-	(attrnav->reconfigure_attr_cb)(attrnav->parent_ctx);
+      else if ((((AItemEnum*)item)->type_id == ge_eAttrType_DashElements) && attrnav->reconfigure_attr_cb)
+      {
+        (attrnav->reconfigure_attr_cb)(attrnav->parent_ctx);
         return FLOW__DESTROYED;
       }
       break;
     }
-    case attrnav_eItemType_Mask: {
+    case attrnav_eItemType_Mask:
+    {
       int value;
 
       brow_GetRadiobutton(node_list[0], 0, &value);
-      if (value) {
+      if (value)
+      {
         brow_SetRadiobutton(node_list[0], 0, 0);
-        *(unsigned int*)((AItemEnum*)item)->value_p
-            &= ~(((AItemMask*)item)->mask);
-      } else {
+        *(unsigned int*)((AItemEnum*)item)->value_p &= ~(((AItemMask*)item)->mask);
+      }
+      else
+      {
         brow_SetRadiobutton(node_list[0], 0, 1);
         *(unsigned int*)((AItemEnum*)item)->value_p |= ((AItemMask*)item)->mask;
       }
-      if ((((AItemMask*)item)->type_id == ge_eAttrType_DynType1
-              || ((AItemMask*)item)->type_id == ge_eAttrType_DynType2
-              || ((AItemMask*)item)->type_id == ge_eAttrType_DynTypeTone
-              || ((AItemMask*)item)->type_id == ge_eAttrType_ActionType1
-              || ((AItemMask*)item)->type_id == ge_eAttrType_InstanceMask)
-          && attrnav->reconfigure_attr_cb) {
+      if ((((AItemMask*)item)->type_id == ge_eAttrType_DynType1 ||
+           ((AItemMask*)item)->type_id == ge_eAttrType_DynType2 ||
+           ((AItemMask*)item)->type_id == ge_eAttrType_DynTypeTone ||
+           ((AItemMask*)item)->type_id == ge_eAttrType_ActionType1 ||
+           ((AItemMask*)item)->type_id == ge_eAttrType_InstanceMask) &&
+          attrnav->reconfigure_attr_cb)
+      {
         if (attrnav->type == attr_eType_Attributes)
           (attrnav->reconfigure_attr_cb)(attrnav->parent_ctx);
         else
@@ -2705,7 +2687,8 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
     }
     break;
   }
-  case flow_eEvent_Key_ShiftRight: {
+  case flow_eEvent_Key_ShiftRight:
+  {
     brow_tNode* node_list;
     int node_count;
 
@@ -2714,7 +2697,8 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
       return 1;
 
     brow_GetUserData(node_list[0], (void**)&item);
-    switch (item->type) {
+    switch (item->type)
+    {
     case attrnav_eItemType_Object:
       ((AItemObject*)item)->open_children(attrnav, 0, 0);
       break;
@@ -2723,32 +2707,35 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
     break;
   }
   case flow_eEvent_MB1DoubleClick:
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_GetUserData(event->object.object, (void**)&item);
-      switch (item->type) {
+      switch (item->type)
+      {
       case attrnav_eItemType_Local:
-        ((AItemLocal*)item)
-            ->open_children(attrnav, event->object.x, event->object.y);
+        ((AItemLocal*)item)->open_children(attrnav, event->object.x, event->object.y);
         break;
       case attrnav_eItemType_Object:
-	if (attrnav->type == attr_eType_Layers) {
-	  if (grow_GetObjectVisibility(((AItemObject*)item)->id) == glow_eVis_Invisible) {
-	    grow_SetObjectVisibility(((AItemObject*)item)->id, glow_eVis_Visible);
-	    brow_SetAnnotPixmap(item->node, 0, attrnav->brow->pixmap_view);
-	    attrnav->graph->journal_store(journal_eAction_SetLayerVisible, 
-	        ((AItemObject*)item)->id);
-	  }
-	  else {
-	    grow_SetObjectVisibility(((AItemObject*)item)->id, glow_eVis_Invisible);
-	    brow_SetAnnotPixmap(item->node, 0, attrnav->brow->pixmap_hide);
-	    attrnav->graph->journal_store(journal_eAction_SetLayerInvisible, 
-	        ((AItemObject*)item)->id);
-	  }
-	} else {
-	  ((AItemObject*)item)->open_attributes(attrnav, event->object.x, 
-	      event->object.y);
-	}
+        if (attrnav->type == attr_eType_Layers)
+        {
+          if (grow_GetObjectVisibility(((AItemObject*)item)->id) == glow_eVis_Invisible)
+          {
+            grow_SetObjectVisibility(((AItemObject*)item)->id, glow_eVis_Visible);
+            brow_SetAnnotPixmap(item->node, 0, attrnav->brow->pixmap_view);
+            attrnav->graph->journal_store(journal_eAction_SetLayerVisible, ((AItemObject*)item)->id);
+          }
+          else
+          {
+            grow_SetObjectVisibility(((AItemObject*)item)->id, glow_eVis_Invisible);
+            brow_SetAnnotPixmap(item->node, 0, attrnav->brow->pixmap_hide);
+            attrnav->graph->journal_store(journal_eAction_SetLayerInvisible, ((AItemObject*)item)->id);
+          }
+        }
+        else
+        {
+          ((AItemObject*)item)->open_attributes(attrnav, event->object.x, event->object.y);
+        }
         break;
       default:;
       }
@@ -2757,14 +2744,15 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
     }
     break;
   case flow_eEvent_MB1DoubleClickShift:
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_GetUserData(event->object.object, (void**)&item);
-      switch (item->type) {
+      switch (item->type)
+      {
       case attrnav_eItemType_Object:
-        ((AItemObject*)item)
-            ->open_children(attrnav, event->object.x, event->object.y);
-	attrnav->refresh_objects(attr_mRefresh_Select);
+        ((AItemObject*)item)->open_children(attrnav, event->object.x, event->object.y);
+        attrnav->refresh_objects(attr_mRefresh_Select);
         break;
       default:;
       }
@@ -2773,44 +2761,48 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
     }
     break;
   case flow_eEvent_MB1DoubleClickCtrl:
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_GetUserData(event->object.object, (void**)&item);
-      switch (item->type) {
+      switch (item->type)
+      {
       case attrnav_eItemType_Local:
-        if (item->type_id == glow_eType_String) {
+        if (item->type_id == glow_eType_String)
+        {
           char attr_name[120];
           int sts;
 
           if (!attrnav->get_plant_select_cb)
             break;
-          sts = (attrnav->get_plant_select_cb)(
-	      attrnav->parent_ctx, attr_name, sizeof(attr_name));
+          sts = (attrnav->get_plant_select_cb)(attrnav->parent_ctx, attr_name, sizeof(attr_name));
           if (EVEN(sts))
             break;
 
           strncpy((char*)item->value_p, attr_name, item->size);
-        } else if (item->type_id == glow_eType_Color) {
+        }
+        else if (item->type_id == glow_eType_Color)
+        {
           int sts;
           glow_eDrawType fill_color, border_color, text_color;
 
           if (!attrnav->get_current_colors_cb)
             break;
-          sts = (attrnav->get_current_colors_cb)(
-              attrnav->parent_ctx, &fill_color, &border_color, &text_color);
+          sts =
+              (attrnav->get_current_colors_cb)(attrnav->parent_ctx, &fill_color, &border_color, &text_color);
           if (EVEN(sts))
             break;
 
           *(glow_eDrawType*)item->value_p = fill_color;
-        } else if (item->type_id == glow_eType_Tone
-            || item->type_id == glow_eType_ToneOrColor) {
+        }
+        else if (item->type_id == glow_eType_Tone || item->type_id == glow_eType_ToneOrColor)
+        {
           int sts;
           glow_eDrawType color_tone;
 
           if (!attrnav->get_current_color_tone_cb)
             break;
-          sts = (attrnav->get_current_color_tone_cb)(
-              attrnav->parent_ctx, &color_tone);
+          sts = (attrnav->get_current_color_tone_cb)(attrnav->parent_ctx, &color_tone);
           if (EVEN(sts))
             break;
 
@@ -2823,20 +2815,25 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
     default:;
     }
     break;
-  case flow_eEvent_Radiobutton: {
-    switch (event->object.object_type) {
+  case flow_eEvent_Radiobutton:
+  {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_GetUserData(event->object.object, (void**)&item);
-      switch (item->type) {
+      switch (item->type)
+      {
       case attrnav_eItemType_Enum:
-        if (!event->radiobutton.value) {
-          brow_SetRadiobutton(event->radiobutton.object,
-              event->radiobutton.number, !event->radiobutton.value);
+        if (!event->radiobutton.value)
+        {
+          brow_SetRadiobutton(event->radiobutton.object, event->radiobutton.number,
+                              !event->radiobutton.value);
           *(int*)((AItemEnum*)item)->value_p = ((AItemEnum*)item)->num;
         }
-        if ((((AItemEnum*)item)->type_id == ge_eAttrType_OptionMenuType
-	  || ((AItemEnum*)item)->type_id == ge_eAttrType_UcEntity)
-            && attrnav->reconfigure_attr_cb) {
+        if ((((AItemEnum*)item)->type_id == ge_eAttrType_OptionMenuType ||
+             ((AItemEnum*)item)->type_id == ge_eAttrType_UcEntity) &&
+            attrnav->reconfigure_attr_cb)
+        {
           if (attrnav->type == attr_eType_Attributes)
             (attrnav->reconfigure_attr_cb)(attrnav->parent_ctx);
           else
@@ -2845,22 +2842,20 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
         }
         break;
       case attrnav_eItemType_Mask:
-        brow_SetRadiobutton(event->radiobutton.object,
-            event->radiobutton.number, !event->radiobutton.value);
+        brow_SetRadiobutton(event->radiobutton.object, event->radiobutton.number, !event->radiobutton.value);
         if (event->radiobutton.value)
-          *(unsigned int*)((AItemMask*)item)->value_p
-              &= ~(((AItemMask*)item)->mask);
+          *(unsigned int*)((AItemMask*)item)->value_p &= ~(((AItemMask*)item)->mask);
         else
-          *(unsigned int*)((AItemMask*)item)->value_p
-              |= ((AItemMask*)item)->mask;
+          *(unsigned int*)((AItemMask*)item)->value_p |= ((AItemMask*)item)->mask;
 
-        if ((((AItemMask*)item)->type_id == ge_eAttrType_DynType1
-                || ((AItemMask*)item)->type_id == ge_eAttrType_DynType2
-                || ((AItemMask*)item)->type_id == ge_eAttrType_DynTypeTone
-                || ((AItemMask*)item)->type_id == ge_eAttrType_ActionType1
-                || ((AItemMask*)item)->type_id == ge_eAttrType_OptionMenuType
-                || ((AItemMask*)item)->type_id == ge_eAttrType_InstanceMask)
-            && attrnav->reconfigure_attr_cb) {
+        if ((((AItemMask*)item)->type_id == ge_eAttrType_DynType1 ||
+             ((AItemMask*)item)->type_id == ge_eAttrType_DynType2 ||
+             ((AItemMask*)item)->type_id == ge_eAttrType_DynTypeTone ||
+             ((AItemMask*)item)->type_id == ge_eAttrType_ActionType1 ||
+             ((AItemMask*)item)->type_id == ge_eAttrType_OptionMenuType ||
+             ((AItemMask*)item)->type_id == ge_eAttrType_InstanceMask) &&
+            attrnav->reconfigure_attr_cb)
+        {
           if (attrnav->type == attr_eType_Attributes)
             (attrnav->reconfigure_attr_cb)(attrnav->parent_ctx);
           else
@@ -2876,7 +2871,8 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
 
     break;
   }
-  case flow_eEvent_Key_Tab: {
+  case flow_eEvent_Key_Tab:
+  {
     if (attrnav->traverse_inputfocus_cb)
       (attrnav->traverse_inputfocus_cb)(attrnav->parent_ctx);
     break;
@@ -2899,32 +2895,37 @@ static int attrnav_trace_scan_bc(brow_tObject object, void* p)
   int len;
 
   brow_GetUserData(object, (void**)&base_item);
-  switch (base_item->type) {
-  case attrnav_eItemType_Local: {
+  switch (base_item->type)
+  {
+  case attrnav_eItemType_Local:
+  {
     AItemLocal* item;
 
     item = (AItemLocal*)base_item;
     if (item->size == 0)
       break;
 
-    if (!item->first_scan) {
-      if (item->size > (int)sizeof(item->old_value)
-          && item->type_id == glow_eType_String
-          && strlen((char*)p) < sizeof(item->old_value)
-          && streq((char*)p, item->old_value))
+    if (!item->first_scan)
+    {
+      if (item->size > (int)sizeof(item->old_value) && item->type_id == glow_eType_String &&
+          strlen((char*)p) < sizeof(item->old_value) && streq((char*)p, item->old_value))
         // No change since last time
         return 1;
       else if (memcmp(item->old_value, p, item->size) == 0)
         // No change since last time
         return 1;
-    } else
+    }
+    else
       item->first_scan = 0;
 
     attrnav_attrvalue_to_string(item->type_id, p, buf, sizeof(buf), &len, NULL);
-    if (item->multiline) {
+    if (item->multiline)
+    {
       // Display first line only
-      for (int i = 0; i < len; i++) {
-        if (buf[i] == '\n') {
+      for (int i = 0; i < len; i++)
+      {
+        if (buf[i] == '\n')
+        {
           buf[i] = 0;
           len = strlen(buf);
           break;
@@ -2935,15 +2936,18 @@ static int attrnav_trace_scan_bc(brow_tObject object, void* p)
     memcpy(item->old_value, p, MIN(item->size, (int)sizeof(item->old_value)));
     break;
   }
-  case attrnav_eItemType_Enum: {
+  case attrnav_eItemType_Enum:
+  {
     AItemEnum* item;
 
     item = (AItemEnum*)base_item;
-    if (!item->first_scan) {
+    if (!item->first_scan)
+    {
       if (item->old_value == *(int*)p)
         // No change since last time
         return 1;
-    } else
+    }
+    else
       item->first_scan = 0;
 
     if (*(int*)p == item->num)
@@ -2954,15 +2958,18 @@ static int attrnav_trace_scan_bc(brow_tObject object, void* p)
     item->old_value = *(int*)p;
     break;
   }
-  case attrnav_eItemType_Mask: {
+  case attrnav_eItemType_Mask:
+  {
     AItemMask* item;
 
     item = (AItemMask*)base_item;
-    if (!item->first_scan) {
+    if (!item->first_scan)
+    {
       if (item->old_value == *(int*)p)
         // No change since last time
         return 1;
-    } else
+    }
+    else
       item->first_scan = 0;
 
     if (*(unsigned int*)p & item->mask)
@@ -2978,8 +2985,8 @@ static int attrnav_trace_scan_bc(brow_tObject object, void* p)
   return 1;
 }
 
-static int attrnav_trace_connect_bc(brow_tObject object, char* name, char* attr,
-    flow_eTraceType type, /* flow_eDrawType color, */ void** p)
+static int attrnav_trace_connect_bc(brow_tObject object, char* name, char* attr, flow_eTraceType type,
+                                    /* flow_eDrawType color, */ void** p)
 {
   AItemLocal* base_item;
 
@@ -2989,8 +2996,10 @@ static int attrnav_trace_connect_bc(brow_tObject object, char* name, char* attr,
     return 1;
 
   brow_GetUserData(object, (void**)&base_item);
-  switch (base_item->type) {
-  case attrnav_eItemType_Local: {
+  switch (base_item->type)
+  {
+  case attrnav_eItemType_Local:
+  {
     AItemLocal* item;
 
     item = (AItemLocal*)base_item;
@@ -3000,14 +3009,16 @@ static int attrnav_trace_connect_bc(brow_tObject object, char* name, char* attr,
     *p = item->value_p;
     break;
   }
-  case attrnav_eItemType_Enum: {
+  case attrnav_eItemType_Enum:
+  {
     AItemEnum* item;
 
     item = (AItemEnum*)base_item;
     *p = item->value_p;
     break;
   }
-  case attrnav_eItemType_Mask: {
+  case attrnav_eItemType_Mask:
+  {
     AItemMask* item;
 
     item = (AItemMask*)base_item;
@@ -3024,7 +3035,8 @@ static int attrnav_trace_disconnect_bc(brow_tObject object)
   AItemLocal* base_item;
 
   brow_GetUserData(object, (void**)&base_item);
-  switch (base_item->type) {
+  switch (base_item->type)
+  {
   default:;
   }
   return 1;
@@ -3039,114 +3051,77 @@ void AttrNavBrow::create_nodeclasses()
 
   // Create common-class
 
-  brow_CreateNodeClass(
-      ctx, "NavigatorDefault", flow_eNodeGroup_Common, &nc_object);
+  brow_CreateNodeClass(ctx, "NavigatorDefault", flow_eNodeGroup_Common, &nc_object);
   brow_AddAnnotPixmap(nc_object, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_object, 1, 1.1, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_object, 2, 0.6, 0, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_object, 7, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_object, 11, 0.6, 2, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_object, 2, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_object, 7, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_object, 11, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_object, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Create attribute nodeclass
 
   brow_CreateNodeClass(ctx, "NavigatorAttr", flow_eNodeGroup_Common, &nc_attr);
   brow_AddAnnotPixmap(nc_attr, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_attr, 2, 0.6, 0, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_attr, 8, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_attr, 2, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_attr, 8, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_attr, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Create multiline attribute nodeclass
 
-  brow_CreateNodeClass(ctx, "NavigatorAttrMultiLine", flow_eNodeGroup_Common,
-      &nc_attr_multiline);
-  brow_AddAnnotPixmap(
-      nc_attr_multiline, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_attr_multiline, 2, 0.6, 0, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_attr_multiline, 8, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_MultiLine, 1);
-  brow_AddFrame(
-      nc_attr_multiline, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
+  brow_CreateNodeClass(ctx, "NavigatorAttrMultiLine", flow_eNodeGroup_Common, &nc_attr_multiline);
+  brow_AddAnnotPixmap(nc_attr_multiline, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
+  brow_AddAnnot(nc_attr_multiline, 2, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_attr_multiline, 8, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_MultiLine, 1);
+  brow_AddFrame(nc_attr_multiline, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Create attribute nodeclass
 
   brow_CreateNodeClass(ctx, "NavigatorEnum", flow_eNodeGroup_Common, &nc_enum);
   brow_AddRadiobutton(nc_enum, 12, 0.1, 0.7, 0.7, 0, flow_eDrawType_Line, 1);
   brow_AddAnnotPixmap(nc_enum, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_enum, 2, 0.6, 0, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_enum, 2, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_enum, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Create table nodeclass
 
-  brow_CreateNodeClass(
-      ctx, "NavigatorTable", flow_eNodeGroup_Common, &nc_table);
+  brow_CreateNodeClass(ctx, "NavigatorTable", flow_eNodeGroup_Common, &nc_table);
   brow_AddAnnotPixmap(nc_table, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_table, 1, 1.1, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_table, 2, 0.6, 0, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_table, 8, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 12, 0.6, 2, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 16, 0.6, 3, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 20, 0.6, 4, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 24, 0.6, 5, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 28, 0.6, 6, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 32, 0.6, 7, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 35, 0.6, 8, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 38, 0.6, 9, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 2, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_table, 8, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 12, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 16, 0.6, 3, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 20, 0.6, 4, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 24, 0.6, 5, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 28, 0.6, 6, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 32, 0.6, 7, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 35, 0.6, 8, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 38, 0.6, 9, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_table, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Create Header
 
-  brow_CreateNodeClass(
-      ctx, "NavigatorHead", flow_eNodeGroup_Common, &nc_header);
+  brow_CreateNodeClass(ctx, "NavigatorHead", flow_eNodeGroup_Common, &nc_header);
   brow_AddAnnotPixmap(nc_header, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_header, 2, 0.6, 0, flow_eDrawType_TextHelveticaBold, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_header, 8, 0.6, 1, flow_eDrawType_TextHelveticaBold, 2,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_header, 2, 0.6, 0, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_header, 8, 0.6, 1, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_header, 0, 0, 20, 0.83, flow_eDrawType_LineGray, 2, 1);
 
   // Create TableHeader
 
-  brow_CreateNodeClass(
-      ctx, "NavigatorTableHead", flow_eNodeGroup_Common, &nc_table_header);
+  brow_CreateNodeClass(ctx, "NavigatorTableHead", flow_eNodeGroup_Common, &nc_table_header);
   brow_AddAnnotPixmap(nc_table_header, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_table_header, 2, 0.6, 0, flow_eDrawType_TextHelveticaBold, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_table_header, 8, 0.6, 1, flow_eDrawType_TextHelveticaBold, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_table_header, 12, 0.6, 2, flow_eDrawType_TextHelveticaBold,
-      2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_table_header, 16, 0.6, 3, flow_eDrawType_TextHelveticaBold,
-      2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_table_header, 20, 0.6, 4, flow_eDrawType_TextHelveticaBold,
-      2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_table_header, 24, 0.6, 5, flow_eDrawType_TextHelveticaBold,
-      2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_table_header, 28, 0.6, 6, flow_eDrawType_TextHelveticaBold,
-      2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_table_header, 32, 0.6, 7, flow_eDrawType_TextHelveticaBold,
-      2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_table_header, 35, 0.6, 8, flow_eDrawType_TextHelveticaBold,
-      2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_table_header, 38, 0.6, 9, flow_eDrawType_TextHelveticaBold,
-      2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_table_header, 2, 0.6, 0, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_table_header, 8, 0.6, 1, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_table_header, 12, 0.6, 2, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_table_header, 16, 0.6, 3, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_table_header, 20, 0.6, 4, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_table_header, 24, 0.6, 5, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_table_header, 28, 0.6, 6, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_table_header, 32, 0.6, 7, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_table_header, 35, 0.6, 8, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_table_header, 38, 0.6, 9, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_table_header, 0, 0, 20, 0.83, flow_eDrawType_LineGray, 2, 1);
 }
 
@@ -3158,11 +3133,11 @@ int AttrNav::object_attr()
   brow_SetNodraw(brow->ctx);
 
   item_p = itemlist;
-  for (i = 0; i < item_cnt; i++) {
-    new AItemLocal(this, item_p->name, "LocalAttr", item_p->type, item_p->size,
-        item_p->minlimit, item_p->maxlimit, item_p->value, item_p->multiline,
-        item_p->noedit, item_p->mask, item_p->input_validation_cb,
-        item_p->validation_ctx, NULL, flow_eDest_IntoLast);
+  for (i = 0; i < item_cnt; i++)
+  {
+    new AItemLocal(this, item_p->name, "LocalAttr", item_p->type, item_p->size, item_p->minlimit,
+                   item_p->maxlimit, item_p->value, item_p->multiline, item_p->noedit, item_p->mask,
+                   item_p->input_validation_cb, item_p->validation_ctx, NULL, flow_eDest_IntoLast);
 
     item_p++;
   }
@@ -3203,7 +3178,8 @@ void AttrNav::refresh_objects(unsigned int rtype)
   if (!get_object_list_cb)
     return;
 
-  if (rtype == attr_mRefresh_Objects) {
+  if (rtype == attr_mRefresh_Objects)
+  {
     // Store open objects
     brow_tObject* blist;
     int blist_cnt;
@@ -3211,11 +3187,14 @@ void AttrNav::refresh_objects(unsigned int rtype)
 
     // Find open objects
     brow_GetObjectList(brow->ctx, &blist, &blist_cnt);
-    for (int i = 0; i < blist_cnt; i++) {
+    for (int i = 0; i < blist_cnt; i++)
+    {
       open = brow_IsOpen(blist[i]);
-      if (open & attrnav_mOpen_Attributes || open & attrnav_mOpen_Children) {
+      if (open & attrnav_mOpen_Attributes || open & attrnav_mOpen_Children)
+      {
         brow_GetUserData(blist[i], (void**)&item);
-        if (item->type == attrnav_eItemType_Object) {
+        if (item->type == attrnav_eItemType_Object)
+        {
           open_list[open_cnt] = item->id;
           open_type[open_cnt] = open;
           open_cnt++;
@@ -3227,16 +3206,19 @@ void AttrNav::refresh_objects(unsigned int rtype)
 
     // Find selected attribute
     brow_GetSelectList(brow->ctx, &blist, &blist_cnt);
-    for (int i = 0; i < blist_cnt; i++) {
+    for (int i = 0; i < blist_cnt; i++)
+    {
       brow_GetUserData(blist[i], (void**)&item);
 
-      switch (item->type) {
+      switch (item->type)
+      {
       case attrnav_eItemType_Object:
         select_list[select_cnt] = item->id;
         select_type[select_cnt] = item->type;
         select_cnt++;
         break;
-      case attrnav_eItemType_Local: {
+      case attrnav_eItemType_Local:
+      {
         AItemObject* pitem;
         brow_tObject parent;
 
@@ -3255,7 +3237,8 @@ void AttrNav::refresh_objects(unsigned int rtype)
         break;
       }
       case attrnav_eItemType_Enum:
-      case attrnav_eItemType_Mask: {
+      case attrnav_eItemType_Mask:
+      {
         AItemObject *pitem, *ppitem;
         brow_tObject parent;
 
@@ -3292,27 +3275,28 @@ void AttrNav::refresh_objects(unsigned int rtype)
 
     brow_DeleteAll(brow->ctx);
 
-    (get_object_list_cb)(
-        parent_ctx, attr_eList_Objects, &list, &list_cnt, 0, 0);
+    (get_object_list_cb)(parent_ctx, attr_eList_Objects, &list, &list_cnt, 0, 0);
 
-    if (type == attr_eType_Layers) {
+    if (type == attr_eType_Layers)
+    {
       grow_tObject layer = grow_GetBackgroundLayer(graph->grow->ctx);
       grow_GetObjectName(layer, oname, sizeof(oname), glow_eName_Object);
       otype = grow_GetObjectType(layer);
       strcpy(ncname, "");
-      item = new AItemObject(
-          this, oname, otype, layer, ncname, NULL, flow_eDest_IntoLast);
+      item = new AItemObject(this, oname, otype, layer, ncname, NULL, flow_eDest_IntoLast);
     }
-    for (int i = list_cnt - 1; i >= 0; i--) {
+    for (int i = list_cnt - 1; i >= 0; i--)
+    {
       grow_GetObjectName(list[i], oname, sizeof(oname), glow_eName_Object);
       otype = grow_GetObjectType(list[i]);
-      if (type == attr_eType_Layers && 
-	  otype != glow_eObjectType_GrowLayer)
-	continue;	  
+      if (type == attr_eType_Layers && otype != glow_eObjectType_GrowLayer)
+        continue;
 
-      switch (otype) {
+      switch (otype)
+      {
       case glow_eObjectType_GrowNode:
-      case glow_eObjectType_GrowSlider: {
+      case glow_eObjectType_GrowSlider:
+      {
         grow_GetObjectClass(list[i], &nc);
         grow_GetNodeClassName(nc, ncname, sizeof(ncname));
         break;
@@ -3323,7 +3307,8 @@ void AttrNav::refresh_objects(unsigned int rtype)
         strcpy(ncname, "");
       }
 
-      switch (filter_type) {
+      switch (filter_type)
+      {
       case attr_eFilterType_No:
         break;
       case attr_eFilterType_Name:
@@ -3336,8 +3321,7 @@ void AttrNav::refresh_objects(unsigned int rtype)
         break;
       }
 
-      item = new AItemObject(
-          this, oname, otype, list[i], ncname, NULL, flow_eDest_IntoLast);
+      item = new AItemObject(this, oname, otype, list[i], ncname, NULL, flow_eDest_IntoLast);
 
       // Open previously open objects
       object_open_check(item, open_list, open_type, open_cnt);
@@ -3346,23 +3330,29 @@ void AttrNav::refresh_objects(unsigned int rtype)
     // Reselect
 
     brow_GetObjectList(brow->ctx, &blist, &blist_cnt);
-    for (int i = 0; i < select_cnt; i++) {
-      switch (select_type[i]) {
+    for (int i = 0; i < select_cnt; i++)
+    {
+      switch (select_type[i])
+      {
       case attrnav_eItemType_Object:
-        for (int j = 0; j < blist_cnt; j++) {
+        for (int j = 0; j < blist_cnt; j++)
+        {
           brow_GetUserData(blist[j], (void**)&item);
-	  if (item->id == select_list[i]) {
-	    brow_SetInverse(blist[j], 1);
-	    brow_SelectInsert(brow->ctx, blist[j]);
-	    break;
-	  }
+          if (item->id == select_list[i])
+          {
+            brow_SetInverse(blist[j], 1);
+            brow_SelectInsert(brow->ctx, blist[j]);
+            break;
+          }
         }
         break;
-      case attrnav_eItemType_Local: {
+      case attrnav_eItemType_Local:
+      {
         AItemObject* pitem;
         brow_tObject parent;
 
-        for (int j = 0; j < blist_cnt; j++) {
+        for (int j = 0; j < blist_cnt; j++)
+        {
           brow_GetUserData(blist[j], (void**)&item);
 
           sts = brow_GetParent(brow->ctx, blist[j], &parent);
@@ -3373,8 +3363,8 @@ void AttrNav::refresh_objects(unsigned int rtype)
           if (pitem->type != attrnav_eItemType_Object)
             continue;
 
-          if (select_list[i] == pitem->id
-              && streq(select_name[i], ((AItemLocal*)item)->name)) {
+          if (select_list[i] == pitem->id && streq(select_name[i], ((AItemLocal*)item)->name))
+          {
             brow_SetInverse(blist[j], 1);
             brow_SelectInsert(brow->ctx, blist[j]);
             break;
@@ -3387,34 +3377,43 @@ void AttrNav::refresh_objects(unsigned int rtype)
     }
 
     // Mark layer active / visible
-    if (type == attr_eType_Layers) {
+    if (type == attr_eType_Layers)
+    {
       grow_tObject active_layer = 0;
       grow_GetActiveLayer(graph->grow->ctx, &active_layer);
 
-      for (int i = 0; i < blist_cnt; i++) {
-	brow_GetUserData(blist[i], (void**)&item);
-	if (item->type == attrnav_eItemType_Object) {
-	  otype = grow_GetObjectType(item->id);
-	  if (otype == glow_eObjectType_GrowLayer) {
-	    if (grow_GetObjectVisibility(item->id) == glow_eVis_Invisible)
-	      brow_SetAnnotPixmap(item->node, 0, brow->pixmap_hide);
-	    else
-	      brow_SetAnnotPixmap(item->node, 0, brow->pixmap_view);
-	    if (item->id == active_layer) {
-	      brow_SetInverse(blist[i], 1);
-	      brow_SelectInsert(brow->ctx, blist[i]);
-	    } else {
-	      brow_SetInverse(blist[i], 0);
-	      brow_SelectRemove(brow->ctx, blist[i]);
-	    }
-	  }
-	}
+      for (int i = 0; i < blist_cnt; i++)
+      {
+        brow_GetUserData(blist[i], (void**)&item);
+        if (item->type == attrnav_eItemType_Object)
+        {
+          otype = grow_GetObjectType(item->id);
+          if (otype == glow_eObjectType_GrowLayer)
+          {
+            if (grow_GetObjectVisibility(item->id) == glow_eVis_Invisible)
+              brow_SetAnnotPixmap(item->node, 0, brow->pixmap_hide);
+            else
+              brow_SetAnnotPixmap(item->node, 0, brow->pixmap_view);
+            if (item->id == active_layer)
+            {
+              brow_SetInverse(blist[i], 1);
+              brow_SelectInsert(brow->ctx, blist[i]);
+            }
+            else
+            {
+              brow_SetInverse(blist[i], 0);
+              brow_SelectRemove(brow->ctx, blist[i]);
+            }
+          }
+        }
       }
     }
 
     brow_ResetNodraw(brow->ctx);
     brow_Redraw(brow->ctx, 0);
-  } else if (rtype == attr_mRefresh_Select) {
+  }
+  else if (rtype == attr_mRefresh_Select)
+  {
     brow_tObject* blist;
     int blist_cnt;
     AItemObject* item;
@@ -3425,15 +3424,19 @@ void AttrNav::refresh_objects(unsigned int rtype)
     (get_object_list_cb)(parent_ctx, attr_eList_Select, &list, &list_cnt, 0, 0);
 
     brow_SelectClear(brow->ctx);
-    if (layer_highlighted) {
+    if (layer_highlighted)
+    {
       grow_ResetHighlightAll(graph->grow->ctx);
       layer_highlighted = 0;
     }
-    for (i = 0; i < list_cnt; i++) {
+    for (i = 0; i < list_cnt; i++)
+    {
       brow_GetObjectList(brow->ctx, &blist, &blist_cnt);
-      for (int j = 0; j < blist_cnt; j++) {
+      for (int j = 0; j < blist_cnt; j++)
+      {
         brow_GetUserData(blist[j], (void**)&item);
-        if (item->id == list[i]) {
+        if (item->id == list[i])
+        {
           brow_SetInverse(blist[j], 1);
           brow_SelectInsert(brow->ctx, blist[j]);
           if (i == 0)
@@ -3446,27 +3449,32 @@ void AttrNav::refresh_objects(unsigned int rtype)
   }
 }
 
-void AttrNav::object_open_check(
-    AItemObject* item, grow_tObject* open_list, int* open_type, int open_cnt)
+void AttrNav::object_open_check(AItemObject* item, grow_tObject* open_list, int* open_type, int open_cnt)
 {
   brow_tObject child;
   AItemObject* child_item;
   int sts;
 
-  for (int i = 0; i < open_cnt; i++) {
-    if (open_list[i] == item->id) {
-      if (open_type[i] == attrnav_mOpen_Children) {
+  for (int i = 0; i < open_cnt; i++)
+  {
+    if (open_list[i] == item->id)
+    {
+      if (open_type[i] == attrnav_mOpen_Children)
+      {
         item->open_children(this, 0, 0);
 
         for (sts = brow_GetChild(brow->ctx, item->node, &child); ODD(sts);
-             sts = brow_GetNextSibling(brow->ctx, child, &child)) {
+             sts = brow_GetNextSibling(brow->ctx, child, &child))
+        {
           // Check if any open group members
           brow_GetUserData(child, (void**)&child_item);
-          if (child_item->type == attrnav_eItemType_Object) {
+          if (child_item->type == attrnav_eItemType_Object)
+          {
             object_open_check(child_item, open_list, open_type, open_cnt);
           }
         }
-      } else if (open_type[i] == attrnav_mOpen_Attributes)
+      }
+      else if (open_type[i] == attrnav_mOpen_Attributes)
         item->open_attributes(this, 0, 0);
       break;
     }
@@ -3494,29 +3502,32 @@ void AttrNav::find_object(char* object)
     return;
 
   bnode = gobject_to_bobject(gnode);
-  if (!bnode) {
+  if (!bnode)
+  {
     // Open group objects
     AItemObject* item;
     brow_tObject bgroup;
     grow_tObject group[10];
     int group_cnt = 0;
     sts = grow_GetObjectGroup(graph->grow->ctx, gnode, &group[0]);
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       group_cnt++;
       if (group_cnt == 9)
         break;
 
-      sts = grow_GetObjectGroup(
-          graph->grow->ctx, group[group_cnt - 1], &group[group_cnt]);
+      sts = grow_GetObjectGroup(graph->grow->ctx, group[group_cnt - 1], &group[group_cnt]);
     }
 
-    for (int i = group_cnt - 1; i >= 0; i--) {
+    for (int i = group_cnt - 1; i >= 0; i--)
+    {
       bgroup = gobject_to_bobject(group[i]);
       if (!bgroup)
         return;
       brow_GetUserData(bgroup, (void**)&item);
 
-      if (!(brow_IsOpen(bgroup) & attrnav_mOpen_Children)) {
+      if (!(brow_IsOpen(bgroup) & attrnav_mOpen_Children))
+      {
         if (brow_IsOpen(bgroup) & attrnav_mOpen_Attributes)
           item->close(this, 0, 0);
         item->open_children(this, 0, 0);
@@ -3536,10 +3547,7 @@ void AttrNav::find_object(char* object)
   graph->select_object(gnode);
 }
 
-void AttrNav::clear()
-{
-  brow_DeleteAll(brow->ctx);
-}
+void AttrNav::clear() { brow_DeleteAll(brow->ctx); }
 
 brow_tObject AttrNav::gobject_to_bobject(grow_tObject gobject)
 {
@@ -3548,7 +3556,8 @@ brow_tObject AttrNav::gobject_to_bobject(grow_tObject gobject)
   AItemObject* item;
 
   brow_GetObjectList(brow->ctx, &blist, &blist_cnt);
-  for (int j = 0; j < blist_cnt; j++) {
+  for (int j = 0; j < blist_cnt; j++)
+  {
     brow_GetUserData(blist[j], (void**)&item);
     if (item->type == attrnav_eItemType_Object && item->id == gobject)
       return item->node;
@@ -3556,10 +3565,10 @@ brow_tObject AttrNav::gobject_to_bobject(grow_tObject gobject)
   return 0;
 }
 
-void AttrNav::object_type_to_str(
-    glow_eObjectType object_type, char* object_type_str)
+void AttrNav::object_type_to_str(glow_eObjectType object_type, char* object_type_str)
 {
-  switch (object_type) {
+  switch (object_type)
+  {
   case glow_eObjectType_NoObject:
     strcpy(object_type_str, "NoObject");
     break;
@@ -3671,50 +3680,28 @@ void AttrNavBrow::brow_setup()
   brow_SetAttributes(ctx, &brow_attr, mask);
   brow_SetCtxUserData(ctx, attrnav);
 
-  brow_EnableEvent(
-      ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, attrnav_brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_MB1ClickShift, flow_eEventType_CallBack,
-      attrnav_brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack,
-      attrnav_brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_MB1DoubleClickShift,
-      flow_eEventType_CallBack, attrnav_brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_MB1DoubleClickCtrl,
-      flow_eEventType_CallBack, attrnav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_MB2Click, flow_eEventType_CallBack, attrnav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, attrnav_brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack,
-      attrnav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack, attrnav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_ShiftUp, flow_eEventType_CallBack, attrnav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack, attrnav_brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_Key_ShiftDown, flow_eEventType_CallBack,
-      attrnav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Right, flow_eEventType_CallBack, attrnav_brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_Key_ShiftRight, flow_eEventType_CallBack,
-      attrnav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Left, flow_eEventType_CallBack, attrnav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_PF3, flow_eEventType_CallBack, attrnav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Radiobutton, flow_eEventType_CallBack, attrnav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_PageUp, flow_eEventType_CallBack, attrnav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_PageDown, flow_eEventType_CallBack, attrnav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Tab, flow_eEventType_CallBack, attrnav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, attrnav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, attrnav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, attrnav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB1ClickShift, flow_eEventType_CallBack, attrnav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, attrnav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB1DoubleClickShift, flow_eEventType_CallBack, attrnav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB1DoubleClickCtrl, flow_eEventType_CallBack, attrnav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB2Click, flow_eEventType_CallBack, attrnav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, attrnav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack, attrnav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack, attrnav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_ShiftUp, flow_eEventType_CallBack, attrnav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack, attrnav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_ShiftDown, flow_eEventType_CallBack, attrnav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Right, flow_eEventType_CallBack, attrnav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_ShiftRight, flow_eEventType_CallBack, attrnav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Left, flow_eEventType_CallBack, attrnav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PF3, flow_eEventType_CallBack, attrnav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Radiobutton, flow_eEventType_CallBack, attrnav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PageUp, flow_eEventType_CallBack, attrnav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PageDown, flow_eEventType_CallBack, attrnav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Tab, flow_eEventType_CallBack, attrnav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, attrnav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, attrnav_brow_cb);
 }
 
 //
@@ -3733,7 +3720,8 @@ int AttrNav::init_brow_cb(FlowCtx* fctx, void* client_data)
   attrnav->brow->create_nodeclasses();
 
   // Create the root item
-  switch (attrnav->type) {
+  switch (attrnav->type)
+  {
   case attr_eType_Attributes:
     attrnav->object_attr();
     break;
@@ -3745,8 +3733,7 @@ int AttrNav::init_brow_cb(FlowCtx* fctx, void* client_data)
     return 0;
   }
 
-  sts = brow_TraceInit(ctx, attrnav_trace_connect_bc,
-      attrnav_trace_disconnect_bc, attrnav_trace_scan_bc);
+  sts = brow_TraceInit(ctx, attrnav_trace_connect_bc, attrnav_trace_disconnect_bc, attrnav_trace_scan_bc);
   attrnav->trace_started = 1;
 
   attrnav->trace_start();
@@ -3754,17 +3741,15 @@ int AttrNav::init_brow_cb(FlowCtx* fctx, void* client_data)
   return 1;
 }
 
-AItemLocal::AItemLocal(AttrNav* attrnav, const char* item_name,
-    const char* attr, int attr_type, int attr_size, double attr_min_limit,
-    double attr_max_limit, void* attr_value_p, int attr_multiline,
-    int attr_noedit, int attr_mask,
-    int (*attr_input_validation_cb)(void* ctx, void* value),
-    void* attr_validation_ctx, brow_tNode dest, flow_eDest dest_code)
-    : value_p(attr_value_p), first_scan(1), type_id(attr_type), size(attr_size),
-      min_limit(attr_min_limit), max_limit(attr_max_limit),
-      multiline(attr_multiline), noedit(attr_noedit), mask(attr_mask),
-      input_validation_cb(attr_input_validation_cb),
-      validation_ctx(attr_validation_ctx), parent(0), subgraph(0)
+AItemLocal::AItemLocal(AttrNav* attrnav, const char* item_name, const char* attr, int attr_type,
+                       int attr_size, double attr_min_limit, double attr_max_limit, void* attr_value_p,
+                       int attr_multiline, int attr_noedit, int attr_mask,
+                       int (*attr_input_validation_cb)(void* ctx, void* value), void* attr_validation_ctx,
+                       brow_tNode dest, flow_eDest dest_code)
+    : value_p(attr_value_p), first_scan(1), type_id(attr_type), size(attr_size), min_limit(attr_min_limit),
+      max_limit(attr_max_limit), multiline(attr_multiline), noedit(attr_noedit), mask(attr_mask),
+      input_validation_cb(attr_input_validation_cb), validation_ctx(attr_validation_ctx), parent(0),
+      subgraph(0)
 {
   type = attrnav_eItemType_Local;
 
@@ -3772,14 +3757,14 @@ AItemLocal::AItemLocal(AttrNav* attrnav, const char* item_name,
   memset(old_value, 0, sizeof(old_value));
 
   if (!multiline)
-    brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_attr, dest,
-        dest_code, (void*)this, 1, &node);
+    brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_attr, dest, dest_code, (void*)this, 1,
+                    &node);
 
   else
-    brow_CreateNode(attrnav->brow->ctx, item_name,
-        attrnav->brow->nc_attr_multiline, dest, dest_code, (void*)this, 1,
-        &node);
-  switch (type_id) {
+    brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_attr_multiline, dest, dest_code,
+                    (void*)this, 1, &node);
+  switch (type_id)
+  {
   case glow_eType_Direction:
   case glow_eType_HorizDirection:
   case glow_eType_Adjustment:
@@ -3833,20 +3818,25 @@ AItemLocal::AItemLocal(AttrNav* attrnav, const char* item_name,
   case ge_eAttrType_UcTime:
   case ge_eAttrType_UcVolume:
   case ge_eAttrType_UcVolumeFlow:
-    if (!noedit) {
+    if (!noedit)
+    {
       brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attrarray);
       parent = 1;
-    } else
+    }
+    else
       brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attr);
     break;
   case ge_eAttrType_Dyn:
     brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attrarray);
     break;
-  default: {
-    if (streq(name, "SubGraph")) {
+  default:
+  {
+    if (streq(name, "SubGraph"))
+    {
       brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attrarray);
       subgraph = 1;
-    } else
+    }
+    else
       brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attr);
   }
   }
@@ -3861,7 +3851,8 @@ int AItemLocal::open_children(AttrNav* attrnav, double x, double y)
 
   brow_GetNodePosition(node, &node_x, &node_y);
 
-  if (brow_IsOpen(node)) {
+  if (brow_IsOpen(node))
+  {
     // Close
     brow_SetNodraw(attrnav->brow->ctx);
     brow_CloseNode(attrnav->brow->ctx, node);
@@ -3872,56 +3863,65 @@ int AItemLocal::open_children(AttrNav* attrnav, double x, double y)
     brow_ResetOpen(node, attrnav_mOpen_All);
     brow_ResetNodraw(attrnav->brow->ctx);
     brow_Redraw(attrnav->brow->ctx, node_y);
-  } else if (type_id == ge_eAttrType_Dyn) {
+  }
+  else if (type_id == ge_eAttrType_Dyn)
+  {
     attr_sItem *itemlist, *item_p;
     int item_cnt;
     int sts;
     int i;
 
-    sts = (attrnav->get_dyn_info_cb)(
-        attrnav->parent_ctx, (GeDyn*)value_p, &itemlist, &item_cnt);
+    sts = (attrnav->get_dyn_info_cb)(attrnav->parent_ctx, (GeDyn*)value_p, &itemlist, &item_cnt);
     if (EVEN(sts))
       return 0;
 
     brow_SetNodraw(attrnav->brow->ctx);
 
     item_p = itemlist;
-    for (i = 0; i < item_cnt; i++) {
-      new AItemLocal(attrnav, item_p->name, "LocalAttr", item_p->type,
-          item_p->size, item_p->minlimit, item_p->maxlimit, item_p->value,
-          item_p->multiline, item_p->noedit, item_p->mask,
-          item_p->input_validation_cb, item_p->validation_ctx, node,
-          flow_eDest_IntoLast);
+    for (i = 0; i < item_cnt; i++)
+    {
+      new AItemLocal(attrnav, item_p->name, "LocalAttr", item_p->type, item_p->size, item_p->minlimit,
+                     item_p->maxlimit, item_p->value, item_p->multiline, item_p->noedit, item_p->mask,
+                     item_p->input_validation_cb, item_p->validation_ctx, node, flow_eDest_IntoLast);
       item_p++;
     }
     brow_SetOpen(node, attrnav_mOpen_Children);
     brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_openmap);
     brow_ResetNodraw(attrnav->brow->ctx);
     brow_Redraw(attrnav->brow->ctx, node_y);
-  } else if (parent && !noedit) {
+  }
+  else if (parent && !noedit)
+  {
     attrnav_sEnumElement* elem_p = NULL;
     attrnav_sEnum* enum_p;
     int found;
 
     found = 0;
-    for (enum_p = enum_types; enum_p->elements; enum_p++) {
-      if (enum_p->num == (unsigned int)type_id) {
+    for (enum_p = enum_types; enum_p->elements; enum_p++)
+    {
+      if (enum_p->num == (unsigned int)type_id)
+      {
         elem_p = enum_p->elements;
         found = 1;
         break;
       }
     }
-    if (found) {
+    if (found)
+    {
       // Create some children
       brow_SetNodraw(attrnav->brow->ctx);
 
-      for (; elem_p->name[0] != 0; elem_p++) {
-        new AItemEnum(attrnav, elem_p->name, elem_p->num, type_id,
-            this->value_p, node, flow_eDest_IntoLast);
+      for (; elem_p->name[0] != 0; elem_p++)
+      {
+        new AItemEnum(attrnav, elem_p->name, elem_p->num, type_id, this->value_p, node, flow_eDest_IntoLast);
       }
-    } else {
-      for (enum_p = mask_types; enum_p->elements; enum_p++) {
-        if (enum_p->num == (unsigned int)type_id) {
+    }
+    else
+    {
+      for (enum_p = mask_types; enum_p->elements; enum_p++)
+      {
+        if (enum_p->num == (unsigned int)type_id)
+        {
           elem_p = enum_p->elements;
           found = 1;
           break;
@@ -3933,11 +3933,12 @@ int AItemLocal::open_children(AttrNav* attrnav, double x, double y)
       // Create some children
       brow_SetNodraw(attrnav->brow->ctx);
 
-      for (; elem_p->name[0] != 0; elem_p++) {
+      for (; elem_p->name[0] != 0; elem_p++)
+      {
         if (mask && !(mask & elem_p->num))
           continue;
-        new AItemMask(attrnav, elem_p->name, (unsigned int)elem_p->num, type_id,
-            this->value_p, node, flow_eDest_IntoLast);
+        new AItemMask(attrnav, elem_p->name, (unsigned int)elem_p->num, type_id, this->value_p, node,
+                      flow_eDest_IntoLast);
       }
     }
 
@@ -3945,26 +3946,26 @@ int AItemLocal::open_children(AttrNav* attrnav, double x, double y)
     brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_openmap);
     brow_ResetNodraw(attrnav->brow->ctx);
     brow_Redraw(attrnav->brow->ctx, node_y);
-  } else if (subgraph) {
+  }
+  else if (subgraph)
+  {
     attr_sItem *itemlist, *item_p;
     int item_cnt;
     int sts;
     int i;
 
-    sts = (attrnav->get_subgraph_info_cb)(
-        attrnav->parent_ctx, (char*)value_p, &itemlist, &item_cnt);
+    sts = (attrnav->get_subgraph_info_cb)(attrnav->parent_ctx, (char*)value_p, &itemlist, &item_cnt);
     if (EVEN(sts))
       return 0;
 
     brow_SetNodraw(attrnav->brow->ctx);
 
     item_p = itemlist;
-    for (i = 0; i < item_cnt; i++) {
-      new AItemLocal(attrnav, item_p->name, "LocalAttr", item_p->type,
-          item_p->size, item_p->minlimit, item_p->maxlimit, item_p->value,
-          item_p->multiline, item_p->noedit, item_p->mask,
-          item_p->input_validation_cb, item_p->validation_ctx, node,
-          flow_eDest_IntoLast);
+    for (i = 0; i < item_cnt; i++)
+    {
+      new AItemLocal(attrnav, item_p->name, "LocalAttr", item_p->type, item_p->size, item_p->minlimit,
+                     item_p->maxlimit, item_p->value, item_p->multiline, item_p->noedit, item_p->mask,
+                     item_p->input_validation_cb, item_p->validation_ctx, node, flow_eDest_IntoLast);
       item_p++;
     }
     brow_SetOpen(node, attrnav_mOpen_Children);
@@ -3981,7 +3982,8 @@ int AItemLocal::close(AttrNav* attrnav, double x, double y)
 
   brow_GetNodePosition(node, &node_x, &node_y);
 
-  if (brow_IsOpen(node)) {
+  if (brow_IsOpen(node))
+  {
     // Close
     brow_SetNodraw(attrnav->brow->ctx);
     brow_CloseNode(attrnav->brow->ctx, node);
@@ -3996,16 +3998,16 @@ int AItemLocal::close(AttrNav* attrnav, double x, double y)
   return 1;
 }
 
-AItemEnum::AItemEnum(AttrNav* attrnav, char* item_name, int item_num,
-    int item_type_id, void* attr_value_p, brow_tNode dest, flow_eDest dest_code)
+AItemEnum::AItemEnum(AttrNav* attrnav, char* item_name, int item_num, int item_type_id, void* attr_value_p,
+                     brow_tNode dest, flow_eDest dest_code)
     : num(item_num), type_id(item_type_id), value_p(attr_value_p), first_scan(1)
 {
   type = attrnav_eItemType_Enum;
 
   strcpy(name, item_name);
 
-  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_enum, dest,
-      dest_code, (void*)this, 1, &node);
+  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_enum, dest, dest_code, (void*)this, 1,
+                  &node);
 
   brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attr);
   brow_SetAnnotation(node, 0, item_name, strlen(item_name));
@@ -4016,17 +4018,16 @@ AItemEnum::AItemEnum(AttrNav* attrnav, char* item_name, int item_num,
   brow_SetTraceAttr(node, name, "", flow_eTraceType_User);
 }
 
-AItemMask::AItemMask(AttrNav* attrnav, char* item_name, unsigned int item_mask,
-    int item_type_id, void* attr_value_p, brow_tNode dest, flow_eDest dest_code)
-    : mask(item_mask), type_id(item_type_id), value_p(attr_value_p),
-      first_scan(1)
+AItemMask::AItemMask(AttrNav* attrnav, char* item_name, unsigned int item_mask, int item_type_id,
+                     void* attr_value_p, brow_tNode dest, flow_eDest dest_code)
+    : mask(item_mask), type_id(item_type_id), value_p(attr_value_p), first_scan(1)
 {
   type = attrnav_eItemType_Mask;
 
   strcpy(name, item_name);
 
-  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_enum, dest,
-      dest_code, (void*)this, 1, &node);
+  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_enum, dest, dest_code, (void*)this, 1,
+                  &node);
 
   brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attr);
   brow_SetAnnotation(node, 0, item_name, strlen(item_name));
@@ -4046,21 +4047,26 @@ static char* attrnav_mask_to_string(int type_id, int value)
   static char str[2000];
 
   found = 0;
-  for (enum_p = mask_types; enum_p->elements; enum_p++) {
-    if (enum_p->num == (unsigned int)type_id) {
+  for (enum_p = mask_types; enum_p->elements; enum_p++)
+  {
+    if (enum_p->num == (unsigned int)type_id)
+    {
       elem_p = enum_p->elements;
       found = 1;
       break;
     }
   }
-  if (!found) {
+  if (!found)
+  {
     strcpy(str, "");
     return str;
   }
 
   strcpy(str, "");
-  for (; elem_p->name[0] != 0; elem_p++) {
-    if (elem_p->num & value) {
+  for (; elem_p->name[0] != 0; elem_p++)
+  {
+    if (elem_p->num & value)
+    {
       if (!first)
         strcat(str, " | ");
       else
@@ -4071,11 +4077,9 @@ static char* attrnav_mask_to_string(int type_id, int value)
   return str;
 }
 
-AItemObject::AItemObject(AttrNav* attrnav, char* item_name,
-    glow_eObjectType item_object_type, grow_tObject item_id,
-    char* item_subgraph, brow_tNode dest, flow_eDest dest_code)
-    : type(attrnav_eItemType_Object), object_type(item_object_type),
-      id(item_id), attr_client_data(0)
+AItemObject::AItemObject(AttrNav* attrnav, char* item_name, glow_eObjectType item_object_type,
+                         grow_tObject item_id, char* item_subgraph, brow_tNode dest, flow_eDest dest_code)
+    : type(attrnav_eItemType_Object), object_type(item_object_type), id(item_id), attr_client_data(0)
 
 {
   char object_type_str[40];
@@ -4086,31 +4090,34 @@ AItemObject::AItemObject(AttrNav* attrnav, char* item_name,
   else
     strcpy(subgraph, "");
 
-  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_object, dest,
-      dest_code, (void*)this, 1, &node);
+  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_object, dest, dest_code, (void*)this, 1,
+                  &node);
 
   AttrNav::object_type_to_str(object_type, object_type_str);
 
-  if (attrnav->type == attr_eType_Layers) {
+  if (attrnav->type == attr_eType_Layers)
+  {
     if (grow_GetObjectVisibility(id) == glow_eVis_Invisible)
       brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_hide);
     else
       brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_view);
-  } else {
+  }
+  else
+  {
     if (object_type == glow_eObjectType_GrowGroup)
       brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
-    else if (object_type == glow_eObjectType_GrowLayer) {
+    else if (object_type == glow_eObjectType_GrowLayer)
+    {
       if (grow_LayerIsEmpty(id))
-	brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_leaf);
+        brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_leaf);
       else
-	brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
+        brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
     }
     else
       brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_leaf);
   }
   brow_SetAnnotation(node, 0, item_name, strlen(item_name));
-  if (object_type == glow_eObjectType_GrowNode
-      || object_type == glow_eObjectType_GrowSlider)
+  if (object_type == glow_eObjectType_GrowNode || object_type == glow_eObjectType_GrowSlider)
     brow_SetAnnotation(node, 1, subgraph, strlen(subgraph));
   else
     brow_SetAnnotation(node, 1, object_type_str, strlen(object_type_str));
@@ -4122,17 +4129,19 @@ int AItemObject::close(AttrNav* attrnav, double x, double y)
 
   brow_GetNodePosition(node, &node_x, &node_y);
 
-  if (brow_IsOpen(node)) {
+  if (brow_IsOpen(node))
+  {
     // Close
     brow_SetNodraw(attrnav->brow->ctx);
     brow_CloseNode(attrnav->brow->ctx, node);
     if (brow_IsOpen(node) & attrnav_mOpen_Attributes)
       brow_RemoveAnnotPixmap(node, 1);
-    if (brow_IsOpen(node) & attrnav_mOpen_Children) {
+    if (brow_IsOpen(node) & attrnav_mOpen_Children)
+    {
       if (is_layer() && grow_LayerIsEmpty(id))
-	brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_leaf);
+        brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_leaf);
       else
-	brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
+        brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
     }
     brow_ResetOpen(node, attrnav_mOpen_All);
     brow_ResetNodraw(attrnav->brow->ctx);
@@ -4146,28 +4155,31 @@ int AItemObject::open_children(AttrNav* attrnav, double x, double y)
 {
   double node_x, node_y;
 
-  if (!(object_type == glow_eObjectType_GrowGroup ||
-	object_type == glow_eObjectType_GrowLayer))
+  if (!(object_type == glow_eObjectType_GrowGroup || object_type == glow_eObjectType_GrowLayer))
     return 1;
 
   brow_GetNodePosition(node, &node_x, &node_y);
 
-  if (brow_IsOpen(node)) {
+  if (brow_IsOpen(node))
+  {
     // Close
     brow_SetNodraw(attrnav->brow->ctx);
     brow_CloseNode(attrnav->brow->ctx, node);
     if (brow_IsOpen(node) & attrnav_mOpen_Attributes)
       brow_RemoveAnnotPixmap(node, 1);
-    if (brow_IsOpen(node) & attrnav_mOpen_Children) {
+    if (brow_IsOpen(node) & attrnav_mOpen_Children)
+    {
       if (is_layer() && grow_LayerIsEmpty(id))
-	brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_leaf);
+        brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_leaf);
       else
-	brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
+        brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
     }
     brow_ResetOpen(node, attrnav_mOpen_All);
     brow_ResetNodraw(attrnav->brow->ctx);
     brow_Redraw(attrnav->brow->ctx, node_y);
-  } else {
+  }
+  else
+  {
     grow_tObject* list;
     int list_cnt;
     char oname[80];
@@ -4179,7 +4191,8 @@ int AItemObject::open_children(AttrNav* attrnav, double x, double y)
     // Create some children
     brow_SetNodraw(attrnav->brow->ctx);
 
-    switch (object_type) {
+    switch (object_type)
+    {
     case glow_eObjectType_GrowGroup:
       list_type = attr_eList_Group;
       break;
@@ -4190,16 +4203,18 @@ int AItemObject::open_children(AttrNav* attrnav, double x, double y)
       return 1;
     }
 
-    (attrnav->get_object_list_cb)(
-        attrnav->parent_ctx, list_type, &list, &list_cnt, &id, 1);
+    (attrnav->get_object_list_cb)(attrnav->parent_ctx, list_type, &list, &list_cnt, &id, 1);
 
-    for (int i = list_cnt - 1; i >= 0; i--) {
+    for (int i = list_cnt - 1; i >= 0; i--)
+    {
       grow_GetObjectName(list[i], oname, sizeof(oname), glow_eName_Object);
       otype = grow_GetObjectType(list[i]);
 
-      switch (otype) {
+      switch (otype)
+      {
       case glow_eObjectType_GrowNode:
-      case glow_eObjectType_GrowSlider: {
+      case glow_eObjectType_GrowSlider:
+      {
         grow_GetObjectClass(list[i], &nc);
         grow_GetNodeClassName(nc, ncname, sizeof(ncname));
         break;
@@ -4207,8 +4222,7 @@ int AItemObject::open_children(AttrNav* attrnav, double x, double y)
       default:
         strcpy(ncname, "");
       }
-      new AItemObject(
-          attrnav, oname, otype, list[i], ncname, node, flow_eDest_IntoLast);
+      new AItemObject(attrnav, oname, otype, list[i], ncname, node, flow_eDest_IntoLast);
     }
 
     brow_SetOpen(node, attrnav_mOpen_Children);
@@ -4219,10 +4233,7 @@ int AItemObject::open_children(AttrNav* attrnav, double x, double y)
   return 1;
 }
 
-int AItemObject::is_layer()
-{
-  return  (grow_GetObjectType(id) == glow_eObjectType_GrowLayer) ? 1 : 0;
-}
+int AItemObject::is_layer() { return (grow_GetObjectType(id) == glow_eObjectType_GrowLayer) ? 1 : 0; }
 
 int AItemObject::open_attributes(AttrNav* attrnav, double x, double y)
 {
@@ -4230,23 +4241,27 @@ int AItemObject::open_attributes(AttrNav* attrnav, double x, double y)
 
   brow_GetNodePosition(node, &node_x, &node_y);
 
-  if (brow_IsOpen(node)) {
+  if (brow_IsOpen(node))
+  {
     // Close
     brow_SetNodraw(attrnav->brow->ctx);
     brow_CloseNode(attrnav->brow->ctx, node);
     if (brow_IsOpen(node) & attrnav_mOpen_Attributes)
       brow_RemoveAnnotPixmap(node, 1);
-    if (brow_IsOpen(node) & attrnav_mOpen_Children) {
+    if (brow_IsOpen(node) & attrnav_mOpen_Children)
+    {
       if (is_layer() && grow_LayerIsEmpty(id))
-	brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_leaf);
+        brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_leaf);
       else
-	brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
+        brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
     }
     brow_ResetOpen(node, attrnav_mOpen_All);
     brow_ResetNodraw(attrnav->brow->ctx);
     brow_Redraw(attrnav->brow->ctx, node_y);
     attr_client_data = 0;
-  } else {
+  }
+  else
+  {
     // Create some attributes
     attr_sItem* item_p;
     attr_sItem* itemlist;
@@ -4258,12 +4273,11 @@ int AItemObject::open_attributes(AttrNav* attrnav, double x, double y)
     attrnav->graph->get_attr_items(id, &itemlist, &item_cnt, &attr_client_data);
 
     item_p = itemlist;
-    for (i = 0; i < item_cnt; i++) {
-      new AItemLocal(attrnav, item_p->name, "LocalAttr", item_p->type,
-          item_p->size, item_p->minlimit, item_p->maxlimit, item_p->value,
-          item_p->multiline, item_p->noedit, item_p->mask,
-          item_p->input_validation_cb, item_p->validation_ctx, node,
-          flow_eDest_IntoLast);
+    for (i = 0; i < item_cnt; i++)
+    {
+      new AItemLocal(attrnav, item_p->name, "LocalAttr", item_p->type, item_p->size, item_p->minlimit,
+                     item_p->maxlimit, item_p->value, item_p->multiline, item_p->noedit, item_p->mask,
+                     item_p->input_validation_cb, item_p->validation_ctx, node, flow_eDest_IntoLast);
 
       item_p++;
     }

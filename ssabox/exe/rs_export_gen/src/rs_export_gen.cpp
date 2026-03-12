@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -34,19 +34,20 @@
  * General Public License plus this exception.
  */
 
-/* rs_export_gen Generate export table in JSON format */
+/* rs_export_gen - Interactive export signal selector */
 
 /*_Include files_________________________________________________________*/
 
 #if defined PWRE_CONF_RDKAFKA
 
-#include <cstdint>
-#include <algorithm>
-#include <unistd.h>
-#include <sstream>
+#include <gtk/gtk.h>
+#include <gdk/gdkkeysyms.h>
+#include <string.h>
+#include <map>
+#include <set>
+#include <string>
 #include <vector>
-
-#include <glib.h>
+#include <functional>
 
 #include "pwr.h"
 #include "pwr_systemclasses.h"
@@ -55,246 +56,2688 @@
 #include "rt_gdh_msg.h"
 #include "rt_errh.h"
 #include "co_cdh.h"
+#include "co_cJSON.h"
 #include "co_dcli.h"
-#include "co_error.h"
 #include "co_string.h"
 
-typedef enum
+/*_Encoding conversion___________________________________________________*/
+
+/* Convert ISO-8859-1 string to UTF-8 for GTK/Pango.
+ * ProviewR uses ISO-8859-1 internally, but GTK3 requires UTF-8.
+ * Returns a newly allocated string that must be freed with g_free(). */
+static gchar* latin1_to_utf8(const char* str)
 {
-  gen_eFilter_All,
-  gen_eFilter_Signals,
-  gen_eFilter_Redu,
-  gen_eFilter_SevHist
-} gen_eFilter;
+  if (!str || !str[0])
+    return g_strdup("");
 
-static char json_filename[] = "$pwrp_load/select.json";
-static gen_eFilter filter = gen_eFilter_Signals;
+  /* Check if already valid UTF-8 */
+  if (g_utf8_validate(str, -1, NULL))
+    return g_strdup(str);
 
-std::vector<std::string> tmp_array;
-
-std::string aref_to_str(pwr_tAttrRef& aref)
-{
-  return "{\"Objid\":{\"oix\":" + std::to_string(aref.Objid.oix) +
-         ",\"vid\":" + std::to_string(aref.Objid.vid) + "},\"Body\":" + std::to_string(aref.Body) +
-         ",\"Offset\":" + std::to_string(aref.Offset) + ",\"Size\":" + std::to_string(aref.Size) +
-         ",\"Flags\":" + std::to_string(aref.Flags.m) + "}";
+  /* Convert from ISO-8859-1 (Latin-1) to UTF-8 */
+  gsize bytes_read, bytes_written;
+  GError* error = NULL;
+  gchar* utf8 = g_convert(str, -1, "UTF-8", "ISO-8859-1", &bytes_read, &bytes_written, &error);
+  if (error)
+  {
+    g_error_free(error);
+    /* Fallback: manual conversion - each ISO-8859-1 byte becomes 1-2 UTF-8 bytes */
+    gsize len = strlen(str);
+    gchar* result = (gchar*)g_malloc(len * 2 + 1);
+    gchar* p = result;
+    for (gsize i = 0; i < len; i++)
+    {
+      unsigned char c = (unsigned char)str[i];
+      if (c < 0x80)
+        *p++ = c;
+      else
+      {
+        /* ISO-8859-1 to UTF-8: bytes 0x80-0xFF become 2-byte sequences */
+        *p++ = (gchar)(0xC0 | (c >> 6));
+        *p++ = (gchar)(0x80 | (c & 0x3F));
+      }
+    }
+    *p = '\0';
+    return result;
+  }
+  return utf8;
 }
 
-void printObjectR(char* ap, char* aname, pwr_tAttrRef* arp, pwr_tCid cid)
+/* Convert UTF-8 string back to ISO-8859-1 for ProviewR/GDH functions.
+ * GTK uses UTF-8, but ProviewR/GDH expects ISO-8859-1.
+ * Returns a newly allocated string that must be freed with g_free(). */
+static gchar* utf8_to_latin1(const char* str)
 {
-  gdh_sAttrDef* bd;
-  int rows;
-  pwr_tStatus sts = gdh_GetObjectBodyDef(cid, &bd, &rows, arp->Objid);
-  if (EVEN(sts))
-    throw co_error(sts);
+  if (!str || !str[0])
+    return g_strdup("");
 
-  for (int i = 0; i < rows; i++)
+  /* Try using g_convert first */
+  gsize bytes_read, bytes_written;
+  GError* error = NULL;
+  gchar* latin1 = g_convert(str, -1, "ISO-8859-1", "UTF-8", &bytes_read, &bytes_written, &error);
+  if (error)
   {
-    pwr_sParInfo pari = bd[i].attr->Param.Info;
-
-    if (filter == gen_eFilter_Signals && !(pari.Flags & PWR_MASK_CLASS) &&
-        strcmp(bd[i].attrName, "ActualValue") != 0)
-      continue;
-
-    if (filter == gen_eFilter_Redu && !(pari.Flags & PWR_MASK_REDUTRANSFER))
-      continue;
-
-    if (pari.Flags & PWR_MASK_RTVIRTUAL || (pari.Flags & PWR_MASK_PRIVATE && pari.Flags & PWR_MASK_POINTER) ||
-        pari.Type == pwr_eType_Void)
-      continue;
-
-    pwr_tOName name, attrName;
-    strcpy(name, aname);
-    strcat(name, ".");
-    strcat(name, bd[i].attrName);
-    strcpy(attrName, bd[i].attrName);
-
-    int elements = 1;
-    if (pari.Flags & PWR_MASK_ARRAY)
-      elements = pari.Elements;
-
-    for (int j = 0; j < elements; j++)
+    g_error_free(error);
+    /* Fallback: manual conversion - decode UTF-8 to ISO-8859-1 */
+    gsize len = strlen(str);
+    gchar* result = (gchar*)g_malloc(len + 1);
+    gchar* p = result;
+    const unsigned char* s = (const unsigned char*)str;
+    while (*s)
     {
-      if (pari.Flags & PWR_MASK_ARRAY)
+      if (*s < 0x80)
       {
-        char idx[20];
-        sprintf(idx, "[%d]", j);
-        strcpy(name, aname);
-        strcat(name, ".");
-        strcat(name, bd[i].attrName);
-        strcat(name, idx);
-        strcpy(attrName, bd[i].attrName);
-        strcat(attrName, idx);
+        /* ASCII character */
+        *p++ = *s++;
       }
-      pwr_tAttrRef aref;
-      sts = gdh_ArefANameToAref(arp, attrName, &aref);
-      if (EVEN(sts))
-        throw co_error(sts);
-
-      if (bd[i].attr->Param.Info.Flags & PWR_MASK_CLASS)
+      else if ((*s & 0xE0) == 0xC0 && (s[1] & 0xC0) == 0x80)
       {
-        printObjectR(ap + pari.Offset + j * pari.Size / elements, name, &aref, pari.Type);
+        /* 2-byte UTF-8 sequence: 110xxxxx 10xxxxxx -> single Latin-1 byte */
+        unsigned int code = ((*s & 0x1F) << 6) | (s[1] & 0x3F);
+        if (code <= 0xFF)
+          *p++ = (gchar)code;
+        else
+          *p++ = '?'; /* Character outside Latin-1 range */
+        s += 2;
+      }
+      else if ((*s & 0xF0) == 0xE0)
+      {
+        /* 3-byte UTF-8 sequence - outside Latin-1, replace with ? */
+        *p++ = '?';
+        s += 3;
+      }
+      else if ((*s & 0xF8) == 0xF0)
+      {
+        /* 4-byte UTF-8 sequence - outside Latin-1, replace with ? */
+        *p++ = '?';
+        s += 4;
       }
       else
       {
-        std::string tmp = "{\"name\":\"" + std::string(name) + "\",\"aref\":" + aref_to_str(aref) +
-                          ",\"type\":" + std::to_string(pari.Type) +
-                          ",\"flags\":" + std::to_string(pari.Flags) + ",\"enable\":1}";
-        tmp_array.push_back(tmp);
+        /* Invalid UTF-8, copy as-is */
+        *p++ = *s++;
+      }
+    }
+    *p = '\0';
+    return result;
+  }
+  return latin1;
+}
+
+/*_Types_________________________________________________________________*/
+
+enum
+{
+  COL_NAME = 0,
+  COL_TYPE,
+  COL_CLASS,
+  COL_CLASS_ID,
+  COL_DESCRIPTION,
+  COL_UNIT,
+  COL_ENABLED,
+  COL_INCONSISTENT, /* Partially selected (some children selected) */
+  COL_IS_SIGNAL,
+  COL_SELECTABLE,
+  COL_AREF_STR,
+  COL_OID_OIX,
+  COL_OID_VID,
+  COL_VISIBLE,
+  NUM_COLS
+};
+
+enum
+{
+  SEL_COL_NAME = 0,
+  SEL_COL_TYPE,
+  SEL_COL_DESCRIPTION,
+  SEL_COL_UNIT,
+  SEL_COL_DISABLED,  /* TRUE if this is a disabled IO signal */
+  SEL_COL_IS_SIGNAL, /* TRUE if this is an IO signal (can be disabled, not removed) */
+  SEL_NUM_COLS
+};
+
+struct AppData
+{
+  GtkWidget* window;
+  GtkWidget* source_tree;
+  GtkWidget* selected_tree;
+  GtkTreeStore* source_store;
+  GtkTreeModelFilter* filter_model;
+  GtkListStore* selected_store;
+  GtkWidget* stats_label;
+  GtkWidget* log_view; /* Scrolling log text view */
+  GtkTextBuffer* log_buffer;
+  GtkWidget* search_entry;
+
+  int signal_count;
+  int variable_count;
+  int total_selected;
+
+  std::set<std::string> selected_names;
+  std::set<std::string> disabled_names; /* Signals explicitly disabled by user (enable: 0) */
+  bool has_saved_config;                /* True if select.json was loaded */
+
+  /* Filter state */
+  bool filter_di;
+  bool filter_do;
+  bool filter_dv;
+  bool filter_ai;
+  bool filter_ao;
+  bool filter_av;
+  bool filter_ii;
+  bool filter_io;
+  bool filter_iv;
+  bool filter_co;
+  bool filter_po;
+  bool filter_other;
+  std::string search_text;
+};
+
+static char json_filename[] = "$pwrp_load/select.json";
+
+/*
+ * Load previously selected signals from select.json
+ * This populates app->selected_names so that the tree can be built with
+ * previously selected items already checked.
+ */
+static void load_selected_from_json(AppData* app)
+{
+  pwr_tFileName fname;
+  dcli_translate_filename(fname, json_filename);
+
+  FILE* fp = fopen(fname, "r");
+  if (!fp)
+    return; /* No previous selection file */
+
+  /* Get file size */
+  fseek(fp, 0, SEEK_END);
+  long fsize = ftell(fp);
+  fseek(fp, 0, SEEK_SET);
+
+  if (fsize <= 0)
+  {
+    fclose(fp);
+    return;
+  }
+
+  char* buffer = (char*)malloc(fsize + 1);
+  if (!buffer)
+  {
+    fclose(fp);
+    return;
+  }
+
+  size_t read_size = fread(buffer, 1, fsize, fp);
+  fclose(fp);
+  buffer[read_size] = '\0';
+
+  cJSON* parsed = cJSON_Parse(buffer);
+  free(buffer);
+
+  if (!parsed)
+    return;
+
+  const cJSON* signals = cJSON_GetObjectItemCaseSensitive(parsed, "signals");
+  if (!signals)
+  {
+    cJSON_Delete(parsed);
+    return;
+  }
+
+  const cJSON* item = NULL;
+  cJSON_ArrayForEach(item, signals)
+  {
+    const cJSON* name_json = cJSON_GetObjectItemCaseSensitive(item, "name");
+    const cJSON* enable_json = cJSON_GetObjectItemCaseSensitive(item, "enable");
+
+    if (name_json && cJSON_IsString(name_json) && name_json->valuestring)
+    {
+      /* Track enabled and disabled signals separately */
+      if (!enable_json || enable_json->valueint)
+      {
+        app->selected_names.insert(name_json->valuestring);
+      }
+      else
+      {
+        /* Explicitly disabled by user */
+        app->disabled_names.insert(name_json->valuestring);
       }
     }
   }
+
+  /* Only consider it a saved config if we loaded at least one signal */
+  if (!app->selected_names.empty() || !app->disabled_names.empty())
+    app->has_saved_config = true;
+
+  cJSON_Delete(parsed);
 }
 
-void printObject(pwr_tAttrRef* arp, char* aname)
+/*
+ * Append a timestamped message to the log view
+ */
+static void log_message(AppData* app, const char* msg)
 {
-  pwr_tTid tid;
-  pwr_tStatus sts = gdh_GetAttrRefTid(arp, &tid);
-  if (EVEN(sts))
-    throw co_error(sts);
-
-  if (arp->Flags.b.Object && arp->Size == 0)
-  {
-    sts = gdh_GetObjectSize(arp->Objid, &arp->Size);
-    if (EVEN(sts))
-      throw co_error(sts);
-  }
-  else if (arp->Size == 0)
-  {
-    throw co_error(GDH__BADARG);
-  }
-
-  char* ap = (char*)calloc(1, arp->Size);
-  memset(ap, 0, arp->Size);
-
-  sts = gdh_GetObjectInfoAttrref(arp, ap, arp->Size);
-  if (EVEN(sts))
-  {
-    fprintf(stderr, "Couldn't get object info attr ref for object %s\n", aname);
-    throw co_error(sts);
-  }
-
-  printObjectR(ap, aname, arp, tid);
-
-  free(ap);
-}
-
-void dfs_helper(pwr_tOid oid)
-{
-  pwr_tOName name;
-  pwr_tCid cid;
-  pwr_tStatus sts;
-  pwr_tBoolean local;
-
-  // Dismiss the security object, dynamic volumes and mounted remote objects
-  sts = gdh_GetObjectLocation(oid, &local);
-  if (EVEN(sts))
-    throw co_error(sts);
-
-  if (!local)
+  if (!app->log_buffer)
     return;
+
+  /* Get current time */
+  time_t now = time(NULL);
+  struct tm* tm_info = localtime(&now);
+  char timestamp[32];
+  strftime(timestamp, sizeof(timestamp), "%H:%M:%S", tm_info);
+
+  /* Format the log line */
+  char line[512];
+  snprintf(line, sizeof(line), "[%s] %s\n", timestamp, msg);
+
+  /* Append to buffer */
+  GtkTextIter end;
+  gtk_text_buffer_get_end_iter(app->log_buffer, &end);
+  gtk_text_buffer_insert(app->log_buffer, &end, line, -1);
+
+  /* Auto-scroll to bottom */
+  gtk_text_buffer_get_end_iter(app->log_buffer, &end);
+  GtkTextMark* mark = gtk_text_buffer_create_mark(app->log_buffer, NULL, &end, FALSE);
+  gtk_text_view_scroll_to_mark(GTK_TEXT_VIEW(app->log_view), mark, 0.0, FALSE, 0.0, 0.0);
+  gtk_text_buffer_delete_mark(app->log_buffer, mark);
+}
+
+/*_Helper functions______________________________________________________*/
+
+static bool is_signal_class(pwr_tCid cid)
+{
+  switch (cid)
+  {
+  case pwr_cClass_Di:
+  case pwr_cClass_Do:
+  case pwr_cClass_Ai:
+  case pwr_cClass_Ao:
+  case pwr_cClass_Ii:
+  case pwr_cClass_Io:
+  case pwr_cClass_Co:
+  case pwr_cClass_Po:
+    return true;
+  default:
+    return false;
+  }
+}
+
+/* Check if a type is a primitive type that can be exported */
+static bool is_primitive_type(pwr_eType type)
+{
+  switch (type)
+  {
+  case pwr_eType_Boolean:
+  case pwr_eType_Float32:
+  case pwr_eType_Float64:
+  case pwr_eType_Int8:
+  case pwr_eType_Int16:
+  case pwr_eType_Int32:
+  case pwr_eType_Int64:
+  case pwr_eType_UInt8:
+  case pwr_eType_UInt16:
+  case pwr_eType_UInt32:
+  case pwr_eType_UInt64:
+  case pwr_eType_String:
+  case pwr_eType_Char:
+    return true;
+  default:
+    return false;
+  }
+}
+
+static bool should_skip_object(pwr_tCid cid)
+{
+  return (cid == pwr_cClass_Security || cid == pwr_cClass_DynamicVolume);
+}
+
+/* Structure to hold primitive attribute info for saving */
+struct PrimitiveAttr
+{
+  std::string name;
+  pwr_tAttrRef aref;
+  pwr_eType type;
+  std::string description;
+  std::string unit;
+};
+
+/*
+ * Recursively collect all primitive attributes from a class.
+ * If the attribute is a nested class, recurse into it.
+ * If it's a class array, iterate through all elements.
+ */
+static void collect_primitive_attrs(const char* base_path, pwr_tCid cid, pwr_tOid oid,
+                                    std::vector<PrimitiveAttr>& attrs, const char* base_desc,
+                                    const char* base_unit)
+{
+  pwr_tStatus sts;
+  gdh_sAttrDef* bd;
+  int rows;
+
+  sts = gdh_GetObjectBodyDef(cid, &bd, &rows, pwr_cNOid);
+  if (EVEN(sts))
+    return;
+
+  for (int i = 0; i < rows; i++)
+  {
+    pwr_sParInfo* info = &bd[i].attr->Param.Info;
+
+    /* Skip virtual, private pointers, void */
+    if (info->Flags & PWR_MASK_RTVIRTUAL)
+      continue;
+    if ((info->Flags & PWR_MASK_PRIVATE) && (info->Flags & PWR_MASK_POINTER))
+      continue;
+    if (info->Type == pwr_eType_Void)
+      continue;
+
+    char attr_path[512];
+    snprintf(attr_path, sizeof(attr_path), "%s.%s", base_path, bd[i].attrName);
+
+    /* Check if this is a primitive type */
+    if (is_primitive_type(info->Type))
+    {
+      PrimitiveAttr pa;
+      pa.name = attr_path;
+      pa.description = base_desc ? base_desc : "";
+      pa.unit = base_unit ? base_unit : "";
+
+      sts = gdh_NameToAttrref(pwr_cNOid, attr_path, &pa.aref);
+      if (ODD(sts))
+      {
+        pa.type = info->Type;
+        attrs.push_back(pa);
+      }
+    }
+    /* Check if it's a non-array class - recurse into it */
+    else if ((info->Flags & PWR_MASK_CLASS) && !(info->Flags & PWR_MASK_ARRAY))
+    {
+      pwr_tAttrRef nested_aref;
+      sts = gdh_NameToAttrref(pwr_cNOid, attr_path, &nested_aref);
+      if (ODD(sts))
+      {
+        pwr_tTid nested_tid;
+        sts = gdh_GetAttrRefTid(&nested_aref, &nested_tid);
+        if (ODD(sts))
+          collect_primitive_attrs(attr_path, nested_tid, oid, attrs, base_desc, base_unit);
+      }
+    }
+    /* Check if it's a class array - iterate through elements */
+    else if ((info->Flags & PWR_MASK_CLASS) && (info->Flags & PWR_MASK_ARRAY))
+    {
+      pwr_tAttrRef arr_aref;
+      sts = gdh_NameToAttrref(pwr_cNOid, attr_path, &arr_aref);
+      if (ODD(sts))
+      {
+        pwr_tTid arr_tid;
+        sts = gdh_GetAttrRefTid(&arr_aref, &arr_tid);
+        if (ODD(sts))
+        {
+          for (int j = 0; j < (int)info->Elements; j++)
+          {
+            char elem_path[512];
+            snprintf(elem_path, sizeof(elem_path), "%s[%d]", attr_path, j);
+            collect_primitive_attrs(elem_path, arr_tid, oid, attrs, base_desc, base_unit);
+          }
+        }
+      }
+    }
+  }
+
+  free(bd);
+}
+
+static void get_description(pwr_tOid oid, char* desc, size_t size)
+{
+  pwr_tStatus sts;
+  pwr_tOName attrname;
+
+  desc[0] = '\0';
+  sts = gdh_ObjidToName(oid, attrname, sizeof(attrname), cdh_mName_volumeStrict);
+  if (EVEN(sts))
+    return;
+
+  strcat(attrname, ".Description");
+  sts = gdh_GetObjectInfo(attrname, desc, size);
+  if (EVEN(sts))
+    desc[0] = '\0';
+  else
+    desc[size - 1] = '\0'; /* Ensure null termination */
+}
+
+static void get_unit(pwr_tOid oid, char* unit, size_t size)
+{
+  pwr_tStatus sts;
+  pwr_tOName attrname;
+
+  unit[0] = '\0';
+  sts = gdh_ObjidToName(oid, attrname, sizeof(attrname), cdh_mName_volumeStrict);
+  if (EVEN(sts))
+    return;
+
+  strcat(attrname, ".Unit");
+  sts = gdh_GetObjectInfo(attrname, unit, size);
+  if (EVEN(sts))
+    unit[0] = '\0';
+  else
+    unit[size - 1] = '\0'; /* Ensure null termination */
+}
+
+static const char* get_class_name(pwr_tCid cid)
+{
+  static pwr_tOName classname;
+  pwr_tStatus sts;
+
+  sts = gdh_ObjidToName(cdh_ClassIdToObjid(cid), classname, sizeof(classname), cdh_mName_object);
+  if (EVEN(sts))
+    return "Unknown";
+  return classname;
+}
+
+static const char* get_type_name(pwr_eType type)
+{
+  switch (type)
+  {
+  case pwr_eType_Boolean:
+    return "Boolean";
+  case pwr_eType_Float32:
+    return "Float32";
+  case pwr_eType_Float64:
+    return "Float64";
+  case pwr_eType_Int8:
+    return "Int8";
+  case pwr_eType_Int16:
+    return "Int16";
+  case pwr_eType_Int32:
+    return "Int32";
+  case pwr_eType_Int64:
+    return "Int64";
+  case pwr_eType_UInt8:
+    return "UInt8";
+  case pwr_eType_UInt16:
+    return "UInt16";
+  case pwr_eType_UInt32:
+    return "UInt32";
+  case pwr_eType_UInt64:
+    return "UInt64";
+  case pwr_eType_String:
+    return "String";
+  case pwr_eType_Time:
+    return "Time";
+  case pwr_eType_DeltaTime:
+    return "DeltaTime";
+  default:
+    return "Other";
+  }
+}
+
+/*_Statistics update_____________________________________________________*/
+
+static void update_stats(AppData* app)
+{
+  char stats[256];
+  snprintf(stats, sizeof(stats), "Selected: %d total (%d signals, %d variables)", app->total_selected,
+           app->signal_count, app->variable_count);
+  gtk_label_set_text(GTK_LABEL(app->stats_label), stats);
+}
+
+/*_Forward declarations__________________________________________________*/
+
+static void rebuild_selected_list(AppData* app);
+static void update_parent_state(AppData* app, GtkTreeIter* child_iter);
+
+/*_Tree population_______________________________________________________*/
+
+/* Add primitive attributes of an object as child nodes in the tree */
+static void add_attributes_to_tree(AppData* app, pwr_tOid oid, pwr_tCid cid, const char* fullname,
+                                   GtkTreeIter* parent, bool is_signal, pwr_tCid parent_class_id,
+                                   const char* parent_desc, const char* parent_unit)
+{
+  gdh_sAttrDef* bd;
+  int rows;
+  pwr_tStatus sts = gdh_GetObjectBodyDef(cid, &bd, &rows, oid);
+  if (EVEN(sts))
+    return;
+
+  for (int i = 0; i < rows; i++)
+  {
+    pwr_sParInfo* info = &bd[i].attr->Param.Info;
+
+    /* Skip class attributes (nested objects), virtual, private pointers, void */
+    if (info->Flags & PWR_MASK_RTVIRTUAL)
+      continue;
+    if ((info->Flags & PWR_MASK_PRIVATE) && (info->Flags & PWR_MASK_POINTER))
+      continue;
+    if (info->Type == pwr_eType_Void)
+      continue;
+
+    /* Check if it's a primitive type we can export */
+    if (!is_primitive_type(info->Type) && !(info->Flags & PWR_MASK_CLASS))
+      continue;
+
+    /* Build attribute path and display name */
+    char attr_path[512];
+    char display_name[256];
+    char type_display[64];
+
+    snprintf(attr_path, sizeof(attr_path), "%s.%s", fullname, bd[i].attrName);
+    strncpy(display_name, bd[i].attrName, sizeof(display_name) - 1);
+    display_name[sizeof(display_name) - 1] = '\0';
+
+    /* If it's a non-array class attribute, recurse into it */
+    if ((info->Flags & PWR_MASK_CLASS) && !(info->Flags & PWR_MASK_ARRAY))
+    {
+      /* Get the class type for nested object */
+      pwr_tAttrRef nested_aref;
+      sts = gdh_NameToAttrref(pwr_cNOid, attr_path, &nested_aref);
+      if (ODD(sts))
+      {
+        pwr_tTid nested_tid;
+        sts = gdh_GetAttrRefTid(&nested_aref, &nested_tid);
+        if (ODD(sts))
+        {
+          /* Create a selectable container node for the nested class */
+          gchar* name_utf8 = latin1_to_utf8(display_name);
+          gchar* class_utf8 = latin1_to_utf8(get_class_name(nested_tid));
+          gchar* aref_utf8 = latin1_to_utf8(attr_path);
+
+          bool enabled = (app->selected_names.find(std::string(aref_utf8)) != app->selected_names.end());
+
+          GtkTreeIter attr_iter;
+          gtk_tree_store_append(app->source_store, &attr_iter, parent);
+          gtk_tree_store_set(app->source_store, &attr_iter, COL_NAME, name_utf8, COL_TYPE, "", COL_CLASS,
+                             class_utf8, COL_CLASS_ID, (guint)parent_class_id, COL_DESCRIPTION,
+                             parent_desc ? parent_desc : "", COL_UNIT, parent_unit ? parent_unit : "",
+                             COL_ENABLED, enabled, COL_INCONSISTENT, FALSE, COL_IS_SIGNAL, FALSE,
+                             COL_SELECTABLE, TRUE, COL_AREF_STR, aref_utf8, COL_OID_OIX, oid.oix, COL_OID_VID,
+                             oid.vid, COL_VISIBLE, TRUE, -1);
+
+          /* Recursively add attributes of the nested class */
+          add_attributes_to_tree(app, oid, nested_tid, attr_path, &attr_iter, false, parent_class_id,
+                                 parent_desc, parent_unit);
+
+          g_free(name_utf8);
+          g_free(class_utf8);
+          g_free(aref_utf8);
+        }
+      }
+      continue;
+    }
+
+    /* If it's a class array, create a selectable parent with expandable children */
+    if ((info->Flags & PWR_MASK_CLASS) && (info->Flags & PWR_MASK_ARRAY))
+    {
+      pwr_tAttrRef arr_aref;
+      sts = gdh_NameToAttrref(pwr_cNOid, attr_path, &arr_aref);
+      if (ODD(sts))
+      {
+        pwr_tTid arr_tid;
+        sts = gdh_GetAttrRefTid(&arr_aref, &arr_tid);
+        if (ODD(sts))
+        {
+          snprintf(type_display, sizeof(type_display), "%s[%d]", get_class_name(arr_tid), info->Elements);
+
+          gchar* name_utf8 = latin1_to_utf8(display_name);
+          gchar* aref_utf8 = latin1_to_utf8(attr_path);
+
+          bool enabled = (app->selected_names.find(std::string(aref_utf8)) != app->selected_names.end());
+
+          /* Create selectable parent node for the array */
+          GtkTreeIter arr_iter;
+          gtk_tree_store_append(app->source_store, &arr_iter, parent);
+          gtk_tree_store_set(app->source_store, &arr_iter, COL_NAME, name_utf8, COL_TYPE, type_display,
+                             COL_CLASS, "", COL_CLASS_ID, (guint)parent_class_id, COL_DESCRIPTION,
+                             parent_desc ? parent_desc : "", COL_UNIT, parent_unit ? parent_unit : "",
+                             COL_ENABLED, enabled, COL_INCONSISTENT, FALSE, COL_IS_SIGNAL, FALSE,
+                             COL_SELECTABLE, TRUE, COL_AREF_STR, aref_utf8, COL_OID_OIX, oid.oix, COL_OID_VID,
+                             oid.vid, COL_VISIBLE, TRUE, -1);
+
+          /* Add each array element as an expandable child */
+          for (int j = 0; j < (int)info->Elements; j++)
+          {
+            char elem_path[512];
+            char elem_name[256];
+            snprintf(elem_path, sizeof(elem_path), "%s.%s[%d]", fullname, bd[i].attrName, j);
+            snprintf(elem_name, sizeof(elem_name), "%s[%d]", bd[i].attrName, j);
+
+            gchar* elem_name_utf8 = latin1_to_utf8(elem_name);
+            gchar* elem_class_utf8 = latin1_to_utf8(get_class_name(arr_tid));
+            gchar* elem_aref_utf8 = latin1_to_utf8(elem_path);
+
+            bool elem_enabled =
+                (app->selected_names.find(std::string(elem_aref_utf8)) != app->selected_names.end());
+
+            GtkTreeIter elem_iter;
+            gtk_tree_store_append(app->source_store, &elem_iter, &arr_iter);
+            gtk_tree_store_set(app->source_store, &elem_iter, COL_NAME, elem_name_utf8, COL_TYPE, "",
+                               COL_CLASS, elem_class_utf8, COL_CLASS_ID, (guint)parent_class_id,
+                               COL_DESCRIPTION, parent_desc ? parent_desc : "", COL_UNIT,
+                               parent_unit ? parent_unit : "", COL_ENABLED, elem_enabled, COL_INCONSISTENT,
+                               FALSE, COL_IS_SIGNAL, FALSE, COL_SELECTABLE, TRUE, COL_AREF_STR,
+                               elem_aref_utf8, COL_OID_OIX, oid.oix, COL_OID_VID, oid.vid, COL_VISIBLE, TRUE,
+                               -1);
+
+            /* Recursively add attributes of this array element */
+            add_attributes_to_tree(app, oid, arr_tid, elem_path, &elem_iter, false, parent_class_id,
+                                   parent_desc, parent_unit);
+
+            g_free(elem_name_utf8);
+            g_free(elem_class_utf8);
+            g_free(elem_aref_utf8);
+          }
+
+          g_free(name_utf8);
+          g_free(aref_utf8);
+        }
+      }
+      continue;
+    }
+
+    /* Get the type for this attribute - show array size in type if it's an array */
+    if (info->Flags & PWR_MASK_ARRAY)
+      snprintf(type_display, sizeof(type_display), "%s[%d]", get_type_name(info->Type), info->Elements);
+    else
+      strncpy(type_display, get_type_name(info->Type), sizeof(type_display) - 1);
+    type_display[sizeof(type_display) - 1] = '\0';
+
+    /* Get the type for this attribute */
+    pwr_tAttrRef attr_aref;
+    sts = gdh_NameToAttrref(pwr_cNOid, attr_path, &attr_aref);
+    if (EVEN(sts))
+      continue;
+
+    gchar* name_utf8 = latin1_to_utf8(display_name);
+    gchar* aref_utf8 = latin1_to_utf8(attr_path);
+
+    /* For signals, ActualValue is enabled by default only if no saved config exists */
+    bool is_actual_value = streq(bd[i].attrName, "ActualValue");
+    bool is_signal_attr = is_signal && is_actual_value;
+    bool in_selection = (app->selected_names.find(std::string(aref_utf8)) != app->selected_names.end());
+
+    /* Determine enabled state:
+     * - No saved config: auto-enable IO signals and track them
+     * - Has saved config: only enable if explicitly in selected_names
+     */
+    bool enabled;
+    if (!app->has_saved_config && is_signal_attr)
+    {
+      /* Fresh start - auto-enable IO signals and add to selected_names */
+      enabled = true;
+      app->selected_names.insert(std::string(aref_utf8));
+    }
+    else
+    {
+      /* Has config - use saved state */
+      enabled = in_selection;
+    }
+
+    GtkTreeIter attr_iter;
+    gtk_tree_store_append(app->source_store, &attr_iter, parent);
+    gtk_tree_store_set(app->source_store, &attr_iter, COL_NAME, name_utf8, COL_TYPE, type_display, COL_CLASS,
+                       "", COL_CLASS_ID, (guint)parent_class_id, COL_DESCRIPTION,
+                       parent_desc ? parent_desc : "", COL_UNIT, parent_unit ? parent_unit : "", COL_ENABLED,
+                       enabled, COL_INCONSISTENT, FALSE, COL_IS_SIGNAL, is_signal_attr, COL_SELECTABLE, TRUE,
+                       COL_AREF_STR, aref_utf8, COL_OID_OIX, oid.oix, COL_OID_VID, oid.vid, COL_VISIBLE, TRUE,
+                       -1);
+
+    g_free(name_utf8);
+    g_free(aref_utf8);
+  }
+  free(bd);
+}
+
+static void add_object_to_tree(AppData* app, pwr_tOid oid, GtkTreeIter* parent)
+{
+  pwr_tStatus sts;
+  pwr_tCid cid;
+  pwr_tOName name;
+  char description[256];
+  char unit[256];
 
   sts = gdh_GetObjectClass(oid, &cid);
   if (EVEN(sts))
-    throw co_error(sts);
-
-  if (cid == pwr_cClass_Security || cid == pwr_cClass_DynamicVolume)
     return;
 
-  sts = gdh_ObjidToName(oid, name, sizeof(name), cdh_mName_volumeStrict);
+  if (should_skip_object(cid))
+    return;
+
+  sts = gdh_ObjidToName(oid, name, sizeof(name), cdh_mName_object);
   if (EVEN(sts))
-    throw co_error(sts);
+    return;
 
-  pwr_tAttrRef aref = cdh_ObjidToAref(oid);
+  pwr_tOName fullname;
+  sts = gdh_ObjidToName(oid, fullname, sizeof(fullname), cdh_mName_volumeStrict);
+  if (EVEN(sts))
+    return;
 
-  printObject(&aref, name);
+  get_description(oid, description, sizeof(description));
+  get_unit(oid, unit, sizeof(unit));
 
+  bool is_sig = is_signal_class(cid);
+
+  /* Convert strings to UTF-8 for GTK */
+  gchar* name_utf8 = latin1_to_utf8(name);
+  gchar* desc_utf8 = latin1_to_utf8(description);
+  gchar* unit_utf8 = latin1_to_utf8(unit);
+  gchar* class_utf8 = latin1_to_utf8(get_class_name(cid));
+  gchar* fullname_utf8 = latin1_to_utf8(fullname);
+
+  GtkTreeIter iter;
+  gtk_tree_store_append(app->source_store, &iter, parent);
+
+  /* Objects are selectable - selecting them selects all children */
+  /* Note: COL_IS_SIGNAL is FALSE for objects - only the ActualValue attribute is marked as signal */
+  gtk_tree_store_set(app->source_store, &iter, COL_NAME, name_utf8, COL_TYPE, "", COL_CLASS, class_utf8,
+                     COL_CLASS_ID, (guint)cid, COL_DESCRIPTION, desc_utf8, COL_UNIT, unit_utf8, COL_ENABLED,
+                     FALSE, COL_INCONSISTENT, FALSE, COL_IS_SIGNAL, FALSE, COL_SELECTABLE, TRUE, COL_AREF_STR,
+                     fullname_utf8, COL_OID_OIX, oid.oix, COL_OID_VID, oid.vid, COL_VISIBLE, TRUE, -1);
+
+  /* Add all primitive attributes as child nodes */
+  add_attributes_to_tree(app, oid, cid, fullname, &iter, is_sig, cid, desc_utf8, unit_utf8);
+
+  g_free(name_utf8);
+  g_free(desc_utf8);
+  g_free(unit_utf8);
+  g_free(class_utf8);
+  g_free(fullname_utf8);
+
+  /* Add child objects */
   pwr_tOid coid;
-  pwr_tStatus sts2 = gdh_GetChild(oid, &coid);
-  while (ODD(sts2))
+  sts = gdh_GetChild(oid, &coid);
+  while (ODD(sts))
   {
-    dfs_helper(coid);
-    sts2 = gdh_GetNextSibling(coid, &coid);
+    add_object_to_tree(app, coid, &iter);
+    sts = gdh_GetNextSibling(coid, &coid);
   }
 }
 
-void usage()
-{
-  printf("rs_export_gen [-f 'filter']\n\n"
-         "-f Filter, 'all', 'signals' or 'redu'. Default 'signals'\n\n");
-}
+/* Forward declaration */
+static int get_children_state(AppData* app, GtkTreeIter* parent);
 
-int main(int argc, char** argv)
+/*
+ * Recursively recalculate parent states after loading selections.
+ * Goes bottom-up: first processes children, then updates parent state.
+ */
+static void recalculate_states_recursive(AppData* app, GtkTreeIter* iter)
 {
-
-  if (argc > 1 && streq(argv[1], "-h"))
+  /* First recurse to all children */
+  GtkTreeIter child;
+  if (gtk_tree_model_iter_children(GTK_TREE_MODEL(app->source_store), &child, iter))
   {
-    usage();
-    exit(0);
+    do
+    {
+      recalculate_states_recursive(app, &child);
+    } while (gtk_tree_model_iter_next(GTK_TREE_MODEL(app->source_store), &child));
   }
 
-  if (argc > 2 && streq(argv[1], "-f"))
+  /* Then update this node's state based on children */
+  if (gtk_tree_model_iter_has_child(GTK_TREE_MODEL(app->source_store), iter))
   {
-    if (streq(argv[2], "all"))
-      filter = gen_eFilter_All;
-    else if (streq(argv[2], "signals"))
-      filter = gen_eFilter_Signals;
-    else if (streq(argv[2], "redu"))
-      filter = gen_eFilter_Redu;
-    else if (streq(argv[2], "sevhist"))
-      filter = gen_eFilter_SevHist;
+    gboolean selectable;
+    gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), iter, COL_SELECTABLE, &selectable, -1);
+
+    if (selectable)
+    {
+      int state = get_children_state(app, iter);
+
+      if (state == 0)
+        gtk_tree_store_set(app->source_store, iter, COL_ENABLED, FALSE, COL_INCONSISTENT, FALSE, -1);
+      else if (state == 1)
+        gtk_tree_store_set(app->source_store, iter, COL_ENABLED, FALSE, COL_INCONSISTENT, TRUE, -1);
+      else
+        gtk_tree_store_set(app->source_store, iter, COL_ENABLED, TRUE, COL_INCONSISTENT, FALSE, -1);
+    }
+  }
+}
+
+/*
+ * Recalculate all parent states after tree is populated.
+ * This ensures parents show correct state based on which children are selected.
+ */
+static void recalculate_all_parent_states(AppData* app)
+{
+  GtkTreeIter iter;
+  gboolean valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(app->source_store), &iter);
+  while (valid)
+  {
+    recalculate_states_recursive(app, &iter);
+    valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(app->source_store), &iter);
+  }
+}
+
+/*
+ * Auto-discover new IO signals in the tree that are not in selected_names or disabled_names.
+ * Enable them by default and add to selected_names.
+ */
+static int auto_discover_io_signals(AppData* app)
+{
+  int discovered_count = 0;
+
+  /* Lambda to process each tree row */
+  std::function<void(GtkTreeIter*)> check_and_enable = [&](GtkTreeIter* iter)
+  {
+    gboolean is_signal;
+    gchar* aref_str;
+    gboolean enabled;
+
+    gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), iter, COL_IS_SIGNAL, &is_signal, COL_AREF_STR,
+                       &aref_str, COL_ENABLED, &enabled, -1);
+
+    /* Check if this is a signal's ActualValue attribute */
+    if (is_signal && aref_str && aref_str[0] != '\0')
+    {
+      std::string name(aref_str);
+
+      /* Check if this signal is new (not in selected or disabled) */
+      bool in_selected = app->selected_names.find(name) != app->selected_names.end();
+      bool in_disabled = app->disabled_names.find(name) != app->disabled_names.end();
+
+      if (!in_selected && !in_disabled)
+      {
+        /* New signal - auto-enable it */
+        app->selected_names.insert(name);
+        gtk_tree_store_set(app->source_store, iter, COL_ENABLED, TRUE, -1);
+        discovered_count++;
+      }
+    }
+
+    g_free(aref_str);
+
+    /* Recurse into children */
+    GtkTreeIter child;
+    if (gtk_tree_model_iter_children(GTK_TREE_MODEL(app->source_store), &child, iter))
+    {
+      do
+      {
+        check_and_enable(&child);
+      } while (gtk_tree_model_iter_next(GTK_TREE_MODEL(app->source_store), &child));
+    }
+  };
+
+  /* Process all top-level nodes */
+  GtkTreeIter iter;
+  gboolean valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(app->source_store), &iter);
+  while (valid)
+  {
+    check_and_enable(&iter);
+    valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(app->source_store), &iter);
+  }
+
+  return discovered_count;
+}
+
+static void populate_source_tree(AppData* app)
+{
+  gtk_tree_store_clear(app->source_store);
+
+  pwr_tOid oid;
+  pwr_tStatus sts = gdh_GetRootList(&oid);
+  while (ODD(sts))
+  {
+    if (oid.oix != 0x80000001)
+      add_object_to_tree(app, oid, NULL);
+    sts = gdh_GetNextSibling(oid, &oid);
+  }
+
+  /* Auto-discover new IO signals not in select.json */
+  if (app->has_saved_config)
+  {
+    int discovered = auto_discover_io_signals(app);
+    if (discovered > 0)
+    {
+      char msg[256];
+      snprintf(msg, sizeof(msg), "Auto-discovered %d new IO signal%s", discovered,
+               discovered == 1 ? "" : "s");
+      log_message(app, msg);
+    }
     else
     {
-      usage();
-      exit(0);
+      log_message(app, "Loaded configuration from select.json");
     }
+
+    /* Note: Disabled IO signals are shown in the export list with pastel red styling */
+  }
+  else
+  {
+    /* Fresh start - count how many signals were auto-enabled */
+    int count = (int)app->selected_names.size();
+    if (count > 0)
+    {
+      char msg[256];
+      snprintf(msg, sizeof(msg), "No saved config - auto-enabled %d IO signal%s", count,
+               count == 1 ? "" : "s");
+      log_message(app, msg);
+    }
+    else
+    {
+      log_message(app, "No saved configuration found");
+    }
+  }
+
+  /* After building tree, recalculate parent states based on loaded selections */
+  if (!app->selected_names.empty())
+    recalculate_all_parent_states(app);
+}
+
+/* Check if a row matches the current filter criteria */
+static bool row_matches_filter(AppData* app, guint class_id, const char* name, const char* desc)
+{
+  /* Check class filter */
+  bool class_match = false;
+
+  switch (class_id)
+  {
+  case pwr_cClass_Di:
+    class_match = app->filter_di;
+    break;
+  case pwr_cClass_Do:
+    class_match = app->filter_do;
+    break;
+  case pwr_cClass_Dv:
+    class_match = app->filter_dv;
+    break;
+  case pwr_cClass_Ai:
+    class_match = app->filter_ai;
+    break;
+  case pwr_cClass_Ao:
+    class_match = app->filter_ao;
+    break;
+  case pwr_cClass_Av:
+    class_match = app->filter_av;
+    break;
+  case pwr_cClass_Ii:
+    class_match = app->filter_ii;
+    break;
+  case pwr_cClass_Io:
+    class_match = app->filter_io;
+    break;
+  case pwr_cClass_Iv:
+    class_match = app->filter_iv;
+    break;
+  case pwr_cClass_Co:
+    class_match = app->filter_co;
+    break;
+  case pwr_cClass_Po:
+    class_match = app->filter_po;
+    break;
+  default:
+    class_match = app->filter_other;
+    break;
+  }
+
+  if (!class_match)
+    return false;
+
+  /* Check search text */
+  if (!app->search_text.empty())
+  {
+    std::string name_lower = name ? name : "";
+    std::string desc_lower = desc ? desc : "";
+    std::string search_lower = app->search_text;
+
+    /* Convert to lowercase for case-insensitive search */
+    for (auto& c : name_lower)
+      c = tolower(c);
+    for (auto& c : desc_lower)
+      c = tolower(c);
+    for (auto& c : search_lower)
+      c = tolower(c);
+
+    if (name_lower.find(search_lower) == std::string::npos &&
+        desc_lower.find(search_lower) == std::string::npos)
+      return false;
+  }
+
+  return true;
+}
+
+/* Apply filter to tree - set COL_VISIBLE for each row */
+static void apply_filter_recursive(AppData* app, GtkTreeIter* parent, bool* any_child_visible)
+{
+  GtkTreeIter iter;
+  gboolean valid;
+
+  if (parent)
+    valid = gtk_tree_model_iter_children(GTK_TREE_MODEL(app->source_store), &iter, parent);
+  else
+    valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(app->source_store), &iter);
+
+  while (valid)
+  {
+    guint class_id;
+    gchar* name;
+    gchar* desc;
+    gboolean selectable;
+
+    gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), &iter, COL_CLASS_ID, &class_id, COL_NAME, &name,
+                       COL_DESCRIPTION, &desc, COL_SELECTABLE, &selectable, -1);
+
+    /* Check if any children are visible */
+    bool child_visible = false;
+    if (gtk_tree_model_iter_has_child(GTK_TREE_MODEL(app->source_store), &iter))
+      apply_filter_recursive(app, &iter, &child_visible);
+
+    /* Row is visible if it matches filter OR if any child is visible */
+    bool row_visible = false;
+    if (selectable)
+      row_visible = row_matches_filter(app, class_id, name, desc);
+
+    /* Always show parent if child is visible */
+    if (child_visible)
+      row_visible = true;
+
+    gtk_tree_store_set(app->source_store, &iter, COL_VISIBLE, row_visible, -1);
+
+    if (row_visible && any_child_visible)
+      *any_child_visible = true;
+
+    g_free(name);
+    g_free(desc);
+
+    valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(app->source_store), &iter);
+  }
+}
+
+static void apply_filter(AppData* app)
+{
+  bool dummy = false;
+  apply_filter_recursive(app, NULL, &dummy);
+  gtk_tree_model_filter_refilter(app->filter_model);
+}
+
+static void traverse_tree(AppData* app, GtkTreeIter* it, std::function<void(GtkTreeIter*)> callback)
+{
+  callback(it);
+
+  GtkTreeIter child;
+  if (gtk_tree_model_iter_children(GTK_TREE_MODEL(app->source_store), &child, it))
+  {
+    do
+    {
+      traverse_tree(app, &child, callback);
+    } while (gtk_tree_model_iter_next(GTK_TREE_MODEL(app->source_store), &child));
+  }
+}
+
+static void rebuild_selected_list(AppData* app)
+{
+  gtk_list_store_clear(app->selected_store);
+  app->signal_count = 0;
+  app->variable_count = 0;
+  app->total_selected = 0;
+
+  auto add_if_enabled = [&](GtkTreeIter* it)
+  {
+    gboolean enabled;
+    gboolean is_signal;
+    gchar* name;
+    gchar* type;
+    gchar* desc;
+    gchar* unit;
+    gchar* aref_str;
+
+    gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), it, COL_ENABLED, &enabled, COL_IS_SIGNAL,
+                       &is_signal, COL_NAME, &name, COL_TYPE, &type, COL_DESCRIPTION, &desc, COL_UNIT, &unit,
+                       COL_AREF_STR, &aref_str, -1);
+
+    if (enabled && aref_str && aref_str[0] != '\0')
+    {
+      GtkTreeIter sel_iter;
+      gtk_list_store_append(app->selected_store, &sel_iter);
+      gtk_list_store_set(app->selected_store, &sel_iter, SEL_COL_NAME, aref_str, SEL_COL_TYPE, type,
+                         SEL_COL_DESCRIPTION, desc, SEL_COL_UNIT, unit, SEL_COL_DISABLED, FALSE,
+                         SEL_COL_IS_SIGNAL, is_signal, -1);
+
+      if (is_signal)
+        app->signal_count++;
+      else
+        app->variable_count++;
+      app->total_selected++;
+    }
+
+    g_free(name);
+    g_free(type);
+    g_free(desc);
+    g_free(unit);
+    g_free(aref_str);
+  };
+
+  GtkTreeIter iter;
+  gboolean valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(app->source_store), &iter);
+  while (valid)
+  {
+    traverse_tree(app, &iter, add_if_enabled);
+    valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(app->source_store), &iter);
+  }
+
+  /* Add disabled IO signals to the list (shown with different styling) */
+  for (const auto& name : app->disabled_names)
+  {
+    GtkTreeIter sel_iter;
+    gtk_list_store_append(app->selected_store, &sel_iter);
+    gtk_list_store_set(app->selected_store, &sel_iter, SEL_COL_NAME, name.c_str(), SEL_COL_TYPE, "(disabled)",
+                       SEL_COL_DESCRIPTION, "", SEL_COL_UNIT, "", SEL_COL_DISABLED, TRUE, SEL_COL_IS_SIGNAL,
+                       TRUE, -1);
+  }
+
+  update_stats(app);
+}
+
+/*
+ * Find an item in the source tree by its aref string.
+ * Returns TRUE if found and sets the found_iter.
+ * Searches recursively through the tree.
+ */
+static gboolean find_in_source_tree(GtkTreeModel* model, GtkTreeIter* parent, const char* target_aref,
+                                    GtkTreeIter* found_iter)
+{
+  GtkTreeIter iter;
+  gboolean valid;
+
+  if (parent)
+    valid = gtk_tree_model_iter_children(model, &iter, parent);
+  else
+    valid = gtk_tree_model_get_iter_first(model, &iter);
+
+  while (valid)
+  {
+    gchar* aref_str;
+    gtk_tree_model_get(model, &iter, COL_AREF_STR, &aref_str, -1);
+
+    if (aref_str && strcmp(aref_str, target_aref) == 0)
+    {
+      *found_iter = iter;
+      g_free(aref_str);
+      return TRUE;
+    }
+    g_free(aref_str);
+
+    /* Search children recursively */
+    if (gtk_tree_model_iter_has_child(model, &iter))
+    {
+      if (find_in_source_tree(model, &iter, target_aref, found_iter))
+        return TRUE;
+    }
+
+    valid = gtk_tree_model_iter_next(model, &iter);
+  }
+
+  return FALSE;
+}
+
+/*
+ * Navigate to and highlight an item in the source tree.
+ * Expands parent nodes and scrolls to make the item visible.
+ */
+static void navigate_to_source_item(AppData* app, const char* aref)
+{
+  GtkTreeIter store_iter;
+
+  /* Find the item in the underlying store */
+  if (!find_in_source_tree(GTK_TREE_MODEL(app->source_store), NULL, aref, &store_iter))
+  {
+    log_message(app, "Item not found in source tree (may have been deleted)");
+    return;
+  }
+
+  /* Convert store iter to filter iter (needed for tree view) */
+  GtkTreeIter filter_iter;
+  if (!gtk_tree_model_filter_convert_child_iter_to_iter(app->filter_model, &filter_iter, &store_iter))
+  {
+    log_message(app, "Item is hidden by current filter");
+    return;
+  }
+
+  /* Get the path and expand all parent nodes */
+  GtkTreePath* path = gtk_tree_model_get_path(GTK_TREE_MODEL(app->filter_model), &filter_iter);
+  if (path)
+  {
+    /* Expand to the parent of this path so the item is visible */
+    GtkTreePath* parent_path = gtk_tree_path_copy(path);
+    if (gtk_tree_path_up(parent_path))
+      gtk_tree_view_expand_to_path(GTK_TREE_VIEW(app->source_tree), parent_path);
+    gtk_tree_path_free(parent_path);
+
+    /* Select and scroll to the item */
+    gtk_tree_view_set_cursor(GTK_TREE_VIEW(app->source_tree), path, NULL, FALSE);
+    gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(app->source_tree), path, NULL, TRUE, 0.5, 0.0);
+
+    gtk_tree_path_free(path);
+  }
+}
+
+/*
+ * Handler for double-click or Enter on the selected list.
+ * Navigates to the corresponding item in the source tree.
+ */
+static void on_selected_row_activated(GtkTreeView* tree_view, GtkTreePath* path, GtkTreeViewColumn* column,
+                                      gpointer user_data)
+{
+  AppData* app = (AppData*)user_data;
+  GtkTreeIter iter;
+
+  if (gtk_tree_model_get_iter(GTK_TREE_MODEL(app->selected_store), &iter, path))
+  {
+    gchar* name;
+    gboolean disabled;
+    gtk_tree_model_get(GTK_TREE_MODEL(app->selected_store), &iter, SEL_COL_NAME, &name, SEL_COL_DISABLED,
+                       &disabled, -1);
+
+    if (name)
+    {
+      /* For disabled items, the name still has the full aref */
+      navigate_to_source_item(app, name);
+      g_free(name);
+    }
+  }
+}
+
+/*
+ * Disable (for IO signals) or remove (for objects) the currently selected item
+ * in the export list.
+ */
+static void disable_or_remove_selected_export(AppData* app)
+{
+  GtkTreeSelection* selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(app->selected_tree));
+  GtkTreeIter sel_iter;
+
+  if (!gtk_tree_selection_get_selected(selection, NULL, &sel_iter))
+    return;
+
+  gchar* name;
+  gboolean disabled, is_signal;
+  gtk_tree_model_get(GTK_TREE_MODEL(app->selected_store), &sel_iter, SEL_COL_NAME, &name, SEL_COL_DISABLED,
+                     &disabled, SEL_COL_IS_SIGNAL, &is_signal, -1);
+
+  if (!name)
+    return;
+
+  /* If already disabled, re-enable it */
+  if (disabled)
+  {
+    /* Find in source tree and enable */
+    GtkTreeIter store_iter;
+    if (find_in_source_tree(GTK_TREE_MODEL(app->source_store), NULL, name, &store_iter))
+    {
+      gtk_tree_store_set(app->source_store, &store_iter, COL_ENABLED, TRUE, COL_INCONSISTENT, FALSE, -1);
+      update_parent_state(app, &store_iter);
+    }
+    app->disabled_names.erase(name);
+    app->selected_names.insert(name);
+
+    char msg[256];
+    snprintf(msg, sizeof(msg), "Re-enabled: %s", name);
+    log_message(app, msg);
+  }
+  else
+  {
+    /* Find in source tree and disable/uncheck */
+    GtkTreeIter store_iter;
+    if (find_in_source_tree(GTK_TREE_MODEL(app->source_store), NULL, name, &store_iter))
+    {
+      gtk_tree_store_set(app->source_store, &store_iter, COL_ENABLED, FALSE, COL_INCONSISTENT, FALSE, -1);
+      update_parent_state(app, &store_iter);
+    }
+
+    app->selected_names.erase(name);
+
+    if (is_signal)
+    {
+      /* IO signals are disabled (kept in JSON with enable: 0) */
+      app->disabled_names.insert(name);
+      char msg[256];
+      snprintf(msg, sizeof(msg), "Disabled IO signal: %s", name);
+      log_message(app, msg);
+    }
+    else
+    {
+      /* Objects are removed completely */
+      char msg[256];
+      snprintf(msg, sizeof(msg), "Removed from export: %s", name);
+      log_message(app, msg);
+    }
+  }
+
+  g_free(name);
+  rebuild_selected_list(app);
+}
+
+/*
+ * Context menu popup handler for selected tree
+ */
+static void on_context_menu_disable_remove(GtkMenuItem* item, gpointer user_data)
+{
+  AppData* app = (AppData*)user_data;
+  disable_or_remove_selected_export(app);
+}
+
+static void on_context_menu_navigate(GtkMenuItem* item, gpointer user_data)
+{
+  AppData* app = (AppData*)user_data;
+  GtkTreeSelection* selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(app->selected_tree));
+  GtkTreeIter iter;
+
+  if (gtk_tree_selection_get_selected(selection, NULL, &iter))
+  {
+    gchar* name;
+    gtk_tree_model_get(GTK_TREE_MODEL(app->selected_store), &iter, SEL_COL_NAME, &name, -1);
+    if (name)
+    {
+      navigate_to_source_item(app, name);
+      g_free(name);
+    }
+  }
+}
+
+static gboolean on_selected_button_press(GtkWidget* widget, GdkEventButton* event, gpointer user_data)
+{
+  AppData* app = (AppData*)user_data;
+
+  /* Right-click for context menu */
+  if (event->type == GDK_BUTTON_PRESS && event->button == 3)
+  {
+    GtkTreeSelection* selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(app->selected_tree));
+    GtkTreeIter iter;
+
+    /* Select the row under cursor if not already selected */
+    GtkTreePath* path;
+    if (gtk_tree_view_get_path_at_pos(GTK_TREE_VIEW(app->selected_tree), (gint)event->x, (gint)event->y,
+                                      &path, NULL, NULL, NULL))
+    {
+      gtk_tree_selection_select_path(selection, path);
+      gtk_tree_path_free(path);
+    }
+
+    if (!gtk_tree_selection_get_selected(selection, NULL, &iter))
+      return FALSE;
+
+    /* Get item info to determine action label */
+    gboolean disabled, is_signal;
+    gtk_tree_model_get(GTK_TREE_MODEL(app->selected_store), &iter, SEL_COL_DISABLED, &disabled,
+                       SEL_COL_IS_SIGNAL, &is_signal, -1);
+
+    /* Create context menu */
+    GtkWidget* menu = gtk_menu_new();
+
+    /* Navigate item */
+    GtkWidget* nav_item = gtk_menu_item_new_with_label("Show in Source Tree");
+    g_signal_connect(nav_item, "activate", G_CALLBACK(on_context_menu_navigate), app);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), nav_item);
+
+    /* Disable/Remove/Enable item */
+    const char* action_label;
+    if (disabled)
+      action_label = "Re-enable";
+    else if (is_signal)
+      action_label = "Disable";
+    else
+      action_label = "Remove";
+
+    GtkWidget* action_item = gtk_menu_item_new_with_label(action_label);
+    g_signal_connect(action_item, "activate", G_CALLBACK(on_context_menu_disable_remove), app);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), action_item);
+
+    gtk_widget_show_all(menu);
+    gtk_menu_popup_at_pointer(GTK_MENU(menu), (GdkEvent*)event);
+
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
+/*
+ * Key press handler for selected tree (Delete/Backspace to disable/remove)
+ */
+static gboolean on_selected_key_press(GtkWidget* widget, GdkEventKey* event, gpointer user_data)
+{
+  AppData* app = (AppData*)user_data;
+
+  if (event->keyval == GDK_KEY_Delete || event->keyval == GDK_KEY_BackSpace)
+  {
+    disable_or_remove_selected_export(app);
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
+/*_Callbacks_____________________________________________________________*/
+
+static gboolean on_query_tooltip(GtkWidget* widget, gint x, gint y, gboolean keyboard_mode,
+                                 GtkTooltip* tooltip, gpointer user_data)
+{
+  GtkTreeView* tree = GTK_TREE_VIEW(widget);
+  GtkTreeModel* model;
+  GtkTreePath* path;
+  GtkTreeIter iter;
+  gint bx, by;
+
+  gtk_tree_view_convert_widget_to_bin_window_coords(tree, x, y, &bx, &by);
+  if (!gtk_tree_view_get_path_at_pos(tree, bx, by, &path, NULL, NULL, NULL))
+    return FALSE;
+
+  model = gtk_tree_view_get_model(tree);
+  if (!gtk_tree_model_get_iter(model, &iter, path))
+  {
+    gtk_tree_path_free(path);
+    return FALSE;
+  }
+  gtk_tree_path_free(path);
+
+  gboolean selectable;
+  gtk_tree_model_get(model, &iter, COL_SELECTABLE, &selectable, -1);
+
+  if (!selectable)
+  {
+    gtk_tooltip_set_text(tooltip, "Container node - expand to see exportable attributes");
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/* Forward declarations for hierarchical selection */
+static void set_children_enabled(AppData* app, GtkTreeIter* parent, gboolean enabled);
+static void update_parent_state(AppData* app, GtkTreeIter* child_iter);
+
+static void toggle_selected_row(AppData* app)
+{
+  GtkTreeSelection* selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(app->source_tree));
+  GtkTreeModel* model;
+  GtkTreeIter filter_iter;
+
+  if (gtk_tree_selection_get_selected(selection, &model, &filter_iter))
+  {
+    /* Convert filter iter to store iter */
+    GtkTreeIter store_iter;
+    gtk_tree_model_filter_convert_iter_to_child_iter(app->filter_model, &store_iter, &filter_iter);
+
+    gboolean enabled, selectable, inconsistent, is_signal;
+    gchar* aref_str;
+    gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), &store_iter, COL_ENABLED, &enabled, COL_SELECTABLE,
+                       &selectable, COL_INCONSISTENT, &inconsistent, COL_AREF_STR, &aref_str, COL_IS_SIGNAL,
+                       &is_signal, -1);
+
+    if (selectable && aref_str && aref_str[0] != '\0')
+    {
+      /* If currently inconsistent (partial), clicking makes it fully enabled */
+      if (inconsistent)
+      {
+        enabled = TRUE;
+        gtk_tree_store_set(app->source_store, &store_iter, COL_ENABLED, TRUE, COL_INCONSISTENT, FALSE, -1);
+        app->selected_names.insert(aref_str);
+        app->disabled_names.erase(aref_str); /* No longer disabled */
+        set_children_enabled(app, &store_iter, TRUE);
+      }
+      else
+      {
+        enabled = !enabled;
+        gtk_tree_store_set(app->source_store, &store_iter, COL_ENABLED, enabled, COL_INCONSISTENT, FALSE, -1);
+
+        if (enabled)
+        {
+          app->selected_names.insert(aref_str);
+          app->disabled_names.erase(aref_str); /* No longer disabled */
+          set_children_enabled(app, &store_iter, TRUE);
+        }
+        else
+        {
+          app->selected_names.erase(aref_str);
+          /* Track disabled IO signals so they're saved with enable: 0 */
+          if (is_signal)
+            app->disabled_names.insert(aref_str);
+          set_children_enabled(app, &store_iter, FALSE);
+        }
+      }
+
+      update_parent_state(app, &store_iter);
+      rebuild_selected_list(app);
+    }
+    g_free(aref_str);
+  }
+}
+
+static gboolean on_tree_key_press(GtkWidget* widget, GdkEventKey* event, gpointer user_data)
+{
+  AppData* app = (AppData*)user_data;
+  GtkTreeView* tree = GTK_TREE_VIEW(widget);
+  GtkTreeSelection* selection = gtk_tree_view_get_selection(tree);
+  GtkTreeModel* model;
+  GtkTreeIter iter;
+
+  if (event->keyval == GDK_KEY_space)
+  {
+    toggle_selected_row(app);
+    return TRUE;
+  }
+
+  if (event->keyval == GDK_KEY_Right)
+  {
+    if (gtk_tree_selection_get_selected(selection, &model, &iter))
+    {
+      GtkTreePath* path = gtk_tree_model_get_path(model, &iter);
+      if (!gtk_tree_view_row_expanded(tree, path))
+      {
+        gtk_tree_view_expand_row(tree, path, FALSE);
+        gtk_tree_path_free(path);
+        return TRUE;
+      }
+      gtk_tree_path_free(path);
+    }
+  }
+
+  if (event->keyval == GDK_KEY_Left)
+  {
+    if (gtk_tree_selection_get_selected(selection, &model, &iter))
+    {
+      GtkTreePath* path = gtk_tree_model_get_path(model, &iter);
+      if (gtk_tree_view_row_expanded(tree, path))
+      {
+        gtk_tree_view_collapse_row(tree, path);
+        gtk_tree_path_free(path);
+        return TRUE;
+      }
+      /* If not expanded, go to parent */
+      if (gtk_tree_path_up(path) && gtk_tree_path_get_depth(path) > 0)
+      {
+        gtk_tree_view_set_cursor(tree, path, NULL, FALSE);
+        gtk_tree_path_free(path);
+        return TRUE;
+      }
+      gtk_tree_path_free(path);
+    }
+  }
+
+  return FALSE; /* Let GTK handle other keys */
+}
+
+/*
+ * Set enabled state for all children of a node recursively.
+ * Also updates selected_names set accordingly.
+ */
+static void set_children_enabled(AppData* app, GtkTreeIter* parent, gboolean enabled)
+{
+  GtkTreeIter child;
+  if (!gtk_tree_model_iter_children(GTK_TREE_MODEL(app->source_store), &child, parent))
+    return;
+
+  do
+  {
+    gboolean selectable, visible, is_signal;
+    gchar* aref_str;
+    gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), &child, COL_SELECTABLE, &selectable, COL_VISIBLE,
+                       &visible, COL_AREF_STR, &aref_str, COL_IS_SIGNAL, &is_signal, -1);
+
+    /* Only affect visible (filtered) items */
+    if (selectable && visible)
+    {
+      gtk_tree_store_set(app->source_store, &child, COL_ENABLED, enabled, COL_INCONSISTENT, FALSE, -1);
+      if (aref_str && aref_str[0] != '\0')
+      {
+        if (enabled)
+        {
+          app->selected_names.insert(aref_str);
+          app->disabled_names.erase(aref_str);
+        }
+        else
+        {
+          app->selected_names.erase(aref_str);
+          /* Track disabled IO signals so they're saved with enable: 0 */
+          if (is_signal)
+            app->disabled_names.insert(aref_str);
+        }
+      }
+    }
+
+    /* Recurse into children (regardless of visibility - children may be visible even if parent container
+     * isn't matching filter) */
+    set_children_enabled(app, &child, enabled);
+
+    g_free(aref_str);
+  } while (gtk_tree_model_iter_next(GTK_TREE_MODEL(app->source_store), &child));
+}
+
+/*
+ * Check children state and return:
+ *  0 = no children selected
+ *  1 = some children selected (inconsistent)
+ *  2 = all children selected
+ * Only counts visible (filtered) children
+ */
+static int get_children_state(AppData* app, GtkTreeIter* parent)
+{
+  GtkTreeIter child;
+  if (!gtk_tree_model_iter_children(GTK_TREE_MODEL(app->source_store), &child, parent))
+    return 2; /* No children = treat as all selected */
+
+  int total = 0;
+  int selected = 0;
+
+  do
+  {
+    gboolean selectable, enabled, inconsistent, visible;
+    gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), &child, COL_SELECTABLE, &selectable, COL_ENABLED,
+                       &enabled, COL_INCONSISTENT, &inconsistent, COL_VISIBLE, &visible, -1);
+
+    /* Only count visible children */
+    if (visible)
+    {
+      if (selectable)
+      {
+        total++;
+        if (enabled)
+          selected++;
+        else if (inconsistent)
+          selected++; /* Inconsistent counts as partially selected */
+      }
+      else if (gtk_tree_model_iter_has_child(GTK_TREE_MODEL(app->source_store), &child))
+      {
+        /* Non-selectable container (like "Enable") - check its children recursively */
+        int child_state = get_children_state(app, &child);
+        /* Aggregate grandchildren state into our counts */
+        total++;
+        if (child_state == 2)
+          selected++;
+        else if (child_state == 1)
+        {
+          /* Partial selection in descendants - treat as 0.5 to force inconsistent */
+          /* We achieve this by not incrementing selected, but total is incremented */
+          /* This will result in selected < total, yielding state 1 (inconsistent) */
+        }
+        /* child_state == 0 means no grandchildren selected, don't increment selected */
+      }
+    }
+  } while (gtk_tree_model_iter_next(GTK_TREE_MODEL(app->source_store), &child));
+
+  if (total == 0)
+    return 2;
+  if (selected == 0)
+    return 0;
+  if (selected == total)
+    return 2;
+  return 1;
+}
+
+/*
+ * Update parent nodes' enabled/inconsistent state based on children.
+ * Called after a child's state changes.
+ */
+static void update_parent_state(AppData* app, GtkTreeIter* child_iter)
+{
+  GtkTreeIter parent;
+  if (!gtk_tree_model_iter_parent(GTK_TREE_MODEL(app->source_store), &parent, child_iter))
+    return; /* No parent */
+
+  gboolean selectable;
+  gchar* aref_str;
+  gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), &parent, COL_SELECTABLE, &selectable, COL_AREF_STR,
+                     &aref_str, -1);
+
+  if (selectable)
+  {
+    int state = get_children_state(app, &parent);
+
+    if (state == 0)
+    {
+      /* No children selected */
+      gtk_tree_store_set(app->source_store, &parent, COL_ENABLED, FALSE, COL_INCONSISTENT, FALSE, -1);
+      if (aref_str && aref_str[0] != '\0')
+        app->selected_names.erase(aref_str);
+    }
+    else if (state == 1)
+    {
+      /* Some children selected - show inconsistent */
+      gtk_tree_store_set(app->source_store, &parent, COL_ENABLED, FALSE, COL_INCONSISTENT, TRUE, -1);
+      if (aref_str && aref_str[0] != '\0')
+        app->selected_names.insert(aref_str); /* Still include in selection for saving */
+    }
+    else
+    {
+      /* All children selected */
+      gtk_tree_store_set(app->source_store, &parent, COL_ENABLED, TRUE, COL_INCONSISTENT, FALSE, -1);
+      if (aref_str && aref_str[0] != '\0')
+        app->selected_names.insert(aref_str);
+    }
+  }
+
+  g_free(aref_str);
+
+  /* Continue up the tree */
+  update_parent_state(app, &parent);
+}
+
+static void on_toggle_enabled(GtkCellRendererToggle* renderer, gchar* path_str, gpointer user_data)
+{
+  AppData* app = (AppData*)user_data;
+  GtkTreePath* filter_path = gtk_tree_path_new_from_string(path_str);
+  GtkTreeIter filter_iter;
+
+  /* Get iterator in filter model first */
+  if (gtk_tree_model_get_iter(GTK_TREE_MODEL(app->filter_model), &filter_iter, filter_path))
+  {
+    /* Convert to underlying store iterator */
+    GtkTreeIter store_iter;
+    gtk_tree_model_filter_convert_iter_to_child_iter(app->filter_model, &store_iter, &filter_iter);
+
+    gboolean enabled, inconsistent, is_signal;
+    gchar* aref_str;
+    gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), &store_iter, COL_ENABLED, &enabled,
+                       COL_INCONSISTENT, &inconsistent, COL_AREF_STR, &aref_str, COL_IS_SIGNAL, &is_signal,
+                       -1);
+
+    if (aref_str && aref_str[0] != '\0')
+    {
+      /* If currently inconsistent (partial), clicking makes it fully enabled */
+      if (inconsistent)
+      {
+        enabled = TRUE;
+        gtk_tree_store_set(app->source_store, &store_iter, COL_ENABLED, TRUE, COL_INCONSISTENT, FALSE, -1);
+        app->selected_names.insert(aref_str);
+        app->disabled_names.erase(aref_str); /* No longer disabled */
+        /* Enable all children */
+        set_children_enabled(app, &store_iter, TRUE);
+      }
+      else
+      {
+        /* Toggle between enabled and disabled */
+        enabled = !enabled;
+        gtk_tree_store_set(app->source_store, &store_iter, COL_ENABLED, enabled, COL_INCONSISTENT, FALSE, -1);
+
+        if (enabled)
+        {
+          app->selected_names.insert(aref_str);
+          app->disabled_names.erase(aref_str); /* No longer disabled */
+          /* Enable all children */
+          set_children_enabled(app, &store_iter, TRUE);
+        }
+        else
+        {
+          app->selected_names.erase(aref_str);
+          /* Track disabled IO signals so they're saved with enable: 0 */
+          if (is_signal)
+            app->disabled_names.insert(aref_str);
+          /* Disable all children */
+          set_children_enabled(app, &store_iter, FALSE);
+        }
+      }
+
+      /* Update parent states */
+      update_parent_state(app, &store_iter);
+    }
+    g_free(aref_str);
+  }
+
+  gtk_tree_path_free(filter_path);
+  rebuild_selected_list(app);
+}
+
+static void on_save_clicked(GtkButton* button, gpointer user_data)
+{
+  AppData* app = (AppData*)user_data;
+
+  cJSON* root = cJSON_CreateObject();
+  cJSON_AddNumberToObject(root, "frequency", 1);
+  cJSON_AddNumberToObject(root, "batches", 1);
+  cJSON* signals = cJSON_AddArrayToObject(root, "signals");
+
+  int saved_count = 0;
+  GtkTreeIter iter;
+  gboolean valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(app->selected_store), &iter);
+
+  while (valid)
+  {
+    gchar* name;
+    gchar* type_str;
+    gchar* desc;
+    gchar* unit;
+    gboolean is_disabled;
+
+    gtk_tree_model_get(GTK_TREE_MODEL(app->selected_store), &iter, SEL_COL_NAME, &name, SEL_COL_TYPE,
+                       &type_str, SEL_COL_DESCRIPTION, &desc, SEL_COL_UNIT, &unit, SEL_COL_DISABLED,
+                       &is_disabled, -1);
+
+    /* Skip disabled items - they're saved separately from disabled_names */
+    if (is_disabled)
+    {
+      g_free(name);
+      g_free(type_str);
+      g_free(desc);
+      g_free(unit);
+      valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(app->selected_store), &iter);
+      continue;
+    }
+
+    /* Convert name from UTF-8 (GTK) to Latin1 (ProviewR/GDH) */
+    gchar* name_latin1 = utf8_to_latin1(name);
+
+    /* Get full aref info from GDH */
+    pwr_tAttrRef aref;
+    pwr_tStatus sts = gdh_NameToAttrref(pwr_cNOid, name_latin1, &aref);
+    if (ODD(sts))
+    {
+      /* Get type ID */
+      pwr_tTid tid;
+      sts = gdh_GetAttrRefTid(&aref, &tid);
+      if (ODD(sts))
+      {
+        /* Check if this is a class (not a primitive type) */
+        pwr_tOid class_oid = cdh_ClassIdToObjid(tid);
+        pwr_tStatus class_sts;
+        pwr_tCid class_cid;
+        class_sts = gdh_GetObjectClass(class_oid, &class_cid);
+
+        /* If tid refers to a class, expand to primitive attributes */
+        if (ODD(class_sts))
+        {
+          std::vector<PrimitiveAttr> prim_attrs;
+
+          /* Handle class array */
+          if (aref.Flags.b.Array)
+          {
+            /* For class arrays, we need to iterate through each element */
+            /* Find parent object and get attribute info */
+            pwr_tOName attrname;
+            sts = gdh_AttrrefToName(&aref, attrname, sizeof(attrname), cdh_mName_volumeStrict);
+            if (ODD(sts))
+            {
+              /* Extract just the array base name (without index) */
+              char* bracket = strchr(attrname, '[');
+              if (bracket)
+                *bracket = '\0';
+
+              /* Get the aref for the base array to find element count */
+              pwr_tAttrRef base_aref;
+              sts = gdh_NameToAttrref(pwr_cNOid, attrname, &base_aref);
+              if (ODD(sts))
+              {
+                /* Calculate element count from array size */
+                pwr_tAttrRef elem_aref;
+                char elem_path[512];
+                snprintf(elem_path, sizeof(elem_path), "%s[0]", attrname);
+                sts = gdh_NameToAttrref(pwr_cNOid, elem_path, &elem_aref);
+                if (ODD(sts))
+                {
+                  int elem_count = base_aref.Size / elem_aref.Size;
+                  for (int i = 0; i < elem_count; i++)
+                  {
+                    snprintf(elem_path, sizeof(elem_path), "%s[%d]", attrname, i);
+                    collect_primitive_attrs(elem_path, tid, aref.Objid, prim_attrs,
+                                            desc && desc[0] != '\0' ? desc : NULL,
+                                            unit && unit[0] != '\0' ? unit : NULL);
+                  }
+                }
+              }
+            }
+          }
+          else
+          {
+            /* Single class instance */
+            collect_primitive_attrs(name_latin1, tid, aref.Objid, prim_attrs,
+                                    desc && desc[0] != '\0' ? desc : NULL,
+                                    unit && unit[0] != '\0' ? unit : NULL);
+          }
+
+          /* Add all collected primitive attributes */
+          for (const auto& pa : prim_attrs)
+          {
+            cJSON* signal = cJSON_CreateObject();
+            /* Convert name from Latin1 to UTF-8 for JSON */
+            gchar* name_utf8 = latin1_to_utf8(pa.name.c_str());
+            cJSON_AddStringToObject(signal, "name", name_utf8);
+            g_free(name_utf8);
+            cJSON_AddNumberToObject(signal, "type", (int)pa.type);
+            cJSON_AddNumberToObject(signal, "flags", (int)pa.aref.Flags.m);
+            cJSON_AddNumberToObject(signal, "enable", 1);
+            if (!pa.description.empty())
+              cJSON_AddStringToObject(signal, "description", pa.description.c_str());
+            if (!pa.unit.empty())
+              cJSON_AddStringToObject(signal, "unit", pa.unit.c_str());
+
+            cJSON* aref_json = cJSON_CreateObject();
+            cJSON* oid_json = cJSON_CreateObject();
+            cJSON_AddNumberToObject(oid_json, "oix", (int)pa.aref.Objid.oix);
+            cJSON_AddNumberToObject(oid_json, "vid", (int)pa.aref.Objid.vid);
+            cJSON_AddItemToObject(aref_json, "Objid", oid_json);
+            cJSON_AddNumberToObject(aref_json, "Body", (int)pa.aref.Body);
+            cJSON_AddNumberToObject(aref_json, "Offset", (int)pa.aref.Offset);
+            cJSON_AddNumberToObject(aref_json, "Size", (int)pa.aref.Size);
+            cJSON_AddNumberToObject(aref_json, "Flags", (int)pa.aref.Flags.m);
+            cJSON_AddItemToObject(signal, "aref", aref_json);
+
+            cJSON_AddItemToArray(signals, signal);
+            saved_count++;
+          }
+        }
+        else
+        {
+          /* It's a primitive type - save directly */
+          cJSON* signal = cJSON_CreateObject();
+          cJSON_AddStringToObject(signal, "name", name);
+          cJSON_AddNumberToObject(signal, "type", (int)tid);
+          cJSON_AddNumberToObject(signal, "flags", (int)aref.Flags.m);
+          cJSON_AddNumberToObject(signal, "enable", 1);
+          if (desc && desc[0] != '\0')
+            cJSON_AddStringToObject(signal, "description", desc);
+          if (unit && unit[0] != '\0')
+            cJSON_AddStringToObject(signal, "unit", unit);
+
+          cJSON* aref_json = cJSON_CreateObject();
+          cJSON* oid_json = cJSON_CreateObject();
+          cJSON_AddNumberToObject(oid_json, "oix", (int)aref.Objid.oix);
+          cJSON_AddNumberToObject(oid_json, "vid", (int)aref.Objid.vid);
+          cJSON_AddItemToObject(aref_json, "Objid", oid_json);
+          cJSON_AddNumberToObject(aref_json, "Body", (int)aref.Body);
+          cJSON_AddNumberToObject(aref_json, "Offset", (int)aref.Offset);
+          cJSON_AddNumberToObject(aref_json, "Size", (int)aref.Size);
+          cJSON_AddNumberToObject(aref_json, "Flags", (int)aref.Flags.m);
+          cJSON_AddItemToObject(signal, "aref", aref_json);
+
+          cJSON_AddItemToArray(signals, signal);
+          saved_count++;
+        }
+      }
+    }
+
+    g_free(name);
+    g_free(name_latin1);
+    g_free(type_str);
+    g_free(desc);
+    g_free(unit);
+
+    valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(app->selected_store), &iter);
+  }
+
+  /* Also save explicitly disabled signals with enable: 0 */
+  for (const auto& disabled_name : app->disabled_names)
+  {
+    /* Skip if this signal is now enabled (user re-enabled it) */
+    if (app->selected_names.find(disabled_name) != app->selected_names.end())
+      continue;
+
+    /* Get aref info from GDH */
+    pwr_tAttrRef aref;
+    pwr_tStatus sts = gdh_NameToAttrref(pwr_cNOid, disabled_name.c_str(), &aref);
+    if (EVEN(sts))
+      continue; /* Signal may have been deleted */
+
+    pwr_tTid tid;
+    sts = gdh_GetAttrRefTid(&aref, &tid);
+    if (EVEN(sts))
+      continue;
+
+    cJSON* signal = cJSON_CreateObject();
+    cJSON_AddStringToObject(signal, "name", disabled_name.c_str());
+    cJSON_AddNumberToObject(signal, "type", (int)tid);
+    cJSON_AddNumberToObject(signal, "flags", (int)aref.Flags.m);
+    cJSON_AddNumberToObject(signal, "enable", 0); /* Explicitly disabled */
+
+    cJSON* aref_json = cJSON_CreateObject();
+    cJSON* oid_json = cJSON_CreateObject();
+    cJSON_AddNumberToObject(oid_json, "oix", (int)aref.Objid.oix);
+    cJSON_AddNumberToObject(oid_json, "vid", (int)aref.Objid.vid);
+    cJSON_AddItemToObject(aref_json, "Objid", oid_json);
+    cJSON_AddNumberToObject(aref_json, "Body", (int)aref.Body);
+    cJSON_AddNumberToObject(aref_json, "Offset", (int)aref.Offset);
+    cJSON_AddNumberToObject(aref_json, "Size", (int)aref.Size);
+    cJSON_AddNumberToObject(aref_json, "Flags", (int)aref.Flags.m);
+    cJSON_AddItemToObject(signal, "aref", aref_json);
+
+    cJSON_AddItemToArray(signals, signal);
   }
 
   pwr_tFileName fname;
   dcli_translate_filename(fname, json_filename);
+
+  char* json_str = cJSON_Print(root);
+  FILE* fp = fopen(fname, "w");
+  if (fp)
+  {
+    fputs(json_str, fp);
+    fclose(fp);
+
+    char msg[512];
+    snprintf(msg, sizeof(msg), "Saved %d selections → %d attributes to %s", app->total_selected, saved_count,
+             fname);
+    log_message(app, msg);
+  }
+  else
+  {
+    log_message(app, "Error: Could not save file");
+  }
+
+  free(json_str);
+  cJSON_Delete(root);
+}
+
+static void on_select_all_signals(GtkButton* button, gpointer user_data)
+{
+  AppData* app = (AppData*)user_data;
+
+  auto select_signal = [&](GtkTreeIter* it)
+  {
+    gboolean is_signal;
+    gchar* aref_str;
+
+    gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), it, COL_IS_SIGNAL, &is_signal, COL_AREF_STR,
+                       &aref_str, -1);
+
+    if (is_signal && aref_str && aref_str[0] != '\0')
+    {
+      gtk_tree_store_set(app->source_store, it, COL_ENABLED, TRUE, COL_INCONSISTENT, FALSE, -1);
+      app->selected_names.insert(aref_str);
+      app->disabled_names.erase(aref_str); /* Remove from disabled if it was there */
+    }
+
+    g_free(aref_str);
+  };
+
+  GtkTreeIter iter;
+  gboolean valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(app->source_store), &iter);
+  while (valid)
+  {
+    traverse_tree(app, &iter, select_signal);
+    valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(app->source_store), &iter);
+  }
+
+  /* Update parent states to show inconsistent where applicable */
+  recalculate_all_parent_states(app);
+
+  rebuild_selected_list(app);
+}
+
+static void on_filter_toggled(GtkToggleButton* button, gpointer user_data)
+{
+  AppData* app = (AppData*)user_data;
+  const gchar* name = gtk_widget_get_name(GTK_WIDGET(button));
+  gboolean active = gtk_toggle_button_get_active(button);
+
+  if (strcmp(name, "Di") == 0)
+    app->filter_di = active;
+  else if (strcmp(name, "Do") == 0)
+    app->filter_do = active;
+  else if (strcmp(name, "Dv") == 0)
+    app->filter_dv = active;
+  else if (strcmp(name, "Ai") == 0)
+    app->filter_ai = active;
+  else if (strcmp(name, "Ao") == 0)
+    app->filter_ao = active;
+  else if (strcmp(name, "Av") == 0)
+    app->filter_av = active;
+  else if (strcmp(name, "Ii") == 0)
+    app->filter_ii = active;
+  else if (strcmp(name, "Io") == 0)
+    app->filter_io = active;
+  else if (strcmp(name, "Iv") == 0)
+    app->filter_iv = active;
+  else if (strcmp(name, "Co") == 0)
+    app->filter_co = active;
+  else if (strcmp(name, "Po") == 0)
+    app->filter_po = active;
+  else if (strcmp(name, "Other") == 0)
+    app->filter_other = active;
+
+  apply_filter(app);
+}
+
+static void on_search_changed(GtkSearchEntry* entry, gpointer user_data)
+{
+  AppData* app = (AppData*)user_data;
+  const gchar* text = gtk_entry_get_text(GTK_ENTRY(entry));
+  app->search_text = text ? text : "";
+  apply_filter(app);
+}
+
+static void on_clear_all(GtkButton* button, gpointer user_data)
+{
+  AppData* app = (AppData*)user_data;
+
+  /* Clear all enabled flags and track IO signals as disabled */
+  auto clear_enabled = [&](GtkTreeIter* it)
+  {
+    gboolean is_signal;
+    gchar* aref_str;
+    gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), it, COL_IS_SIGNAL, &is_signal, COL_AREF_STR,
+                       &aref_str, -1);
+
+    gtk_tree_store_set(app->source_store, it, COL_ENABLED, FALSE, COL_INCONSISTENT, FALSE, -1);
+
+    /* Track IO signals as explicitly disabled */
+    if (is_signal && aref_str && aref_str[0] != '\0')
+      app->disabled_names.insert(aref_str);
+
+    g_free(aref_str);
+  };
+
+  GtkTreeIter iter;
+  gboolean valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(app->source_store), &iter);
+  while (valid)
+  {
+    traverse_tree(app, &iter, clear_enabled);
+    valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(app->source_store), &iter);
+  }
+
+  app->selected_names.clear();
+  rebuild_selected_list(app);
+}
+
+/* Forward declaration for theme toggle */
+
+/*_Window creation_______________________________________________________*/
+
+static void create_window(AppData* app)
+{
+  app->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_title(GTK_WINDOW(app->window), "ProviewR Export Signal Selector");
+  gtk_window_set_default_size(GTK_WINDOW(app->window), 1400, 800);
+  g_signal_connect(app->window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+
+  /* Set ProviewR owl icon */
+  pwr_tFileName icon_file;
+  dcli_translate_filename(icon_file, "$pwr_exe/pwr_icon16.png");
+  GdkPixbuf* icon = gdk_pixbuf_new_from_file(icon_file, NULL);
+  if (icon)
+    gtk_window_set_icon(GTK_WINDOW(app->window), icon);
+
+  GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+  gtk_container_add(GTK_CONTAINER(app->window), vbox);
+
+  // Toolbar
+  GtkWidget* toolbar = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
+  gtk_widget_set_margin_start(toolbar, 10);
+  gtk_widget_set_margin_end(toolbar, 10);
+  gtk_widget_set_margin_top(toolbar, 5);
+  gtk_widget_set_margin_bottom(toolbar, 5);
+  gtk_box_pack_start(GTK_BOX(vbox), toolbar, FALSE, FALSE, 0);
+
+  GtkWidget* select_signals_btn = gtk_button_new_with_label("Select All Signals");
+  g_signal_connect(select_signals_btn, "clicked", G_CALLBACK(on_select_all_signals), app);
+  gtk_box_pack_start(GTK_BOX(toolbar), select_signals_btn, FALSE, FALSE, 0);
+
+  GtkWidget* clear_btn = gtk_button_new_with_label("Clear All");
+  g_signal_connect(clear_btn, "clicked", G_CALLBACK(on_clear_all), app);
+  gtk_box_pack_start(GTK_BOX(toolbar), clear_btn, FALSE, FALSE, 0);
+
+  GtkWidget* save_btn = gtk_button_new_with_label("Save");
+  g_signal_connect(save_btn, "clicked", G_CALLBACK(on_save_clicked), app);
+  gtk_box_pack_start(GTK_BOX(toolbar), save_btn, FALSE, FALSE, 0);
+
+  app->stats_label = gtk_label_new("Selected: 0 total (0 signals, 0 variables)");
+  gtk_widget_set_halign(app->stats_label, GTK_ALIGN_END);
+  gtk_box_pack_end(GTK_BOX(toolbar), app->stats_label, FALSE, FALSE, 0);
+
+  /* Filter row */
+  GtkWidget* filter_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
+  gtk_widget_set_margin_start(filter_box, 10);
+  gtk_widget_set_margin_end(filter_box, 10);
+  gtk_widget_set_margin_bottom(filter_box, 5);
+  gtk_box_pack_start(GTK_BOX(vbox), filter_box, FALSE, FALSE, 0);
+
+  GtkWidget* filter_label = gtk_label_new("Filter:");
+  gtk_box_pack_start(GTK_BOX(filter_box), filter_label, FALSE, FALSE, 0);
+
+  /* Create filter toggle buttons */
+  const char* filter_names[] = {"Di", "Do", "Dv", "Ai", "Ao", "Av", "Ii", "Io", "Iv", "Co", "Po", "Other"};
+  for (int i = 0; i < 12; i++)
+  {
+    GtkWidget* btn = gtk_toggle_button_new_with_label(filter_names[i]);
+    gtk_widget_set_name(btn, filter_names[i]);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(btn), TRUE);
+    g_signal_connect(btn, "toggled", G_CALLBACK(on_filter_toggled), app);
+    gtk_box_pack_start(GTK_BOX(filter_box), btn, FALSE, FALSE, 0);
+  }
+
+  /* Search entry */
+  GtkWidget* search_label = gtk_label_new("   Search:");
+  gtk_box_pack_start(GTK_BOX(filter_box), search_label, FALSE, FALSE, 0);
+
+  app->search_entry = gtk_search_entry_new();
+  gtk_widget_set_size_request(app->search_entry, 200, -1);
+  g_signal_connect(app->search_entry, "search-changed", G_CALLBACK(on_search_changed), app);
+  gtk_box_pack_start(GTK_BOX(filter_box), app->search_entry, FALSE, FALSE, 0);
+
+  // Paned view
+  GtkWidget* paned = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
+  gtk_box_pack_start(GTK_BOX(vbox), paned, TRUE, TRUE, 0);
+
+  // Left: Source tree
+  GtkWidget* left_frame = gtk_frame_new("Available Objects");
+  gtk_paned_pack1(GTK_PANED(paned), left_frame, TRUE, TRUE);
+
+  GtkWidget* scrolled_source = gtk_scrolled_window_new(NULL, NULL);
+  gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_source), GTK_POLICY_AUTOMATIC,
+                                 GTK_POLICY_AUTOMATIC);
+  gtk_container_add(GTK_CONTAINER(left_frame), scrolled_source);
+
+  app->source_store = gtk_tree_store_new(NUM_COLS, G_TYPE_STRING, /* COL_NAME */
+                                         G_TYPE_STRING,           /* COL_TYPE */
+                                         G_TYPE_STRING,           /* COL_CLASS */
+                                         G_TYPE_UINT,             /* COL_CLASS_ID */
+                                         G_TYPE_STRING,           /* COL_DESCRIPTION */
+                                         G_TYPE_STRING,           /* COL_UNIT */
+                                         G_TYPE_BOOLEAN,          /* COL_ENABLED */
+                                         G_TYPE_BOOLEAN,          /* COL_INCONSISTENT */
+                                         G_TYPE_BOOLEAN,          /* COL_IS_SIGNAL */
+                                         G_TYPE_BOOLEAN,          /* COL_SELECTABLE */
+                                         G_TYPE_STRING,           /* COL_AREF_STR */
+                                         G_TYPE_UINT,             /* COL_OID_OIX */
+                                         G_TYPE_UINT,             /* COL_OID_VID */
+                                         G_TYPE_BOOLEAN);         /* COL_VISIBLE */
+
+  /* Create filter model */
+  app->filter_model =
+      GTK_TREE_MODEL_FILTER(gtk_tree_model_filter_new(GTK_TREE_MODEL(app->source_store), NULL));
+  gtk_tree_model_filter_set_visible_column(app->filter_model, COL_VISIBLE);
+
+  app->source_tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(app->filter_model));
+  gtk_widget_set_name(app->source_tree, "source-tree");                  /* For CSS targeting */
+  gtk_tree_view_set_tooltip_column(GTK_TREE_VIEW(app->source_tree), -1); /* We'll handle tooltips manually */
+  gtk_tree_view_set_enable_tree_lines(GTK_TREE_VIEW(app->source_tree), TRUE); /* Show tree structure lines */
+  gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(app->source_tree), TRUE);
+  gtk_container_add(GTK_CONTAINER(scrolled_source), app->source_tree);
+
+  /* Toggle checkbox - sensitive only for selectable items */
+  GtkCellRenderer* toggle_renderer = gtk_cell_renderer_toggle_new();
+  g_signal_connect(toggle_renderer, "toggled", G_CALLBACK(on_toggle_enabled), app);
+  GtkTreeViewColumn* col_enabled = gtk_tree_view_column_new_with_attributes(
+      "Export", toggle_renderer, "active", COL_ENABLED, "inconsistent", COL_INCONSISTENT, "sensitive",
+      COL_SELECTABLE, "visible", COL_SELECTABLE, NULL);
+  gtk_tree_view_append_column(GTK_TREE_VIEW(app->source_tree), col_enabled);
+
+  GtkCellRenderer* name_renderer = gtk_cell_renderer_text_new();
+  GtkTreeViewColumn* col_name = gtk_tree_view_column_new();
+  gtk_tree_view_column_set_title(col_name, "Name");
+  gtk_tree_view_column_pack_start(col_name, name_renderer, TRUE);
+  gtk_tree_view_column_add_attribute(col_name, name_renderer, "text", COL_NAME);
+  gtk_tree_view_column_add_attribute(col_name, name_renderer, "sensitive", COL_SELECTABLE);
+  gtk_tree_view_column_set_expand(col_name, TRUE);
+  gtk_tree_view_append_column(GTK_TREE_VIEW(app->source_tree), col_name);
+
+  GtkCellRenderer* class_renderer = gtk_cell_renderer_text_new();
+  GtkTreeViewColumn* col_class = gtk_tree_view_column_new();
+  gtk_tree_view_column_set_title(col_class, "Class");
+  gtk_tree_view_column_pack_start(col_class, class_renderer, TRUE);
+  gtk_tree_view_column_add_attribute(col_class, class_renderer, "text", COL_CLASS);
+  gtk_tree_view_column_add_attribute(col_class, class_renderer, "sensitive", COL_SELECTABLE);
+  gtk_tree_view_append_column(GTK_TREE_VIEW(app->source_tree), col_class);
+
+  GtkCellRenderer* type_renderer = gtk_cell_renderer_text_new();
+  GtkTreeViewColumn* col_type = gtk_tree_view_column_new();
+  gtk_tree_view_column_set_title(col_type, "Type");
+  gtk_tree_view_column_pack_start(col_type, type_renderer, TRUE);
+  gtk_tree_view_column_add_attribute(col_type, type_renderer, "text", COL_TYPE);
+  gtk_tree_view_column_add_attribute(col_type, type_renderer, "sensitive", COL_SELECTABLE);
+  gtk_tree_view_append_column(GTK_TREE_VIEW(app->source_tree), col_type);
+
+  GtkCellRenderer* desc_renderer = gtk_cell_renderer_text_new();
+  GtkTreeViewColumn* col_desc = gtk_tree_view_column_new();
+  gtk_tree_view_column_set_title(col_desc, "Description");
+  gtk_tree_view_column_pack_start(col_desc, desc_renderer, TRUE);
+  gtk_tree_view_column_add_attribute(col_desc, desc_renderer, "text", COL_DESCRIPTION);
+  gtk_tree_view_column_add_attribute(col_desc, desc_renderer, "sensitive", COL_SELECTABLE);
+  gtk_tree_view_append_column(GTK_TREE_VIEW(app->source_tree), col_desc);
+
+  // Right: Selected list
+  GtkWidget* right_frame = gtk_frame_new("Selected for Export");
+  gtk_paned_pack2(GTK_PANED(paned), right_frame, FALSE, TRUE);
+
+  GtkWidget* scrolled_selected = gtk_scrolled_window_new(NULL, NULL);
+  gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_selected), GTK_POLICY_AUTOMATIC,
+                                 GTK_POLICY_AUTOMATIC);
+  gtk_container_add(GTK_CONTAINER(right_frame), scrolled_selected);
+
+  app->selected_store = gtk_list_store_new(SEL_NUM_COLS, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING,
+                                           G_TYPE_STRING, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN);
+
+  app->selected_tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(app->selected_store));
+  gtk_container_add(GTK_CONTAINER(scrolled_selected), app->selected_tree);
+
+  /* Cell data function to style disabled rows with pastel red */
+  auto set_disabled_style = [](GtkTreeViewColumn* col, GtkCellRenderer* renderer, GtkTreeModel* model,
+                               GtkTreeIter* iter, gpointer data)
+  {
+    gboolean disabled;
+    gtk_tree_model_get(model, iter, SEL_COL_DISABLED, &disabled, -1);
+    if (disabled)
+    {
+      g_object_set(renderer, "foreground", "#c08080", "style", PANGO_STYLE_ITALIC, NULL);
+    }
+    else
+    {
+      g_object_set(renderer, "foreground", NULL, "style", PANGO_STYLE_NORMAL, NULL);
+    }
+  };
+
+  /* Create renderers for each column in selected tree */
+  GtkCellRenderer* sel_name_renderer = gtk_cell_renderer_text_new();
+  GtkTreeViewColumn* sel_col_name = gtk_tree_view_column_new();
+  gtk_tree_view_column_set_title(sel_col_name, "Attribute");
+  gtk_tree_view_column_pack_start(sel_col_name, sel_name_renderer, TRUE);
+  gtk_tree_view_column_add_attribute(sel_col_name, sel_name_renderer, "text", SEL_COL_NAME);
+  gtk_tree_view_column_set_cell_data_func(sel_col_name, sel_name_renderer,
+                                          (GtkTreeCellDataFunc) + set_disabled_style, NULL, NULL);
+  gtk_tree_view_column_set_expand(sel_col_name, TRUE);
+  gtk_tree_view_append_column(GTK_TREE_VIEW(app->selected_tree), sel_col_name);
+
+  GtkCellRenderer* sel_type_renderer = gtk_cell_renderer_text_new();
+  GtkTreeViewColumn* sel_col_type = gtk_tree_view_column_new();
+  gtk_tree_view_column_set_title(sel_col_type, "Type");
+  gtk_tree_view_column_pack_start(sel_col_type, sel_type_renderer, TRUE);
+  gtk_tree_view_column_add_attribute(sel_col_type, sel_type_renderer, "text", SEL_COL_TYPE);
+  gtk_tree_view_column_set_cell_data_func(sel_col_type, sel_type_renderer,
+                                          (GtkTreeCellDataFunc) + set_disabled_style, NULL, NULL);
+  gtk_tree_view_append_column(GTK_TREE_VIEW(app->selected_tree), sel_col_type);
+
+  GtkCellRenderer* sel_desc_renderer = gtk_cell_renderer_text_new();
+  GtkTreeViewColumn* sel_col_desc = gtk_tree_view_column_new();
+  gtk_tree_view_column_set_title(sel_col_desc, "Description");
+  gtk_tree_view_column_pack_start(sel_col_desc, sel_desc_renderer, TRUE);
+  gtk_tree_view_column_add_attribute(sel_col_desc, sel_desc_renderer, "text", SEL_COL_DESCRIPTION);
+  gtk_tree_view_column_set_cell_data_func(sel_col_desc, sel_desc_renderer,
+                                          (GtkTreeCellDataFunc) + set_disabled_style, NULL, NULL);
+  gtk_tree_view_append_column(GTK_TREE_VIEW(app->selected_tree), sel_col_desc);
+
+  GtkCellRenderer* sel_unit_renderer = gtk_cell_renderer_text_new();
+  GtkTreeViewColumn* sel_col_unit = gtk_tree_view_column_new();
+  gtk_tree_view_column_set_title(sel_col_unit, "Unit");
+  gtk_tree_view_column_pack_start(sel_col_unit, sel_unit_renderer, TRUE);
+  gtk_tree_view_column_add_attribute(sel_col_unit, sel_unit_renderer, "text", SEL_COL_UNIT);
+  gtk_tree_view_column_set_cell_data_func(sel_col_unit, sel_unit_renderer,
+                                          (GtkTreeCellDataFunc) + set_disabled_style, NULL, NULL);
+  gtk_tree_view_append_column(GTK_TREE_VIEW(app->selected_tree), sel_col_unit);
+
+  gtk_paned_set_position(GTK_PANED(paned), 800);
+
+  /* Enable tooltips for non-selectable items */
+  gtk_widget_set_has_tooltip(app->source_tree, TRUE);
+  g_signal_connect(app->source_tree, "query-tooltip", G_CALLBACK(on_query_tooltip), NULL);
+
+  /* Enable keyboard navigation - space to toggle */
+  g_signal_connect(app->source_tree, "key-press-event", G_CALLBACK(on_tree_key_press), app);
+
+  /* Selected tree navigation and interaction */
+  g_signal_connect(app->selected_tree, "row-activated", G_CALLBACK(on_selected_row_activated), app);
+  g_signal_connect(app->selected_tree, "button-press-event", G_CALLBACK(on_selected_button_press), app);
+  g_signal_connect(app->selected_tree, "key-press-event", G_CALLBACK(on_selected_key_press), app);
+
+  // Log view with scrolling
+  GtkWidget* log_scroll = gtk_scrolled_window_new(NULL, NULL);
+  gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(log_scroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+  gtk_widget_set_size_request(log_scroll, -1, 80); /* Fixed height */
+  gtk_box_pack_start(GTK_BOX(vbox), log_scroll, FALSE, FALSE, 0);
+
+  app->log_buffer = gtk_text_buffer_new(NULL);
+  app->log_view = gtk_text_view_new_with_buffer(app->log_buffer);
+  gtk_text_view_set_editable(GTK_TEXT_VIEW(app->log_view), FALSE);
+  gtk_text_view_set_cursor_visible(GTK_TEXT_VIEW(app->log_view), FALSE);
+  gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(app->log_view), GTK_WRAP_NONE);
+  gtk_text_view_set_left_margin(GTK_TEXT_VIEW(app->log_view), 8);
+  gtk_text_view_set_right_margin(GTK_TEXT_VIEW(app->log_view), 8);
+  gtk_widget_set_name(app->log_view, "log-view");
+  gtk_container_add(GTK_CONTAINER(log_scroll), app->log_view);
+}
+
+/*_Theme and CSS________________________________________________________*/
+
+static const gchar* get_dark_theme_css()
+{
+  return
+      /* Dark Theme - Clean and minimal */
+      "* {"
+      "  font-family: 'Roboto', 'Noto Sans', sans-serif;"
+      "  font-size: 10pt;"
+      "}"
+
+      /* Window and containers */
+      "window, .background {"
+      "  background-color: #1a1a1a;"
+      "  color: #d0d0d0;"
+      "}"
+
+      "box {"
+      "  background-color: transparent;"
+      "}"
+
+      /* TreeView */
+      "treeview {"
+      "  background-color: #242424;"
+      "  color: #d0d0d0;"
+      "}"
+      "treeview:selected {"
+      "  background-color: rgba(100, 140, 180, 0.35);"
+      "  color: #ffffff;"
+      "}"
+      "treeview:selected:focus {"
+      "  background-color: rgba(100, 140, 180, 0.5);"
+      "}"
+      "treeview:hover {"
+      "  background-color: rgba(255, 255, 255, 0.05);"
+      "}"
+
+      /* Expander arrows - use icontheme arrows */
+      "treeview.expander {"
+      "  color: #808080;"
+      "  min-width: 14px;"
+      "  min-height: 14px;"
+      "  -gtk-icon-source: -gtk-icontheme('pan-end-symbolic');"
+      "}"
+      "treeview.expander:checked {"
+      "  -gtk-icon-source: -gtk-icontheme('pan-down-symbolic');"
+      "}"
+      "treeview.expander:hover {"
+      "  color: #a0a0a0;"
+      "}"
+
+      /* Column headers - minimal */
+      "treeview header button {"
+      "  background-color: #2a2a2a;"
+      "  color: #909090;"
+      "  border: none;"
+      "  border-bottom: 1px solid #404040;"
+      "  padding: 4px 8px;"
+      "  font-weight: 500;"
+      "}"
+      "treeview header button:hover {"
+      "  color: #c0c0c0;"
+      "}"
+
+      /* Scrolled windows */
+      "scrolledwindow {"
+      "  background-color: #242424;"
+      "  border: 1px solid #383838;"
+      "}"
+
+      /* Buttons */
+      "button {"
+      "  background-color: #383838;"
+      "  color: #d0d0d0;"
+      "  border: 1px solid #505050;"
+      "  padding: 6px 14px;"
+      "  font-weight: 500;"
+      "}"
+      "button:hover {"
+      "  background-color: #454545;"
+      "  border-color: #606060;"
+      "}"
+      "button:active {"
+      "  background-color: #303030;"
+      "}"
+
+      /* Toggle buttons for filters */
+      "button.toggle {"
+      "  background-color: #333333;"
+      "  color: #808080;"
+      "  border: 1px solid #505050;"
+      "  border-bottom: 3px solid #505050;"
+      "  padding: 3px 10px;"
+      "  border-radius: 3px;"
+      "}"
+      "button.toggle:checked {"
+      "  background-color: #2a3a2a;"
+      "  color: #80c080;"
+      "  border: 1px solid #406040;"
+      "  border-bottom: 3px solid #50a060;"
+      "}"
+      "button.toggle:not(:checked) {"
+      "  background-color: #3a2a2a;"
+      "  color: #705050;"
+      "  border: 1px solid #503030;"
+      "  border-bottom: 3px solid #803030;"
+      "}"
+      "button.toggle:hover {"
+      "  background-color: #505050;"
+      "  color: #ffffff;"
+      "  border-color: #707070;"
+      "  border-bottom-color: #909090;"
+      "}"
+      "button.toggle:checked:hover {"
+      "  background-color: #3a5a3a;"
+      "  color: #a0f0a0;"
+      "  border-color: #509050;"
+      "  border-bottom-color: #60c070;"
+      "}"
+      "button.toggle:not(:checked):hover {"
+      "  background-color: #5a3a3a;"
+      "  color: #f0a0a0;"
+      "  border-color: #905050;"
+      "  border-bottom-color: #c06060;"
+      "}"
+
+      /* Labels */
+      "label {"
+      "  color: #d0d0d0;"
+      "}"
+
+      /* Entry/Search */
+      "entry {"
+      "  background-color: #2a2a2a;"
+      "  color: #d0d0d0;"
+      "  border: 1px solid #404040;"
+      "  padding: 6px 10px;"
+      "}"
+      "entry:focus {"
+      "  border-color: #6090b0;"
+      "}"
+
+      /* Checkboxes - keep consistent regardless of row selection */
+      "treeview check {"
+      "  min-width: 14px;"
+      "  min-height: 14px;"
+      "  background-color: #242424;"
+      "  color: #707070;"
+      "}"
+      "treeview check:checked {"
+      "  color: #70a0c0;"
+      "  background-color: #242424;"
+      "}"
+      "treeview:selected check {"
+      "  background-color: #242424;"
+      "  color: #707070;"
+      "}"
+      "treeview:selected check:checked {"
+      "  background-color: #242424;"
+      "  color: #70a0c0;"
+      "}"
+
+      /* Frame */
+      "frame {"
+      "  background-color: #242424;"
+      "  border: 1px solid #383838;"
+      "}"
+      "frame > label {"
+      "  color: #909090;"
+      "}"
+
+      /* Paned separator */
+      "paned > separator {"
+      "  background-color: #383838;"
+      "  min-width: 4px;"
+      "}"
+      "paned > separator:hover {"
+      "  background-color: #505050;"
+      "}"
+
+      /* Log view */
+      "#log-view, #log-view text {"
+      "  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'Consolas', monospace;"
+      "  font-size: 9pt;"
+      "  background-color: #1a1a1a;"
+      "  color: #808080;"
+      "}"
+
+      /* Scrollbars */
+      "scrollbar {"
+      "  background-color: #242424;"
+      "}"
+      "scrollbar slider {"
+      "  background-color: #404040;"
+      "  min-width: 6px;"
+      "  min-height: 6px;"
+      "}"
+      "scrollbar slider:hover {"
+      "  background-color: #505050;"
+      "}";
+}
+
+static void load_css()
+{
+  GtkCssProvider* provider = gtk_css_provider_new();
+  const gchar* css = get_dark_theme_css();
+  GError* error = NULL;
+  gtk_css_provider_load_from_data(provider, css, -1, &error);
+  if (error)
+  {
+    g_warning("CSS load error: %s", error->message);
+    g_error_free(error);
+  }
+  else
+  {
+    gtk_style_context_add_provider_for_screen(gdk_screen_get_default(), GTK_STYLE_PROVIDER(provider),
+                                              GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+  }
+}
+
+int main(int argc, char** argv)
+{
+  gtk_init(&argc, &argv);
   errh_Interactive();
 
-  pwr_tStatus sts = gdh_Init("java_native");
+  /* Load dark theme CSS */
+  load_css();
+
+  pwr_tStatus sts = gdh_Init("rs_export_gen");
   if (EVEN(sts))
   {
-    fprintf(stderr, "gdh_Init failed\n");
-    return sts;
-  }
-  pwr_tOid oid;
-
-  std::ostringstream json_string;
-  json_string << "{\n";
-  json_string << "  \"frequency\": 1,\n";
-  json_string << "  \"batches\": 1,\n";
-  json_string << "  \"signals\": [\n";
-
-  sts = gdh_GetRootList(&oid);
-  while (ODD(sts))
-  {
-    if (oid.oix != 0x80000001)
-      dfs_helper(oid);
-    sts = gdh_GetNextSibling(oid, &oid);
-  }
-  std::sort(std::begin(tmp_array), std::end(tmp_array));
-  for (int i = 0; i < tmp_array.size(); i++)
-  {
-    json_string << "    " << tmp_array[i];
-    if (i < tmp_array.size() - 1)
-    {
-      json_string << ",";
-    }
-    json_string << "\n";
-  }
-  json_string << "  ]\n";
-  json_string << "}";
-
-  FILE* fp = fopen(fname, "w");
-  if (!fp)
+    fprintf(stderr, "gdh_Init failed - is the runtime running?\n");
     return 1;
-  fputs(json_string.str().c_str(), fp);
-  fclose(fp);
+  }
 
-  printf("%s generated with %d columns\n", fname, (int)tmp_array.size());
+  AppData app = {};
+
+  /* Initialize all filters to enabled */
+  app.filter_di = true;
+  app.filter_do = true;
+  app.filter_dv = true;
+  app.filter_ai = true;
+  app.filter_ao = true;
+  app.filter_av = true;
+  app.filter_ii = true;
+  app.filter_io = true;
+  app.filter_iv = true;
+  app.filter_co = true;
+  app.filter_po = true;
+  app.filter_other = true;
+
+  /* Load previously selected signals from select.json */
+  load_selected_from_json(&app);
+
+  create_window(&app);
+  populate_source_tree(&app);
+  apply_filter(&app);
+
+  /* Rebuild selected list from tree state */
+  rebuild_selected_list(&app);
+
+  gtk_widget_show_all(app.window);
+  gtk_main();
 
   return 0;
 }

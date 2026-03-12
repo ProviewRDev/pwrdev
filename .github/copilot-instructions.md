@@ -1,0 +1,177 @@
+# ProviewR AI Coding Instructions
+
+## Project Overview
+
+ProviewR is an open-source industrial process control system with a modular architecture designed for automation and SCADA applications. The system follows a component-based design with clear separation between runtime (rt), GUI components (xtt, wb), and industrial protocol modules.
+
+## Core Architecture
+
+You understand the build system in src/doc/man/man_pwre.fodt
+
+### Module Structure
+The codebase is organized into specialized modules, each with a consistent directory layout:
+- `lib/` - Core libraries and shared functionality  
+- `exe/` - Executable programs and applications
+- `mmi/` - Man-Machine Interface components
+- `wbl/` - Workbench Load files (object definitions)
+- `exp/` - Export/interface definitions
+- `doc/` - Module documentation
+
+**Key Modules:**
+- **rt** - Runtime system and core engine
+- **xtt** - Process graphics and HMI (Human Machine Interface) 
+- **wb** - Workbench/configurator tools
+- **nmps** - Network Message Passing System
+- **dataq** - Data queue management for historical data
+- **profibus/otherio** - Industrial protocol implementations
+- **java** - Java web interface components
+
+### Build System Architecture
+
+ProviewR uses a sophisticated Perl-based build system (`pwre.pl`) that manages module dependencies and cross-compilation:
+
+
+
+### Component Integration Patterns
+
+**XTT Navigation System:** The XTT (eXecution Tool and Trends) module uses a hierarchical navigation pattern where `XttGtk` provides GTK-specific UI while core logic resides in platform-agnostic classes. Authorization checks are consistently applied: `if (!xtt->xnav->is_authorized()) return;`
+
+**Data Flow Architecture:** 
+- **DataQ** classes handle time-series data with specialized queue implementations (DataQ1, DataQ5, DataQ30, DataQ120 for different time intervals)
+- **NMPS** provides distributed system communication with cell-based data structures
+- **GDH** (Global Data Handler) manages real-time data access across the system
+
+## Development Conventions
+
+### File Organization Patterns
+- GTK implementations use `*_gtk.cpp` suffix pattern
+- Platform-neutral logic in base classes (e.g., `Xtt` base, `XttGtk` implementation)
+- Configuration objects use `.wb_load` extension for workbench definitions
+
+### Authorization & Security  
+All GUI operations require authorization checks using the pattern:
+
+```cpp
+if (!xtt->xnav->is_authorized())
+  return;
+```
+
+System operations may require elevated privileges (`pwr_mPrv_SevAdmin`).
+
+### Error Handling
+- Use ProviewR-specific error codes and `pwr_tStatus` return values
+- Error logging follows `errh_CErrLog()` pattern with structured error arguments
+- Status checking uses `ODD(sts)` macro for success validation
+
+## Critical Developer Knowledge
+
+### Environment Setup
+The system requires proper PWR environment initialization before building or working with modules:
+
+```bash
+# List build environments
+pwre list
+
+# Init for instance the "latest" ProviewR environment
+pwre init latest
+
+# Example to change to module profibus
+pwre module profibus
+
+# Build current module
+pwre build module   
+
+# Build method dependent programs, i.e. wb (gtk)
+pwre method_build wb gtk
+
+# To make sure a binary is relinked a touch on a source file in the respective module is needed, e.g.
+touch /data0/pwr/profibus/exe/profinet_viewer2/gtk/pn_dcp_tool_gtk.h && pwre build module # Relink the gtk binary
+
+# To build the entire project
+pwre build_all_modules gtk
+```
+
+The system uses `/usr/local/adm` or local `adm/` directories for configuration. Always initialize the environment before using pwre commands.
+
+### GUI Framework Support  
+The system supports both GTK and Qt through compile-time selection. When working on UI components, maintain separation between framework-specific code and business logic.
+
+### Graphics Framework
+ProviewR has a layered graphics framework in `xtt/lib/`:
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| **Glow** | `glow/src/glow_*.cpp` | Base graphics library - primitives, contexts, events |
+| **Grow** | `glow/src/glow_grow*.cpp` | Rich HMI objects (bars, trends, sliders, images) |
+| **Flow** | `flow/src/flow_*.cpp` | Flow chart editor for PLC programming |
+| **Brow** | `glow/src/glow_browctx.cpp` | Browser/tree view navigation |
+| **Ge** | `ge/src/ge_*.cpp` | Graphics Editor application |
+| **Cow** | `cow/src/cow_*.cpp` | Common UI components and dialogs |
+
+**Key abbreviations:**
+- **Glow** = Graphics Library for Objects in Windows
+- **Grow** = Graphics with Rich Objects (extends Glow)
+- **Xtt** = eXecution Tool and Trends
+- **Wb** = Workbench
+- **Nav** = Navigator (tree-based navigation)
+
+**Context hierarchy:** `GlowCtx` → `GrowCtx` → specialized contexts (CurveCtx, ColPalCtx, KeyboardCtx)
+
+**Widget pattern:** Each graphics area has a GTK widget (`*_gtk.cpp`) wrapping a platform-agnostic context.
+
+See [GRAPHICS_FRAMEWORK.md](.github/GRAPHICS_FRAMEWORK.md) for comprehensive documentation.
+
+### Database Architecture
+
+ProviewR uses a multi-layered database architecture separating configuration-time from runtime data:
+
+| Component | Purpose |
+|-----------|---------|
+| **WBL files** | Text-based `.wb_load` object definitions in `*/wbl/` directories |
+| **BerkeleyDB** | Persistent storage for workbench editing sessions |
+| **DBS files** | ProviewR binary snapshot format (`.dbs`) for runtime loading |
+| **GDB** | In-memory runtime database with hash tables for fast lookups |
+| **GDH** | Public API for runtime data access (`gdh_*` functions) |
+| **LDH** | Workbench API for configuration (`ldh_*` functions) |
+| **RTDB** | Shared memory segment at `/tmp/pwr_rtdb_<node_id>` |
+| **Volumes** | Logical containers (RootVolume, ClassVolume, SharedVolume) |
+
+**Data flow:** WBL → LDH → BerkeleyDB → (build/export) → DBS → GDB → GDH → RTDB
+
+See [DATABASE_ARCHITECTURE.md](.github/DATABASE_ARCHITECTURE.md) for comprehensive documentation.
+
+### QCom (Queue Communication)
+
+QCom is the core inter-process and inter-node message-passing system:
+
+| Component | Purpose |
+|-----------|---------|
+| **qcom_*** | Queue API: `qcom_Init()`, `qcom_CreateQ()`, `qcom_Put()`, `qcom_Get()` |
+| **rt_qmon** | QCom Monitor daemon - handles UDP transport between nodes |
+| **rt_neth** | Network handler - higher-level protocol (subscriptions, volumes) |
+| **QDB** | Internal shared memory database for queues and links |
+
+**Key concepts:**
+- Queue types: private, forward, broadcast, event
+- Network: UDP on port 55000 + bus number, message segmentation
+- Patterns: Request/Reply via `qcom_Request()`/`qcom_Reply()`
+
+See [QCOM.md](.github/QCOM.md) for comprehensive documentation.
+
+### Module Dependencies
+Understand the build dependency chain when making changes:
+- Core system changes require rebuilding dependent modules  
+- Protocol modules are largely independent but may depend on core runtime
+
+### Real-time Considerations
+This is a real-time industrial control system. Changes to rt module components, data handling, or timing-sensitive code require careful consideration of system performance and deterministic behavior.
+
+## Getting Started
+1. Examine existing module structure in `src/` for patterns
+2. Use `pwre.pl` commands to understand build dependencies  
+3. Study `xtt` module for GUI development patterns
+4. Review [DATABASE_ARCHITECTURE.md](.github/DATABASE_ARCHITECTURE.md) for data layer understanding
+5. Review [QCOM.md](.github/QCOM.md) for inter-process communication
+6. Review [UPGRADE.md](.github/UPGRADE.md) for the project upgrade infrastructure
+
+The modular architecture allows focused development while maintaining system integrity through well-defined interfaces and consistent build patterns.

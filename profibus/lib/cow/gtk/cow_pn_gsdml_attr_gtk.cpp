@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -270,7 +270,6 @@ void GsdmlAttrGtk::activate_cmd_input(GtkWidget* w, gpointer data)
 {
   char* text;
   GsdmlAttrGtk* attr = (GsdmlAttrGtk*)data;
-  int sts;
 
   g_object_set(attr->cmd_prompt, "visible", FALSE, NULL);
   g_object_set(attr->cmd_input, "visible", FALSE, NULL);
@@ -280,7 +279,7 @@ void GsdmlAttrGtk::activate_cmd_input(GtkWidget* w, gpointer data)
   text = gtk_editable_get_chars(GTK_EDITABLE(w), 0, -1);
   if (attr->input_open)
   {
-    sts = attr->attrnav->set_attr_value(text);
+    attr->attrnav->set_attr_value(text);
     g_object_set(w, "visible", FALSE, NULL);
     attr->set_prompt("");
     attr->input_open = 0;
@@ -545,4 +544,14 @@ GsdmlAttrGtk::GsdmlAttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx, void* a_
   }
 
   wow = new CoWowGtk(toplevel);
+
+  // Process pending events to ensure the parent is realized
+  // We do this to ensure that any windows/dialogs that may popup
+  // well be able to use the metrics of the parent, to use for centering
+  // it over the parent instead of it popping up on another screen which is
+  // obviously annoying for a modal dialog...
+  while (gtk_events_pending())
+  {
+    gtk_main_iteration();
+  }
 }

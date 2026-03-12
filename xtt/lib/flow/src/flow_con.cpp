@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -283,7 +283,7 @@ FlowCon::FlowCon(FlowCtx* flow_ctx, const char* name, FlowConClass* con_class,
     r1 = new FlowRect(ctx, rect_x, rect_y, ctx->refcon_width,
         ctx->refcon_height, flow_eDrawType_Line, ctx->refcon_linewidth);
     t1 = new FlowText(ctx, reftext, text_x, text_y,
-        flow_eDrawType_TextHelveticaBold, ctx->refcon_textsize);
+        flow_eDrawType_TextRobotoBold, ctx->refcon_textsize);
     ref_a.insert(r1);
     ref_a.insert(t1);
 
@@ -314,7 +314,7 @@ FlowCon::FlowCon(FlowCtx* flow_ctx, const char* name, FlowConClass* con_class,
     r2 = new FlowRect(ctx, rect_x, rect_y, ctx->refcon_width,
         ctx->refcon_height, flow_eDrawType_Line, ctx->refcon_linewidth);
     t2 = new FlowText(ctx, reftext, text_x, text_y,
-        flow_eDrawType_TextHelveticaBold, ctx->refcon_textsize);
+        flow_eDrawType_TextRobotoBold, ctx->refcon_textsize);
     ref_a.insert(r2);
     ref_a.insert(t2);
     ref_num = 4;
@@ -3291,7 +3291,7 @@ void FlowCon::move_ref(double x1, double y1, double x2, double y2)
     r1 = new FlowRect(ctx, rect_x, rect_y, ctx->refcon_width,
         ctx->refcon_height, flow_eDrawType_Line, ctx->refcon_linewidth);
     t1 = new FlowText(ctx, reftext, text_x, text_y,
-        flow_eDrawType_TextHelveticaBold, ctx->refcon_textsize);
+        flow_eDrawType_TextRobotoBold, ctx->refcon_textsize);
     ref_a.insert(r1);
     ref_a.insert(t1);
   } else {
@@ -3328,7 +3328,7 @@ void FlowCon::move_ref(double x1, double y1, double x2, double y2)
     r2 = new FlowRect(ctx, rect_x, rect_y, ctx->refcon_width,
         ctx->refcon_height, flow_eDrawType_Line, ctx->refcon_linewidth);
     t2 = new FlowText(ctx, reftext, text_x, text_y,
-        flow_eDrawType_TextHelveticaBold, ctx->refcon_textsize);
+        flow_eDrawType_TextRobotoBold, ctx->refcon_textsize);
     ref_a.insert(r2);
     ref_a.insert(t2);
   } else {

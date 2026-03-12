@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2024 SSAB EMEA AB.
+ * Copyright (C) 2005-2026 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -67,14 +67,16 @@ class wb_vrepwbl : public wb_vrep {
 public:
   wb_vrepwbl(wb_erep* erep)
       : m_erep(erep), m_merep(erep->merep()), m_nRef(0), m_ignore_oix(false),
-        root_object(0), error_cnt(0), file_cnt(0), next_oix(0), volume_node(0),
+        root_object(0), error_cnt(0), warning_cnt(0), file_cnt(0),
+        next_oix(0), volume_node(0),
         depend(0)
   {
   }
 
   wb_vrepwbl(wb_erep* erep, pwr_tVid vid)
       : wb_vrep(vid), m_erep(erep), m_merep(erep->merep()), m_nRef(0),
-        root_object(0), error_cnt(0), file_cnt(0), next_oix(0), volume_node(0)
+        root_object(0), error_cnt(0), warning_cnt(0), file_cnt(0),
+        next_oix(0), volume_node(0)
   {
   }
   ~wb_vrepwbl();
@@ -110,6 +112,7 @@ public:
   wb_wblnode* root_object;
 
   void error(const char* msg, const char* file, int line_number);
+  void warning(const char* msg, const char* file, int line_number);
   ref_wblnode find(const char* name);
   void registerClass(const char* name, pwr_tCid cid, ref_wblnode node);
   void registerType(const char* name, pwr_tTid tid, ref_wblnode node);
@@ -146,6 +149,7 @@ public:
   }
 
   int error_cnt;
+  int warning_cnt;
   int file_cnt;
   int next_oix;
   char volume_class[32];
