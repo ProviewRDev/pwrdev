@@ -2212,7 +2212,8 @@ int ItemPnDAP::open_children_impl()
       }
     }
 
-    // Add timing properties
+    // Add device and timing properties
+    new ItemPnDeviceProperties(m_attrnav, "Device Properties", dap, m_node, flow_eDest_IntoLast);
     new ItemPnTimingProperties(m_attrnav, "Timing Properties", dap, m_node, flow_eDest_IntoLast);
   }
 
@@ -2995,20 +2996,6 @@ void ItemPnEnumRTClass::setup_node()
   *m_value_p = value;
   brow_SetAnnotation(m_node, 1, m_value_p->c_str(), m_value_p->length());
 
-  // Here we set the startup mode, since it depends on RT_CLASS selection but it's not a choice, we choost
-  // advanced if possible otherwise legacy...
-  if (m_interface_submodule_item->_ApplicationRelations._StartupMode.getList().size())
-  {
-    if (m_interface_submodule_item->_ApplicationRelations._StartupMode.inList("Advanced"))
-      m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[PROFINET_IO_CR_TYPE_INPUT].m_startup_mode =
-          "Advanced";
-    else
-      m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[PROFINET_IO_CR_TYPE_INPUT].m_startup_mode = "Legacy";
-  }
-  else
-  {
-    m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[PROFINET_IO_CR_TYPE_INPUT].m_startup_mode = "Legacy";
-  }
 }
 
 void ItemPnEnumRTClass::scan_impl(ItemPnValueSelectItem<std::string> const* selected_item) const
@@ -3082,6 +3069,97 @@ void ItemPnSkipIPAssignment::scan_impl(ItemPnValueSelectItem<bool> const* select
 }
 
 /* ==================================== END Skip IP Assignment node ==================================== */
+
+/* ==================================== Startup Mode node ==================================== */
+
+ItemPnStartupMode::ItemPnStartupMode(GsdmlAttrNav* attrnav, const char* name,
+                                     std::shared_ptr<GSDML::InterfaceSubmoduleItem> interface_submodule_item,
+                                     std::string* pwr_pn_value_p, brow_tNode dest, flow_eDest dest_code)
+    : ValueSelection<std::string>(
+          attrnav, attrnav_mItemType_Parent, name,
+          "Choose how the AR should start up. Legacy is the safer default.\nAdvanced is only available "
+          "when supported by the device.\nSome devices have shown startup problems with Advanced mode "
+          "when large parameter/download requests are used. In those cases the traffic can be fragmented "
+          "across multiple packets and startup may fail.\nIf a device shows startup issues in Advanced "
+          "mode, try Legacy.",
+          dest, dest_code, pwr_pn_value_p),
+      m_interface_submodule_item(interface_submodule_item)
+{
+  m_closed_annotation = attrnav->brow->pixmap_attrenum;
+  setup_node();
+}
+
+int ItemPnStartupMode::open_children_impl()
+{
+  auto const& supported_modes = m_interface_submodule_item->_ApplicationRelations._StartupMode.getList();
+
+  if (supported_modes.empty())
+  {
+    std::string startup_mode("Legacy");
+    new ItemPnValueSelectItem<std::string>(m_attrnav, startup_mode.c_str(), "", this, m_value_p, startup_mode,
+                                           startup_mode.c_str(), m_node, flow_eDest_IntoLast);
+  }
+  else
+  {
+    for (auto const& startup_mode : supported_modes)
+    {
+      new ItemPnValueSelectItem<std::string>(m_attrnav, startup_mode.c_str(), "", this, m_value_p, startup_mode,
+                                             startup_mode.c_str(), m_node, flow_eDest_IntoLast);
+    }
+  }
+
+  return 1;
+}
+
+void ItemPnStartupMode::select(ItemPnValueSelectItem<std::string>* selected_item)
+{
+  *m_value_p = selected_item->value();
+
+  brow_SetAnnotation(m_node, 1, m_value_p->c_str(), m_value_p->length());
+
+  double node_x, node_y;
+  brow_GetNodePosition(m_node, &node_x, &node_y);
+  ItemPn::close(m_attrnav, node_x, node_y);
+}
+
+void ItemPnStartupMode::setup_node()
+{
+  auto const& supported_modes = m_interface_submodule_item->_ApplicationRelations._StartupMode.getList();
+  std::string value;
+
+  m_noedit = 0;
+
+  if (!m_value_p->empty() &&
+      (supported_modes.empty() || m_interface_submodule_item->_ApplicationRelations._StartupMode.inList(*m_value_p)))
+  {
+    value = *m_value_p;
+  }
+  else if (supported_modes.empty())
+  {
+    value = "Legacy";
+  }
+  else if (m_interface_submodule_item->_ApplicationRelations._StartupMode.inList("Legacy"))
+  {
+    value = "Legacy";
+  }
+  else
+  {
+    value = supported_modes[0];
+  }
+
+  *m_value_p = value;
+  brow_SetAnnotation(m_node, 1, m_value_p->c_str(), m_value_p->length());
+}
+
+void ItemPnStartupMode::scan_impl(ItemPnValueSelectItem<std::string> const* selected_item) const
+{
+  if (*selected_item->m_value_p == selected_item->m_select_value)
+    brow_SetRadiobutton(selected_item->m_node, 0, 1);
+  else
+    brow_SetRadiobutton(selected_item->m_node, 0, 0);
+}
+
+/* ==================================== END Startup Mode node ==================================== */
 
 /* ==================================== Send Clock Selection node ==================================== */
 

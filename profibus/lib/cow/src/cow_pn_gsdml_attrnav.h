@@ -776,6 +776,23 @@ public:
   void scan_impl(ItemPnValueSelectItem<bool> const* selected_item) const override;
 };
 
+class ItemPnStartupMode : public ValueSelection<std::string>
+{
+public:
+  ItemPnStartupMode(GsdmlAttrNav* attrnav, const char* name,
+                    std::shared_ptr<GSDML::InterfaceSubmoduleItem> interface_submodule_item,
+                    std::string* pwr_pn_value_p, brow_tNode dest, flow_eDest dest_code);
+  virtual ~ItemPnStartupMode() {}
+
+  int open_children_impl() override;
+  void select(ItemPnValueSelectItem<std::string>* selected_item) override;
+  void setup_node() override;
+  void scan_impl(ItemPnValueSelectItem<std::string> const* selected_item) const override;
+
+private:
+  std::shared_ptr<GSDML::InterfaceSubmoduleItem> m_interface_submodule_item;
+};
+
 class ItemPnSendClock : public ValueSelection<uint16_t>
 {
 public:
@@ -959,6 +976,57 @@ public:
         &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[PROFINET_IO_CR_TYPE_INPUT]
              .m_phase,
         iprr, "Phase for this device. Phase cannot exceed your reduction ratio.", m_node,
+        flow_eDest_IntoLast);
+
+    return 1;
+  }
+
+  bool selected_impl(GsdmlAttrNav* attrnav) override { return false; }
+  bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
+
+private:
+  std::shared_ptr<GSDML::DeviceAccessPointItem> m_dap;
+  std::shared_ptr<GSDML::InterfaceSubmoduleItem> m_interface_submodule;
+};
+
+class ItemPnDeviceProperties : public ItemPn
+{
+public:
+  ItemPnDeviceProperties(GsdmlAttrNav* attrnav, const char* name,
+                         std::shared_ptr<GSDML::DeviceAccessPointItem> dap, brow_tNode dest,
+                         flow_eDest dest_code)
+      : ItemPn(attrnav, attrnav_mItemType_Parent | attrnav_mItemType_ExpandForSave, name,
+               "Device Properties such as startup mode."),
+        m_dap(dap)
+  {
+    m_closed_annotation = attrnav->brow->pixmap_map;
+
+    brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr, dest, dest_code, (void*)this,
+                    1, &m_node);
+    brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_map);
+    brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
+
+    for (auto const& submodule_item : dap->_SystemDefinedSubmoduleList)
+    {
+      if (submodule_item.second->_SubmoduleItemType == GSDML::SubmoduleItemType_Interface)
+      {
+        m_interface_submodule =
+            std::static_pointer_cast<GSDML::InterfaceSubmoduleItem>(submodule_item.second);
+        break;
+      }
+    }
+
+    if (!m_interface_submodule)
+      m_interface_submodule.reset(new GSDML::InterfaceSubmoduleItem());
+  }
+
+  virtual ~ItemPnDeviceProperties() {}
+
+  int open_children_impl() override
+  {
+    new ItemPnStartupMode(
+        m_attrnav, "Startup Mode", m_interface_submodule,
+        &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[PROFINET_IO_CR_TYPE_INPUT].m_startup_mode, m_node,
         flow_eDest_IntoLast);
 
     return 1;
