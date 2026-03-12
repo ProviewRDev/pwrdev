@@ -164,20 +164,31 @@ static std::string generate_channel_object_name(GSDML::DataItem const* data_item
   std::regex disallowed_characters_re(
       R"([^A-Za-z0-9_])"); // Match anything NOT in A-Z, a-z, 0-9 or _ i.e. all disallowed characters
   std::ostringstream name(std::ios_base::out);
+
   if (channel_name_from_id)
   {
-    name << "SS" << subslot_number << "_" << (data_item->_TextId != "" ? "" : "Ch") << std::setw(2)
-         << std::setfill('0') << start_index << (data_item->_TextId != "" ? "_" + data_item->_TextId : "");
+    name << "SS" << subslot_number << "_";
+    if (data_item->_TextId != "")
+      name << std::setw(2) << std::setfill('0') << start_index << "_" << data_item->_TextId;
+    else
+      name << "Ch" << std::setw(2) << std::setfill('0') << start_index;
   }
   else
   {
+    std::string temp_text;
+
+    if (data_item->_Text)
+      temp_text = *data_item->_Text;
+    else if (data_item->_TextId != "")
+      temp_text = data_item->_TextId;
+    else
+      temp_text = "Ch";
+
     // Make sure the text is no longer than 20 bytes. Because we will fill it with more info. And we are
     // limited to 32 characters in these names :/
-    std::string temp_text = *data_item->_Text;
     if (temp_text.length() > 20)
       temp_text.erase(20, std::string::npos); // We can only have 32 characters including null termination :(
-    name << "SS" << subslot_number << "_" << (data_item->_Text ? temp_text : "Ch") << "_" << start_index
-         << "_" << number;
+    name << "SS" << subslot_number << "_" << temp_text << "_" << start_index << "_" << number;
   }
 
   std::string new_name;
@@ -329,7 +340,10 @@ static int pndevice_fill_io_vector_from_data_item(std::vector<ChanItem>& io_vect
           data_item->_DataType == GSDML::ValueDataType_OctetString ? pwr_cClass_ChanIi : pwr_cClass_ChanAi;
     }
 
-    ci.description = *data_item->_Text;
+    if (data_item->_Text)
+      ci.description = *data_item->_Text;
+    else
+      ci.description = data_item->_TextId;
 
     // If this is octetstring we add one item for each byte
     if (data_item->_DataType == GSDML::ValueDataType_OctetString)
@@ -692,7 +706,15 @@ int pndevice_save_cb(void* sctx)
         }
 
         // Populate channel vectors with the data collected for this subslot
-        pndevice_populate_channel_vectors(ctx, io_data, subslot.first, input_vect, output_vect);
+        sts = pndevice_populate_channel_vectors(ctx, io_data, subslot.first, input_vect, output_vect);
+        if (EVEN(sts))
+        {
+          std::ostringstream msg;
+          msg << "Error populating channel vectors for subslot " << subslot.first << ", sts " << std::hex << sts;
+          MsgWindow::message('E', msg.str().c_str());
+          ((WNav*)ctx->editor_ctx)->reset_nodraw();
+          return sts;
+        }
       }
 
       for (auto const& input_chan : input_vect)
@@ -700,6 +722,9 @@ int pndevice_save_cb(void* sctx)
         sts = create_channel(ctx->ldhses, input_chan, module_oid, ldh_eDest_IntoLast);
         if (EVEN(sts))
         {
+          std::ostringstream msg;
+          msg << "Error creating input channel " << input_chan.name << ", sts " << std::hex << sts;
+          MsgWindow::message('E', msg.str().c_str());
           ((WNav*)ctx->editor_ctx)->reset_nodraw();
           return sts;
         }
@@ -709,6 +734,9 @@ int pndevice_save_cb(void* sctx)
         sts = create_channel(ctx->ldhses, output_chan, module_oid, ldh_eDest_IntoLast);
         if (EVEN(sts))
         {
+          std::ostringstream msg;
+          msg << "Error creating output channel " << output_chan.name << ", sts " << std::hex << sts;
+          MsgWindow::message('E', msg.str().c_str());
           ((WNav*)ctx->editor_ctx)->reset_nodraw();
           return sts;
         }
@@ -879,7 +907,7 @@ static int pndevice_populate_channel_vectors(device_sCtx* ctx, GSDML::IOData* io
   // Output!
   for (auto const& output_data_item : io_data->_Output._DataItem)
   {
-    pndevice_fill_io_vector_from_data_item(output_vect, &output_data_item, index++, subslot_number, true);
+    sts = pndevice_fill_io_vector_from_data_item(output_vect, &output_data_item, index++, subslot_number, true);
 
     if (EVEN(sts))
       return sts;
