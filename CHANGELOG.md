@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added packet-qcom.lua plugin for Wireshark. This can be copied to the Wireshark lua plugin folder which one can find in the wireshark menu Help->About Wireshark->Folders (tab).
   - Start Wireshark from a terminal with PWR_BUS_ID set and it will find and dissect qcom messages with the filter "qcom".
 - Support for treating char arrays as strings in ge using format '%s' on a datatype like ##Char#16.
+- PROFINET: IM0 tab in object graph for class PnDevice.
 
 ### Fixed
 
