@@ -1195,7 +1195,7 @@ int unpack_read_im0_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local,
       im0->HardwareRevision = _HIGH_LOW_BYTES_TO_PN_U16(pIM0->HwRevisionHighByte, pIM0->HwRevisionLowByte);
 
       im0->SoftwareRevisionPrefix = pIM0->SwRevisionHighWordHighByte;
-      im0->SoftwareRevisionFunctionalEnhancement = pIM0->SwRevisionHighWordLowByte;
+      im0->SoftwareRevisionFunctionalEnh = pIM0->SwRevisionHighWordLowByte;
       im0->SoftwareRevisionBugFix = pIM0->SwRevisionLowWordHighByte;
       im0->SoftwareRevisionInternalChange = pIM0->SwRevisionLowWordLowByte;
 
