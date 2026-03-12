@@ -3439,44 +3439,70 @@ Volume Profibus $ClassVolume 0.0.250.7
             Attr TypeRef = "pwrs:Type-$UInt16"
           EndBody
         EndObject
-        Object SoftwareRevision $Attribute 25 19-SEP-2025 12:57:41.79
+        Object SoftwareRevisionPrefix $Attribute 25 19-SEP-2025 12:57:41.79
           Body SysBody 19-SEP-2025 12:57:41.79
-            Attr PgmName = "SoftwareRevision"
-            Attr Size = 4
-            Attr Flags = 2
-            Attr Elements = 4
+            Attr PgmName = "SoftwareRevisionPrefix"
+            Attr Size = 1
             Attr TypeRef = "pwrs:Type-$Char"
           EndBody
         EndObject
-        Object RevisionStatus $Attribute 26 19-SEP-2025 12:57:41.79
+        Object SoftwareRevisionFunctionalEnhancement $Attribute 26 19-SEP-2025 12:57:41.79
           Body SysBody 19-SEP-2025 12:57:41.79
-            Attr PgmName = "RevisionStatus"
+            Attr PgmName = "SoftwareRevisionFunctionalEnhancement"
+            Attr Size = 1
+            Attr TypeRef = "pwrs:Type-$UInt8"
+          EndBody
+        EndObject
+        Object SoftwareRevisionBugFix $Attribute 27 19-SEP-2025 12:57:41.79
+          Body SysBody 19-SEP-2025 12:57:41.79
+            Attr PgmName = "SoftwareRevisionBugFix"
+            Attr Size = 1
+            Attr TypeRef = "pwrs:Type-$UInt8"
+          EndBody
+        EndObject
+        Object SoftwareRevisionInternalChange $Attribute 28 19-SEP-2025 12:57:41.79
+          Body SysBody 19-SEP-2025 12:57:41.79
+            Attr PgmName = "SoftwareRevisionInternalChange"
+            Attr Size = 1
+            Attr TypeRef = "pwrs:Type-$UInt8"
+          EndBody
+        EndObject
+        Object RevisionCounter $Attribute 29 19-SEP-2025 12:57:41.79
+          Body SysBody 19-SEP-2025 12:57:41.79
+            Attr PgmName = "RevisionCounter"
             Attr Size = 2
             Attr TypeRef = "pwrs:Type-$UInt16"
           EndBody
         EndObject
-        Object ProfileID $Attribute 27 19-SEP-2025 12:57:41.79
+        Object ProfileID $Attribute 30 19-SEP-2025 12:57:41.79
           Body SysBody 19-SEP-2025 12:57:41.79
             Attr PgmName = "ProfileID"
             Attr Size = 2
             Attr TypeRef = "pwrs:Type-$UInt16"
           EndBody
         EndObject
-        Object ProfileSpecificType $Attribute 28 19-SEP-2025 12:57:41.79
+        Object ProfileSpecificType $Attribute 31 19-SEP-2025 12:57:41.79
           Body SysBody 19-SEP-2025 12:57:41.79
             Attr PgmName = "ProfileSpecificType"
             Attr Size = 2
             Attr TypeRef = "pwrs:Type-$UInt16"
           EndBody
         EndObject
-        Object IMVersion $Attribute 29 19-SEP-2025 12:57:41.79
+        Object IMVersionMajor $Attribute 32 19-SEP-2025 12:57:41.79
           Body SysBody 19-SEP-2025 12:57:41.79
-            Attr PgmName = "IMVersion"
-            Attr Size = 2
-            Attr TypeRef = "pwrs:Type-$UInt16"
+            Attr PgmName = "IMVersionMajor"
+            Attr Size = 1
+            Attr TypeRef = "pwrs:Type-$UInt8"
           EndBody
         EndObject
-        Object IMSupport $Attribute 30 19-SEP-2025 12:57:41.79
+        Object IMVersionMinor $Attribute 33 19-SEP-2025 12:57:41.79
+          Body SysBody 19-SEP-2025 12:57:41.79
+            Attr PgmName = "IMVersionMinor"
+            Attr Size = 1
+            Attr TypeRef = "pwrs:Type-$UInt8"
+          EndBody
+        EndObject
+        Object IMSupport $Attribute 34 19-SEP-2025 12:57:41.79
           Body SysBody 19-SEP-2025 12:57:41.79
             Attr PgmName = "IMSupport"
             Attr Size = 2

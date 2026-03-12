@@ -51,6 +51,7 @@
 
 #include "co_cdh.h"
 #include "co_dcli.h"
+#include "pwr_version.h"
 #include "pwr_profibusclasses.h"
 
 #include "rt_io_base.h"
@@ -199,10 +200,10 @@ void pack_set_identification_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes)
   memcpy((char*)pSSIR->SerialNumber, "0700123456789099", 16); // Container exatly 16 in size, no \0
   pSSIR->HwRevisionHighByte = 0;
   pSSIR->HwRevisionLowByte = 1;
-  pSSIR->SwRevisionHighWordHighByte = 0;
-  pSSIR->SwRevisionHighWordLowByte = 60;
-  pSSIR->SwRevisionLowWordHighByte = 0;
-  pSSIR->SwRevisionLowWordLowByte = 'V';
+  pSSIR->SwRevisionHighWordHighByte = pwrv_cPwrVersionStr[0];
+  pSSIR->SwRevisionHighWordLowByte = PWRV_VERSION_MAJOR;
+  pSSIR->SwRevisionLowWordHighByte = PWRV_VERSION_MINOR;
+  pSSIR->SwRevisionLowWordLowByte = PWRV_VERSION_PATCH;
   pSSIR->IdentAndMaintenanceVersionHighByte = 1;
   pSSIR->IdentAndMaintenanceVersionLowByte = 1;
 }
@@ -1185,21 +1186,20 @@ int unpack_read_im0_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local,
 
       im0->ManufacturerID = _HIGH_LOW_BYTES_TO_PN_U16(pIM0->VendorIdHighByte, pIM0->VendorIdLowByte);
 
-      // Copy OrderId (20 bytes, null-terminate)
+      // Copy fixed-width OrderId field (20 bytes on wire)
       memcpy(im0->OrderNo, pIM0->OrderId, PROFINET_IDENT_MAINTENANCE_ORDER_ID_LENGTH);
 
-      // Copy SerialNumber (16 bytes, null-terminate)
+      // Copy fixed-width SerialNumber field (16 bytes on wire)
       memcpy(im0->SerialNo, pIM0->SerialNumber, PROFINET_IDENT_MAINTENANCE_SR_NUMBER_LENGTH);
 
       im0->HardwareRevision = _HIGH_LOW_BYTES_TO_PN_U16(pIM0->HwRevisionHighByte, pIM0->HwRevisionLowByte);
 
-      // Software revision is stored as 4 bytes: prefix (V/R/P/U/T) + major + minor + patch
-      im0->SoftwareRevision[0] = pIM0->SwRevisionHighWordHighByte;
-      im0->SoftwareRevision[1] = pIM0->SwRevisionHighWordLowByte;
-      im0->SoftwareRevision[2] = pIM0->SwRevisionLowWordHighByte;
-      im0->SoftwareRevision[3] = pIM0->SwRevisionLowWordLowByte;
+      im0->SoftwareRevisionPrefix = pIM0->SwRevisionHighWordHighByte;
+      im0->SoftwareRevisionFunctionalEnhancement = pIM0->SwRevisionHighWordLowByte;
+      im0->SoftwareRevisionBugFix = pIM0->SwRevisionLowWordHighByte;
+      im0->SoftwareRevisionInternalChange = pIM0->SwRevisionLowWordLowByte;
 
-      im0->RevisionStatus =
+      im0->RevisionCounter =
           _HIGH_LOW_BYTES_TO_PN_U16(pIM0->RevisionCounterHighByte, pIM0->RevisionCounterLowByte);
 
       im0->ProfileID = _HIGH_LOW_BYTES_TO_PN_U16(pIM0->ProfileIdHighByte, pIM0->ProfileIdLowByte);
@@ -1207,7 +1207,8 @@ int unpack_read_im0_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local,
       im0->ProfileSpecificType =
           _HIGH_LOW_BYTES_TO_PN_U16(pIM0->ProfileTypeHighByte, pIM0->ProfileTypeLowByte);
 
-      im0->IMVersion = _HIGH_LOW_BYTES_TO_PN_U16(pIM0->VersionHighByte, pIM0->VersionLowByte);
+      im0->IMVersionMajor = pIM0->VersionHighByte;
+      im0->IMVersionMinor = pIM0->VersionLowByte;
 
       im0->IMSupport = _HIGH_LOW_BYTES_TO_PN_U16(pIM0->SupportedHighByte, pIM0->SupportedLowByte);
 
