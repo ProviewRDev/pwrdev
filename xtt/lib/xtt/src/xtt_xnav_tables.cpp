@@ -987,6 +987,10 @@ int XNav::show_device()
 static void xnav_channel_get_flags(void* cardp, void* chanp, pwr_tCid card_cid,
     pwr_tCid chan_cid, int* conv, int* inv, int* teston)
 {
+  *conv = 0;
+  *inv = 0;
+  *teston = 0;
+
   switch (card_cid) {
   case pwr_cClass_Ssab_DI32D: {
     pwr_sClass_Ssab_BaseDiCard* cp = (pwr_sClass_Ssab_BaseDiCard*)cardp;
@@ -1083,6 +1087,14 @@ static void xnav_channel_get_flags(void* cardp, void* chanp, pwr_tCid card_cid,
     }
     case pwr_cClass_ChanAit: {
       pwr_sClass_ChanAit* cp = (pwr_sClass_ChanAit*)chanp;
+
+      *inv = 0;
+      *conv = cp->ConversionOn;
+      *teston = 0;
+      break;
+    }
+    case pwr_cClass_ChanCo: {
+      pwr_sClass_ChanCo* cp = (pwr_sClass_ChanCo*)chanp;
 
       *inv = 0;
       *conv = cp->ConversionOn;
