@@ -70,6 +70,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Package distribution now writes a per-target SSH log file and reports that path on failure.
 - Closing a subwindow without adding anything to it or building it will no longer end up in an inconsistent state when trying to open that subwindow again.
 - Fixed random flickering of Flags and icons when displaying a ChanCo class item in the device listing in rt_xtt.
+- Double signal connections are now caught by syntaxcheck.
 
 
 ### Changed

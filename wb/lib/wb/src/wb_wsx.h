@@ -74,6 +74,9 @@ pwr_tStatus wsx_CheckIoDevice(ldh_tSesContext sesctx, pwr_tAttrRef aref,
 pwr_tStatus wsx_CheckSigChanCon(ldh_tSesContext sesctx, pwr_tAttrRef aref,
     int* errorcount, int* warningcount);
 
+pwr_tStatus wsx_CheckSignalConnections(ldh_tSesContext sesctx,
+    int* errorcount, int* warningcount);
+
 pwr_tStatus wsx_CheckAttrRef(ldh_tSesContext sesctx, pwr_tAttrRef aref,
     const pwr_tObjName attribute, pwr_tCid* cid_vect, int null_is_ok,
     int* errorcount, int* warningcount);

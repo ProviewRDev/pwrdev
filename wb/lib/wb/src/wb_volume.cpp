@@ -529,6 +529,11 @@ pwr_tStatus wb_volume::syntaxCheck(int* errorcount, int* warningcount)
     if (EVEN(osts))
       sts = osts;
   }
+
+  osts = wsx_CheckSignalConnections((ldh_tSesContext)this, errorcount, warningcount);
+  if (EVEN(osts))
+    sts = osts;
+
   return osts;
 }
 
