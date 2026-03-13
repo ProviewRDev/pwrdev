@@ -3173,12 +3173,19 @@ public:
 //! Execute the supplied command when the value gets high.
 class GeRefUpdate : public GeDynElem {
 public:
+  union value_u {
+    pwr_tAttrRef aref;
+    pwr_tDataRef dref;
+    pwr_tObjid oid;
+    pwr_tInt32 idx;
+  };
+
   pwr_tAName attribute; //!< Database reference for reference attribute.
   int whole_graph; //!< Reconnect whole graph.
 
-  pwr_tAttrRef* p[2];
+  void* p[2];
   pwr_tSubid subid[2];
-  pwr_tAttrRef* idx_p[2];
+  void* idx_p[2];
   pwr_tSubid idx_subid[2];
   int ref_size[2];
   pwr_tTid ref_tid[2];
@@ -3187,8 +3194,8 @@ public:
   pwr_tTid idx_ref_tid[2];
   int idx_ref_cnt;
   bool first_scan;
-  pwr_tAttrRef old_value[2];
-  pwr_tAttrRef idx_old_value[2];
+  value_u old_value[2];
+  value_u idx_old_value[2];
   pwr_tStatus status;
 
   GeRefUpdate(GeDyn* e_dyn, ge_mInstance e_instance = ge_mInstance_1);
