@@ -479,6 +479,7 @@ public class GdhWebSocketServer
     int threadNumber;
     java.util.Timer timer;
     OutputStream out = null;
+    boolean cleanedUp = false;
 	  
 
     public GdhThread(Socket clientSocket, int threadNumber, int maxConnections) {
@@ -494,6 +495,77 @@ public class GdhWebSocketServer
       this.clientSocket = clientSocket;
       this.maxConnections = maxConnections;
       start();
+    }
+
+    private void cleanupConnection() {
+      if (cleanedUp)
+        return;
+
+      cleanedUp = true;
+
+      if (timer != null) {
+        timer.cancel();
+        timer = null;
+      }
+
+      try {
+        if (out != null)
+          out.close();
+      }
+      catch (IOException e) {
+        System.err.println("Close failed");
+      }
+
+      try {
+        clientSocket.close();
+      }
+      catch (IOException e) {
+        System.err.println("Close failed");
+      }
+
+      // Check that all subscriptions have stopped.
+      for (int i = 0; i < thSub.size(); i++) {
+        try {
+          Sub sub = thSub.elementAt(i);
+          if (sub != null)
+            this.unrefObjectInfo(sub.subId, threadNumber);
+        }
+        catch (ArrayIndexOutOfBoundsException exc) {
+        }
+      }
+
+      // Reduce subscription size to save memory.
+      this.trimRefObjectList();
+
+      connectionOccupied[threadNumber] = false;
+      cbInfoRemove(threadNumber);
+      if (debug)
+        cbInfoShow();
+      if (threadCount > 0)
+        threadCount--;
+      setCurrentConnections(threadCount);
+    }
+
+    private byte[] readFramePayload(BufferedInputStream in, int[] key, int size)
+        throws IOException {
+      byte[] value = new byte[size];
+
+      for (int i = 0; i < size; i++) {
+        int c = in.read();
+        value[i] = (byte)(c ^ key[i & 0x3]);
+      }
+      return value;
+    }
+
+    private void sendControlFrame(int opcode, byte[] payload) throws IOException {
+      byte[] msg = new byte[2 + payload.length];
+      msg[0] = (byte)(0x80 | opcode);
+      msg[1] = (byte)payload.length;
+      if (payload.length != 0)
+        System.arraycopy(payload, 0, msg, 2, payload.length);
+
+      out.write(msg);
+      out.flush();
     }
 
     class SendSub extends TimerTask {
@@ -588,6 +660,7 @@ public class GdhWebSocketServer
       Vector subCopy;
       BufferedInputStream in = null;
 
+      try {
       // Handshake
       try {
 	  InputStream instream = clientSocket.getInputStream();
@@ -616,16 +689,11 @@ public class GdhWebSocketServer
       }
       catch(IOException e) {
 	  errh.error("DataStream failed");
-	  connectionOccupied[threadNumber] = false;
-	  cbInfoRemove(threadNumber);
-	  if (debug)
-	      cbInfoShow();
-	  threadCount--;
-	  setCurrentConnections(threadCount);
 	  return;
       }
       catch ( java.security.NoSuchAlgorithmException e) {
 	  System.out.println("ServerSocket NoSuchAlgorithmException");
+	  return;
       }
 
       try {
@@ -648,12 +716,6 @@ public class GdhWebSocketServer
 		      continue;
 		  }
 		  errh.error("DataStream failed");
-		  connectionOccupied[threadNumber] = false;
-		  cbInfoRemove(threadNumber);
-		  if (debug)
-		      cbInfoShow();
-		  threadCount--;
-		  setCurrentConnections(threadCount);
 		  return;
 	      }
 
@@ -669,37 +731,24 @@ public class GdhWebSocketServer
 		  break;
 	      case 9:
 		  System.out.println( "Opcode 9, Ping");
-		  return;
+		  sendControlFrame(10, readFramePayload(in, key, size));
+		  continue;
 	      case 10:
-		  System.out.println( "Opcode 10, Ping");
-		  return;
+		  System.out.println( "Opcode 10, Pong");
+		  readFramePayload(in, key, size);
+		  continue;
 	      case 8:
-		  byte[] value = new byte[2];
-		  for ( int i = 0; i < 2; i++) {
-		      int c = in.read();
-		      value[i] = (byte)(c ^ key[i & 0x3]);
-		  }
-		  int reason = ((value[1] & 0xFF) << 0) + ((value[0] & 0xFF) << 8);
+		  byte[] value = readFramePayload(in, key, size);
+		  int reason = 0;
+		  if (size >= 2)
+		      reason = ((value[1] & 0xFF) << 0) + ((value[0] & 0xFF) << 8);
 		  System.out.println( "Thread " + threadNumber + " closed, Opcode 8, reason: " + reason);
-		  if ( timer != null)
-		      timer.cancel();
-
-		  connectionOccupied[threadNumber] = false;
-		  cbInfoRemove(threadNumber);
-		  if (debug)
-		      cbInfoShow();
-		  threadCount--;
-		  setCurrentConnections(threadCount);
 		  return;
 	      default:
 		  System.out.println( "Unknown opcode: " + opcode);
 	      }
 
-	      byte[] value = new byte[size];
-	      for ( int i = 0; i < size; i++) {
-		  int c = in.read();
-		  value[i] = (byte)(c ^ key[i & 0x3]);
-	      }
+	      byte[] value = readFramePayload(in, key, size);
 
 	      int id = ((value[2] & 0xFF) << 0) + ((value[3] & 0xFF) << 8) + ((value[4] & 0xFF) << 16) + ((value[5] & 0xFF) << 24);
 	  
@@ -3543,46 +3592,13 @@ public class GdhWebSocketServer
       }				   
       catch ( java.io.IOException e) {
 	  errh.error("DataStream failed");
-	  try {
-	      out.close();
-	  }
-	  catch(IOException e2) {
-	      System.err.println("Close failed");
-	  }
-	  try {
-	      in.close();
-	  }
-	  catch(IOException e2) {
-	      System.err.println("Close failed");
-	  }
-	  try {
-	      clientSocket.close();
-	  }
-	  catch(IOException e2) {
-	      System.err.println("Close failed");
-	  }
-	  //check that all subscriptions has stopped
-	  for(int i = 0; i < thSub.size(); i++) {
-	      try {
-		  sub = thSub.elementAt(i);
-		  int index = thSub.elementAt(i).getIndex();
-		  PwrtStatus sts = this.unrefObjectInfo(sub.subId, threadNumber);
-	      }
-	      catch(ArrayIndexOutOfBoundsException exc) {
-	      }
-	  }
-	  // Reduce subscription size to save memory
-	  this.trimRefObjectList();
-
-	  connectionOccupied[threadNumber] = false;
-	  cbInfoRemove(threadNumber);
-	  if (debug)
-	      cbInfoShow();
-	  threadCount--;	  
-	  setCurrentConnections(threadCount);
 	  System.out.println("ServerSocket IOException " + e.toString());
 	  System.out.println("Terminating thread " + threadNumber);
 	  return;
+      }
+      }
+      finally {
+	  cleanupConnection();
       }
     }
     public synchronized Sub refObjectInfo(String attrName, int threadNumber, int refId, int elements)
@@ -3816,4 +3832,3 @@ public class GdhWebSocketServer
     }
   }
 }
-
