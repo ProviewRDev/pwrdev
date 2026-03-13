@@ -68,6 +68,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Message handler application requests no longer block for up to one hour waiting for a `qcom_Request()` reply. They now use the normal MH send/receive timeout and preserve `MH__TMO` on timeout.
 - Distribution is now SSH-only. `RemoteAccessType` only offers `SSH`, and the old upgrade path rewrites older distribution settings to the SSH defaults.
 - Package distribution now writes a per-target SSH log file and reports that path on failure.
+- Closing a subwindow without adding anything to it or building it will no longer end up in an inconsistent state when trying to open that subwindow again.
 
 
 ### Changed
