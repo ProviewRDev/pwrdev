@@ -2118,13 +2118,13 @@ static void on_select_all_signals(GtkButton* button, gpointer user_data)
 
   auto select_signal = [&](GtkTreeIter* it)
   {
-    gboolean is_signal;
+    gboolean is_signal, visible;
     gchar* aref_str;
 
-    gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), it, COL_IS_SIGNAL, &is_signal, COL_AREF_STR,
-                       &aref_str, -1);
+    gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), it, COL_IS_SIGNAL, &is_signal, COL_VISIBLE, &visible,
+                       COL_AREF_STR, &aref_str, -1);
 
-    if (is_signal && aref_str && aref_str[0] != '\0')
+    if (visible && is_signal && aref_str && aref_str[0] != '\0')
     {
       gtk_tree_store_set(app->source_store, it, COL_ENABLED, TRUE, COL_INCONSISTENT, FALSE, -1);
       app->selected_names.insert(aref_str);
