@@ -1687,6 +1687,7 @@ Volume Remote $ClassVolume 0.0.1.4
         !  The restart limit tells the remote handler how many times the transport process
         !  that handle this remnode can be restarted.
         !  Dynamic change is possible and can be used in order to earn more restarts.
+        !  A value of 0 means unlimited restart attempts with increasing backoff.
         !*/
         Object RestartLimit $Attribute 14 23-JAN-2018 17:01:41.00
           Body SysBody 01-JAN-1970 01:00:00.00
@@ -1918,6 +1919,7 @@ Volume Remote $ClassVolume 0.0.1.4
         !  The restart limit tells the remote handler how many times the transport process
         !  that handle this remnode can be restarted.
         !  Dynamic change is possible and can be used in order to earn more restarts.
+        !  A value of 0 means unlimited restart attempts with increasing backoff.
         !*/
         Object RestartLimit $Attribute 10 23-JAN-2018 17:01:41.00
           Body SysBody 01-JAN-1970 01:00:00.00
@@ -2282,6 +2284,7 @@ Volume Remote $ClassVolume 0.0.1.4
         !  The restart limit tells the remote handler how many times the transport process
         !  that handle this remnode can be restarted.
         !  Dynamic change is possible and can be used in order to earn more restarts.
+        !  A value of 0 means unlimited restart attempts with increasing backoff.
         !*/
         Object RestartLimit $Attribute 13 23-JAN-2018 17:01:41.00
           Body SysBody 01-JAN-1970 01:00:00.00
@@ -2481,6 +2484,7 @@ Volume Remote $ClassVolume 0.0.1.4
         !  The restart limit tells the remote handler how many times the transport process
         !  that handle this remnode can be restarted.
         !  Dynamic change is possible and can be used in order to earn more restarts.
+        !  A value of 0 means unlimited restart attempts with increasing backoff.
         !*/
         Object RestartLimit $Attribute 9 23-JAN-2018 17:01:41.00
           Body SysBody 01-JAN-1970 01:00:00.00
@@ -2713,6 +2717,7 @@ Volume Remote $ClassVolume 0.0.1.4
         !  The restart limit tells the remote handler how many times the transport process
         !  that handle this remnode can be restarted.
         !  Dynamic change is possible and can be used in order to earn more restarts.
+        !  A value of 0 means unlimited restart attempts with increasing backoff.
         !*/
         Object RestartLimit $Attribute 16 28-APR-2021 10:17:26.39
           Body SysBody 28-APR-2021 10:17:26.39
@@ -2916,6 +2921,7 @@ Volume Remote $ClassVolume 0.0.1.4
         !  The restart limit tells the remote handler how many times the transport process
         !  that handle this remnode can be restarted.
         !  Dynamic change is possible and can be used in order to earn more restarts.
+        !  A value of 0 means unlimited restart attempts with increasing backoff.
         !*/
         Object RestartLimit $Attribute 9 23-JAN-2018 17:01:41.00
           Body SysBody 01-JAN-1970 01:00:00.00
@@ -3198,6 +3204,7 @@ Volume Remote $ClassVolume 0.0.1.4
         !  The restart limit tells the remote handler how many times the transport process
         !  that handle this remnode can be restarted.
         !  Dynamic change is possible and can be used in order to earn more restarts.
+        !  A value of 0 means unlimited restart attempts with increasing backoff.
         !*/
         Object RestartLimit $Attribute 17 23-JAN-2018 17:01:41.00
           Body SysBody 01-JAN-1970 01:00:00.00
@@ -3459,6 +3466,7 @@ Volume Remote $ClassVolume 0.0.1.4
         !  The restart limit tells the remote handler how many times the transport process
         !  that handle this remnode can be restarted.
         !  Dynamic change is possible and can be used in order to earn more restarts.
+        !  A value of 0 means unlimited restart attempts with increasing backoff.
         !*/
         Object RestartLimit $Attribute 14 23-JAN-2018 17:01:41.00
           Body SysBody 01-JAN-1970 01:00:00.00
@@ -3719,6 +3727,7 @@ Volume Remote $ClassVolume 0.0.1.4
         !  The restart limit tells the remote handler how many times the transport process
         !  that handle this remnode can be restarted.
         !  Dynamic change is possible and can be used in order to earn more restarts.
+        !  A value of 0 means unlimited restart attempts with increasing backoff.
         !*/
         Object RestartLimit $Attribute 14 23-JAN-2018 17:01:41.00
           Body SysBody 01-JAN-1970 01:00:00.00
@@ -3973,6 +3982,7 @@ Volume Remote $ClassVolume 0.0.1.4
         !  The restart limit tells the remote handler how many times the transport process
         !  that handle this remnode can be restarted.
         !  Dynamic change is possible and can be used in order to earn more restarts.
+        !  A value of 0 means unlimited restart attempts with increasing backoff.
         !*/
         Object RestartLimit $Attribute 13 23-JAN-2018 17:01:41.00
           Body SysBody 01-JAN-1970 01:00:00.00
@@ -4271,6 +4281,7 @@ Volume Remote $ClassVolume 0.0.1.4
         !  The restart limit tells the remote handler how many times the transport process
         !  that handle this remnode can be restarted.
         !  Dynamic change is possible and can be used in order to earn more restarts.
+        !  A value of 0 means unlimited restart attempts with increasing backoff.
         !*/
         Object RestartLimit $Attribute 12 23-JAN-2018 17:01:41.00
           Body SysBody 01-JAN-1970 01:00:00.00
@@ -4741,6 +4752,7 @@ Volume Remote $ClassVolume 0.0.1.4
         !  The restart limit tells the remote handler how many times the transport process
         !  that handle this remnode can be restarted.
         !  Dynamic change is possible and can be used in order to earn more restarts.
+        !  A value of 0 means unlimited restart attempts with increasing backoff.
         !*/
         Object RestartLimit $Attribute 9 23-JAN-2018 17:01:41.00
           Body SysBody 01-JAN-1970 01:00:00.00

@@ -95,6 +95,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PROFINET: Softing headers have moved outside the codebase.
 - Update Classes will now be more thorough and check sizes of class definitions compared to database and update accordingly. (https://gitlab.ssab.com/pwrdev/pwr/-/issues/189)
 - Various exit/return paths changed in some wb tooling used in reload/upgrade process. Some errors have been downgraded to warnings which is more in line with how one would expect things to be.
+- A RestartLimit of 0 in a Remnode object will now be restarted by the rs_remotehandler forever but with increased backoff like 1s, 2s, 4s and so on until it reaches 30s backoff. If backend service hasn't restarted for 5s this is reset back to shorter backoff.
 
 ### Deprecated
 - Nodave for communcating with legacy S7 300/400 will be removed next release.
