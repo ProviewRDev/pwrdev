@@ -71,6 +71,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Closing a subwindow without adding anything to it or building it will no longer end up in an inconsistent state when trying to open that subwindow again.
 - Fixed random flickering of Flags and icons when displaying a ChanCo class item in the device listing in rt_xtt.
 - Double signal connections are now caught by syntaxcheck.
+- GE/rt_xtt: Fixed `RefUpdate` for objid-based subgraph references by tracking referenced values with the actual subscription size instead of treating them as `AttrRef`. This makes nullified objid links trigger a reconnect/reset without reopening the graph.
+  - Updated the GE Designers Guide with the RefUpdate dynamic.
 
 
 ### Changed
