@@ -649,21 +649,13 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, std::shared_ptr<Pr
 
     pSDR->Flag = PN_SERVICE_DOWNLOAD_FLAG_ACTIVATE;
 
-    // Check if advanced startup and act accordingly
+    // Apply configured startup mode for the AR.
     ar_property = PROFINET_AR_PROPERTY_STATE_PRIMARY | PROFINET_AR_PROPERTY_PARAMETER_SERVER_CM;
 
-    ar_property |= PROFINET_AR_PROPERTY_STARTUP_MODE_LEGACY;
-
-    // "Temporary" removed due to issues with larger write requests (issues with fragmentation and corrupt
-    // messages) when using advanced startup mode if
-    // (pn_device->m_IOCR_map.at(PROFINET_IO_CR_TYPE_INPUT).m_startup_mode == "Advanced")
-    // {
-    //   ar_property |= PROFINET_AR_PROPERTY_STARTUP_MODE_ADVANCED;
-    // }
-    // else
-    // {
-    //   ar_property |= PROFINET_AR_PROPERTY_STARTUP_MODE_LEGACY;
-    // }
+    if (pn_device->m_IOCR_map.at(PROFINET_IO_CR_TYPE_INPUT).m_startup_mode == "Advanced")
+      ar_property |= PROFINET_AR_PROPERTY_STARTUP_MODE_ADVANCED;
+    else
+      ar_property |= PROFINET_AR_PROPERTY_STARTUP_MODE_LEGACY;
 
     pSDR->AdditionalFlag = 0;
 

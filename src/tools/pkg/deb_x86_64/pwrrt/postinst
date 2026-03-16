@@ -218,7 +218,7 @@ if [ -e /etc/proview.cnf ]; then
 
   if [ -e "$web_dir" ]; then
     cp /usr/pwrrt/web/* $web_dir
-    if [ ! -e $webdir/index.html ]; then
+    if [ ! -e $web_dir/index.html ]; then
       cp $web_dir/opwind.html $web_dir/index.html
     fi
     chown pwrp $web_dir/*

@@ -33,6 +33,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added packet-qcom.lua plugin for Wireshark. This can be copied to the Wireshark lua plugin folder which one can find in the wireshark menu Help->About Wireshark->Folders (tab).
   - Start Wireshark from a terminal with PWR_BUS_ID set and it will find and dissect qcom messages with the filter "qcom".
 - Support for treating char arrays as strings in ge using format '%s' on a datatype like ##Char#16.
+- PROFINET: IM0 tab in object graph for class PnDevice.
+- PROFINET: Added a configurable Startup Mode choice under Device Properties in the configurator, with guidance for when Legacy may be preferable if Advanced startup causes issues with large fragmented startup traffic.
 
 ### Fixed
 
@@ -67,6 +69,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Message handler application requests no longer block for up to one hour waiting for a `qcom_Request()` reply. They now use the normal MH send/receive timeout and preserve `MH__TMO` on timeout.
 - Distribution is now SSH-only. `RemoteAccessType` only offers `SSH`, and the old upgrade path rewrites older distribution settings to the SSH defaults.
 - Package distribution now writes a per-target SSH log file and reports that path on failure.
+- Closing a subwindow without adding anything to it or building it will no longer end up in an inconsistent state when trying to open that subwindow again.
+- Fixed random flickering of Flags and icons when displaying a ChanCo class item in the device listing in rt_xtt.
+- Double signal connections are now caught by syntaxcheck.
 
 ### Changed
 

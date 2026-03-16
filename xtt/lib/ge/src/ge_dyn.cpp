@@ -40,6 +40,7 @@
 #include <stdlib.h>
 
 #include <iostream>
+#include <string>
 
 #include "co_cdh.h"
 #include "co_dcli.h"
@@ -187,6 +188,29 @@ static bool treat_char_array_as_string(int type, int size, const char* format)
   const char* s = format_conversion_ptr(format);
 
   return type == pwr_eType_Char && size > 1 && s && *s == 's';
+}
+
+static size_t bounded_string_length(const char* value, size_t max_size)
+{
+  size_t len = 0;
+
+  while (len < max_size && value[len] != 0)
+    len++;
+
+  return len;
+}
+
+static int format_bounded_string(char* buf, size_t buf_size, const char* format,
+    const void* value_ptr, int value_size, int* len)
+{
+  if (!value_ptr || value_size < 0)
+    return 0;
+
+  std::string safe_value((const char*)value_ptr,
+      bounded_string_length((const char*)value_ptr, (size_t)value_size));
+
+  *len = snprintf(buf, buf_size, format, safe_value.c_str());
+  return 1;
 }
 
 static int check_format(const char* format, int type, int size)
@@ -369,7 +393,7 @@ static int normalize_integer_format(
 }
 
 static int ge_table_format_value(char* buf, size_t buf_size, const char* format,
-    int type_id, void* value_ptr, pwr_tMask bitmask, int* len)
+    int type_id, int value_size, void* value_ptr, pwr_tMask bitmask, int* len)
 {
   char conv;
   char safe_format[80];
@@ -381,12 +405,14 @@ static int ge_table_format_value(char* buf, size_t buf_size, const char* format,
   conv = format[strlen(format) - 1];
   unsigned_conv = conv == 'u' || conv == 'o' || conv == 'x' || conv == 'X';
 
+  if (treat_char_array_as_string(type_id, value_size, format))
+    return format_bounded_string(buf, buf_size, format, value_ptr, value_size, len);
+
   switch (type_id)
   {
   case pwr_eType_String:
   case pwr_eType_Text:
-    *len = snprintf(buf, buf_size, format, (char*)value_ptr);
-    return 1;
+    return format_bounded_string(buf, buf_size, format, value_ptr, value_size, len);
   case pwr_eType_Float32:
     *len = snprintf(buf, buf_size, format, *(pwr_tFloat32*)value_ptr);
     return 1;
@@ -6032,7 +6058,7 @@ int GeValue::scan(grow_tObject object)
       first_scan = false;
 
     memcpy(&old_value, p, cmp_size);
-    len = snprintf(buf, sizeof(buf), format, (char*)p);
+    format_bounded_string(buf, sizeof(buf), format, p, size, &len);
   }
   else switch (annot_typeid)
   {
@@ -6150,7 +6176,7 @@ int GeValue::scan(grow_tObject object)
 
     memcpy(&old_value, p, cmp_size);
 
-    len = snprintf(buf, sizeof(buf), format, (char*)p);
+    format_bounded_string(buf, sizeof(buf), format, p, size, &len);
     break;
   case pwr_eType_Objid:
   {
@@ -14062,7 +14088,7 @@ int GeTable::scan(grow_tObject object)
             continue;
         }
 
-        if (ge_table_format_value(buf, sizeof(buf), format[i], type_id[i],
+        if (ge_table_format_value(buf, sizeof(buf), format[i], type_id[i], size[i],
                 headerref_p[i][j], bitmask[i], &len))
           ;
         else switch (type_id[i])
@@ -14192,7 +14218,7 @@ int GeTable::scan(grow_tObject object)
             continue;
         }
 
-        if (ge_table_format_value(buf, sizeof(buf), format[i], type_id[i],
+        if (ge_table_format_value(buf, sizeof(buf), format[i], type_id[i], size[i],
                 p[i] + offs, bitmask[i], &len))
           ;
         else switch (type_id[i])

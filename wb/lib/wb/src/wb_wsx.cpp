@@ -40,6 +40,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <map>
 
 #include "pwr_baseclasses.h"
 #include "pwr_systemclasses.h"
@@ -63,6 +64,157 @@ static int wsx_object_count(pwr_tAttrRef* aref, void* count, void* dum1,
     void* dum2, void* dum3, void* dum4)
 {
   (*(int*)count)++;
+  return WSX__SUCCESS;
+}
+
+struct wsx_sArefKey {
+  pwr_tVid vid;
+  pwr_tOix oix;
+  pwr_tUInt32 offset;
+  pwr_tBoolean object;
+
+  bool operator<(const wsx_sArefKey& x) const
+  {
+    if (vid != x.vid)
+      return vid < x.vid;
+    if (oix != x.oix)
+      return oix < x.oix;
+    if (object != x.object)
+      return object < x.object;
+    return offset < x.offset;
+  }
+};
+
+static pwr_tStatus wsx_check_signal_connection(ldh_tSesContext sesctx,
+    pwr_tAttrRef* aref, pwr_tCid chan_cid1, pwr_tCid chan_cid2,
+    int chand_type, std::map<wsx_sArefKey, pwr_tAttrRef>& connected,
+    int* errorcount, int* warningcount)
+{
+  pwr_tStatus sts;
+  pwr_tCid con_cid;
+  pwr_tAttrRef* con_aref;
+  pwr_tEnum* type_p;
+  int size;
+
+  sts = ldh_GetAttrObjectPar(
+      sesctx, aref, "RtBody", "SigChanCon", (char**)&con_aref, &size);
+  if (EVEN(sts))
+    return sts;
+
+  if (cdh_ObjidIsNull(con_aref->Objid)) {
+    free((char*)con_aref);
+    return WSX__SUCCESS;
+  }
+
+  sts = ldh_GetAttrRefTid(sesctx, con_aref, &con_cid);
+  if (EVEN(sts)) {
+    free((char*)con_aref);
+    return WSX__SUCCESS;
+  }
+
+  if (!(con_cid == chan_cid1 || (chan_cid2 != pwr_cNCid && con_cid == chan_cid2))) {
+    free((char*)con_aref);
+    return WSX__SUCCESS;
+  }
+
+  if (con_cid == pwr_cClass_ChanD && chand_type != -1) {
+    sts = ldh_GetAttrObjectPar(
+        sesctx, con_aref, "RtBody", "Type", (char**)&type_p, &size);
+    if (EVEN(sts)) {
+      free((char*)con_aref);
+      return sts;
+    }
+    if (*type_p != chand_type) {
+      free((char*)type_p);
+      free((char*)con_aref);
+      return WSX__SUCCESS;
+    }
+    free((char*)type_p);
+  }
+
+  wsx_sArefKey key;
+  key.vid = con_aref->Objid.vid;
+  key.oix = con_aref->Objid.oix;
+  key.object = con_aref->Flags.b.Object;
+  key.offset = con_aref->Flags.b.Object ? 0 : con_aref->Offset;
+
+  std::map<wsx_sArefKey, pwr_tAttrRef>::iterator it = connected.find(key);
+  if (it == connected.end())
+    connected[key] = *aref;
+  else {
+    int size;
+    char* namep;
+    pwr_tAName name;
+    pwr_tAName oldname;
+    char msg[2 * sizeof(pwr_tAName) + 80];
+
+    sts = ldh_AttrRefToName(sesctx, aref, cdh_mNName, &namep, &size);
+    if (ODD(sts)) {
+      strncpy(name, namep, sizeof(name));
+      name[sizeof(name) - 1] = 0;
+    } else
+      strcpy(name, "<unknown>");
+
+    sts = ldh_AttrRefToName(sesctx, &it->second, cdh_mNName, &namep, &size);
+    if (ODD(sts)) {
+      strncpy(oldname, namep, sizeof(oldname));
+      oldname[sizeof(oldname) - 1] = 0;
+    } else
+      strcpy(oldname, "<unknown>");
+
+    snprintf(msg, sizeof(msg), "Double signal connection '%s' and '%s'",
+        name, oldname);
+    wsx_error_msg_str(sesctx, msg, *aref, 'E', errorcount, warningcount);
+    it->second = *aref;
+  }
+
+  free((char*)con_aref);
+  return WSX__SUCCESS;
+}
+
+static pwr_tStatus wsx_check_signal_class(ldh_tSesContext sesctx,
+    pwr_tCid signal_cid, pwr_tCid chan_cid1, pwr_tCid chan_cid2,
+    int chand_type, std::map<wsx_sArefKey, pwr_tAttrRef>& connected,
+    int* errorcount, int* warningcount)
+{
+  pwr_tStatus sts;
+  pwr_tStatus lsts = WSX__SUCCESS;
+  pwr_tAttrRef aref;
+
+  sts = ldh_GetClassListAttrRef(sesctx, signal_cid, &aref);
+  while (ODD(sts)) {
+    lsts = wsx_check_signal_connection(sesctx, &aref, chan_cid1, chan_cid2,
+        chand_type, connected, errorcount, warningcount);
+    if (EVEN(lsts))
+      return lsts;
+
+    sts = ldh_GetNextAttrRef(sesctx, signal_cid, &aref, &aref);
+  }
+  return WSX__SUCCESS;
+}
+
+static pwr_tStatus wsx_check_signal_subclasses(ldh_tSesContext sesctx,
+    pwr_tCid super_cid, pwr_tCid chan_cid1, pwr_tCid chan_cid2,
+    std::map<wsx_sArefKey, pwr_tAttrRef>& connected, int* errorcount,
+    int* warningcount)
+{
+  pwr_tStatus sts = WSX__SUCCESS;
+  pwr_tCid subcid;
+  wb_volume* volume = (wb_volume*)sesctx;
+
+  volume->subClass(super_cid, pwr_cNCid, &subcid);
+  while (volume->oddSts()) {
+    sts = wsx_check_signal_class(sesctx, subcid, chan_cid1, chan_cid2, -1,
+        connected, errorcount, warningcount);
+    if (EVEN(sts))
+      return sts;
+
+    volume->subClass(super_cid, subcid, &subcid);
+  }
+
+  if (volume->sts() != LDH__NONEXTCLASS)
+    return volume->sts();
+
   return WSX__SUCCESS;
 }
 
@@ -554,6 +706,75 @@ pwr_tStatus wsx_CheckSigChanCon(ldh_tSesContext sesctx, pwr_tAttrRef aref,
   }
 
   free((char*)con_ptr);
+  return WSX__SUCCESS;
+}
+
+pwr_tStatus wsx_CheckSignalConnections(ldh_tSesContext sesctx,
+    int* errorcount, int* warningcount)
+{
+  pwr_tStatus sts;
+  std::map<wsx_sArefKey, pwr_tAttrRef> connected;
+
+  sts = wsx_check_signal_class(sesctx, pwr_cClass_Ai, pwr_cClass_ChanAi,
+      pwr_cClass_ChanAit, -1, connected, errorcount, warningcount);
+  if (EVEN(sts))
+    return sts;
+
+  connected.clear();
+  sts = wsx_check_signal_class(sesctx, pwr_cClass_Ao, pwr_cClass_ChanAo,
+      pwr_cNCid, -1, connected, errorcount, warningcount);
+  if (EVEN(sts))
+    return sts;
+
+  connected.clear();
+  sts = wsx_check_signal_class(sesctx, pwr_cClass_Di, pwr_cClass_ChanDi,
+      pwr_cClass_ChanD, pwr_eDChanTypeEnum_Di, connected, errorcount,
+      warningcount);
+  if (EVEN(sts))
+    return sts;
+
+  connected.clear();
+  sts = wsx_check_signal_class(sesctx, pwr_cClass_Do, pwr_cClass_ChanDo,
+      pwr_cClass_ChanD, pwr_eDChanTypeEnum_Do, connected, errorcount,
+      warningcount);
+  if (EVEN(sts))
+    return sts;
+
+  sts = wsx_check_signal_class(sesctx, pwr_cClass_Po, pwr_cClass_ChanDo,
+      pwr_cNCid, -1, connected, errorcount, warningcount);
+  if (EVEN(sts))
+    return sts;
+
+  connected.clear();
+  sts = wsx_check_signal_class(sesctx, pwr_cClass_Co, pwr_cClass_ChanCo,
+      pwr_cNCid, -1, connected, errorcount, warningcount);
+  if (EVEN(sts))
+    return sts;
+
+  connected.clear();
+  sts = wsx_check_signal_class(sesctx, pwr_cClass_Ii, pwr_cClass_ChanIi,
+      pwr_cNCid, -1, connected, errorcount, warningcount);
+  if (EVEN(sts))
+    return sts;
+
+  connected.clear();
+  sts = wsx_check_signal_class(sesctx, pwr_cClass_Io, pwr_cClass_ChanIo,
+      pwr_cNCid, -1, connected, errorcount, warningcount);
+  if (EVEN(sts))
+    return sts;
+
+  connected.clear();
+  sts = wsx_check_signal_subclasses(sesctx, pwr_cClass_Bi, pwr_cClass_ChanBi,
+      pwr_cNCid, connected, errorcount, warningcount);
+  if (EVEN(sts))
+    return sts;
+
+  connected.clear();
+  sts = wsx_check_signal_subclasses(sesctx, pwr_cClass_Bo, pwr_cClass_ChanBo,
+      pwr_cNCid, connected, errorcount, warningcount);
+  if (EVEN(sts))
+    return sts;
+
   return WSX__SUCCESS;
 }
 

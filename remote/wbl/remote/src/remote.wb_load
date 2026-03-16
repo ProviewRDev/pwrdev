@@ -5239,8 +5239,8 @@ Volume Remote $ClassVolume 0.0.1.4
         ! RabbitMQ
         ! [0] - Message address
         ! [1] - Message address
-        ! [2] - Delivery mode. 2 is persistent, otherwise transient.
-        ! [3] - First bit: keep all messages. Second bit: keep message order.
+        ! [2] - First bit: keep all messages. Second bit: keep message order.
+        ! [3] - Delivery mode. 2 is persistent, otherwise transient.
         ! 
         !*/
         Object Address $Attribute 3 23-JAN-2018 17:01:41.00
