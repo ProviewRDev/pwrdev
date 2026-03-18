@@ -126,6 +126,8 @@ std::pair<std::string, std::map<int, std::string>> NavHelp::line_counter(const c
 
   if (error_line_number == 0 && error_number_line.empty())
   {
+    if (static_file_tree.size() <= 1)
+      return {tree_file_name, error_number_line};
     static_file_tree.pop_back();
     return line_counter(help_key, file_name);
   }
