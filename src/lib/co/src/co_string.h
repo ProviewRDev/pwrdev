@@ -152,8 +152,6 @@ extern "C"
       \param dst Output string.
   */
   void str_trim(char* dst, const char* src);
-  const char* str_trim_rtn(const char* src);
-
 #ifdef __cplusplus
 }
 #endif

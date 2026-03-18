@@ -185,7 +185,8 @@ int NavHelp::help(const char* help_key, const char* help_bookmark, navh_eHelpFil
     str_ToLower(search_bookmark, help_bookmark);
   }
 
-  if(file_name){
+  if (file_name)
+  {
     static_file_tree.push_back(std::make_pair(file_type, file_name));
   }
 
@@ -195,15 +196,15 @@ int NavHelp::help(const char* help_key, const char* help_bookmark, navh_eHelpFil
   {
     // key: error line number, value: error line
     std::pair<std::string, std::map<int, std::string>> result = line_counter(help_key, file_name);
-
     //{file_name, {line_number, error_line}}
+    char trimmed_filename[256];
+    char trimmed_line[256];
     for (const auto& pair : result.second)
     {
-      static_error_log.log_map[str_trim_rtn(result.first.c_str())]
-          .place_map[pair.first]
-          .reason_map[str_trim_rtn(pair.second.c_str())] = NAV__NOFILE;
+      str_trim(trimmed_filename, result.first.c_str());
+      str_trim(trimmed_line, pair.second.c_str());
+      static_error_log.log_map[trimmed_filename].place_map[pair.first].reason_map[trimmed_line] = NAV__NOFILE;
     }
-
     return NAV__NOFILE;
   }
 
@@ -632,18 +633,18 @@ int NavHelp::help(const char* help_key, const char* help_bookmark, navh_eHelpFil
 
   if (!print_all && !hit)
   {
-
     // key: error line number, value: error line
     std::pair<std::string, std::map<int, std::string>> result = line_counter(help_key, file_name);
-
     //{file_name, {line_number, error line}}
+    char trimmed_filename[256];
+    char trimmed_line[256];
     for (const auto& pair : result.second)
     {
-      static_error_log.log_map[str_trim_rtn(result.first.c_str())]
-          .place_map[pair.first]
-          .reason_map[str_trim_rtn(pair.second.c_str())] = NAV__TOPICNOTFOUND;
+      str_trim(trimmed_filename, result.first.c_str());
+      str_trim(trimmed_line, pair.second.c_str());
+      static_error_log.log_map[trimmed_filename].place_map[pair.first].reason_map[trimmed_line] =
+          NAV__TOPICNOTFOUND;
     }
-    
     return NAV__TOPICNOTFOUND;
   }
   return NAV__SUCCESS;
