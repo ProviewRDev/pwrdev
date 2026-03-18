@@ -180,7 +180,7 @@ int Graph::generate_web(ldh_tSesContext ldhses, pwr_tOid opplaceweb_oid)
          << "    </style>\n"
          << "  </head>\n"
          << "  <body>\n"
-         << "    <iframe class=\"menu\" src=\"opwind_menu.html?opplace=" << opplaceweb_name << "\"></iframe>\n"
+         << "    <iframe class=\"menu\" src=\"opwind_menu.html\"></iframe>\n"
          << "    <iframe class=\"main\" src=\"" << start_URL << "\"></iframe>\n"
          << "  </body>\n"
          << "</html>\n";
