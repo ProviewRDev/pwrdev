@@ -214,7 +214,7 @@ function OpWindMenu() {
       window.open("xtt_help_index.html", "_blank");
     } else if (!self.info.disable_proview && text == "ProviewR") {
       console.log("ProviewR activated");
-      window.open("http://www.proview.se", "_blank");
+      window.open("https://www.proviewr.se/", "_blank");
     } else {
       if (
         !self.is_authorized(

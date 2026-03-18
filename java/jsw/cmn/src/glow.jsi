@@ -3993,8 +3993,8 @@ function GlowArc(ctx) {
           ll_y + idx / 2 - idx + offs,
           ur_x - ll_x + idx - offs * 2,
           ur_y - ll_y + idx - offs * 2,
-          angle1,
-          angle2 - 45,
+          this.angle1,
+          this.angle2 - 45,
           GlowColor.shift_drawtype(this.draw_type, 2, null),
           ish - 1,
           highlight,
@@ -4108,7 +4108,7 @@ function GlowArc(ctx) {
           Math.max(0, ur_y - ll_y - idx + offs * 2),
           this.angle1,
           this.angle2,
-          GlowColor.shift_drawtype(dthis.raw_type, -2, null),
+          GlowColor.shift_drawtype(this.raw_type, -2, null),
           ish - 1,
           highlight,
         );
@@ -4742,17 +4742,21 @@ function GrowNode(ctx) {
           this.ctx.mw.offset_y;
       } else {
         x1 =
-          Math.floor(t.x(x_left, y_low) * this.ctx.mw.zoom_factor_x + 0.5) -
-          this.ctx.mw.offset_x;
+          Math.floor(
+            t.x(this.x_left, this.y_low) * this.ctx.mw.zoom_factor_x + 0.5,
+          ) - this.ctx.mw.offset_x;
         y1 =
-          Math.floor(t.y(x_left, y_low) * this.ctx.mw.zoom_factor_y + 0.5) -
-          this.ctx.mw.offset_y;
+          Math.floor(
+            t.y(this.x_left, this.y_low) * this.ctx.mw.zoom_factor_y + 0.5,
+          ) - this.ctx.mw.offset_y;
         x2 =
-          Math.floor(t.x(x_right, y_high) * this.ctx.mw.zoom_factor_x + 0.5) -
-          this.ctx.mw.offset_x;
+          Math.floor(
+            t.x(this.x_right, this.y_high) * this.ctx.mw.zoom_factor_x + 0.5,
+          ) - this.ctx.mw.offset_x;
         y2 =
-          Math.floor(t.y(x_right, y_high) * this.ctx.mw.zoom_factor_y + 0.5) -
-          this.ctx.mw.offset_y;
+          Math.floor(
+            t.y(this.x_right, this.y_high) * this.ctx.mw.zoom_factor_y + 0.5,
+          ) - this.ctx.mw.offset_y;
       }
       switch (this.level_direction) {
         case Glow.eDirection_Right:
@@ -8914,17 +8918,17 @@ function GrowArc(ctx) {
           2;
       } else {
         var tmp = t.multiply(this.trf);
-        scale = trf.vertical_scale(tmp);
+        scale = this.trf.vertical_scale(tmp);
         x_c =
-          (trf.x(t, ll.x, ll.y) * this.ctx.mw.zoom_factor_x -
+          (this.trf.x(t, this.ll.x, this.ll.y) * this.ctx.mw.zoom_factor_x -
             this.ctx.mw.offset_x +
-            (trf.x(t, ur.x, ur.y) * this.ctx.mw.zoom_factor_x -
+            (this.trf.x(t, this.ur.x, this.ur.y) * this.ctx.mw.zoom_factor_x -
               this.ctx.mw.offset_x)) /
           2;
         y_c =
-          (trf.y(t, ll.x, ll.y) * this.ctx.mw.zoom_factor_y -
+          (this.trf.y(t, this.ll.x, this.ll.y) * this.ctx.mw.zoom_factor_y -
             this.ctx.mw.offset_y +
-            (trf.y(t, ur.x, ur.y) * this.ctx.mw.zoom_factor_y -
+            (this.trf.y(t, this.ur.x, this.ur.y) * this.ctx.mw.zoom_factor_y -
               this.ctx.mw.offset_y)) /
           2;
       }
@@ -9652,7 +9656,7 @@ function GrowText(ctx) {
     );
     var tsize =
       ((trf_scale * this.ctx.mw.zoom_factor_y) / this.ctx.mw.base_zoom_factor) *
-      (8 + 2 * this.text_size);
+      (7.4 + 2 * this.text_size);
     idx = Math.min(idx, Glow.DRAW_TYPE_SIZE - 1);
     var highl = highlight;
     if (node !== null) highl = node.highlight;
@@ -10025,7 +10029,7 @@ function GrowAnnot(ctx) {
     );
     var tsize =
       ((trf_scale * this.ctx.mw.zoom_factor_y) / this.ctx.mw.base_zoom_factor) *
-      (8 + 2 * this.text_size);
+      (7.4 + 2 * this.text_size);
     if (idx < 0) return;
     idx = Math.min(idx, Glow.DRAW_TYPE_SIZE - 1);
 
@@ -10200,7 +10204,7 @@ function GrowAnnot(ctx) {
     );
     var tsize =
       ((trf_scale * this.ctx.mw.zoom_factor_y) / this.ctx.mw.base_zoom_factor) *
-      (8 + 2 * this.text_size);
+      (7.4 + 2 * this.text_size);
     if (idx < 0) {
       dim.width = 0;
       dim.height = 0;
@@ -11440,7 +11444,8 @@ function GrowImage(ctx) {
 
   this.construct = function (name, filename, x, y) {
     this.ll.construct(x, y);
-    (this.n_name = name), (this.image_filename = filename);
+    this.n_name = name;
+    this.image_filename = filename;
     this.image.src = this.image_filename;
   };
 
@@ -11726,8 +11731,8 @@ function GrowImage(ctx) {
       case Glow.eScaleType_FixPoint:
         break;
       case Glow.eScaleType_Center:
-        x0 = (x_left + x_right) / 2;
-        y0 = (y_low + y_high) / 2;
+        x0 = (this.x_left + this.x_right) / 2;
+        y0 = (this.y_low + this.y_high) / 2;
         break;
       default:
     }
@@ -16045,7 +16050,7 @@ function GrowMenu(ctx) {
     var tsize =
       ((this.trf.vertical_scale(t) * this.ctx.mw.zoom_factor_y) /
         this.ctx.mw.base_zoom_factor) *
-      (8 + 2 * this.text_size);
+      (7.5 + 2 * this.text_size);
     text_idx = Math.min(text_idx, Glow.DRAW_TYPE_SIZE - 1);
     text_idx = Math.max(0, text_idx);
 
@@ -17796,7 +17801,7 @@ function GrowFolder(ctx) {
     );
     var tsize =
       (this.ctx.mw.zoom_factor_y / this.ctx.mw.base_zoom_factor) *
-      (8 + 2 * this.text_size);
+      (7.5 + 2 * this.text_size);
     text_idx = Math.min(text_idx, Glow.DRAW_TYPE_SIZE - 1);
 
     var ll_x, ll_y, ur_x, ur_y;
@@ -18224,7 +18229,7 @@ function GrowAxis(ctx) {
     );
     var tsize =
       (this.ctx.mw.zoom_factor_y / this.ctx.mw.base_zoom_factor) *
-      (8 + 2 * this.text_size);
+      (7.5 + 2 * this.text_size);
     text_idx = Math.min(text_idx, Glow.DRAW_TYPE_SIZE - 1);
 
     if ((node !== null && node.invisible !== 0) || this.invisible !== 0) return;
@@ -18914,7 +18919,7 @@ function GrowAxisArc(ctx) {
     );
     var tsize =
       (this.ctx.mw.zoom_factor_y / this.ctx.mw.base_zoom_factor) *
-      (8 + 2 * this.text_size);
+      (7.5 + 2 * this.text_size);
     text_idx = Math.min(text_idx, Glow.DRAW_TYPE_SIZE - 1);
 
     if (node !== null && node.line_width !== 0)
@@ -20683,7 +20688,7 @@ function GrowTable(ctx) {
     }
 
     if (this.ctx.debug)
-      console.log("GeTable: call_value size: " + columns * rows);
+      console.log("GeTable: call_value size: " + this.columns * this.rows);
 
     this.configure();
     this.configure_scrollbars();
@@ -20851,7 +20856,7 @@ function GrowTable(ctx) {
     );
     var tsize =
       (this.ctx.mw.zoom_factor_y / this.ctx.mw.base_zoom_factor) *
-      (8 + 2 * this.text_size);
+      (7.5 + 2 * this.text_size);
     text_idx = Math.min(text_idx, Glow.DRAW_TYPE_SIZE - 1);
     var header_text_idx = Math.floor(
       (this.ctx.mw.zoom_factor_y / this.ctx.mw.base_zoom_factor) *
@@ -20861,7 +20866,7 @@ function GrowTable(ctx) {
     header_text_idx = Math.min(header_text_idx, Glow.DRAW_TYPE_SIZE - 1);
     var header_tsize =
       (this.ctx.mw.zoom_factor_y / this.ctx.mw.base_zoom_factor) *
-      (8 + 2 * this.header_text_size);
+      (7.5 + 2 * this.header_text_size);
 
     var ll_x, ll_y, ur_x, ur_y;
     var dx1, dy1, dx2, dy2;
@@ -21468,7 +21473,7 @@ function GrowTable(ctx) {
             offs = column_offs + j;
             if (
               text_idx >= 0 &&
-              this.cell_value[offs] !== null &&
+              this.cell_value[offs] != null &&
               this.cell_value[offs] !== ""
             ) {
               var text_x = Math.floor(x) + text_offs;
@@ -21749,6 +21754,7 @@ function GlowDraw(ctx) {
   this.CUSTOMCOLORS_STACK_SIZE = 10;
   this.customcolors = new Array(this.CUSTOMCOLORS_STACK_SIZE);
   this.customcolors_cnt = 0;
+  this.image_loaded = false;
 
   this.gctx.save();
 
@@ -21975,7 +21981,7 @@ function GlowDraw(ctx) {
   this.text = function (
     x,
     y,
-    text,
+    text = "",
     gc_type,
     color,
     idx,
@@ -22016,7 +22022,27 @@ function GlowDraw(ctx) {
 
     if (Number(transparency) === 0) this.gctx.fillStyle = this.getColor(color);
     else this.gctx.fillStyle = this.getColorTransparent(color, transparency);
-    this.gctx.fillText(text, x, y);
+
+    if (rot !== 0) {
+      const width = this.gctx.measureText(text).width;
+      const height = tsize;
+      rot = 360 - rot;
+      this.gctx.save();
+      this.gctx.translate(x + width / 2, y - height / 2);
+      this.gctx.rotate((rot * Math.PI) / 180);
+      if (rot == 90) {
+        this.gctx.translate(-width / 2 + height, width / 2 - height);
+      } else if (rot == 270) {
+        this.gctx.translate(0, width / 2 - height);
+      } else {
+        this.gctx.translate(0, height / 2);
+      }
+      this.gctx.textAlign = "center";
+      this.gctx.fillText(text, 0, 0);
+      this.gctx.restore();
+    } else {
+      this.gctx.fillText(text, x, y);
+    }
   };
 
   this.drawtype_to_fonttype = function (gc_type) {
@@ -22083,7 +22109,7 @@ function GlowDraw(ctx) {
           tsize = 14;
           break;
         case 5:
-          tsize = 8;
+          tsize = 18;
           break;
         case 6:
           tsize = 18;
@@ -22239,8 +22265,15 @@ function GlowDraw(ctx) {
     this.gctx.fill();
   };
 
-  this.image = function (image, x, y, w, h) {
-    this.gctx.drawImage(image, x, y, w, h);
+  this.image = async function (image, x, y, w, h) {
+    if (!this.image_loaded) {
+      image.addEventListener("load", () => {
+        this.gctx.drawImage(image, x, y, w, h);
+        this.image_loaded = true;
+      });
+    } else {
+      this.gctx.drawImage(image, x, y, w, h);
+    }
   };
 
   this.gradient_rotate = function (rotate, gradient) {

@@ -358,6 +358,9 @@ var DynC = {
   eSave_Rotate_x0: 1401,
   eSave_Rotate_y0: 1402,
   eSave_Rotate_factor: 1403,
+  eSave_Rotate_offset: 1404,
+  eSave_Rotate_min_angle: 1405,
+  eSave_Rotate_max_angle: 1406,
   eSave_Move_move_x_attribute: 1500,
   eSave_Move_move_y_attribute: 1501,
   eSave_Move_x_offset: 1502,
@@ -1013,6 +1016,99 @@ function Dyn(graph) {
   this.resetInvisible = false;
   this.ignoreBgColor = false;
   this.resetBgColor = false;
+  this.resetTextA1 = false;
+  this.ignoreTextA1 = false;
+
+  this.rgb_to_hue = function (rgb) {
+    var max, min, delta;
+    var r, g, b;
+    var v, s, h;
+
+    r = ((rgb >> 16) & 0xff) / 255;
+    g = ((rgb >> 8) & 0xff) / 255;
+    b = (rgb & 0xff) / 255;
+
+    min = r < g ? r : g;
+    min = min < b ? min : b;
+    max = r > g ? r : g;
+    max = max > b ? max : b;
+
+    v = max;
+    delta = max - min;
+    if (delta < 0.00001) return 0;
+
+    if (max > 0) s = delta / max;
+    else return 0;
+
+    if (r >= max) h = (g - b) / delta;
+    else if (g >= max) h = 2.0 + (b - r) / delta;
+    else h = 4.0 + (r - g) / delta;
+
+    h *= 16.667;
+    if (h < 0) h += 100;
+
+    return h;
+  };
+
+  // Convert hue (0-100) to rgb
+  this.hue_to_rgb = function (hue) {
+    var ff, hh, p, q, t, r, g, b;
+    var v = 1.0;
+    var s = 1.0;
+    var i;
+
+    if (hue > 100) hue = 100;
+    else if (hue < 0) hue = 0;
+
+    hh = (hue / 100.0) * 6.0;
+    i = Math.floor(hh);
+    ff = hh - i;
+    p = v * (1.0 - s);
+    q = v * (1.0 - s * ff);
+    t = v * (1.0 - s * (1.0 - ff));
+
+    switch (i) {
+      case 0:
+        r = v;
+        g = t;
+        b = p;
+        break;
+      case 1:
+        r = q;
+        g = v;
+        b = p;
+        break;
+      case 2:
+        r = p;
+        g = v;
+        b = t;
+        break;
+      case 3:
+        r = p;
+        g = q;
+        b = v;
+        break;
+      case 4:
+        r = t;
+        g = p;
+        b = v;
+        break;
+      case 5:
+        r = v;
+        g = p;
+        b = q;
+        break;
+      default:
+        r = v;
+        g = p;
+        b = q;
+    }
+    return (
+      (Math.floor(r * 255) << 16) +
+      (Math.floor(g * 255) << 8) +
+      Math.floor(b * 255)
+    );
+  };
 
   this.getColor1 = function (object, color) {
     if (color == Glow.eDrawType_Inherit) {
@@ -2015,6 +2111,8 @@ function Dyn(graph) {
     this.resetInvisible = false;
     this.ignoreBgColor = false;
     this.resetBgColor = false;
+    this.resetTextA1 = false;
+    this.ignoreTextA1 = false;
 
     for (var i = 0; i < this.elements.length; i++) {
       this.elements[i].scan(object);
@@ -2632,21 +2730,34 @@ function DynDigLowColor(dyn) {
     if (this.a.inverted) value = !value;
 
     if (!this.firstScan) {
-      if (this.a.oldValue == value && !this.dyn.resetColor) return;
-    } else this.firstScan = false;
+      if (this.a.oldValue == value && !this.dyn.resetColor) {
+        // No change since last time
+        return;
+      }
+    } else {
+      this.firstScan = false;
+    }
 
     if ((this.dyn.total_dyn_type1 & DynC.mDynType1_Tone) !== 0) {
       if (!value) {
-        if (this.color >= Glow.eDrawTone__) object.setFillColor(this.color);
-        else object.setColorTone(this.color);
+        if (this.color >= Glow.eDrawTone__) {
+          object.setFillColor(this.color);
+        } else {
+          object.setColorTone(this.color);
+        }
       } else {
-        if (this.color >= Glow.eDrawTone__) object.resetFillColor();
+        if (this.color >= Glow.eDrawTone__) {
+          object.resetFillColor();
+        }
         object.resetColorTone();
       }
       this.dyn.repaintNow = true;
     } else {
-      if (!value) object.setFillColor(this.color);
-      else object.resetFillColor();
+      if (!value) {
+        object.setFillColor(this.color);
+      } else {
+        object.resetFillColor();
+      }
       this.dyn.repaintNow = true;
     }
     this.a.oldValue = value;
@@ -3413,7 +3524,7 @@ function DynInvisible(dyn, instance) {
       var idx = this.attribute.lastIndexOf(")");
       if (idx != -1 && idx > 5) this.command = this.attribute.substring(5, idx);
       else this.command = this.attribute.substring(5);
-      this.command = this.dyn.graph.getCommand(command);
+      this.command = this.dyn.graph.getCommand(this.command);
     } else {
       this.a = new DynReference(this.dyn, this.attribute);
       this.a.connect(this.dyn);
@@ -3744,7 +3855,8 @@ function DynDigText(dyn, instance) {
   };
 
   this.scan = function (object) {
-    if (!this.a.sts) return;
+    var inst = this.dyn.instance_number(this.instance);
+    if (!this.a.sts || this.dyn.ignoreTextA1) return;
     var value = this.dyn.getDig(
       this.a.p,
       this.a.typeid,
@@ -3754,12 +3866,45 @@ function DynDigText(dyn, instance) {
 
     if (this.a.inverted) value = !value;
 
-    if (!this.firstScan) {
-      if (this.a.oldValue == value) return;
-    } else this.firstScan = false;
+    if (inst == DynC.mInstance_1) {
+      // Write low_text on low signal
+      if (!this.firstScan) {
+        if (this.a.oldValue == value && !this.dyn.resetTextA1) {
+          // No change since last time
+          return;
+        }
+      } else {
+        this.firstScan = false;
+      }
 
-    if (value) object.setAnnotation(1, this.high_text);
-    else object.setAnnotation(1, this.low_text);
+      if (!value) {
+        object.setAnnotation(1, this.low_text);
+        this.dyn.resetTextA1 = true;
+      } else {
+        object.setAnnotation(1, this.high_text);
+      }
+    } else {
+      // Instance > 1, write low_text on high signal
+      if (!this.firstScan) {
+        if (this.a.oldValue == value && !this.dyn.resetTextA1) {
+          // No change since last time
+          if (value) {
+            this.dyn.ignoreTextA1 = true;
+          }
+          return;
+        }
+      } else {
+        this.firstScan = false;
+      }
+
+      if (value) {
+        object.setAnnotation(1, this.low_text);
+        this.dyn.ignoreTextA1 = true;
+      } else {
+        object.setAnnotation(1, this.high_text);
+        this.dyn.resetTextA1 = true;
+      }
+    }
     this.dyn.repaintNow = true;
     this.a.oldValue = value;
   };
@@ -4144,9 +4289,13 @@ function DynValue(dyn) {
           );
 
         if (value0 != this.oldValueF || this.firstScan) {
-          if (this.cFormat !== null) {
-            var sb = this.cFormat.format(value0);
-            object.setAnnotation(annot_num, sb);
+          if (this.zero_blank !== 0 && value0 === 0) {
+            object.setAnnotation(annot_num, "");
+          } else {
+            if (this.cFormat !== null) {
+              var sb = this.cFormat.format(value0);
+              object.setAnnotation(annot_num, sb);
+            }
           }
           this.dyn.repaintNow = true;
           this.oldValueF = value0;
@@ -4163,9 +4312,13 @@ function DynValue(dyn) {
         if (typeof value0 == "undefined") return;
 
         if (value0 != this.oldValueI || this.firstScan) {
-          if (this.cFormat !== null) {
-            var sb = this.cFormat.format(value0);
-            object.setAnnotation(annot_num, sb);
+          if (this.zero_blank !== 0 && value0 === 0) {
+            object.setAnnotation(annot_num, "");
+          } else {
+            if (this.cFormat !== null) {
+              var sb = this.cFormat.format(value0);
+              object.setAnnotation(annot_num, sb);
+            }
           }
           this.dyn.repaintNow = true;
           this.oldValueI = value0;
@@ -4272,6 +4425,31 @@ function DynValue(dyn) {
         this.oldValueI = value0;
         break;
       }
+      case Pwr.eType_Enum: {
+        var value0 = this.a.get_ref_value(this.dyn);
+        if (typeof value0 == "undefined") return;
+
+        if (value0 != this.oldValueI || this.firstScan) {
+          if (this.a.database == GraphIfc.eDatabase_Gdh) {
+            if (this.format === "%s") {
+              var pname = this.dyn.parseAttrName(this.attribute);
+              if (pname === null) return 1;
+              var data = new Array(2);
+              data[0] = this;
+              data[1] = object;
+              this.dyn.graph
+                .getGdh()
+                .getObjectEnumText(pname.name, value0, this.scan2, data);
+            } else if (this.cFormat !== null) {
+              var sb = this.cFormat.format(value0);
+              object.setAnnotation(annot_num, sb);
+              this.dyn.repaintNow = true;
+            }
+          }
+        }
+        this.oldValueI = value0;
+        break;
+      }
     }
     if (this.firstScan) this.firstScan = false;
   };
@@ -4285,7 +4463,11 @@ function DynValue(dyn) {
       object.setAnnotation(annot_num, value);
       self.dyn.repaintNow = true;
     } else {
-      object.setAnnotation(annot_num, "Unknown message");
+      var self = data[0];
+      var object = data[1];
+      if (self.a.typeid === Pwr.eType_Enum) object.setAnnotation(annot_num, "");
+      else object.setAnnotation(annot_num, "Unknown message");
+      if (typeof this.dyn === "undefined") return;
       this.dyn.repaintNow = true;
     }
   };
@@ -5035,6 +5217,15 @@ function DynRotate(dyn) {
           break;
         case DynC.eSave_Rotate_factor:
           this.factor = parseFloat(tokens[1]);
+          break;
+        case DynC.eSave_Rotate_offset:
+          this.offset = parseFloat(tokens[1]);
+          break;
+        case DynC.eSave_Rotate_min_angle:
+          this.min_angle = parseFloat(tokens[1]);
+          break;
+        case DynC.eSave_Rotate_max_angle:
+          this.max_angle = parseFloat(tokens[1]);
           break;
         case DynC.eSave_End:
           end = true;
@@ -6671,7 +6862,7 @@ function DynAnimation(dyn) {
           // Shift nodeclass
           if (this.animation_direction == 1) {
             // Shift forward
-            if (sequence == ge_eAnimSequence_CycleLast) {
+            if (this.sequence == DynC.eAnimSequence_CycleLast) {
               next_nc = object.get_next_nodeclass();
               if (next_nc != null && next_nc.is_last() == 1)
                 // Start from the beginning again
@@ -10155,7 +10346,7 @@ function DynDigTransparency(dyn) {
   this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "DigTransparency.Attribute") {
-      ret, (value = this.attribute);
+      ret.value = this.attribute;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
     } else if (name === "DigTransparency.LowValue") {
@@ -11287,7 +11478,7 @@ function DynTable(dyn) {
         switch (this.type_id[i]) {
           case Pwr.eType_Float32: {
             var val = this.dyn.graph.getGdh().getObjectRefInfo(this.p[i]);
-            if (val === null) break;
+            if (val == null) break;
             for (var j = 0; j < Math.min(this.elements[i], val.length); j++) {
               if (this.oldValueF[i][j] != val[j] || this.firstScan) {
                 var sb = this.cFormat[i].format(val[j]);
@@ -11299,7 +11490,7 @@ function DynTable(dyn) {
           }
           case Pwr.eType_Boolean: {
             var val = this.dyn.graph.getGdh().getObjectRefInfo(this.p[i]);
-            if (val === null) break;
+            if (val == null) break;
             for (var j = 0; j < Math.min(this.elements[i], val.length); j++) {
               if (this.firstScan || this.oldValueB[i][j] != val[j]) {
                 if (val[j]) object.setValue("1", i, j);
@@ -11332,7 +11523,7 @@ function DynTable(dyn) {
           case Pwr.eType_Time:
           case Pwr.eType_DeltaTime: {
             var val = this.dyn.graph.getGdh().getObjectRefInfo(this.p[i]);
-            if (val === null) break;
+            if (val == null) break;
             for (var j = 0; j < Math.min(this.elements[i], val.length); j++) {
               if (this.firstScan || this.oldValueS[i][j] != val[j]) {
                 switch (this.type_id[i]) {
@@ -14474,6 +14665,7 @@ function DynSlider(dyn) {
         if (typeof value == "undefined") value = 0;
         break;
       case Pwr.eType_Int32:
+      case GraphIfc.eType_Color:
         ivalue = this.a.get_ref_value(this.dyn);
         if (typeof ivalue == "undefined") ivalue = 0;
         break;
@@ -14514,6 +14706,7 @@ function DynSlider(dyn) {
             return;
           break;
         case Pwr.eType_Int32:
+        case GraphIfc.eType_Color:
         case Pwr.eType_Boolean:
           if (ivalue == this.old_ivalue) return;
           break;
@@ -14526,6 +14719,7 @@ function DynSlider(dyn) {
         this.old_value = value;
         break;
       case Pwr.eType_Int32:
+      case GraphIfc.eType_Color:
       case Pwr.eType_Boolean:
         this.old_ivalue = ivalue;
         break;
@@ -14553,6 +14747,9 @@ function DynSlider(dyn) {
 
         switch (this.a.typeid) {
           case Pwr.eType_Float32:
+            break;
+          case GraphIfc.eType_Color:
+            value = this.dyn.rgb_to_hue(ivalue);
             break;
           default:
             value = ivalue;
@@ -14753,6 +14950,22 @@ function DynSlider(dyn) {
                   sts = this.dyn.graph
                     .getLdb()
                     .setObjectInfo(this.dyn.graph, pname.name, bvalue);
+                  break;
+              }
+              break;
+            }
+            case GraphIfc.eType_Color: {
+              var ivalue = this.dyn.hue_to_rgb(value);
+              switch (pname.database) {
+                case GraphIfc.eDatabase_Gdh:
+                  sts = this.dyn.graph
+                    .getGdh()
+                    .setObjectInfoInt(pname.name, ivalue);
+                  break;
+                case GraphIfc.eDatabase_Local:
+                  sts = this.dyn.graph
+                    .getLdb()
+                    .setObjectInfo(this.dyn.graph, pname.name, ivalue);
                   break;
               }
               break;
@@ -15448,9 +15661,9 @@ function DynOptionMenu(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = 0;
-  this.action_type1 = DynC.mActionType1_OptionsMenu;
+  this.action_type1 = DynC.mActionType1_OptionMenu;
   this.action_type2 = 0;
-  this.prio = DynC.eDynPrio_OptionsMenu;
+  this.prio = DynC.eDynPrio_OptionMenu;
   this.instance_mask = 0;
   this.instance = DynC.mInstance_1;
 
@@ -15881,7 +16094,7 @@ function DynOptionMenu(dyn) {
           this.button_mask = parseInt(tokens[1], 10);
           break;
         case DynC.eSave_OptionMenu_items_text0:
-          if (tokens.length > 1) this.items_text[0] = tokens[1];
+          if (tokens.length > 1) this.items_text[0] = lines[i].substring(5);
           break;
         case DynC.eSave_OptionMenu_items_text1:
           if (tokens.length > 1) this.items_text[1] = lines[i].substring(5);
@@ -17722,6 +17935,246 @@ function DynEmitSignal(dyn) {
   };
 }
 
+function DynDigCommand(dyn) {
+  this.dyn = dyn;
+  this.dyn_type1 = DynC.mDynType1_DigCommand;
+  this.dyn_type2 = 0;
+  this.action_type1 = 0;
+  this.action_type2 = 0;
+  this.prio = DynC.eDynPrio_DigCommand;
+  this.instance_mask = 0;
+  this.instance = 0;
+
+  this.attribute;
+  this.command;
+  this.level;
+
+  this.setAttribute = function (o, name, value) {
+    if (name === "DigCommand.Attribute") {
+      this.attribute = value;
+      return 1;
+    } else if (name === "DigCommand.Command") {
+      this.command = value;
+      return 1;
+    } else if (name === "DigCommand.Level") {
+      this.level = value;
+      return 1;
+    }
+    return 0;
+  };
+  this.getAttribute = function (o, name, value) {
+    var ret = new ge_tValueReturn();
+    if (name === "DigCommand.Attribute") {
+      ret.value = this.attribute;
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    } else if (name === "DigCommand.Command") {
+      ret.value = this.command;
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    } else if (name === "DigCommand.Level") {
+      ret.value = this.level;
+      ret.decl = CcmC.K_DECL_INT;
+      return ret;
+    }
+    ret.sts = 0;
+    return ret;
+  };
+
+  this.connect = function (o) {
+    return 1;
+  };
+  this.disconnect = function () {};
+  this.scan = function (o) {
+    return 1;
+  };
+  this.action = function (object, e) {
+    return 1;
+  };
+
+  this.open = function (lines, row) {
+    var end = false;
+    var i;
+    var elem;
+
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
+      var key = parseInt(tokens[0], 10);
+
+      if (this.dyn.debug) console.log("DynDigCommand : " + lines[i]);
+
+      elem = null;
+
+      switch (key) {
+        case DynC.eSave_DigCommand:
+          break;
+        case DynC.eSave_DigCommand_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_DigCommand_command:
+          if (tokens.length > 1) this.command = tokens[1];
+          break;
+        case DynC.eSave_DigCommand_level:
+          this.level = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_DigCommand_instance:
+          this.instance = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_DigCommand_instance_mask:
+          this.instance_mask = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynDigCommand");
+          break;
+      }
+
+      if (end) break;
+    }
+
+    return i;
+  };
+}
+
+function DynDigScript(dyn) {
+  this.dyn = dyn;
+  this.dyn_type1 = 0;
+  this.dyn_type2 = DynC.mDynType2_DigScript;
+  this.action_type1 = 0;
+  this.action_type2 = 0;
+  this.prio = DynC.eDynPrio_DigScript;
+  this.instance_mask = 0;
+  this.instance = 0;
+
+  this.attribute;
+  this.script;
+  this.script_len;
+  this.level;
+  this.script_arguments;
+
+  this.setAttribute = function (o, name, value) {
+    if (name === "DigScript.Attribute") {
+      this.attribute = value;
+      return 1;
+    } else if (name === "DigScript.Script") {
+      this.script = value;
+      return 1;
+    } else if (name === "DigScript.Arguments") {
+      this.arguments = value;
+      return 1;
+    } else if (name === "DigScript.Level") {
+      this.level = value;
+      return 1;
+    }
+    return 0;
+  };
+  this.getAttribute = function (o, name, value) {
+    var ret = new ge_tValueReturn();
+    if (name === "DigScript.Attribute") {
+      ret.value = this.attribute;
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    } else if (name === "DigScript.Script") {
+      ret.value = this.script;
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    } else if (name === "DigScript.Arguments") {
+      ret.value = this.arguments;
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    } else if (name === "DigScript.Level") {
+      ret.value = this.level;
+      ret.decl = CcmC.K_DECL_INT;
+      return ret;
+    }
+    ret.sts = 0;
+    return ret;
+  };
+
+  this.connect = function (o) {
+    return 1;
+  };
+  this.disconnect = function () {};
+  this.scan = function (o) {
+    return 1;
+  };
+  this.action = function (object, e) {
+    return 1;
+  };
+
+  this.open = function (lines, row) {
+    var end = false;
+    var i;
+    var elem;
+
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
+      var key = parseInt(tokens[0], 10);
+
+      if (this.dyn.debug) console.log("DynDigScript : " + lines[i]);
+
+      elem = null;
+
+      switch (key) {
+        case DynC.eSave_DigScript:
+          break;
+        case DynC.eSave_DigScript_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_DigScript_script:
+          var idx;
+          var send = false;
+          this.script = "";
+          i++;
+          var line = lines[i].trim().substring(1);
+
+          idx = 0;
+          while (line != null) {
+            while ((idx = line.indexOf('"', idx)) != -1) {
+              if (idx > 0 && line.charAt(idx - 1) == "\\") {
+                line = line.substring(0, idx - 1) + line.substring(idx);
+              } else {
+                if (idx > 0) line = line.substring(0, idx - 1);
+                else line = "";
+                this.script += line;
+                send = true;
+                break;
+              }
+            }
+            if (send) break;
+            this.script += line + "\n";
+            i++;
+            if (i >= lines.length) break;
+
+            line = lines[i];
+          }
+          break;
+        case DynC.eSave_DigScript_arguments:
+          if (tokens.length > 1) this.arguments = tokens[1];
+          break;
+        case DynC.eSave_DigScript_script_len:
+          this.script_len = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_DigScript_level:
+          this.level = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynDigScript");
+          break;
+      }
+
+      if (end) break;
+    }
+
+    return i;
+  };
+}
+
 var GraphIfc = {
   eDatabase_Gdh: 0,
   eDatabase_User: 1,
@@ -17729,6 +18182,8 @@ var GraphIfc = {
   eDatabase_Ccm: 3,
 
   eType_Bit: (1 << 15) + 1,
+  eType_NodeId: (1 << 15) + 2,
+  eType_Color: (1 << 15) + 3,
 };
 
 var current_graph = null;
@@ -18194,6 +18649,7 @@ function Graph(appl) {
     if (str.toLowerCase() == "enum") return Pwr.eType_Enum;
     if (str.toLowerCase() == "mask") return Pwr.eType_Mask;
     if (str.toLowerCase() == "bit") return GraphIfc.eType_Bit;
+    if (str.toLowerCase() == "color") return GraphIfc.eType_Color;
     if (str.length >= 6 && str.substring(0, 6).toLowerCase() == "string")
       return Pwr.eType_String;
     return 0;
