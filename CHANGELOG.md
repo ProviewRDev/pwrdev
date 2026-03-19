@@ -11,11 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added triage bot to the project.
-- Added issue templates.
-- Added some ABB classes to the workbench palette for quick access.
-- Added the cJSON library to the project.
-- Added this changelog.
+- Added triage bot to the project
+- Added issue templates
+- Added some ABB classes to the workbench palette for quick access
+- Added the cJSON library to the project
+- Added this changelog
+- Prettier npm package and configuration for source code formatting.
 - Add an error section to the bottom of the help window that displays up to 20 error messages.
   - Improve contextual feedback in the help window (e.g., via XTT, WTT) with clearer, more actionable error messages.
   - Include detailed error information, such as the filename and line number where each issue occurs.
@@ -73,7 +74,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Double signal connections are now caught by syntaxcheck.
 - GE/rt_xtt: Fixed `RefUpdate` for objid-based subgraph references by tracking referenced values with the actual subscription size instead of treating them as `AttrRef`. This makes nullified objid links trigger a reconnect/reset without reopening the graph.
   - Updated the GE Designers Guide with the RefUpdate dynamic.
-
+- Fixed typos, bugs and missing features in the Web interface.
 
 ### Changed
 
@@ -90,14 +91,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Threads checking in on CycleSup objects will now tell you which CycleSup object triggered the EmergencyBreak.
 - UDP (rs_remote_udpip) have had its buffer increased to 65507 bytes. But do try to keep UDP packets small.
 - rt_errh/rt_errl has been changed to log in rfc5424 format.
-- Xtt console log has been updated to read both old and new format of the proviewr log file (pwr_{hostname}.log).
+- Xtt console log has been updated to read both old and new format of the proviewr log file (pwr\_{hostname}.log).
 - Xtt console log has had its filters and search improved and controls moved to the toolbar instead of a separate window.
 - PROFINET: Softing headers have moved outside the codebase.
-- Update Classes will now be more thorough and check sizes of class definitions compared to database and update accordingly. (https://gitlab.ssab.com/pwrdev/pwr/-/issues/189)
+- Update Classes will now be more thorough and check sizes of class definitions compared to database and update accordingly. (<https://gitlab.ssab.com/pwrdev/pwr/-/issues/189>)
 - Various exit/return paths changed in some wb tooling used in reload/upgrade process. Some errors have been downgraded to warnings which is more in line with how one would expect things to be.
 - A RestartLimit of 0 in a Remnode object will now be restarted by the rs_remotehandler forever but with increased backoff like 1s, 2s, 4s and so on until it reaches 30s backoff. If backend service hasn't restarted for 5s this is reset back to shorter backoff.
 
 ### Deprecated
+
 - Nodave for communcating with legacy S7 300/400 will be removed next release.
 - MQ (dmq) which is a 32-bit message queue will be removed next release.
 
@@ -108,6 +110,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The old Profinet Viewer has been removed and replaced with the new and improved one.
 - Removed rt_version.dat. The runtime version is now compiled in from pwr_version.h instead of read from a file that was only created during packaging. This also fixes the empty Version field in the runtime status monitor on non-packaged (dev) builds.
 - Removed all remnants of the Motif framework that was still present.
+- Removed URL search param from index.html in the Web interface due to file encoding error.
 
 [unreleased]: https://gitlab.ssab.com/pwrdev/pwr/-/compare/V7.0.0...HEAD
 [V7.0.0]: https://gitlab.ssab.com/pwrdev/pwr/-/compare/V6.1.3...V7.0.0

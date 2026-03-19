@@ -1,898 +1,979 @@
 "use strict";
 
-if ( !Object.create) {
-  Object.create = function(proto) {
+if (!Object.create) {
+  Object.create = function (proto) {
     function ctor() {}
     ctor.prototype = proto;
     return new ctor();
   };
 }
 
-#jsc_include pwr.jsi
-#jsc_include cli.jsi
-#jsc_include gdh.jsi
-#jsc_include glow.jsi
-#jsc_include ccm.jsi
-#jsc_include geunitconv.jsi
+// This comment may not be deleted.
+// #jsc_include pwr.jsi
+// #jsc_include cli.jsi
+// #jsc_include gdh.jsi
+// #jsc_include glow.jsi
+// #jsc_include ccm.jsi
+// #jsc_include geunitconv.jsi
 
 var GE_ = {
-  NOATTR : 154304650,
-  SYNTAX : 154304586,
-  SUCCESS : 154304521,
-  ARG : 154304802,
+  NOATTR: 154304650,
+  SYNTAX: 154304586,
+  SUCCESS: 154304521,
+  ARG: 154304802,
 };
 
 var DynC = {
-  DYN__NO_PROPAGATE 			: 20001,
-  eValueInput_Success			: 0,
-  eValueInput_Error			: 1,
-  eValueInput_SyntaxError	       	: 2,
-  eValueInput_MinValueExceeded       	: 3,
-  eValueInput_MaxValueExceeded       	: 4,
+  DYN__NO_PROPAGATE: 20001,
+  eValueInput_Success: 0,
+  eValueInput_Error: 1,
+  eValueInput_SyntaxError: 2,
+  eValueInput_MinValueExceeded: 3,
+  eValueInput_MaxValueExceeded: 4,
 
-  eCurveDataType_XYArrays    		: 0,
-  eCurveDataType_PointArray  		: 1,
-  eCurveDataType_TableObject  		: 2,
+  eCurveDataType_XYArrays: 0,
+  eCurveDataType_PointArray: 1,
+  eCurveDataType_TableObject: 2,
 
-  eOptionMenuType_Static  		: 0,
-  eOptionMenuType_Dynamic  		: 1,
+  eOptionMenuType_Static: 0,
+  eOptionMenuType_Dynamic: 1,
 
+  mInstance_1: 1 << 0,
+  mInstance_2: 1 << 1,
+  mInstance_3: 1 << 2,
+  mInstance_4: 1 << 3,
+  mInstance_5: 1 << 4,
+  mInstance_6: 1 << 5,
+  mInstance_7: 1 << 6,
+  mInstance_8: 1 << 7,
+  mInstance_9: 1 << 8,
+  mInstance_10: 1 << 9,
+  mInstance_11: 1 << 10,
+  mInstance_12: 1 << 11,
+  mInstance_13: 1 << 12,
+  mInstance_14: 1 << 13,
+  mInstance_15: 1 << 14,
+  mInstance_16: 1 << 15,
+  mInstance_17: 1 << 16,
+  mInstance_18: 1 << 17,
+  mInstance_19: 1 << 18,
+  mInstance_20: 1 << 19,
+  mInstance_21: 1 << 20,
+  mInstance_22: 1 << 21,
+  mInstance_23: 1 << 22,
+  mInstance_24: 1 << 23,
+  mInstance_25: 1 << 24,
+  mInstance_26: 1 << 25,
+  mInstance_27: 1 << 26,
+  mInstance_28: 1 << 27,
+  mInstance_29: 1 << 28,
+  mInstance_30: 1 << 29,
+  mInstance_31: 1 << 30,
+  mInstance_32: 1 << 31,
 
+  mDynType1_No: 0,
+  mDynType1_Inherit: 1 << 0,
+  mDynType1_Tone: 1 << 1,
+  mDynType1_DigLowColor: 1 << 2,
+  mDynType1_DigColor: 1 << 3,
+  mDynType1_DigError: 1 << 4,
+  mDynType1_DigWarning: 1 << 5,
+  mDynType1_DigFlash: 1 << 6,
+  mDynType1_Invisible: 1 << 7,
+  mDynType1_DigBorder: 1 << 8,
+  mDynType1_DigText: 1 << 9,
+  mDynType1_Value: 1 << 10,
+  mDynType1_AnalogColor: 1 << 11,
+  mDynType1_Rotate: 1 << 12,
+  mDynType1_Move: 1 << 13,
+  mDynType1_AnalogShift: 1 << 14,
+  mDynType1_DigShift: 1 << 15,
+  mDynType1_Animation: 1 << 16,
+  mDynType1_Bar: 1 << 17,
+  mDynType1_Trend: 1 << 18,
+  mDynType1_SliderBackground: 1 << 19,
+  mDynType1_Video: 1 << 20,
+  mDynType1_FillLevel: 1 << 21,
+  mDynType1_FastCurve: 1 << 22,
+  mDynType1_AnalogText: 1 << 23,
+  mDynType1_Table: 1 << 24,
+  mDynType1_StatusColor: 1 << 25,
+  mDynType1_HostObject: 1 << 26,
+  mDynType1_DigSound: 1 << 27,
+  mDynType1_XY_Curve: 1 << 28,
+  mDynType1_DigCommand: 1 << 29,
+  mDynType1_Pie: 1 << 30,
+  mDynType1_BarChart: 1 << 31,
 
-  mInstance_1				: 1 << 0,
-  mInstance_2				: 1 << 1,
-  mInstance_3				: 1 << 2,
-  mInstance_4				: 1 << 3,
-  mInstance_5				: 1 << 4,
-  mInstance_6				: 1 << 5,
-  mInstance_7				: 1 << 6,
-  mInstance_8				: 1 << 7,
-  mInstance_9				: 1 << 8,
-  mInstance_10			: 1 << 9,
-  mInstance_11			: 1 << 10,
-  mInstance_12			: 1 << 11,
-  mInstance_13			: 1 << 12,
-  mInstance_14			: 1 << 13,
-  mInstance_15			: 1 << 14,
-  mInstance_16			: 1 << 15,
-  mInstance_17			: 1 << 16,
-  mInstance_18			: 1 << 17,
-  mInstance_19			: 1 << 18,
-  mInstance_20			: 1 << 19,
-  mInstance_21			: 1 << 20,
-  mInstance_22			: 1 << 21,
-  mInstance_23			: 1 << 22,
-  mInstance_24			: 1 << 23,
-  mInstance_25			: 1 << 24,
-  mInstance_26			: 1 << 25,
-  mInstance_27			: 1 << 26,
-  mInstance_28			: 1 << 27,
-  mInstance_29			: 1 << 28,
-  mInstance_30			: 1 << 29,
-  mInstance_31			: 1 << 30,
-  mInstance_32			: 1 << 31,
+  mDynType2_No: 0,
+  mDynType2_Axis: 1 << 0,
+  mDynType2_DigTextColor: 1 << 1,
+  mDynType2_TimeoutColor: 1 << 2,
+  mDynType2_DigFourShift: 1 << 3,
+  mDynType2_ScrollingText: 1 << 4,
+  mDynType2_ColorThemeLightness: 1 << 5,
+  mDynType2_DigBackgroundColor: 1 << 6,
+  mDynType2_DigSwap: 1 << 7,
+  mDynType2_DigScript: 1 << 8,
+  mDynType2_RefUpdate: 1 << 9,
+  mDynType2_DsTrend: 1 << 10,
+  mDynType2_DsTrendCurve: 1 << 11,
+  mDynType2_SevHist: 1 << 12,
+  mDynType2_DigTransparency: 1 << 13,
+  mDynType2_AnalogTransparency: 1 << 14,
+  mDynType2_UnitConvert: 1 << 15,
+  mDynType2_DigLowShift: 1 << 16,
 
-  mDynType1_No			: 0,
-  mDynType1_Inherit            	: 1 << 0,
-  mDynType1_Tone	       	: 1 << 1,
-  mDynType1_DigLowColor		: 1 << 2,
-  mDynType1_DigColor           	: 1 << 3,
-  mDynType1_DigError           	: 1 << 4,
-  mDynType1_DigWarning		: 1 << 5,
-  mDynType1_DigFlash           	: 1 << 6,
-  mDynType1_Invisible 		: 1 << 7,
-  mDynType1_DigBorder          	: 1 << 8,
-  mDynType1_DigText            	: 1 << 9,
-  mDynType1_Value	       	: 1 << 10,
-  mDynType1_AnalogColor		: 1 << 11,
-  mDynType1_Rotate	       	: 1 << 12,
-  mDynType1_Move	       	: 1 << 13,
-  mDynType1_AnalogShift		: 1 << 14,
-  mDynType1_DigShift           	: 1 << 15,
-  mDynType1_Animation          	: 1 << 16,
-  mDynType1_Bar			: 1 << 17,
-  mDynType1_Trend	       	: 1 << 18,
-  mDynType1_SliderBackground   	: 1 << 19,
-  mDynType1_Video	       	: 1 << 20,
-  mDynType1_FillLevel	       	: 1 << 21,
-  mDynType1_FastCurve	       	: 1 << 22,
-  mDynType1_AnalogText	      	: 1 << 23,
-  mDynType1_Table	       	: 1 << 24,
-  mDynType1_StatusColor        	: 1 << 25,
-  mDynType1_HostObject         	: 1 << 26,
-  mDynType1_DigSound           	: 1 << 27,
-  mDynType1_XY_Curve           	: 1 << 28,
-  mDynType1_DigCommand         	: 1 << 29,
-  mDynType1_Pie	    		: 1 << 30,
-  mDynType1_BarChart           	: 1 << 31,
+  mActionType1_No: 0,
+  mActionType1_Inherit: 1 << 0,
+  mActionType1_PopupMenu: 1 << 1,
+  mActionType1_SetDig: 1 << 2,
+  mActionType1_ResetDig: 1 << 3,
+  mActionType1_ToggleDig: 1 << 4,
+  mActionType1_StoDig: 1 << 5,
+  mActionType1_Command: 1 << 6,
+  mActionType1_CommandDoubleClick: 1 << 7,
+  mActionType1_Confirm: 1 << 8,
+  mActionType1_IncrAnalog: 1 << 9,
+  mActionType1_RadioButton: 1 << 10,
+  mActionType1_Slider: 1 << 11,
+  mActionType1_ValueInput: 1 << 12,
+  mActionType1_TipText: 1 << 13,
+  mActionType1_Help: 1 << 14,
+  mActionType1_OpenGraph: 1 << 15,
+  mActionType1_OpenURL: 1 << 16,
+  mActionType1_InputFocus: 1 << 17,
+  mActionType1_CloseGraph: 1 << 18,
+  mActionType1_PulldownMenu: 1 << 19,
+  mActionType1_OptionMenu: 1 << 20,
+  mActionType1_SetValue: 1 << 21,
+  mActionType1_MethodToolbar: 1 << 22,
+  mActionType1_MethodPulldownMenu: 1 << 23,
+  mActionType1_Script: 1 << 24,
+  mActionType1_CatchSignal: 1 << 25,
+  mActionType1_EmitSignal: 1 << 26,
+  mActionType1_ContextMenu: 1 << 27,
 
-  mDynType2_No			: 0,
-  mDynType2_Axis	       	: 1 << 0,
-  mDynType2_DigTextColor       	: 1 << 1,
-  mDynType2_TimeoutColor       	: 1 << 2,
-  mDynType2_DigFourShift       	: 1 << 3,
-  mDynType2_ScrollingText       : 1 << 4,
-  mDynType2_ColorThemeLightness : 1 << 5,
-  mDynType2_DigBackgroundColor  : 1 << 6,
-  mDynType2_DigSwap	        : 1 << 7,
-  mDynType2_DigScript	        : 1 << 8,
-  mDynType2_RefUpdate	        : 1 << 9,
-  mDynType2_DsTrend	        : 1 << 10,
-  mDynType2_DsTrendCurve        : 1 << 11,
-  mDynType2_SevHist	        : 1 << 12,
-  mDynType2_DigTransparency     : 1 << 13,
-  mDynType2_AnalogTransparency	: 1 << 14,
-  mDynType2_UnitConvert		: 1 << 15,
-  mDynType2_DigLowShift		: 1 << 16,
+  mActionType2_No: 0,
 
-  mActionType1_No		: 0,
-  mActionType1_Inherit		: 1 << 0,
-  mActionType1_PopupMenu       	: 1 << 1,
-  mActionType1_SetDig          	: 1 << 2,
-  mActionType1_ResetDig		: 1 << 3,
-  mActionType1_ToggleDig       	: 1 << 4,
-  mActionType1_StoDig          	: 1 << 5,
-  mActionType1_Command		: 1 << 6,
-  mActionType1_CommandDoubleClick : 1 << 7,
-  mActionType1_Confirm		: 1 << 8,
-  mActionType1_IncrAnalog      	: 1 << 9,
-  mActionType1_RadioButton     	: 1 << 10,
-  mActionType1_Slider          	: 1 << 11,
-  mActionType1_ValueInput      	: 1 << 12,
-  mActionType1_TipText         	: 1 << 13,
-  mActionType1_Help            	: 1 << 14,
-  mActionType1_OpenGraph       	: 1 << 15,
-  mActionType1_OpenURL		: 1 << 16,
-  mActionType1_InputFocus      	: 1 << 17,
-  mActionType1_CloseGraph      	: 1 << 18,
-  mActionType1_PulldownMenu    	: 1 << 19,
-  mActionType1_OptionMenu      	: 1 << 20,
-  mActionType1_SetValue        	: 1 << 21,
-  mActionType1_MethodToolbar   	: 1 << 22,
-  mActionType1_MethodPulldownMenu : 1 << 23,
-  mActionType1_Script	      	: 1 << 24,
-  mActionType1_CatchSignal     	: 1 << 25,
-  mActionType1_EmitSignal     	: 1 << 26,
-  mActionType1_ContextMenu     	: 1 << 27,
-
-  mActionType2_No	       	: 0,
-    
   //! Priority order for dyntypes and actiontypes. Lower value gives higher priority.
-  eDynPrio_DigSound			: 0,
-  eDynPrio_HostObject			: 1,
-  eDynPrio_Invisible			: 2,
-  eDynPrio_DigFlash			: 3,
-  eDynPrio_TimeoutColor	       	: 4,
-  eDynPrio_DigError			: 5,
-  eDynPrio_DigWarning			: 6,
-  eDynPrio_AnalogColor	       	: 7,
-  eDynPrio_DigColor			: 8,
-  eDynPrio_DigLowColor	       	: 9,
-  eDynPrio_DigBackgroundColor	       	: 10,
-  eDynPrio_DigTextColor	       	: 11,
-  eDynPrio_DigBorder			: 12,
-  eDynPrio_DigText			: 13,
-  eDynPrio_FillLevel			: 14,
-  eDynPrio_Value			: 15,
-  eDynPrio_ValueInput			: 16,
-  eDynPrio_Rotate			: 17,
-  eDynPrio_Move			: 18,
-  eDynPrio_AnalogShift	       	: 19,
-  eDynPrio_DigShift			: 20,
-  eDynPrio_DigLowShift			: 21,
-  eDynPrio_DigFourShift	       	: 22,
-  eDynPrio_Animation			: 23,
-  eDynPrio_Bar			: 24,
-  eDynPrio_Trend			: 25,
-  eDynPrio_FastCurve			: 26,
-  eDynPrio_XY_Curve			: 27,
-  eDynPrio_DsTrend			: 28,
-  eDynPrio_DsTrendCurve			: 29,
-  eDynPrio_SevHist			: 20,
-  eDynPrio_UnitConvert			: 31,
-  eDynPrio_DigTransparency	      	: 32,
-  eDynPrio_AnalogTransparency	       	: 33,
-  eDynPrio_AnalogText			: 34,
-  eDynPrio_Table			: 35,
-  eDynPrio_SliderBackground	       	: 36,
-  eDynPrio_Video			: 37,
-  eDynPrio_StatusColor	       		: 38,
-  eDynPrio_PopupMenu			: 39,
-  eDynPrio_Confirm			: 40,
-  eDynPrio_SetDig			: 41,
-  eDynPrio_ResetDig			: 42,
-  eDynPrio_ToggleDig			: 43,
-  eDynPrio_StoDig			: 44,
-  eDynPrio_Help				: 45,
-  eDynPrio_OpenGraph			: 46,
-  eDynPrio_OpenURL			: 47,
-  eDynPrio_CommandDoubleClick	       	: 48,
-  eDynPrio_IncrAnalog			: 49,
-  eDynPrio_RadioButton	       		: 50,
-  eDynPrio_Slider			: 51,
-  eDynPrio_TipText			: 52,
-  eDynPrio_PulldownMenu	       		: 53,
-  eDynPrio_OptionMenu			: 54,
-  eDynPrio_InputFocus			: 55,
-  eDynPrio_DigCommand			: 56,
-  eDynPrio_SetValue			: 57,
-  eDynPrio_Pie				: 58,
-  eDynPrio_BarChart			: 59,
-  eDynPrio_Axis				: 60,
-  eDynPrio_MethodToolbar	       	: 61,
-  eDynPrio_MethodPulldownMenu	       	: 62,
-  eDynPrio_ScrollingText	       	: 63,
-  eDynPrio_ColorThemeLightness       	: 64,
-  eDynPrio_DigSwap		       	: 65,
-  eDynPrio_DigScript		       	: 66,
-  eDynPrio_CatchSignal           	: 67,
-  eDynPrio_EmitSignal     	       	: 68,
-  eDynPrio_ContextMenu     	       	: 69,
-  eDynPrio_Script  			: 9998,
-  eDynPrio_Command  			: 9999,
-  eDynPrio_CloseGraph 			: 10000,
+  eDynPrio_DigSound: 0,
+  eDynPrio_HostObject: 1,
+  eDynPrio_Invisible: 2,
+  eDynPrio_DigFlash: 3,
+  eDynPrio_TimeoutColor: 4,
+  eDynPrio_DigError: 5,
+  eDynPrio_DigWarning: 6,
+  eDynPrio_AnalogColor: 7,
+  eDynPrio_DigColor: 8,
+  eDynPrio_DigLowColor: 9,
+  eDynPrio_DigBackgroundColor: 10,
+  eDynPrio_DigTextColor: 11,
+  eDynPrio_DigBorder: 12,
+  eDynPrio_DigText: 13,
+  eDynPrio_FillLevel: 14,
+  eDynPrio_Value: 15,
+  eDynPrio_ValueInput: 16,
+  eDynPrio_Rotate: 17,
+  eDynPrio_Move: 18,
+  eDynPrio_AnalogShift: 19,
+  eDynPrio_DigShift: 20,
+  eDynPrio_DigLowShift: 21,
+  eDynPrio_DigFourShift: 22,
+  eDynPrio_Animation: 23,
+  eDynPrio_Bar: 24,
+  eDynPrio_Trend: 25,
+  eDynPrio_FastCurve: 26,
+  eDynPrio_XY_Curve: 27,
+  eDynPrio_DsTrend: 28,
+  eDynPrio_DsTrendCurve: 29,
+  eDynPrio_SevHist: 20,
+  eDynPrio_UnitConvert: 31,
+  eDynPrio_DigTransparency: 32,
+  eDynPrio_AnalogTransparency: 33,
+  eDynPrio_AnalogText: 34,
+  eDynPrio_Table: 35,
+  eDynPrio_SliderBackground: 36,
+  eDynPrio_Video: 37,
+  eDynPrio_StatusColor: 38,
+  eDynPrio_PopupMenu: 39,
+  eDynPrio_Confirm: 40,
+  eDynPrio_SetDig: 41,
+  eDynPrio_ResetDig: 42,
+  eDynPrio_ToggleDig: 43,
+  eDynPrio_StoDig: 44,
+  eDynPrio_Help: 45,
+  eDynPrio_OpenGraph: 46,
+  eDynPrio_OpenURL: 47,
+  eDynPrio_CommandDoubleClick: 48,
+  eDynPrio_IncrAnalog: 49,
+  eDynPrio_RadioButton: 50,
+  eDynPrio_Slider: 51,
+  eDynPrio_TipText: 52,
+  eDynPrio_PulldownMenu: 53,
+  eDynPrio_OptionMenu: 54,
+  eDynPrio_InputFocus: 55,
+  eDynPrio_DigCommand: 56,
+  eDynPrio_SetValue: 57,
+  eDynPrio_Pie: 58,
+  eDynPrio_BarChart: 59,
+  eDynPrio_Axis: 60,
+  eDynPrio_MethodToolbar: 61,
+  eDynPrio_MethodPulldownMenu: 62,
+  eDynPrio_ScrollingText: 63,
+  eDynPrio_ColorThemeLightness: 64,
+  eDynPrio_DigSwap: 65,
+  eDynPrio_DigScript: 66,
+  eDynPrio_CatchSignal: 67,
+  eDynPrio_EmitSignal: 68,
+  eDynPrio_ContextMenu: 69,
+  eDynPrio_Script: 9998,
+  eDynPrio_Command: 9999,
+  eDynPrio_CloseGraph: 10000,
 
-  eSave_Dyn		       		: 1,
-  eSave_DigLowColor	       		: 2,
-  eSave_DigColor	       		: 3,
-  eSave_DigError	       		: 7,
-  eSave_DigWarning	       		: 8,
-  eSave_Invisible	       		: 9,
-  eSave_DigBorder	       		: 10,
-  eSave_DigText	       		: 11,
-  eSave_Value				: 12,
-  eSave_ValueInput	       		: 13,
-  eSave_Rotate	       		: 14,
-  eSave_Move		       		: 15,
-  eSave_AnalogShift	       		: 17,
-  eSave_DigShift	       		: 18,
-  eSave_Animation	       		: 19,
-  eSave_Bar		       		: 22,
-  eSave_Trend				: 23,
-  eSave_SliderBackground     		: 24,
-  eSave_Video				: 25,
-  eSave_DigFlash	       		: 26,
-  eSave_FillLevel	       		: 27,
-  eSave_FastCurve   			: 28,
-  eSave_AnalogText	    		: 29,
-  eSave_Table	       			: 30,
-  eSave_StatusColor         		: 31,
-  eSave_HostObject         		: 32,
-  eSave_DigSound	      		: 33,
-  eSave_XY_Curve	      		: 34,
-  eSave_DigCommand	       		: 35,
-  eSave_Pie	             		: 36,
-  eSave_BarChart	       		: 37,
-  eSave_Axis	             		: 38,
-  eSave_DigTextColor	             	: 39,
-  eSave_TimeoutColor	             	: 40,
-  eSave_DigFourShift	             	: 41,
-  eSave_ScrollingText             	: 42,
-  eSave_ColorThemeLightness        	: 43,
-  eSave_DigBackgroundColor        	: 44,
-  eSave_DigSwap	        	: 45,
-  eSave_DigScript	        	: 46,
-  eSave_RefUpdate	        	: 47,
-  eSave_DsTrend	        		: 48,
-  eSave_DsTrendCurve	        	: 49,
-  eSave_PopupMenu	       		: 50,
-  eSave_SetDig	       		: 51,
-  eSave_ResetDig	       		: 52,
-  eSave_ToggleDig	       		: 53,
-  eSave_StoDig	       		: 54,
-  eSave_Command	       		: 55,
-  eSave_CommandDC	       		: 56,
-  eSave_Confirm	       		: 57,
-  eSave_IncrAnalog	       		: 58,
-  eSave_RadioButton	       		: 59,
-  eSave_Slider	       		: 60,
-  eSave_AnalogColor	       		: 61,
-  eSave_TipText	       		: 62,
-  eSave_Help		       		: 63,
-  eSave_OpenGraph	       		: 64,
-  eSave_OpenURL	       		: 65,
-  eSave_InputFocus	       		: 66,
-  eSave_CloseGraph	       		: 67,
-  eSave_PulldownMenu         		: 68,
-  eSave_OptionMenu           		: 69,
-  eSave_SetValue	       		: 70,
-  eSave_MethodToolbar	       		: 71,
-  eSave_MethodPulldownMenu	       	: 72,
-  eSave_Script		       	: 73,
-  eSave_CatchSignal		       	: 74,
-  eSave_EmitSignal		       	: 75,
-  eSave_SevHist			       	: 76,
-  eSave_DigTransparency	            	: 77,
-  eSave_AnalogTransparency            	: 78,
-  eSave_UnitConvert	            	: 79,
-  eSave_ContextMenu	            	: 80,
-  eSave_DigLowShift	            	: 81,
-  eSave_End		       		: 99,
-  eSave_Dyn_dyn_type1	       		: 100,
-  eSave_Dyn_action_type1      	: 101,
-  eSave_Dyn_access	       		: 102,
-  eSave_Dyn_cycle	       		: 103,
-  eSave_Dyn_ref_object      		: 104,
-  eSave_Dyn_dyn_type2	       		: 105,
-  eSave_Dyn_action_type2     		: 106,
-  eSave_DigLowColor_attribute		: 200,
-  eSave_DigLowColor_color    		: 201,
-  eSave_DigColor_attribute   		: 300,
-  eSave_DigColor_color       		: 301,
-  eSave_DigColor_instance    		: 302,
-  eSave_DigColor_instance_mask 	: 303,
-  eSave_DigError_attribute   		: 700,
-  eSave_DigError_use_colortheme    	: 701,
-  eSave_DigWarning_attribute  	: 800,
-  eSave_DigWarning_use_colortheme  	: 801,
-  eSave_Invisible_attribute 		: 900,
-  eSave_Invisible_dimmed     		: 901,
-  eSave_Invisible_instance   		: 902,
-  eSave_Invisible_instance_mask 	: 903,
-  eSave_Invisible_dim_level           	: 904,
-  eSave_DigBorder_attribute  		: 1000,
-  eSave_DigBorder_color      		: 1001,
-  eSave_DigText_attribute    		: 1100,
-  eSave_DigText_low_text     		: 1101,
-  eSave_DigText_instance     		: 1102,
-  eSave_DigText_instance_mask 	: 1103,
-  eSave_Value_attribute      		: 1200,
-  eSave_Value_format	       		: 1201,
-  eSave_Value_instance      		: 1202,
-  eSave_Value_instance_mask 		: 1203,
-  eSave_Value_zero_blank     		: 1204,
-  eSave_Value_decimals_attr          	: 1205,
-  eSave_Value_decimals_decr          	: 1206,
-  eSave_ValueInput_attribute      	: 1300,
-  eSave_ValueInput_format		: 1301,
-  eSave_ValueInput_min_value      	: 1302,
-  eSave_ValueInput_max_value      	: 1303,
-  eSave_ValueInput_clear      	: 1304,
-  eSave_ValueInput_popup      	: 1305,
-  eSave_ValueInput_unselect      	: 1306,
-  eSave_ValueInput_minvalue_attr   	: 1307,
-  eSave_ValueInput_maxvalue_attr   	: 1308,
-  eSave_ValueInput_escape_store    	: 1309,
-  eSave_ValueInput_keyboard_type    	: 1310,
-  eSave_ValueInput_update_open    	: 1311,
-  eSave_Rotate_attribute		: 1400,
-  eSave_Rotate_x0			: 1401,
-  eSave_Rotate_y0			: 1402,
-  eSave_Rotate_factor             	: 1403,
-  eSave_Move_move_x_attribute     	: 1500,
-  eSave_Move_move_y_attribute    	: 1501,
-  eSave_Move_x_offset	       		: 1502,
-  eSave_Move_y_offset	        	: 1503,
-  eSave_Move_x_factor	       		: 1504,
-  eSave_Move_scale_x_attribute     	: 1505,
-  eSave_Move_scale_y_attribute    	: 1506,
-  eSave_Move_scale_x_factor      	: 1507,
-  eSave_Move_scale_type      		: 1508,
-  eSave_Move_y_factor	       		: 1509,
-  eSave_Move_scale_y_factor      	: 1510,
-  eSave_AnalogShift_attribute     	: 1700,
-  eSave_DigShift_attribute		: 1800,
-  eSave_Animation_attribute       	: 1900,
-  eSave_Animation_sequence		: 1901,
-  eSave_Bar_attribute	   		: 2200,
-  eSave_Bar_minvalue_attr	   	: 2201,
-  eSave_Bar_maxvalue_attr	   	: 2202,
-  eSave_Trend_attribute1	   	: 2300,
-  eSave_Trend_attribute2	   	: 2301,
-  eSave_Trend_minvalue_attr1     	: 2302,
-  eSave_Trend_maxvalue_attr1     	: 2303,
-  eSave_Trend_minvalue_attr2      	: 2304,
-  eSave_Trend_maxvalue_attr2      	: 2305,
-  eSave_Trend_hold_attr	      	: 2306,
-  eSave_Trend_timerange_attr	      	: 2307,
-  eSave_Trend_mark1_attr	      	: 2308,
-  eSave_Trend_mark2_attr	      	: 2309,
-  eSave_Trend_mark1_color	      	: 2310,
-  eSave_Trend_mark2_color	      	: 2311,
-  eSave_DigFlash_attribute		: 2600,
-  eSave_DigFlash_color		: 2601,
-  eSave_DigFlash_color2		: 2602,
-  eSave_FillLevel_attribute       	: 2700,
-  eSave_FillLevel_color		: 2701,
-  eSave_FillLevel_direction       	: 2702,
-  eSave_FillLevel_min_value       	: 2703,
-  eSave_FillLevel_max_value       	: 2704,
-  eSave_FillLevel_minvalue_attr    	: 2705,
-  eSave_FillLevel_maxvalue_attr    	: 2706,
-  eSave_FastCurve_fast_object   	: 2800,
-  eSave_FastCurve_curve_index1   	: 2801,
-  eSave_FastCurve_curve_index2   	: 2802,
-  eSave_AnalogText_super   		: 2900,
-  eSave_Table_attribute1	   	: 3000,
-  eSave_Table_format1	   		: 3001,
-  eSave_Table_sel_attribute1      	: 3002,
-  eSave_Table_attribute2	   	: 3003,
-  eSave_Table_format2	   		: 3004,
-  eSave_Table_sel_attribute2      	: 3005,
-  eSave_Table_attribute3	   	: 3006,
-  eSave_Table_format3	   		: 3007,
-  eSave_Table_sel_attribute3      	: 3008,
-  eSave_Table_attribute4	   	: 3009,
-  eSave_Table_format4	   		: 3010,
-  eSave_Table_sel_attribute4      	: 3011,
-  eSave_Table_attribute5	   	: 3012,
-  eSave_Table_format5	   		: 3013,
-  eSave_Table_sel_attribute5      	: 3014,
-  eSave_Table_attribute6	   	: 3015,
-  eSave_Table_format6	   		: 3016,
-  eSave_Table_sel_attribute6      	: 3017,
-  eSave_Table_attribute7	   	: 3018,
-  eSave_Table_format7	   		: 3019,
-  eSave_Table_sel_attribute7      	: 3020,
-  eSave_Table_attribute8	   	: 3021,
-  eSave_Table_format8	   		: 3022,
-  eSave_Table_sel_attribute8      	: 3023,
-  eSave_Table_attribute9	   	: 3024,
-  eSave_Table_format9	   		: 3025,
-  eSave_Table_sel_attribute9      	: 3026,
-  eSave_Table_attribute10	   	: 3027,
-  eSave_Table_format10	   	: 3028,
-  eSave_Table_sel_attribute10     	: 3029,
-  eSave_Table_attribute11	   	: 3030,
-  eSave_Table_format11	   	: 3031,
-  eSave_Table_sel_attribute11     	: 3032,
-  eSave_Table_attribute12	   	: 3033,
-  eSave_Table_format12	   	: 3034,
-  eSave_Table_sel_attribute12     	: 3035,
-  eSave_StatusColor_attribute     	: 3100,
-  eSave_StatusColor_nostatus_color 	: 3101,
-  eSave_StatusColor_use_colortheme 	: 3102,
-  eSave_HostObject_object     	: 3200,
-  eSave_DigSound_attribute     	: 3300,
-  eSave_DigSound_soundobject     	: 3301,
-  eSave_DigSound_level     		: 3302,
-  eSave_DigSound_interval     	: 3303,
-  eSave_DigSound_instance		: 3304,
-  eSave_DigSound_instance_mask    	: 3305,
-  eSave_XY_Curve_x_attr      		: 3400,
-  eSave_XY_Curve_y_attr      		: 3401,
-  eSave_XY_Curve_y_min_value 		: 3402,
-  eSave_XY_Curve_y_max_value 		: 3403,
-  eSave_XY_Curve_x_min_value 		: 3404,
-  eSave_XY_Curve_x_max_value 		: 3405,
-  eSave_XY_Curve_y_minvalue_attr 	: 3406,
-  eSave_XY_Curve_y_maxvalue_attr 	: 3407,
-  eSave_XY_Curve_x_minvalue_attr 	: 3408,
-  eSave_XY_Curve_x_maxvalue_attr 	: 3409,
-  eSave_XY_Curve_noofpoints 		: 3410,
-  eSave_XY_Curve_noofpoints_attr 	: 3411,
-  eSave_XY_Curve_update_attr 		: 3412,
-  eSave_XY_Curve_datatype 		: 3413,
-  eSave_XY_Curve_instance		: 3414,
-  eSave_XY_Curve_instance_mask    	: 3415,
-  eSave_XY_Curve_curve_color    	: 3416,
-  eSave_XY_Curve_fill_color    	: 3417,
-  eSave_XY_Curve_horizontal_padding  	: 3418,
-  eSave_XY_Curve_x_mark1_attr    	: 3419,
-  eSave_XY_Curve_x_mark2_attr    	: 3420,
-  eSave_XY_Curve_y_mark1_attr    	: 3421,
-  eSave_XY_Curve_y_mark2_attr    	: 3422,
-  eSave_XY_Curve_mark1_color    	: 3423,
-  eSave_XY_Curve_mark2_color    	: 3424,
-  eSave_XY_Curve_hold_attr	    	: 3425,
-  eSave_DigCommand_attribute      	: 3500,
-  eSave_DigCommand_command      	: 3501,
-  eSave_DigCommand_instance        	: 3502,
-  eSave_DigCommand_instance_mask 	: 3503,
-  eSave_DigCommand_level 		: 3504,
-  eSave_Pie_attribute1      		: 3600,
-  eSave_Pie_attribute2      		: 3601,
-  eSave_Pie_attribute3      		: 3602,
-  eSave_Pie_attribute4      		: 3603,
-  eSave_Pie_attribute5      		: 3604,
-  eSave_Pie_attribute6      		: 3605,
-  eSave_Pie_attribute7      		: 3606,
-  eSave_Pie_attribute8      		: 3607,
-  eSave_Pie_attribute9      		: 3608,
-  eSave_Pie_attribute10      		: 3609,
-  eSave_Pie_attribute11      		: 3610,
-  eSave_Pie_attribute12      		: 3611,
-  eSave_Pie_fix_range      		: 3612,
-  eSave_BarChart_attribute1      	: 3700,
-  eSave_BarChart_attribute2      	: 3701,
-  eSave_BarChart_attribute3      	: 3702,
-  eSave_BarChart_attribute4      	: 3703,
-  eSave_BarChart_attribute5      	: 3704,
-  eSave_BarChart_attribute6      	: 3705,
-  eSave_BarChart_attribute7      	: 3706,
-  eSave_BarChart_attribute8      	: 3707,
-  eSave_BarChart_attribute9      	: 3708,
-  eSave_BarChart_attribute10      	: 3709,
-  eSave_BarChart_attribute11      	: 3710,
-  eSave_BarChart_attribute12      	: 3711,
-  eSave_BarChart_fix_range      	: 3712,
-  eSave_Axis_minvalue_attr      	: 3800,
-  eSave_Axis_maxvalue_attr      	: 3801,
-  eSave_Axis_keep_settings      	: 3802,
-  eSave_DigTextColor_attribute        : 3900,
-  eSave_DigTextColor_color		: 3901,
-  eSave_TimeoutColor_time             : 4000,
-  eSave_TimeoutColor_color		: 4001,
-  eSave_DigFourShift_attribute1      	: 4100,
-  eSave_DigFourShift_attribute2      	: 4101,
-  eSave_DigFourShift_attribute3      	: 4102,
-  eSave_ScrollingText_attribute      	: 4200,
-  eSave_ScrollingText_direction      	: 4201,
-  eSave_ScrollingText_speed      	: 4202,
-  eSave_ScrollingText_bounce      	: 4203,
-  eSave_DigBackgroundColor_attribute  : 4400,
-  eSave_DigBackgroundColor_color      : 4401,
-  eSave_DigBackgroundColor_instance   : 4402,
-  eSave_DigBackgroundColor_instance_mask : 4403,
-  eSave_DigSwap_attribute  		: 4500,
-  eSave_DigSwap_reset_value  		: 4501,
-  eSave_DigScript_attribute  		: 4600,
-  eSave_DigScript_script  		: 4601,
-  eSave_DigScript_script_len         	: 4602,
-  eSave_DigScript_level  		: 4603,
-  eSave_DigScript_arguments  		: 4604,
-  eSave_RefUpdate_attribute 		: 4700,
-  eSave_RefUpdate_whole_graph 		: 4701,
-  eSave_DsTrend_dstrend_object1 	: 4800,
-  eSave_DsTrend_dstrend_object2 	: 4801,
-  eSave_DsTrend_mark1_attr 		: 4802,
-  eSave_DsTrend_mark2_attr 		: 4803,
-  eSave_DsTrend_mark1_color 		: 4804,
-  eSave_DsTrend_mark2_color 		: 4805,
-  eSave_DsTrend_hold_attr 		: 4806,
-  eSave_DsTrend_minvalue_attr1 		: 4807,
-  eSave_DsTrend_maxvalue_attr1 		: 4808,
-  eSave_DsTrend_minvalue_attr2 		: 4809,
-  eSave_DsTrend_maxvalue_attr2 		: 4810,
-  eSave_DsTrendCurve_dstrend_object 	: 4900,
-  eSave_DsTrendCurve_mark1_attr 	: 4902,
-  eSave_DsTrendCurve_mark2_attr 	: 4903,
-  eSave_DsTrendCurve_mark1_color 	: 4904,
-  eSave_DsTrendCurve_mark2_color 	: 4905,
-  eSave_DsTrendCurve_hold_attr 		: 4906,
-  eSave_DsTrendCurve_minvalue_attr1 	: 4907,
-  eSave_DsTrendCurve_maxvalue_attr1 	: 4908,
-  eSave_DsTrendCurve_minvalue_attr2 	: 4909,
-  eSave_DsTrendCurve_maxvalue_attr2 	: 4910,
-  eSave_PopupMenu_ref_object      	: 5000,
-  eSave_SetDig_attribute		: 5100,
-  eSave_SetDig_instance		: 5101,
-  eSave_SetDig_instance_mask      	: 5102,
-  eSave_ResetDig_attribute		: 5200,
-  eSave_ResetDig_instance		: 5201,
-  eSave_ResetDig_instance_mask    	: 5202,
-  eSave_ToggleDig_attribute       	: 5300,
-  eSave_StoDig_attribute		: 5400,
-  eSave_Command_command		: 5500,
-  eSave_CommandDC_command		: 5600,
-  eSave_Confirm_text	       		: 5700,
-  eSave_Confirm_on_set	       	: 5701,
-  eSave_Confirm_on_reset	       	: 5702,
-  eSave_IncrAnalog_attribute      	: 5800,
-  eSave_IncrAnalog_increment      	: 5801,
-  eSave_IncrAnalog_min_value      	: 5802,
-  eSave_IncrAnalog_max_value      	: 5803,
-  eSave_RadioButton_attribute     	: 5900,
-  eSave_Slider_attribute	       	: 6000,
-  eSave_Slider_minvalue_attr     	: 6001,
-  eSave_Slider_maxvalue_attr     	: 6002,
-  eSave_Slider_insensitive_attr    	: 6003,
-  eSave_Slider_release_attr    	: 6004,
-  eSave_AnalogColor_attribute      	: 6100,
-  eSave_AnalogColor_limit        	: 6101,
-  eSave_AnalogColor_limit_type     	: 6102,
-  eSave_AnalogColor_color       	: 6103,
-  eSave_AnalogColor_instance      	: 6104,
-  eSave_AnalogColor_instance_mask 	: 6105,
-  eSave_AnalogColor_border	 	: 6106,
-  eSave_AnalogColor_common_attr	 	: 6107,
-  eSave_TipText_text              	: 6200,
-  eSave_Help_topic        		: 6300,
-  eSave_Help_bookmark             	: 6400,
-  eSave_OpenGraph_graph_object    	: 6401,
-  eSave_OpenURL_url               	: 6500,
-  eSave_InputFocus_initial_focus	: 6600,
-  eSave_InputFocus_next_horizontal	: 6601,
-  eSave_InputFocus_next_vertical	: 6602,
-  eSave_InputFocus_next_tab		: 6603,
-  eSave_PulldownMenu_button_mask	: 6800,
-  eSave_PulldownMenu_items_text0	: 6801,
-  eSave_PulldownMenu_items_text1	: 6802,
-  eSave_PulldownMenu_items_text2	: 6803,
-  eSave_PulldownMenu_items_text3	: 6804,
-  eSave_PulldownMenu_items_text4	: 6805,
-  eSave_PulldownMenu_items_text5	: 6806,
-  eSave_PulldownMenu_items_text6	: 6807,
-  eSave_PulldownMenu_items_text7	: 6808,
-  eSave_PulldownMenu_items_text8	: 6809,
-  eSave_PulldownMenu_items_text9	: 6810,
-  eSave_PulldownMenu_items_text10	: 6811,
-  eSave_PulldownMenu_items_text11	: 6812,
-  eSave_PulldownMenu_items_text12	: 6813,
-  eSave_PulldownMenu_items_text13	: 6814,
-  eSave_PulldownMenu_items_text14	: 6815,
-  eSave_PulldownMenu_items_text15	: 6816,
-  eSave_PulldownMenu_items_text16	: 6817,
-  eSave_PulldownMenu_items_text17	: 6818,
-  eSave_PulldownMenu_items_text18	: 6819,
-  eSave_PulldownMenu_items_text19	: 6820,
-  eSave_PulldownMenu_items_text20	: 6821,
-  eSave_PulldownMenu_items_text21	: 6822,
-  eSave_PulldownMenu_items_text22	: 6823,
-  eSave_PulldownMenu_items_text23	: 6824,
-  eSave_PulldownMenu_items_text24	: 6825,
-  eSave_PulldownMenu_items_text25	: 6826,
-  eSave_PulldownMenu_items_text26	: 6827,
-  eSave_PulldownMenu_items_text27	: 6828,
-  eSave_PulldownMenu_items_text28	: 6829,
-  eSave_PulldownMenu_items_text29	: 6830,
-  eSave_PulldownMenu_items_text30	: 6831,
-  eSave_PulldownMenu_items_text31	: 6832,
-  eSave_PulldownMenu_items_dyn0	: 6833,
-  eSave_PulldownMenu_items_dyn1	: 6834,
-  eSave_PulldownMenu_items_dyn2	: 6835,
-  eSave_PulldownMenu_items_dyn3	: 6836,
-  eSave_PulldownMenu_items_dyn4	: 6837,
-  eSave_PulldownMenu_items_dyn5	: 6838,
-  eSave_PulldownMenu_items_dyn6	: 6839,
-  eSave_PulldownMenu_items_dyn7	: 6840,
-  eSave_PulldownMenu_items_dyn8	: 6841,
-  eSave_PulldownMenu_items_dyn9	: 6842,
-  eSave_PulldownMenu_items_dyn10	: 6843,
-  eSave_PulldownMenu_items_dyn11	: 6844,
-  eSave_PulldownMenu_items_dyn12	: 6845,
-  eSave_PulldownMenu_items_dyn13	: 6846,
-  eSave_PulldownMenu_items_dyn14	: 6847,
-  eSave_PulldownMenu_items_dyn15	: 6848,
-  eSave_PulldownMenu_items_dyn16	: 6849,
-  eSave_PulldownMenu_items_dyn17	: 6850,
-  eSave_PulldownMenu_items_dyn18	: 6851,
-  eSave_PulldownMenu_items_dyn19	: 6852,
-  eSave_PulldownMenu_items_dyn20	: 6853,
-  eSave_PulldownMenu_items_dyn21	: 6854,
-  eSave_PulldownMenu_items_dyn22	: 6855,
-  eSave_PulldownMenu_items_dyn23	: 6856,
-  eSave_PulldownMenu_items_dyn24	: 6857,
-  eSave_PulldownMenu_items_dyn25	: 6858,
-  eSave_PulldownMenu_items_dyn26	: 6859,
-  eSave_PulldownMenu_items_dyn27	: 6860,
-  eSave_PulldownMenu_items_dyn28	: 6861,
-  eSave_PulldownMenu_items_dyn29	: 6862,
-  eSave_PulldownMenu_items_dyn30	: 6863,
-  eSave_PulldownMenu_items_dyn31	: 6864,
-  eSave_OptionMenu_button_mask	: 6900,
-  eSave_OptionMenu_items_text0	: 6901,
-  eSave_OptionMenu_items_text1	: 6902,
-  eSave_OptionMenu_items_text2	: 6903,
-  eSave_OptionMenu_items_text3	: 6904,
-  eSave_OptionMenu_items_text4	: 6905,
-  eSave_OptionMenu_items_text5	: 6906,
-  eSave_OptionMenu_items_text6	: 6907,
-  eSave_OptionMenu_items_text7	: 6908,
-  eSave_OptionMenu_items_text8	: 6909,
-  eSave_OptionMenu_items_text9	: 6910,
-  eSave_OptionMenu_items_text10	: 6911,
-  eSave_OptionMenu_items_text11	: 6912,
-  eSave_OptionMenu_items_text12	: 6913,
-  eSave_OptionMenu_items_text13	: 6914,
-  eSave_OptionMenu_items_text14	: 6915,
-  eSave_OptionMenu_items_text15	: 6916,
-  eSave_OptionMenu_items_text16	: 6917,
-  eSave_OptionMenu_items_text17	: 6918,
-  eSave_OptionMenu_items_text18	: 6919,
-  eSave_OptionMenu_items_text19	: 6920,
-  eSave_OptionMenu_items_text20	: 6921,
-  eSave_OptionMenu_items_text21	: 6922,
-  eSave_OptionMenu_items_text22	: 6923,
-  eSave_OptionMenu_items_text23	: 6924,
-  eSave_OptionMenu_items_text24	: 6925,
-  eSave_OptionMenu_items_text25	: 6926,
-  eSave_OptionMenu_items_text26	: 6927,
-  eSave_OptionMenu_items_text27	: 6928,
-  eSave_OptionMenu_items_text28	: 6929,
-  eSave_OptionMenu_items_text29	: 6930,
-  eSave_OptionMenu_items_text30	: 6931,
-  eSave_OptionMenu_items_text31	: 6932,
-  eSave_OptionMenu_items_enum0	: 6933,
-  eSave_OptionMenu_items_enum1	: 6934,
-  eSave_OptionMenu_items_enum2	: 6935,
-  eSave_OptionMenu_items_enum3	: 6936,
-  eSave_OptionMenu_items_enum4	: 6937,
-  eSave_OptionMenu_items_enum5	: 6938,
-  eSave_OptionMenu_items_enum6	: 6939,
-  eSave_OptionMenu_items_enum7	: 6940,
-  eSave_OptionMenu_items_enum8	: 6941,
-  eSave_OptionMenu_items_enum9	: 6942,
-  eSave_OptionMenu_items_enum10	: 6943,
-  eSave_OptionMenu_items_enum11	: 6944,
-  eSave_OptionMenu_items_enum12	: 6945,
-  eSave_OptionMenu_items_enum13	: 6946,
-  eSave_OptionMenu_items_enum14	: 6947,
-  eSave_OptionMenu_items_enum15	: 6948,
-  eSave_OptionMenu_items_enum16	: 6949,
-  eSave_OptionMenu_items_enum17	: 6950,
-  eSave_OptionMenu_items_enum18	: 6951,
-  eSave_OptionMenu_items_enum19	: 6952,
-  eSave_OptionMenu_items_enum20	: 6953,
-  eSave_OptionMenu_items_enum21	: 6954,
-  eSave_OptionMenu_items_enum22	: 6955,
-  eSave_OptionMenu_items_enum23	: 6956,
-  eSave_OptionMenu_items_enum24	: 6957,
-  eSave_OptionMenu_items_enum25	: 6958,
-  eSave_OptionMenu_items_enum26	: 6959,
-  eSave_OptionMenu_items_enum27	: 6960,
-  eSave_OptionMenu_items_enum28	: 6961,
-  eSave_OptionMenu_items_enum29	: 6962,
-  eSave_OptionMenu_items_enum30	: 6963,
-  eSave_OptionMenu_items_enum31	: 6964,
-  eSave_OptionMenu_attribute		: 6965,
-  eSave_OptionMenu_text_attribute	: 6966,
-  eSave_OptionMenu_size_attribute	: 6967,
-  eSave_OptionMenu_update_attribute 	: 6968,
-  eSave_OptionMenu_optionmenu_type 	: 6969,
-  eSave_SetValue_attribute		: 7000,
-  eSave_SetValue_value		: 7001,
-  eSave_SetValue_instance		: 7002,
-  eSave_SetValue_instance_mask     	: 7003,
-  eSave_MethodToolbar_method_object   : 7100,
-  eSave_MethodToolbar_toolbar_type    : 7101,
-  eSave_MethodPulldownMenu_method_object : 7200,
-  eSave_MethodPulldownMenu_menu_type  : 7201,
-  eSave_Script_script_len		: 7300,
-  eSave_Script_script			: 7301,
-  eSave_Script_arguments       		: 7302,
-  eSave_Script_trigger_event	       	: 7303,
-  eSave_CatchSignal_signal_name   	: 7400,
-  eSave_EmitSignal_signal_name   	: 7500,
-  eSave_EmitSignal_global   		: 7501,
-  eSave_SevHist_sevhist_object1 	: 7600,
-  eSave_SevHist_sevhist_object2 	: 7601,
-  eSave_SevHist_attribute1 		: 7602,
-  eSave_SevHist_attribute2 		: 7603,
-  eSave_SevHist_server 			: 7604,
-  eSave_SevHist_mark1_attr 		: 7605,
-  eSave_SevHist_mark2_attr 		: 7606,
-  eSave_SevHist_mark1_color 		: 7607,
-  eSave_SevHist_mark2_color 		: 7608,
-  eSave_SevHist_hold_attr 		: 7609,
-  eSave_SevHist_minvalue_attr1 		: 7610,
-  eSave_SevHist_maxvalue_attr1 		: 7611,
-  eSave_SevHist_minvalue_attr2 		: 7612,
-  eSave_SevHist_maxvalue_attr2 		: 7613,
-  eSave_SevHist_timerange 		: 7614,
-  eSave_SevHist_timerange_attr 		: 7615,
-  eSave_SevHist_update_attr 		: 7616,
-  eSave_SevHist_updatetime 		: 7617,
-  eSave_DigTransparency_attribute 	: 7700,
-  eSave_DigTransparency_low_value 	: 7701,
-  eSave_DigTransparency_high_value 	: 7702,
-  eSave_DigTransparency_smooth_transition : 7703,
-  eSave_AnalogTransparency_attribute 	: 7800,
-  eSave_AnalogTransparency_min_value 	: 7801,
-  eSave_AnalogTransparency_max_value 	: 7802,
-  eSave_UnitConvert_entity 		: 7900,
-  eSave_UnitConvert_db_unit 		: 7901,
-  eSave_UnitConvert_display_unit 	: 7902,
-  eSave_ContextMenu_item_text1 		: 8000,
-  eSave_ContextMenu_item_text2 		: 8001,
-  eSave_ContextMenu_item_text3 		: 8002,
-  eSave_ContextMenu_item_text4 		: 8003,
-  eSave_ContextMenu_item_text5 		: 8004,
-  eSave_ContextMenu_item_text6 		: 8005,
-  eSave_ContextMenu_item_text7 		: 8006,
-  eSave_ContextMenu_item_text8 		: 8007,
-  eSave_ContextMenu_item_text9 		: 8008,
-  eSave_ContextMenu_item_text10 	: 8009,
-  eSave_ContextMenu_item_action1 	: 8010,
-  eSave_ContextMenu_item_action2 	: 8011,
-  eSave_ContextMenu_item_action3 	: 8012,
-  eSave_ContextMenu_item_action4 	: 8013,
-  eSave_ContextMenu_item_action5 	: 8014,
-  eSave_ContextMenu_item_action6 	: 8015,
-  eSave_ContextMenu_item_action7	: 8016,
-  eSave_ContextMenu_item_action8 	: 8017,
-  eSave_ContextMenu_item_action9 	: 8018,
-  eSave_ContextMenu_item_action10 	: 8019,
-  eSave_DigLowShift_attribute		: 8100,
+  eSave_Dyn: 1,
+  eSave_DigLowColor: 2,
+  eSave_DigColor: 3,
+  eSave_DigError: 7,
+  eSave_DigWarning: 8,
+  eSave_Invisible: 9,
+  eSave_DigBorder: 10,
+  eSave_DigText: 11,
+  eSave_Value: 12,
+  eSave_ValueInput: 13,
+  eSave_Rotate: 14,
+  eSave_Move: 15,
+  eSave_AnalogShift: 17,
+  eSave_DigShift: 18,
+  eSave_Animation: 19,
+  eSave_Bar: 22,
+  eSave_Trend: 23,
+  eSave_SliderBackground: 24,
+  eSave_Video: 25,
+  eSave_DigFlash: 26,
+  eSave_FillLevel: 27,
+  eSave_FastCurve: 28,
+  eSave_AnalogText: 29,
+  eSave_Table: 30,
+  eSave_StatusColor: 31,
+  eSave_HostObject: 32,
+  eSave_DigSound: 33,
+  eSave_XY_Curve: 34,
+  eSave_DigCommand: 35,
+  eSave_Pie: 36,
+  eSave_BarChart: 37,
+  eSave_Axis: 38,
+  eSave_DigTextColor: 39,
+  eSave_TimeoutColor: 40,
+  eSave_DigFourShift: 41,
+  eSave_ScrollingText: 42,
+  eSave_ColorThemeLightness: 43,
+  eSave_DigBackgroundColor: 44,
+  eSave_DigSwap: 45,
+  eSave_DigScript: 46,
+  eSave_RefUpdate: 47,
+  eSave_DsTrend: 48,
+  eSave_DsTrendCurve: 49,
+  eSave_PopupMenu: 50,
+  eSave_SetDig: 51,
+  eSave_ResetDig: 52,
+  eSave_ToggleDig: 53,
+  eSave_StoDig: 54,
+  eSave_Command: 55,
+  eSave_CommandDC: 56,
+  eSave_Confirm: 57,
+  eSave_IncrAnalog: 58,
+  eSave_RadioButton: 59,
+  eSave_Slider: 60,
+  eSave_AnalogColor: 61,
+  eSave_TipText: 62,
+  eSave_Help: 63,
+  eSave_OpenGraph: 64,
+  eSave_OpenURL: 65,
+  eSave_InputFocus: 66,
+  eSave_CloseGraph: 67,
+  eSave_PulldownMenu: 68,
+  eSave_OptionMenu: 69,
+  eSave_SetValue: 70,
+  eSave_MethodToolbar: 71,
+  eSave_MethodPulldownMenu: 72,
+  eSave_Script: 73,
+  eSave_CatchSignal: 74,
+  eSave_EmitSignal: 75,
+  eSave_SevHist: 76,
+  eSave_DigTransparency: 77,
+  eSave_AnalogTransparency: 78,
+  eSave_UnitConvert: 79,
+  eSave_ContextMenu: 80,
+  eSave_DigLowShift: 81,
+  eSave_End: 99,
+  eSave_Dyn_dyn_type1: 100,
+  eSave_Dyn_action_type1: 101,
+  eSave_Dyn_access: 102,
+  eSave_Dyn_cycle: 103,
+  eSave_Dyn_ref_object: 104,
+  eSave_Dyn_dyn_type2: 105,
+  eSave_Dyn_action_type2: 106,
+  eSave_DigLowColor_attribute: 200,
+  eSave_DigLowColor_color: 201,
+  eSave_DigColor_attribute: 300,
+  eSave_DigColor_color: 301,
+  eSave_DigColor_instance: 302,
+  eSave_DigColor_instance_mask: 303,
+  eSave_DigError_attribute: 700,
+  eSave_DigError_use_colortheme: 701,
+  eSave_DigWarning_attribute: 800,
+  eSave_DigWarning_use_colortheme: 801,
+  eSave_Invisible_attribute: 900,
+  eSave_Invisible_dimmed: 901,
+  eSave_Invisible_instance: 902,
+  eSave_Invisible_instance_mask: 903,
+  eSave_Invisible_dim_level: 904,
+  eSave_DigBorder_attribute: 1000,
+  eSave_DigBorder_color: 1001,
+  eSave_DigText_attribute: 1100,
+  eSave_DigText_low_text: 1101,
+  eSave_DigText_instance: 1102,
+  eSave_DigText_instance_mask: 1103,
+  eSave_Value_attribute: 1200,
+  eSave_Value_format: 1201,
+  eSave_Value_instance: 1202,
+  eSave_Value_instance_mask: 1203,
+  eSave_Value_zero_blank: 1204,
+  eSave_Value_decimals_attr: 1205,
+  eSave_Value_decimals_decr: 1206,
+  eSave_ValueInput_attribute: 1300,
+  eSave_ValueInput_format: 1301,
+  eSave_ValueInput_min_value: 1302,
+  eSave_ValueInput_max_value: 1303,
+  eSave_ValueInput_clear: 1304,
+  eSave_ValueInput_popup: 1305,
+  eSave_ValueInput_unselect: 1306,
+  eSave_ValueInput_minvalue_attr: 1307,
+  eSave_ValueInput_maxvalue_attr: 1308,
+  eSave_ValueInput_escape_store: 1309,
+  eSave_ValueInput_keyboard_type: 1310,
+  eSave_ValueInput_update_open: 1311,
+  eSave_Rotate_attribute: 1400,
+  eSave_Rotate_x0: 1401,
+  eSave_Rotate_y0: 1402,
+  eSave_Rotate_factor: 1403,
+  eSave_Rotate_offset: 1404,
+  eSave_Rotate_min_angle: 1405,
+  eSave_Rotate_max_angle: 1406,
+  eSave_Move_move_x_attribute: 1500,
+  eSave_Move_move_y_attribute: 1501,
+  eSave_Move_x_offset: 1502,
+  eSave_Move_y_offset: 1503,
+  eSave_Move_x_factor: 1504,
+  eSave_Move_scale_x_attribute: 1505,
+  eSave_Move_scale_y_attribute: 1506,
+  eSave_Move_scale_x_factor: 1507,
+  eSave_Move_scale_type: 1508,
+  eSave_Move_y_factor: 1509,
+  eSave_Move_scale_y_factor: 1510,
+  eSave_AnalogShift_attribute: 1700,
+  eSave_DigShift_attribute: 1800,
+  eSave_Animation_attribute: 1900,
+  eSave_Animation_sequence: 1901,
+  eSave_Bar_attribute: 2200,
+  eSave_Bar_minvalue_attr: 2201,
+  eSave_Bar_maxvalue_attr: 2202,
+  eSave_Trend_attribute1: 2300,
+  eSave_Trend_attribute2: 2301,
+  eSave_Trend_minvalue_attr1: 2302,
+  eSave_Trend_maxvalue_attr1: 2303,
+  eSave_Trend_minvalue_attr2: 2304,
+  eSave_Trend_maxvalue_attr2: 2305,
+  eSave_Trend_hold_attr: 2306,
+  eSave_Trend_timerange_attr: 2307,
+  eSave_Trend_mark1_attr: 2308,
+  eSave_Trend_mark2_attr: 2309,
+  eSave_Trend_mark1_color: 2310,
+  eSave_Trend_mark2_color: 2311,
+  eSave_DigFlash_attribute: 2600,
+  eSave_DigFlash_color: 2601,
+  eSave_DigFlash_color2: 2602,
+  eSave_FillLevel_attribute: 2700,
+  eSave_FillLevel_color: 2701,
+  eSave_FillLevel_direction: 2702,
+  eSave_FillLevel_min_value: 2703,
+  eSave_FillLevel_max_value: 2704,
+  eSave_FillLevel_minvalue_attr: 2705,
+  eSave_FillLevel_maxvalue_attr: 2706,
+  eSave_FastCurve_fast_object: 2800,
+  eSave_FastCurve_curve_index1: 2801,
+  eSave_FastCurve_curve_index2: 2802,
+  eSave_AnalogText_super: 2900,
+  eSave_Table_attribute1: 3000,
+  eSave_Table_format1: 3001,
+  eSave_Table_sel_attribute1: 3002,
+  eSave_Table_attribute2: 3003,
+  eSave_Table_format2: 3004,
+  eSave_Table_sel_attribute2: 3005,
+  eSave_Table_attribute3: 3006,
+  eSave_Table_format3: 3007,
+  eSave_Table_sel_attribute3: 3008,
+  eSave_Table_attribute4: 3009,
+  eSave_Table_format4: 3010,
+  eSave_Table_sel_attribute4: 3011,
+  eSave_Table_attribute5: 3012,
+  eSave_Table_format5: 3013,
+  eSave_Table_sel_attribute5: 3014,
+  eSave_Table_attribute6: 3015,
+  eSave_Table_format6: 3016,
+  eSave_Table_sel_attribute6: 3017,
+  eSave_Table_attribute7: 3018,
+  eSave_Table_format7: 3019,
+  eSave_Table_sel_attribute7: 3020,
+  eSave_Table_attribute8: 3021,
+  eSave_Table_format8: 3022,
+  eSave_Table_sel_attribute8: 3023,
+  eSave_Table_attribute9: 3024,
+  eSave_Table_format9: 3025,
+  eSave_Table_sel_attribute9: 3026,
+  eSave_Table_attribute10: 3027,
+  eSave_Table_format10: 3028,
+  eSave_Table_sel_attribute10: 3029,
+  eSave_Table_attribute11: 3030,
+  eSave_Table_format11: 3031,
+  eSave_Table_sel_attribute11: 3032,
+  eSave_Table_attribute12: 3033,
+  eSave_Table_format12: 3034,
+  eSave_Table_sel_attribute12: 3035,
+  eSave_StatusColor_attribute: 3100,
+  eSave_StatusColor_nostatus_color: 3101,
+  eSave_StatusColor_use_colortheme: 3102,
+  eSave_HostObject_object: 3200,
+  eSave_DigSound_attribute: 3300,
+  eSave_DigSound_soundobject: 3301,
+  eSave_DigSound_level: 3302,
+  eSave_DigSound_interval: 3303,
+  eSave_DigSound_instance: 3304,
+  eSave_DigSound_instance_mask: 3305,
+  eSave_XY_Curve_x_attr: 3400,
+  eSave_XY_Curve_y_attr: 3401,
+  eSave_XY_Curve_y_min_value: 3402,
+  eSave_XY_Curve_y_max_value: 3403,
+  eSave_XY_Curve_x_min_value: 3404,
+  eSave_XY_Curve_x_max_value: 3405,
+  eSave_XY_Curve_y_minvalue_attr: 3406,
+  eSave_XY_Curve_y_maxvalue_attr: 3407,
+  eSave_XY_Curve_x_minvalue_attr: 3408,
+  eSave_XY_Curve_x_maxvalue_attr: 3409,
+  eSave_XY_Curve_noofpoints: 3410,
+  eSave_XY_Curve_noofpoints_attr: 3411,
+  eSave_XY_Curve_update_attr: 3412,
+  eSave_XY_Curve_datatype: 3413,
+  eSave_XY_Curve_instance: 3414,
+  eSave_XY_Curve_instance_mask: 3415,
+  eSave_XY_Curve_curve_color: 3416,
+  eSave_XY_Curve_fill_color: 3417,
+  eSave_XY_Curve_horizontal_padding: 3418,
+  eSave_XY_Curve_x_mark1_attr: 3419,
+  eSave_XY_Curve_x_mark2_attr: 3420,
+  eSave_XY_Curve_y_mark1_attr: 3421,
+  eSave_XY_Curve_y_mark2_attr: 3422,
+  eSave_XY_Curve_mark1_color: 3423,
+  eSave_XY_Curve_mark2_color: 3424,
+  eSave_XY_Curve_hold_attr: 3425,
+  eSave_DigCommand_attribute: 3500,
+  eSave_DigCommand_command: 3501,
+  eSave_DigCommand_instance: 3502,
+  eSave_DigCommand_instance_mask: 3503,
+  eSave_DigCommand_level: 3504,
+  eSave_Pie_attribute1: 3600,
+  eSave_Pie_attribute2: 3601,
+  eSave_Pie_attribute3: 3602,
+  eSave_Pie_attribute4: 3603,
+  eSave_Pie_attribute5: 3604,
+  eSave_Pie_attribute6: 3605,
+  eSave_Pie_attribute7: 3606,
+  eSave_Pie_attribute8: 3607,
+  eSave_Pie_attribute9: 3608,
+  eSave_Pie_attribute10: 3609,
+  eSave_Pie_attribute11: 3610,
+  eSave_Pie_attribute12: 3611,
+  eSave_Pie_fix_range: 3612,
+  eSave_BarChart_attribute1: 3700,
+  eSave_BarChart_attribute2: 3701,
+  eSave_BarChart_attribute3: 3702,
+  eSave_BarChart_attribute4: 3703,
+  eSave_BarChart_attribute5: 3704,
+  eSave_BarChart_attribute6: 3705,
+  eSave_BarChart_attribute7: 3706,
+  eSave_BarChart_attribute8: 3707,
+  eSave_BarChart_attribute9: 3708,
+  eSave_BarChart_attribute10: 3709,
+  eSave_BarChart_attribute11: 3710,
+  eSave_BarChart_attribute12: 3711,
+  eSave_BarChart_fix_range: 3712,
+  eSave_Axis_minvalue_attr: 3800,
+  eSave_Axis_maxvalue_attr: 3801,
+  eSave_Axis_keep_settings: 3802,
+  eSave_DigTextColor_attribute: 3900,
+  eSave_DigTextColor_color: 3901,
+  eSave_TimeoutColor_time: 4000,
+  eSave_TimeoutColor_color: 4001,
+  eSave_DigFourShift_attribute1: 4100,
+  eSave_DigFourShift_attribute2: 4101,
+  eSave_DigFourShift_attribute3: 4102,
+  eSave_ScrollingText_attribute: 4200,
+  eSave_ScrollingText_direction: 4201,
+  eSave_ScrollingText_speed: 4202,
+  eSave_ScrollingText_bounce: 4203,
+  eSave_DigBackgroundColor_attribute: 4400,
+  eSave_DigBackgroundColor_color: 4401,
+  eSave_DigBackgroundColor_instance: 4402,
+  eSave_DigBackgroundColor_instance_mask: 4403,
+  eSave_DigSwap_attribute: 4500,
+  eSave_DigSwap_reset_value: 4501,
+  eSave_DigScript_attribute: 4600,
+  eSave_DigScript_script: 4601,
+  eSave_DigScript_script_len: 4602,
+  eSave_DigScript_level: 4603,
+  eSave_DigScript_arguments: 4604,
+  eSave_RefUpdate_attribute: 4700,
+  eSave_RefUpdate_whole_graph: 4701,
+  eSave_DsTrend_dstrend_object1: 4800,
+  eSave_DsTrend_dstrend_object2: 4801,
+  eSave_DsTrend_mark1_attr: 4802,
+  eSave_DsTrend_mark2_attr: 4803,
+  eSave_DsTrend_mark1_color: 4804,
+  eSave_DsTrend_mark2_color: 4805,
+  eSave_DsTrend_hold_attr: 4806,
+  eSave_DsTrend_minvalue_attr1: 4807,
+  eSave_DsTrend_maxvalue_attr1: 4808,
+  eSave_DsTrend_minvalue_attr2: 4809,
+  eSave_DsTrend_maxvalue_attr2: 4810,
+  eSave_DsTrendCurve_dstrend_object: 4900,
+  eSave_DsTrendCurve_mark1_attr: 4902,
+  eSave_DsTrendCurve_mark2_attr: 4903,
+  eSave_DsTrendCurve_mark1_color: 4904,
+  eSave_DsTrendCurve_mark2_color: 4905,
+  eSave_DsTrendCurve_hold_attr: 4906,
+  eSave_DsTrendCurve_minvalue_attr1: 4907,
+  eSave_DsTrendCurve_maxvalue_attr1: 4908,
+  eSave_DsTrendCurve_minvalue_attr2: 4909,
+  eSave_DsTrendCurve_maxvalue_attr2: 4910,
+  eSave_PopupMenu_ref_object: 5000,
+  eSave_SetDig_attribute: 5100,
+  eSave_SetDig_instance: 5101,
+  eSave_SetDig_instance_mask: 5102,
+  eSave_ResetDig_attribute: 5200,
+  eSave_ResetDig_instance: 5201,
+  eSave_ResetDig_instance_mask: 5202,
+  eSave_ToggleDig_attribute: 5300,
+  eSave_StoDig_attribute: 5400,
+  eSave_Command_command: 5500,
+  eSave_CommandDC_command: 5600,
+  eSave_Confirm_text: 5700,
+  eSave_Confirm_on_set: 5701,
+  eSave_Confirm_on_reset: 5702,
+  eSave_IncrAnalog_attribute: 5800,
+  eSave_IncrAnalog_increment: 5801,
+  eSave_IncrAnalog_min_value: 5802,
+  eSave_IncrAnalog_max_value: 5803,
+  eSave_RadioButton_attribute: 5900,
+  eSave_Slider_attribute: 6000,
+  eSave_Slider_minvalue_attr: 6001,
+  eSave_Slider_maxvalue_attr: 6002,
+  eSave_Slider_insensitive_attr: 6003,
+  eSave_Slider_release_attr: 6004,
+  eSave_AnalogColor_attribute: 6100,
+  eSave_AnalogColor_limit: 6101,
+  eSave_AnalogColor_limit_type: 6102,
+  eSave_AnalogColor_color: 6103,
+  eSave_AnalogColor_instance: 6104,
+  eSave_AnalogColor_instance_mask: 6105,
+  eSave_AnalogColor_border: 6106,
+  eSave_AnalogColor_common_attr: 6107,
+  eSave_TipText_text: 6200,
+  eSave_Help_topic: 6300,
+  eSave_Help_bookmark: 6400,
+  eSave_OpenGraph_graph_object: 6401,
+  eSave_OpenURL_url: 6500,
+  eSave_InputFocus_initial_focus: 6600,
+  eSave_InputFocus_next_horizontal: 6601,
+  eSave_InputFocus_next_vertical: 6602,
+  eSave_InputFocus_next_tab: 6603,
+  eSave_PulldownMenu_button_mask: 6800,
+  eSave_PulldownMenu_items_text0: 6801,
+  eSave_PulldownMenu_items_text1: 6802,
+  eSave_PulldownMenu_items_text2: 6803,
+  eSave_PulldownMenu_items_text3: 6804,
+  eSave_PulldownMenu_items_text4: 6805,
+  eSave_PulldownMenu_items_text5: 6806,
+  eSave_PulldownMenu_items_text6: 6807,
+  eSave_PulldownMenu_items_text7: 6808,
+  eSave_PulldownMenu_items_text8: 6809,
+  eSave_PulldownMenu_items_text9: 6810,
+  eSave_PulldownMenu_items_text10: 6811,
+  eSave_PulldownMenu_items_text11: 6812,
+  eSave_PulldownMenu_items_text12: 6813,
+  eSave_PulldownMenu_items_text13: 6814,
+  eSave_PulldownMenu_items_text14: 6815,
+  eSave_PulldownMenu_items_text15: 6816,
+  eSave_PulldownMenu_items_text16: 6817,
+  eSave_PulldownMenu_items_text17: 6818,
+  eSave_PulldownMenu_items_text18: 6819,
+  eSave_PulldownMenu_items_text19: 6820,
+  eSave_PulldownMenu_items_text20: 6821,
+  eSave_PulldownMenu_items_text21: 6822,
+  eSave_PulldownMenu_items_text22: 6823,
+  eSave_PulldownMenu_items_text23: 6824,
+  eSave_PulldownMenu_items_text24: 6825,
+  eSave_PulldownMenu_items_text25: 6826,
+  eSave_PulldownMenu_items_text26: 6827,
+  eSave_PulldownMenu_items_text27: 6828,
+  eSave_PulldownMenu_items_text28: 6829,
+  eSave_PulldownMenu_items_text29: 6830,
+  eSave_PulldownMenu_items_text30: 6831,
+  eSave_PulldownMenu_items_text31: 6832,
+  eSave_PulldownMenu_items_dyn0: 6833,
+  eSave_PulldownMenu_items_dyn1: 6834,
+  eSave_PulldownMenu_items_dyn2: 6835,
+  eSave_PulldownMenu_items_dyn3: 6836,
+  eSave_PulldownMenu_items_dyn4: 6837,
+  eSave_PulldownMenu_items_dyn5: 6838,
+  eSave_PulldownMenu_items_dyn6: 6839,
+  eSave_PulldownMenu_items_dyn7: 6840,
+  eSave_PulldownMenu_items_dyn8: 6841,
+  eSave_PulldownMenu_items_dyn9: 6842,
+  eSave_PulldownMenu_items_dyn10: 6843,
+  eSave_PulldownMenu_items_dyn11: 6844,
+  eSave_PulldownMenu_items_dyn12: 6845,
+  eSave_PulldownMenu_items_dyn13: 6846,
+  eSave_PulldownMenu_items_dyn14: 6847,
+  eSave_PulldownMenu_items_dyn15: 6848,
+  eSave_PulldownMenu_items_dyn16: 6849,
+  eSave_PulldownMenu_items_dyn17: 6850,
+  eSave_PulldownMenu_items_dyn18: 6851,
+  eSave_PulldownMenu_items_dyn19: 6852,
+  eSave_PulldownMenu_items_dyn20: 6853,
+  eSave_PulldownMenu_items_dyn21: 6854,
+  eSave_PulldownMenu_items_dyn22: 6855,
+  eSave_PulldownMenu_items_dyn23: 6856,
+  eSave_PulldownMenu_items_dyn24: 6857,
+  eSave_PulldownMenu_items_dyn25: 6858,
+  eSave_PulldownMenu_items_dyn26: 6859,
+  eSave_PulldownMenu_items_dyn27: 6860,
+  eSave_PulldownMenu_items_dyn28: 6861,
+  eSave_PulldownMenu_items_dyn29: 6862,
+  eSave_PulldownMenu_items_dyn30: 6863,
+  eSave_PulldownMenu_items_dyn31: 6864,
+  eSave_OptionMenu_button_mask: 6900,
+  eSave_OptionMenu_items_text0: 6901,
+  eSave_OptionMenu_items_text1: 6902,
+  eSave_OptionMenu_items_text2: 6903,
+  eSave_OptionMenu_items_text3: 6904,
+  eSave_OptionMenu_items_text4: 6905,
+  eSave_OptionMenu_items_text5: 6906,
+  eSave_OptionMenu_items_text6: 6907,
+  eSave_OptionMenu_items_text7: 6908,
+  eSave_OptionMenu_items_text8: 6909,
+  eSave_OptionMenu_items_text9: 6910,
+  eSave_OptionMenu_items_text10: 6911,
+  eSave_OptionMenu_items_text11: 6912,
+  eSave_OptionMenu_items_text12: 6913,
+  eSave_OptionMenu_items_text13: 6914,
+  eSave_OptionMenu_items_text14: 6915,
+  eSave_OptionMenu_items_text15: 6916,
+  eSave_OptionMenu_items_text16: 6917,
+  eSave_OptionMenu_items_text17: 6918,
+  eSave_OptionMenu_items_text18: 6919,
+  eSave_OptionMenu_items_text19: 6920,
+  eSave_OptionMenu_items_text20: 6921,
+  eSave_OptionMenu_items_text21: 6922,
+  eSave_OptionMenu_items_text22: 6923,
+  eSave_OptionMenu_items_text23: 6924,
+  eSave_OptionMenu_items_text24: 6925,
+  eSave_OptionMenu_items_text25: 6926,
+  eSave_OptionMenu_items_text26: 6927,
+  eSave_OptionMenu_items_text27: 6928,
+  eSave_OptionMenu_items_text28: 6929,
+  eSave_OptionMenu_items_text29: 6930,
+  eSave_OptionMenu_items_text30: 6931,
+  eSave_OptionMenu_items_text31: 6932,
+  eSave_OptionMenu_items_enum0: 6933,
+  eSave_OptionMenu_items_enum1: 6934,
+  eSave_OptionMenu_items_enum2: 6935,
+  eSave_OptionMenu_items_enum3: 6936,
+  eSave_OptionMenu_items_enum4: 6937,
+  eSave_OptionMenu_items_enum5: 6938,
+  eSave_OptionMenu_items_enum6: 6939,
+  eSave_OptionMenu_items_enum7: 6940,
+  eSave_OptionMenu_items_enum8: 6941,
+  eSave_OptionMenu_items_enum9: 6942,
+  eSave_OptionMenu_items_enum10: 6943,
+  eSave_OptionMenu_items_enum11: 6944,
+  eSave_OptionMenu_items_enum12: 6945,
+  eSave_OptionMenu_items_enum13: 6946,
+  eSave_OptionMenu_items_enum14: 6947,
+  eSave_OptionMenu_items_enum15: 6948,
+  eSave_OptionMenu_items_enum16: 6949,
+  eSave_OptionMenu_items_enum17: 6950,
+  eSave_OptionMenu_items_enum18: 6951,
+  eSave_OptionMenu_items_enum19: 6952,
+  eSave_OptionMenu_items_enum20: 6953,
+  eSave_OptionMenu_items_enum21: 6954,
+  eSave_OptionMenu_items_enum22: 6955,
+  eSave_OptionMenu_items_enum23: 6956,
+  eSave_OptionMenu_items_enum24: 6957,
+  eSave_OptionMenu_items_enum25: 6958,
+  eSave_OptionMenu_items_enum26: 6959,
+  eSave_OptionMenu_items_enum27: 6960,
+  eSave_OptionMenu_items_enum28: 6961,
+  eSave_OptionMenu_items_enum29: 6962,
+  eSave_OptionMenu_items_enum30: 6963,
+  eSave_OptionMenu_items_enum31: 6964,
+  eSave_OptionMenu_attribute: 6965,
+  eSave_OptionMenu_text_attribute: 6966,
+  eSave_OptionMenu_size_attribute: 6967,
+  eSave_OptionMenu_update_attribute: 6968,
+  eSave_OptionMenu_optionmenu_type: 6969,
+  eSave_SetValue_attribute: 7000,
+  eSave_SetValue_value: 7001,
+  eSave_SetValue_instance: 7002,
+  eSave_SetValue_instance_mask: 7003,
+  eSave_MethodToolbar_method_object: 7100,
+  eSave_MethodToolbar_toolbar_type: 7101,
+  eSave_MethodPulldownMenu_method_object: 7200,
+  eSave_MethodPulldownMenu_menu_type: 7201,
+  eSave_Script_script_len: 7300,
+  eSave_Script_script: 7301,
+  eSave_Script_arguments: 7302,
+  eSave_Script_trigger_event: 7303,
+  eSave_CatchSignal_signal_name: 7400,
+  eSave_EmitSignal_signal_name: 7500,
+  eSave_EmitSignal_global: 7501,
+  eSave_SevHist_sevhist_object1: 7600,
+  eSave_SevHist_sevhist_object2: 7601,
+  eSave_SevHist_attribute1: 7602,
+  eSave_SevHist_attribute2: 7603,
+  eSave_SevHist_server: 7604,
+  eSave_SevHist_mark1_attr: 7605,
+  eSave_SevHist_mark2_attr: 7606,
+  eSave_SevHist_mark1_color: 7607,
+  eSave_SevHist_mark2_color: 7608,
+  eSave_SevHist_hold_attr: 7609,
+  eSave_SevHist_minvalue_attr1: 7610,
+  eSave_SevHist_maxvalue_attr1: 7611,
+  eSave_SevHist_minvalue_attr2: 7612,
+  eSave_SevHist_maxvalue_attr2: 7613,
+  eSave_SevHist_timerange: 7614,
+  eSave_SevHist_timerange_attr: 7615,
+  eSave_SevHist_update_attr: 7616,
+  eSave_SevHist_updatetime: 7617,
+  eSave_DigTransparency_attribute: 7700,
+  eSave_DigTransparency_low_value: 7701,
+  eSave_DigTransparency_high_value: 7702,
+  eSave_DigTransparency_smooth_transition: 7703,
+  eSave_AnalogTransparency_attribute: 7800,
+  eSave_AnalogTransparency_min_value: 7801,
+  eSave_AnalogTransparency_max_value: 7802,
+  eSave_UnitConvert_entity: 7900,
+  eSave_UnitConvert_db_unit: 7901,
+  eSave_UnitConvert_display_unit: 7902,
+  eSave_ContextMenu_item_text1: 8000,
+  eSave_ContextMenu_item_text2: 8001,
+  eSave_ContextMenu_item_text3: 8002,
+  eSave_ContextMenu_item_text4: 8003,
+  eSave_ContextMenu_item_text5: 8004,
+  eSave_ContextMenu_item_text6: 8005,
+  eSave_ContextMenu_item_text7: 8006,
+  eSave_ContextMenu_item_text8: 8007,
+  eSave_ContextMenu_item_text9: 8008,
+  eSave_ContextMenu_item_text10: 8009,
+  eSave_ContextMenu_item_action1: 8010,
+  eSave_ContextMenu_item_action2: 8011,
+  eSave_ContextMenu_item_action3: 8012,
+  eSave_ContextMenu_item_action4: 8013,
+  eSave_ContextMenu_item_action5: 8014,
+  eSave_ContextMenu_item_action6: 8015,
+  eSave_ContextMenu_item_action7: 8016,
+  eSave_ContextMenu_item_action8: 8017,
+  eSave_ContextMenu_item_action9: 8018,
+  eSave_ContextMenu_item_action10: 8019,
+  eSave_DigLowShift_attribute: 8100,
 
-  eAnimSequence_Inherit      	: 0,
-  eAnimSequence_Cycle		: 1,
-  eAnimSequence_Dig		: 2,
-  eAnimSequence_ForwBack	: 3,
-  eAnimSequence_CycleLast      	: 4,
+  eAnimSequence_Inherit: 0,
+  eAnimSequence_Cycle: 1,
+  eAnimSequence_Dig: 2,
+  eAnimSequence_ForwBack: 3,
+  eAnimSequence_CycleLast: 4,
 
-  eLimitType_Gt		: 0,
-  eLimitType_Lt		: 1,
-  eLimitType_Ge		: 2,
-  eLimitType_Le		: 3,
-  eLimitType_Eq		: 4,
+  eLimitType_Gt: 0,
+  eLimitType_Lt: 1,
+  eLimitType_Ge: 2,
+  eLimitType_Le: 3,
+  eLimitType_Eq: 4,
 
-  ePwrStatus_No		: 0,
-  ePwrStatus_Success		: 1,
-  ePwrStatus_Warning		: 2,
-  ePwrStatus_Error		: 3,
-  ePwrStatus_Fatal		: 4,
+  ePwrStatus_No: 0,
+  ePwrStatus_Success: 1,
+  ePwrStatus_Warning: 2,
+  ePwrStatus_Error: 3,
+  ePwrStatus_Fatal: 4,
 
-  eMethodsMenuType_Object	: 0,
-  eMethodsMenuType_Help	: 1,
-  eMethodsMenuType_Simulate	: 2,
+  eMethodsMenuType_Object: 0,
+  eMethodsMenuType_Help: 1,
+  eMethodsMenuType_Simulate: 2,
 
-  eMethodToolbarType_Object	: 0,
-  eMethodToolbarType_Simulate	: 1,
+  eMethodToolbarType_Object: 0,
+  eMethodToolbarType_Simulate: 1,
 
-  method_toolbar_op_cnt 	: 12,
-  method_toolbar_op_helpmask 	: 1 << 8,
-  method_toolbar_op_subgraph 	: [ "pwr_mb2opengraph",
-				    "pwr_mb2openobjectgraph",
-				    "pwr_mb2trend",
-				    "pwr_mb2history",
-				    "pwr_mb2fast",
-				    "pwr_mb2camera",
-				    "pwr_mb2histevent",
-				    "pwr_mb2blockevents",
-				    "pwr_mb2help",
-				    "pwr_mb2photo",
-				    "pwr_mb2note",
-				    "pwr_mb2parentgraph"],
-  method_toolbar_mnt_cnt 	: 32,
-  method_toolbar_mnt_helpmask 	: 1 << 4,
-  method_toolbar_mnt_subgraph 	: [ "pwr_mb2openobject",
-				    "pwr_mb2openplc",
-				    "pwr_mb2rtnavigator",
-				    "pwr_mb2crossreferences",
-				    "pwr_mb2helpclass",
-				    "pwr_mb2datasheet",
-				    "pwr_mb2circuitdiagram",
-				    "", "","","","","","","","","","","","","","","","","","","","","","","",
-				    "pwr_mb2simulate"
-				    ],
+  method_toolbar_op_cnt: 12,
+  method_toolbar_op_helpmask: 1 << 8,
+  method_toolbar_op_subgraph: [
+    "pwr_mb2opengraph",
+    "pwr_mb2openobjectgraph",
+    "pwr_mb2trend",
+    "pwr_mb2history",
+    "pwr_mb2fast",
+    "pwr_mb2camera",
+    "pwr_mb2histevent",
+    "pwr_mb2blockevents",
+    "pwr_mb2help",
+    "pwr_mb2photo",
+    "pwr_mb2note",
+    "pwr_mb2parentgraph",
+  ],
+  method_toolbar_mnt_cnt: 32,
+  method_toolbar_mnt_helpmask: 1 << 4,
+  method_toolbar_mnt_subgraph: [
+    "pwr_mb2openobject",
+    "pwr_mb2openplc",
+    "pwr_mb2rtnavigator",
+    "pwr_mb2crossreferences",
+    "pwr_mb2helpclass",
+    "pwr_mb2datasheet",
+    "pwr_mb2circuitdiagram",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "pwr_mb2simulate",
+  ],
 
-  method_toolbar_op_methods 	: [ "Graph", 
-				    "Object Graph",
-				    "Trend",
-				    "History",
-				    "Fast", 
-				    "Camera",
-				    "Event Log...",
-				    "Block Events...", 
-				    "Help",
-				    "Photo", 
-				    "Note",
-				    "Parent Object Graph"],
-  
-  method_toolbar_mnt_methods 	: [ "Open Object",
-				    "Open Plc",
-				    "RtNavigator", 
-				    "Crossreferences", 
-				    "Help Class", 
-				    "DataSheet", 
-				    "CircuitDiagram", 
-				    "","","","","","","","","","","","","","","","","","","","","","","","",
-				    "Simulate"],
+  method_toolbar_op_methods: [
+    "Graph",
+    "Object Graph",
+    "Trend",
+    "History",
+    "Fast",
+    "Camera",
+    "Event Log...",
+    "Block Events...",
+    "Help",
+    "Photo",
+    "Note",
+    "Parent Object Graph",
+  ],
 
-  method_toolbar_op_tooltip 	: [ "Graph", 
-				    "Object graph",
-				    "Trend", 
-				    "History", 
-				    "Fast curve", 
-				    "Camera", 
-				    "Event log", 
-				    "Block events", 
-				    "Help", 
-				    "Photo", 
-				    "Note",
-				    "Open parent object graph"   
-				    ],
+  method_toolbar_mnt_methods: [
+    "Open Object",
+    "Open Plc",
+    "RtNavigator",
+    "Crossreferences",
+    "Help Class",
+    "DataSheet",
+    "CircuitDiagram",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "Simulate",
+  ],
 
-  method_toolbar_mnt_tooltip 	: [ "Open object",
-				    "Open plc",
-				    "Navigator", 
-				    "CrossReferences", 
-				    "Help class", 
-				    "Datasheet",
-				    "CircuitDiagram", 
-				    "", "","","","","","","","","","","","","","","","","","","","","","","",
-				    "Simulate"]
+  method_toolbar_op_tooltip: [
+    "Graph",
+    "Object graph",
+    "Trend",
+    "History",
+    "Fast curve",
+    "Camera",
+    "Event log",
+    "Block events",
+    "Help",
+    "Photo",
+    "Note",
+    "Open parent object graph",
+  ],
+
+  method_toolbar_mnt_tooltip: [
+    "Open object",
+    "Open plc",
+    "Navigator",
+    "CrossReferences",
+    "Help class",
+    "Datasheet",
+    "CircuitDiagram",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "Simulate",
+  ],
 };
 
 function ge_tValueReturn() {
@@ -912,8 +993,7 @@ function DynParsedAttrName() {
   this.bitmask;
 }
 
-function Dyn( graph) {
-
+function Dyn(graph) {
   this.debug = false;
   this.elements = [];
   this.graph = graph;
@@ -936,331 +1016,412 @@ function Dyn( graph) {
   this.resetInvisible = false;
   this.ignoreBgColor = false;
   this.resetBgColor = false;
+  this.resetTextA1 = false;
+  this.ignoreTextA1 = false;
 
-  this.getColor1 = function( object, color) {
-    if ( color == Glow.eDrawType_Inherit) {
+  this.rgb_to_hue = function (rgb) {
+    var max, min, delta;
+    var r, g, b;
+    var v, s, h;
+
+    r = ((rgb >> 16) & 0xff) / 255;
+    g = ((rgb >> 8) & 0xff) / 255;
+    b = (rgb & 0xff) / 255;
+
+    min = r < g ? r : g;
+    min = min < b ? min : b;
+    max = r > g ? r : g;
+    max = max > b ? max : b;
+
+    v = max;
+    delta = max - min;
+    if (delta < 0.00001) return 0;
+
+    if (max > 0) s = delta / max;
+    else return 0;
+
+    if (r >= max) h = (g - b) / delta;
+    else if (g >= max) h = 2.0 + (b - r) / delta;
+    else h = 4.0 + (r - g) / delta;
+
+    h *= 16.667;
+    if (h < 0) h += 100;
+
+    return h;
+  };
+
+  // Convert hue (0-100) to rgb
+  this.hue_to_rgb = function (hue) {
+    var ff, hh, p, q, t, r, g, b;
+    var v = 1.0;
+    var s = 1.0;
+    var i;
+
+    if (hue > 100) hue = 100;
+    else if (hue < 0) hue = 0;
+
+    hh = (hue / 100.0) * 6.0;
+    i = Math.floor(hh);
+    ff = hh - i;
+    p = v * (1.0 - s);
+    q = v * (1.0 - s * ff);
+    t = v * (1.0 - s * (1.0 - ff));
+
+    switch (i) {
+      case 0:
+        r = v;
+        g = t;
+        b = p;
+        break;
+      case 1:
+        r = q;
+        g = v;
+        b = p;
+        break;
+      case 2:
+        r = p;
+        g = v;
+        b = t;
+        break;
+      case 3:
+        r = p;
+        g = q;
+        b = v;
+        break;
+      case 4:
+        r = t;
+        g = p;
+        b = v;
+        break;
+      case 5:
+        r = v;
+        g = p;
+        b = q;
+        break;
+      default:
+        r = v;
+        g = p;
+        b = q;
+    }
+    return (
+      (Math.floor(r * 255) << 16) +
+      (Math.floor(g * 255) << 8) +
+      Math.floor(b * 255)
+    );
+  };
+
+  this.getColor1 = function (object, color) {
+    if (color == Glow.eDrawType_Inherit) {
       return object.getClassTraceColor1();
     }
     return color;
   };
 
-  this.getColor2 = function( object, color) {
-    if ( color == Glow.eDrawType_Inherit) {
+  this.getColor2 = function (object, color) {
+    if (color == Glow.eDrawType_Inherit) {
       return object.getClassTraceColor2();
     }
     return color;
   };
 
-  this.create_action1_element = function(mask, instance) {
+  this.create_action1_element = function (mask, instance) {
     var e = null;
 
     switch (mask) {
-    case DynC.mActionType1_PopupMenu:
-      e = new DynPopupMenu(this);
-      break;
-    case DynC.mActionType1_SetDig:
-      e = new DynSetDig(this, instance);
-      break;
-    case DynC.mActionType1_ResetDig:
-      e = new DynResetDig(this, instance);
-      break;
-    case DynC.mActionType1_ToggleDig:
-      e = new DynToggleDig(this);
-      break;
-    case DynC.mActionType1_StoDig:
-      e = new DynStoDig(this);
-      break;
-    case DynC.mActionType1_Command:
-      e = new DynCommand(this);
-      break;
-    case DynC.mActionType1_CommandDoubleClick:
-      e = new DynCommandDoubleClick(this);
-      break;
-    case DynC.mActionType1_Confirm:
-      e = new DynConfirm(this);
-      break;
-    case DynC.mActionType1_IncrAnalog:
-      e = new DynIncrAnalog(this);
-      break;
-    case DynC.mActionType1_RadioButton:
-      e = new DynRadioButton(this);
-      break;
-    case DynC.mActionType1_Slider:
-      e = new DynSlider(this);
-      break;
-    case DynC.mActionType1_ValueInput:
-      e = new DynValueInput(this);
-      break;
-    case DynC.mActionType1_TipText:
-      e = new DynTipText(this);
-      break;
-    case DynC.mActionType1_Help:
-      e = new DynHelp(this);
-      break;
-    case DynC.mActionType1_OpenGraph:
-      e = new DynOpenGraph(this);
-      break;
-    case DynC.mActionType1_OpenURL:
-      e = new DynOpenURL(this);
-      break;
-    case DynC.mActionType1_InputFocus:
-      e = new DynInputFocus(this);
-      break;
-    case DynC.mActionType1_CloseGraph:
-      e = new DynCloseGraph(this);
-      break;
-    case DynC.mActionType1_PulldownMenu:
-      e = new DynPulldownMenu(this);
-      break;
-    case DynC.mActionType1_OptionMenu:
-      e = new DynOptionMenu(this);
-      break;
-    case DynC.mActionType1_SetValue:
-      e = new DynSetValue(this, instance);
-      break;
-    case DynC.mActionType1_MethodToolbar:
-      e = new DynMethodToolbar(this, instance);
-      break;
-    case DynC.mActionType1_MethodPulldownMenu:
-      e = new DynMethodPulldownMenu(this);
-      break;
-    case DynC.mActionType1_Script:
-      e = new DynScript(this);
-      break;
-    case DynC.mActionType1_CatchSignal:
-      e = new DynCatchSignal(this);
-      break;
-    case DynC.mActionType1_EmitSignal:
-      e = new DynEmitSignal(this);
-      break;
-    case DynC.mActionType1_ContextMenu:
-      e = new DynContextMenu(this);
-      break;
-    default:;
+      case DynC.mActionType1_PopupMenu:
+        e = new DynPopupMenu(this);
+        break;
+      case DynC.mActionType1_SetDig:
+        e = new DynSetDig(this, instance);
+        break;
+      case DynC.mActionType1_ResetDig:
+        e = new DynResetDig(this, instance);
+        break;
+      case DynC.mActionType1_ToggleDig:
+        e = new DynToggleDig(this);
+        break;
+      case DynC.mActionType1_StoDig:
+        e = new DynStoDig(this);
+        break;
+      case DynC.mActionType1_Command:
+        e = new DynCommand(this);
+        break;
+      case DynC.mActionType1_CommandDoubleClick:
+        e = new DynCommandDoubleClick(this);
+        break;
+      case DynC.mActionType1_Confirm:
+        e = new DynConfirm(this);
+        break;
+      case DynC.mActionType1_IncrAnalog:
+        e = new DynIncrAnalog(this);
+        break;
+      case DynC.mActionType1_RadioButton:
+        e = new DynRadioButton(this);
+        break;
+      case DynC.mActionType1_Slider:
+        e = new DynSlider(this);
+        break;
+      case DynC.mActionType1_ValueInput:
+        e = new DynValueInput(this);
+        break;
+      case DynC.mActionType1_TipText:
+        e = new DynTipText(this);
+        break;
+      case DynC.mActionType1_Help:
+        e = new DynHelp(this);
+        break;
+      case DynC.mActionType1_OpenGraph:
+        e = new DynOpenGraph(this);
+        break;
+      case DynC.mActionType1_OpenURL:
+        e = new DynOpenURL(this);
+        break;
+      case DynC.mActionType1_InputFocus:
+        e = new DynInputFocus(this);
+        break;
+      case DynC.mActionType1_CloseGraph:
+        e = new DynCloseGraph(this);
+        break;
+      case DynC.mActionType1_PulldownMenu:
+        e = new DynPulldownMenu(this);
+        break;
+      case DynC.mActionType1_OptionMenu:
+        e = new DynOptionMenu(this);
+        break;
+      case DynC.mActionType1_SetValue:
+        e = new DynSetValue(this, instance);
+        break;
+      case DynC.mActionType1_MethodToolbar:
+        e = new DynMethodToolbar(this, instance);
+        break;
+      case DynC.mActionType1_MethodPulldownMenu:
+        e = new DynMethodPulldownMenu(this);
+        break;
+      case DynC.mActionType1_Script:
+        e = new DynScript(this);
+        break;
+      case DynC.mActionType1_CatchSignal:
+        e = new DynCatchSignal(this);
+        break;
+      case DynC.mActionType1_EmitSignal:
+        e = new DynEmitSignal(this);
+        break;
+      case DynC.mActionType1_ContextMenu:
+        e = new DynContextMenu(this);
+        break;
+      default:
     }
     return e;
-  }
+  };
 
-  this.create_action2_element = function(mask, instance) {
+  this.create_action2_element = function (mask, instance) {
     var e = null;
 
     switch (mask) {
-    default:;
+      default:
     }
     return e;
-  }
+  };
 
-  this.create_dyn1_element = function(mask, instance) {
+  this.create_dyn1_element = function (mask, instance) {
     var e = null;
 
     switch (mask) {
-    case DynC.mDynType1_DigLowColor:
-      e = new DynDigLowColor(this);
-      break;
-    case DynC.mDynType1_DigColor:
-      e = new DynDigColor(this, instance);
-      break;
-    case DynC.mDynType1_DigWarning:
-      e = new DynDigWarning(this);
-      break;
-    case DynC.mDynType1_DigError:
-      e = new DynDigError(this);
-      break;
-    case DynC.mDynType1_DigFlash:
-      e = new DynDigFlash(this);
-      break;
-    case DynC.mDynType1_Invisible:
-      e = new DynInvisible(this, instance);
-      break;
-    case DynC.mDynType1_DigBorder:
-      e = new DynDigBorder(this);
-      break;
-    case DynC.mDynType1_DigText:
-      e = new DynDigText(this, instance);
-      break;
-    case DynC.mDynType1_Value:
-      e = new DynValue(this, instance);
-      break;
-    case DynC.mDynType1_AnalogColor:
-      e = new DynAnalogColor(this, instance);
-      break;
-    case DynC.mDynType1_Rotate:
-      e = new DynRotate(this);
-      break;
-    case DynC.mDynType1_Move:
-      e = new DynMove(this);
-      break;
-    case DynC.mDynType1_AnalogShift:
-      e = new DynAnalogShift(this);
-      break;
-    case DynC.mDynType1_DigShift:
-      e = new DynDigShift(this);
-      break;
-    case DynC.mDynType1_Animation:
-      e = new DynAnimation(this);
-      break;
-    case DynC.mDynType1_Video:
-      e = new DynVideo(this);
-      break;
-    case DynC.mDynType1_Bar:
-      e = new DynBar(this);
-      break;
-    case DynC.mDynType1_Trend:
-      e = new DynTrend(this);
-      break;
-    case DynC.mDynType1_FillLevel:
-      e = new DynFillLevel(this);
-      break;
-    case DynC.mDynType1_FastCurve:
-      e = new DynFastCurve(this);
-      break;
-    case DynC.mDynType1_AnalogText:
-      e = new DynAnalogText(this);
-      break;
-    case DynC.mDynType1_Table:
-      e = new DynTable(this);
-      break;
-    case DynC.mDynType1_StatusColor:
-      e = new DynStatusColor(this);
-      break;
-    case DynC.mDynType1_Pie:
-      e = new DynPie(this);
-      break;
-    case DynC.mDynType1_BarChart:
-      e = new DynBarChart(this);
-      break;
-    case DynC.mDynType1_HostObject:
-      e = new DynHostObject(this);
-      break;
-    case DynC.mDynType1_DigSound:
-      e = new DynDigSound(this, instance);
-      break;
-    case DynC.mDynType1_XY_Curve:
-      e = new DynXY_Curve(this, instance);
-      break;
-    case DynC.mDynType1_DigCommand:
-      e = new DynDigCommand(this, instance);
-      break;
-    default:;
+      case DynC.mDynType1_DigLowColor:
+        e = new DynDigLowColor(this);
+        break;
+      case DynC.mDynType1_DigColor:
+        e = new DynDigColor(this, instance);
+        break;
+      case DynC.mDynType1_DigWarning:
+        e = new DynDigWarning(this);
+        break;
+      case DynC.mDynType1_DigError:
+        e = new DynDigError(this);
+        break;
+      case DynC.mDynType1_DigFlash:
+        e = new DynDigFlash(this);
+        break;
+      case DynC.mDynType1_Invisible:
+        e = new DynInvisible(this, instance);
+        break;
+      case DynC.mDynType1_DigBorder:
+        e = new DynDigBorder(this);
+        break;
+      case DynC.mDynType1_DigText:
+        e = new DynDigText(this, instance);
+        break;
+      case DynC.mDynType1_Value:
+        e = new DynValue(this, instance);
+        break;
+      case DynC.mDynType1_AnalogColor:
+        e = new DynAnalogColor(this, instance);
+        break;
+      case DynC.mDynType1_Rotate:
+        e = new DynRotate(this);
+        break;
+      case DynC.mDynType1_Move:
+        e = new DynMove(this);
+        break;
+      case DynC.mDynType1_AnalogShift:
+        e = new DynAnalogShift(this);
+        break;
+      case DynC.mDynType1_DigShift:
+        e = new DynDigShift(this);
+        break;
+      case DynC.mDynType1_Animation:
+        e = new DynAnimation(this);
+        break;
+      case DynC.mDynType1_Video:
+        e = new DynVideo(this);
+        break;
+      case DynC.mDynType1_Bar:
+        e = new DynBar(this);
+        break;
+      case DynC.mDynType1_Trend:
+        e = new DynTrend(this);
+        break;
+      case DynC.mDynType1_FillLevel:
+        e = new DynFillLevel(this);
+        break;
+      case DynC.mDynType1_FastCurve:
+        e = new DynFastCurve(this);
+        break;
+      case DynC.mDynType1_AnalogText:
+        e = new DynAnalogText(this);
+        break;
+      case DynC.mDynType1_Table:
+        e = new DynTable(this);
+        break;
+      case DynC.mDynType1_StatusColor:
+        e = new DynStatusColor(this);
+        break;
+      case DynC.mDynType1_Pie:
+        e = new DynPie(this);
+        break;
+      case DynC.mDynType1_BarChart:
+        e = new DynBarChart(this);
+        break;
+      case DynC.mDynType1_HostObject:
+        e = new DynHostObject(this);
+        break;
+      case DynC.mDynType1_DigSound:
+        e = new DynDigSound(this, instance);
+        break;
+      case DynC.mDynType1_XY_Curve:
+        e = new DynXY_Curve(this, instance);
+        break;
+      case DynC.mDynType1_DigCommand:
+        e = new DynDigCommand(this, instance);
+        break;
+      default:
     }
     return e;
-  }
+  };
 
-  this.create_dyn2_element = function(mask, instance) {
+  this.create_dyn2_element = function (mask, instance) {
     var e = null;
 
     switch (mask) {
-    case DynC.mDynType2_Axis:
-      e = new DynAxis(this);
-      break;
-    case DynC.mDynType2_DigTextColor:
-      e = new DynDigTextColor(this);
-      break;
-    case DynC.mDynType2_TimeoutColor:
-      e = new DynTimeoutColor(this);
-      break;
-    case DynC.mDynType2_DigFourShift:
-      e = new DynDigFourShift(this);
-      break;
-    case DynC.mDynType2_ScrollingText:
-      e = new DynScrollingText(this);
-      break;
-    case DynC.mDynType2_ColorThemeLightness:
-      e = new DynColorThemeLightness(this);
-      break;
-    case DynC.mDynType2_DigBackgroundColor:
-      e = new DynDigBackgroundColor(this, instance);
-      break;
-    case DynC.mDynType2_DigSwap:
-      e = new DynDigSwap(this, instance);
-      break;
-    case DynC.mDynType2_DigScript:
-      e = new DynDigScript(this, instance);
-      break;
-    case DynC.mDynType2_RefUpdate:
-      e = new DynRefUpdate(this, instance);
-      break;
-    case DynC.mDynType2_DsTrend:
-      e = new DynDsTrend(this);
-      break;
-    case DynC.mDynType2_DsTrendCurve:
-      e = new DynDsTrendCurve(this);
-      break;
-    case DynC.mDynType2_SevHist:
-      e = new DynSevHist(this);
-      break;
-    case DynC.mDynType2_DigTransparency:
-      e = new DynDigTransparency(this);
-      break;
-    case DynC.mDynType2_AnalogTransparency:
-      e = new DynAnalogTransparency(this);
-      break;
-    case DynC.mDynType2_UnitConvert:
-      e = new DynUnitConvert(this);
-      break;
-    case DynC.mDynType2_DigLowShift:
-      e = new DynDigLowShift(this);
-      break;
-    default:;
+      case DynC.mDynType2_Axis:
+        e = new DynAxis(this);
+        break;
+      case DynC.mDynType2_DigTextColor:
+        e = new DynDigTextColor(this);
+        break;
+      case DynC.mDynType2_TimeoutColor:
+        e = new DynTimeoutColor(this);
+        break;
+      case DynC.mDynType2_DigFourShift:
+        e = new DynDigFourShift(this);
+        break;
+      case DynC.mDynType2_ScrollingText:
+        e = new DynScrollingText(this);
+        break;
+      case DynC.mDynType2_ColorThemeLightness:
+        e = new DynColorThemeLightness(this);
+        break;
+      case DynC.mDynType2_DigBackgroundColor:
+        e = new DynDigBackgroundColor(this, instance);
+        break;
+      case DynC.mDynType2_DigSwap:
+        e = new DynDigSwap(this, instance);
+        break;
+      case DynC.mDynType2_DigScript:
+        e = new DynDigScript(this, instance);
+        break;
+      case DynC.mDynType2_RefUpdate:
+        e = new DynRefUpdate(this, instance);
+        break;
+      case DynC.mDynType2_DsTrend:
+        e = new DynDsTrend(this);
+        break;
+      case DynC.mDynType2_DsTrendCurve:
+        e = new DynDsTrendCurve(this);
+        break;
+      case DynC.mDynType2_SevHist:
+        e = new DynSevHist(this);
+        break;
+      case DynC.mDynType2_DigTransparency:
+        e = new DynDigTransparency(this);
+        break;
+      case DynC.mDynType2_AnalogTransparency:
+        e = new DynAnalogTransparency(this);
+        break;
+      case DynC.mDynType2_UnitConvert:
+        e = new DynUnitConvert(this);
+        break;
+      case DynC.mDynType2_DigLowShift:
+        e = new DynDigLowShift(this);
+        break;
+      default:
     }
     return e;
-  }
+  };
 
-  this.getAttribute = function(name) {
+  this.getAttribute = function (name) {
     var ret = new ge_tValueReturn();
     if (name === "Access") {
       ret.value = this.access;
       return ret;
-    }
-    else if (name === "Cycle") {
+    } else if (name === "Cycle") {
       ret.value = this.cycle;
       return ret;
-    }
-    else if (name === "DynType1") {
+    } else if (name === "DynType1") {
       ret.value = this.dyn_type1;
       return ret;
-    }
-    else if (name === "DynType2") {
+    } else if (name === "DynType2") {
       ret.value = this.dyn_type2;
       return ret;
-    }
-    else if (name === "Action") {
+    } else if (name === "Action") {
       ret.valuel = this.action_type1;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "Access") {
       this.access = value;
       return 1;
-    }
-    else if (name === "Cycle") {
-      if (value === "Fast")
-        this.cycle = Glow.eCycle_Fast;
-      else if (value === "Slow")
-        this.cycle = Glow.eCycle_Slow;
-      else if (value === "Inherit")
-        this.cycle = Glow.eCycle_Inherit;
-      else
-        this.cycle = value;
+    } else if (name === "Cycle") {
+      if (value === "Fast") this.cycle = Glow.eCycle_Fast;
+      else if (value === "Slow") this.cycle = Glow.eCycle_Slow;
+      else if (value === "Inherit") this.cycle = Glow.eCycle_Inherit;
+      else this.cycle = value;
       return 1;
-    }
-    else if (name === "DynType1") {
+    } else if (name === "DynType1") {
       this.dyn_type1 = value;
       this.total_dyn_type1 = value;
       this.update_elements();
       return 1;
-    }
-    else if (name === "DynType2") {
+    } else if (name === "DynType2") {
       this.dyn_type2 = value;
       this.total_dyn_type2 = value;
       this.update_elements();
       return 1;
-    }
-    else if (name === "Action") {
+    } else if (name === "Action") {
       this.action_type1 = value;
       this.total_action_type1 = value;
       this.update_elements();
@@ -1270,36 +1431,31 @@ function Dyn( graph) {
     for (let i = 0; i < this.elements.length; i++) {
       var elem = this.elements[i];
       sts = elem.setAttribute(o, name, value);
-      if (ODD(sts))
-        return sts;
+      if (ODD(sts)) return sts;
     }
-    
+
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "Access") {
-      ret.value =  this.access;
+      ret.value = this.access;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "Cycle") {
-      ret.value =  this.cycle;
+    } else if (name === "Cycle") {
+      ret.value = this.cycle;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "DynType1") {
-      ret.value =  this.dyn_type1;
+    } else if (name === "DynType1") {
+      ret.value = this.dyn_type1;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "DynType2") {
-      ret.value =  this.dyn_type2;
+    } else if (name === "DynType2") {
+      ret.value = this.dyn_type2;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "Action") {
-      ret.value =  this.action_type1;
+    } else if (name === "Action") {
+      ret.value = this.action_type1;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
     }
@@ -1307,14 +1463,13 @@ function Dyn( graph) {
     for (let i = 0; i < this.elements.length; i++) {
       var elem = this.elements[i];
       var eret = elem.getAttribute(o, name);
-      if (ODD(eret.sts))
-        return eret;
-    }    
+      if (ODD(eret.sts)) return eret;
+    }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.instance_number = function(instance) {
+  this.instance_number = function (instance) {
     var inst = 1;
     var m = instance;
     while (m > 1) {
@@ -1322,9 +1477,9 @@ function Dyn( graph) {
       inst++;
     }
     return inst;
-  }
+  };
 
-  this.insert_element = function(e) {
+  this.insert_element = function (e) {
     var elem, prev;
     var k;
 
@@ -1332,66 +1487,63 @@ function Dyn( graph) {
     prev = 0;
     for (k = 0; k < this.elements.length; k++) {
       elem = this.elements[0];
-      if (elem.prio > e.prio)
-	break;
-      if (elem.prio == e.prio
-	  && elem.instance < e.instance) {
+      if (elem.prio > e.prio) break;
+      if (elem.prio == e.prio && elem.instance < e.instance) {
         prev = k;
         break;
       }
     }
     this.elements.splice(prev, 0, e);
-  }
+  };
 
-  this.update_dyntype = function(object) {
-    if ( (this.dyn_type1 & DynC.mDynType1_Inherit) !== 0) {
+  this.update_dyntype = function (object) {
+    if ((this.dyn_type1 & DynC.mDynType1_Inherit) !== 0) {
       var inherit_dyn_type1 = object.getClassDynType1();
       var inherit_dyn_type2 = object.getClassDynType2();
       this.total_dyn_type1 = this.dyn_type1 | inherit_dyn_type1;
       this.total_dyn_type2 = this.dyn_type2 | inherit_dyn_type2;
-    }
-    else {
+    } else {
       this.total_dyn_type1 = this.dyn_type1;
       this.total_dyn_type2 = this.dyn_type2;
     }
-    
-    if ( (this.action_type1 & DynC.mActionType1_Inherit) !== 0) {
+
+    if ((this.action_type1 & DynC.mActionType1_Inherit) !== 0) {
       var inherit_action_type1 = object.getClassActionType1();
       var inherit_action_type2 = object.getClassActionType2();
       this.total_action_type1 = this.action_type1 | inherit_action_type1;
       this.total_action_type2 = this.action_type2 | inherit_action_type2;
-    }
-    else {
+    } else {
       this.total_action_type1 = this.action_type1;
       this.total_action_type2 = this.action_type2;
     }
-  }
+  };
 
-  this.update_elements = function() {
+  this.update_elements = function () {
     var elem, prev, next;
 
     // Remove
     prev = 0;
     for (let k = 0; k < this.elements.length; k++) {
       elem = this.elements[k];
-      if ((elem.dyn_type1 && !(elem.dyn_type1 & this.total_dyn_type1))
-          || (elem.action_type1 && !(elem.action_type1 & this.total_action_type1))
-          || (elem.dyn_type2 && !(elem.dyn_type2 & this.total_dyn_type2))
-          || (elem.action_type2 && !(elem.action_type2 & this.total_action_type2))) {
-	// Type is not valid, remove element
-	this.elements.splice(k, 1);
+      if (
+        (elem.dyn_type1 && !(elem.dyn_type1 & this.total_dyn_type1)) ||
+        (elem.action_type1 && !(elem.action_type1 & this.total_action_type1)) ||
+        (elem.dyn_type2 && !(elem.dyn_type2 & this.total_dyn_type2)) ||
+        (elem.action_type2 && !(elem.action_type2 & this.total_action_type2))
+      ) {
+        // Type is not valid, remove element
+        this.elements.splice(k, 1);
       } else if (elem.instance != DynC.mInstance_1) {
-	// Check if instance is valid
+        // Check if instance is valid
         var mask_elem = null;
         for (let l = k; l < this.elements.length; l++) {
-	  mask_elem = this.elements[l];
-	  if (mask_elem.instance == DynC.mInstance_1)
-	    break;
-	}
-	if (mask_elem && !(mask_elem.instance_mask & elem.instance)) {
-	  // Instance is not valid, remove element
-  	  this.elements.splice(k, 1);
-	}
+          mask_elem = this.elements[l];
+          if (mask_elem.instance == DynC.mInstance_1) break;
+        }
+        if (mask_elem && !(mask_elem.instance_mask & elem.instance)) {
+          // Instance is not valid, remove element
+          this.elements.splice(k, 1);
+        }
       }
     }
 
@@ -1402,47 +1554,47 @@ function Dyn( graph) {
     var i_mask;
     var i_found;
     var i_elem;
-    
+
     mask = 1;
     for (let i = 0; i < 32; i++) {
       if (mask & this.total_dyn_type1) {
-	found = false;
-	for (let k = 0; k < this.elements.length; k++) {
+        found = false;
+        for (let k = 0; k < this.elements.length; k++) {
           elem = this.elements[k];
-	  if (elem.dyn_type1 == mask && elem.instance == DynC.mInstance_1) {
-	    found = true;
+          if (elem.dyn_type1 == mask && elem.instance == DynC.mInstance_1) {
+            found = true;
 
-	    if (elem.instance_mask > DynC.mInstance_1) {
-	      // Check instance
-	      i_mask = DynC.mInstance_1;
-	      for (let j = 0; j < 32; j++) {
-		i_found = false;
-		for (let l = 0; l < this.elements.length; l++) {
+            if (elem.instance_mask > DynC.mInstance_1) {
+              // Check instance
+              i_mask = DynC.mInstance_1;
+              for (let j = 0; j < 32; j++) {
+                i_found = false;
+                for (let l = 0; l < this.elements.length; l++) {
                   i_elem = this.elements[l];
-		  if (i_elem.dyn_type1 == mask
-		      && i_elem.instance & elem.instance_mask
-		      && i_elem.instance == i_mask) {
-		    i_found = true;
-		    break;
-		  }
-		}
-		if (!i_found && i_mask & elem.instance_mask) {
-		  e = this.create_dyn1_element(mask, i_mask);
-		  if (e)
-		    this.insert_element(e);
-		}
-		i_mask = i_mask << 1;
-	      }
-	    }
-	    break;
-	  }
-	}
-	if (!found) {
-	  // Create this element
-	  e = this.create_dyn1_element(mask, DynC.mInstance_1);
-	  if (e)
-	    this.insert_element(e);
-	}
+                  if (
+                    i_elem.dyn_type1 == mask &&
+                    i_elem.instance & elem.instance_mask &&
+                    i_elem.instance == i_mask
+                  ) {
+                    i_found = true;
+                    break;
+                  }
+                }
+                if (!i_found && i_mask & elem.instance_mask) {
+                  e = this.create_dyn1_element(mask, i_mask);
+                  if (e) this.insert_element(e);
+                }
+                i_mask = i_mask << 1;
+              }
+            }
+            break;
+          }
+        }
+        if (!found) {
+          // Create this element
+          e = this.create_dyn1_element(mask, DynC.mInstance_1);
+          if (e) this.insert_element(e);
+        }
       }
       mask = mask << 1;
     }
@@ -1450,43 +1602,43 @@ function Dyn( graph) {
     mask = 1;
     for (let i = 0; i < 32; i++) {
       if (mask & this.total_dyn_type2) {
-	found = false;
-	for (let k = 0; k < this.elements.length; k++) {
+        found = false;
+        for (let k = 0; k < this.elements.length; k++) {
           elem = this.elements[k];
-	  if (elem.dyn_type2 == mask && elem.instance == DynC.mInstance_1) {
-	    found = true;
-	    
-	    if (elem.instance_mask > DynC.mInstance_1) {
-	      // Check instance
-	      i_mask = DynC.mInstance_1;
-	      for (let j = 0; j < 32; j++) {
-		i_found = false;
-		for (let l = 0; l < this.elements.length; l++) {
+          if (elem.dyn_type2 == mask && elem.instance == DynC.mInstance_1) {
+            found = true;
+
+            if (elem.instance_mask > DynC.mInstance_1) {
+              // Check instance
+              i_mask = DynC.mInstance_1;
+              for (let j = 0; j < 32; j++) {
+                i_found = false;
+                for (let l = 0; l < this.elements.length; l++) {
                   i_elem = this.elements[l];
-		  if (i_elem.dyn_type2 == mask
-		      && i_elem.instance & elem.instance_mask
-		      && i_elem.instance == i_mask) {
-		    i_found = true;
-		    break;
-		  }
-		}
-		if (!i_found && i_mask & elem.instance_mask) {
-		  e = this.create_dyn2_element(mask, i_mask);
-		  if (e)
-		    this.insert_element(e);
-		}
-		i_mask = i_mask << 1;
-	      }
-	    }
-	    break;
-	  }
-	}
-	if (!found) {
-	  // Create this element
-	  e = this.create_dyn2_element(mask, DynC.mInstance_1);
-	  if (e)
-	    this.insert_element(e);
-	}
+                  if (
+                    i_elem.dyn_type2 == mask &&
+                    i_elem.instance & elem.instance_mask &&
+                    i_elem.instance == i_mask
+                  ) {
+                    i_found = true;
+                    break;
+                  }
+                }
+                if (!i_found && i_mask & elem.instance_mask) {
+                  e = this.create_dyn2_element(mask, i_mask);
+                  if (e) this.insert_element(e);
+                }
+                i_mask = i_mask << 1;
+              }
+            }
+            break;
+          }
+        }
+        if (!found) {
+          // Create this element
+          e = this.create_dyn2_element(mask, DynC.mInstance_1);
+          if (e) this.insert_element(e);
+        }
       }
       mask = mask << 1;
     }
@@ -1494,43 +1646,43 @@ function Dyn( graph) {
     mask = 1;
     for (let i = 0; i < 32; i++) {
       if (mask & this.total_action_type1) {
-	found = false;
-	for (let k = 0; k < this.elements.length; k++) {
+        found = false;
+        for (let k = 0; k < this.elements.length; k++) {
           elem = this.elements[k];
-	  if (elem.action_type1 == mask && elem.instance == DynC.mInstance_1) {
-	    found = true;
-	    
-	    if (elem.instance_mask > DynC.mInstance_1) {
-	      // Check instance
-	      i_mask = DynC.mInstance_1;
-	      for (let j = 0; j < 32; j++) {
-		i_found = false;
-		for (let l = 0; l < this.elements.length; l++) {
+          if (elem.action_type1 == mask && elem.instance == DynC.mInstance_1) {
+            found = true;
+
+            if (elem.instance_mask > DynC.mInstance_1) {
+              // Check instance
+              i_mask = DynC.mInstance_1;
+              for (let j = 0; j < 32; j++) {
+                i_found = false;
+                for (let l = 0; l < this.elements.length; l++) {
                   i_elem = this.elements[l];
-		  if (i_elem.action_type1 == mask
-		      && i_elem.instance & elem.instance_mask
-		      && i_elem.instance == i_mask) {
-		    i_found = true;
-		    break;
-		  }
-		}
-		if (!i_found && i_mask & elem.instance_mask) {
-		  e = this.create_action1_element(mask, i_mask);
-		  if (e)
-		    this.insert_element(e);
-		}
-		i_mask = i_mask << 1;
-	      }
-	    }
-	    break;
-	  }
-	}
-	if (!found) {
-	  // Create this element
-	  e = this.create_action1_element(mask, DynC.mInstance_1);
-	  if (e)
-	    this.insert_element(e);
-	}
+                  if (
+                    i_elem.action_type1 == mask &&
+                    i_elem.instance & elem.instance_mask &&
+                    i_elem.instance == i_mask
+                  ) {
+                    i_found = true;
+                    break;
+                  }
+                }
+                if (!i_found && i_mask & elem.instance_mask) {
+                  e = this.create_action1_element(mask, i_mask);
+                  if (e) this.insert_element(e);
+                }
+                i_mask = i_mask << 1;
+              }
+            }
+            break;
+          }
+        }
+        if (!found) {
+          // Create this element
+          e = this.create_action1_element(mask, DynC.mInstance_1);
+          if (e) this.insert_element(e);
+        }
       }
       mask = mask << 1;
     }
@@ -1538,43 +1690,43 @@ function Dyn( graph) {
     mask = 1;
     for (let i = 0; i < 32; i++) {
       if (mask & this.total_action_type2) {
-	found = false;
-	for (let k = 0; k < this.elements.length; k++) {
+        found = false;
+        for (let k = 0; k < this.elements.length; k++) {
           elem = this.elements[k];
-	  if (elem.action_type2 == mask && elem.instance == DynC.mInstance_1) {
-	    found = true;
+          if (elem.action_type2 == mask && elem.instance == DynC.mInstance_1) {
+            found = true;
 
-	    if (elem.instance_mask > DynC.mInstance_1) {
-	      // Check instance
-	      i_mask = DynC.mInstance_1;
-	      for (let j = 0; j < 32; j++) {
-		i_found = false;
-		for (let l = 0; l < this.elements.length; l++) {
+            if (elem.instance_mask > DynC.mInstance_1) {
+              // Check instance
+              i_mask = DynC.mInstance_1;
+              for (let j = 0; j < 32; j++) {
+                i_found = false;
+                for (let l = 0; l < this.elements.length; l++) {
                   i_elem = this.elements[l];
-		  if (i_elem.action_type2 == mask
-		      && i_elem.instance & elem.instance_mask
-		      && i_elem.instance == i_mask) {
-		    i_found = true;
-		    break;
-		  }
-		}
-		if (!i_found && i_mask & elem.instance_mask) {
-		  e = this.create_action2_element(mask, i_mask);
-		  if (e)
-		    this.insert_element(e);
-		}
-		i_mask = i_mask << 1;
-	      }
-	    }
-	    break;
-	  }
-	}
-	if (!found) {
-	  // Create this element
-	  e = this.create_action2_element(mask, DynC.mInstance_1);
-	  if (e)
-	    this.insert_element(e);
-	}
+                  if (
+                    i_elem.action_type2 == mask &&
+                    i_elem.instance & elem.instance_mask &&
+                    i_elem.instance == i_mask
+                  ) {
+                    i_found = true;
+                    break;
+                  }
+                }
+                if (!i_found && i_mask & elem.instance_mask) {
+                  e = this.create_action2_element(mask, i_mask);
+                  if (e) this.insert_element(e);
+                }
+                i_mask = i_mask << 1;
+              }
+            }
+            break;
+          }
+        }
+        if (!found) {
+          // Create this element
+          e = this.create_action2_element(mask, DynC.mInstance_1);
+          if (e) this.insert_element(e);
+        }
       }
       mask = mask << 1;
     }
@@ -1583,21 +1735,21 @@ function Dyn( graph) {
     for (let k = 0; k < this.elements.length; k++) {
       elem = this.elements[k];
       if (elem.action_type1 == DynC.mActionType1_PulldownMenu) {
-	var pm = elem;
-	for (let i = 0; i < 32; i++) {
-	  if (pm.items_dyn[i]) {
-	    pm.items_dyn[i].total_dyn_type1 = pm.items_dyn[i].dyn_type1;
-	    pm.items_dyn[i].total_dyn_type2 = pm.items_dyn[i].dyn_type2;
-	    pm.items_dyn[i].total_action_type1 = pm.items_dyn[i].action_type1;
-	    pm.items_dyn[i].total_action_type2 = pm.items_dyn[i].action_type2;
-	    pm.items_dyn[i].update_elements();
-	  }
-	}
+        var pm = elem;
+        for (let i = 0; i < 32; i++) {
+          if (pm.items_dyn[i]) {
+            pm.items_dyn[i].total_dyn_type1 = pm.items_dyn[i].dyn_type1;
+            pm.items_dyn[i].total_dyn_type2 = pm.items_dyn[i].dyn_type2;
+            pm.items_dyn[i].total_action_type1 = pm.items_dyn[i].action_type1;
+            pm.items_dyn[i].total_action_type2 = pm.items_dyn[i].action_type2;
+            pm.items_dyn[i].update_elements();
+          }
+        }
       }
     }
-  }
+  };
 
-  this.merge = function( x) {
+  this.merge = function (x) {
     var elem, xelem;
     var e;
 
@@ -1606,354 +1758,352 @@ function Dyn( graph) {
     this.action_type1 = this.action_type1 | x.action_type1;
     this.total_action_type1 = this.total_action_type1 | x.total_action_type1;
 
-    for ( var i = 0; i < x.elements.length; i++) {
+    for (var i = 0; i < x.elements.length; i++) {
       xelem = x.elements[i];
 
-      for ( var j = 0; j < this.elements.length; j++) {
-	elem = this.elements[j];
-	if ( elem.dyn_type1 == xelem.dyn_type1 && 
-	     elem.dyn_type2 == xelem.dyn_type2 && 		     
-	     elem.action_type1 == xelem.action_type1 &&
-	     elem.action_type2 == xelem.action_type2) {
-	  // Element exists in both, use element in x, i.e. remove current element
-	  if ( typeof elem.instance == 'undefined' || 
-	       (typeof elem.instance != 'undefined' &&
-		elem.instance == xelem.instance)) {
-	    this.elements.splice(j, 1);
-	    break;
-	  }
-	}
+      for (var j = 0; j < this.elements.length; j++) {
+        elem = this.elements[j];
+        if (
+          elem.dyn_type1 == xelem.dyn_type1 &&
+          elem.dyn_type2 == xelem.dyn_type2 &&
+          elem.action_type1 == xelem.action_type1 &&
+          elem.action_type2 == xelem.action_type2
+        ) {
+          // Element exists in both, use element in x, i.e. remove current element
+          if (
+            typeof elem.instance == "undefined" ||
+            (typeof elem.instance != "undefined" &&
+              elem.instance == xelem.instance)
+          ) {
+            this.elements.splice(j, 1);
+            break;
+          }
+        }
       }
       // Insert copy of x element
-      e = this.copy_element( xelem);
-      if ( e != null) {
-	e.dyn = this;
-	this.elements.push( e);
+      e = this.copy_element(xelem);
+      if (e != null) {
+        e.dyn = this;
+        this.elements.push(e);
       }
     }
   };
 
-  this.copy_element = function( x) {
+  this.copy_element = function (x) {
     var e = {};
-    for ( var attr in x) {
-      if ( x.hasOwnProperty( attr)) {
-	e[attr] = x[attr];
-      }	
+    for (var attr in x) {
+      if (x.hasOwnProperty(attr)) {
+        e[attr] = x[attr];
+      }
     }
     return e;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.debug) console.log( "Dyn : " + lines[i]);
+      if (this.debug) console.log("Dyn : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_Dyn: 
-	break;
-      case DynC.eSave_Dyn_dyn_type1: 
-	this.dyn_type1 = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_Dyn_dyn_type2: 
-	this.dyn_type2 = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_Dyn_action_type1: 
-	this.action_type1 = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_Dyn_action_type2: 
-	this.action_type2 = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_Dyn_access: 
-	this.access = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_Dyn_cycle: 
-	this.cycle = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_DigLowColor: 
-	elem = new DynDigLowColor(this); 
-	break;
-      case DynC.eSave_DigColor: 
-	elem = new DynDigColor(this, 0); 
-	break;
-      case DynC.eSave_DigWarning: 
-	elem = new DynDigWarning(this); 
-	break;
-      case DynC.eSave_DigError: 
-	elem = new DynDigError(this); 
-	break;
-      case DynC.eSave_DigFlash: 
-	elem = new DynDigFlash(this); 
-	break;
-      case DynC.eSave_Invisible: 
-	elem = new DynInvisible(this, 0); 
-	break;
-      case DynC.eSave_DigBorder: 
-	elem = new DynDigBorder(this); 
-	break;
-      case DynC.eSave_DigText: 
-	elem = new DynDigText(this, 0); 
-	break;
-      case DynC.eSave_Value: 
-	elem = new DynValue(this, 0); 
-	break;
-      case DynC.eSave_ValueInput: 
-	elem = new DynValueInput(this); 
-	break;
-      case DynC.eSave_AnalogColor: 
-	elem = new DynAnalogColor(this, 0); 
-	break;
-      case DynC.eSave_Rotate: 
-	elem = new DynRotate(this); 
-	break;
-      case DynC.eSave_Move: 
-	elem = new DynMove(this); 
-	break;
-      case DynC.eSave_AnalogShift: 
-	elem = new DynAnalogShift(this); 
-	break;
-      case DynC.eSave_DigShift: 
-	elem = new DynDigShift(this); 
-	break;
-      case DynC.eSave_DigFourShift: 
-	elem = new DynDigFourShift(this); 
-	break;
-      case DynC.eSave_ScrollingText: 
-	elem = new DynScrollingText(this); 
-	break;
-      case DynC.eSave_ColorThemeLightness: 
-	elem = new DynColorThemeLightness(this); 
-	break;
-      case DynC.eSave_DigBackgroundColor: 
-	elem = new DynDigBackgroundColor(this, 0); 
-	break;
-      case DynC.eSave_DigSwap: 
-	elem = new DynDigSwap(this, 0); 
-	break;
-      case DynC.eSave_DigScript: 
-	elem = new DynDigScript(this, 0); 
-	break;
-      case DynC.eSave_Animation: 
-	elem = new DynAnimation(this); 
-	break;
-      case DynC.eSave_Video: 
-	elem = new DynVideo(this); 
-	break;
-      case DynC.eSave_Bar: 
-	elem = new DynBar(this); 
-	break;
-      case DynC.eSave_Trend: 
-	elem = new DynTrend(this); 
-	break;
-      case DynC.eSave_DsTrend: 
-	elem = new DynDsTrend(this); 
-	break;
-      case DynC.eSave_DsTrendCurve: 
-	elem = new DynDsTrendCurve(this); 
-	break;
-      case DynC.eSave_SevHist: 
-	elem = new DynSevHist(this); 
-	break;
-      case DynC.eSave_DigTransparency: 
-	elem = new DynDigTransparency(this); 
-	break;
-      case DynC.eSave_AnalogTransparency: 
-	elem = new DynAnalogTransparency(this); 
-	break;
-      case DynC.eSave_UnitConvert: 
-	elem = new DynUnitConvert(this); 
-	break;
-      case DynC.eSave_DigLowShift: 
-	elem = new DynDigLowShift(this); 
-	break;
-      case DynC.eSave_FillLevel: 
-	elem = new DynFillLevel(this); 
-	break;
-      case DynC.eSave_FastCurve: 
-	elem = new DynFastCurve(this); 
-	break;
-      case DynC.eSave_AnalogText: 
-	elem = new DynAnalogText(this); 
-	break;
-      case DynC.eSave_Table: 
-	elem = new DynTable(this); 
-	break;
-      case DynC.eSave_StatusColor: 
-	elem = new DynStatusColor(this); 
-	break;
-      case DynC.eSave_Pie: 
-	elem = new DynPie(this); 
-	break;
-      case DynC.eSave_BarChart: 
-	elem = new DynBarChart(this); 
-	break;
-      case DynC.eSave_Axis: 
-	elem = new DynAxis(this); 
-	break;
-      case DynC.eSave_DigTextColor: 
-	elem = new DynDigTextColor(this); 
-	break;
-      case DynC.eSave_TimeoutColor: 
-	elem = new DynTimeoutColor(this); 
-	break;
-      case DynC.eSave_HostObject: 
-	elem = new DynHostObject(this); 
-	break;
-      case DynC.eSave_DigSound: 
-	elem = new DynDigSound(this, 0); 
-	break;
-      case DynC.eSave_XY_Curve: 
-	elem = new DynXY_Curve(this, 0); 
-	break;
-      case DynC.eSave_DigCommand: 
-	elem = new DynDigCommand(this, 0); 
-	break;
-      case DynC.eSave_PopupMenu: 
-	elem = new DynPopupMenu(this); 
-	break;
-      case DynC.eSave_SetDig: 
-	elem = new DynSetDig(this); 
-	break;
-      case DynC.eSave_ResetDig: 
-	elem = new DynResetDig(this); 
-	break;
-      case DynC.eSave_ToggleDig: 
-	elem = new DynToggleDig(this); 
-	break;
-      case DynC.eSave_StoDig: 
-	elem = new DynStoDig(this); 
-	break;
-      case DynC.eSave_Command: 
-	elem = new DynCommand(this); 
-	break;
-      case DynC.eSave_CommandDC: 
-	elem = new DynCommandDoubleClick(this); 
-	break;
-      case DynC.eSave_Confirm: 
-	elem = new DynConfirm(this); 
-	break;
-      case DynC.eSave_IncrAnalog: 
-	elem = new DynIncrAnalog(this); 
-	break;
-      case DynC.eSave_RadioButton: 
-	elem = new DynRadioButton(this); 
-	break;
-      case DynC.eSave_Slider: 
-	elem = new DynSlider(this); 
-	break;
-      case DynC.eSave_TipText: 
-	elem = new DynTipText(this); 
-	break;
-      case DynC.eSave_Help: 
-	elem = new DynHelp(this); 
-	break;
-      case DynC.eSave_OpenGraph:
-	elem = new DynOpenGraph(this); 
-	break;
-      case DynC.eSave_OpenURL: 
-	elem = new DynOpenURL(this); 
-	break;
-      case DynC.eSave_InputFocus: 
-	elem = new DynInputFocus(this); 
-	break;
-      case DynC.eSave_CloseGraph: 
-	elem = new DynCloseGraph(this); 
-	break;
-      case DynC.eSave_PulldownMenu: 
-	elem = new DynPulldownMenu(this); 
-	break;
-      case DynC.eSave_OptionMenu: 
-	elem = new DynOptionMenu(this); 
-	break;
-      case DynC.eSave_SetValue: 
-	elem = new DynSetValue(this); 
-	break;
-      case DynC.eSave_MethodToolbar: 
-	elem = new DynMethodToolbar(this); 
-	break;
-      case DynC.eSave_MethodPulldownMenu: 
-	elem = new DynMethodPulldownMenu(this); 
-	break;
-      case DynC.eSave_Script: 
-	elem = new DynScript(this); 
-	break;
-      case DynC.eSave_CatchSignal: 
-	elem = new DynCatchSignal(this); 
-	break;
-      case DynC.eSave_EmitSignal: 
-	elem = new DynEmitSignal(this); 
-	break;
-      case DynC.eSave_ContextMenu: 
-	elem = new DynContextMenu(this); 
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in Dyn");
-	break;
+      switch (key) {
+        case DynC.eSave_Dyn:
+          break;
+        case DynC.eSave_Dyn_dyn_type1:
+          this.dyn_type1 = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_Dyn_dyn_type2:
+          this.dyn_type2 = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_Dyn_action_type1:
+          this.action_type1 = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_Dyn_action_type2:
+          this.action_type2 = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_Dyn_access:
+          this.access = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_Dyn_cycle:
+          this.cycle = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_DigLowColor:
+          elem = new DynDigLowColor(this);
+          break;
+        case DynC.eSave_DigColor:
+          elem = new DynDigColor(this, 0);
+          break;
+        case DynC.eSave_DigWarning:
+          elem = new DynDigWarning(this);
+          break;
+        case DynC.eSave_DigError:
+          elem = new DynDigError(this);
+          break;
+        case DynC.eSave_DigFlash:
+          elem = new DynDigFlash(this);
+          break;
+        case DynC.eSave_Invisible:
+          elem = new DynInvisible(this, 0);
+          break;
+        case DynC.eSave_DigBorder:
+          elem = new DynDigBorder(this);
+          break;
+        case DynC.eSave_DigText:
+          elem = new DynDigText(this, 0);
+          break;
+        case DynC.eSave_Value:
+          elem = new DynValue(this, 0);
+          break;
+        case DynC.eSave_ValueInput:
+          elem = new DynValueInput(this);
+          break;
+        case DynC.eSave_AnalogColor:
+          elem = new DynAnalogColor(this, 0);
+          break;
+        case DynC.eSave_Rotate:
+          elem = new DynRotate(this);
+          break;
+        case DynC.eSave_Move:
+          elem = new DynMove(this);
+          break;
+        case DynC.eSave_AnalogShift:
+          elem = new DynAnalogShift(this);
+          break;
+        case DynC.eSave_DigShift:
+          elem = new DynDigShift(this);
+          break;
+        case DynC.eSave_DigFourShift:
+          elem = new DynDigFourShift(this);
+          break;
+        case DynC.eSave_ScrollingText:
+          elem = new DynScrollingText(this);
+          break;
+        case DynC.eSave_ColorThemeLightness:
+          elem = new DynColorThemeLightness(this);
+          break;
+        case DynC.eSave_DigBackgroundColor:
+          elem = new DynDigBackgroundColor(this, 0);
+          break;
+        case DynC.eSave_DigSwap:
+          elem = new DynDigSwap(this, 0);
+          break;
+        case DynC.eSave_DigScript:
+          elem = new DynDigScript(this, 0);
+          break;
+        case DynC.eSave_Animation:
+          elem = new DynAnimation(this);
+          break;
+        case DynC.eSave_Video:
+          elem = new DynVideo(this);
+          break;
+        case DynC.eSave_Bar:
+          elem = new DynBar(this);
+          break;
+        case DynC.eSave_Trend:
+          elem = new DynTrend(this);
+          break;
+        case DynC.eSave_DsTrend:
+          elem = new DynDsTrend(this);
+          break;
+        case DynC.eSave_DsTrendCurve:
+          elem = new DynDsTrendCurve(this);
+          break;
+        case DynC.eSave_SevHist:
+          elem = new DynSevHist(this);
+          break;
+        case DynC.eSave_DigTransparency:
+          elem = new DynDigTransparency(this);
+          break;
+        case DynC.eSave_AnalogTransparency:
+          elem = new DynAnalogTransparency(this);
+          break;
+        case DynC.eSave_UnitConvert:
+          elem = new DynUnitConvert(this);
+          break;
+        case DynC.eSave_DigLowShift:
+          elem = new DynDigLowShift(this);
+          break;
+        case DynC.eSave_FillLevel:
+          elem = new DynFillLevel(this);
+          break;
+        case DynC.eSave_FastCurve:
+          elem = new DynFastCurve(this);
+          break;
+        case DynC.eSave_AnalogText:
+          elem = new DynAnalogText(this);
+          break;
+        case DynC.eSave_Table:
+          elem = new DynTable(this);
+          break;
+        case DynC.eSave_StatusColor:
+          elem = new DynStatusColor(this);
+          break;
+        case DynC.eSave_Pie:
+          elem = new DynPie(this);
+          break;
+        case DynC.eSave_BarChart:
+          elem = new DynBarChart(this);
+          break;
+        case DynC.eSave_Axis:
+          elem = new DynAxis(this);
+          break;
+        case DynC.eSave_DigTextColor:
+          elem = new DynDigTextColor(this);
+          break;
+        case DynC.eSave_TimeoutColor:
+          elem = new DynTimeoutColor(this);
+          break;
+        case DynC.eSave_HostObject:
+          elem = new DynHostObject(this);
+          break;
+        case DynC.eSave_DigSound:
+          elem = new DynDigSound(this, 0);
+          break;
+        case DynC.eSave_XY_Curve:
+          elem = new DynXY_Curve(this, 0);
+          break;
+        case DynC.eSave_DigCommand:
+          elem = new DynDigCommand(this, 0);
+          break;
+        case DynC.eSave_PopupMenu:
+          elem = new DynPopupMenu(this);
+          break;
+        case DynC.eSave_SetDig:
+          elem = new DynSetDig(this);
+          break;
+        case DynC.eSave_ResetDig:
+          elem = new DynResetDig(this);
+          break;
+        case DynC.eSave_ToggleDig:
+          elem = new DynToggleDig(this);
+          break;
+        case DynC.eSave_StoDig:
+          elem = new DynStoDig(this);
+          break;
+        case DynC.eSave_Command:
+          elem = new DynCommand(this);
+          break;
+        case DynC.eSave_CommandDC:
+          elem = new DynCommandDoubleClick(this);
+          break;
+        case DynC.eSave_Confirm:
+          elem = new DynConfirm(this);
+          break;
+        case DynC.eSave_IncrAnalog:
+          elem = new DynIncrAnalog(this);
+          break;
+        case DynC.eSave_RadioButton:
+          elem = new DynRadioButton(this);
+          break;
+        case DynC.eSave_Slider:
+          elem = new DynSlider(this);
+          break;
+        case DynC.eSave_TipText:
+          elem = new DynTipText(this);
+          break;
+        case DynC.eSave_Help:
+          elem = new DynHelp(this);
+          break;
+        case DynC.eSave_OpenGraph:
+          elem = new DynOpenGraph(this);
+          break;
+        case DynC.eSave_OpenURL:
+          elem = new DynOpenURL(this);
+          break;
+        case DynC.eSave_InputFocus:
+          elem = new DynInputFocus(this);
+          break;
+        case DynC.eSave_CloseGraph:
+          elem = new DynCloseGraph(this);
+          break;
+        case DynC.eSave_PulldownMenu:
+          elem = new DynPulldownMenu(this);
+          break;
+        case DynC.eSave_OptionMenu:
+          elem = new DynOptionMenu(this);
+          break;
+        case DynC.eSave_SetValue:
+          elem = new DynSetValue(this);
+          break;
+        case DynC.eSave_MethodToolbar:
+          elem = new DynMethodToolbar(this);
+          break;
+        case DynC.eSave_MethodPulldownMenu:
+          elem = new DynMethodPulldownMenu(this);
+          break;
+        case DynC.eSave_Script:
+          elem = new DynScript(this);
+          break;
+        case DynC.eSave_CatchSignal:
+          elem = new DynCatchSignal(this);
+          break;
+        case DynC.eSave_EmitSignal:
+          elem = new DynEmitSignal(this);
+          break;
+        case DynC.eSave_ContextMenu:
+          elem = new DynContextMenu(this);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in Dyn");
+          break;
       }
-      if ( elem !== null) {
-	this.elements.push(elem);
-	i = elem.open( lines, i+1);
+      if (elem !== null) {
+        this.elements.push(elem);
+        i = elem.open(lines, i + 1);
       }
-      
-      if ( end)
-	break;
+
+      if (end) break;
     }
     return i;
   };
 
-  this.connect = function( object) {
-
-    if ( (this.dyn_type1 & DynC.mDynType1_Inherit) !== 0) {
+  this.connect = function (object) {
+    if ((this.dyn_type1 & DynC.mDynType1_Inherit) !== 0) {
       var inherit_dyn_type1 = object.getClassDynType1();
       var inherit_dyn_type2 = object.getClassDynType2();
       this.total_dyn_type1 = this.dyn_type1 | inherit_dyn_type1;
       this.total_dyn_type2 = this.dyn_type2 | inherit_dyn_type2;
-    }
-    else {
+    } else {
       this.total_dyn_type1 = this.dyn_type1;
       this.total_dyn_type2 = this.dyn_type2;
     }
-    
-    if ( (this.action_type1 & DynC.mActionType1_Inherit) !== 0) {
+
+    if ((this.action_type1 & DynC.mActionType1_Inherit) !== 0) {
       var inherit_action_type1 = object.getClassActionType1();
       var inherit_action_type2 = object.getClassActionType2();
       this.total_action_type1 = this.action_type1 | inherit_action_type1;
       this.total_action_type2 = this.action_type2 | inherit_action_type2;
-    }
-    else {
+    } else {
       this.total_action_type1 = this.action_type1;
       this.total_action_type2 = this.action_type2;
     }
-    
-    if ( this.cycle == Glow.eCycle_Inherit) {
+
+    if (this.cycle == Glow.eCycle_Inherit) {
       this.cycle = object.getClassCycle();
-      if ( this.cycle == Glow.eCycle_Inherit)
-	this.cycle = Glow.eCycle_Slow;
-    }    
-    for ( var i = 0; i < this.elements.length; i++) {
+      if (this.cycle == Glow.eCycle_Inherit) this.cycle = Glow.eCycle_Slow;
+    }
+    for (var i = 0; i < this.elements.length; i++) {
       this.elements[i].connect(object);
     }
     return 1;
   };
 
-
-  this.disconnect = function() {
-    for ( var i = 0; i < this.elements.length; i++) {
+  this.disconnect = function () {
+    for (var i = 0; i < this.elements.length; i++) {
       this.elements[i].disconnect();
     }
   };
 
-  this.scan = function( object) {
+  this.scan = function (object) {
     this.repaintNow = false;
     this.ignoreColor = false;
     this.resetColor = false;
@@ -1961,468 +2111,482 @@ function Dyn( graph) {
     this.resetInvisible = false;
     this.ignoreBgColor = false;
     this.resetBgColor = false;
-    
-    for ( var i = 0; i < this.elements.length; i++) {
+    this.resetTextA1 = false;
+    this.ignoreTextA1 = false;
+
+    for (var i = 0; i < this.elements.length; i++) {
       this.elements[i].scan(object);
-    }	
-    if ( this.repaintNow) {
+    }
+    if (this.repaintNow) {
       object.draw();
     }
   };
 
-  this.action = function( object, event) {
+  this.action = function (object, event) {
     var sts;
-    for ( var i = 0; i < this.elements.length; i++) {
+    for (var i = 0; i < this.elements.length; i++) {
       sts = this.elements[i].action(object, event);
-      if ( sts == DynC.DYN__NO_PROPAGATE || sts == Glow.GLOW__TERMINATED ||
-	   sts == Glow.GLOW__SUBTERMINATED)
-	return sts;
+      if (
+        sts == DynC.DYN__NO_PROPAGATE ||
+        sts == Glow.GLOW__TERMINATED ||
+        sts == Glow.GLOW__SUBTERMINATED
+      )
+        return sts;
     }
     return 1;
   };
-  
-  this.setTotal = function( object) {
-    if ( object == null) {
+
+  this.setTotal = function (object) {
+    if (object == null) {
       this.total_dyn_type1 = this.dyn_type1;
       this.total_dyn_type2 = this.dyn_type2;
       this.total_action_type1 = this.action_type1;
       this.total_action_type2 = this.action_type2;
-    }
-    else {
-      if ( (this.dyn_type1 & DynC.mDynType1_Inherit) != 0) {
-	var inherit_dyn_type1 = object.getClassDynType1();
-	var inherit_dyn_type2 = object.getClassDynType2();
-	this.total_dyn_type1 = this.dyn_type1 | inherit_dyn_type1;
-	this.total_dyn_type2 = this.dyn_type2 | inherit_dyn_type2;
+    } else {
+      if ((this.dyn_type1 & DynC.mDynType1_Inherit) != 0) {
+        var inherit_dyn_type1 = object.getClassDynType1();
+        var inherit_dyn_type2 = object.getClassDynType2();
+        this.total_dyn_type1 = this.dyn_type1 | inherit_dyn_type1;
+        this.total_dyn_type2 = this.dyn_type2 | inherit_dyn_type2;
+      } else {
+        this.total_dyn_type1 = this.dyn_type1;
+        this.total_dyn_type2 = this.dyn_type2;
       }
-      else {
-	this.total_dyn_type1 = this.dyn_type1;
-	this.total_dyn_type2 = this.dyn_type2;
-      }
-	    
-      if ( (this.action_type1 & DynC.mActionType1_Inherit) != 0) {
-	var inherit_action_type1 = object.getClassActionType1();
-	var inherit_action_type2 = object.getClassActionType2();
-	this.total_action_type1 = this.action_type1 | inherit_action_type1;
-	this.total_action_type2 = this.action_type2 | inherit_action_type2;
-      }
-      else {
-	this.total_action_type1 = this.action_type1;
-	this.total_action_type2 = this.action_type2;
+
+      if ((this.action_type1 & DynC.mActionType1_Inherit) != 0) {
+        var inherit_action_type1 = object.getClassActionType1();
+        var inherit_action_type2 = object.getClassActionType2();
+        this.total_action_type1 = this.action_type1 | inherit_action_type1;
+        this.total_action_type2 = this.action_type2 | inherit_action_type2;
+      } else {
+        this.total_action_type1 = this.action_type1;
+        this.total_action_type2 = this.action_type2;
       }
     }
   };
 
-  this.parseAttrName = function( name) {
-    if ( name === null)
-      return null;
-    if ( (this.total_dyn_type1 & DynC.mDynType1_HostObject) !== 0) {
+  this.parseAttrName = function (name) {
+    if (name === null) return null;
+    if ((this.total_dyn_type1 & DynC.mDynType1_HostObject) !== 0) {
       var idx = name.indexOf("$hostobject");
-      if ( idx != -1) {
-	var hostobject = this.getHostObject();
-	var n = name.substring(0, idx) + hostobject + name.substring(idx+11);
-	return this.graph.parseAttrName( n);
-      }	    
+      if (idx != -1) {
+        var hostobject = this.getHostObject();
+        var n = name.substring(0, idx) + hostobject + name.substring(idx + 11);
+        return this.graph.parseAttrName(n);
+      }
     }
-    
-    return this.graph.parseAttrName( name);
+
+    return this.graph.parseAttrName(name);
   };
 
-  this.getHostObject = function() {
-    for ( var i = 0; i < this.elements.length; i++) {
-      if ( (this.elements[i].dyn_type1 & DynC.mDynType1_HostObject) !== 0)
-	return this.elements[i].hostobject;
+  this.getHostObject = function () {
+    for (var i = 0; i < this.elements.length; i++) {
+      if ((this.elements[i].dyn_type1 & DynC.mDynType1_HostObject) !== 0)
+        return this.elements[i].hostobject;
     }
     return "";
   };
 
-  this.getDig = function( p, a_typeid, bitmask, db) {
-    switch ( a_typeid) {
-    case Pwr.eType_Boolean: {
-      var bvalue = false;
-      switch ( db) {
-      case GraphIfc.eDatabase_Gdh:
-	bvalue = this.graph.getGdh().getObjectRefInfo( p);
-	break;
-      case GraphIfc.eDatabase_Local:
-	bvalue = this.graph.getLdb().getObjectRefInfo( p);
-	break;
-      default: break;
-      }	
-      return bvalue;
-    }
-    case Pwr.eType_Int32:
-    case Pwr.eType_UInt32:
-    case Pwr.eType_Int64:
-    case Pwr.eType_UInt64: {
-      var ivalue = 0;
-      switch ( db) {
-      case GraphIfc.eDatabase_Gdh:
-	ivalue = this.graph.getGdh().getObjectRefInfo( p);
-	break;
-      case GraphIfc.eDatabase_Local:
-	ivalue = this.graph.getLdb().getObjectRefInfo( p);
-	break;
-      default: break;
-      }	
+  this.getDig = function (p, a_typeid, bitmask, db) {
+    switch (a_typeid) {
+      case Pwr.eType_Boolean: {
+        var bvalue = false;
+        switch (db) {
+          case GraphIfc.eDatabase_Gdh:
+            bvalue = this.graph.getGdh().getObjectRefInfo(p);
+            break;
+          case GraphIfc.eDatabase_Local:
+            bvalue = this.graph.getLdb().getObjectRefInfo(p);
+            break;
+          default:
+            break;
+        }
+        return bvalue;
+      }
+      case Pwr.eType_Int32:
+      case Pwr.eType_UInt32:
+      case Pwr.eType_Int64:
+      case Pwr.eType_UInt64: {
+        var ivalue = 0;
+        switch (db) {
+          case GraphIfc.eDatabase_Gdh:
+            ivalue = this.graph.getGdh().getObjectRefInfo(p);
+            break;
+          case GraphIfc.eDatabase_Local:
+            ivalue = this.graph.getLdb().getObjectRefInfo(p);
+            break;
+          default:
+            break;
+        }
 
-      return ivalue !== 0;
-    }
-    case GraphIfc.eType_Bit: {
-      var tvalue = 0;
-      switch ( db) {
-      case GraphIfc.eDatabase_Gdh:
-	tvalue = this.graph.getGdh().getObjectRefInfo( p);
-	break;
-      case GraphIfc.eDatabase_Local:
-	tvalue = this.graph.getLdb().getObjectRefInfo( p);
-	break;
-      default: break;
+        return ivalue !== 0;
       }
-      return (tvalue & bitmask) !== 0;
-    }
-    case Pwr.eType_Float32:
-    case Pwr.eType_Float64: {
-      var fvalue = 0;
-      switch ( db) {
-      case GraphIfc.eDatabase_Gdh:
-	fvalue = this.graph.getGdh().getObjectRefInfo( p);
-	break;
-      case GraphIfc.eDatabase_Local:
-	fvalue = this.graph.getLdb().getObjectRefInfo( p);
-	break;
-      default: break;
-      }	
-      return fvalue > Number.MIN_VALUE;
-    }
-    case Pwr.eType_String: {
-      switch ( db) {
-      case GraphIfc.eDatabase_Gdh: {
-	var svalue = graph.getGdh().getObjectRefInfo( p);
-	return !(svalue === "");
-      }	
-      default: break;
+      case GraphIfc.eType_Bit: {
+        var tvalue = 0;
+        switch (db) {
+          case GraphIfc.eDatabase_Gdh:
+            tvalue = this.graph.getGdh().getObjectRefInfo(p);
+            break;
+          case GraphIfc.eDatabase_Local:
+            tvalue = this.graph.getLdb().getObjectRefInfo(p);
+            break;
+          default:
+            break;
+        }
+        return (tvalue & bitmask) !== 0;
       }
-      return false;
-    }
-    default:
-      return false;
+      case Pwr.eType_Float32:
+      case Pwr.eType_Float64: {
+        var fvalue = 0;
+        switch (db) {
+          case GraphIfc.eDatabase_Gdh:
+            fvalue = this.graph.getGdh().getObjectRefInfo(p);
+            break;
+          case GraphIfc.eDatabase_Local:
+            fvalue = this.graph.getLdb().getObjectRefInfo(p);
+            break;
+          default:
+            break;
+        }
+        return fvalue > Number.MIN_VALUE;
+      }
+      case Pwr.eType_String: {
+        switch (db) {
+          case GraphIfc.eDatabase_Gdh: {
+            var svalue = graph.getGdh().getObjectRefInfo(p);
+            return !(svalue === "");
+          }
+          default:
+            break;
+        }
+        return false;
+      }
+      default:
+        return false;
     }
   };
 
-  this.confirmedAction = function( event, object) {
-    if ( this.elements == null)
-      return;
+  this.confirmedAction = function (event, object) {
+    if (this.elements == null) return;
 
     var e = new GlowEvent();
-    e.event = event;	
+    e.event = event;
     e.object = object;
     this.action_type1 &= ~DynC.mActionType1_Confirm;
-    for ( var i = 0; i < this.elements.length; i++)
-      this.elements[i].action( object,  e);
+    for (var i = 0; i < this.elements.length; i++)
+      this.elements[i].action(object, e);
     this.action_type1 |= DynC.mActionType1_Confirm;
-  };    
+  };
 
-  this.instance_to_number = function( instance) {
+  this.instance_to_number = function (instance) {
     var inst = 1;
     var m = instance;
-    while( m > 1) {
+    while (m > 1) {
       m = m >> 1;
       inst++;
     }
     return inst;
   };
 
-  this.valueInputAction = function( object, str) {
-    if ( this.elements === null)
-      return DynC.eValueInput_Error;
+  this.valueInputAction = function (object, str) {
+    if (this.elements === null) return DynC.eValueInput_Error;
 
     this.inputStr = str;
     this.e = object;
 
-    this.ctx_popped = this.e.dyn.graph.ctxPop( object.dyn.object.ctx);	
+    this.ctx_popped = this.e.dyn.graph.ctxPop(object.dyn.object.ctx);
 
     var sts = null;
     this.minval = 0;
     this.maxval = 0;
-    if ( this.e.minvalue_attr !== null) {
-
-      var pname = this.e.dyn.parseAttrName( this.e.minvalue_attr);
-      if ( pname !== null && pname.type == Pwr.eType_Float32) {
-	this.e.dyn.graph.getGdh().getObjectInfoFloat(pname.name,
-	    this.valueInputAction2, this);
+    if (this.e.minvalue_attr !== null) {
+      var pname = this.e.dyn.parseAttrName(this.e.minvalue_attr);
+      if (pname !== null && pname.type == Pwr.eType_Float32) {
+        this.e.dyn.graph
+          .getGdh()
+          .getObjectInfoFloat(pname.name, this.valueInputAction2, this);
         return 1;
-      }
-      else 
-        this.minval = this.e.min_value;
-    }
-    else
-      this.minval = this.e.min_value;
+      } else this.minval = this.e.min_value;
+    } else this.minval = this.e.min_value;
 
-    if ( this.e.maxvalue_attr !== null) {
-      var pname = this.e.dyn.parseAttrName( this.e.maxvalue_attr);
-      if ( pname === null || pname.name === "") 
-	this.maxval = this.e.max_value;
+    if (this.e.maxvalue_attr !== null) {
+      var pname = this.e.dyn.parseAttrName(this.e.maxvalue_attr);
+      if (pname === null || pname.name === "") this.maxval = this.e.max_value;
       else {
-	if ( pname.type == Pwr.eType_Float32) {
-	  this.e.dyn.graph.getGdh().getObjectInfoFloat(pname.name,
-	      this.valueInputAction3, this);
-        }
-	else
-	  this.maxval = this.e.max_value;
+        if (pname.type == Pwr.eType_Float32) {
+          this.e.dyn.graph
+            .getGdh()
+            .getObjectInfoFloat(pname.name, this.valueInputAction3, this);
+        } else this.maxval = this.e.max_value;
       }
-    }
-    else
-      this.maxval = this.e.max_value;
+    } else this.maxval = this.e.max_value;
 
     this.valueInputAction4();
-  }
+  };
 
-  this.valueInputAction2 = function(id, self, sts, value) {
+  this.valueInputAction2 = function (id, self, sts, value) {
     self.minval = value;
 
     if (self.e.maxvalue_attr !== null) {
-      var pname = self.e.dyn.parseAttrName( self.e.maxvalue_attr);
-      if ( pname === null || pname.name === "") 
-	self.maxval = self.e.max_value;
+      var pname = self.e.dyn.parseAttrName(self.e.maxvalue_attr);
+      if (pname === null || pname.name === "") self.maxval = self.e.max_value;
       else {
-	if ( pname.type == Pwr.eType_Float32) {
-	  self.e.dyn.graph.getGdh().getObjectInfoFloat(pname.name,
-	      self.valueInputAction3, self);
+        if (pname.type == Pwr.eType_Float32) {
+          self.e.dyn.graph
+            .getGdh()
+            .getObjectInfoFloat(pname.name, self.valueInputAction3, self);
           return 1;
-        }
-	else
-	  self.maxval = self.e.max_value;
+        } else self.maxval = self.e.max_value;
       }
-    }
-    else
-      self.maxval = self.e.max_value;
+    } else self.maxval = self.e.max_value;
 
     self.valueInputAction4();
-  }
+  };
 
-  this.valueInputAction3 = function(id, self, sts, value) {
+  this.valueInputAction3 = function (id, self, sts, value) {
     self.maxval = value;
     self.valueInputAction4();
-  }
+  };
 
-  this.valueInputAction4 = function() {
+  this.valueInputAction4 = function () {
+    switch (this.e.a_typeid) {
+      case Pwr.eType_Float32: {
+        var inputValue = parseFloat(this.inputStr.trim());
+        if (Number.isNaN(inputValue)) {
+          if (this.ctx_popped) this.e.dyn.graph.ctxPush();
+          window.alert("Syntax error");
+          return DynC.eValueInput_SyntaxError;
+        }
+        if (
+          !(this.minval == 0 && this.maxval == 0) &&
+          inputValue < this.minval
+        ) {
+          if (this.ctx_popped) this.e.dyn.graph.ctxPush();
+          window.alert("Min value exceeded");
+          return DynC.eValueInput_MinValueExceeded;
+        }
+        if (
+          !(this.minval == 0 && this.maxval == 0) &&
+          inputValue > this.maxval
+        ) {
+          if (this.ctx_popped) this.e.dyn.graph.ctxPush();
+          window.alert("Max value exceeded");
+          return DynC.eValueInput_MaxValueExceeded;
+        }
 
-    switch ( this.e.a_typeid) {
-    case Pwr.eType_Float32: {
-      var inputValue = parseFloat( this.inputStr.trim());
-      if (Number.isNaN(inputValue)) {
-	if ( this.ctx_popped)
-	  this.e.dyn.graph.ctxPush();
-        window.alert("Syntax error");
-	return DynC.eValueInput_SyntaxError;
-      }
-      if ( !(this.minval == 0 && this.maxval == 0) && inputValue < this.minval) {
-	if ( this.ctx_popped)
-	  this.e.dyn.graph.ctxPush();
-        window.alert("Min value exceeded");
-	return DynC.eValueInput_MinValueExceeded;
-      }
-      if ( !(this.minval == 0 && this.maxval == 0) && inputValue > this.maxval) {
-	if ( this.ctx_popped)
-	  this.e.dyn.graph.ctxPush();
-        window.alert("Max value exceeded");
-	return DynC.eValueInput_MaxValueExceeded;
-      }
-		
-      if (this.e.value_element != null && this.e.value_element.convert_element != null)
-        inputValue = uc_convert(this.e.value_element.convert_element.entity,
-				this.e.value_element.convert_element.display_unit,
-				this.e.value_element.convert_element.db_unit, inputValue);
+        if (
+          this.e.value_element != null &&
+          this.e.value_element.convert_element != null
+        )
+          inputValue = uc_convert(
+            this.e.value_element.convert_element.entity,
+            this.e.value_element.convert_element.display_unit,
+            this.e.value_element.convert_element.db_unit,
+            inputValue,
+          );
 
-      var pname = this.e.dyn.parseAttrName(this.e.value_element.attribute);
-      if ( pname === null || pname.name === "")
-	break;
-		    
-      var sts;
-      switch ( pname.database) {
-      case GraphIfc.eDatabase_Gdh:
-	sts = this.e.dyn.graph.getGdh().setObjectInfoFloat( pname.name, inputValue);
-	break;
-      case GraphIfc.eDatabase_Local:
-	sts = this.e.dyn.graph.getLdb().setObjectInfo( graph, pname.name, inputValue);
-	break;
-      default:
-	if ( this.ctx_popped)
-	  this.e.dyn.graph.ctxPush();
-	return DynC.eValueInput_Error;
+        var pname = this.e.dyn.parseAttrName(this.e.value_element.attribute);
+        if (pname === null || pname.name === "") break;
+
+        var sts;
+        switch (pname.database) {
+          case GraphIfc.eDatabase_Gdh:
+            sts = this.e.dyn.graph
+              .getGdh()
+              .setObjectInfoFloat(pname.name, inputValue);
+            break;
+          case GraphIfc.eDatabase_Local:
+            sts = this.e.dyn.graph
+              .getLdb()
+              .setObjectInfo(graph, pname.name, inputValue);
+            break;
+          default:
+            if (this.ctx_popped) this.e.dyn.graph.ctxPush();
+            return DynC.eValueInput_Error;
+        }
+        if (sts.evenSts()) {
+          console.log("setObjectInfoError " + sts);
+          if (this.ctx_popped) this.e.dyn.graph.ctxPush();
+          return DynC.eValueInput_Error;
+        }
+        break;
       }
-      if ( sts.evenSts()) {
-	console.log( "setObjectInfoError " + sts);
-	if ( this.ctx_popped)
-	  this.e.dyn.graph.ctxPush();
-	return DynC.eValueInput_Error;
+      case Pwr.eType_Int32:
+      case Pwr.eType_UInt32:
+      case Pwr.eType_Int16:
+      case Pwr.eType_UInt16:
+      case Pwr.eType_Int8:
+      case Pwr.eType_UInt8: {
+        var inputValue = parseInt(this.inputStr.trim(), 10);
+        if (Number.isNaN(inputValue)) {
+          if (this.ctx_popped) this.e.dyn.graph.ctxPush();
+          window.alert("Syntax error");
+          return DynC.eValueInput_SyntaxError;
+        }
+        if (
+          !(this.minval == 0 && this.maxval == 0) &&
+          inputValue < this.minval
+        ) {
+          if (this.ctx_popped) this.e.dyn.graph.ctxPush();
+          window.alert("Min value exceeded");
+          return DynC.eValueInput_MinValueExceeded;
+        }
+        if (
+          !(this.minval == 0 && this.maxval == 0) &&
+          inputValue > this.maxval
+        ) {
+          if (this.ctx_popped) this.e.dyn.graph.ctxPush();
+          window.alert("Max value exceeded");
+          return DynC.eValueInput_MaxValueExceeded;
+        }
+
+        var pname = this.e.dyn.parseAttrName(this.e.value_element.attribute);
+        if (pname === null || pname.name === "") break;
+
+        switch (pname.database) {
+          case GraphIfc.eDatabase_Gdh:
+            sts = this.e.dyn.graph
+              .getGdh()
+              .setObjectInfoInt(pname.name, inputValue);
+            break;
+          case GraphIfc.eDatabase_Local:
+            sts = this.e.dyn.graph
+              .getLdb()
+              .setObjectInfo(graph, pname.name, inputValue);
+            break;
+          default:
+            if (this.ctx_popped) this.e.dyn.graph.ctxPush();
+            return DynC.eValueInput_Error;
+        }
+        if (sts.evenSts()) {
+          console.log("setObjectInfoError " + sts);
+          if (this.ctx_popped) this.e.dyn.graph.ctxPush();
+          return DynC.eValueInput_Error;
+        }
+        break;
       }
-      break;
+      case Pwr.eType_Boolean: {
+        var inputValueInt = parseInt(this.inputStr.trim(), 10);
+        if (Number.isNaN(inputValueInt)) {
+          if (this.ctx_popped) this.e.dyn.graph.ctxPush();
+          window.alert("Syntax error");
+          return DynC.eValueInput_SyntaxError;
+        }
+
+        var inputValue;
+        if (inputValueInt === 0) inputValue = false;
+        else if (inputValueInt == 1) inputValue = true;
+        else break;
+
+        // valueElement.oldValueB = inputValue;
+
+        var pname = this.e.dyn.parseAttrName(this.e.value_element.attribute);
+        if (pname === null || pname.name === "") break;
+
+        switch (pname.database) {
+          case GraphIfc.eDatabase_Gdh:
+            sts = this.e.dyn.graph
+              .getGdh()
+              .setObjectInfoBoolean(pname.name, inputValue);
+            break;
+          case GraphIfc.eDatabase_Local:
+            sts = this.e.dyn.graph
+              .getLdb()
+              .setObjectInfo(graph, pname.name, inputValue);
+            break;
+          default:
+            return DynC.eValueInput_Error;
+        }
+        if (sts.evenSts()) {
+          console.log("setObjectInfoError " + sts);
+          if (this.ctx_popped) this.e.dyn.graph.ctxPush();
+          return DynC.eValueInput_Error;
+        }
+        break;
+      }
+      case Pwr.eType_String: {
+        // valueElement.oldValueS = this.inputStr;
+
+        var pname = this.e.dyn.parseAttrName(this.e.value_element.attribute);
+        if (pname === null || pname.name === "") break;
+
+        switch (pname.database) {
+          case GraphIfc.eDatabase_Gdh:
+            sts = this.e.dyn.graph
+              .getGdh()
+              .setObjectInfoString(pname.name, this.inputStr);
+            break;
+          case GraphIfc.eDatabase_Local:
+            sts = this.e.dyn.graph
+              .getLdb()
+              .setObjectInfo(graph, pname.name, this.inputStr);
+            break;
+          default:
+            if (this.ctx_popped) this.e.dyn.graph.ctxPush();
+            return DynC.eValueInput_Error;
+        }
+        if (sts.evenSts()) {
+          console.log("setObjectInfoError " + sts);
+          if (this.ctx_popped) this.e.dyn.graph.ctxPush();
+          return DynC.eValueInput_Error;
+        }
+        break;
+      }
     }
-    case Pwr.eType_Int32:
-    case Pwr.eType_UInt32:
-    case Pwr.eType_Int16:
-    case Pwr.eType_UInt16:
-    case Pwr.eType_Int8:
-    case Pwr.eType_UInt8: {
-      var inputValue = parseInt( this.inputStr.trim(), 10);
-      if (Number.isNaN(inputValue)) {
-	if ( this.ctx_popped)
-	  this.e.dyn.graph.ctxPush();
-        window.alert("Syntax error");
-	return DynC.eValueInput_SyntaxError;
-      }
-      if ( !(this.minval == 0 && this.maxval == 0) && inputValue < this.minval) {
-	if ( this.ctx_popped)
-	  this.e.dyn.graph.ctxPush();
-        window.alert("Min value exceeded");
-	return DynC.eValueInput_MinValueExceeded;
-      }
-      if ( !(this.minval == 0 && this.maxval == 0) && inputValue > this.maxval ) {
-	if ( this.ctx_popped)
-	  this.e.dyn.graph.ctxPush();
-        window.alert("Max value exceeded");
-	return DynC.eValueInput_MaxValueExceeded;
-      }
-      
-      var pname = this.e.dyn.parseAttrName(this.e.value_element.attribute);
-      if ( pname === null || pname.name === "")
-	break;
-      
-      switch ( pname.database) {
-      case GraphIfc.eDatabase_Gdh:
-	sts = this.e.dyn.graph.getGdh().setObjectInfoInt( pname.name, inputValue);
-	break;
-      case GraphIfc.eDatabase_Local:
-	sts = this.e.dyn.graph.getLdb().setObjectInfo( graph, pname.name, inputValue);
-	break;
-      default:
-	if ( this.ctx_popped)
-	  this.e.dyn.graph.ctxPush();
-	return DynC.eValueInput_Error;
-      }
-      if ( sts.evenSts()) {
-	console.log( "setObjectInfoError " + sts);
-	if ( this.ctx_popped)
-	  this.e.dyn.graph.ctxPush();
-	return DynC.eValueInput_Error;
-      }		
-      break;
-    }
-    case Pwr.eType_Boolean: {
-      var inputValueInt = parseInt( this.inputStr.trim(), 10);
-      if (Number.isNaN(inputValueInt)) {
-	if ( this.ctx_popped)
-	  this.e.dyn.graph.ctxPush();
-        window.alert("Syntax error");
-	return DynC.eValueInput_SyntaxError;
-      }
-
-      var inputValue;
-      if ( inputValueInt === 0)
-	inputValue = false;
-      else if ( inputValueInt == 1)
-	inputValue = true;
-      else
-	break;
-
-      // valueElement.oldValueB = inputValue;
-
-      var pname = this.e.dyn.parseAttrName(this.e.value_element.attribute);
-      if ( pname === null || pname.name === "")
-	break;
-		    
-      switch ( pname.database) {
-      case GraphIfc.eDatabase_Gdh:
-	sts = this.e.dyn.graph.getGdh().setObjectInfoBoolean( pname.name, inputValue);
-	break;
-      case GraphIfc.eDatabase_Local:
-	sts = this.e.dyn.graph.getLdb().setObjectInfo( graph, pname.name, inputValue);
-	break;
-      default:
-	return DynC.eValueInput_Error;
-      }
-      if ( sts.evenSts()) {
-	console.log( "setObjectInfoError " + sts);
-	if ( this.ctx_popped)
-	  this.e.dyn.graph.ctxPush();
-	return DynC.eValueInput_Error;
-      }
-      break;
-    }
-    case Pwr.eType_String: {
-      // valueElement.oldValueS = this.inputStr;
-
-      var pname = this.e.dyn.parseAttrName(this.e.value_element.attribute);
-      if ( pname === null || pname.name === "")
-	break;
-		    
-      switch ( pname.database) {
-      case GraphIfc.eDatabase_Gdh:
-	sts = this.e.dyn.graph.getGdh().setObjectInfoString( pname.name, this.inputStr);
-	break;
-      case GraphIfc.eDatabase_Local:
-	sts = this.e.dyn.graph.getLdb().setObjectInfo( graph, pname.name, this.inputStr);
-	break;
-      default:
-	if ( this.ctx_popped)
-	  this.e.dyn.graph.ctxPush();
-	return DynC.eValueInput_Error;
-      }
-      if ( sts.evenSts()) {
-	console.log( "setObjectInfoError " + sts);
-	if ( this.ctx_popped)
-	  this.e.dyn.graph.ctxPush();
-	return DynC.eValueInput_Error;
-      }
-      break;
-    }
-    }
-    if ( this.ctx_popped)
-      this.e.dyn.graph.ctxPush();
+    if (this.ctx_popped) this.e.dyn.graph.ctxPush();
 
     return DynC.eValueInput_Success;
   };
 
-  this.value_to_msg = function( value) {
+  this.value_to_msg = function (value) {
     var str;
-    if ( value === 0)
-      str = "";
+    if (value === 0) str = "";
     else {
-      switch ( value & 7) {
-      case 3:
-      case 1:
-	str = "MSG-SUCCESS, ";
-	break;
-      case 0:
-	str = "MSG-WARNING, ";
-	break;
-      case 2:
-	str = "MSG-ERROR, ";
-	break;
-      case 4:
-	str = "MSG-FATAL, ";
-	break;
-      default:
-	str = "MSG-NO, ";
+      switch (value & 7) {
+        case 3:
+        case 1:
+          str = "MSG-SUCCESS, ";
+          break;
+        case 0:
+          str = "MSG-WARNING, ";
+          break;
+        case 2:
+          str = "MSG-ERROR, ";
+          break;
+        case 4:
+          str = "MSG-FATAL, ";
+          break;
+        default:
+          str = "MSG-NO, ";
       }
-      switch ( value) {
-      case 134512649: str += "Success"; break;
-      case 134512659: str += "Proview starting up"; break;
-      case 134512665: str += "Proview running"; break;
-      case 134512731: str += "Server running"; break;
-      case 134512795: str += "Application running"; break;
-      case 134512820: str += "Process timeout"; break;
-      default:
-	str += "Message number " + value;
+      switch (value) {
+        case 134512649:
+          str += "Success";
+          break;
+        case 134512659:
+          str += "Proview starting up";
+          break;
+        case 134512665:
+          str += "Proview running";
+          break;
+        case 134512731:
+          str += "Server running";
+          break;
+        case 134512795:
+          str += "Application running";
+          break;
+        case 134512820:
+          str += "Process timeout";
+          break;
+        default:
+          str += "Message number " + value;
       }
     }
     return str;
   };
 }
 
-function DynReference( dyn, attribute) {
+function DynReference(dyn, attribute) {
   this.name = attribute;
   this.pname;
   this.p = 0;
@@ -2435,25 +2599,28 @@ function DynReference( dyn, attribute) {
   this.typeid;
   this.sts = false;
 
-  this.connect = function(dyn) {
-    if ( !this.sts)
-      return;
+  this.connect = function (dyn) {
+    if (!this.sts) return;
     this.sts = false;
-    switch( this.pname.database) {
-    case GraphIfc.eDatabase_Gdh:
-      this.p = dyn.graph.getGdh().refObjectInfo( this.pname.tname, this.pname.type, 
-						 this.pname.elements);
-      break;
-    case GraphIfc.eDatabase_Local:
-      this.p = dyn.graph.getLdb().refObjectInfo( dyn.graph, this.pname.name);
-      break;
-    default:
-      this.p = 0;
-      break;
+    switch (this.pname.database) {
+      case GraphIfc.eDatabase_Gdh:
+        this.p = dyn.graph
+          .getGdh()
+          .refObjectInfo(
+            this.pname.tname,
+            this.pname.type,
+            this.pname.elements,
+          );
+        break;
+      case GraphIfc.eDatabase_Local:
+        this.p = dyn.graph.getLdb().refObjectInfo(dyn.graph, this.pname.name);
+        break;
+      default:
+        this.p = 0;
+        break;
     }
 
-    if ( this.p === 0)
-      return;
+    if (this.p === 0) return;
 
     this.inverted = this.pname.inverted;
     this.typeid = this.pname.type;
@@ -2465,31 +2632,29 @@ function DynReference( dyn, attribute) {
     this.sts = true;
   };
 
-  this.disconnect = function(dyn) {
-    if ( this.sts && this.database == GraphIfc.eDatabase_Gdh) {
-      dyn.graph.getGdh().unrefObjectInfo( this.p);
+  this.disconnect = function (dyn) {
+    if (this.sts && this.database == GraphIfc.eDatabase_Gdh) {
+      dyn.graph.getGdh().unrefObjectInfo(this.p);
       this.sts = false;
     }
   };
 
-  this.get_ref_value = function(dyn) {
+  this.get_ref_value = function (dyn) {
     var value = null;
-    switch ( this.database) {
-    case GraphIfc.eDatabase_Gdh:
-      value = dyn.graph.getGdh().getObjectRefInfo( this.p);
-      break;
-    case GraphIfc.eDatabase_Local:
-      value = dyn.graph.getLdb().getObjectRefInfo( this.p);
-      break;
+    switch (this.database) {
+      case GraphIfc.eDatabase_Gdh:
+        value = dyn.graph.getGdh().getObjectRefInfo(this.p);
+        break;
+      case GraphIfc.eDatabase_Local:
+        value = dyn.graph.getLdb().getObjectRefInfo(this.p);
+        break;
     }
     return value;
   };
 
-  if (this.name == null)
-    return;
-  this.pname = dyn.parseAttrName( this.name);
-  if ( this.pname === null || this.pname.name === "") 
-    return;
+  if (this.name == null) return;
+  this.pname = dyn.parseAttrName(this.name);
+  if (this.pname === null || this.pname.name === "") return;
   this.sts = true;
 }
 
@@ -2507,140 +2672,139 @@ function DynDigLowColor(dyn) {
   this.attribute;
   this.color = Glow.eDrawType_Inherit;
   this.firstScan = true;
-	
-  this.setAttribute = function(o, name, value) {
+
+  this.setAttribute = function (o, name, value) {
     if (name === "DigLowColor.Attribute" || name === "DigLowTone.Attribute") {
       this.attribute = value;
       return 1;
-    }
-    else if (name === "DigLowColor.Color" || name === "DigLowTone.Tone") {
+    } else if (name === "DigLowColor.Color" || name === "DigLowTone.Tone") {
       this.color = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "DigLowColor.Attribute" || name === "DigLowTone.Attribute") {
       ret.value = this.attribute;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "DigLowColor.Color" || name === "DigLowTone.Tone") {
+    } else if (name === "DigLowColor.Color" || name === "DigLowTone.Tone") {
       ret.value = this.color;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( o) {
+  this.connect = function (o) {
     var object = o;
     this.color = this.dyn.getColor1(object, this.color);
-    if ( this.color < 0 || this.color >= Glow.eDrawType__)
-      return 0;
+    if (this.color < 0 || this.color >= Glow.eDrawType__) return 0;
 
-    this.a = new DynReference( this.dyn, this.attribute);
+    this.a = new DynReference(this.dyn, this.attribute);
     this.a.connect(this.dyn);
-    if ( !this.a.sts) {
+    if (!this.a.sts) {
       console.log("DigLowColor: " + this.attribute);
       return 1;
     }
     return 1;
   };
 
-  this.disconnect = function() {
-    if ( this.a !== null)
-      this.a.disconnect(this.dyn);
+  this.disconnect = function () {
+    if (this.a !== null) this.a.disconnect(this.dyn);
   };
 
-	
-  this.scan = function( o) {
+  this.scan = function (o) {
     var object = o;
 
-    if ( this.a === null || !this.a.sts || this.dyn.ignoreColor)
-      return;
-    var value = this.dyn.getDig(this.a.p, this.a.typeid, this.a.bitmask, this.a.database);
+    if (this.a === null || !this.a.sts || this.dyn.ignoreColor) return;
+    var value = this.dyn.getDig(
+      this.a.p,
+      this.a.typeid,
+      this.a.bitmask,
+      this.a.database,
+    );
 
-    if ( this.a.inverted)
-      value = !value;
+    if (this.a.inverted) value = !value;
 
-    if ( !this.firstScan) {
-      if ( this.a.oldValue == value && !this.dyn.resetColor)
-	return;
-    }
-    else
-      this.firstScan = false;
-	
-    if ( (this.dyn.total_dyn_type1 & DynC.mDynType1_Tone) !== 0) {
-      if ( !value) {
-	if ( this.color >= Glow.eDrawTone__)
-	  object.setFillColor( this.color);
-	else
-	  object.setColorTone( this.color);
+    if (!this.firstScan) {
+      if (this.a.oldValue == value && !this.dyn.resetColor) {
+        // No change since last time
+        return;
       }
-      else {
-	if ( this.color >= Glow.eDrawTone__)
-	  object.resetFillColor();
-	object.resetColorTone();
+    } else {
+      this.firstScan = false;
+    }
+
+    if ((this.dyn.total_dyn_type1 & DynC.mDynType1_Tone) !== 0) {
+      if (!value) {
+        if (this.color >= Glow.eDrawTone__) {
+          object.setFillColor(this.color);
+        } else {
+          object.setColorTone(this.color);
+        }
+      } else {
+        if (this.color >= Glow.eDrawTone__) {
+          object.resetFillColor();
+        }
+        object.resetColorTone();
       }
       this.dyn.repaintNow = true;
-    }
-    else {
-      if ( !value)
-	object.setFillColor( this.color);
-      else 
-	object.resetFillColor();		
+    } else {
+      if (!value) {
+        object.setFillColor(this.color);
+      } else {
+        object.resetFillColor();
+      }
       this.dyn.repaintNow = true;
     }
     this.a.oldValue = value;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynDigLowColor : " + lines[i]);
+      if (this.dyn.debug) console.log("DynDigLowColor : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_DigLowColor: 
-	break;
-      case DynC.eSave_DigLowColor_attribute: 
-	if ( tokens.length > 1)
-	  this.attribute = tokens[1];
-	break;
-      case DynC.eSave_DigLowColor_color: 
-	this.color = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-        console.log( "Syntax error in DynDigLowColor");
-	break;
+      switch (key) {
+        case DynC.eSave_DigLowColor:
+          break;
+        case DynC.eSave_DigLowColor_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_DigLowColor_color:
+          this.color = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynDigLowColor");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
 
-    return i;		
+    return i;
   };
 
-  this.action = function( object, e) {
+  this.action = function (object, e) {
     return 1;
   };
 }
 
-function DynDigColor( dyn, instance) {
+function DynDigColor(dyn, instance) {
   this.dyn = dyn;
   this.dyn_type1 = DynC.mDynType1_DigColor;
   this.dyn_type2 = 0;
@@ -2655,23 +2819,19 @@ function DynDigColor( dyn, instance) {
   this.color;
   this.firstScan = true;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     var inst = this.dyn.instance_number(this.instance);
     var iname;
     var inames = new Array(3);
     if (this.dyn.total_dyn_type1 & DynC.mDynType1_Tone) {
-      if (inst == 1)
-	iname = "DigTone";
-      else
-	iname = "DigTone" + inst.toString();
+      if (inst == 1) iname = "DigTone";
+      else iname = "DigTone" + inst.toString();
       inames[0] = "DigTone.Instances";
       inames[1] = iname + ".Attribute";
       inames[2] = iname + ".Tone";
     } else {
-      if (inst == 1)
-	iname = "DigColor";
-      else
-	iname = "DigColor" + inst.toString();
+      if (inst == 1) iname = "DigColor";
+      else iname = "DigColor" + inst.toString();
       inames[0] = "DigColor.Instances";
       inames[1] = iname + ".Attribute";
       inames[2] = iname + ".Color";
@@ -2680,35 +2840,29 @@ function DynDigColor( dyn, instance) {
       this.instance_mask = value;
       this.dyn.update_elements();
       return 1;
-    }
-    else if (name === inames[1]) {
-      this.attribute =  value;
+    } else if (name === inames[1]) {
+      this.attribute = value;
       return 1;
-    }
-    else if (name === inames[2]) {
+    } else if (name === inames[2]) {
       this.color = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     var inst = this.dyn.instance_number(this.instance);
     var iname;
     var inames = new Array(3);
     if (this.dyn.total_dyn_type1 & DynC.mDynType1_Tone) {
-      if (inst == 1)
-	iname = "DigTone";
-      else
-	iname = "DigTone" + inst.toString();
+      if (inst == 1) iname = "DigTone";
+      else iname = "DigTone" + inst.toString();
       inames[0] = "DigTone.Instances";
       inames[1] = iname + ".Attribute";
       inames[2] = iname + ".Tone";
     } else {
-      if (inst == 1)
-	iname = "DigColor";
-      else
-	iname = "DigColor" + inst.toString();
+      if (inst == 1) iname = "DigColor";
+      else iname = "DigColor" + inst.toString();
       inames[0] = "DigColor.Instances";
       inames[1] = iname + ".Attribute";
       inames[2] = iname + ".Color";
@@ -2717,142 +2871,128 @@ function DynDigColor( dyn, instance) {
       ret.value = this.instance_mask;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === inames[1]) {
+    } else if (name === inames[1]) {
       ret.value = this.attribute;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === inames[2]) {
+    } else if (name === inames[2]) {
       ret.value = this.color;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( object) {
+  this.connect = function (object) {
     this.color = this.dyn.getColor2(object, this.color);
-    if ( this.color < 0 || this.color >= Glow.eDrawType__)
-      return 0;
-    
-    this.a = new DynReference( this.dyn, this.attribute);
+    if (this.color < 0 || this.color >= Glow.eDrawType__) return 0;
+
+    this.a = new DynReference(this.dyn, this.attribute);
     this.a.connect(this.dyn);
-    if ( !this.a.sts) {
+    if (!this.a.sts) {
       console.log("DigColor: " + this.attribute);
       return 1;
     }
     return 1;
   };
 
-  this.disconnect = function() {
-    if ( this.a !== null)
-      this.a.disconnect(this.dyn);
+  this.disconnect = function () {
+    if (this.a !== null) this.a.disconnect(this.dyn);
   };
 
-	
-  this.scan = function( object) {
-    if ( this.a === null || !this.a.sts || this.dyn.ignoreColor)
-      return;
-    var value = this.dyn.getDig( this.a.p, this.a.typeid, this.a.bitmask, this.a.database);
+  this.scan = function (object) {
+    if (this.a === null || !this.a.sts || this.dyn.ignoreColor) return;
+    var value = this.dyn.getDig(
+      this.a.p,
+      this.a.typeid,
+      this.a.bitmask,
+      this.a.database,
+    );
 
-    if ( this.a.inverted)
-      value = !value;
+    if (this.a.inverted) value = !value;
 
-    if ( !this.firstScan) {
-      if ( this.a.oldValue == value && !this.dyn.resetColor) {
-	// No change since last time
-	if ( value)
-	  this.dyn.ignoreColor = true;
-	return;
+    if (!this.firstScan) {
+      if (this.a.oldValue == value && !this.dyn.resetColor) {
+        // No change since last time
+        if (value) this.dyn.ignoreColor = true;
+        return;
       }
-    }
-    else
-      this.firstScan = false;
-	
-    if ( (this.dyn.total_dyn_type1 & DynC.mDynType1_Tone) !== 0) {
-      if ( value) {
-	if ( this.color >= Glow.eDrawTone__) {
-	  if ( this.dyn.resetColor)
-	    object.resetFillColor();
-	  object.setFillColor(this.color);
-	}
-	else
-	  object.setColorTone( this.color);
-	this.dyn.ignoreColor = true;
-      }
-      else {
-	if ( this.color >= Glow.eDrawTone__)
-	  object.resetFillColor();
-	object.resetColorTone();
-	this.dyn.resetColor = true;
+    } else this.firstScan = false;
+
+    if ((this.dyn.total_dyn_type1 & DynC.mDynType1_Tone) !== 0) {
+      if (value) {
+        if (this.color >= Glow.eDrawTone__) {
+          if (this.dyn.resetColor) object.resetFillColor();
+          object.setFillColor(this.color);
+        } else object.setColorTone(this.color);
+        this.dyn.ignoreColor = true;
+      } else {
+        if (this.color >= Glow.eDrawTone__) object.resetFillColor();
+        object.resetColorTone();
+        this.dyn.resetColor = true;
       }
       this.dyn.repaintNow = true;
-    }
-    else {
-      if ( value) {
-	object.setFillColor( this.color);
-	this.dyn.ignoreColor = true;
-      }
-      else {
-	object.resetFillColor();
-	this.dyn.resetColor = true;
+    } else {
+      if (value) {
+        object.setFillColor(this.color);
+        this.dyn.ignoreColor = true;
+      } else {
+        object.resetFillColor();
+        this.dyn.resetColor = true;
       }
       this.dyn.repaintNow = true;
     }
     this.a.oldValue = value;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynDigColor : " + lines[i]);
+      if (this.dyn.debug) console.log("DynDigColor : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_DigColor: 
-	break;
-      case DynC.eSave_DigColor_attribute: 
-	if ( tokens.length > 1)
-	  this.attribute = tokens[1];
-	break;
-      case DynC.eSave_DigColor_color: 
-	this.color = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_DigColor_instance: 
-	this.instance = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_DigColor_instance_mask: 
-	this.instance_mask = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynDigColor");
-	break;
+      switch (key) {
+        case DynC.eSave_DigColor:
+          break;
+        case DynC.eSave_DigColor_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_DigColor_color:
+          this.color = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_DigColor_instance:
+          this.instance = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_DigColor_instance_mask:
+          this.instance_mask = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynDigColor");
+          break;
       }
-      
-      if ( end)
-	break;
-    }		
+
+      if (end) break;
+    }
     return i;
   };
 
-  this.action = function( object, e) {
+  this.action = function (object, e) {
     return 1;
   };
 }
 
-function DynDigWarning( dyn) {
+function DynDigWarning(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = DynC.mDynType1_DigWarning;
   this.dyn_type2 = 0;
@@ -2866,137 +3006,133 @@ function DynDigWarning( dyn) {
   this.attribute;
   this.use_colortheme = 0;
   this.firstScan = true;
-					 
-  this.setAttribute = function(o, name, value) {
+
+  this.setAttribute = function (o, name, value) {
     if (name === "DigWarning.Attribute") {
       this.attribute = value;
       return 1;
-    }
-    else if (name === "DigWarning.UseColorTheme") {
+    } else if (name === "DigWarning.UseColorTheme") {
       this.use_colortheme = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "DigWarning.Attribute") {
       ret.value = this.attribute;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "DigWarning.UseColorTheme") {
+    } else if (name === "DigWarning.UseColorTheme") {
       ret.value = this.use_colortheme;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
-  
-  this.connect = function( object) {
-    this.a = new DynReference( this.dyn, this.attribute);
+  };
+
+  this.connect = function (object) {
+    this.a = new DynReference(this.dyn, this.attribute);
     this.a.connect(this.dyn);
-    if ( !this.a.sts) {
+    if (!this.a.sts) {
       console.log("DigWarning: " + this.attribute);
       return 1;
     }
     return 1;
   };
 
-  this.disconnect = function() {
+  this.disconnect = function () {
     this.a.disconnect(this.dyn);
   };
 
-	
-  this.scan = function( object) {
-    if ( !this.a.sts || this.dyn.ignoreColor)
-      return;
-    var value = this.dyn.getDig( this.a.p, this.a.typeid, this.a.bitmask, this.a.database);
+  this.scan = function (object) {
+    if (!this.a.sts || this.dyn.ignoreColor) return;
+    var value = this.dyn.getDig(
+      this.a.p,
+      this.a.typeid,
+      this.a.bitmask,
+      this.a.database,
+    );
 
-    if ( this.a.inverted)
-      value = !value;
+    if (this.a.inverted) value = !value;
 
-    if ( !this.firstScan) {
-      if ( this.a.oldValue == value && !this.dyn.resetColor) {
-	// No change since last time
-	if ( value)
-	  this.dyn.ignoreColor = true;
-	return;
+    if (!this.firstScan) {
+      if (this.a.oldValue == value && !this.dyn.resetColor) {
+        // No change since last time
+        if (value) this.dyn.ignoreColor = true;
+        return;
       }
-    }
-    else
-      this.firstScan = false;
-	
-    if ( (this.dyn.total_dyn_type1 & DynC.mDynType1_Tone) !== 0) {
-      if ( value) {
-	object.setColorTone( Glow.eDrawTone_Yellow);
-	this.dyn.ignoreColor = true;
-      }
-      else {
-	object.resetFillColor();
-	object.resetColorTone();
-	this.dyn.resetColor = true;
+    } else this.firstScan = false;
+
+    if ((this.dyn.total_dyn_type1 & DynC.mDynType1_Tone) !== 0) {
+      if (value) {
+        object.setColorTone(Glow.eDrawTone_Yellow);
+        this.dyn.ignoreColor = true;
+      } else {
+        object.resetFillColor();
+        object.resetColorTone();
+        this.dyn.resetColor = true;
       }
       this.dyn.repaintNow = true;
-    }
-    else {
-      if (  value) {
-	object.setFillColor( (this.use_colortheme !== 0) ? Glow.eDrawType_CustomColor41 : Glow.eDrawType_ColorYellow);
-	this.dyn.ignoreColor = true;
-      }
-      else {
-	object.resetFillColor();
-	this.dyn.resetColor = true;
+    } else {
+      if (value) {
+        object.setFillColor(
+          this.use_colortheme !== 0
+            ? Glow.eDrawType_CustomColor41
+            : Glow.eDrawType_ColorYellow,
+        );
+        this.dyn.ignoreColor = true;
+      } else {
+        object.resetFillColor();
+        this.dyn.resetColor = true;
       }
       this.dyn.repaintNow = true;
     }
     this.a.oldValue = value;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynDigWarning : " + lines[i]);
+      if (this.dyn.debug) console.log("DynDigWarning : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_DigWarning: 
-	break;
-      case DynC.eSave_DigWarning_attribute: 
-	if ( tokens.length > 1)
-	  this.attribute = tokens[1];
-	break;
-      case DynC.eSave_DigWarning_use_colortheme:
-	this.use_colortheme = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynDigWarning");
-	break;
+      switch (key) {
+        case DynC.eSave_DigWarning:
+          break;
+        case DynC.eSave_DigWarning_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_DigWarning_use_colortheme:
+          this.use_colortheme = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynDigWarning");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
     return i;
   };
 
-  this.action = function( object, e) {
+  this.action = function (object, e) {
     return 1;
   };
 }
 
-function DynDigError( dyn) {
+function DynDigError(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = DynC.mDynType1_DigError;
   this.dyn_type2 = 0;
@@ -3005,141 +3141,137 @@ function DynDigError( dyn) {
   this.prio = DynC.eDynPrio_DigError;
   this.instance_mask = 0;
   this.instance = 0;
-  
+
   this.attribute;
   this.use_colortheme = 0;
   this.firstScan = true;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "DigError.Attribute") {
       this.attribute = value;
       return 1;
-    }
-    else if (name === "DigError.UseColorTheme") {
+    } else if (name === "DigError.UseColorTheme") {
       this.use_colortheme = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "DigError.Attribute") {
       ret.value = this.attribute;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "DigError.UseColorTheme") {
+    } else if (name === "DigError.UseColorTheme") {
       ret.value = this.use_colortheme;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( object) {
-    this.a = new DynReference( this.dyn, this.attribute);
+  this.connect = function (object) {
+    this.a = new DynReference(this.dyn, this.attribute);
     this.a.connect(this.dyn);
-    if ( !this.a.sts) {
+    if (!this.a.sts) {
       console.log("DigError: " + this.attribute);
       return 1;
     }
     return 1;
   };
 
-  this.disconnect = function() {
+  this.disconnect = function () {
     this.a.disconnect(this.dyn);
   };
 
-	
-  this.scan = function( object) {
-    if ( !this.a.sts || this.dyn.ignoreColor)
-      return;
-    var value = this.dyn.getDig( this.a.p, this.a.typeid, this.a.bitmask, this.a.database);
+  this.scan = function (object) {
+    if (!this.a.sts || this.dyn.ignoreColor) return;
+    var value = this.dyn.getDig(
+      this.a.p,
+      this.a.typeid,
+      this.a.bitmask,
+      this.a.database,
+    );
 
-    if ( this.a.inverted)
-      value = !value;
+    if (this.a.inverted) value = !value;
 
-    if ( !this.firstScan) {
-      if ( this.a.oldValue == value && !this.dyn.resetColor) {
-	// No change since last time
-	if ( value)
-	  this.dyn.ignoreColor = true;
-	return;
+    if (!this.firstScan) {
+      if (this.a.oldValue == value && !this.dyn.resetColor) {
+        // No change since last time
+        if (value) this.dyn.ignoreColor = true;
+        return;
       }
-    }
-    else
-      this.firstScan = false;
-	
-    if ( (this.dyn.total_dyn_type1 & DynC.mDynType1_Tone) !== 0) {
-      if ( value) {
-	object.setColorTone( Glow.eDrawTone_Red);
-	this.dyn.ignoreColor = true;
-      }
-      else {
-	object.resetFillColor();
-	object.resetColorTone();
-	this.dyn.resetColor = true;
+    } else this.firstScan = false;
+
+    if ((this.dyn.total_dyn_type1 & DynC.mDynType1_Tone) !== 0) {
+      if (value) {
+        object.setColorTone(Glow.eDrawTone_Red);
+        this.dyn.ignoreColor = true;
+      } else {
+        object.resetFillColor();
+        object.resetColorTone();
+        this.dyn.resetColor = true;
       }
       this.dyn.repaintNow = true;
-    }
-    else {
-      if (  value) {
-	object.setFillColor( (this.use_colortheme !== 0) ? Glow.eDrawType_CustomColor11 : Glow.eDrawType_ColorRed);
-	this.dyn.ignoreColor = true;
-      }
-      else {
-	object.resetFillColor();
-	this.dyn.resetColor = true;
+    } else {
+      if (value) {
+        object.setFillColor(
+          this.use_colortheme !== 0
+            ? Glow.eDrawType_CustomColor11
+            : Glow.eDrawType_ColorRed,
+        );
+        this.dyn.ignoreColor = true;
+      } else {
+        object.resetFillColor();
+        this.dyn.resetColor = true;
       }
       this.dyn.repaintNow = true;
     }
     this.a.oldValue = value;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynDigError : " + lines[i]);
+      if (this.dyn.debug) console.log("DynDigError : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_DigError: 
-	break;
-      case DynC.eSave_DigError_attribute: 
-	if ( tokens.length > 1)
-	  this.attribute = tokens[1];
-	break;
-      case DynC.eSave_DigError_use_colortheme:
-	this.use_colortheme = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynDigError");
-	break;
+      switch (key) {
+        case DynC.eSave_DigError:
+          break;
+        case DynC.eSave_DigError_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_DigError_use_colortheme:
+          this.use_colortheme = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynDigError");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
     return i;
   };
 
-  this.action = function( object, e) {
+  this.action = function (object, e) {
     return 1;
   };
 }
 
-function DynDigFlash( dyn) {
+function DynDigFlash(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = DynC.mDynType1_DigFlash;
   this.dyn_type2 = 0;
@@ -3156,173 +3288,158 @@ function DynDigFlash( dyn) {
   this.firstScan = true;
   this.on = false;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "DigFlash.Attribute") {
       this.attribute = value;
       return 1;
-    }
-    else if (name === "DigFlash.Color" || name === "DigFlash.Tone") {
+    } else if (name === "DigFlash.Color" || name === "DigFlash.Tone") {
       this.color = value;
       return 1;
-    }
-    else if (name === "DigFlash.Color2" || name === "DigFlash.Tone2") {
+    } else if (name === "DigFlash.Color2" || name === "DigFlash.Tone2") {
       this.color2 = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "DigFlash.Attribute") {
       ret.value = this.attribute;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "DigFlash.Color" || name === "DigFlash.Tone") {
+    } else if (name === "DigFlash.Color" || name === "DigFlash.Tone") {
       ret.value = this.color;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "DigFlash.Color2" || name === "DigFlash.Tone2") {
+    } else if (name === "DigFlash.Color2" || name === "DigFlash.Tone2") {
       ret.value = this.color2;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( object) {
+  this.connect = function (object) {
     this.color = this.dyn.getColor1(object, this.color);
 
-    this.a = new DynReference( this.dyn, this.attribute);
+    this.a = new DynReference(this.dyn, this.attribute);
     this.a.connect(this.dyn);
-    if ( !this.a.sts) {
+    if (!this.a.sts) {
       console.log("DigFlash: " + this.attribute);
       return 1;
     }
     return 1;
   };
 
-  this.disconnect = function() {
+  this.disconnect = function () {
     this.a.disconnect(this.dyn);
   };
 
-	
-  this.scan = function( object) {
-    if ( !this.a.sts || this.dyn.ignoreColor)
-      return;
-    var value = this.dyn.getDig( this.a.p, this.a.typeid, this.a.bitmask, this.a.database);
+  this.scan = function (object) {
+    if (!this.a.sts || this.dyn.ignoreColor) return;
+    var value = this.dyn.getDig(
+      this.a.p,
+      this.a.typeid,
+      this.a.bitmask,
+      this.a.database,
+    );
 
-    if ( this.a.inverted)
-      value = !value;
+    if (this.a.inverted) value = !value;
 
-    if ( !this.firstScan) {
-      if ( this.a.oldValue == value && !this.dyn.resetColor) {
-	// No change since last time
-	if ( !value)
-	  return;
+    if (!this.firstScan) {
+      if (this.a.oldValue == value && !this.dyn.resetColor) {
+        // No change since last time
+        if (!value) return;
       }
-    }
-    else
-      this.firstScan = false;
-	
-    if ( (this.dyn.total_dyn_type1 & DynC.mDynType1_Tone) !== 0) {
-      if ( value) {
-	if ( this.on) {
-	  if ( this.color >= Glow.eDrawTone__)
-	    object.setColorTone(this.color);
-	  else
-	    object.setFillColor(this.color);
-	  this.dyn.ignoreColor = true;
-	}
-	else {
-	  object.resetFillColor();
-	  object.resetColorTone();
-	  this.dyn.resetColor = true;
-	}
-	this.on = !this.on;
-      }
-      else {
-	object.resetFillColor();
-	object.resetColorTone();
-	this.dyn.resetColor = true;
+    } else this.firstScan = false;
+
+    if ((this.dyn.total_dyn_type1 & DynC.mDynType1_Tone) !== 0) {
+      if (value) {
+        if (this.on) {
+          if (this.color >= Glow.eDrawTone__) object.setColorTone(this.color);
+          else object.setFillColor(this.color);
+          this.dyn.ignoreColor = true;
+        } else {
+          object.resetFillColor();
+          object.resetColorTone();
+          this.dyn.resetColor = true;
+        }
+        this.on = !this.on;
+      } else {
+        object.resetFillColor();
+        object.resetColorTone();
+        this.dyn.resetColor = true;
       }
       this.dyn.repaintNow = true;
-    }
-    else {
-      if (  value) {
-	if ( this.on) {
-	  object.setFillColor(this.color);
-	  this.dyn.ignoreColor = true;
-	}
-	else {
-	  if ( this.color2 == Glow.eDrawType_Inherit) {
-	    object.resetFillColor();
-	    this.dyn.resetColor = true;
-	  }
-	  else {
-	    object.setFillColor(this.color2);
-	    this.dyn.ignoreColor = true;
-	  }
-	}
-	this.on = !this.on;
-      }
-      else {
-	object.resetFillColor();
-	this.dyn.resetColor = true;
+    } else {
+      if (value) {
+        if (this.on) {
+          object.setFillColor(this.color);
+          this.dyn.ignoreColor = true;
+        } else {
+          if (this.color2 == Glow.eDrawType_Inherit) {
+            object.resetFillColor();
+            this.dyn.resetColor = true;
+          } else {
+            object.setFillColor(this.color2);
+            this.dyn.ignoreColor = true;
+          }
+        }
+        this.on = !this.on;
+      } else {
+        object.resetFillColor();
+        this.dyn.resetColor = true;
       }
       this.dyn.repaintNow = true;
     }
     this.a.oldValue = value;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynDigError : " + lines[i]);
+      if (this.dyn.debug) console.log("DynDigError : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_DigFlash: 
-	break;
-      case DynC.eSave_DigFlash_attribute: 
-	if ( tokens.length > 1)
-	  this.attribute = tokens[1];
-	break;
-      case DynC.eSave_DigFlash_color: 
-	this.color = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_DigFlash_color2: 
-	this.color2 = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynDigFlash");
-	break;
+      switch (key) {
+        case DynC.eSave_DigFlash:
+          break;
+        case DynC.eSave_DigFlash_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_DigFlash_color:
+          this.color = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_DigFlash_color2:
+          this.color2 = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynDigFlash");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
     return i;
   };
 
-  this.action = function( object, e) {
+  this.action = function (object, e) {
     return 1;
   };
 }
 
-function DynInvisible( dyn, instance) {
+function DynInvisible(dyn, instance) {
   this.dyn = dyn;
   this.dyn_type1 = DynC.mDynType1_Invisible;
   this.dyn_type2 = 0;
@@ -3340,7 +3457,7 @@ function DynInvisible( dyn, instance) {
   this.cmd;
   this.command;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "Invisible.Instances" && this.instance == DynC.mInstance_1) {
       this.instance_mask = value;
       this.dyn.update_elements();
@@ -3349,28 +3466,24 @@ function DynInvisible( dyn, instance) {
     var inst = this.dyn.instance_number(this.instance);
     var iname;
     var inames = new Array(3);
-    if (inst == 1)
-      iname = "Invisible";
-    else
-      iname = "Invisible" + inst.toString();
+    if (inst == 1) iname = "Invisible";
+    else iname = "Invisible" + inst.toString();
     inames[0] = iname + ".Attribute";
     inames[1] = iname + ".Dimmed";
     inames[2] = iname + ".DimLevel";
     if (name === inames[0]) {
-      this.attribute =  value;
+      this.attribute = value;
       return 1;
-    }
-    else if (name === inames[1]) {
-      this.dimmed =  value;
+    } else if (name === inames[1]) {
+      this.dimmed = value;
       return 1;
-    }
-    else if (name === inames[2]) {
-      this.dim_level =  value;
+    } else if (name === inames[2]) {
+      this.dim_level = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "Invisible.Instances" && this.instance == DynC.mInstance_1) {
       ret.value = this.instance_mask;
@@ -3380,10 +3493,8 @@ function DynInvisible( dyn, instance) {
     var inst = this.dyn.instance_number(this.instance);
     var iname;
     var inames = new Array(3);
-    if (inst == 1)
-      iname = "Invisible";
-    else
-      iname = "Invisible" + inst.toString();
+    if (inst == 1) iname = "Invisible";
+    else iname = "Invisible" + inst.toString();
     inames[0] = iname + ".Attribute";
     inames[1] = iname + ".Dimmed";
     inames[2] = iname + ".DimLevel";
@@ -3391,161 +3502,147 @@ function DynInvisible( dyn, instance) {
       ret.value = this.attribute;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === inames[1]) {
+    } else if (name === inames[1]) {
       ret.value = this.dimmed;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === inames[2]) {
+    } else if (name === inames[2]) {
       ret.value = this.dim_level;
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( object) {
-
-    if ( this.attribute !== null && this.attribute.toLowerCase().substring(0,5) == "$cmd(") {
+  this.connect = function (object) {
+    if (
+      this.attribute !== null &&
+      this.attribute.toLowerCase().substring(0, 5) == "$cmd("
+    ) {
       this.cmd = true;
-      var idx = this.attribute.lastIndexOf(')');
-      if ( idx != -1 && idx > 5)
-	this.command = this.attribute.substring(5, idx);
-      else
-	this.command = this.attribute.substring(5);
-      this.command = this.dyn.graph.getCommand(command);
-    }
-    else {
-      this.a = new DynReference( this.dyn, this.attribute);
+      var idx = this.attribute.lastIndexOf(")");
+      if (idx != -1 && idx > 5) this.command = this.attribute.substring(5, idx);
+      else this.command = this.attribute.substring(5);
+      this.command = this.dyn.graph.getCommand(this.command);
+    } else {
+      this.a = new DynReference(this.dyn, this.attribute);
       this.a.connect(this.dyn);
-      if ( !this.a.sts) {
-	console.log("DigFlash: " + this.attribute);
-	return 1;
+      if (!this.a.sts) {
+        console.log("DigFlash: " + this.attribute);
+        return 1;
       }
     }
     return 1;
   };
 
-  this.disconnect = function() {
+  this.disconnect = function () {
     this.a.disconnect(this.dyn);
   };
 
-  this.scan = function( o) {
-
-    if ( this.cmd) {
-      if ( this.firstScan) {
-	var sts = this.dyn.graph.command( this.command);
-	console.log( "DynInvisible: " + this.command + ", value: " + sts);
-	if ( sts === 0) {
-	  if ( this.dimmed === 0)
-	    o.setVisibility( Glow.eVis_Invisible);
-	  else
-	    o.setVisibility( Glow.eVis_Dimmed);
-	}
-	this.firstScan = false;
+  this.scan = function (o) {
+    if (this.cmd) {
+      if (this.firstScan) {
+        var sts = this.dyn.graph.command(this.command);
+        console.log("DynInvisible: " + this.command + ", value: " + sts);
+        if (sts === 0) {
+          if (this.dimmed === 0) o.setVisibility(Glow.eVis_Invisible);
+          else o.setVisibility(Glow.eVis_Dimmed);
+        }
+        this.firstScan = false;
       }
       return;
     }
 
-    if ( !this.a.sts || this.dyn.ignoreInvisible)
-      return;
-    var value = this.dyn.getDig( this.a.p, this.a.typeid, this.a.bitmask, this.a.database);
+    if (!this.a.sts || this.dyn.ignoreInvisible) return;
+    var value = this.dyn.getDig(
+      this.a.p,
+      this.a.typeid,
+      this.a.bitmask,
+      this.a.database,
+    );
 
+    if (this.a.typeid == Pwr.eType_String) value = !value;
 
-    if ( this.a.typeid == Pwr.eType_String)
-      value = !value;
+    if (this.a.inverted) value = !value;
 
-    if ( this.a.inverted)
-      value = !value;
-
-    if ( !this.firstScan) {
-      if ( this.a.oldValue == value && !this.dyn.resetInvisible) {
-	// No change since last time
-	if ( value)
-	  this.dyn.ignoreInvisible;
-	return;
+    if (!this.firstScan) {
+      if (this.a.oldValue == value && !this.dyn.resetInvisible) {
+        // No change since last time
+        if (value) this.dyn.ignoreInvisible;
+        return;
       }
-    }
-    else
-      this.firstScan = false;
+    } else this.firstScan = false;
 
-    if ( value) {
-      if ( this.dimmed === 0)
-	o.setVisibility( Glow.eVis_Invisible);
+    if (value) {
+      if (this.dimmed === 0) o.setVisibility(Glow.eVis_Invisible);
       else {
-	o.setVisibility( Glow.eVis_Dimmed);
-	if (this.dim_level !== 0)
-	  o.setTransparency(this.dim_level);
+        o.setVisibility(Glow.eVis_Dimmed);
+        if (this.dim_level !== 0) o.setTransparency(this.dim_level);
       }
       this.dyn.ignoreColor = true;
       this.dyn.ignoreInvisible = true;
-    }
-    else {
-      o.setVisibility( Glow.eVis_Visible);
+    } else {
+      o.setVisibility(Glow.eVis_Visible);
       this.dyn.resetColor = true;
       this.dyn.resetInvisible = true;
-      if (this.dim_level !== 0)
-	o.setTransparency(0);
+      if (this.dim_level !== 0) o.setTransparency(0);
     }
     this.dyn.repaintNow = true;
     this.a.oldValue = value;
   };
-	
-  this.open = function( lines, row) {
+
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynInvisible : " + lines[i]);
+      if (this.dyn.debug) console.log("DynInvisible : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_Invisible: 
-	break;
-      case DynC.eSave_Invisible_attribute: 
-	if ( tokens.length > 1)
-	  this.attribute = lines[i].substring(4);
-	break;
-      case DynC.eSave_Invisible_dimmed: 
-	this.dimmed = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_Invisible_dim_level: 
-	this.dim_level = parseFloat(tokens[1]);
-	break;
-      case DynC.eSave_Invisible_instance: 
-	this.instance = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_Invisible_instance_mask: 
-	this.instance_mask = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynInvisible");
-	break;
+      switch (key) {
+        case DynC.eSave_Invisible:
+          break;
+        case DynC.eSave_Invisible_attribute:
+          if (tokens.length > 1) this.attribute = lines[i].substring(4);
+          break;
+        case DynC.eSave_Invisible_dimmed:
+          this.dimmed = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_Invisible_dim_level:
+          this.dim_level = parseFloat(tokens[1]);
+          break;
+        case DynC.eSave_Invisible_instance:
+          this.instance = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_Invisible_instance_mask:
+          this.instance_mask = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynInvisible");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-		
+
     return i;
   };
 
-  this.action = function( object, e) {
+  this.action = function (object, e) {
     return 1;
   };
 }
- 
-function DynDigTextColor( dyn) {
+
+function DynDigTextColor(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = DynC.mDynType2_DigTextColor;
@@ -3559,121 +3656,112 @@ function DynDigTextColor( dyn) {
   this.attribute;
   this.color;
   this.firstScan = true;
-	
-  this.setAttribute = function(o, name, value) {
+
+  this.setAttribute = function (o, name, value) {
     if (name === "DigTextColor.Attribute") {
       this.attribute = value;
       return 1;
-    }
-    else if (name === "DigTextColor.Color") {
+    } else if (name === "DigTextColor.Color") {
       this.color = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "DigTextColor.Attribute") {
       ret.value = this.attribute;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "DigTextColor.Color") {
+    } else if (name === "DigTextColor.Color") {
       ret.value = this.color;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
     }
     return 0;
-  }
+  };
 
-  this.connect = function( object) {
+  this.connect = function (object) {
     this.color = this.dyn.getColor1(object, this.color);
-    if ( this.color < 0 || this.color >= Glow.eDrawType__)
-      return 0;
+    if (this.color < 0 || this.color >= Glow.eDrawType__) return 0;
 
-    this.a = new DynReference( this.dyn, this.attribute);
+    this.a = new DynReference(this.dyn, this.attribute);
     this.a.connect(this.dyn);
-    if ( !this.a.sts) {
+    if (!this.a.sts) {
       console.log("DigTextColor: " + this.attribute);
       return 1;
     }
     return 1;
   };
 
-  this.disconnect = function() {
-    if ( this.a !== null)
-      this.a.disconnect(this.dyn);
+  this.disconnect = function () {
+    if (this.a !== null) this.a.disconnect(this.dyn);
   };
 
-	
-  this.scan = function( object) {
-    if ( this.a ===  null || !this.a.sts || this.dyn.ignoreColor)
-      return;
-    var value = this.dyn.getDig( this.a.p, this.a.typeid, this.a.bitmask, this.a.database);
+  this.scan = function (object) {
+    if (this.a === null || !this.a.sts || this.dyn.ignoreColor) return;
+    var value = this.dyn.getDig(
+      this.a.p,
+      this.a.typeid,
+      this.a.bitmask,
+      this.a.database,
+    );
 
-    if ( this.a.inverted)
-      value = !value;
+    if (this.a.inverted) value = !value;
 
-    if ( !this.firstScan) {
-      if ( this.a.oldValue == value && !this.dyn.resetColor)
-	return;
-    }
-    else
-      this.firstScan = false;
-	
-    if ( value)
-      object.setTextColor( this.color);
-    else 
-      object.resetTextColor();		
+    if (!this.firstScan) {
+      if (this.a.oldValue == value && !this.dyn.resetColor) return;
+    } else this.firstScan = false;
+
+    if (value) object.setTextColor(this.color);
+    else object.resetTextColor();
     this.dyn.repaintNow = true;
 
     this.a.oldValue = value;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DigTextColor : " + lines[i]);
+      if (this.dyn.debug) console.log("DigTextColor : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_DigTextColor: 
-	break;
-      case DynC.eSave_DigTextColor_attribute: 
-	if ( tokens.length > 1)
-	  this.attribute = tokens[1];
-	break;
-      case DynC.eSave_DigTextColor_color: 
-	this.color = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynDigTextColor");
-	break;
+      switch (key) {
+        case DynC.eSave_DigTextColor:
+          break;
+        case DynC.eSave_DigTextColor_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_DigTextColor_color:
+          this.color = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynDigTextColor");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-		
+
     return i;
   };
 
-  this.action = function( object, e) {
+  this.action = function (object, e) {
     return 1;
   };
 }
 
-function DynDigText( dyn, instance) {
+function DynDigText(dyn, instance) {
   this.dyn = dyn;
   this.dyn_type1 = DynC.mDynType1_DigText;
   this.dyn_type2 = 0;
@@ -3689,49 +3777,40 @@ function DynDigText( dyn, instance) {
   this.high_text;
   this.firstScan = true;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     var inst = this.dyn.instance_number(this.instance);
     var iname;
     var inames = new Array(4);
-    if (inst == 1)
-      iname = "DigText";
-    else
-      iname = "DigText" + inst.toString();
+    if (inst == 1) iname = "DigText";
+    else iname = "DigText" + inst.toString();
     inames[0] = "DigText.Instances";
     inames[1] = "DigText.Text";
     inames[2] = iname + ".Attribute";
-    if (inst == 1)
-      inames[3] = iname + ".LowText";
-    else
-      inames[3] = iname + ".HighText";
+    if (inst == 1) inames[3] = iname + ".LowText";
+    else inames[3] = iname + ".HighText";
     if (name === inames[0] && this.instance == DynC.mInstance_1) {
       this.instance_mask = value;
       this.dyn.update_elements();
       return 1;
-    }
-    else if (name === inames[1] && this.instance == DynC.mInstance_1) {
+    } else if (name === inames[1] && this.instance == DynC.mInstance_1) {
       o.setAnnotation(1, value);
       return 1;
-    }
-    else if (name === inames[2]) {
-      this.attribute =  value;
+    } else if (name === inames[2]) {
+      this.attribute = value;
       return 1;
-    }
-    else if (name === inames[3]) {
+    } else if (name === inames[3]) {
       this.low_text = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     var inst = this.dyn.instance_number(this.instance);
     var iname;
     var inames = new Array(4);
-    if (inst == 1)
-      iname = "DigText";
-    else
-      iname = "DigText" + inst.toString();
+    if (inst == 1) iname = "DigText";
+    else iname = "DigText" + inst.toString();
     inames[0] = "DigText.Instances";
     inames[1] = "DigText.Text";
     inames[2] = iname + ".Attribute";
@@ -3740,120 +3819,143 @@ function DynDigText( dyn, instance) {
       ret.value = this.instance_mask;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === inames[1] && this.instance == DynC.mInstance_1) {
+    } else if (name === inames[1] && this.instance == DynC.mInstance_1) {
       ret.value = o.getAnnotation(1);
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === inames[2]) {
+    } else if (name === inames[2]) {
       ret.value = this.attribute;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === inames[3]) {
+    } else if (name === inames[3]) {
       ret.value = this.low_text;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( object) {
+  this.connect = function (object) {
+    if (this.low_text === null) return 1;
 
-    if ( this.low_text === null)
-      return 1;
-
-    this.a = new DynReference( this.dyn, this.attribute);
+    this.a = new DynReference(this.dyn, this.attribute);
     this.a.connect(this.dyn);
-    if ( !this.a.sts) {
+    if (!this.a.sts) {
       console.log("DigText: " + this.attribute);
       return 1;
     }
     this.high_text = object.getAnnotation(1);
-    if ( this.high_text === null)
-      this.high_text = "";
+    if (this.high_text === null) this.high_text = "";
     return 1;
   };
 
-  this.disconnect = function() {
+  this.disconnect = function () {
     this.a.disconnect(this.dyn);
   };
-	
-  this.scan = function( object) {
-    if ( !this.a.sts)
-      return;
-    var value = this.dyn.getDig( this.a.p, this.a.typeid, this.a.bitmask, this.a.database);
 
-    if ( this.a.inverted)
-      value = !value;
+  this.scan = function (object) {
+    var inst = this.dyn.instance_number(this.instance);
+    if (!this.a.sts || this.dyn.ignoreTextA1) return;
+    var value = this.dyn.getDig(
+      this.a.p,
+      this.a.typeid,
+      this.a.bitmask,
+      this.a.database,
+    );
 
-    if ( !this.firstScan) {
-      if ( this.a.oldValue == value)
-	return;
+    if (this.a.inverted) value = !value;
+
+    if (inst == DynC.mInstance_1) {
+      // Write low_text on low signal
+      if (!this.firstScan) {
+        if (this.a.oldValue == value && !this.dyn.resetTextA1) {
+          // No change since last time
+          return;
+        }
+      } else {
+        this.firstScan = false;
+      }
+
+      if (!value) {
+        object.setAnnotation(1, this.low_text);
+        this.dyn.resetTextA1 = true;
+      } else {
+        object.setAnnotation(1, this.high_text);
+      }
+    } else {
+      // Instance > 1, write low_text on high signal
+      if (!this.firstScan) {
+        if (this.a.oldValue == value && !this.dyn.resetTextA1) {
+          // No change since last time
+          if (value) {
+            this.dyn.ignoreTextA1 = true;
+          }
+          return;
+        }
+      } else {
+        this.firstScan = false;
+      }
+
+      if (value) {
+        object.setAnnotation(1, this.low_text);
+        this.dyn.ignoreTextA1 = true;
+      } else {
+        object.setAnnotation(1, this.high_text);
+        this.dyn.resetTextA1 = true;
+      }
     }
-    else
-      this.firstScan = false;
-	
-    if ( value)
-      object.setAnnotation(1, this.high_text);
-    else
-      object.setAnnotation(1, this.low_text);
     this.dyn.repaintNow = true;
     this.a.oldValue = value;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DigText : " + lines[i]);
+      if (this.dyn.debug) console.log("DigText : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_DigText: 
-	break;
-      case DynC.eSave_DigText_attribute: 
-	if ( tokens.length > 1)
-	  this.attribute = tokens[1];
-	break;
-      case DynC.eSave_DigText_low_text: 
-	if ( tokens.length > 1)
-	  this.low_text = lines[i].substring(5);
-	break;
-      case DynC.eSave_DigText_instance: 
-	this.instance = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_DigText_instance_mask: 
-	this.instance_mask = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynDigText");
-	break;
+      switch (key) {
+        case DynC.eSave_DigText:
+          break;
+        case DynC.eSave_DigText_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_DigText_low_text:
+          if (tokens.length > 1) this.low_text = lines[i].substring(5);
+          break;
+        case DynC.eSave_DigText_instance:
+          this.instance = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_DigText_instance_mask:
+          this.instance_mask = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynDigText");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
     return i;
   };
 
-  this.action = function( object, e) {
+  this.action = function (object, e) {
     return 1;
   };
 }
- 
-function DynDigBorder( dyn) {
+
+function DynDigBorder(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = DynC.mDynType1_DigBorder;
   this.dyn_type2 = 0;
@@ -3868,118 +3970,113 @@ function DynDigBorder( dyn) {
   this.color;
   this.firstScan = true;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "DigBorder.Attribute") {
       this.attribute = value;
       return 1;
-    }
-    else if (name === "DigBorder.LowColor") {
+    } else if (name === "DigBorder.LowColor") {
       this.color = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "DigBorder.Attribute") {
       ret.value = this.attribute;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "DigBorder.LowColor") {
+    } else if (name === "DigBorder.LowColor") {
       ret.value = this.color;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( object) {
-    this.a = new DynReference( this.dyn, this.attribute);
+  this.connect = function (object) {
+    this.a = new DynReference(this.dyn, this.attribute);
     this.a.connect(this.dyn);
-    if ( !this.a.sts) {
+    if (!this.a.sts) {
       console.log("DigBorder: " + this.attribute);
       return 1;
     }
     return 1;
   };
 
-  this.disconnect = function() {
+  this.disconnect = function () {
     this.a.disconnect(this.dyn);
   };
 
-	
-  this.scan = function( object) {
-    if ( !this.a.sts)
-      return;
-    var value = this.dyn.getDig( this.a.p, this.a.typeid, this.a.bitmask, this.a.database);
+  this.scan = function (object) {
+    if (!this.a.sts) return;
+    var value = this.dyn.getDig(
+      this.a.p,
+      this.a.typeid,
+      this.a.bitmask,
+      this.a.database,
+    );
 
-    if ( this.a.inverted)
-      value = !value;
+    if (this.a.inverted) value = !value;
 
-    if ( !this.firstScan) {
-      if ( this.a.oldValue == value) {
-	// No change since last time
-	return;
+    if (!this.firstScan) {
+      if (this.a.oldValue == value) {
+        // No change since last time
+        return;
       }
-    }
-    else
-      this.firstScan = false;
-	
-    if ( value) {
+    } else this.firstScan = false;
+
+    if (value) {
       object.setBorderColor(this.color);
-    }
-    else {
+    } else {
       object.resetBorderColor();
     }
     this.dyn.repaintNow = true;
     this.a.oldValue = value;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynBorder : " + lines[i]);
+      if (this.dyn.debug) console.log("DynBorder : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_DigBorder: 
-	break;
-      case DynC.eSave_DigBorder_attribute: 
-	if ( tokens.length > 1)
-	  this.attribute = tokens[1];
-	break;
-      case DynC.eSave_DigBorder_color: 
-	this.color = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynDigBorder");
-	break;
+      switch (key) {
+        case DynC.eSave_DigBorder:
+          break;
+        case DynC.eSave_DigBorder_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_DigBorder_color:
+          this.color = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynDigBorder");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-    return  i;
+    return i;
   };
 
-  this.action = function( object, e) {
+  this.action = function (object, e) {
     return 1;
   };
 }
 
-function DynValue( dyn) {
+function DynValue(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = DynC.mDynType1_Value;
   this.dyn_type2 = 0;
@@ -4000,17 +4097,15 @@ function DynValue( dyn) {
   this.oldValueF;
   this.oldValueI;
   this.oldValueS;
-  this.cFormat =  null;
+  this.cFormat = null;
   this.convert_element = null;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     var inst = this.dyn.instance_number(this.instance);
     var iname;
     var inames = new Array(6);
-    if (inst == 1)
-      iname = "Value";
-    else
-      iname = "Value" + inst.toString();
+    if (inst == 1) iname = "Value";
+    else iname = "Value" + inst.toString();
     inames[0] = "Value.Instances";
     inames[1] = iname + ".Attribute";
     inames[2] = iname + ".Format";
@@ -4021,38 +4116,31 @@ function DynValue( dyn) {
       this.instance_mask = value;
       this.dyn.update_elements();
       return 1;
-    }
-    else if (name === inames[1]) {
-      this.attribute =  value;
+    } else if (name === inames[1]) {
+      this.attribute = value;
       return 1;
-    }
-    else if (name === inames[2]) {
+    } else if (name === inames[2]) {
       this.format = value;
       return 1;
-    }
-    else if (name === inames[3]) {
+    } else if (name === inames[3]) {
       this.zero_blank = value;
       return 1;
-    }
-    else if (name === inames[4]) {
+    } else if (name === inames[4]) {
       this.decimals_attr = value;
       return 1;
-    }
-    else if (name === inames[5]) {
+    } else if (name === inames[5]) {
       this.decimals_decr = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     var inst = this.dyn.instance_number(this.instance);
     var iname;
     var inames = new Array(6);
-    if (inst == 1)
-      iname = "Value";
-    else
-      iname = "Value" + inst.toString();
+    if (inst == 1) iname = "Value";
+    else iname = "Value" + inst.toString();
     inames[0] = "Value.Instances";
     inames[1] = iname + ".Attribute";
     inames[2] = iname + ".Format";
@@ -4063,270 +4151,262 @@ function DynValue( dyn) {
       ret.value = this.instance_mask;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === inames[1]) {
+    } else if (name === inames[1]) {
       ret.value = this.attribute;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === inames[2]) {
+    } else if (name === inames[2]) {
       ret.value = this.format;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === inames[3]) {
+    } else if (name === inames[3]) {
       ret.value = this.zero_blank;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === inames[4]) {
+    } else if (name === inames[4]) {
       ret.value = this.decimals_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === inames[5]) {
+    } else if (name === inames[5]) {
       ret.value = this.decimals_decr;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.read_decimals = function( dyn, attr, decr, format) {
-    var 	decimals;
+  this.read_decimals = function (dyn, attr, decr, format) {
+    var decimals;
 
-    var pname = dyn.parseAttrName( attr);
-    if ( pname === null || pname.name === "") 
-      return format;
-	    
-    switch ( pname.type) {
-    case Pwr.eType_Int32:
-    case Pwr.eType_UInt32:
-    case Pwr.eType_Enum:
-    case Pwr.eType_Mask:
-      break;
-    default:
-      return format;
+    var pname = dyn.parseAttrName(attr);
+    if (pname === null || pname.name === "") return format;
+
+    switch (pname.type) {
+      case Pwr.eType_Int32:
+      case Pwr.eType_UInt32:
+      case Pwr.eType_Enum:
+      case Pwr.eType_Mask:
+        break;
+      default:
+        return format;
     }
 
     // TODO
     return format; // TODO
-    var ret = this.dyn.graph.getGdh().getObjectInfoInt( pname.name);
-    if ( ret.evenSts()) return format;
+    var ret = this.dyn.graph.getGdh().getObjectInfoInt(pname.name);
+    if (ret.evenSts()) return format;
 
     decimals = ret.value - decr;
-    if ( decimals < 0)
-      decimals = 0;
-    if ( decimals >= 10)
-      return format;
+    if (decimals < 0) decimals = 0;
+    if (decimals >= 10) return format;
 
-    if ( format === null)
-      return "%." + decimals + "f";
+    if (format === null) return "%." + decimals + "f";
 
     // Print format, of replace digit between . and f
-    var s = format.indexOf( 'f');
-    if ( s == -1)
-      return "%." + decimals + "f";
+    var s = format.indexOf("f");
+    if (s == -1) return "%." + decimals + "f";
     else {
-      if ( s < 2 || format.charAt(s-2) != '.')
-	return "%." + decimals + "f";
-      else
-	return format.substring( 0, s-1) + decimals + format.substring(s);
+      if (s < 2 || format.charAt(s - 2) != ".") return "%." + decimals + "f";
+      else return format.substring(0, s - 1) + decimals + format.substring(s);
     }
   };
 
-  this.connect = function( object) {
-    if (this.a != null)
-      return 1;
-    if ( this.format === null && this.decimals_attr === null)
-      return 1;
+  this.connect = function (object) {
+    if (this.a != null) return 1;
+    if (this.format === null && this.decimals_attr === null) return 1;
 
-    if ( typeof this.decimals_attr != 'undefined' && this.decimals_attr !== null && !(this.decimals_attr === "")) {
-      this.format = this.read_decimals( this.dyn, this.decimals_attr, this.decimals_decr, this.format);
-      console.log( "read_decimals " + this.format);
+    if (
+      typeof this.decimals_attr != "undefined" &&
+      this.decimals_attr !== null &&
+      !(this.decimals_attr === "")
+    ) {
+      this.format = this.read_decimals(
+        this.dyn,
+        this.decimals_attr,
+        this.decimals_decr,
+        this.format,
+      );
+      console.log("read_decimals " + this.format);
     }
-    if ( this.format === null)
-      return 1;
+    if (this.format === null) return 1;
     this.cFormat = new GlowCFormat(this.format);
 
-    this.a = new DynReference( this.dyn, this.attribute);
+    this.a = new DynReference(this.dyn, this.attribute);
     this.a.connect(this.dyn);
-    if ( !this.a.sts) {
+    if (!this.a.sts) {
       console.log("Value: " + this.attribute);
       return 1;
     }
 
     this.convert_element = null;
-    for ( var j = 0; j < this.dyn.elements.length; j++) {
-      if ( this.dyn.elements[j].dyn_type2 == DynC.mDynType2_UnitConvert) {
-	this.convert_element = this.dyn.elements[j];
-	break;
+    for (var j = 0; j < this.dyn.elements.length; j++) {
+      if (this.dyn.elements[j].dyn_type2 == DynC.mDynType2_UnitConvert) {
+        this.convert_element = this.dyn.elements[j];
+        break;
       }
     }
 
     return 1;
   };
 
-  this.disconnect = function() {
+  this.disconnect = function () {
     this.a.disconnect(this.dyn);
   };
 
-  this.month = function(str) {
-    if (str === "JAN")
-      return "01";
-    if (str === "FEB")
-      return "02";
-    if (str === "MAR")
-      return "03";
-    if (str === "APR")
-      return "04";
-    if (str === "MAY")
-      return "05";
-    if (str === "JUN")
-      return "06";
-    if (str === "JUL")
-      return "07";
-    if (str === "AUG")
-      return "08";
-    if (str === "SEP")
-      return "09";
-    if (str === "OCT")
-      return "10";
-    if (str === "NOV")
-      return "11";
-    if (str === "DEC")
-      return "12";
+  this.month = function (str) {
+    if (str === "JAN") return "01";
+    if (str === "FEB") return "02";
+    if (str === "MAR") return "03";
+    if (str === "APR") return "04";
+    if (str === "MAY") return "05";
+    if (str === "JUN") return "06";
+    if (str === "JUL") return "07";
+    if (str === "AUG") return "08";
+    if (str === "SEP") return "09";
+    if (str === "OCT") return "10";
+    if (str === "NOV") return "11";
+    if (str === "DEC") return "12";
     return str;
-  }
+  };
 
-  this.scan = function( object) {
-    if ( !this.a.sts)
-      return;
+  this.scan = function (object) {
+    if (!this.a.sts) return;
 
-    var annot_num = this.dyn.instance_to_number( this.instance);
+    var annot_num = this.dyn.instance_to_number(this.instance);
 
-    switch ( this.a.typeid) {
-    case Pwr.eType_Float32: {
-      var value0 = this.a.get_ref_value(this.dyn);
-      if ( typeof value0 == 'undefined')
-	return;
+    switch (this.a.typeid) {
+      case Pwr.eType_Float32: {
+        var value0 = this.a.get_ref_value(this.dyn);
+        if (typeof value0 == "undefined") return;
 
-      if (this.convert_element != null)
-        value0 = uc_convert(this.convert_element.entity, this.convert_element.db_unit, 
-		       this.convert_element.display_unit, value0);
+        if (this.convert_element != null)
+          value0 = uc_convert(
+            this.convert_element.entity,
+            this.convert_element.db_unit,
+            this.convert_element.display_unit,
+            value0,
+          );
 
-      if ( value0 != this.oldValueF  || this.firstScan) {
-	if ( this.cFormat !== null) {
-	  var sb = this.cFormat.format( value0);
-	  object.setAnnotation( annot_num, sb);
-	}
-	this.dyn.repaintNow = true;
-	this.oldValueF = value0;
+        if (value0 != this.oldValueF || this.firstScan) {
+          if (this.zero_blank !== 0 && value0 === 0) {
+            object.setAnnotation(annot_num, "");
+          } else {
+            if (this.cFormat !== null) {
+              var sb = this.cFormat.format(value0);
+              object.setAnnotation(annot_num, sb);
+            }
+          }
+          this.dyn.repaintNow = true;
+          this.oldValueF = value0;
+        }
+        break;
       }
-      break;
-    }
-    case Pwr.eType_Int32:
-    case Pwr.eType_UInt32:
-    case Pwr.eType_Int16:
-    case Pwr.eType_UInt16:
-    case Pwr.eType_Int8:
-    case Pwr.eType_UInt8: {
-      var value0 = this.a.get_ref_value(this.dyn);
-      if ( typeof value0 == 'undefined')
-	return;
+      case Pwr.eType_Int32:
+      case Pwr.eType_UInt32:
+      case Pwr.eType_Int16:
+      case Pwr.eType_UInt16:
+      case Pwr.eType_Int8:
+      case Pwr.eType_UInt8: {
+        var value0 = this.a.get_ref_value(this.dyn);
+        if (typeof value0 == "undefined") return;
 
-      if ( value0 != this.oldValueI || this.firstScan) {
-	if ( this.cFormat !== null) {
-	  var sb = this.cFormat.format( value0);
-	  object.setAnnotation( annot_num, sb);
-	}
-	this.dyn.repaintNow = true;
-	this.oldValueI = value0;
+        if (value0 != this.oldValueI || this.firstScan) {
+          if (this.zero_blank !== 0 && value0 === 0) {
+            object.setAnnotation(annot_num, "");
+          } else {
+            if (this.cFormat !== null) {
+              var sb = this.cFormat.format(value0);
+              object.setAnnotation(annot_num, sb);
+            }
+          }
+          this.dyn.repaintNow = true;
+          this.oldValueI = value0;
+        }
+        break;
       }
-      break;
-    }
-    case Pwr.eType_Boolean: {
-      var value0 = this.a.get_ref_value(this.dyn);
-      if ( typeof value0 == 'undefined')
-	return;
+      case Pwr.eType_Boolean: {
+        var value0 = this.a.get_ref_value(this.dyn);
+        if (typeof value0 == "undefined") return;
 
-      if ( value0 != this.oldValueB || this.firstScan) {
-	if ( this.cFormat !== null) {
-	  var sb = this.cFormat.format( value0);
-	  object.setAnnotation( annot_num, sb);
-	}
-	this.dyn.repaintNow = true;
-	this.oldValueB = value0;
+        if (value0 != this.oldValueB || this.firstScan) {
+          if (this.cFormat !== null) {
+            var sb = this.cFormat.format(value0);
+            object.setAnnotation(annot_num, sb);
+          }
+          this.dyn.repaintNow = true;
+          this.oldValueB = value0;
+        }
+        break;
       }
-      break;
-    }
-    case Pwr.eType_String:
-    case Pwr.eType_Objid:
-    case Pwr.eType_Time:
-    case Pwr.eType_DeltaTime: {
-      var value0 = this.a.get_ref_value(this.dyn);
-      if ( typeof value0 == 'undefined')
-	return;
+      case Pwr.eType_String:
+      case Pwr.eType_Objid:
+      case Pwr.eType_Time:
+      case Pwr.eType_DeltaTime: {
+        var value0 = this.a.get_ref_value(this.dyn);
+        if (typeof value0 == "undefined") return;
 
-      if ( this.firstScan || !(value0 == this.oldValueS)) {
-	switch ( this.a.typeid) {
-	case Pwr.eType_String: {
-	  if ( this.cFormat !== null) {
-	    var sb = this.cFormat.format( value0);
-	    object.setAnnotation( annot_num, sb);
-	  }
-	  break;
-	}
-	case Pwr.eType_Time: {
-	  var timstr;
-	  if (this.format === "%1t")
-	    timstr = value0.substring(12,20);
-	  else if (this.format === "%2t")
-	    timstr = value0.substring(12);
-	  else if (this.format === "%3t")
-	    timstr = value0.substring(9,11)+"-"+this.month(value0.substring(3,6))+
-               "-"+value0.substring(0,2)+value0.substring(11,20);
-	  else if (this.format === "%4t")
-	    timstr = value0.substring(0,11);
-	  else if (this.format === "%5t")
-	    timstr = value0.substring(9,11)+"-"+this.month(value0.substring(3,6))+
-                "-"+value0.substring(0,2);
-	  else
-	    timstr = value0;
-	  
-	  object.setAnnotation( annot_num, timstr);
-	  break;
-	}
-	default:
-	  object.setAnnotation( annot_num, value0);
-	}
-	this.dyn.repaintNow = true;
-	this.oldValueS = value0;
-      }
-      break;
-    }
-    case Pwr.eType_Status:
-    case Pwr.eType_NetStatus: {
-      var value0 = this.a.get_ref_value(this.dyn);
-      if ( typeof value0 == 'undefined')
-	return;
+        if (this.firstScan || !(value0 == this.oldValueS)) {
+          switch (this.a.typeid) {
+            case Pwr.eType_String: {
+              if (this.cFormat !== null) {
+                var sb = this.cFormat.format(value0);
+                object.setAnnotation(annot_num, sb);
+              }
+              break;
+            }
+            case Pwr.eType_Time: {
+              var timstr;
+              if (this.format === "%1t") timstr = value0.substring(12, 20);
+              else if (this.format === "%2t") timstr = value0.substring(12);
+              else if (this.format === "%3t")
+                timstr =
+                  value0.substring(9, 11) +
+                  "-" +
+                  this.month(value0.substring(3, 6)) +
+                  "-" +
+                  value0.substring(0, 2) +
+                  value0.substring(11, 20);
+              else if (this.format === "%4t") timstr = value0.substring(0, 11);
+              else if (this.format === "%5t")
+                timstr =
+                  value0.substring(9, 11) +
+                  "-" +
+                  this.month(value0.substring(3, 6)) +
+                  "-" +
+                  value0.substring(0, 2);
+              else timstr = value0;
 
-      if ( value0 != this.oldValueI || this.firstScan) {
-	if ( value0 === 0) {
-	  object.setAnnotation( annot_num, "");
-	  this.dyn.repaintNow = true;
-	}
-	else {
-	  if ( this.a.database == GraphIfc.eDatabase_Gdh) {
-	    var data = new Array(2);
-	    data[0] = this;
-	    data[1] = object;
-	    this.dyn.graph.getGdh().getMsg( value0, this.scan2, data);
-	  }
-	}
+              object.setAnnotation(annot_num, timstr);
+              break;
+            }
+            default:
+              object.setAnnotation(annot_num, value0);
+          }
+          this.dyn.repaintNow = true;
+          this.oldValueS = value0;
+        }
+        break;
       }
-      /** TODO
+      case Pwr.eType_Status:
+      case Pwr.eType_NetStatus: {
+        var value0 = this.a.get_ref_value(this.dyn);
+        if (typeof value0 == "undefined") return;
+
+        if (value0 != this.oldValueI || this.firstScan) {
+          if (value0 === 0) {
+            object.setAnnotation(annot_num, "");
+            this.dyn.repaintNow = true;
+          } else {
+            if (this.a.database == GraphIfc.eDatabase_Gdh) {
+              var data = new Array(2);
+              data[0] = this;
+              data[1] = object;
+              this.dyn.graph.getGdh().getMsg(value0, this.scan2, data);
+            }
+          }
+        }
+        /** TODO
 	switch ( this.cFormat.type()) {
 	case GlowCFormat.FRM_M: {
 	  var cstr = this.dyn.graph.getGdh().getMsg( value0);
@@ -4342,93 +4422,115 @@ function DynValue( dyn) {
 	}
 	}
       **/
-      this.oldValueI = value0;
-      break;
+        this.oldValueI = value0;
+        break;
+      }
+      case Pwr.eType_Enum: {
+        var value0 = this.a.get_ref_value(this.dyn);
+        if (typeof value0 == "undefined") return;
+
+        if (value0 != this.oldValueI || this.firstScan) {
+          if (this.a.database == GraphIfc.eDatabase_Gdh) {
+            if (this.format === "%s") {
+              var pname = this.dyn.parseAttrName(this.attribute);
+              if (pname === null) return 1;
+              var data = new Array(2);
+              data[0] = this;
+              data[1] = object;
+              this.dyn.graph
+                .getGdh()
+                .getObjectEnumText(pname.name, value0, this.scan2, data);
+            } else if (this.cFormat !== null) {
+              var sb = this.cFormat.format(value0);
+              object.setAnnotation(annot_num, sb);
+              this.dyn.repaintNow = true;
+            }
+          }
+        }
+        this.oldValueI = value0;
+        break;
+      }
     }
-    }
-    if ( this.firstScan)
-      this.firstScan = false;
+    if (this.firstScan) this.firstScan = false;
   };
 
-  this.scan2 = function( id, data, sts, value) {
-    if ( sts & 1 != 0) {
+  this.scan2 = function (id, data, sts, value) {
+    if (sts & (1 != 0)) {
       var self = data[0];
       var object = data[1];
-      var annot_num = self.dyn.instance_to_number( self.instance);
+      var annot_num = self.dyn.instance_to_number(self.instance);
 
-      object.setAnnotation( annot_num, value);
+      object.setAnnotation(annot_num, value);
       self.dyn.repaintNow = true;
-    }
-    else {
-      object.setAnnotation( annot_num, "Unknown message");
+    } else {
+      var self = data[0];
+      var object = data[1];
+      if (self.a.typeid === Pwr.eType_Enum) object.setAnnotation(annot_num, "");
+      else object.setAnnotation(annot_num, "Unknown message");
+      if (typeof this.dyn === "undefined") return;
       this.dyn.repaintNow = true;
     }
-  }
+  };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynBorder : " + lines[i]);
+      if (this.dyn.debug) console.log("DynBorder : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_Value: 
-	break;
-      case DynC.eSave_Value_attribute: 
-	if ( tokens.length > 1)
-	  this.attribute = tokens[1];
-	break;
-      case DynC.eSave_Value_format: 
-	if ( tokens.length > 1)
-	  this.format = tokens[1];
-	break;
-      case DynC.eSave_Value_instance: 
-	this.instance = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_Value_instance_mask: 
-	this.instance_mask = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_Value_zero_blank: 
-	this.zero_blank = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_Value_decimals_attr: 
-	if ( tokens.length > 1)
-	  this.decimals_attr = tokens[1];
-	break;
-      case DynC.eSave_Value_decimals_decr: 
-	this.decimals_decr = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynValue");
-	break;
+      switch (key) {
+        case DynC.eSave_Value:
+          break;
+        case DynC.eSave_Value_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_Value_format:
+          if (tokens.length > 1) this.format = tokens[1];
+          break;
+        case DynC.eSave_Value_instance:
+          this.instance = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_Value_instance_mask:
+          this.instance_mask = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_Value_zero_blank:
+          this.zero_blank = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_Value_decimals_attr:
+          if (tokens.length > 1) this.decimals_attr = tokens[1];
+          break;
+        case DynC.eSave_Value_decimals_decr:
+          this.decimals_decr = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynValue");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-		
-    if ( this.format !== null)
-      this.cFormat = new GlowCFormat(this.format);
+
+    if (this.format !== null) this.cFormat = new GlowCFormat(this.format);
 
     return i;
   };
 
-  this.action = function( object, e) {
+  this.action = function (object, e) {
     return 1;
   };
 }
 
-function DynValueInput( dyn) {
+function DynValueInput(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = 0;
@@ -4451,206 +4553,183 @@ function DynValueInput( dyn) {
   this.update_open = 0;
   this.value_element = null;
   this.a_typeid;
-				       
-  this.setAttribute = function(o, name, value) {
+
+  this.setAttribute = function (o, name, value) {
     if (name === "ValueInput.MinValue") {
       this.min_value = value;
       return 1;
-    }
-    else if (name === "ValueInput.MaxValue") {
+    } else if (name === "ValueInput.MaxValue") {
       this.max_value = value;
       return 1;
-    }
-    else if (name === "ValueInput.Clear") {
+    } else if (name === "ValueInput.Clear") {
       this.clear = value;
       return 1;
-    }
-    else if (name === "ValueInput.Popup") {
+    } else if (name === "ValueInput.Popup") {
       this.popup = value;
       return 1;
-    }
-    else if (name === "ValueInput.Unselect") {
+    } else if (name === "ValueInput.Unselect") {
       this.unselect = value;
       return 1;
-    }
-    else if (name === "ValueInput.EscapeStore") {
+    } else if (name === "ValueInput.EscapeStore") {
       this.escape_store = value;
       return 1;
-    }
-    else if (name === "ValueInput.MinValueAttr") {
+    } else if (name === "ValueInput.MinValueAttr") {
       this.minvalue_attr = value;
       return 1;
-    }
-    else if (name === "ValueInput.MaxValueAttr") {
+    } else if (name === "ValueInput.MaxValueAttr") {
       this.maxvalue_attr = value;
       return 1;
-    }
-    else if (name === "ValueInput.KeyboardType") {
+    } else if (name === "ValueInput.KeyboardType") {
       this.keyboard_type = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "ValueInput.MinValue") {
       ret.value = this.min_value;
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
-    }
-    else if (name === "ValueInput.MaxValue") {
+    } else if (name === "ValueInput.MaxValue") {
       ret.value = this.max_value;
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
-    }
-    else if (name === "ValueInput.Clear") {
+    } else if (name === "ValueInput.Clear") {
       ret.value = this.clear;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "ValueInput.Popup") {
+    } else if (name === "ValueInput.Popup") {
       ret.value = this.popup;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "ValueInput.Unselect") {
+    } else if (name === "ValueInput.Unselect") {
       ret.value = this.unselect;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "ValueInput.EscapeStore") {
+    } else if (name === "ValueInput.EscapeStore") {
       ret.value = this.escape_store;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "ValueInput.MinValueAttr") {
+    } else if (name === "ValueInput.MinValueAttr") {
       ret.value = this.minvalue_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "ValueInput.MaxValueAttr") {
+    } else if (name === "ValueInput.MaxValueAttr") {
       ret.value = this.maxvalue_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "ValueInput.KeyboardType") {
+    } else if (name === "ValueInput.KeyboardType") {
       ret.value = this.keyboard_type;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( object) {
+  this.connect = function (object) {
     // Get the Value element
     this.value_element = null;
-    for ( var j = 0; j < this.dyn.elements.length; j++) {
-      if ( this.dyn.elements[j].dyn_type1 == DynC.mDynType1_Value) {
-	this.value_element = this.dyn.elements[j];
+    for (var j = 0; j < this.dyn.elements.length; j++) {
+      if (this.dyn.elements[j].dyn_type1 == DynC.mDynType1_Value) {
+        this.value_element = this.dyn.elements[j];
         if (this.value_element.a == null) {
           this.value_element.connect(object);
-	  if (this.value_element.a == null)
-	    return 1;
-	}
-	this.a_typeid = this.value_element.a.typeid;
-	break;
+          if (this.value_element.a == null) return 1;
+        }
+        this.a_typeid = this.value_element.a.typeid;
+        break;
       }
     }
-	    
+
     return 1;
   };
 
-  this.disconnect = function() {
-  };
+  this.disconnect = function () {};
 
-  this.action = function( object, e) {
-    if ( !this.dyn.graph.isAuthorized( this.dyn.access))
-      return 1;
+  this.action = function (object, e) {
+    if (!this.dyn.graph.isAuthorized(this.dyn.access)) return 1;
 
-    switch ( e.event) {
-    case Glow.eEvent_MB1Click:
-      this.dyn.object = object;
-      this.dyn.graph.openValueInputDialog( this.dyn, "Enter value", this);
-      break;
+    switch (e.event) {
+      case Glow.eEvent_MB1Click:
+        this.dyn.object = object;
+        this.dyn.graph.openValueInputDialog(this.dyn, "Enter value", this);
+        break;
     }
     return 1;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynValueInput : " + lines[i]);
+      if (this.dyn.debug) console.log("DynValueInput : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_ValueInput: 
-	break;
-      case DynC.eSave_ValueInput_attribute: 
-	if ( tokens.length > 1)
-	  this.attribute = tokens[1];
-	break;
-      case DynC.eSave_ValueInput_format: 
-	break;
-      case DynC.eSave_ValueInput_unselect: 
-	this.unselect = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_ValueInput_min_value: 
-	this.min_value = parseFloat( tokens[1]);
-	break;
-      case DynC.eSave_ValueInput_max_value: 
-	this.max_value = parseFloat( tokens[1]);
-	break;
-      case DynC.eSave_ValueInput_clear: 
-	this.clear = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_ValueInput_popup: 
-	this.popup = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_ValueInput_minvalue_attr: 
-	if ( tokens.length > 1)
-	  this.minvalue_attr = tokens[1];
-	break;
-      case DynC.eSave_ValueInput_maxvalue_attr: 
-	if ( tokens.length > 1)
-	  this.maxvalue_attr = tokens[1];
-	break;
-      case DynC.eSave_ValueInput_escape_store: 
-	this.escape_store = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_ValueInput_keyboard_type: 
-	this.keyboard_type = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_ValueInput_update_open: 
-	this.update_open = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynValueInput");
-	break;
+      switch (key) {
+        case DynC.eSave_ValueInput:
+          break;
+        case DynC.eSave_ValueInput_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_ValueInput_format:
+          break;
+        case DynC.eSave_ValueInput_unselect:
+          this.unselect = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_ValueInput_min_value:
+          this.min_value = parseFloat(tokens[1]);
+          break;
+        case DynC.eSave_ValueInput_max_value:
+          this.max_value = parseFloat(tokens[1]);
+          break;
+        case DynC.eSave_ValueInput_clear:
+          this.clear = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_ValueInput_popup:
+          this.popup = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_ValueInput_minvalue_attr:
+          if (tokens.length > 1) this.minvalue_attr = tokens[1];
+          break;
+        case DynC.eSave_ValueInput_maxvalue_attr:
+          if (tokens.length > 1) this.maxvalue_attr = tokens[1];
+          break;
+        case DynC.eSave_ValueInput_escape_store:
+          this.escape_store = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_ValueInput_keyboard_type:
+          this.keyboard_type = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_ValueInput_update_open:
+          this.update_open = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynValueInput");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
     return i;
   };
 
-  this.scan = function( o) {
+  this.scan = function (o) {
     return 1;
   };
 }
 
-function DynAnalogColor( dyn, instance) {
+function DynAnalogColor(dyn, instance) {
   this.dyn = dyn;
   this.dyn_type1 = DynC.mDynType1_AnalogColor;
   this.dyn_type2 = 0;
@@ -4672,15 +4751,13 @@ function DynAnalogColor( dyn, instance) {
   this.oldValueI;
   this.oldState;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     var inst = this.dyn.instance_number(this.instance);
     var iname;
     var inames = new Array(7);
     if (this.dyn.total_dyn_type1 & DynC.mDynType1_Tone) {
-      if (inst == 1)
-	iname = "AnalogTone";
-      else
-	iname = "AnalogTone" + inst.toString();
+      if (inst == 1) iname = "AnalogTone";
+      else iname = "AnalogTone" + inst.toString();
       inames[0] = "AnalogTone.Instances";
       inames[1] = iname + ".Attribute";
       inames[2] = iname + ".Limit";
@@ -4689,10 +4766,8 @@ function DynAnalogColor( dyn, instance) {
       inames[5] = iname + ".Border";
       inames[6] = iname + ".CommonAttribute";
     } else {
-      if (inst == 1)
-	iname = "AnalogColor";
-      else
-	iname = "AnalogColor" + inst.toString();
+      if (inst == 1) iname = "AnalogColor";
+      else iname = "AnalogColor" + inst.toString();
       inames[0] = "AnalogColor.Instances";
       inames[1] = iname + ".Attribute";
       inames[2] = iname + ".Limit";
@@ -4705,54 +4780,40 @@ function DynAnalogColor( dyn, instance) {
       this.instance_mask = value;
       this.dyn.update_elements();
       return 1;
-    }
-    else if (name === inames[1]) {
-      this.attribute =  value;
+    } else if (name === inames[1]) {
+      this.attribute = value;
       return 1;
-    }
-    else if (name === inames[2]) {
+    } else if (name === inames[2]) {
       this.limit = value;
       return 1;
-    }
-    else if (name === inames[3]) {
+    } else if (name === inames[3]) {
       this.color = value;
       return 1;
-    }
-    else if (name === inames[4]) {
-      if (value === "GreaterThan")
-        this.limit_type = DynC.eLimitType_Gt;
-      else if (value === "LessThan")
-        this.limit_type = DynC.eLimitType_Lt;
-      else if (value === "GreaterEqual")
-        this.limit_type = DynC.eLimitType_Ge;
-      else if (value === "LessEqual")
-        this.limit_type = DynC.eLimitType_Le;
-      else if (value === "Equal")
-        this.limit_type = DynC.eLimitType_Eq;
-      else
-        this.limit_type = value;
+    } else if (name === inames[4]) {
+      if (value === "GreaterThan") this.limit_type = DynC.eLimitType_Gt;
+      else if (value === "LessThan") this.limit_type = DynC.eLimitType_Lt;
+      else if (value === "GreaterEqual") this.limit_type = DynC.eLimitType_Ge;
+      else if (value === "LessEqual") this.limit_type = DynC.eLimitType_Le;
+      else if (value === "Equal") this.limit_type = DynC.eLimitType_Eq;
+      else this.limit_type = value;
       return 1;
-    }
-    else if (name === inames[5]) {
+    } else if (name === inames[5]) {
       this.border = value;
       return 1;
-    }
-    else if (name === inames[6] && this.instance == DynC.mInstance_1) {
+    } else if (name === inames[6] && this.instance == DynC.mInstance_1) {
       this.common_attr = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     var inst = this.dyn.instance_number(this.instance);
     var iname;
     var inames = new Array(7);
     if (this.dyn.total_dyn_type1 & DynC.mDynType1_Tone) {
-      if (inst == 1)
-	iname = "AnalogTone";
-      else
-	iname = "AnalogTone" + inst.toString();
+      if (inst == 1) iname = "AnalogTone";
+      else iname = "AnalogTone" + inst.toString();
       inames[0] = "AnalogTone.Instances";
       inames[1] = iname + ".Attribute";
       inames[2] = iname + ".Limit";
@@ -4761,10 +4822,8 @@ function DynAnalogColor( dyn, instance) {
       inames[5] = iname + ".Border";
       inames[6] = iname + ".CommonAttribute";
     } else {
-      if (inst == 1)
-	iname = "AnalogColor";
-      else
-	iname = "AnalogColor" + inst.toString();
+      if (inst == 1) iname = "AnalogColor";
+      else iname = "AnalogColor" + inst.toString();
       inames[0] = "AnalogColor.Instances";
       inames[1] = iname + ".Attribute";
       inames[2] = iname + ".Limit";
@@ -4777,279 +4836,243 @@ function DynAnalogColor( dyn, instance) {
       ret.value = this.instance_mask;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === inames[1]) {
+    } else if (name === inames[1]) {
       ret.value = this.attribute;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === inames[2]) {
+    } else if (name === inames[2]) {
       ret.value = this.limit;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === inames[3]) {
+    } else if (name === inames[3]) {
       ret.value = this.color;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === inames[4]) {
+    } else if (name === inames[4]) {
       ret.value = this.limit_type;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === inames[5]) {
+    } else if (name === inames[5]) {
       ret.value = this.border;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === inames[6] && this.instance == DynC.mInstance_1) {
+    } else if (name === inames[6] && this.instance == DynC.mInstance_1) {
       ret.value = this.common_attr;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( object) {
+  this.connect = function (object) {
     // Find the main instance
     var e = null;
     if (this.instance == DynC.mInstance_1) {
-      if (this.a !== null)
-	return 1;
+      if (this.a !== null) return 1;
       e = this;
-    }
-    else {
-      for ( var i = this.dyn.elements.length - 1; i >= 0; i--) {
-        if ( this.dyn.elements[i].dyn_type1 == DynC.mDynType1_AnalogColor &&
-             this.dyn.elements[i].instance == DynC.mInstance_1) {
-	  e = this.dyn.elements[i];
-	  break;
-	}
+    } else {
+      for (var i = this.dyn.elements.length - 1; i >= 0; i--) {
+        if (
+          this.dyn.elements[i].dyn_type1 == DynC.mDynType1_AnalogColor &&
+          this.dyn.elements[i].instance == DynC.mInstance_1
+        ) {
+          e = this.dyn.elements[i];
+          break;
+        }
       }
     }
-    if (e === null)
-      return 1;
+    if (e === null) return 1;
 
-    if ( e.common_attr == 0 || this.instance == DynC.mInstance_1) {
-      this.a = new DynReference( this.dyn, this.attribute);
+    if (e.common_attr == 0 || this.instance == DynC.mInstance_1) {
+      this.a = new DynReference(this.dyn, this.attribute);
       this.a.connect(this.dyn);
-      if ( !this.a.sts)
-	return 1;
+      if (!this.a.sts) return 1;
     } else {
-      if (e.a === null)
-	e.connect(object);
+      if (e.a === null) e.connect(object);
       this.a = e.a;
       this.common_attr = e.common_attr;
     }
     return 1;
   };
 
-
-  this.disconnect = function() {
-    if ( this.common_attr == 0 || this.instance == DynC.mInstance_1)
+  this.disconnect = function () {
+    if (this.common_attr == 0 || this.instance == DynC.mInstance_1)
       this.a.disconnect(this.dyn);
   };
-	
-  this.scan = function( object) {
-    if ( !this.a.sts || this.dyn.ignoreColor)
-      return;
+
+  this.scan = function (object) {
+    if (!this.a.sts || this.dyn.ignoreColor) return;
 
     var state = false;
     var set_color = false;
     var reset_color = false;
 
-    if ( this.a.typeid == Pwr.eType_Float32) {
+    if (this.a.typeid == Pwr.eType_Float32) {
       var value = this.a.get_ref_value(this.dyn);
       var i;
 
-      if ( !this.firstScan) {
-	if ( !this.dyn.resetColor && value == this.oldValueF) {
-	  if ( this.oldState)
-	    this.dyn.ignoreColor = true;
-	  return;
-	}
-      }
-      else
-	this.firstScan = false;
+      if (!this.firstScan) {
+        if (!this.dyn.resetColor && value == this.oldValueF) {
+          if (this.oldState) this.dyn.ignoreColor = true;
+          return;
+        }
+      } else this.firstScan = false;
 
-      switch ( this.limit_type) {
-      case DynC.eLimitType_Gt:
-	state = (value > this.limit);
-	break;
-      case DynC.eLimitType_Lt:
-	state = (value < this.limit);
-	break;
-      case DynC.eLimitType_Ge:
-	state = (value >= this.limit);
-	break;
-      case DynC.eLimitType_Le:
-	state = (value <= this.limit);
-	break;
-      case DynC.eLimitType_Eq:
-	state = (value == this.limit);
-	break;      
+      switch (this.limit_type) {
+        case DynC.eLimitType_Gt:
+          state = value > this.limit;
+          break;
+        case DynC.eLimitType_Lt:
+          state = value < this.limit;
+          break;
+        case DynC.eLimitType_Ge:
+          state = value >= this.limit;
+          break;
+        case DynC.eLimitType_Le:
+          state = value <= this.limit;
+          break;
+        case DynC.eLimitType_Eq:
+          state = value == this.limit;
+          break;
       }
       this.oldValueF = value;
-    }
-    else if ( this.a.typeid == Pwr.eType_Int32 || this.a.typeid == Pwr.eType_UInt32) {
-      var value = this.dyn.graph.getGdh().getObjectRefInfo( this.a.p);
+    } else if (
+      this.a.typeid == Pwr.eType_Int32 ||
+      this.a.typeid == Pwr.eType_UInt32
+    ) {
+      var value = this.dyn.graph.getGdh().getObjectRefInfo(this.a.p);
       var i;
-      if ( !this.firstScan) {
-	if ( !this.dyn.resetColor && value == this.oldValueI) {
-	  if ( this.oldState)
-	    this.dyn.ignoreColor = true;
-	  return;
-	}
-      }
-      else
-	this.firstScan = false;
-  
-      switch ( this.limit_type) {
-      case DynC.eLimitType_Gt:
-	state = (value > this.limit);
-	break;
-      case DynC.eLimitType_Lt:
-	state = (value < this.limit);
-	break;
-      case DynC.eLimitType_Ge:
-	state = (value >= this.limit);
-	break;
-      case DynC.eLimitType_Le:
-	state = (value >= this.limit);
-	break;
-      case DynC.eLimitType_Eq:
-	state = (value == this.limit);
-	break;      
+      if (!this.firstScan) {
+        if (!this.dyn.resetColor && value == this.oldValueI) {
+          if (this.oldState) this.dyn.ignoreColor = true;
+          return;
+        }
+      } else this.firstScan = false;
+
+      switch (this.limit_type) {
+        case DynC.eLimitType_Gt:
+          state = value > this.limit;
+          break;
+        case DynC.eLimitType_Lt:
+          state = value < this.limit;
+          break;
+        case DynC.eLimitType_Ge:
+          state = value >= this.limit;
+          break;
+        case DynC.eLimitType_Le:
+          state = value >= this.limit;
+          break;
+        case DynC.eLimitType_Eq:
+          state = value == this.limit;
+          break;
       }
       this.oldValueI = value;
     }
 
-    if ( state != this.oldState || this.dyn.resetColor || this.firstScan) {
-      if ( state) {
-	set_color = true;
-	this.dyn.ignoreColor = true;
-      }
-      else {
-	reset_color = true;
-	this.dyn.resetColor = true;
+    if (state != this.oldState || this.dyn.resetColor || this.firstScan) {
+      if (state) {
+        set_color = true;
+        this.dyn.ignoreColor = true;
+      } else {
+        reset_color = true;
+        this.dyn.resetColor = true;
       }
       this.oldState = state;
-    }
-    else if ( state)
-      this.dyn.ignoreColor = true;
+    } else if (state) this.dyn.ignoreColor = true;
 
+    if (!set_color && !reset_color) return;
 
-    if ( !set_color && !reset_color)
-      return;
-
-    if ( (this.dyn.total_dyn_type1 & DynC.mDynType1_Tone) !== 0) {
-      if ( set_color) {
-	if ( color >= Glow.eDrawTone__) {
-	  if ( this.border === 0)
-	    object.setFillColor( this.color);
-	  else
-	    object.setBorderColor( this.color);
-	}
-	else
-	  object.setColorTone( this.color);
-	this.dyn.ignoreColor = true;
-      }
-      else {
-	if ( this.color >= Glow.eDrawTone__) {
-	  if ( this.border === 0)
-	    object.resetFillColor();
-	  else
-	    object.resetBorderColor();
-	}
-	object.resetColorTone();
-	this.dyn.resetColor = true;
+    if ((this.dyn.total_dyn_type1 & DynC.mDynType1_Tone) !== 0) {
+      if (set_color) {
+        if (color >= Glow.eDrawTone__) {
+          if (this.border === 0) object.setFillColor(this.color);
+          else object.setBorderColor(this.color);
+        } else object.setColorTone(this.color);
+        this.dyn.ignoreColor = true;
+      } else {
+        if (this.color >= Glow.eDrawTone__) {
+          if (this.border === 0) object.resetFillColor();
+          else object.resetBorderColor();
+        }
+        object.resetColorTone();
+        this.dyn.resetColor = true;
       }
       this.dyn.repaintNow = true;
-    }
-    else {
-      if ( set_color) {
-	if ( this.border === 0)
-	  object.setFillColor( this.color);
-	else
-	  object.setBorderColor( this.color);
-	this.dyn.ignoreColor = true;
-      }
-      else {
-	if ( this.border === 0)
-	  object.resetFillColor();
-	else
-	  object.resetBorderColor();
-	this.dyn.resetColor = true;
+    } else {
+      if (set_color) {
+        if (this.border === 0) object.setFillColor(this.color);
+        else object.setBorderColor(this.color);
+        this.dyn.ignoreColor = true;
+      } else {
+        if (this.border === 0) object.resetFillColor();
+        else object.resetBorderColor();
+        this.dyn.resetColor = true;
       }
       this.dyn.repaintNow = true;
     }
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynAnalogColor : " + lines[i]);
+      if (this.dyn.debug) console.log("DynAnalogColor : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_AnalogColor: 
-	break;
-      case DynC.eSave_AnalogColor_attribute: 
-	if ( tokens.length > 1)
-	  this.attribute = tokens[1];
-	break;
-      case DynC.eSave_AnalogColor_limit: 
-	this.limit = parseFloat( tokens[1]);
-	break;
-      case DynC.eSave_AnalogColor_limit_type: 
-	this.limit_type = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_AnalogColor_color: 
-	this.color = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_AnalogColor_instance: 
-	this.instance = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_AnalogColor_instance_mask: 
-	this.instance_mask = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_AnalogColor_border: 
-	this.border = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_AnalogColor_common_attr: 
-	this.common_attr = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynAnalogColor");
-	break;
+      switch (key) {
+        case DynC.eSave_AnalogColor:
+          break;
+        case DynC.eSave_AnalogColor_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_AnalogColor_limit:
+          this.limit = parseFloat(tokens[1]);
+          break;
+        case DynC.eSave_AnalogColor_limit_type:
+          this.limit_type = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_AnalogColor_color:
+          this.color = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_AnalogColor_instance:
+          this.instance = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_AnalogColor_instance_mask:
+          this.instance_mask = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_AnalogColor_border:
+          this.border = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_AnalogColor_common_attr:
+          this.common_attr = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynAnalogColor");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-		
+
     return i;
   };
 
-  this.action = function( object, e) {
+  this.action = function (object, e) {
     return 1;
   };
-
 }
 
-function DynRotate( dyn) {
+function DynRotate(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = DynC.mDynType1_Rotate;
   this.dyn_type2 = 0;
@@ -5070,171 +5093,159 @@ function DynRotate( dyn) {
   this.min_angle = 0;
   this.max_angle = 0;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "Rotate.Attribute") {
       this.attribute = value;
       return 1;
-    }
-    else if (name === "Rotate.x0") {
+    } else if (name === "Rotate.x0") {
       this.x0 = value;
       return 1;
-    }
-    else if (name === "Rotate.y0") {
+    } else if (name === "Rotate.y0") {
       this.y0 = value;
       return 1;
-    }
-    else if (name === "Rotate.Factor") {
+    } else if (name === "Rotate.Factor") {
       this.factor = value;
       return 1;
-    }
-    else if (name === "Rotate.Offset") {
+    } else if (name === "Rotate.Offset") {
       this.offset = value;
       return 1;
-    }
-    else if (name === "Rotate.MinAngle") {
+    } else if (name === "Rotate.MinAngle") {
       this.min_angle = value;
       return 1;
-    }
-    else if (name === "Rotate.MaxAngle") {
+    } else if (name === "Rotate.MaxAngle") {
       this.max_angle = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "Rotate.Attribute") {
       ret.value = this.attribute;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "Rotate.x0") {
+    } else if (name === "Rotate.x0") {
       ret.value = this.x0;
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
-    }
-    else if (name === "Rotate.y0") {
+    } else if (name === "Rotate.y0") {
       ret.value = this.y0;
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
-    }
-    else if (name === "Rotate.Factor") {
+    } else if (name === "Rotate.Factor") {
       ret.value = this.factor;
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
-    }
-    else if (name === "Rotate.Offset") {
+    } else if (name === "Rotate.Offset") {
       ret.value = this.offset;
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
-    }
-    else if (name === "Rotate.MinAngle") {
+    } else if (name === "Rotate.MinAngle") {
       ret.value = this.min_angle;
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
-    }
-    else if (name === "Rotate.MaxAngle") {
+    } else if (name === "Rotate.MaxAngle") {
       ret.value = this.max_angle;
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( object) {
-
-    this.a = new DynReference( this.dyn, this.attribute);
+  this.connect = function (object) {
+    this.a = new DynReference(this.dyn, this.attribute);
     this.a.connect(this.dyn);
-    if ( !this.a.sts) {
+    if (!this.a.sts) {
       console.log("Rotate: " + this.attribute);
       return 1;
     }
 
-    if ( this.x0 !== 0 || this.y0 !== 0)
+    if (this.x0 !== 0 || this.y0 !== 0)
       this.rotation_point = Glow.eRotationPoint_FixPoint;
-    else
-      this.rotation_point = Glow.eRotationPoint_Zero;
-	    
+    else this.rotation_point = Glow.eRotationPoint_Zero;
+
     object.storeTransform();
     return 1;
   };
 
-  this.disconnect = function() {
+  this.disconnect = function () {
     this.a.disconnect(this.dyn);
   };
-	
-  this.scan = function( object) {
-    if ( !this.a.sts)
-      return;
+
+  this.scan = function (object) {
+    if (!this.a.sts) return;
     var val = this.a.get_ref_value(this.dyn);
-    if ( val != this.a.oldValue  || this.firstScan) {
+    if (val != this.a.oldValue || this.firstScan) {
       var value = val * this.factor + this.offset;
       if (this.min_angle != 0 || this.max_angle != 0) {
-	if (value < this.min_angle)
-	  value = this.min_angle;
-	else if (value > this.max_angle)
-	  value = this.max_angle;
+        if (value < this.min_angle) value = this.min_angle;
+        else if (value > this.max_angle) value = this.max_angle;
       }
       object.setRotation(value, this.x0, this.y0, this.rotation_point);
 
       this.dyn.repaintNow = true;
       this.a.oldValue = val;
     }
-    if ( this.firstScan)
-      this.firstScan = false;
+    if (this.firstScan) this.firstScan = false;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynRotate : " + lines[i]);
+      if (this.dyn.debug) console.log("DynRotate : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_Rotate: 
-	break;
-      case DynC.eSave_Rotate_attribute: 
-	if ( tokens.length > 1)
-	  this.attribute = tokens[1];
-	break;
-      case DynC.eSave_Rotate_x0: 
-	this.x0 = parseFloat( tokens[1]);
-	break;
-      case DynC.eSave_Rotate_y0: 
-	this.y0 = parseFloat( tokens[1]);
-	break;
-      case DynC.eSave_Rotate_factor: 
-	this.factor = parseFloat( tokens[1]);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynRotate");
-	break;
+      switch (key) {
+        case DynC.eSave_Rotate:
+          break;
+        case DynC.eSave_Rotate_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_Rotate_x0:
+          this.x0 = parseFloat(tokens[1]);
+          break;
+        case DynC.eSave_Rotate_y0:
+          this.y0 = parseFloat(tokens[1]);
+          break;
+        case DynC.eSave_Rotate_factor:
+          this.factor = parseFloat(tokens[1]);
+          break;
+        case DynC.eSave_Rotate_offset:
+          this.offset = parseFloat(tokens[1]);
+          break;
+        case DynC.eSave_Rotate_min_angle:
+          this.min_angle = parseFloat(tokens[1]);
+          break;
+        case DynC.eSave_Rotate_max_angle:
+          this.max_angle = parseFloat(tokens[1]);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynRotate");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
     return i;
   };
 
-  this.action = function( object, e) {
+  this.action = function (object, e) {
     return 1;
   };
 }
 
-
-function DynMove( dyn){
+function DynMove(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = DynC.mDynType1_Move;
   this.dyn_type2 = 0;
@@ -5264,208 +5275,179 @@ function DynMove( dyn){
   this.y_orig;
   this.width_orig;
   this.height_orig;
-	
-  this.setAttribute = function(o, name, value) {
+
+  this.setAttribute = function (o, name, value) {
     if (name === "Move.XAttribute") {
       this.move_x_attribute = value;
       return 1;
-    }
-    else if (name === "Move.YAttribute") {
+    } else if (name === "Move.YAttribute") {
       this.move_y_attribute = value;
       return 1;
-    }
-    else if (name === "Move.XOffset") {
+    } else if (name === "Move.XOffset") {
       this.x_offset = value;
       return 1;
-    }
-    else if (name === "Move.YOffset") {
+    } else if (name === "Move.YOffset") {
       this.y_offset = value;
       return 1;
-    }
-    else if (name === "Move.XFactor") {
+    } else if (name === "Move.XFactor") {
       this.x_factor = value;
       return 1;
-    }
-    else if (name === "Move.YFactor") {
+    } else if (name === "Move.YFactor") {
       this.y_factor = value;
       return 1;
-    }
-    else if (name === "Move.ScaleXAttribute") {
+    } else if (name === "Move.ScaleXAttribute") {
       this.scale_x_attribute = value;
       return 1;
-    }
-    else if (name === "Move.ScaleYAttribute") {
+    } else if (name === "Move.ScaleYAttribute") {
       this.scale_y_attribute = value;
       return 1;
-    }
-    else if (name === "Move.ScaleXFactor") {
+    } else if (name === "Move.ScaleXFactor") {
       this.scale_x_factor = value;
       return 1;
-    }
-    else if (name === "Move.ScaleYFactor") {
+    } else if (name === "Move.ScaleYFactor") {
       this.scale_y_factor = value;
       return 1;
-    }
-    else if (name === "Move.ScaleType") {
+    } else if (name === "Move.ScaleType") {
       if (value === "LowerLeft") {
-	this.scale_type = Glow.eScaleType_UpperLeft;
-	return 1;
-      }
-      else if (value === "LowerRight") {
-	this.scale_type = Glow.eScaleType_UpperRight;
-	return 1;
-      }
-      else if (value === "UpperRight") {
-	this.scale_type = Glow.eScaleType_LowerRight;
-	return 1;
-      }
-      else if (value === "UpperLeft") {
-	this.scale_type = Glow.eScaleType_LowerLeft;
-	return 1;
-      }
-      else if (value === "FixPoint") {
-	this.scale_type = Glow.eScaleType_FixPoint;
-	return 1;
-      }
-      else if (value === "Center") {
-	this.scale_type = Glow.eScaleType_Center;
-	return 1;
-      }
-      else 
-	this.scale_type = value;
+        this.scale_type = Glow.eScaleType_UpperLeft;
+        return 1;
+      } else if (value === "LowerRight") {
+        this.scale_type = Glow.eScaleType_UpperRight;
+        return 1;
+      } else if (value === "UpperRight") {
+        this.scale_type = Glow.eScaleType_LowerRight;
+        return 1;
+      } else if (value === "UpperLeft") {
+        this.scale_type = Glow.eScaleType_LowerLeft;
+        return 1;
+      } else if (value === "FixPoint") {
+        this.scale_type = Glow.eScaleType_FixPoint;
+        return 1;
+      } else if (value === "Center") {
+        this.scale_type = Glow.eScaleType_Center;
+        return 1;
+      } else this.scale_type = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "Move.XAttribute") {
       ret.value = this.move_x_attribute;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "Move.YAttribute") {
+    } else if (name === "Move.YAttribute") {
       ret.value = this.move_y_attribute;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "Move.XOffset") {
+    } else if (name === "Move.XOffset") {
       ret.value = this.x_offset;
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
-    }
-    else if (name === "Move.YOffset") {
+    } else if (name === "Move.YOffset") {
       ret.value = this.y_offset;
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
-    }
-    else if (name === "Move.XFactor") {
+    } else if (name === "Move.XFactor") {
       ret.value = this.x_factor;
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
-    }
-    else if (name === "Move.YFactor") {
+    } else if (name === "Move.YFactor") {
       ret.value = this.y_factor;
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
-    }
-    else if (name === "Move.ScaleXAttribute") {
+    } else if (name === "Move.ScaleXAttribute") {
       ret.value = this.scale_x_attribute;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "Move.ScaleYAttribute") {
+    } else if (name === "Move.ScaleYAttribute") {
       ret.value = this.scale_y_attribute;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "Move.ScaleXFactor") {
+    } else if (name === "Move.ScaleXFactor") {
       ret.value = this.scale_x_factor;
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
-    }
-    else if (name === "Move.ScaleYFactor") {
+    } else if (name === "Move.ScaleYFactor") {
       ret.value = this.scale_y_factor;
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
-    }
-    else if (name === "Move.ScaleType") {
+    } else if (name === "Move.ScaleType") {
       ret.value = this.scale_type;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( object) {
-
-    this.move_x_a = new DynReference( this.dyn, this.move_x_attribute);
+  this.connect = function (object) {
+    this.move_x_a = new DynReference(this.dyn, this.move_x_attribute);
     this.move_x_a.connect(this.dyn);
-    if ( this.move_x_a.sts) {
-      switch ( this.move_x_a.typeid) {
-      case Pwr.eType_Float32:
-      case Pwr.eType_Float64:
-      case Pwr.eType_Int32:
-      case Pwr.eType_UInt32:
-	break;
-      default:
-	this.move_x_a.disconnect(dyn);
-	console.log("Move: " + this.move_x_attribute);
-	return 1;
+    if (this.move_x_a.sts) {
+      switch (this.move_x_a.typeid) {
+        case Pwr.eType_Float32:
+        case Pwr.eType_Float64:
+        case Pwr.eType_Int32:
+        case Pwr.eType_UInt32:
+          break;
+        default:
+          this.move_x_a.disconnect(dyn);
+          console.log("Move: " + this.move_x_attribute);
+          return 1;
       }
     }
 
-    this.move_y_a = new DynReference( this.dyn, this.move_y_attribute);
+    this.move_y_a = new DynReference(this.dyn, this.move_y_attribute);
     this.move_y_a.connect(this.dyn);
-    if ( this.move_y_a.sts) {
-      switch ( this.move_y_a.typeid) {
-      case Pwr.eType_Float32:
-      case Pwr.eType_Float64:
-      case Pwr.eType_Int32:
-      case Pwr.eType_UInt32:
-	break;
-      default:
-	this.move_y_a.disconnect(dyn);
-	console.log("Move: " + this.move_y_attribute);
-	return 1;
+    if (this.move_y_a.sts) {
+      switch (this.move_y_a.typeid) {
+        case Pwr.eType_Float32:
+        case Pwr.eType_Float64:
+        case Pwr.eType_Int32:
+        case Pwr.eType_UInt32:
+          break;
+        default:
+          this.move_y_a.disconnect(dyn);
+          console.log("Move: " + this.move_y_attribute);
+          return 1;
       }
     }
 
-    this.scale_x_a = new DynReference( this.dyn, this.scale_x_attribute);
+    this.scale_x_a = new DynReference(this.dyn, this.scale_x_attribute);
     this.scale_x_a.connect(this.dyn);
-    if ( this.scale_x_a.sts) {
-      switch ( this.scale_x_a.typeid) {
-      case Pwr.eType_Float32:
-      case Pwr.eType_Float64:
-      case Pwr.eType_Int32:
-      case Pwr.eType_UInt32:
-	break;
-      default:
-	this.scale_x_a.disconnect(dyn);
-	console.log("Move: " + this.scale_x_attribute);
-	return 1;
+    if (this.scale_x_a.sts) {
+      switch (this.scale_x_a.typeid) {
+        case Pwr.eType_Float32:
+        case Pwr.eType_Float64:
+        case Pwr.eType_Int32:
+        case Pwr.eType_UInt32:
+          break;
+        default:
+          this.scale_x_a.disconnect(dyn);
+          console.log("Move: " + this.scale_x_attribute);
+          return 1;
       }
     }
 
-    this.scale_y_a = new DynReference( this.dyn, this.scale_y_attribute);
+    this.scale_y_a = new DynReference(this.dyn, this.scale_y_attribute);
     this.scale_y_a.connect(this.dyn);
-    if ( this.scale_y_a.sts) {
-      switch ( this.scale_y_a.typeid) {
-      case Pwr.eType_Float32:
-      case Pwr.eType_Float64:
-      case Pwr.eType_Int32:
-      case Pwr.eType_UInt32:
-	break;
-      default:
-	this.scale_y_a.disconnect(dyn);
-	console.log("Move: " + this.scale_y_attribute);
-	return 1;
+    if (this.scale_y_a.sts) {
+      switch (this.scale_y_a.typeid) {
+        case Pwr.eType_Float32:
+        case Pwr.eType_Float64:
+        case Pwr.eType_Int32:
+        case Pwr.eType_UInt32:
+          break;
+        default:
+          this.scale_y_a.disconnect(dyn);
+          console.log("Move: " + this.scale_y_attribute);
+          return 1;
       }
     }
 
-    if ( !object.transformIsStored())
-      object.storeTransform();
+    if (!object.transformIsStored()) object.storeTransform();
     object.storeBorders();
     var geom = object.measure();
     this.x_orig = geom.ll_x;
@@ -5476,223 +5458,205 @@ function DynMove( dyn){
     return 1;
   };
 
-  this.disconnect = function() {
+  this.disconnect = function () {
     this.move_x_a.disconnect(this.dyn);
     this.move_y_a.disconnect(this.dyn);
     this.scale_x_a.disconnect(this.dyn);
     this.scale_y_a.disconnect(this.dyn);
   };
 
-  this.scan = function( object) {
+  this.scan = function (object) {
     var update = false;
-  
+
     var move_x_value = 0;
     var move_y_value = 0;
     var scale_x_value = 0;
     var scale_y_value = 0;
-    if ( this.move_x_a.sts) {
+    if (this.move_x_a.sts) {
       move_x_value = this.move_x_a.get_ref_value(this.dyn);
     }
 
-    if ( this.move_y_a.sts) {
+    if (this.move_y_a.sts) {
       move_y_value = this.move_y_a.get_ref_value(this.dyn);
     }
 
-    if ( this.scale_x_a.sts) {
+    if (this.scale_x_a.sts) {
       scale_x_value = this.scale_x_a.get_ref_value(this.dyn);
     }
 
-    if ( this.scale_y_a.sts) {
+    if (this.scale_y_a.sts) {
       scale_y_value = this.scale_y_a.get_ref_value(this.dyn);
     }
 
-
     update = false;
-    if ( !this.firstScan) {
-      if ( this.move_x_a.sts && move_x_value != this.move_x_a.oldValue)
-	update = true;
-      else if ( this.move_y_a.sts && move_y_value != this.move_y_a.oldValue)
-	update = true;
-      else if ( this.scale_x_a.sts && scale_x_value != this.scale_x_a.oldValue)
-	update = true;
-      else if ( this.scale_y_a.sts && scale_y_value != this.scale_y_a.oldValue)
-	update = true;
-      if ( !update)
-	return;
-
-    }
-    else
-      this.firstScan = false;
+    if (!this.firstScan) {
+      if (this.move_x_a.sts && move_x_value != this.move_x_a.oldValue)
+        update = true;
+      else if (this.move_y_a.sts && move_y_value != this.move_y_a.oldValue)
+        update = true;
+      else if (this.scale_x_a.sts && scale_x_value != this.scale_x_a.oldValue)
+        update = true;
+      else if (this.scale_y_a.sts && scale_y_value != this.scale_y_a.oldValue)
+        update = true;
+      if (!update) return;
+    } else this.firstScan = false;
 
     var move_x = 0;
     var move_y = 0;
     var scale_x = 1;
     var scale_y = 1;
 
-    if ( this.scale_x_a.sts)
-      scale_x = scale_x_value * this.scale_x_factor;
-		
-    if ( this.scale_y_a.sts)
-      scale_y = scale_y_value * this.scale_y_factor;
+    if (this.scale_x_a.sts) scale_x = scale_x_value * this.scale_x_factor;
 
-      
-    if ( !(this.move_x_a.sts || this.move_y_a.sts)) {
-      object.set_scale( scale_x, scale_y, 0, 0, this.scale_type);
+    if (this.scale_y_a.sts) scale_y = scale_y_value * this.scale_y_factor;
+
+    if (!(this.move_x_a.sts || this.move_y_a.sts)) {
+      object.set_scale(scale_x, scale_y, 0, 0, this.scale_type);
     }
-    if ( this.scale_x_a.sts)
-      this.scale_x_a.oldValue = scale_x_value;
-    if ( this.scale_y_a.sts)
-      this.scale_y_a.oldValue =  scale_y_value;
+    if (this.scale_x_a.sts) this.scale_x_a.oldValue = scale_x_value;
+    if (this.scale_y_a.sts) this.scale_y_a.oldValue = scale_y_value;
 
+    if (this.move_x_a.sts || this.move_y_a.sts) {
+      if (this.move_x_a.sts) {
+        var scale_offs = 0;
+        // Adjust position for different scaletypes
+        switch (this.scale_type) {
+          case Glow.eScaleType_LowerRight:
+          case Glow.eScaleType_UpperRight:
+            scale_offs = this.width_orig * (1 - scale_x);
+            break;
+          case Glow.eScaleType_Center:
+            scale_offs = (this.width_orig * (1 - scale_x)) / 2;
+            break;
+          default:
+            break;
+        }
 
-    if ( this.move_x_a.sts || this.move_y_a.sts) {
-      if ( this.move_x_a.sts) {
-	var scale_offs = 0;
-	// Adjust position for different scaletypes
-	switch ( this.scale_type) {
-	case Glow.eScaleType_LowerRight:
-	case Glow.eScaleType_UpperRight:
-	  scale_offs = this.width_orig * ( 1 - scale_x);
-	  break;
-	case Glow.eScaleType_Center:
-	  scale_offs = this.width_orig * ( 1 - scale_x) / 2;
-	  break;
-	default: break;
-	}
+        move_x =
+          this.x_orig +
+          scale_offs +
+          (move_x_value - this.x_offset) * this.x_factor;
+      } else move_x = this.x_orig;
 
-	move_x = this.x_orig + scale_offs + (move_x_value - this.x_offset) * this.x_factor;
-      }
-      else
-	move_x = this.x_orig;
-		
-      if ( this.move_y_a.sts) {
-	var scale_offs = 0;
-	// Adjust position for different scaletypes
-	switch ( this.scale_type) {
-	case Glow.eScaleType_UpperRight:
-	case Glow.eScaleType_UpperLeft:
-	  scale_offs = this.height_orig * ( 1 - scale_y);
-	  break;
-	case Glow.eScaleType_Center:
-	  scale_offs = this.height_orig * ( 1 - scale_y) / 2;
-	  break;
-	default: break;
-	}
-		    
-	move_y = this.y_orig + scale_offs + (move_y_value - this.y_offset) * this.y_factor;
-      }
-      else
-	move_y = this.y_orig;
-		
-      if ( Math.abs(scale_x) < Number.MIN_VALUE)
-	scale_x = 10e-5;
-      if ( Math.abs(scale_y) < Number.MIN_VALUE)
-	scale_y = 10e-5;
-		
-      object.set_scale_pos( move_x, move_y, 
-			    scale_x, scale_y, 0, 0,
-			    this.scale_type);
-      if ( this.move_x_a.sts)
-	this.move_x_a.oldValue = move_x_value;
-      if ( this.move_y_a.sts)
-	this.move_y_a.oldValue = move_y_value;
-    }
-    else if (this.move_x_a.sts || this.move_y_a.sts) {
+      if (this.move_y_a.sts) {
+        var scale_offs = 0;
+        // Adjust position for different scaletypes
+        switch (this.scale_type) {
+          case Glow.eScaleType_UpperRight:
+          case Glow.eScaleType_UpperLeft:
+            scale_offs = this.height_orig * (1 - scale_y);
+            break;
+          case Glow.eScaleType_Center:
+            scale_offs = (this.height_orig * (1 - scale_y)) / 2;
+            break;
+          default:
+            break;
+        }
 
-      if ( this.move_x_a.sts)
-	move_x = (move_x_value - x_offset) * this.x_factor;
-      else
-	move_x = 0;
-	    
-      if ( this.move_y_a.sts) {
-	move_y = (move_y_value - y_offset) * this.y_factor;
-      }
-      else
-	move_y = 0;
-  
-      object.set_position( move_x, move_y);
-	    
-      if ( this.move_x_a.sts)
-	this.move_x_a.oldValue = move_x_value;
-      if ( this.move_y_a.sts)
-	this.move_y_a.oldValue = move_y_value;
+        move_y =
+          this.y_orig +
+          scale_offs +
+          (move_y_value - this.y_offset) * this.y_factor;
+      } else move_y = this.y_orig;
+
+      if (Math.abs(scale_x) < Number.MIN_VALUE) scale_x = 10e-5;
+      if (Math.abs(scale_y) < Number.MIN_VALUE) scale_y = 10e-5;
+
+      object.set_scale_pos(
+        move_x,
+        move_y,
+        scale_x,
+        scale_y,
+        0,
+        0,
+        this.scale_type,
+      );
+      if (this.move_x_a.sts) this.move_x_a.oldValue = move_x_value;
+      if (this.move_y_a.sts) this.move_y_a.oldValue = move_y_value;
+    } else if (this.move_x_a.sts || this.move_y_a.sts) {
+      if (this.move_x_a.sts) move_x = (move_x_value - x_offset) * this.x_factor;
+      else move_x = 0;
+
+      if (this.move_y_a.sts) {
+        move_y = (move_y_value - y_offset) * this.y_factor;
+      } else move_y = 0;
+
+      object.set_position(move_x, move_y);
+
+      if (this.move_x_a.sts) this.move_x_a.oldValue = move_x_value;
+      if (this.move_y_a.sts) this.move_y_a.oldValue = move_y_value;
     }
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynMove : " + lines[i]);
+      if (this.dyn.debug) console.log("DynMove : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_Move: 
-	break;
-      case DynC.eSave_Move_move_x_attribute: 
-	if ( tokens.length > 1)
-	  this.move_x_attribute = tokens[1];
-	break;
-      case DynC.eSave_Move_move_y_attribute: 
-	if ( tokens.length > 1)
-	  this.move_y_attribute = tokens[1];
-	break;
-      case DynC.eSave_Move_scale_x_attribute: 
-	if ( tokens.length > 1)
-	  this.scale_x_attribute = tokens[1];
-	break;
-      case DynC.eSave_Move_scale_y_attribute: 
-	if ( tokens.length > 1)
-	  this.scale_y_attribute = tokens[1];
-	break;
-      case DynC.eSave_Move_x_offset: 
-	this.x_offset = parseFloat( tokens[1]);
-	break;
-      case DynC.eSave_Move_y_offset: 
-	this.y_offset = parseFloat( tokens[1]);
-	break;
-      case DynC.eSave_Move_x_factor: 
-	this.x_factor = parseFloat( tokens[1]);
-	break;
-      case DynC.eSave_Move_y_factor: 
-	this.y_factor = parseFloat( tokens[1]);
-	break;
-      case DynC.eSave_Move_scale_x_factor: 
-	this.scale_x_factor = parseFloat( tokens[1]);
-	break;
-      case DynC.eSave_Move_scale_y_factor: 
-	this.scale_y_factor = parseFloat( tokens[1]);
-	break;
-      case DynC.eSave_Move_scale_type: 
-	this.scale_type = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynMove");
-	break;
+      switch (key) {
+        case DynC.eSave_Move:
+          break;
+        case DynC.eSave_Move_move_x_attribute:
+          if (tokens.length > 1) this.move_x_attribute = tokens[1];
+          break;
+        case DynC.eSave_Move_move_y_attribute:
+          if (tokens.length > 1) this.move_y_attribute = tokens[1];
+          break;
+        case DynC.eSave_Move_scale_x_attribute:
+          if (tokens.length > 1) this.scale_x_attribute = tokens[1];
+          break;
+        case DynC.eSave_Move_scale_y_attribute:
+          if (tokens.length > 1) this.scale_y_attribute = tokens[1];
+          break;
+        case DynC.eSave_Move_x_offset:
+          this.x_offset = parseFloat(tokens[1]);
+          break;
+        case DynC.eSave_Move_y_offset:
+          this.y_offset = parseFloat(tokens[1]);
+          break;
+        case DynC.eSave_Move_x_factor:
+          this.x_factor = parseFloat(tokens[1]);
+          break;
+        case DynC.eSave_Move_y_factor:
+          this.y_factor = parseFloat(tokens[1]);
+          break;
+        case DynC.eSave_Move_scale_x_factor:
+          this.scale_x_factor = parseFloat(tokens[1]);
+          break;
+        case DynC.eSave_Move_scale_y_factor:
+          this.scale_y_factor = parseFloat(tokens[1]);
+          break;
+        case DynC.eSave_Move_scale_type:
+          this.scale_type = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynMove");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-		
+
     return i;
   };
 
-  this.action = function( object, e) {
+  this.action = function (object, e) {
     return 1;
   };
 }
 
-function DynAnalogShift( dyn) {
+function DynAnalogShift(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = DynC.mDynType1_AnalogShift;
   this.dyn_type2 = 0;
@@ -5708,14 +5672,14 @@ function DynAnalogShift( dyn) {
   this.oldValueF;
   this.oldValueI;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "AnalogShift.Attribute") {
       this.attribute = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "AnalogShift.Attribute") {
       ret.value = this.attribute;
@@ -5724,110 +5688,101 @@ function DynAnalogShift( dyn) {
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( object) {
-
-    this.a = new DynReference( this.dyn, this.attribute);
+  this.connect = function (object) {
+    this.a = new DynReference(this.dyn, this.attribute);
     this.a.connect(this.dyn);
-    if ( !this.a.sts) {
+    if (!this.a.sts) {
       console.log("AnalogShift: " + this.attribute);
       return 1;
     }
     return 1;
   };
 
-  this.disconnect = function() {
+  this.disconnect = function () {
     this.a.disconnect(this.dyn);
   };
 
-	
-  this.scan = function( object) {
-    if ( !this.a.sts)
-      return;
+  this.scan = function (object) {
+    if (!this.a.sts) return;
 
     var index = 0;
 
-    switch ( this.a.typeid) {
-    case Pwr.eType_Float32: {
-      var value = this.a.get_ref_value(this.dyn);
-      var i;
+    switch (this.a.typeid) {
+      case Pwr.eType_Float32: {
+        var value = this.a.get_ref_value(this.dyn);
+        var i;
 
-      if ( !this.firstScan) {
-	if ( value == this.oldValueF) {
-	  return;
-	}
+        if (!this.firstScan) {
+          if (value == this.oldValueF) {
+            return;
+          }
+        } else this.firstScan = false;
+
+        index = Math.floor(value + 0.5);
+        this.oldValueF = value;
+
+        break;
       }
-      else
-	this.firstScan = false;
+      case Pwr.eType_Int32: {
+        var value = this.a.get_ref_value(this.dyn);
+        var i;
 
-      index = Math.floor( value + 0.5);
-      this.oldValueF = value;
+        if (!this.firstScan) {
+          if (value == this.oldValueI) {
+            return;
+          }
+        } else this.firstScan = false;
 
-      break;
-    }
-    case Pwr.eType_Int32: {
-      var value = this.a.get_ref_value(this.dyn);
-      var i;
+        index = value;
+        this.oldValueI = value;
 
-      if ( !this.firstScan) {
-	if ( value == this.oldValueI) {
-	  return;
-	}
+        break;
       }
-      else
-	this.firstScan = false;
-
-      index = value;
-      this.oldValueI = value;
-
-      break;
     }
-    }
-    object.set_nodeclass_by_index(index);	    
+    object.set_nodeclass_by_index(index);
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynAnalogShift : " + lines[i]);
+      if (this.dyn.debug) console.log("DynAnalogShift : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_AnalogShift: 
-	break;
-      case DynC.eSave_AnalogShift_attribute: 
-	if ( tokens.length > 1)
-	  this.attribute = tokens[1];
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynAnalogShift");
-	break;
+      switch (key) {
+        case DynC.eSave_AnalogShift:
+          break;
+        case DynC.eSave_AnalogShift_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynAnalogShift");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-		
+
     return i;
   };
 
-  this.action = function( object, e) {
+  this.action = function (object, e) {
     return 1;
   };
 }
 
-function DynDigShift( dyn) {
+function DynDigShift(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = DynC.mDynType1_DigShift;
   this.dyn_type2 = 0;
@@ -5841,14 +5796,14 @@ function DynDigShift( dyn) {
   this.attribute;
   this.firstScan = true;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "DigShift.Attribute") {
       this.attribute = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "DigShift.Attribute") {
       ret.value = this.attribute;
@@ -5857,13 +5812,12 @@ function DynDigShift( dyn) {
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( object) {
-
-    this.a = new DynReference( this.dyn, this.attribute);
+  this.connect = function (object) {
+    this.a = new DynReference(this.dyn, this.attribute);
     this.a.connect(this.dyn);
-    if ( !this.a.sts) {
+    if (!this.a.sts) {
       console.log("DigShift: " + this.attribute);
       return 1;
     }
@@ -5871,76 +5825,72 @@ function DynDigShift( dyn) {
     return 1;
   };
 
-  this.disconnect = function() {
+  this.disconnect = function () {
     this.a.disconnect(this.dyn);
   };
 
-	
-  this.scan = function( object) {
-    if ( !this.a.sts)
-      return;
-    var value = this.dyn.getDig( this.a.p, this.a.typeid, this.a.bitmask, this.a.database);
+  this.scan = function (object) {
+    if (!this.a.sts) return;
+    var value = this.dyn.getDig(
+      this.a.p,
+      this.a.typeid,
+      this.a.bitmask,
+      this.a.database,
+    );
 
-    if ( this.a.inverted)
-      value = !value;
+    if (this.a.inverted) value = !value;
 
-    if ( !this.firstScan) {
-      if ( this.a.oldValue == value)
-	return;
-    }
-    else
-      this.firstScan = false;
-	
-    if ( value) {
+    if (!this.firstScan) {
+      if (this.a.oldValue == value) return;
+    } else this.firstScan = false;
+
+    if (value) {
       object.set_last_nodeclass();
-    }
-    else {
+    } else {
       object.set_root_nodeclass();
     }
     this.a.oldValue = value;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynDigShift : " + lines[i]);
+      if (this.dyn.debug) console.log("DynDigShift : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_DigShift: 
-	break;
-      case DynC.eSave_DigShift_attribute: 
-	if ( tokens.length > 1)
-	  this.attribute = tokens[1];
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynDigShift");
-	break;
+      switch (key) {
+        case DynC.eSave_DigShift:
+          break;
+        case DynC.eSave_DigShift_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynDigShift");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-		
+
     return i;
   };
 
-  this.action = function( object, e) {
+  this.action = function (object, e) {
     return 1;
   };
 }
 
-function DynDigLowShift( dyn) {
+function DynDigLowShift(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = DynC.mDynType2_DigLowShift;
@@ -5954,14 +5904,14 @@ function DynDigLowShift( dyn) {
   this.attribute;
   this.firstScan = true;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "DigLowShift.Attribute") {
       this.attribute = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "DigLowShift.Attribute") {
       ret.value = this.attribute;
@@ -5970,13 +5920,12 @@ function DynDigLowShift( dyn) {
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( object) {
-
-    this.a = new DynReference( this.dyn, this.attribute);
+  this.connect = function (object) {
+    this.a = new DynReference(this.dyn, this.attribute);
     this.a.connect(this.dyn);
-    if ( !this.a.sts) {
+    if (!this.a.sts) {
       console.log("DigLowShift: " + this.attribute);
       return 1;
     }
@@ -5984,76 +5933,72 @@ function DynDigLowShift( dyn) {
     return 1;
   };
 
-  this.disconnect = function() {
+  this.disconnect = function () {
     this.a.disconnect(this.dyn);
   };
 
-	
-  this.scan = function( object) {
-    if ( !this.a.sts)
-      return;
-    var value = this.dyn.getDig( this.a.p, this.a.typeid, this.a.bitmask, this.a.database);
+  this.scan = function (object) {
+    if (!this.a.sts) return;
+    var value = this.dyn.getDig(
+      this.a.p,
+      this.a.typeid,
+      this.a.bitmask,
+      this.a.database,
+    );
 
-    if ( this.a.inverted)
-      value = !value;
+    if (this.a.inverted) value = !value;
 
-    if ( !this.firstScan) {
-      if ( this.a.oldValue == value)
-	return;
-    }
-    else
-      this.firstScan = false;
-	
-    if ( value) {
+    if (!this.firstScan) {
+      if (this.a.oldValue == value) return;
+    } else this.firstScan = false;
+
+    if (value) {
       object.set_root_nodeclass();
-    }
-    else {
+    } else {
       object.set_last_nodeclass();
     }
     this.a.oldValue = value;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynDigLowShift : " + lines[i]);
+      if (this.dyn.debug) console.log("DynDigLowShift : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_DigLowShift: 
-	break;
-      case DynC.eSave_DigLowShift_attribute: 
-	if ( tokens.length > 1)
-	  this.attribute = tokens[1];
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynDigLowShift");
-	break;
+      switch (key) {
+        case DynC.eSave_DigLowShift:
+          break;
+        case DynC.eSave_DigLowShift_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynDigLowShift");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-		
+
     return i;
   };
 
-  this.action = function( object, e) {
+  this.action = function (object, e) {
     return 1;
   };
 }
 
-function DynDigFourShift( dyn) {
+function DynDigFourShift(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = DynC.mDynType2_DigFourShift;
@@ -6071,173 +6016,165 @@ function DynDigFourShift( dyn) {
   this.attribute3 = "";
   this.firstScan = true;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "DigFourShift.Attribute1") {
       this.attribute1 = value;
       return 1;
-    }
-    else if (name === "DigFourShift.Attribute2") {
+    } else if (name === "DigFourShift.Attribute2") {
       this.attribute2 = value;
       return 1;
-    }
-    else if (name === "DigFourShift.Attribute3") {
+    } else if (name === "DigFourShift.Attribute3") {
       this.attribute3 = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "DigFourShift.Attribute1") {
       ret.value = this.attribute1;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "DigFourShift.Attribute2") {
+    } else if (name === "DigFourShift.Attribute2") {
       ret.value = this.attribute2;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "DigFourShift.Attribute3") {
+    } else if (name === "DigFourShift.Attribute3") {
       ret.value = this.attribute3;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( object) {
-
-    this.a1 = new DynReference( this.dyn, this.attribute1);
+  this.connect = function (object) {
+    this.a1 = new DynReference(this.dyn, this.attribute1);
     this.a1.connect(this.dyn);
-    if ( !this.a1.sts) {
+    if (!this.a1.sts) {
       console.log("DigFourShift: " + this.attribute1);
     }
 
-    this.a2 = new DynReference( this.dyn, this.attribute2);
+    this.a2 = new DynReference(this.dyn, this.attribute2);
     this.a2.connect(this.dyn);
-    if ( !this.a2.sts) {
+    if (!this.a2.sts) {
       console.log("DigFourShift: " + this.attribute2);
     }
 
-    this.a3 = new DynReference( this.dyn, this.attribute3);
+    this.a3 = new DynReference(this.dyn, this.attribute3);
     this.a3.connect(this.dyn);
-    if ( !this.a3.sts) {
+    if (!this.a3.sts) {
       console.log("DigFourShift: " + this.attribute3);
     }
 
     return 1;
   };
 
-  this.disconnect = function() {
+  this.disconnect = function () {
     this.a1.disconnect(this.dyn);
     this.a2.disconnect(this.dyn);
     this.a3.disconnect(this.dyn);
   };
 
-	
-  this.scan = function( object) {
-    if ( !(this.a1.attrFound || this.a2.attrFound || this.a3.attrFound))
-      return;
+  this.scan = function (object) {
+    if (!(this.a1.attrFound || this.a2.attrFound || this.a3.attrFound)) return;
     var value1;
     var value2;
     var value3;
     if (this.a1.attrFound) {
-      value1 = this.dyn.getDig(this.a1.p, this.a1.typeid, this.a1.bitmask, this.a1.database);
-      if ( this.a1.inverted)
-        value1 = !value1;
-    }
-    else 
-      value1 = 0;
+      value1 = this.dyn.getDig(
+        this.a1.p,
+        this.a1.typeid,
+        this.a1.bitmask,
+        this.a1.database,
+      );
+      if (this.a1.inverted) value1 = !value1;
+    } else value1 = 0;
 
     if (this.a2.attrFound) {
-      value2 = this.dyn.getDig(this.a2.p, this.a2.typeid, this.a2.bitmask, this.a2.database);
-      if ( this.a2.inverted)
-        value2 = !value2;
-    }
-    else 
-      value2 = 0;
+      value2 = this.dyn.getDig(
+        this.a2.p,
+        this.a2.typeid,
+        this.a2.bitmask,
+        this.a2.database,
+      );
+      if (this.a2.inverted) value2 = !value2;
+    } else value2 = 0;
 
     if (this.a3.attrFound) {
-      value3 = this.dyn.getDig(this.a3.p, this.a3.typeid, this.a3.bitmask, this.a3.database);
-      if ( this.a3.inverted)
-        value3 = !value3;
-    }
-    else 
-      value3 = 0;
+      value3 = this.dyn.getDig(
+        this.a3.p,
+        this.a3.typeid,
+        this.a3.bitmask,
+        this.a3.database,
+      );
+      if (this.a3.inverted) value3 = !value3;
+    } else value3 = 0;
 
+    if (!this.firstScan) {
+      if (
+        this.a1.oldValue == value1 &&
+        this.a2.oldValue == value2 &&
+        this.a3.oldValue == value3
+      )
+        return;
+    } else this.firstScan = false;
 
-    if ( !this.firstScan) {
-      if ( this.a1.oldValue == value1 && this.a2.oldValue == value2 && this.a3.oldValue == value3)
-	return;
-    }
-    else
-      this.firstScan = false;
-	
-    if ( value3)
-      object.set_nodeclass_by_index(2);	    
-    else if ( value2)
-      object.set_nodeclass_by_index(1);
-    else if ( value1)
-      object.set_root_nodeclass();
-    else
-      object.set_last_nodeclass();
+    if (value3) object.set_nodeclass_by_index(2);
+    else if (value2) object.set_nodeclass_by_index(1);
+    else if (value1) object.set_root_nodeclass();
+    else object.set_last_nodeclass();
 
     this.a1.oldValue = value1;
     this.a2.oldValue = value2;
     this.a3.oldValue = value3;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynDigFourShift : " + lines[i]);
+      if (this.dyn.debug) console.log("DynDigFourShift : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_DigFourShift: 
-	break;
-      case DynC.eSave_DigFourShift_attribute1: 
-	if ( tokens.length > 1)
-	  this.attribute1 = tokens[1];
-	break;
-      case DynC.eSave_DigFourShift_attribute2: 
-	if ( tokens.length > 1)
-	  this.attribute2 = tokens[1];
-	break;
-      case DynC.eSave_DigFourShift_attribute3: 
-	if ( tokens.length > 1)
-	  this.attribute3 = tokens[1];
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-        console.log( "Syntax error in DynDigFourShift");
-	break;
+      switch (key) {
+        case DynC.eSave_DigFourShift:
+          break;
+        case DynC.eSave_DigFourShift_attribute1:
+          if (tokens.length > 1) this.attribute1 = tokens[1];
+          break;
+        case DynC.eSave_DigFourShift_attribute2:
+          if (tokens.length > 1) this.attribute2 = tokens[1];
+          break;
+        case DynC.eSave_DigFourShift_attribute3:
+          if (tokens.length > 1) this.attribute3 = tokens[1];
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynDigFourShift");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-		
+
     return i;
   };
 
-  this.action = function( object, e) {
+  this.action = function (object, e) {
     return 1;
   };
 }
 
-function DynScrollingText( dyn) {
+function DynScrollingText(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = DynC.mDynType2_ScrollingText;
@@ -6255,247 +6192,219 @@ function DynScrollingText( dyn) {
   this.firstScan = true;
   this.offset = 0;
   this.osize;
-	
-  this.setAttribute = function(o, name, value) {
+
+  this.setAttribute = function (o, name, value) {
     if (name === "ScrollingText.Attribute") {
       this.attribute = value;
       return 1;
-    }
-    else if (name === "ScrollingText.Direction") {
-      if (value === "Up")
-	this.direction = Glow.eDirection_Down;
-      else if (value === "Down")
-	this.direction = Glow.eDirection_Up;
-      else if (value === "Left")
-	this.direction = Glow.eDirection_Left;
-      else if (value === "Right")
-	this.direction = Glow.eDirection_Right;
-      else
-	this.direction = value;
+    } else if (name === "ScrollingText.Direction") {
+      if (value === "Up") this.direction = Glow.eDirection_Down;
+      else if (value === "Down") this.direction = Glow.eDirection_Up;
+      else if (value === "Left") this.direction = Glow.eDirection_Left;
+      else if (value === "Right") this.direction = Glow.eDirection_Right;
+      else this.direction = value;
       return 1;
-    }
-    else if (name === "ScrollingText.Speed") {
+    } else if (name === "ScrollingText.Speed") {
       this.speed = value;
       return 1;
-    }
-    else if (name === "ScrollingText.Direction") {
+    } else if (name === "ScrollingText.Direction") {
       this.direction = value;
       return 1;
-    }
-    else if (name === "ScrollingText.Bounce") {
+    } else if (name === "ScrollingText.Bounce") {
       this.bounce = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "ScrollingText.Attribute") {
       ret.value = this.attribute;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "ScrollingText.Direction") {
+    } else if (name === "ScrollingText.Direction") {
       ret.value = this.direction;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "ScrollingText.Speed") {
+    } else if (name === "ScrollingText.Speed") {
       ret.value = this.speed;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "ScrollingText.Direction") {
+    } else if (name === "ScrollingText.Direction") {
       ret.value = this.direction;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "ScrollingText.Bounce") {
+    } else if (name === "ScrollingText.Bounce") {
       ret.value = this.bounce;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
     }
     return 0;
-  }
+  };
 
-  this.connect = function( object) {
-
-    this.a = new DynReference( this.dyn, this.attribute);
+  this.connect = function (object) {
+    this.a = new DynReference(this.dyn, this.attribute);
     this.a.connect(this.dyn);
-    if ( !this.a.sts) {
+    if (!this.a.sts) {
       console.log("ScrollingText: " + this.attribute);
       return 1;
     }
-    if ( !(this.a.typeid == Pwr.eType_String || this.a.typeid == Pwr.eType_Text)) {
+    if (
+      !(this.a.typeid == Pwr.eType_String || this.a.typeid == Pwr.eType_Text)
+    ) {
       console.log("ScrollingText: " + this.attribute);
       this.a.disconnect(dyn);
       return 1;
     }
 
     var geom = object.measure();
-    switch( this.direction) {
-    case Glow.eDirection_Left:
-    case Glow.eDirection_Right:
-      this.osize = geom.ur_x - geom.ll_x;
-      break;
-    default:
-      this.osize = geom.ur_y - geom.ll_y;
+    switch (this.direction) {
+      case Glow.eDirection_Left:
+      case Glow.eDirection_Right:
+        this.osize = geom.ur_x - geom.ll_x;
+        break;
+      default:
+        this.osize = geom.ur_y - geom.ll_y;
     }
 
     return 1;
-  }
+  };
 
-  this.disconnect = function() {
+  this.disconnect = function () {
     this.a.disconnect(this.dyn);
-  }
+  };
 
-	
-  this.scan = function( object) {
+  this.scan = function (object) {
+    var d = object.getAnnotationTextExtent(1);
+    if (d === null) return;
 
-    var d = object.getAnnotationTextExtent( 1);
-    if ( d === null)
-      return;
-
-    switch ( this.direction) {
-    case Glow.eDirection_Left: {
-      this.offset -= this.speed * this.dyn.graph.getAnimationScanTime();
-      if ( this.bounce !== 0) {
-	if ( d.width < this.osize) {
-	  if ( this.offset < 0) {
-	    this.offset = -this.offset;
-	    this.direction = Glow.eDirection_Right;
-	  }
-	}
-	else {
-	  if ( this.offset < this.osize - d.width) {
-	    this.offset += (this.osize - d.width) - this.offset;
-	    this.direction = Glow.eDirection_Right;
-	  }
-	}
+    switch (this.direction) {
+      case Glow.eDirection_Left: {
+        this.offset -= this.speed * this.dyn.graph.getAnimationScanTime();
+        if (this.bounce !== 0) {
+          if (d.width < this.osize) {
+            if (this.offset < 0) {
+              this.offset = -this.offset;
+              this.direction = Glow.eDirection_Right;
+            }
+          } else {
+            if (this.offset < this.osize - d.width) {
+              this.offset += this.osize - d.width - this.offset;
+              this.direction = Glow.eDirection_Right;
+            }
+          }
+        } else {
+          if (this.offset < -d.width) this.offset = this.osize;
+        }
+        object.setAnnotationTextOffset(1, this.offset, 0);
+        break;
       }
-      else {
-	if ( this.offset < -d.width)
-	  this.offset = this.osize;
+      case Glow.eDirection_Right: {
+        this.offset += this.speed * this.dyn.graph.getAnimationScanTime();
+        if (this.bounce != 0) {
+          if (d.width < this.osize) {
+            if (this.offset > this.osize - d.width) {
+              this.offset -= this.offset - (this.osize - d.width);
+              this.direction = Glow.eDirection_Left;
+            }
+          } else {
+            if (this.offset > 0) {
+              this.offset = -this.offset;
+              this.direction = Glow.eDirection_Left;
+            }
+          }
+        } else {
+          if (this.offset > this.osize) this.offset = -d.width;
+        }
+        object.setAnnotationTextOffset(1, this.offset, 0);
+        break;
       }
-      object.setAnnotationTextOffset( 1, this.offset, 0);
-      break;
-    }
-    case Glow.eDirection_Right: {
-      this.offset += this.speed * this.dyn.graph.getAnimationScanTime();
-      if ( this.bounce != 0) {
-	if ( d.width < this.osize) {
-	  if ( this.offset > this.osize - d.width) {
-	    this.offset -= this.offset - (this.osize -d.width);
-	    this.direction = Glow.eDirection_Left;
-	  }
-	}
-	else {
-	  if ( this.offset > 0) {
-	    this.offset = -this.offset;
-	    this.direction = Glow.eDirection_Left;
-	  }
-	}
+      case Glow.eDirection_Up: {
+        this.offset += this.speed * this.dyn.graph.getAnimationScanTime();
+        if (this.bounce != 0) {
+          if (this.offset > this.osize - d.height) {
+            this.offset -= this.offset - (this.osize - d.height);
+            this.direction = Glow.eDirection_Down;
+          }
+        } else {
+          if (this.offset > this.osize) this.offset = -d.height;
+        }
+        object.setAnnotationTextOffset(1, 0, this.offset);
+        break;
       }
-      else {
-	if ( this.offset > this.osize)
-	  this.offset = -d.width;
+      case Glow.eDirection_Down: {
+        this.offset -= this.speed * this.dyn.graph.getAnimationScanTime();
+        if (this.bounce != 0) {
+          if (this.offset < 0) {
+            this.offset = -this.offset;
+            this.direction = Glow.eDirection_Up;
+          }
+        } else {
+          if (this.offset < -d.height) this.offset = this.osize;
+        }
+        object.setAnnotationTextOffset(1, 0, this.offset);
+        break;
       }
-      object.setAnnotationTextOffset( 1, this.offset, 0);
-      break;
-    }
-    case Glow.eDirection_Up: {
-      this.offset += this.speed * this.dyn.graph.getAnimationScanTime();
-      if ( this.bounce != 0) {
-	if ( this.offset > this.osize - d.height) {
-	  this.offset -= this.offset- (this.osize - d.height);
-	  this.direction = Glow.eDirection_Down;
-	}
-      }
-      else {
-	if ( this.offset > this.osize)
-	  this.offset = -d.height;
-      }
-      object.setAnnotationTextOffset( 1, 0, this.offset);
-      break;
-    }
-    case Glow.eDirection_Down: {
-      this.offset -= this.speed * this.dyn.graph.getAnimationScanTime();
-      if ( this.bounce != 0) {
-	if ( this.offset < 0) {
-	  this.offset = -this.offset;
-	  this.direction = Glow.eDirection_Up;
-	}
-      }
-      else {
-	if ( this.offset < -d.height)
-	  this.offset = this.osize;
-      }
-      object.setAnnotationTextOffset( 1, 0, this.offset);
-      break;
-    }
-    default: ;
+      default:
     }
 
     var value0 = this.a.get_ref_value(dyn);
 
-    if ( this.firstScan || !(value0 == this.a.oldValue)) {
+    if (this.firstScan || !(value0 == this.a.oldValue)) {
       object.setAnnotation(1, value0);
       this.dyn.repaintNow = true;
       this.a.oldValue = value0;
     }
-    if ( this.firstScan)
-      this.firstScan = false;
-  }
+    if (this.firstScan) this.firstScan = false;
+  };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynScrollingText : " + lines[i]);
+      if (this.dyn.debug) console.log("DynScrollingText : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_ScrollingText: 
-	break;
-      case DynC.eSave_ScrollingText_attribute: 
-	if ( tokens.length > 1)
-	  this.attribute = tokens[1];
-	break;
-      case DynC.eSave_ScrollingText_direction: 
-	this.direction = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_ScrollingText_speed: 
-	this.speed = parseFloat( tokens[1]);
-	break;
-      case DynC.eSave_ScrollingText_bounce: 
-	this.bounce = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynScrollingText");
-	break;
+      switch (key) {
+        case DynC.eSave_ScrollingText:
+          break;
+        case DynC.eSave_ScrollingText_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_ScrollingText_direction:
+          this.direction = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_ScrollingText_speed:
+          this.speed = parseFloat(tokens[1]);
+          break;
+        case DynC.eSave_ScrollingText_bounce:
+          this.bounce = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynScrollingText");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
     return i;
   };
 
-  this.action = function( object, e) {
+  this.action = function (object, e) {
     return 1;
   };
 }
 
-function DynColorThemeLightness( dyn) {
+function DynColorThemeLightness(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = DynC.mDynType2_ColorThemeLightness;
@@ -6505,64 +6414,61 @@ function DynColorThemeLightness( dyn) {
   this.instance_mask = 0;
   this.instance = 0;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     return 0;
-  }
-  this.getAttribute = function(o, name, value) {
+  };
+  this.getAttribute = function (o, name, value) {
     var ret = new ge_tValueReturn();
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( o) {
+  this.connect = function (o) {
     return 1;
   };
 
-  this.disconnect = function() {
-  };
-	
-  this.scan = function( o) {
+  this.disconnect = function () {};
+
+  this.scan = function (o) {
     o.setColorThemeLightness();
     return 1;
   };
 
-  this.action = function( object, e) {
+  this.action = function (object, e) {
     return 1;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynColorThemeLightness : " + lines[i]);
+      if (this.dyn.debug) console.log("DynColorThemeLightness : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_ColorThemeLightness: 
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynColorThemeLightness");
-	break;
+      switch (key) {
+        case DynC.eSave_ColorThemeLightness:
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynColorThemeLightness");
+          break;
       }
-      
-      if ( end)
-	break;
+
+      if (end) break;
     }
     return i;
   };
-
 }
 
-function DynDigBackgroundColor( dyn, instance) {
+function DynDigBackgroundColor(dyn, instance) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = DynC.mDynType2_DigBackgroundColor;
@@ -6577,14 +6483,12 @@ function DynDigBackgroundColor( dyn, instance) {
   this.color = Glow.eDrawType_Inherit;
   this.firstScan = true;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     var inst = this.dyn.instance_number(this.instance);
     var iname;
     var inames = new Array(3);
-    if (inst == 1)
-      iname = "DigBackgroundColor";
-    else
-      iname = "DigBackgroundColor" + inst.toString();
+    if (inst == 1) iname = "DigBackgroundColor";
+    else iname = "DigBackgroundColor" + inst.toString();
     inames[0] = "DigBackgroundColor.Instances";
     inames[1] = iname + ".Attribute";
     inames[2] = iname + ".Color";
@@ -6592,26 +6496,22 @@ function DynDigBackgroundColor( dyn, instance) {
       this.instance_mask = value;
       this.dyn.update_elements();
       return 1;
-    }
-    else if (name === inames[1]) {
-      this.attribute =  value;
+    } else if (name === inames[1]) {
+      this.attribute = value;
       return 1;
-    }
-    else if (name === inames[2]) {
+    } else if (name === inames[2]) {
       this.color = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     var inst = this.dyn.instance_number(this.instance);
     var iname;
     var inames = new Array(3);
-    if (inst == 1)
-      iname = "DigBackgroundColor";
-    else
-      iname = "DigBackgroundColor" + inst.toString();
+    if (inst == 1) iname = "DigBackgroundColor";
+    else iname = "DigBackgroundColor" + inst.toString();
     inames[0] = "DigBackgroundColor.Instances";
     inames[1] = iname + ".Attribute";
     inames[2] = iname + ".Color";
@@ -6619,122 +6519,113 @@ function DynDigBackgroundColor( dyn, instance) {
       ret.value = this.instance_mask;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === inames[1]) {
+    } else if (name === inames[1]) {
       ret.value = this.attribute;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === inames[2]) {
+    } else if (name === inames[2]) {
       ret.value = this.color;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( object) {
-    if ( this.color < 0 || this.color >= Glow.eDrawType__)
-      return 0;
+  this.connect = function (object) {
+    if (this.color < 0 || this.color >= Glow.eDrawType__) return 0;
 
-    this.a = new DynReference( this.dyn, this.attribute);
+    this.a = new DynReference(this.dyn, this.attribute);
     this.a.connect(this.dyn);
-    if ( !this.a.sts) {
+    if (!this.a.sts) {
       console.log("DigBackgroundColor: " + this.attribute);
       return 1;
     }
     return 1;
   };
 
-  this.disconnect = function() {
-    if ( this.a != null)
-      this.a.disconnect(this.dyn);
+  this.disconnect = function () {
+    if (this.a != null) this.a.disconnect(this.dyn);
   };
 
-	
-  this.scan = function( object) {
-    if ( this.a === null || !this.a.sts || this.dyn.ignoreBgColor)
-      return;
-    var value = this.dyn.getDig( this.a.p, this.a.typeid, this.a.bitmask, this.a.database);
+  this.scan = function (object) {
+    if (this.a === null || !this.a.sts || this.dyn.ignoreBgColor) return;
+    var value = this.dyn.getDig(
+      this.a.p,
+      this.a.typeid,
+      this.a.bitmask,
+      this.a.database,
+    );
 
-    if ( this.a.inverted)
-      value = !value;
+    if (this.a.inverted) value = !value;
 
-    if ( !this.firstScan) {
-      if ( this.a.oldValue == value && !this.dyn.resetColor) {
-	// No change since last time
-	if ( value)
-	  this.dyn.ignoreBgColor = true;
-	return;
+    if (!this.firstScan) {
+      if (this.a.oldValue == value && !this.dyn.resetColor) {
+        // No change since last time
+        if (value) this.dyn.ignoreBgColor = true;
+        return;
       }
-    }
-    else
-      this.firstScan = false;
-	
-    if ( value) {
-      object.setBackgroundColor( this.color);
+    } else this.firstScan = false;
+
+    if (value) {
+      object.setBackgroundColor(this.color);
       this.dyn.ignoreBgColor = true;
-    }
-    else {
+    } else {
       object.resetBackgroundColor();
       this.dyn.resetBgColor = true;
     }
     this.dyn.repaintNow = true;
     this.a.oldValue = value;
-  }
+  };
 
-  this.action = function( object, e) {
+  this.action = function (object, e) {
     return 1;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynDigBackgroundColor : " + lines[i]);
+      if (this.dyn.debug) console.log("DynDigBackgroundColor : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_DigBackgroundColor: 
-	break;
-      case DynC.eSave_DigBackgroundColor_attribute: 
-	if ( tokens.length > 1)
-	  this.attribute = tokens[1];
-	break;
-      case DynC.eSave_DigBackgroundColor_color: 
-	this.color = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_DigBackgroundColor_instance: 
-	this.instance = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_DigBackgroundColor_instance_mask: 
-	this.instance_mask = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynDigBackgroundColor");
-	break;
+      switch (key) {
+        case DynC.eSave_DigBackgroundColor:
+          break;
+        case DynC.eSave_DigBackgroundColor_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_DigBackgroundColor_color:
+          this.color = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_DigBackgroundColor_instance:
+          this.instance = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_DigBackgroundColor_instance_mask:
+          this.instance_mask = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynDigBackgroundColor");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-		
+
     return i;
   };
-
 }
 
-function DynDigSwap( dyn, instance) {
+function DynDigSwap(dyn, instance) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = DynC.mDynType2_DigSwap;
@@ -6749,69 +6640,68 @@ function DynDigSwap( dyn, instance) {
   this.reset_value = 0;
   this.firstScan = true;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "DigSwap.Attribute") {
       this.attribute = value;
       return 1;
-    }
-    else if (name === "DigSwap.ResetValue") {
+    } else if (name === "DigSwap.ResetValue") {
       this.reset_value = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "DigSwap.Attribute") {
       ret.value = this.attribute;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "DigSwap.ResetValue") {
+    } else if (name === "DigSwap.ResetValue") {
       ret.value = this.reset_value;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( object) {
-
-    this.a = new DynReference( this.dyn, this.attribute);
+  this.connect = function (object) {
+    this.a = new DynReference(this.dyn, this.attribute);
     this.a.connect(this.dyn);
-    if ( !this.a.sts) {
+    if (!this.a.sts) {
       console.log("DigSwap: " + this.attribute);
       return 1;
     }
     return 1;
   };
 
-  this.disconnect = function() {
+  this.disconnect = function () {
     this.a.disconnect(this.dyn);
   };
 
-	
-  this.scan = function( object) {
-    if ( !this.a.sts)
-      return;
-    var value = this.dyn.getDig( this.a.p, this.a.typeid, this.a.bitmask, this.a.database);
+  this.scan = function (object) {
+    if (!this.a.sts) return;
+    var value = this.dyn.getDig(
+      this.a.p,
+      this.a.typeid,
+      this.a.bitmask,
+      this.a.database,
+    );
 
-    if ( !this.firstScan) {
+    if (!this.firstScan) {
       this.a.oldValue = value;
       this.firstScan = false;
       return;
     }
 
-    if ( this.a.inverted)
-      value = !value;
+    if (this.a.inverted) value = !value;
 
-    if ( this.a.oldValue == value) {
+    if (this.a.oldValue == value) {
       // No change since last time
       return;
     }
-	
-    if ( value) {
+
+    if (value) {
       // Todo
       // this.dyn.graph.swap();
     }
@@ -6819,50 +6709,47 @@ function DynDigSwap( dyn, instance) {
     this.a.oldValue = value;
   };
 
-  this.action = function( object, e) {
+  this.action = function (object, e) {
     return 1;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynDigSwap : " + lines[i]);
+      if (this.dyn.debug) console.log("DynDigSwap : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_DigSwap: 
-	break;
-      case DynC.eSave_DigSwap_attribute: 
-	if ( tokens.length > 1)
-	  attribute = tokens[1];
-	break;
-      case DynC.eSave_DigSwap_reset_value: 
-	reset_value = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynDigSwap");
-	break;
+      switch (key) {
+        case DynC.eSave_DigSwap:
+          break;
+        case DynC.eSave_DigSwap_attribute:
+          if (tokens.length > 1) attribute = tokens[1];
+          break;
+        case DynC.eSave_DigSwap_reset_value:
+          reset_value = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynDigSwap");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
     return i;
   };
-
 }
 
-function DynAnimation( dyn) {
+function DynAnimation(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = DynC.mDynType1_Animation;
   this.dyn_type2 = 0;
@@ -6879,242 +6766,223 @@ function DynAnimation( dyn) {
   this.animation_count;
   this.animation_direction;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "Animation.Attribute") {
       this.attribute = value;
       return 1;
-    }
-    else if (name === "Animation.Sequence") {
-      if (value === "Inherit")
-	this.sequence = DynC.eAnimSequence_Inherit;
-      else if (value === "Cyclic")
-	this.sequence = DynC.eAnimSequence_Cycle;
-      else if (value === "Dig")
-	this.sequence = DynC.eAnimSequence_Dig;
+    } else if (name === "Animation.Sequence") {
+      if (value === "Inherit") this.sequence = DynC.eAnimSequence_Inherit;
+      else if (value === "Cyclic") this.sequence = DynC.eAnimSequence_Cycle;
+      else if (value === "Dig") this.sequence = DynC.eAnimSequence_Dig;
       else if (value === "ForwBack")
-	this.sequence = DynC.eAnimSequence_ForwBack;
+        this.sequence = DynC.eAnimSequence_ForwBack;
       else if (value === "CyclicLast")
-	this.sequence = DynC.eAnimSequence_CycleLast;
-      else
-        this.sequence = value;
+        this.sequence = DynC.eAnimSequence_CycleLast;
+      else this.sequence = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "Animation.Attribute") {
       ret.value = this.attribute;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "Animation.Sequence") {
+    } else if (name === "Animation.Sequence") {
       ret.value = this.sequence;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
-  
-  this.connect = function( object) {
+  };
 
-    this.a = new DynReference( this.dyn, this.attribute);
+  this.connect = function (object) {
+    this.a = new DynReference(this.dyn, this.attribute);
     this.a.connect(this.dyn);
-    if ( !this.a.sts) {
+    if (!this.a.sts) {
       console.log("Animation: " + this.attribute);
       return 1;
     }
 
-    if ( this.sequence == DynC.eAnimSequence_Inherit)
+    if (this.sequence == DynC.eAnimSequence_Inherit)
       this.sequence = object.get_nodeclass_dyn_attr1();
 
     return 1;
   };
 
-  this.disconnect = function() {
+  this.disconnect = function () {
     this.a.disconnect(this.dyn);
   };
 
-  this.scan = function( object) {
+  this.scan = function (object) {
     var max_count;
     var sts;
 
-    if ( !this.a.sts)
-      return;
+    if (!this.a.sts) return;
 
-    var value = this.dyn.getDig( this.a.p, this.a.typeid, this.a.bitmask, this.a.database);
-    if ( this.a.inverted)
-      value = !value;
+    var value = this.dyn.getDig(
+      this.a.p,
+      this.a.typeid,
+      this.a.bitmask,
+      this.a.database,
+    );
+    if (this.a.inverted) value = !value;
 
-    if ( this.firstScan) {
+    if (this.firstScan) {
       this.animation_count = 0;
       this.animation_direction = 0;
       this.firstScan = false;
-      if ( this.sequence == DynC.eAnimSequence_Dig) {
-	if ( value)
-	  object.set_last_nodeclass();
-	this.a.oldValue = value;
-      }
-      else if ( this.sequence == DynC.eAnimSequence_CycleLast) {
-	if ( !value)
-	  object.set_last_nodeclass();
-	this.a.oldValue = value;
+      if (this.sequence == DynC.eAnimSequence_Dig) {
+        if (value) object.set_last_nodeclass();
+        this.a.oldValue = value;
+      } else if (this.sequence == DynC.eAnimSequence_CycleLast) {
+        if (!value) object.set_last_nodeclass();
+        this.a.oldValue = value;
       }
     }
 
-    if ( this.sequence == DynC.eAnimSequence_Dig) {
-      if ( this.a.oldValue != value) {
-	// Start animation
-	if ( value) {
-	  this.animation_count = 0;
-	  this.animation_direction = 1;
-	}
-	else if ( !value) {
-	  this.animation_direction = 2;
-	  this.animation_count = 0;
-	}
+    if (this.sequence == DynC.eAnimSequence_Dig) {
+      if (this.a.oldValue != value) {
+        // Start animation
+        if (value) {
+          this.animation_count = 0;
+          this.animation_direction = 1;
+        } else if (!value) {
+          this.animation_direction = 2;
+          this.animation_count = 0;
+        }
       }
 
-      if ( this.animation_direction !== 0) {
-	max_count = object.get_animation_count();
-	this.animation_count++;
-	if ( this.animation_count >= max_count) {
-	  // Shift nodeclass
-	  if ( this.animation_direction == 1) {
-	    // Shift forward
-	    if (sequence == ge_eAnimSequence_CycleLast) {
-
- 	      next_nc = object.get_next_nodeclass();
-	      if (next_nc != null && next_nc.is_last() == 1)
+      if (this.animation_direction !== 0) {
+        max_count = object.get_animation_count();
+        this.animation_count++;
+        if (this.animation_count >= max_count) {
+          // Shift nodeclass
+          if (this.animation_direction == 1) {
+            // Shift forward
+            if (this.sequence == DynC.eAnimSequence_CycleLast) {
+              next_nc = object.get_next_nodeclass();
+              if (next_nc != null && next_nc.is_last() == 1)
                 // Start from the beginning again
-	        object.set_first_nodeclass();
-	      else
-	        object.set_next_nodeclsas();
-	    } else {
-	      sts = object.set_next_nodeclass();
-	      if ( (sts & 1) == 0) {
-	        // End of animation
-	        this.animation_count = 0;
-	        this.animation_direction = 0;
-	      }
-	      this.animation_count = 0;
-	    }
-	  }
-	  else {
-	    // Shift backward
+                object.set_first_nodeclass();
+              else object.set_next_nodeclsas();
+            } else {
+              sts = object.set_next_nodeclass();
+              if ((sts & 1) == 0) {
+                // End of animation
+                this.animation_count = 0;
+                this.animation_direction = 0;
+              }
+              this.animation_count = 0;
+            }
+          } else {
+            // Shift backward
 
-	    sts = object.set_previous_nodeclass();
-	    if ( (sts & 1) === 0) {
-	      // End of animation
-	      this.animation_count = 0;
-	      this.animation_direction = 0;
-	    }
-	    this.animation_count = 0;
-	  }
-	}
+            sts = object.set_previous_nodeclass();
+            if ((sts & 1) === 0) {
+              // End of animation
+              this.animation_count = 0;
+              this.animation_direction = 0;
+            }
+            this.animation_count = 0;
+          }
+        }
       }
-    }
-    else {
-      if ( value) {
-	if ( this.animation_direction == 0) {
-	  // Animation has been stopped
-	  this.animation_count = 0;
-	  this.animation_direction = 1;
-	}
+    } else {
+      if (value) {
+        if (this.animation_direction == 0) {
+          // Animation has been stopped
+          this.animation_count = 0;
+          this.animation_direction = 1;
+        }
 
-	max_count = object.get_animation_count();
-	this.animation_count++;
-	if ( this.animation_count >= max_count) {
-	  // Shift nodeclass
-	  if ( this.animation_direction == 1) {
-	    // Shift forward
+        max_count = object.get_animation_count();
+        this.animation_count++;
+        if (this.animation_count >= max_count) {
+          // Shift nodeclass
+          if (this.animation_direction == 1) {
+            // Shift forward
 
-	    sts = object.set_next_nodeclass();
-	    if ((sts & 1) == 0) {
-	      if ( this.sequence == DynC.eAnimSequence_Cycle) {
-		// Start from the beginning again
-		object.set_nodeclass_by_index( 1);
-	      }
-	      else {
-		// Change direction
-		this.animation_direction = 2;
-		object.set_previous_nodeclass();
-	      }
-	    }
-	    this.animation_count = 0;
-	  }
-	  else {
-	    // Shift backward
+            sts = object.set_next_nodeclass();
+            if ((sts & 1) == 0) {
+              if (this.sequence == DynC.eAnimSequence_Cycle) {
+                // Start from the beginning again
+                object.set_nodeclass_by_index(1);
+              } else {
+                // Change direction
+                this.animation_direction = 2;
+                object.set_previous_nodeclass();
+              }
+            }
+            this.animation_count = 0;
+          } else {
+            // Shift backward
 
-	    sts = object.set_previous_nodeclass();
-	    if ( (sts & 1) == 0) {
-	      // Change direction
-	      this.animation_direction = 1;
-	      sts = object.set_next_nodeclass();
-	    }
-	    this.animation_count = 0;
-	  }
-	}
-      }
-      else {
-	if ( this.animation_direction != 0) {
-	  // Stop and reset animation
-	  this.animation_direction = 0;
-	  if ( this.sequence == DynC.eAnimSequence_CycleLast)
-	    object.set_last_nodeclass();
-	  else
-	    object.set_first_nodeclass();
-	}
+            sts = object.set_previous_nodeclass();
+            if ((sts & 1) == 0) {
+              // Change direction
+              this.animation_direction = 1;
+              sts = object.set_next_nodeclass();
+            }
+            this.animation_count = 0;
+          }
+        }
+      } else {
+        if (this.animation_direction != 0) {
+          // Stop and reset animation
+          this.animation_direction = 0;
+          if (this.sequence == DynC.eAnimSequence_CycleLast)
+            object.set_last_nodeclass();
+          else object.set_first_nodeclass();
+        }
       }
     }
     this.a.oldValue = value;
-  }
+  };
 
-  this.action = function( object, e) {
+  this.action = function (object, e) {
     return 1;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "Animation : " + lines[i]);
+      if (this.dyn.debug) console.log("Animation : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_Animation: 
-	break;
-      case DynC.eSave_Animation_attribute: 
-	if ( tokens.length > 1)
-	  this.attribute = tokens[1];
-	break;
-      case DynC.eSave_Animation_sequence: 
-	this.sequence = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynAnimation");
-	break;
+      switch (key) {
+        case DynC.eSave_Animation:
+          break;
+        case DynC.eSave_Animation_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_Animation_sequence:
+          this.sequence = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynAnimation");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
     return i;
   };
-
 }
 
-function DynVideo( dyn) {
+function DynVideo(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = DynC.mDynType1_Video;
   this.dyn_type2 = 0;
@@ -7124,57 +6992,56 @@ function DynVideo( dyn) {
   this.instance_mask = 0;
   this.instance = 0;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     ret.sts = 0;
     return ret;
-  }
-
-  this.connect = function( o) {
-    return 1;
-  };
-  this.scan = function( o) {
-    return 1;
-  };
-  this.action = function( object, e) {
-    return 1;
   };
 
-  this.open = function( lines, row) {
+  this.connect = function (o) {
+    return 1;
+  };
+  this.scan = function (o) {
+    return 1;
+  };
+  this.action = function (object, e) {
+    return 1;
+  };
+
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "Video : " + lines[i]);
+      if (this.dyn.debug) console.log("Video : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_Video: 
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynVideo");
-	break;
+      switch (key) {
+        case DynC.eSave_Video:
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynVideo");
+          break;
       }
-      
-      if ( end)
-	break;
+
+      if (end) break;
     }
-    return i;    
+    return i;
   };
 }
 
-function DynBar( dyn)  {
+function DynBar(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = DynC.mDynType1_Bar;
   this.dyn_type2 = 0;
@@ -7196,16 +7063,14 @@ function DynBar( dyn)  {
   this.old_value;
   this.old_ivalue;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "Bar.Attribute") {
       this.attribute = value;
       return 1;
-    }
-    else if (name === "Bar.MinValueAttr") {
+    } else if (name === "Bar.MinValueAttr") {
       this.minvalue_attr = value;
       return 1;
-    }
-    else if (name === "Bar.MaxValueAttr") {
+    } else if (name === "Bar.MaxValueAttr") {
       this.maxvalue_attr = value;
       return 1;
     }
@@ -7213,24 +7078,19 @@ function DynBar( dyn)  {
       if (name === "Bar.MaxValue") {
         o.max_value = value;
         return 1;
-      }
-      else if (name === "Bar.MinValue") {
+      } else if (name === "Bar.MinValue") {
         o.min_value = value;
         return 1;
-      }
-      else if (name === "Bar.BarValue") {
+      } else if (name === "Bar.BarValue") {
         o.bar_value = value;
         return 1;
-      }
-      else if (name === "Bar.BarColor") {
+      } else if (name === "Bar.BarColor") {
         o.bar_drawtype = value;
         return 1;
-      }
-      else if (name === "Bar.BarBorderColor") {
+      } else if (name === "Bar.BarBorderColor") {
         o.bar_bordercolor = value;
         return 1;
-      }
-      else if (name === "Bar.BarBorderWidth") {
+      } else if (name === "Bar.BarBorderWidth") {
         o.bar_borderwidth = value;
         return 1;
       }
@@ -7238,55 +7098,45 @@ function DynBar( dyn)  {
       if (name === "BarArc.MaxValue") {
         o.max_value = value;
         return 1;
-      }
-      else if (name === "BarArc.MinValue") {
+      } else if (name === "BarArc.MinValue") {
         o.min_value = value;
         return 1;
-      }
-      else if (name === "BarArc.BarValue") {
+      } else if (name === "BarArc.BarValue") {
         o.bar_value = value;
         return 1;
-      }
-      else if (name === "BarArc.BarColor") {
+      } else if (name === "BarArc.BarColor") {
         o.bar_drawtype = value;
         return 1;
-      }
-      else if (name === "BarArc.BarBorderColor") {
+      } else if (name === "BarArc.BarBorderColor") {
         o.bar_bordercolor = value;
         return 1;
-     }
-      else if (name === "BarArc.BarBorderWidth") {
+      } else if (name === "BarArc.BarBorderWidth") {
         o.bar_borderwidth = value;
         return 1;
-      }
-      else if (name === "BarArc.Angle1") {
+      } else if (name === "BarArc.Angle1") {
         o.angle1 = value;
         return 1;
-      }
-      else if (name === "BarArc.Angle2") {
+      } else if (name === "BarArc.Angle2") {
         o.angle2 = value;
         return 1;
-      }
-      else if (name === "BarArc.Direction") {
+      } else if (name === "BarArc.Direction") {
         o.bar_direction = value;
         return 1;
       }
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "Bar.Attribute") {
       ret.value = this.attribute;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "Bar.MinValueAttr") {
+    } else if (name === "Bar.MinValueAttr") {
       ret.value = this.minvalue_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "Bar.MaxValueAttr") {
+    } else if (name === "Bar.MaxValueAttr") {
       ret.value = this.maxvalue_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
@@ -7296,28 +7146,23 @@ function DynBar( dyn)  {
         ret.value = o.max_value;
         ret.decl = CcmC.K_DECL_FLOAT;
         return ret;
-      }
-      else if (name === "Bar.MinValue") {
+      } else if (name === "Bar.MinValue") {
         ret.value = o.min_value;
         ret.decl = CcmC.K_DECL_FLOAT;
         return ret;
-      }
-      else if (name === "Bar.BarValue") {
+      } else if (name === "Bar.BarValue") {
         ret.value = o.bar_value;
         ret.decl = CcmC.K_DECL_FLOAT;
         return ret;
-      }
-      else if (name === "Bar.BarColor") {
+      } else if (name === "Bar.BarColor") {
         ret.decl = CcmC.K_DECL_INT;
         ret.value = o.bar_drawtype;
         return ret;
-      }
-      else if (name === "Bar.BarBorderColor") {
+      } else if (name === "Bar.BarBorderColor") {
         ret.value = o.bar_bordercolor;
         ret.decl = CcmC.K_DECL_INT;
         return ret;
-      }
-      else if (name === "Bar.BarBorderWidth") {
+      } else if (name === "Bar.BarBorderWidth") {
         ret.value = o.bar_borderwidth;
         ret.decl = CcmC.K_DECL_INT;
         return ret;
@@ -7327,38 +7172,31 @@ function DynBar( dyn)  {
         ret.value = o.max_value;
         ret.decl = CcmC.K_DECL_FLOAT;
         return ret;
-      }
-      else if (name === "BarArc.MinValue") {
+      } else if (name === "BarArc.MinValue") {
         ret.value = o.min_value;
         ret.decl = CcmC.K_DECL_FLOAT;
         return ret;
-      }
-      else if (name === "BarArc.BarValue") {
+      } else if (name === "BarArc.BarValue") {
         ret.value = o.bar_value;
         ret.decl = CcmC.K_DECL_FLOAT;
         return ret;
-      }
-      else if (name === "BarArc.BarColor") {
+      } else if (name === "BarArc.BarColor") {
         ret.value = o.bar_drawtype;
         ret.decl = CcmC.K_DECL_INT;
         return ret;
-      }
-      else if (name === "BarArc.BarBorderColor") {
+      } else if (name === "BarArc.BarBorderColor") {
         ret.value = o.bar_bordercolor;
         ret.decl = CcmC.K_DECL_INT;
         return ret;
-     }
-      else if (name === "BarArc.BarBorderWidth") {
+      } else if (name === "BarArc.BarBorderWidth") {
         ret.value = o.bar_borderwidth;
         ret.decl = CcmC.K_DECL_INT;
         return ret;
-      }
-      else if (name === "BarArc.Angle1") {
+      } else if (name === "BarArc.Angle1") {
         ret.value = o.angle1;
         ret.decl = CcmC.K_DECL_INT;
         return ret;
-      }
-      else if (name === "BarArc.Angle2") {
+      } else if (name === "BarArc.Angle2") {
         ret.value = o.angle2;
         ret.decl = CcmC.K_DECL_INT;
         return ret;
@@ -7366,133 +7204,125 @@ function DynBar( dyn)  {
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( object) {
-    if ( this.attribute == null)
-      return 0;
+  this.connect = function (object) {
+    if (this.attribute == null) return 0;
 
-    this.a = new DynReference( this.dyn, this.attribute);
+    this.a = new DynReference(this.dyn, this.attribute);
     this.a.connect(this.dyn);
-    if ( !this.a.sts) {
+    if (!this.a.sts) {
       console.log("Bar: " + this.attribute);
       return 1;
     }
 
-    this.minvalue_a = new DynReference( this.dyn, this.minvalue_attr);
+    this.minvalue_a = new DynReference(this.dyn, this.minvalue_attr);
     this.minvalue_a.connect(this.dyn);
 
-    this.maxvalue_a = new DynReference( this.dyn, this.maxvalue_attr);
+    this.maxvalue_a = new DynReference(this.dyn, this.maxvalue_attr);
     this.maxvalue_a.connect(this.dyn);
 
     return 1;
   };
 
-  this.disconnect = function() {
+  this.disconnect = function () {
     this.a.disconnect(this.dyn);
     this.minvalue_a.disconnect(this.dyn);
     this.maxvalue_a.disconnect(this.dyn);
   };
 
-  this.scan = function( object) {
-    if ( !this.a.sts)
-      return;
-  
+  this.scan = function (object) {
+    if (!this.a.sts) return;
+
     var minval, maxval;
-    if ( this.maxvalue_a.sts && this.minvalue_a.sts) {
+    if (this.maxvalue_a.sts && this.minvalue_a.sts) {
       minval = this.minvalue_a.get_ref_value(this.dyn);
       maxval = this.maxvalue_a.get_ref_value(this.dyn);
-      if ( minval != this.minvalue_a.oldValue ||
-	   maxval != this.maxvalue_a.oldValue) {
-	if (Math.abs(maxval - minval) > Number.MIN_VALUE)
-	  object.set_range( minval, maxval);
-	this.minvalue_a.oldValue = minval;
-	this.maxvalue_a.oldValue = maxval;
+      if (
+        minval != this.minvalue_a.oldValue ||
+        maxval != this.maxvalue_a.oldValue
+      ) {
+        if (Math.abs(maxval - minval) > Number.MIN_VALUE)
+          object.set_range(minval, maxval);
+        this.minvalue_a.oldValue = minval;
+        this.maxvalue_a.oldValue = maxval;
       }
     }
 
-    switch ( this.a.typeid) {
+    switch (this.a.typeid) {
       case Pwr.eType_Float32: {
-	var value = this.a.get_ref_value(this.dyn);
+        var value = this.a.get_ref_value(this.dyn);
 
-	if ( !this.firstScan) {
-	  if ( Math.abs( this.old_value - value) < Number.MIN_VALUE)
-	    // No change since last time
-	    return;
-	}
-	else
-	  this.firstScan = false;
+        if (!this.firstScan) {
+          if (Math.abs(this.old_value - value) < Number.MIN_VALUE)
+            // No change since last time
+            return;
+        } else this.firstScan = false;
 
-	object.set_value(value);
-	this.old_value = value;
-	break;
+        object.set_value(value);
+        this.old_value = value;
+        break;
       }
       case Pwr.eType_Int32:
       case Pwr.eType_UInt32: {
-	var value = this.a.get_ref_value(this.dyn);
-	if ( !this.firstScan) {
-	  if ( this.old_ivalue == value)
-	    // No change since last time
-	    return;
-	}
-	else
-	  this.firstScan = false;
+        var value = this.a.get_ref_value(this.dyn);
+        if (!this.firstScan) {
+          if (this.old_ivalue == value)
+            // No change since last time
+            return;
+        } else this.firstScan = false;
 
-	object.set_value(value);
-	this.old_ivalue = value;
-	break;
+        object.set_value(value);
+        this.old_ivalue = value;
+        break;
       }
     }
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynBar : " + lines[i]);
+      if (this.dyn.debug) console.log("DynBar : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_Bar: 
-	break;
-      case DynC.eSave_Bar_attribute: 
-	if ( tokens.length > 1)
-	  this.attribute = tokens[1];
-	break;
-      case DynC.eSave_Bar_minvalue_attr: 
-	if ( tokens.length > 1)
-	  this.minvalue_attr = tokens[1];
-	break;
-      case DynC.eSave_Bar_maxvalue_attr: 
-	if ( tokens.length > 1)
-	  this.maxvalue_attr = tokens[1];
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynBar", i, key);
-	break;
+      switch (key) {
+        case DynC.eSave_Bar:
+          break;
+        case DynC.eSave_Bar_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_Bar_minvalue_attr:
+          if (tokens.length > 1) this.minvalue_attr = tokens[1];
+          break;
+        case DynC.eSave_Bar_maxvalue_attr:
+          if (tokens.length > 1) this.maxvalue_attr = tokens[1];
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynBar", i, key);
+          break;
       }
-      
-      if ( end)
-	break;
-    }    
+
+      if (end) break;
+    }
     return i;
   };
 
-  this.action = function( object, e) {
+  this.action = function (object, e) {
     return 1;
   };
 }
 
-function DynTrend( dyn) {
+function DynTrend(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = DynC.mDynType1_Trend;
   this.dyn_type2 = 0;
@@ -7533,278 +7363,222 @@ function DynTrend( dyn) {
   this.orig_graph_fast_scan_time;
   this.orig_graph_animation_scan_time;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "Trend.Attribute1") {
       this.attribute1 = value;
       return 1;
-    }
-    else if (name === "Trend.Attribute2") {
+    } else if (name === "Trend.Attribute2") {
       this.attribute2 = value;
       return 1;
-    }
-    else if (name === "Trend.MinValueAttr1") {
+    } else if (name === "Trend.MinValueAttr1") {
       this.minvalue_attr1 = value;
       return 1;
-    }
-    else if (name === "Trend.MaxValueAttr1") {
+    } else if (name === "Trend.MaxValueAttr1") {
       this.maxvalue_attr1 = value;
       return 1;
-    }
-    else if (name === "Trend.MinValueAttr2") {
+    } else if (name === "Trend.MinValueAttr2") {
       this.minvalue_attr2 = value;
       return 1;
-    }
-    else if (name === "Trend.MaxValueAttr2") {
+    } else if (name === "Trend.MaxValueAttr2") {
       this.maxvalue_attr2 = value;
       return 1;
-    }
-    else if (name === "Trend.HoldAttr") {
+    } else if (name === "Trend.HoldAttr") {
       this.hold_attr = value;
       return 1;
-    }
-    else if (name === "Trend.TimerRangeAttr") {
+    } else if (name === "Trend.TimerRangeAttr") {
       this.timerrange_attr = value;
       return 1;
-    }
-    else if (name === "Trend.Mark1Attr") {
+    } else if (name === "Trend.Mark1Attr") {
       this.mark1_attr = value;
       return 1;
-    }
-    else if (name === "Trend.Mark2Attr") {
+    } else if (name === "Trend.Mark2Attr") {
       this.mark2_attr = value;
       return 1;
-    }
-    else if (name === "Trend.Mark1Color") {
+    } else if (name === "Trend.Mark1Color") {
       this.mark1_color = value;
       return 1;
-    }
-    else if (name === "Trend.Mark2Color") {
+    } else if (name === "Trend.Mark2Color") {
       this.mark2_color = value;
       return 1;
-    }
-    else if (name === "Trend.NoOfPoints") {
+    } else if (name === "Trend.NoOfPoints") {
       o.no_of_points = value;
       return 1;
-    }
-    else if (name === "Trend.ScanTime") {
+    } else if (name === "Trend.ScanTime") {
       o.scan_time = value;
       return 1;
-    }
-    else if (name === "Trend.CurveWidth") {
+    } else if (name === "Trend.CurveWidth") {
       o.curve_width = value;
       return 1;
-    }
-    else if (name === "Trend.FillCurve") {
+    } else if (name === "Trend.FillCurve") {
       o.fill_curve = value;
       return 1;
-    }
-    else if (name === "Trend.HorizontalLines") {
+    } else if (name === "Trend.HorizontalLines") {
       o.horizontal_lines = value;
       return 1;
-    }
-    else if (name === "Trend.VerticalLines") {
+    } else if (name === "Trend.VerticalLines") {
       o.vertical_lines = value;
       return 1;
-    }
-    else if (name === "Trend.MaxValue1") {
+    } else if (name === "Trend.MaxValue1") {
       o.y_max_value[0] = value;
       return 1;
-    }
-    else if (name === "Trend.MinValue1") {
+    } else if (name === "Trend.MinValue1") {
       o.y_min_value[0] = value;
       return 1;
-    }
-    else if (name === "Trend.CurveColor1") {
+    } else if (name === "Trend.CurveColor1") {
       o.curve_drawtype[0] = value;
       return 1;
-    }
-    else if (name === "Trend.CurveFillColor1") {
+    } else if (name === "Trend.CurveFillColor1") {
       o.curve_fill_drawtype[0] = value;
       return 1;
-    }
-    else if (name === "Trend.MaxValue2") {
+    } else if (name === "Trend.MaxValue2") {
       o.y_max_value[1] = value;
       return 1;
-    }
-    else if (name === "Trend.MinValue2") {
+    } else if (name === "Trend.MinValue2") {
       o.y_min_value[1] = value;
       return 1;
-    }
-    else if (name === "Trend.CurveColor2") {
+    } else if (name === "Trend.CurveColor2") {
       o.curve_drawtype[1] = value;
       return 1;
-    }
-    else if (name === "Trend.CurveFillColor2") {
+    } else if (name === "Trend.CurveFillColor2") {
       o.curve_fill_drawtype[1] = value;
       return 1;
-    }
-    else if (name === "Trend.Direction") {
-      if (value === "Left")
-        o.direction = Glow.eHorizDirection_Left;
-      else if (value === "Right")
-        o.direction = Glow.eHorizDirection_Right;
-      else
-	o.direction = value;
+    } else if (name === "Trend.Direction") {
+      if (value === "Left") o.direction = Glow.eHorizDirection_Left;
+      else if (value === "Right") o.direction = Glow.eHorizDirection_Right;
+      else o.direction = value;
       o.configure_curves();
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "Trend.Attribute1") {
       ret.value = this.attribute1;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "Trend.Attribute2") {
+    } else if (name === "Trend.Attribute2") {
       ret.value = this.attribute2;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "Trend.MinValueAttr1") {
+    } else if (name === "Trend.MinValueAttr1") {
       ret.value = this.minvalue_attr1;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "Trend.MaxValueAttr1") {
+    } else if (name === "Trend.MaxValueAttr1") {
       ret.value = this.maxvalue_attr1;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "Trend.MinValueAttr2") {
+    } else if (name === "Trend.MinValueAttr2") {
       ret.value = this.minvalue_attr2;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "Trend.MaxValueAttr2") {
+    } else if (name === "Trend.MaxValueAttr2") {
       ret.value = this.maxvalue_attr2;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "Trend.HoldAttr") {
+    } else if (name === "Trend.HoldAttr") {
       ret.value = this.hold_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "Trend.TimerRangeAttr") {
+    } else if (name === "Trend.TimerRangeAttr") {
       ret.value = this.timerrange_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "Trend.Mark1Attr") {
+    } else if (name === "Trend.Mark1Attr") {
       ret.value = this.mark1_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "Trend.Mark2Attr") {
+    } else if (name === "Trend.Mark2Attr") {
       ret.value = this.mark2_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "Trend.Mark1Color") {
+    } else if (name === "Trend.Mark1Color") {
       ret.value = this.mark1_color;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "Trend.Mark2Color") {
+    } else if (name === "Trend.Mark2Color") {
       ret.value = this.mark2_color;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "Trend.NoOfPoints") {
+    } else if (name === "Trend.NoOfPoints") {
       ret.value = o.no_of_points;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "Trend.ScanTime") {
+    } else if (name === "Trend.ScanTime") {
       ret.value = o.scan_time;
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
-    }
-    else if (name === "Trend.CurveWidth") {
+    } else if (name === "Trend.CurveWidth") {
       ret.value = o.curve_width;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "Trend.FillCurve") {
+    } else if (name === "Trend.FillCurve") {
       ret.value = o.fill_curve;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "Trend.HorizontalLines") {
+    } else if (name === "Trend.HorizontalLines") {
       ret.value = o.horizontal_lines;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "Trend.VerticalLines") {
+    } else if (name === "Trend.VerticalLines") {
       ret.value = o.vertical_lines;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "Trend.MaxValue1") {
+    } else if (name === "Trend.MaxValue1") {
       ret.value = o.y_max_value[0];
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
-    }
-    else if (name === "Trend.MinValue1") {
+    } else if (name === "Trend.MinValue1") {
       ret.value = o.y_min_value[0];
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
-    }
-    else if (name === "Trend.CurveColor1") {
+    } else if (name === "Trend.CurveColor1") {
       ret.value = o.curve_drawtype[0];
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "Trend.CurveFillColor1") {
+    } else if (name === "Trend.CurveFillColor1") {
       ret.value = o.curve_fill_drawtype[0];
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "Trend.MaxValue2") {
+    } else if (name === "Trend.MaxValue2") {
       ret.value = o.y_max_value[1];
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
-    }
-    else if (name === "Trend.MinValue2") {
+    } else if (name === "Trend.MinValue2") {
       ret.value = o.y_min_value[1];
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
-    }
-    else if (name === "Trend.CurveColor2") {
+    } else if (name === "Trend.CurveColor2") {
       ret.value = o.curve_drawtype[1];
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "Trend.CurveFillColor2") {
+    } else if (name === "Trend.CurveFillColor2") {
       ret.value = o.curve_fill_drawtype[1];
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "Trend.Direction") {
+    } else if (name === "Trend.Direction") {
       ret.value = o.direction;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
     }
     return 0;
-  }
-								    
-  this.connect = function( object) {
+  };
 
-    this.a1 = new DynReference( this.dyn, this.attribute1);
+  this.connect = function (object) {
+    this.a1 = new DynReference(this.dyn, this.attribute1);
     this.a1.connect(this.dyn);
-    if ( !this.a1.sts) {
+    if (!this.a1.sts) {
       console.log("Trend: " + this.attribute1);
       return 1;
     }
 
-    if ( this.attribute2 !== null && this.attribute2.trim() !== "") {
-      this.a2 = new DynReference( this.dyn, this.attribute2);
+    if (this.attribute2 !== null && this.attribute2.trim() !== "") {
+      this.a2 = new DynReference(this.dyn, this.attribute2);
       this.a2.connect(this.dyn);
-      if ( !this.a2.sts) {
-	console.log("Trend: " + this.attribute2);
-	return 1;
+      if (!this.a2.sts) {
+        console.log("Trend: " + this.attribute2);
+        return 1;
       }
     }
 
@@ -7813,366 +7587,354 @@ function DynTrend( dyn) {
     this.acc_time = this.scan_time;
     this.trend_hold = 0;
 
-    if ( this.minvalue_attr1 !== null && this.minvalue_attr1.trim() !== "") {
-      this.minvalue_a1 = new DynReference( this.dyn, this.minvalue_attr1);
+    if (this.minvalue_attr1 !== null && this.minvalue_attr1.trim() !== "") {
+      this.minvalue_a1 = new DynReference(this.dyn, this.minvalue_attr1);
       this.minvalue_a1.connect(this.dyn);
-      if ( !this.minvalue_a1.sts) {
-	this.minvalue_a1 = null;
-	console.log("Trend: " + this.minvalue_attr1);
+      if (!this.minvalue_a1.sts) {
+        this.minvalue_a1 = null;
+        console.log("Trend: " + this.minvalue_attr1);
       }
     }
 
-    if ( this.maxvalue_attr1 !== null && this.maxvalue_attr1.trim() !== "") {
-      this.maxvalue_a1 = new DynReference( this.dyn, this.maxvalue_attr1);
+    if (this.maxvalue_attr1 !== null && this.maxvalue_attr1.trim() !== "") {
+      this.maxvalue_a1 = new DynReference(this.dyn, this.maxvalue_attr1);
       this.maxvalue_a1.connect(this.dyn);
-      if ( !this.maxvalue_a1.sts) {
-	this.maxvalue_a1 = null;
-	console.log("Trend: " + this.maxvalue_attr1);
+      if (!this.maxvalue_a1.sts) {
+        this.maxvalue_a1 = null;
+        console.log("Trend: " + this.maxvalue_attr1);
       }
     }
 
-    if ( this.minvalue_attr2 !== null && this.minvalue_attr2.trim() !== "") {
-      this.minvalue_a2 = new DynReference( this.dyn, this.minvalue_attr2);
+    if (this.minvalue_attr2 !== null && this.minvalue_attr2.trim() !== "") {
+      this.minvalue_a2 = new DynReference(this.dyn, this.minvalue_attr2);
       this.minvalue_a2.connect(this.dyn);
-      if ( !this.minvalue_a2.sts) {
-	this.minvalue_a2 = null;
-	console.log("Trend: " + this.minvalue_attr2);
+      if (!this.minvalue_a2.sts) {
+        this.minvalue_a2 = null;
+        console.log("Trend: " + this.minvalue_attr2);
       }
     }
 
-    if ( this.maxvalue_attr2 !== null && this.maxvalue_attr2.trim() !== "") {
-      this.maxvalue_a2 = new DynReference( this.dyn, this.maxvalue_attr2);
+    if (this.maxvalue_attr2 !== null && this.maxvalue_attr2.trim() !== "") {
+      this.maxvalue_a2 = new DynReference(this.dyn, this.maxvalue_attr2);
       this.maxvalue_a2.connect(this.dyn);
-      if ( !this.maxvalue_a2.sts) {
-	this.maxvalue_a2 = null;
-	console.log("Trend: " + this.maxvalue_attr2);
+      if (!this.maxvalue_a2.sts) {
+        this.maxvalue_a2 = null;
+        console.log("Trend: " + this.maxvalue_attr2);
       }
     }
 
-    if ( this.hold_attr !== null && this.hold_attr.trim() !== "") {
-      this.hold_a = new DynReference( this.dyn, this.hold_attr);
+    if (this.hold_attr !== null && this.hold_attr.trim() !== "") {
+      this.hold_a = new DynReference(this.dyn, this.hold_attr);
       this.hold_a.connect(this.dyn);
-      if ( !this.hold_a.sts) {
-	this.hold_a = null;
-	console.log("Trend: " + this.hold_attr);
+      if (!this.hold_a.sts) {
+        this.hold_a = null;
+        console.log("Trend: " + this.hold_attr);
       }
     }
 
-    if ( this.timerange_attr !== null && this.timerange_attr.trim() !== "") {
-      this.timerange_a = new DynReference( this.dyn, this.timerange_attr);
+    if (this.timerange_attr !== null && this.timerange_attr.trim() !== "") {
+      this.timerange_a = new DynReference(this.dyn, this.timerange_attr);
       this.timerange_a.connect(this.dyn);
-      if ( !this.timerange_a.sts) {
-	this.timerange_a = null;
-	console.log("Trend: " + this.timerange_attr);
+      if (!this.timerange_a.sts) {
+        this.timerange_a = null;
+        console.log("Trend: " + this.timerange_attr);
       }
 
       this.orig_graph_scan_time = this.dyn.graph.getScanTime();
       this.orig_graph_fast_scan_time = this.dyn.graph.getFastScanTime();
-      this.orig_graph_animation_scan_time = this.dyn.graph.getAnimationScanTime();
+      this.orig_graph_animation_scan_time =
+        this.dyn.graph.getAnimationScanTime();
     }
 
-    if ( this.mark1_attr !== null && this.mark1_attr.trim() !== "") {
-      this.mark1_a = new DynReference( this.dyn, this.mark1_attr);
+    if (this.mark1_attr !== null && this.mark1_attr.trim() !== "") {
+      this.mark1_a = new DynReference(this.dyn, this.mark1_attr);
       this.mark1_a.connect(this.dyn);
-      if ( !this.mark1_a.sts) {
-	this.mark1_a = null;
-	console.log("Trend: " + this.mark1_attr);
+      if (!this.mark1_a.sts) {
+        this.mark1_a = null;
+        console.log("Trend: " + this.mark1_attr);
       }
     }
 
-    if ( this.mark2_attr !== null && this.mark2_attr.trim() !== "") {
-      this.mark2_a = new DynReference( this.dyn, this.mark2_attr);
+    if (this.mark2_attr !== null && this.mark2_attr.trim() !== "") {
+      this.mark2_a = new DynReference(this.dyn, this.mark2_attr);
       this.mark2_a.connect(this.dyn);
-      if ( !this.mark2_a.sts) {
-	this.mark2_a = null;
-	console.log("Trend: " + this.mark2_attr);
+      if (!this.mark2_a.sts) {
+        this.mark2_a = null;
+        console.log("Trend: " + this.mark2_attr);
       }
     }
 
-    if ( this.mark1_color != Glow.eDrawType_Inherit || this.mark2_color != Glow.eDrawType_Inherit)
-      object.set_mark_color( this.mark1_color, this.mark2_color);
+    if (
+      this.mark1_color != Glow.eDrawType_Inherit ||
+      this.mark2_color != Glow.eDrawType_Inherit
+    )
+      object.set_mark_color(this.mark1_color, this.mark2_color);
     return 1;
   };
 
-  this.disconnect = function() {
+  this.disconnect = function () {
     this.a1.disconnect(this.dyn);
-    if ( this.a2 != null)
-      this.a2.disconnect(this.dyn);
-    if ( this.minvalue_a1 != null)
-      this.minvalue_a1.disconnect(this.dyn);
-    if ( this.maxvalue_a1 != null)
-      this.maxvalue_a1.disconnect(this.dyn);
-    if ( this.minvalue_a2 != null)
-      this.minvalue_a2.disconnect(this.dyn);
-    if ( this.maxvalue_a2 != null)
-      this.maxvalue_a2.disconnect(this.dyn);
-    if ( this.hold_a != null)
-      this.hold_a.disconnect(this.dyn);
-    if ( this.timerange_a != null)
-      this.timerange_a.disconnect(this.dyn);
-    if ( this.mark1_a != null)
-      this.mark1_a.disconnect(this.dyn);
-    if ( this.mark2_a != null)
-      this.mark2_a.disconnect(this.dyn);
+    if (this.a2 != null) this.a2.disconnect(this.dyn);
+    if (this.minvalue_a1 != null) this.minvalue_a1.disconnect(this.dyn);
+    if (this.maxvalue_a1 != null) this.maxvalue_a1.disconnect(this.dyn);
+    if (this.minvalue_a2 != null) this.minvalue_a2.disconnect(this.dyn);
+    if (this.maxvalue_a2 != null) this.maxvalue_a2.disconnect(this.dyn);
+    if (this.hold_a != null) this.hold_a.disconnect(this.dyn);
+    if (this.timerange_a != null) this.timerange_a.disconnect(this.dyn);
+    if (this.mark1_a != null) this.mark1_a.disconnect(this.dyn);
+    if (this.mark2_a != null) this.mark2_a.disconnect(this.dyn);
   };
 
-  this.scan = function( object) {
+  this.scan = function (object) {
+    if (!this.a1.attrFound) return;
 
-    if ( !this.a1.attrFound)
-      return;
-  
-    if ( this.hold_a !== null) {
+    if (this.hold_a !== null) {
       var holdval = this.hold_a.get_ref_value(this.dyn);
-      if ( holdval)
-	return;
+      if (holdval) return;
     }
 
-    if ( this.timerange_a !== null) {
+    if (this.timerange_a !== null) {
       var timerangeval = this.timerange_a.get_ref_value(this.dyn);
-      if ( Math.abs(timerangeval - this.timerange_a.oldValue) > Number.MIN_VALUE) {
-	var dt = timerangeval / this.no_of_points;
-		     
-	if ( dt >= 0.001) {
-	  object.set_scan_time( dt);
-	  this.scan_time = dt;
-	  if ( this.cycle == Glow.eCycle_Slow) {
-	    var current_graph_scan_time = this.dyn.graph.getScanTime();
-	    var current_graph_fast_scan_time = this.dyn.graph.getFastScanTime();
-	    var current_graph_animation_scan_time = this.dyn.graph.getAnimationScanTime();
-	    if ( current_graph_scan_time > this.scan_time)
-	      this.dyn.graph.setScanTime( this.scan_time);
-	    else {
-	      if ( this.scan_time > this.orig_graph_scan_time)
-		this.dyn.graph.setScanTime( this.orig_graph_scan_time);
-	      else
-		this.dyn.graph.setScanTime( this.scan_time);
-	    }
-	    if ( current_graph_fast_scan_time > this.scan_time)
-	      this.dyn.graph.setFastScanTime( this.scan_time);
-	    else {
-	      if ( this.scan_time > orig_graph_fast_scan_time)
-		this.dyn.graph.setFastScanTime( this.orig_graph_fast_scan_time);
-	      else
-		this.dyn.graph.setFastScanTime( this.scan_time);
-	    }
-	    if ( current_graph_animation_scan_time > this.scan_time)
-	      this.dyn.graph.setAnimationScanTime( this.scan_time);
-	    else {
-	      if ( this.scan_time > orig_graph_animation_scan_time)
-		this.dyn.graph.setAnimationScanTime( this.orig_graph_animation_scan_time);
-	      else
-		this.dyn.graph.setAnimationScanTime( this.scan_time);
-	    }
-	  }
-	  else {
-	    // Fast cycle
-	    var current_graph_fast_scan_time = this.dyn.graph.getFastScanTime();
-	    var current_graph_animation_scan_time = this.dyn.graph.getAnimationScanTime();
-	    if ( current_graph_fast_scan_time > this.scan_time)
-	      this.dyn.graph.setFastScanTime( this.scan_time);
-	    else {
-	      if ( this.scan_time > orig_graph_fast_scan_time)
-		this.dyn.graph.setFastScanTime( this.orig_graph_fast_scan_time);
-	      else
-		this.dyn.graph.setFastScanTime( this.scan_time);
-	    }
-	    if ( current_graph_animation_scan_time > this.scan_time)
-	      this.dyn.graph.setAnimationScanTime( this.scan_time);
-	    else {
-	      if ( this.scan_time > orig_graph_animation_scan_time)
-		this.dyn.graph.setAnimationScanTime( orig_graph_animation_scan_time);
-	      else
-		this.dyn.graph.setAnimationScanTime( this.scan_time);
-	    }
-	  }
-	}
-	this.timerange_a.oldValue = timerangeval;
+      if (
+        Math.abs(timerangeval - this.timerange_a.oldValue) > Number.MIN_VALUE
+      ) {
+        var dt = timerangeval / this.no_of_points;
+
+        if (dt >= 0.001) {
+          object.set_scan_time(dt);
+          this.scan_time = dt;
+          if (this.cycle == Glow.eCycle_Slow) {
+            var current_graph_scan_time = this.dyn.graph.getScanTime();
+            var current_graph_fast_scan_time = this.dyn.graph.getFastScanTime();
+            var current_graph_animation_scan_time =
+              this.dyn.graph.getAnimationScanTime();
+            if (current_graph_scan_time > this.scan_time)
+              this.dyn.graph.setScanTime(this.scan_time);
+            else {
+              if (this.scan_time > this.orig_graph_scan_time)
+                this.dyn.graph.setScanTime(this.orig_graph_scan_time);
+              else this.dyn.graph.setScanTime(this.scan_time);
+            }
+            if (current_graph_fast_scan_time > this.scan_time)
+              this.dyn.graph.setFastScanTime(this.scan_time);
+            else {
+              if (this.scan_time > orig_graph_fast_scan_time)
+                this.dyn.graph.setFastScanTime(this.orig_graph_fast_scan_time);
+              else this.dyn.graph.setFastScanTime(this.scan_time);
+            }
+            if (current_graph_animation_scan_time > this.scan_time)
+              this.dyn.graph.setAnimationScanTime(this.scan_time);
+            else {
+              if (this.scan_time > orig_graph_animation_scan_time)
+                this.dyn.graph.setAnimationScanTime(
+                  this.orig_graph_animation_scan_time,
+                );
+              else this.dyn.graph.setAnimationScanTime(this.scan_time);
+            }
+          } else {
+            // Fast cycle
+            var current_graph_fast_scan_time = this.dyn.graph.getFastScanTime();
+            var current_graph_animation_scan_time =
+              this.dyn.graph.getAnimationScanTime();
+            if (current_graph_fast_scan_time > this.scan_time)
+              this.dyn.graph.setFastScanTime(this.scan_time);
+            else {
+              if (this.scan_time > orig_graph_fast_scan_time)
+                this.dyn.graph.setFastScanTime(this.orig_graph_fast_scan_time);
+              else this.dyn.graph.setFastScanTime(this.scan_time);
+            }
+            if (current_graph_animation_scan_time > this.scan_time)
+              this.dyn.graph.setAnimationScanTime(this.scan_time);
+            else {
+              if (this.scan_time > orig_graph_animation_scan_time)
+                this.dyn.graph.setAnimationScanTime(
+                  orig_graph_animation_scan_time,
+                );
+              else this.dyn.graph.setAnimationScanTime(this.scan_time);
+            }
+          }
+        }
+        this.timerange_a.oldValue = timerangeval;
       }
     }
 
     var minval, maxval;
-    if ( this.maxvalue_a1 !== null && this.minvalue_a1 !== null) {
+    if (this.maxvalue_a1 !== null && this.minvalue_a1 !== null) {
       minval = this.minvalue_a1.get_ref_value(this.dyn);
       maxval = this.maxvalue_a1.get_ref_value(this.dyn);
-      if ( minval != this.minvalue_a1.oldValue ||
-	   maxval != this.maxvalue_a1.oldValue) {
-	if ( Math.abs( maxval - minval) > Number.MIN_VALUE)
-	  object.set_range_y( 0, minval, maxval);
-	this.minvalue_a1.oldValue = minval;
-	this.maxvalue_a1.oldValue = maxval;
+      if (
+        minval != this.minvalue_a1.oldValue ||
+        maxval != this.maxvalue_a1.oldValue
+      ) {
+        if (Math.abs(maxval - minval) > Number.MIN_VALUE)
+          object.set_range_y(0, minval, maxval);
+        this.minvalue_a1.oldValue = minval;
+        this.maxvalue_a1.oldValue = maxval;
       }
     }
 
-    if ( this.maxvalue_a2 !== null && this.minvalue_a2 !== null) {
+    if (this.maxvalue_a2 !== null && this.minvalue_a2 !== null) {
       minval = this.minvalue_a2.get_ref_value(this.dyn);
       maxval = this.maxvalue_a2.get_ref_value(this.dyn);
-      if ( minval != this.minvalue_a2.oldValue ||
-	   maxval != this.maxvalue_a2.oldValue) {
-	if ( Math.abs( maxval - minval) > Number.MIN_VALUE)
-	  object.set_range_y( 1, minval, maxval);
-	this.minvalue_a2.oldValue = minval;
-	this.maxvalue_a2.oldValue = maxval;
+      if (
+        minval != this.minvalue_a2.oldValue ||
+        maxval != this.maxvalue_a2.oldValue
+      ) {
+        if (Math.abs(maxval - minval) > Number.MIN_VALUE)
+          object.set_range_y(1, minval, maxval);
+        this.minvalue_a2.oldValue = minval;
+        this.maxvalue_a2.oldValue = maxval;
       }
     }
 
-    if ( this.mark1_a !== null) {
+    if (this.mark1_a !== null) {
       var mark1val = this.mark1_a.get_ref_value(this.dyn);
-      if ( this.firstScan || Math.abs( mark1val - this.mark1_a.oldValue) > Number.MIN_VALUE) {
-	object.set_y_mark1( mark1val);
-	this.mark1_a.oldValue = mark1val;
+      if (
+        this.firstScan ||
+        Math.abs(mark1val - this.mark1_a.oldValue) > Number.MIN_VALUE
+      ) {
+        object.set_y_mark1(mark1val);
+        this.mark1_a.oldValue = mark1val;
       }
     }
-    if ( this.mark2_a !== null) {
+    if (this.mark2_a !== null) {
       var mark2val = this.mark2_a.get_ref_value(this.dyn);
-      if ( this.firstScan || Math.abs( mark2val - this.mark2_a.oldValue) > Number.MIN_VALUE) {
-	object.set_y_mark2( mark2val);
-	this.mark2_a.oldValue = mark2val;
+      if (
+        this.firstScan ||
+        Math.abs(mark2val - this.mark2_a.oldValue) > Number.MIN_VALUE
+      ) {
+        object.set_y_mark2(mark2val);
+        this.mark2_a.oldValue = mark2val;
       }
     }
 
-    if ( this.firstScan)
-      this.firstScan = false;
+    if (this.firstScan) this.firstScan = false;
 
-    if ( this.cycle == Glow.eCycle_Slow)
+    if (this.cycle == Glow.eCycle_Slow)
       this.acc_time += this.dyn.graph.getScanTime();
-    else
-      this.acc_time += this.dyn.graph.getFastScanTime();
-    if ( this.acc_time + Number.MIN_VALUE >= this.scan_time) {
-      if ( this.p1 != 0) {
-	switch ( this.a1.typeid) {
-	case Pwr.eType_Boolean: {
-	  var value = this.a1.get_ref_value(this.dyn);
-	  if ( value)
-	    object.add_value( 1, 0);
-	  else
-	    object.add_value( 0, 0);
-	  break;
-	}
-	case Pwr.eType_Float32: {
-	  var value = this.a1.get_ref_value(this.dyn);
-	  object.add_value( value, 0);
-	  break;
-	}
-	case Pwr.eType_Int32:
-	case Pwr.eType_UInt32: {
-	  var value = this.a1.get_ref_value(this.dyn);
-	  object.add_value( value, 0);
-	  break;
-	}
-	default: ;
-	}
+    else this.acc_time += this.dyn.graph.getFastScanTime();
+    if (this.acc_time + Number.MIN_VALUE >= this.scan_time) {
+      if (this.p1 != 0) {
+        switch (this.a1.typeid) {
+          case Pwr.eType_Boolean: {
+            var value = this.a1.get_ref_value(this.dyn);
+            if (value) object.add_value(1, 0);
+            else object.add_value(0, 0);
+            break;
+          }
+          case Pwr.eType_Float32: {
+            var value = this.a1.get_ref_value(this.dyn);
+            object.add_value(value, 0);
+            break;
+          }
+          case Pwr.eType_Int32:
+          case Pwr.eType_UInt32: {
+            var value = this.a1.get_ref_value(this.dyn);
+            object.add_value(value, 0);
+            break;
+          }
+          default:
+        }
       }
-      if ( this.a2 != null && this.a2.sts) {
-	switch ( this.a2.typeid) {
-	case Pwr.eType_Boolean: {
-	  var value = this.a2.get_ref_value(this.dyn);
-	  if ( value)
-	    object.add_value(1, 1);
-	  else
-	    object.add_value(0, 1);
-	  break;
-	}
-	case Pwr.eType_Float32: {
-	  var value = this.a2.get_ref_value(this.dyn);
-	  object.add_value( value, 1);
-	  break;
-	}
-	case Pwr.eType_Int32:
-	case Pwr.eType_UInt32: {
-	  var value = this.a2.get_ref_value(this.dyn);
-	  object.add_value( value, 1);
-	  break;
-	}
-	default: break;
-	}
+      if (this.a2 != null && this.a2.sts) {
+        switch (this.a2.typeid) {
+          case Pwr.eType_Boolean: {
+            var value = this.a2.get_ref_value(this.dyn);
+            if (value) object.add_value(1, 1);
+            else object.add_value(0, 1);
+            break;
+          }
+          case Pwr.eType_Float32: {
+            var value = this.a2.get_ref_value(this.dyn);
+            object.add_value(value, 1);
+            break;
+          }
+          case Pwr.eType_Int32:
+          case Pwr.eType_UInt32: {
+            var value = this.a2.get_ref_value(this.dyn);
+            object.add_value(value, 1);
+            break;
+          }
+          default:
+            break;
+        }
       }
 
       this.acc_time = 0;
     }
   };
 
-  this.action = function( object, e) {
+  this.action = function (object, e) {
     return 1;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynTrend : " + lines[i]);
+      if (this.dyn.debug) console.log("DynTrend : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_Trend: 
-	break;
-      case DynC.eSave_Trend_attribute1: 
-	if ( tokens.length > 1)
-	  this.attribute1 = tokens[1];
-	break;
-      case DynC.eSave_Trend_attribute2: 
-	if ( tokens.length > 1)
-	  this.attribute2 = tokens[1];
-	break;
-      case DynC.eSave_Trend_minvalue_attr1: 
-	if ( tokens.length > 1)
-	  this.minvalue_attr1 = tokens[1];
-	break;
-      case DynC.eSave_Trend_maxvalue_attr1: 
-	if ( tokens.length > 1)
-	  this.maxvalue_attr1 = tokens[1];
-	break;
-      case DynC.eSave_Trend_minvalue_attr2: 
-	if ( tokens.length > 1)
-	  this.minvalue_attr2 = tokens[1];
-	break;
-      case DynC.eSave_Trend_maxvalue_attr2: 
-	if ( tokens.length > 1)
-	  this.maxvalue_attr2 = tokens[1];
-	break;
-      case DynC.eSave_Trend_hold_attr: 
-	if ( tokens.length > 1)
-	  this.hold_attr = tokens[1];
-	break;
-      case DynC.eSave_Trend_timerange_attr: 
-	if ( tokens.length > 1)
-	  this.timerange_attr = tokens[1];
-	break;
-      case DynC.eSave_Trend_mark1_attr: 
-	if ( tokens.length > 1)
-	  this.mark1_attr = tokens[1];
-	break;
-      case DynC.eSave_Trend_mark2_attr: 
-	if ( tokens.length > 1)
-	  this.mark2_attr = tokens[1];
-	break;
-      case DynC.eSave_Trend_mark1_color: 
-	this.mark1_color = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_Trend_mark2_color: 
-	this.mark2_color = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynTrend", row, key);
-	break;
+      switch (key) {
+        case DynC.eSave_Trend:
+          break;
+        case DynC.eSave_Trend_attribute1:
+          if (tokens.length > 1) this.attribute1 = tokens[1];
+          break;
+        case DynC.eSave_Trend_attribute2:
+          if (tokens.length > 1) this.attribute2 = tokens[1];
+          break;
+        case DynC.eSave_Trend_minvalue_attr1:
+          if (tokens.length > 1) this.minvalue_attr1 = tokens[1];
+          break;
+        case DynC.eSave_Trend_maxvalue_attr1:
+          if (tokens.length > 1) this.maxvalue_attr1 = tokens[1];
+          break;
+        case DynC.eSave_Trend_minvalue_attr2:
+          if (tokens.length > 1) this.minvalue_attr2 = tokens[1];
+          break;
+        case DynC.eSave_Trend_maxvalue_attr2:
+          if (tokens.length > 1) this.maxvalue_attr2 = tokens[1];
+          break;
+        case DynC.eSave_Trend_hold_attr:
+          if (tokens.length > 1) this.hold_attr = tokens[1];
+          break;
+        case DynC.eSave_Trend_timerange_attr:
+          if (tokens.length > 1) this.timerange_attr = tokens[1];
+          break;
+        case DynC.eSave_Trend_mark1_attr:
+          if (tokens.length > 1) this.mark1_attr = tokens[1];
+          break;
+        case DynC.eSave_Trend_mark2_attr:
+          if (tokens.length > 1) this.mark2_attr = tokens[1];
+          break;
+        case DynC.eSave_Trend_mark1_color:
+          this.mark1_color = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_Trend_mark2_color:
+          this.mark2_color = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynTrend", row, key);
+          break;
       }
 
-      if ( end)
-	break;
-    }    
+      if (end) break;
+    }
     return i;
   };
 }
 
-function DynDsTrend( dyn) {
+function DynDsTrend(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = DynC.mDynType2_DsTrend;
@@ -8212,126 +7974,103 @@ function DynDsTrend( dyn) {
   this.last_idx = new Array(2);
   this.last_buffer = new Array(2);
   this.dstrend_cnt = 0;
-								    
-  this.setAttribute = function(o, name, value) {
+
+  this.setAttribute = function (o, name, value) {
     if (name === "DsTrend.Object1") {
       this.object1 = value;
       return 1;
-    }
-    else if (name === "DsTrend.Object2") {
+    } else if (name === "DsTrend.Object2") {
       this.object2 = value;
       return 1;
-    }
-    else if (name === "DsTrend.MinValueAttr1") {
+    } else if (name === "DsTrend.MinValueAttr1") {
       this.minvalue_attr1 = value;
       return 1;
-    }
-    else if (name === "DsTrend.MaxValueAttr1") {
+    } else if (name === "DsTrend.MaxValueAttr1") {
       this.maxvalue_attr1 = value;
       return 1;
-    }
-    else if (name === "DsTrend.MinValueAttr2") {
+    } else if (name === "DsTrend.MinValueAttr2") {
       this.minvalue_attr2 = value;
       return 1;
-    }
-    else if (name === "DsTrend.MaxValueAttr2") {
+    } else if (name === "DsTrend.MaxValueAttr2") {
       this.maxvalue_attr2 = value;
       return 1;
-    }
-    else if (name === "DsTrend.HoldAttr") {
+    } else if (name === "DsTrend.HoldAttr") {
       this.hold_attr = value;
       return 1;
-    }
-    else if (name === "DsTrend.TimerRangeAttr") {
+    } else if (name === "DsTrend.TimerRangeAttr") {
       this.timerrange_attr = value;
       return 1;
-    }
-    else if (name === "DsTrend.Mark1Attr") {
+    } else if (name === "DsTrend.Mark1Attr") {
       this.mark1_attr = value;
       return 1;
-    }
-    else if (name === "DsTrend.Mark2Attr") {
+    } else if (name === "DsTrend.Mark2Attr") {
       this.mark2_attr = value;
       return 1;
-    }
-    else if (name === "DsTrend.Mark1Color") {
+    } else if (name === "DsTrend.Mark1Color") {
       this.mark1_color = value;
       return 1;
-    }
-    else if (name === "DsTrend.Mark2Color") {
+    } else if (name === "DsTrend.Mark2Color") {
       this.mark2_color = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "DsTrend.Object1") {
       ret.value = this.object1;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "DsTrend.Object2") {
+    } else if (name === "DsTrend.Object2") {
       ret.value = this.object2;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "DsTrend.MinValueAttr1") {
+    } else if (name === "DsTrend.MinValueAttr1") {
       ret.value = this.minvalue_attr1;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "DsTrend.MaxValueAttr1") {
+    } else if (name === "DsTrend.MaxValueAttr1") {
       ret.value = this.maxvalue_attr1;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "DsTrend.MinValueAttr2") {
+    } else if (name === "DsTrend.MinValueAttr2") {
       ret.value = this.minvalue_attr2;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "DsTrend.MaxValueAttr2") {
+    } else if (name === "DsTrend.MaxValueAttr2") {
       ret.value = this.maxvalue_attr2;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "DsTrend.HoldAttr") {
+    } else if (name === "DsTrend.HoldAttr") {
       ret.value = this.hold_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "DsTrend.TimerRangeAttr") {
+    } else if (name === "DsTrend.TimerRangeAttr") {
       ret.value = this.timerrange_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "DsTrend.Mark1Attr") {
+    } else if (name === "DsTrend.Mark1Attr") {
       ret.value = this.mark1_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "DsTrend.Mark2Attr") {
+    } else if (name === "DsTrend.Mark2Attr") {
       ret.value = this.mark2_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "DsTrend.Mark1Color") {
+    } else if (name === "DsTrend.Mark1Color") {
       ret.value = this.mark1_color;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "DsTrend.Mark2Color") {
+    } else if (name === "DsTrend.Mark2Color") {
       ret.value = this.mark2_color;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( object) {
-
+  this.connect = function (object) {
     this.no_of_points = object.get_no_of_points();
     this.scan_time = object.get_scan_time();
     this.acc_time = this.scan_time;
@@ -8343,147 +8082,151 @@ function DynDsTrend( dyn) {
 
     if (this.dstrend_object1.trim() !== "") {
       this.dstrend_cnt++;
-      if (this.dstrend_object2.trim() !== "")
-	this.dstrend_cnt++;
+      if (this.dstrend_object2.trim() !== "") this.dstrend_cnt++;
     }
 
-    if ( this.minvalue_attr1.trim() !== "") {
-      this.minvalue_a1 = new DynReference( this.dyn, this.minvalue_attr1);
+    if (this.minvalue_attr1.trim() !== "") {
+      this.minvalue_a1 = new DynReference(this.dyn, this.minvalue_attr1);
       this.minvalue_a1.connect(this.dyn);
-      if ( !this.minvalue_a1.sts) {
-	this.minvalue_a1 = null;
-	console.log("DsTrend: " + this.minvalue_attr1);
+      if (!this.minvalue_a1.sts) {
+        this.minvalue_a1 = null;
+        console.log("DsTrend: " + this.minvalue_attr1);
       }
     }
 
-    if ( this.maxvalue_attr1.trim() !== "") {
-      this.maxvalue_a1 = new DynReference( this.dyn, this.maxvalue_attr1);
+    if (this.maxvalue_attr1.trim() !== "") {
+      this.maxvalue_a1 = new DynReference(this.dyn, this.maxvalue_attr1);
       this.maxvalue_a1.connect(this.dyn);
-      if ( !this.maxvalue_a1.sts) {
-	this.maxvalue_a1 = null;
-	console.log("DsTrend: " + this.maxvalue_attr1);
+      if (!this.maxvalue_a1.sts) {
+        this.maxvalue_a1 = null;
+        console.log("DsTrend: " + this.maxvalue_attr1);
       }
     }
 
-    if ( this.minvalue_attr2.trim() !== "") {
-      this.minvalue_a2 = new DynReference( this.dyn, this.minvalue_attr2);
+    if (this.minvalue_attr2.trim() !== "") {
+      this.minvalue_a2 = new DynReference(this.dyn, this.minvalue_attr2);
       this.minvalue_a2.connect(this.dyn);
-      if ( !this.minvalue_a2.sts) {
-	this.minvalue_a2 = null;
-	console.log("DsTrend: " + this.minvalue_attr2);
+      if (!this.minvalue_a2.sts) {
+        this.minvalue_a2 = null;
+        console.log("DsTrend: " + this.minvalue_attr2);
       }
     }
 
-    if ( this.maxvalue_attr2.trim() !== "") {
-      this.maxvalue_a2 = new DynReference( this.dyn, this.maxvalue_attr2);
+    if (this.maxvalue_attr2.trim() !== "") {
+      this.maxvalue_a2 = new DynReference(this.dyn, this.maxvalue_attr2);
       this.maxvalue_a2.connect(this.dyn);
-      if ( !this.maxvalue_a2.sts) {
-	this.maxvalue_a2 = null;
-	console.log("DsTrend: " + this.maxvalue_attr2);
+      if (!this.maxvalue_a2.sts) {
+        this.maxvalue_a2 = null;
+        console.log("DsTrend: " + this.maxvalue_attr2);
       }
     }
 
-    if ( this.hold_attr.trim() !== "") {
-      this.hold_a = new DynReference( this.dyn, this.hold_attr);
+    if (this.hold_attr.trim() !== "") {
+      this.hold_a = new DynReference(this.dyn, this.hold_attr);
       this.hold_a.connect(this.dyn);
-      if ( !this.hold_a.sts) {
-	this.hold_a = null;
-	console.log("DsTrend: " + this.hold_attr);
+      if (!this.hold_a.sts) {
+        this.hold_a = null;
+        console.log("DsTrend: " + this.hold_attr);
       }
     }
 
-    if ( this.mark1_attr !== null && this.mark1_attr.trim() !== "") {
-      this.mark1_a = new DynReference( this.dyn, this.mark1_attr);
+    if (this.mark1_attr !== null && this.mark1_attr.trim() !== "") {
+      this.mark1_a = new DynReference(this.dyn, this.mark1_attr);
       this.mark1_a.connect(this.dyn);
-      if ( !this.mark1_a.sts) {
-	this.mark1_a = null;
-	console.log("DsTrend: " + this.mark1_attr);
+      if (!this.mark1_a.sts) {
+        this.mark1_a = null;
+        console.log("DsTrend: " + this.mark1_attr);
       }
     }
 
-    if ( this.mark2_attr !== null && this.mark2_attr.trim() !== "") {
-      this.mark2_a = new DynReference( this.dyn, this.mark2_attr);
+    if (this.mark2_attr !== null && this.mark2_attr.trim() !== "") {
+      this.mark2_a = new DynReference(this.dyn, this.mark2_attr);
       this.mark2_a.connect(this.dyn);
-      if ( !this.mark2_a.sts) {
-	this.mark2_a = null;
-	console.log("DsTrend: " + this.mark2_attr);
+      if (!this.mark2_a.sts) {
+        this.mark2_a = null;
+        console.log("DsTrend: " + this.mark2_attr);
       }
     }
 
-    if ( this.mark1_color != Glow.eDrawType_Inherit || this.mark2_color != Glow.eDrawType_Inherit)
-      object.set_mark_color( this.mark1_color, this.mark2_color);
+    if (
+      this.mark1_color != Glow.eDrawType_Inherit ||
+      this.mark2_color != Glow.eDrawType_Inherit
+    )
+      object.set_mark_color(this.mark1_color, this.mark2_color);
     return 1;
   };
 
-  this.disconnect = function() {
-    if ( this.minvalue_a1 != null)
-      this.minvalue_a1.disconnect(this.dyn);
-    if ( this.maxvalue_a1 != null)
-      this.maxvalue_a1.disconnect(this.dyn);
-    if ( this.minvalue_a2 != null)
-      this.minvalue_a2.disconnect(this.dyn);
-    if ( this.maxvalue_a2 != null)
-      this.maxvalue_a2.disconnect(this.dyn);
-    if ( this.hold_a != null)
-      this.hold_a.disconnect(this.dyn);
-    if ( this.mark1_a != null)
-      this.mark1_a.disconnect(this.dyn);
-    if ( this.mark2_a != null)
-      this.mark2_a.disconnect(this.dyn);
+  this.disconnect = function () {
+    if (this.minvalue_a1 != null) this.minvalue_a1.disconnect(this.dyn);
+    if (this.maxvalue_a1 != null) this.maxvalue_a1.disconnect(this.dyn);
+    if (this.minvalue_a2 != null) this.minvalue_a2.disconnect(this.dyn);
+    if (this.maxvalue_a2 != null) this.maxvalue_a2.disconnect(this.dyn);
+    if (this.hold_a != null) this.hold_a.disconnect(this.dyn);
+    if (this.mark1_a != null) this.mark1_a.disconnect(this.dyn);
+    if (this.mark2_a != null) this.mark2_a.disconnect(this.dyn);
   };
 
-  this.scan = function( object) {
+  this.scan = function (object) {
     var new_curve = 0;
     var i;
-    if ( this.hold_a !== null && !this.firstScan) {
+    if (this.hold_a !== null && !this.firstScan) {
       var holdval = this.hold_a.get_ref_value(this.dyn);
-      if ( holdval)
-	return;
+      if (holdval) return;
     }
 
     var minval, maxval;
-    if ( this.maxvalue_a1 !== null && this.minvalue_a1 !== null) {
+    if (this.maxvalue_a1 !== null && this.minvalue_a1 !== null) {
       minval = this.minvalue_a1.get_ref_value(this.dyn);
       maxval = this.maxvalue_a1.get_ref_value(this.dyn);
-      if ( minval != this.minvalue_a1.oldValue ||
-	   maxval != this.maxvalue_a1.oldValue) {
-	if ( Math.abs( maxval - minval) > Number.MIN_VALUE)
-	  object.set_range_y( 0, minval, maxval);
-	this.minvalue_a1.oldValue = minval;
-	this.maxvalue_a1.oldValue = maxval;
-	new_curve = 1;
+      if (
+        minval != this.minvalue_a1.oldValue ||
+        maxval != this.maxvalue_a1.oldValue
+      ) {
+        if (Math.abs(maxval - minval) > Number.MIN_VALUE)
+          object.set_range_y(0, minval, maxval);
+        this.minvalue_a1.oldValue = minval;
+        this.maxvalue_a1.oldValue = maxval;
+        new_curve = 1;
       }
     }
 
-    if ( this.maxvalue_a2 !== null && this.minvalue_a2 !== null) {
+    if (this.maxvalue_a2 !== null && this.minvalue_a2 !== null) {
       minval = this.minvalue_a2.get_ref_value(this.dyn);
       maxval = this.maxvalue_a2.get_ref_value(this.dyn);
-      if ( minval != this.minvalue_a2.oldValue ||
-	   maxval != this.maxvalue_a2.oldValue) {
-	if ( Math.abs( maxval - minval) > Number.MIN_VALUE)
-	  object.set_range_y( 1, minval, maxval);
-	this.minvalue_a2.oldValue = minval;
-	this.maxvalue_a2.oldValue = maxval;
-	new_curve = 1;
+      if (
+        minval != this.minvalue_a2.oldValue ||
+        maxval != this.maxvalue_a2.oldValue
+      ) {
+        if (Math.abs(maxval - minval) > Number.MIN_VALUE)
+          object.set_range_y(1, minval, maxval);
+        this.minvalue_a2.oldValue = minval;
+        this.maxvalue_a2.oldValue = maxval;
+        new_curve = 1;
       }
     }
 
-    if ( this.mark1_a !== null) {
+    if (this.mark1_a !== null) {
       var mark1val = this.mark1_a.get_ref_value(this.dyn);
-      if ( this.firstScan || Math.abs( mark1val - this.mark1_a.oldValue) > Number.MIN_VALUE) {
-	object.set_y_mark1( mark1val);
-	this.mark1_a.oldValue = mark1val;
+      if (
+        this.firstScan ||
+        Math.abs(mark1val - this.mark1_a.oldValue) > Number.MIN_VALUE
+      ) {
+        object.set_y_mark1(mark1val);
+        this.mark1_a.oldValue = mark1val;
       }
     }
-    if ( this.mark2_a !== null) {
+    if (this.mark2_a !== null) {
       var mark2val = this.mark2_a.get_ref_value(this.dyn);
-      if ( this.firstScan || Math.abs( mark2val - this.mark2_a.oldValue) > Number.MIN_VALUE) {
-	object.set_y_mark2( mark2val);
-	this.mark2_a.oldValue = mark2val;
+      if (
+        this.firstScan ||
+        Math.abs(mark2val - this.mark2_a.oldValue) > Number.MIN_VALUE
+      ) {
+        object.set_y_mark2(mark2val);
+        this.mark2_a.oldValue = mark2val;
       }
     }
 
-    if ( this.firstScan) {
+    if (this.firstScan) {
       this.firstScan = false;
       new_curve = 1;
     }
@@ -8493,29 +8236,36 @@ function DynDsTrend( dyn) {
       this.last_idx[1] = -1;
     }
 
-    if ( this.cycle == Glow.eCycle_Slow)
+    if (this.cycle == Glow.eCycle_Slow)
       this.acc_time += this.dyn.graph.getScanTime();
-    else
-      this.acc_time += this.dyn.graph.getFastScanTime();
-    if ( new_curve || this.acc_time + Number.MIN_VALUE >= this.scan_time) {
+    else this.acc_time += this.dyn.graph.getFastScanTime();
+    if (new_curve || this.acc_time + Number.MIN_VALUE >= this.scan_time) {
       this.acc_time = 0;
 
       var data = new Array(4);
       data[0] = this;
       data[1] = object;
       data[2] = 0;
-      data[3] = new_curve;	
-      this.dyn.graph.getGdh().getDsTrend(this.dstrend_object1, 
-	 this.last_idx[0], this.last_buffer[0], this.no_of_points, this.scan2, data);
+      data[3] = new_curve;
+      this.dyn.graph
+        .getGdh()
+        .getDsTrend(
+          this.dstrend_object1,
+          this.last_idx[0],
+          this.last_buffer[0],
+          this.no_of_points,
+          this.scan2,
+          data,
+        );
     }
   };
 
-  this.scan2 = function( id, data, sts, result) {
-    if ( sts & 1 != 0) {
+  this.scan2 = function (id, data, sts, result) {
+    if (sts & (1 != 0)) {
       var i, j;
       var self = data[0];
       var object = data[1];
-      var curve_idx = data[2]
+      var curve_idx = data[2];
       var new_curve = data[3];
       self.last_idx[0] = result[0];
       self.last_buffer[0] = result[1];
@@ -8523,37 +8273,42 @@ function DynDsTrend( dyn) {
       var values = result[3];
 
       if (new_curve) {
-	var vdata = new Array(self.no_of_points);
-	var tdata = new Array(self.no_of_points);
-	for (j = 0; j < self.no_of_points; j++) {
-	  // tdata[self.no_of_points-j-1] = j / self.no_of_points * 100;
-	  tdata[j] = j / self.no_of_points * 100;
-	  if (j < size)
-	    vdata[self.no_of_points-j-1] = values[j];
-	}
+        var vdata = new Array(self.no_of_points);
+        var tdata = new Array(self.no_of_points);
+        for (j = 0; j < self.no_of_points; j++) {
+          // tdata[self.no_of_points-j-1] = j / self.no_of_points * 100;
+          tdata[j] = (j / self.no_of_points) * 100;
+          if (j < size) vdata[self.no_of_points - j - 1] = values[j];
+        }
         object.set_data(tdata, vdata, curve_idx, self.no_of_points);
-      }
-      else {
-        for (i = 0; i < size; i++)
-	  object.add_value( values[i], 0);
+      } else {
+        for (i = 0; i < size; i++) object.add_value(values[i], 0);
       }
       if (self.dstrend_cnt > 1) {
-	var data = new Array(4);
-	data[0] = self;
-	data[1] = object;
-	data[2] = 1;
-	data[3] = new_curve;	
-	self.dyn.graph.getGdh().getDsTrend(self.dstrend_object2, 
-	   self.last_idx[1], self.last_buffer[1], self.no_of_points, self.scan3, data);
+        var data = new Array(4);
+        data[0] = self;
+        data[1] = object;
+        data[2] = 1;
+        data[3] = new_curve;
+        self.dyn.graph
+          .getGdh()
+          .getDsTrend(
+            self.dstrend_object2,
+            self.last_idx[1],
+            self.last_buffer[1],
+            self.no_of_points,
+            self.scan3,
+            data,
+          );
       }
     }
   };
-  this.scan3 = function( id, data, sts, result) {
-    if ( sts & 1 != 0) {
+  this.scan3 = function (id, data, sts, result) {
+    if (sts & (1 != 0)) {
       var i, j;
       var self = data[0];
       var object = data[1];
-      var curve_idx = data[2]
+      var curve_idx = data[2];
       var new_curve = data[3];
       self.last_idx[1] = result[0];
       self.last_buffer[1] = result[1];
@@ -8561,101 +8316,88 @@ function DynDsTrend( dyn) {
       var values = result[3];
 
       if (new_curve) {
-	var vdata = new Array(self.no_of_points);
-	var tdata = new Array(self.no_of_points);
-	for (j = 0; j < self.no_of_points; j++) {
-	  // tdata[self.no_of_points-j-1] = j / self.no_of_points * 100;
-	  tdata[j] = j / self.no_of_points * 100;
-	  if (j < size)
-	    vdata[self.no_of_points-j-1] = values[j];
-	}
+        var vdata = new Array(self.no_of_points);
+        var tdata = new Array(self.no_of_points);
+        for (j = 0; j < self.no_of_points; j++) {
+          // tdata[self.no_of_points-j-1] = j / self.no_of_points * 100;
+          tdata[j] = (j / self.no_of_points) * 100;
+          if (j < size) vdata[self.no_of_points - j - 1] = values[j];
+        }
         object.set_data(tdata, vdata, curve_idx, self.no_of_points);
-      }
-      else {
-        for (i = 0; i < size; i++)
-	  object.add_value( values[i], 1);
+      } else {
+        for (i = 0; i < size; i++) object.add_value(values[i], 1);
       }
     }
   };
 
-  this.action = function( object, e) {
+  this.action = function (object, e) {
     return 1;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynDsTrend : " + lines[i]);
+      if (this.dyn.debug) console.log("DynDsTrend : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_DsTrend: 
-	break;
-      case DynC.eSave_DsTrend_dstrend_object1: 
-	if ( tokens.length > 1)
-	  this.dstrend_object1 = tokens[1];
-	break;
-      case DynC.eSave_DsTrend_dstrend_object2: 
-	if ( tokens.length > 1)
-	  this.dstrend_object2 = tokens[1];
-	break;
-      case DynC.eSave_DsTrend_minvalue_attr1: 
-	if ( tokens.length > 1)
-	  this.minvalue_attr1 = tokens[1];
-	break;
-      case DynC.eSave_DsTrend_maxvalue_attr1: 
-	if ( tokens.length > 1)
-	  this.maxvalue_attr1 = tokens[1];
-	break;
-      case DynC.eSave_DsTrend_minvalue_attr2: 
-	if ( tokens.length > 1)
-	  this.minvalue_attr2 = tokens[1];
-	break;
-      case DynC.eSave_DsTrend_maxvalue_attr2: 
-	if ( tokens.length > 1)
-	  this.maxvalue_attr2 = tokens[1];
-	break;
-      case DynC.eSave_DsTrend_hold_attr: 
-	if ( tokens.length > 1)
-	  this.hold_attr = tokens[1];
-	break;
-      case DynC.eSave_DsTrend_mark1_attr: 
-	if ( tokens.length > 1)
-	  this.mark1_attr = tokens[1];
-	break;
-      case DynC.eSave_DsTrend_mark2_attr: 
-	if ( tokens.length > 1)
-	  this.mark2_attr = tokens[1];
-	break;
-      case DynC.eSave_DsTrend_mark1_color: 
-	this.mark1_color = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_DsTrend_mark2_color: 
-	this.mark2_color = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynDsTrend", row, key);
-	break;
+      switch (key) {
+        case DynC.eSave_DsTrend:
+          break;
+        case DynC.eSave_DsTrend_dstrend_object1:
+          if (tokens.length > 1) this.dstrend_object1 = tokens[1];
+          break;
+        case DynC.eSave_DsTrend_dstrend_object2:
+          if (tokens.length > 1) this.dstrend_object2 = tokens[1];
+          break;
+        case DynC.eSave_DsTrend_minvalue_attr1:
+          if (tokens.length > 1) this.minvalue_attr1 = tokens[1];
+          break;
+        case DynC.eSave_DsTrend_maxvalue_attr1:
+          if (tokens.length > 1) this.maxvalue_attr1 = tokens[1];
+          break;
+        case DynC.eSave_DsTrend_minvalue_attr2:
+          if (tokens.length > 1) this.minvalue_attr2 = tokens[1];
+          break;
+        case DynC.eSave_DsTrend_maxvalue_attr2:
+          if (tokens.length > 1) this.maxvalue_attr2 = tokens[1];
+          break;
+        case DynC.eSave_DsTrend_hold_attr:
+          if (tokens.length > 1) this.hold_attr = tokens[1];
+          break;
+        case DynC.eSave_DsTrend_mark1_attr:
+          if (tokens.length > 1) this.mark1_attr = tokens[1];
+          break;
+        case DynC.eSave_DsTrend_mark2_attr:
+          if (tokens.length > 1) this.mark2_attr = tokens[1];
+          break;
+        case DynC.eSave_DsTrend_mark1_color:
+          this.mark1_color = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_DsTrend_mark2_color:
+          this.mark2_color = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynDsTrend", row, key);
+          break;
       }
 
-      if ( end)
-	break;
-    }    
+      if (end) break;
+    }
     return i;
   };
 }
 
-function DynDsTrendCurve( dyn) {
+function DynDsTrendCurve(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = DynC.mDynType2_DsTrendCurve;
@@ -8703,283 +8445,267 @@ function DynDsTrendCurve( dyn) {
   this.elementtype1;
   this.elementtype2;
   this.scantime;
-								    
-  this.setAttribute = function(o, name, value) {
+
+  this.setAttribute = function (o, name, value) {
     if (name === "DsTrendCurve.Object") {
       this.dstrend_object = value;
       return 1;
-    }
-    else if (name === "DsTrendCurve.MinValueAttr1") {
+    } else if (name === "DsTrendCurve.MinValueAttr1") {
       this.minvalue_attr1 = value;
       return 1;
-    }
-    else if (name === "DsTrendCurve.MaxValueAttr1") {
+    } else if (name === "DsTrendCurve.MaxValueAttr1") {
       this.maxvalue_attr1 = value;
       return 1;
-    }
-    else if (name === "DsTrendCurve.MinValueAttr2") {
+    } else if (name === "DsTrendCurve.MinValueAttr2") {
       this.minvalue_attr2 = value;
       return 1;
-    }
-    else if (name === "DsTrendCurve.MaxValueAttr2") {
+    } else if (name === "DsTrendCurve.MaxValueAttr2") {
       this.maxvalue_attr2 = value;
       return 1;
-    }
-    else if (name === "DsTrendCurve.HoldAttr") {
+    } else if (name === "DsTrendCurve.HoldAttr") {
       this.hold_attr = value;
       return 1;
-    }
-    else if (name === "DsTrendCurve.Mark1Attr") {
+    } else if (name === "DsTrendCurve.Mark1Attr") {
       this.mark1_attr = value;
       return 1;
-    }
-    else if (name === "DsTrendCurve.Mark2Attr") {
+    } else if (name === "DsTrendCurve.Mark2Attr") {
       this.mark2_attr = value;
       return 1;
-    }
-    else if (name === "DsTrendCurve.Mark1Color") {
+    } else if (name === "DsTrendCurve.Mark1Color") {
       this.mark1_color = value;
       return 1;
-    }
-    else if (name === "DsTrendCurve.Mark2Color") {
+    } else if (name === "DsTrendCurve.Mark2Color") {
       this.mark2_color = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "DsTrendCurve.Object") {
       ret.value = this.dstrend_object;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "DsTrendCurve.MinValueAttr1") {
+    } else if (name === "DsTrendCurve.MinValueAttr1") {
       ret.value = this.minvalue_attr1;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "DsTrendCurve.MaxValueAttr1") {
+    } else if (name === "DsTrendCurve.MaxValueAttr1") {
       ret.value = this.maxvalue_attr1;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "DsTrendCurve.MinValueAttr2") {
+    } else if (name === "DsTrendCurve.MinValueAttr2") {
       ret.value = this.minvalue_attr2;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "DsTrendCurve.MaxValueAttr2") {
+    } else if (name === "DsTrendCurve.MaxValueAttr2") {
       ret.value = this.maxvalue_attr2;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "DsTrendCurve.HoldAttr") {
+    } else if (name === "DsTrendCurve.HoldAttr") {
       ret.value = this.hold_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "DsTrendCurve.Mark1Attr") {
+    } else if (name === "DsTrendCurve.Mark1Attr") {
       ret.value = this.mark1_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "DsTrendCurve.Mark2Attr") {
+    } else if (name === "DsTrendCurve.Mark2Attr") {
       ret.value = this.mark2_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "DsTrendCurve.Mark1Color") {
+    } else if (name === "DsTrendCurve.Mark1Color") {
       ret.value = this.mark1_color;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "DsTrendCurve.Mark2Color") {
+    } else if (name === "DsTrendCurve.Mark2Color") {
       ret.value = this.mark2_color;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( object) {
+  this.connect = function (object) {
     this.no_of_points = object.get_no_of_points();
     this.scan_time = object.get_scan_time();
     this.acc_time = this.scan_time;
     this.trend_hold = 0;
 
     if (this.minvalue_attr1 !== null && this.minvalue_attr1.trim() !== "") {
-      this.minvalue_a1 = new DynReference( this.dyn, this.minvalue_attr1);
+      this.minvalue_a1 = new DynReference(this.dyn, this.minvalue_attr1);
       this.minvalue_a1.connect(this.dyn);
-      if ( !this.minvalue_a1.sts) {
-	this.minvalue_a1 = null;
-	console.log("DsTrendCurve: " + this.minvalue_attr1);
+      if (!this.minvalue_a1.sts) {
+        this.minvalue_a1 = null;
+        console.log("DsTrendCurve: " + this.minvalue_attr1);
       }
     }
 
     if (this.maxvalue_attr1 !== null && this.maxvalue_attr1.trim() !== "") {
-      this.maxvalue_a1 = new DynReference( this.dyn, this.maxvalue_attr1);
+      this.maxvalue_a1 = new DynReference(this.dyn, this.maxvalue_attr1);
       this.maxvalue_a1.connect(this.dyn);
-      if ( !this.maxvalue_a1.sts) {
-	this.maxvalue_a1 = null;
-	console.log("DsTrendCurve: " + this.maxvalue_attr1);
+      if (!this.maxvalue_a1.sts) {
+        this.maxvalue_a1 = null;
+        console.log("DsTrendCurve: " + this.maxvalue_attr1);
       }
     }
 
     if (this.minvalue_attr2 !== null && this.minvalue_attr2.trim() !== "") {
-      this.minvalue_a2 = new DynReference( this.dyn, this.minvalue_attr2);
+      this.minvalue_a2 = new DynReference(this.dyn, this.minvalue_attr2);
       this.minvalue_a2.connect(this.dyn);
-      if ( !this.minvalue_a2.sts) {
-	this.minvalue_a2 = null;
-	console.log("DsTrendCurve: " + this.minvalue_attr2);
+      if (!this.minvalue_a2.sts) {
+        this.minvalue_a2 = null;
+        console.log("DsTrendCurve: " + this.minvalue_attr2);
       }
     }
 
     if (this.maxvalue_attr2 !== null && this.maxvalue_attr2.trim() !== "") {
-      this.maxvalue_a2 = new DynReference( this.dyn, this.maxvalue_attr2);
+      this.maxvalue_a2 = new DynReference(this.dyn, this.maxvalue_attr2);
       this.maxvalue_a2.connect(this.dyn);
-      if ( !this.maxvalue_a2.sts) {
-	this.maxvalue_a2 = null;
-	console.log("DsTrendCurve: " + this.maxvalue_attr2);
+      if (!this.maxvalue_a2.sts) {
+        this.maxvalue_a2 = null;
+        console.log("DsTrendCurve: " + this.maxvalue_attr2);
       }
     }
 
     if (this.hold_attr !== null && this.hold_attr.trim() !== "") {
-      this.hold_a = new DynReference( this.dyn, this.hold_attr);
+      this.hold_a = new DynReference(this.dyn, this.hold_attr);
       this.hold_a.connect(this.dyn);
-      if ( !this.hold_a.sts) {
-	this.hold_a = null;
-	console.log("DsTrendCurve: " + this.hold_attr);
+      if (!this.hold_a.sts) {
+        this.hold_a = null;
+        console.log("DsTrendCurve: " + this.hold_attr);
       }
     }
 
     if (this.mark1_attr !== null && this.mark1_attr.trim() !== "") {
-      this.mark1_a = new DynReference( this.dyn, this.mark1_attr);
+      this.mark1_a = new DynReference(this.dyn, this.mark1_attr);
       this.mark1_a.connect(this.dyn);
-      if ( !this.mark1_a.sts) {
-	this.mark1_a = null;
-	console.log("DsTrendCurve: " + this.mark1_attr);
+      if (!this.mark1_a.sts) {
+        this.mark1_a = null;
+        console.log("DsTrendCurve: " + this.mark1_attr);
       }
     }
 
-    if ( this.mark2_attr !== null && this.mark2_attr.trim() !== "") {
-      this.mark2_a = new DynReference( this.dyn, this.mark2_attr);
+    if (this.mark2_attr !== null && this.mark2_attr.trim() !== "") {
+      this.mark2_a = new DynReference(this.dyn, this.mark2_attr);
       this.mark2_a.connect(this.dyn);
-      if ( !this.mark2_a.sts) {
-	this.mark2_a = null;
-	console.log("DsTrendCurve: " + this.mark2_attr);
+      if (!this.mark2_a.sts) {
+        this.mark2_a = null;
+        console.log("DsTrendCurve: " + this.mark2_attr);
       }
     }
 
     this.no_of_points = object.get_no_of_points();
-    if ( this.mark1_color != Glow.eDrawType_Inherit || this.mark2_color != Glow.eDrawType_Inherit)
-      object.set_mark_color( this.mark1_color, this.mark2_color);
+    if (
+      this.mark1_color != Glow.eDrawType_Inherit ||
+      this.mark2_color != Glow.eDrawType_Inherit
+    )
+      object.set_mark_color(this.mark1_color, this.mark2_color);
 
-    this.dyn.graph.getGdh().getDsTrendCurveInfo(this.dstrend_object, 
-	this.connect2, this);
+    this.dyn.graph
+      .getGdh()
+      .getDsTrendCurveInfo(this.dstrend_object, this.connect2, this);
   };
 
-  this.connect2 = function( id, data, sts, result) {
-    if ( sts & 1 != 0) {
+  this.connect2 = function (id, data, sts, result) {
+    if (sts & (1 != 0)) {
       var self = data;
       self.cbid = result[0];
       self.resolution = result[1];
       self.samples = result[2];
-      if (self.samples > self.no_of_points)
-	self.samples = self.no_of_points;
+      if (self.samples > self.no_of_points) self.samples = self.no_of_points;
       self.displayupdatetime = result[3];
-      self.displaytime = result[4];      
+      self.displaytime = result[4];
       self.scantime = result[5];
       self.buff_cnt = result[6];
       self.elementtype1 = result[7];
-      if (self.buff_cnt > 1)
-        self.elementtype2 = result[8];
+      if (self.buff_cnt > 1) self.elementtype2 = result[8];
       self.initialized = 1;
     }
     return 1;
   };
 
-  this.disconnect = function() {
-    if ( this.minvalue_a1 != null)
-      this.minvalue_a1.disconnect(this.dyn);
-    if ( this.maxvalue_a1 != null)
-      this.maxvalue_a1.disconnect(this.dyn);
-    if ( this.minvalue_a2 != null)
-      this.minvalue_a2.disconnect(this.dyn);
-    if ( this.maxvalue_a2 != null)
-      this.maxvalue_a2.disconnect(this.dyn);
-    if ( this.hold_a != null)
-      this.hold_a.disconnect(this.dyn);
-    if ( this.mark1_a != null)
-      this.mark1_a.disconnect(this.dyn);
-    if ( this.mark2_a != null)
-      this.mark2_a.disconnect(this.dyn);
+  this.disconnect = function () {
+    if (this.minvalue_a1 != null) this.minvalue_a1.disconnect(this.dyn);
+    if (this.maxvalue_a1 != null) this.maxvalue_a1.disconnect(this.dyn);
+    if (this.minvalue_a2 != null) this.minvalue_a2.disconnect(this.dyn);
+    if (this.maxvalue_a2 != null) this.maxvalue_a2.disconnect(this.dyn);
+    if (this.hold_a != null) this.hold_a.disconnect(this.dyn);
+    if (this.mark1_a != null) this.mark1_a.disconnect(this.dyn);
+    if (this.mark2_a != null) this.mark2_a.disconnect(this.dyn);
   };
 
-  this.scan = function( object) {
+  this.scan = function (object) {
     var new_curve = 0;
     var i;
-    if ( !this.initialized)
-      return;
-    if ( this.hold_a !== null && !this.firstScan) {
+    if (!this.initialized) return;
+    if (this.hold_a !== null && !this.firstScan) {
       var holdval = this.hold_a.get_ref_value(this.dyn);
-      if ( holdval)
-	return;
+      if (holdval) return;
     }
 
     var minval, maxval;
-    if ( this.maxvalue_a1 !== null && this.minvalue_a1 !== null) {
+    if (this.maxvalue_a1 !== null && this.minvalue_a1 !== null) {
       minval = this.minvalue_a1.get_ref_value(this.dyn);
       maxval = this.maxvalue_a1.get_ref_value(this.dyn);
-      if ( minval != this.minvalue_a1.oldValue ||
-	   maxval != this.maxvalue_a1.oldValue) {
-	if ( Math.abs( maxval - minval) > Number.MIN_VALUE)
-	  object.set_range_y( 0, minval, maxval);
-	this.minvalue_a1.oldValue = minval;
-	this.maxvalue_a1.oldValue = maxval;
-	new_curve = 1;
+      if (
+        minval != this.minvalue_a1.oldValue ||
+        maxval != this.maxvalue_a1.oldValue
+      ) {
+        if (Math.abs(maxval - minval) > Number.MIN_VALUE)
+          object.set_range_y(0, minval, maxval);
+        this.minvalue_a1.oldValue = minval;
+        this.maxvalue_a1.oldValue = maxval;
+        new_curve = 1;
       }
     }
 
-    if ( this.maxvalue_a2 !== null && this.minvalue_a2 !== null) {
+    if (this.maxvalue_a2 !== null && this.minvalue_a2 !== null) {
       minval = this.minvalue_a2.get_ref_value(this.dyn);
       maxval = this.maxvalue_a2.get_ref_value(this.dyn);
-      if ( minval != this.minvalue_a2.oldValue ||
-	   maxval != this.maxvalue_a2.oldValue) {
-	if ( Math.abs( maxval - minval) > Number.MIN_VALUE)
-	  object.set_range_y( 1, minval, maxval);
-	this.minvalue_a2.oldValue = minval;
-	this.maxvalue_a2.oldValue = maxval;
-	new_curve = 1;
+      if (
+        minval != this.minvalue_a2.oldValue ||
+        maxval != this.maxvalue_a2.oldValue
+      ) {
+        if (Math.abs(maxval - minval) > Number.MIN_VALUE)
+          object.set_range_y(1, minval, maxval);
+        this.minvalue_a2.oldValue = minval;
+        this.maxvalue_a2.oldValue = maxval;
+        new_curve = 1;
       }
     }
 
-    if ( this.mark1_a !== null) {
+    if (this.mark1_a !== null) {
       var mark1val = this.mark1_a.get_ref_value(this.dyn);
-      if ( this.firstScan || Math.abs( mark1val - this.mark1_a.oldValue) > Number.MIN_VALUE) {
-	object.set_y_mark1( mark1val);
-	this.mark1_a.oldValue = mark1val;
+      if (
+        this.firstScan ||
+        Math.abs(mark1val - this.mark1_a.oldValue) > Number.MIN_VALUE
+      ) {
+        object.set_y_mark1(mark1val);
+        this.mark1_a.oldValue = mark1val;
       }
     }
-    if ( this.mark2_a !== null) {
+    if (this.mark2_a !== null) {
       var mark2val = this.mark2_a.get_ref_value(this.dyn);
-      if ( this.firstScan || Math.abs( mark2val - this.mark2_a.oldValue) > Number.MIN_VALUE) {
-	object.set_y_mark2( mark2val);
-	this.mark2_a.oldValue = mark2val;
+      if (
+        this.firstScan ||
+        Math.abs(mark2val - this.mark2_a.oldValue) > Number.MIN_VALUE
+      ) {
+        object.set_y_mark2(mark2val);
+        this.mark2_a.oldValue = mark2val;
       }
     }
 
-    if ( this.firstScan) {
+    if (this.firstScan) {
       this.firstScan = false;
       new_curve = 1;
     }
 
-    if ( this.cycle == Glow.eCycle_Slow)
+    if (this.cycle == Glow.eCycle_Slow)
       this.acc_time += this.dyn.graph.getScanTime();
-    else
-      this.acc_time += this.dyn.graph.getFastScanTime();
-    if ( new_curve || this.acc_time + Number.MIN_VALUE >= this.scan_time) {
+    else this.acc_time += this.dyn.graph.getFastScanTime();
+    if (new_curve || this.acc_time + Number.MIN_VALUE >= this.scan_time) {
       this.acc_time = 0;
 
       var data = new Array(4);
@@ -8987,13 +8713,20 @@ function DynDsTrendCurve( dyn) {
       data[1] = object;
       data[2] = 0;
       data[3] = new_curve;
-      this.dyn.graph.getGdh().getDsTrendCurveBuffer(this.cbid,
-	 this.samples, !new_curve, this.scan2, data);
+      this.dyn.graph
+        .getGdh()
+        .getDsTrendCurveBuffer(
+          this.cbid,
+          this.samples,
+          !new_curve,
+          this.scan2,
+          data,
+        );
     }
   };
 
-  this.scan2 = function( id, data, sts, result) {
-    if ( sts & 1 != 0) {
+  this.scan2 = function (id, data, sts, result) {
+    if (sts & (1 != 0)) {
       var i, j, k;
       var size;
       var value;
@@ -9004,103 +8737,91 @@ function DynDsTrendCurve( dyn) {
       var curve_idx = data[2];
       var new_curve = data[3];
       for (k = 0; k < self.buff_cnt; k++) {
-	size = result[k * 3 + 1];
-	elementtype = result[k * 3 + 2];
-	values = result[k * 3 + 3];
+        size = result[k * 3 + 1];
+        elementtype = result[k * 3 + 2];
+        values = result[k * 3 + 3];
 
-	if (size > self.no_of_points)
-	  size = self.no_of_points;
-	if (new_curve) {
-	  var vdata = new Array(size);
-	  var tdata = new Array(size);
-	  for (j = 0; j < size; j++) {
-	    tdata[j] = j / size * 100;
-	    vdata[size-j-1] = values[j];
-	  }
-	  object.set_data(tdata, vdata, k, size);
-	}
-	else {
-	  for (i = 0; i < size; i++)
-	    object.add_value( values[i], k);
-	}
+        if (size > self.no_of_points) size = self.no_of_points;
+        if (new_curve) {
+          var vdata = new Array(size);
+          var tdata = new Array(size);
+          for (j = 0; j < size; j++) {
+            tdata[j] = (j / size) * 100;
+            vdata[size - j - 1] = values[j];
+          }
+          object.set_data(tdata, vdata, k, size);
+        } else {
+          for (i = 0; i < size; i++) object.add_value(values[i], k);
+        }
       }
     }
   };
 
-  this.action = function( object, e) {
+  this.action = function (object, e) {
     return 1;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynDsTrendCurve : " + lines[i]);
+      if (this.dyn.debug) console.log("DynDsTrendCurve : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_DsTrendCurve: 
-	break;
-      case DynC.eSave_DsTrendCurve_dstrend_object: 
-	if ( tokens.length > 1)
-	  this.dstrend_object = tokens[1];
-	break;
-      case DynC.eSave_DsTrendCurve_minvalue_attr1: 
-	if ( tokens.length > 1)
-	  this.minvalue_attr1 = tokens[1];
-	break;
-      case DynC.eSave_DsTrendCurve_maxvalue_attr1: 
-	if ( tokens.length > 1)
-	  this.maxvalue_attr1 = tokens[1];
-	break;
-      case DynC.eSave_DsTrendCurve_minvalue_attr2: 
-	if ( tokens.length > 1)
-	  this.minvalue_attr2 = tokens[1];
-	break;
-      case DynC.eSave_DsTrendCurve_maxvalue_attr2: 
-	if ( tokens.length > 1)
-	  this.maxvalue_attr2 = tokens[1];
-	break;
-      case DynC.eSave_DsTrendCurve_hold_attr: 
-	if ( tokens.length > 1)
-	  this.hold_attr = tokens[1];
-	break;
-      case DynC.eSave_DsTrendCurve_mark1_attr: 
-	if ( tokens.length > 1)
-	  this.mark1_attr = tokens[1];
-	break;
-      case DynC.eSave_DsTrendCurve_mark2_attr: 
-	if ( tokens.length > 1)
-	  this.mark2_attr = tokens[1];
-	break;
-      case DynC.eSave_DsTrendCurve_mark1_color: 
-	this.mark1_color = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_DsTrendCurve_mark2_color: 
-	this.mark2_color = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynDsTrendCurve", row, key);
-	break;
+      switch (key) {
+        case DynC.eSave_DsTrendCurve:
+          break;
+        case DynC.eSave_DsTrendCurve_dstrend_object:
+          if (tokens.length > 1) this.dstrend_object = tokens[1];
+          break;
+        case DynC.eSave_DsTrendCurve_minvalue_attr1:
+          if (tokens.length > 1) this.minvalue_attr1 = tokens[1];
+          break;
+        case DynC.eSave_DsTrendCurve_maxvalue_attr1:
+          if (tokens.length > 1) this.maxvalue_attr1 = tokens[1];
+          break;
+        case DynC.eSave_DsTrendCurve_minvalue_attr2:
+          if (tokens.length > 1) this.minvalue_attr2 = tokens[1];
+          break;
+        case DynC.eSave_DsTrendCurve_maxvalue_attr2:
+          if (tokens.length > 1) this.maxvalue_attr2 = tokens[1];
+          break;
+        case DynC.eSave_DsTrendCurve_hold_attr:
+          if (tokens.length > 1) this.hold_attr = tokens[1];
+          break;
+        case DynC.eSave_DsTrendCurve_mark1_attr:
+          if (tokens.length > 1) this.mark1_attr = tokens[1];
+          break;
+        case DynC.eSave_DsTrendCurve_mark2_attr:
+          if (tokens.length > 1) this.mark2_attr = tokens[1];
+          break;
+        case DynC.eSave_DsTrendCurve_mark1_color:
+          this.mark1_color = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_DsTrendCurve_mark2_color:
+          this.mark2_color = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynDsTrendCurve", row, key);
+          break;
       }
 
-      if ( end)
-	break;
-    }    
+      if (end) break;
+    }
     return i;
   };
 }
 
-function DynXY_Curve( dyn, instance) {
+function DynXY_Curve(dyn, instance) {
   this.dyn = dyn;
   this.dyn_type1 = DynC.mDynType1_XY_Curve;
   this.dyn_type2 = 0;
@@ -9156,14 +8877,12 @@ function DynXY_Curve( dyn, instance) {
   this.object;
   var self = this;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     var inst = this.dyn.instance_number(this.instance);
     var iname;
     var inames = new Array(24);
-    if (inst == 1)
-      iname = "XY_Curve";
-    else
-      iname = "XY_Curve" + inst.toString();
+    if (inst == 1) iname = "XY_Curve";
+    else iname = "XY_Curve" + inst.toString();
     inames[0] = "XY_Curve.Instances";
     inames[1] = iname + ".DataType";
     inames[2] = iname + ".XAttr";
@@ -9192,110 +8911,85 @@ function DynXY_Curve( dyn, instance) {
       this.instance_mask = value;
       this.dyn.update_elements();
       return 1;
-    }
-    else if (name === inames[1]) {
-      this.datatype =  value;
+    } else if (name === inames[1]) {
+      this.datatype = value;
       return 1;
-    }
-    else if (name === inames[2]) {
+    } else if (name === inames[2]) {
       this.x_attr = value;
       return 1;
-    }
-    else if (name === inames[3]) {
+    } else if (name === inames[3]) {
       this.y_attr = value;
       return 1;
-    }
-    else if (name === inames[4]) {
+    } else if (name === inames[4]) {
       this.update_attr = value;
       return 1;
-    }
-    else if (name === inames[5]) {
+    } else if (name === inames[5]) {
       this.hold_attr = value;
       return 1;
-    }
-    else if (name === inames[6]) {
+    } else if (name === inames[6]) {
       this.x_min_value = value;
       return 1;
-    }
-    else if (name === inames[7]) {
+    } else if (name === inames[7]) {
       this.x_max_value = value;
       return 1;
-    }
-    else if (name === inames[8]) {
+    } else if (name === inames[8]) {
       this.y_min_value = value;
       return 1;
-    }
-    else if (name === inames[9]) {
+    } else if (name === inames[9]) {
       this.y_max_value = value;
       return 1;
-    }
-    else if (name === inames[10]) {
+    } else if (name === inames[10]) {
       this.x_minvalue_attr = value;
       return 1;
-    }
-    else if (name === inames[11]) {
+    } else if (name === inames[11]) {
       this.x_maxvalue_attr = value;
       return 1;
-    }
-    else if (name === inames[12]) {
+    } else if (name === inames[12]) {
       this.y_minvalue_attr = value;
       return 1;
-    }
-    else if (name === inames[13]) {
+    } else if (name === inames[13]) {
       this.y_maxvalue_attr = value;
       return 1;
-    }
-    else if (name === inames[14]) {
+    } else if (name === inames[14]) {
       this.noofpoints_attr = value;
       return 1;
-    }
-    else if (name === inames[15]) {
+    } else if (name === inames[15]) {
       this.curve_color = value;
       return 1;
-    }
-    else if (name === inames[16]) {
+    } else if (name === inames[16]) {
       this.fill_color = value;
       return 1;
-    }
-    else if (name === inames[17]) {
+    } else if (name === inames[17]) {
       this.horizontal_padding = value;
       return 1;
-    }
-    else if (name === inames[18] && this.instance == DynC.mInstance_1) {
+    } else if (name === inames[18] && this.instance == DynC.mInstance_1) {
       this.x_mark1_attr = value;
       return 1;
-    }
-    else if (name === inames[18] && this.instance == DynC.mInstance_1) {
+    } else if (name === inames[18] && this.instance == DynC.mInstance_1) {
       this.x_mark2_attr = value;
       return 1;
-    }
-    else if (name === inames[20] && this.instance == DynC.mInstance_1) {
+    } else if (name === inames[20] && this.instance == DynC.mInstance_1) {
       this.y_mark1_attr = value;
       return 1;
-    }
-    else if (name === inames[21] && this.instance == DynC.mInstance_1) {
+    } else if (name === inames[21] && this.instance == DynC.mInstance_1) {
       this.y_mark2_attr = value;
       return 1;
-    }
-    else if (name === inames[22] && this.instance == DynC.mInstance_1) {
+    } else if (name === inames[22] && this.instance == DynC.mInstance_1) {
       this.mark1_color = value;
       return 1;
-    }
-    else if (name === inames[23] && this.instance == DynC.mInstance_1) {
+    } else if (name === inames[23] && this.instance == DynC.mInstance_1) {
       this.mark2_color = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     var inst = this.dyn.instance_number(this.instance);
     var iname;
     var inames = new Array(24);
-    if (inst == 1)
-      iname = "XY_Curve";
-    else
-      iname = "XY_Curve" + inst.toString();
+    if (inst == 1) iname = "XY_Curve";
+    else iname = "XY_Curve" + inst.toString();
     inames[0] = "XY_Curve.Instances";
     inames[1] = iname + ".DataType";
     inames[2] = iname + ".XAttr";
@@ -9323,378 +9017,339 @@ function DynXY_Curve( dyn, instance) {
     if (name === inames[0] && this.instance == DynC.mInstance_1) {
       ret.value = this.instance_mask;
       return ret;
-    }
-    else if (name === inames[1]) {
+    } else if (name === inames[1]) {
       ret.value = this.datatype;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === inames[2]) {
+    } else if (name === inames[2]) {
       ret.value = this.x_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === inames[3]) {
+    } else if (name === inames[3]) {
       ret.value = this.y_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === inames[4]) {
+    } else if (name === inames[4]) {
       ret.value = this.update_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === inames[5]) {
+    } else if (name === inames[5]) {
       ret.value = this.hold_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === inames[6]) {
+    } else if (name === inames[6]) {
       ret.value = this.x_min_value;
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
-    }
-    else if (name === inames[7]) {
+    } else if (name === inames[7]) {
       ret.value = this.x_max_value;
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
-    }
-    else if (name === inames[8]) {
+    } else if (name === inames[8]) {
       ret.value = this.y_min_value;
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
-    }
-    else if (name === inames[9]) {
+    } else if (name === inames[9]) {
       ret.value = this.y_max_value;
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
-    }
-    else if (name === inames[10]) {
+    } else if (name === inames[10]) {
       ret.value = this.x_minvalue_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === inames[11]) {
+    } else if (name === inames[11]) {
       ret.value = this.x_maxvalue_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === inames[12]) {
+    } else if (name === inames[12]) {
       ret.value = this.y_minvalue_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === inames[13]) {
+    } else if (name === inames[13]) {
       ret.value = this.y_maxvalue_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === inames[14]) {
+    } else if (name === inames[14]) {
       ret.value = this.noofpoints_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === inames[15]) {
+    } else if (name === inames[15]) {
       ret.value = this.curve_color;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === inames[16]) {
+    } else if (name === inames[16]) {
       ret.value = this.fill_color;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === inames[17]) {
+    } else if (name === inames[17]) {
       ret.value = this.horizontal_padding;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === inames[18] && this.instance == DynC.mInstance_1) {
+    } else if (name === inames[18] && this.instance == DynC.mInstance_1) {
       ret.value = this.x_mark1_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === inames[18] && this.instance == DynC.mInstance_1) {
+    } else if (name === inames[18] && this.instance == DynC.mInstance_1) {
       ret.value = this.x_mark2_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === inames[20] && this.instance == DynC.mInstance_1) {
+    } else if (name === inames[20] && this.instance == DynC.mInstance_1) {
       ret.value = this.y_mark1_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === inames[21] && this.instance == DynC.mInstance_1) {
+    } else if (name === inames[21] && this.instance == DynC.mInstance_1) {
       ret.value = this.y_mark2_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === inames[22] && this.instance == DynC.mInstance_1) {
+    } else if (name === inames[22] && this.instance == DynC.mInstance_1) {
       ret.value = this.mark1_color;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === inames[23] && this.instance == DynC.mInstance_1) {
+    } else if (name === inames[23] && this.instance == DynC.mInstance_1) {
       ret.value = this.mark2_color;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynXYCurve : " + lines[i]);
+      if (this.dyn.debug) console.log("DynXYCurve : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_XY_Curve: 
-	break;
-      case DynC.eSave_XY_Curve_x_attr: 
-	if ( tokens.length > 1)
-	  this.x_attr = tokens[1];
-	break;
-      case DynC.eSave_XY_Curve_y_attr: 
-	if ( tokens.length > 1)
-	  this.y_attr = tokens[1];
-	break;
-      case DynC.eSave_XY_Curve_y_minvalue_attr: 
-	if ( tokens.length > 1)
-	  this.y_minvalue_attr = tokens[1];
-	break;
-      case DynC.eSave_XY_Curve_y_maxvalue_attr: 
-	if ( tokens.length > 1)
-	  this.y_maxvalue_attr = tokens[1];
-	break;
-      case DynC.eSave_XY_Curve_x_minvalue_attr: 
-	if ( tokens.length > 1)
-	  this.x_minvalue_attr = tokens[1];
-	break;
-      case DynC.eSave_XY_Curve_x_maxvalue_attr: 
-	if ( tokens.length > 1)
-	  this.x_maxvalue_attr = tokens[1];
-	break;
-      case DynC.eSave_XY_Curve_noofpoints_attr: 
-	if ( tokens.length > 1)
-	  this.noofpoints_attr = tokens[1];
-	break;
-      case DynC.eSave_XY_Curve_update_attr: 
-	if ( tokens.length > 1)
-	  this.update_attr = tokens[1];
-	break;
-      case DynC.eSave_XY_Curve_hold_attr: 
-	if ( tokens.length > 1)
-	  this.hold_attr = tokens[1];
-	break;
-      case DynC.eSave_XY_Curve_y_min_value: 
-	this.y_min_value = parseFloat( tokens[1]);;
-	break;
-      case DynC.eSave_XY_Curve_y_max_value: 
-	this.y_max_value = parseFloat( tokens[1]);;
-	break;
-      case DynC.eSave_XY_Curve_x_min_value: 
-	this.x_min_value = parseFloat( tokens[1]);;
-	break;
-      case DynC.eSave_XY_Curve_x_max_value: 
-	this.x_max_value = parseFloat( tokens[1]);;
-	break;
-      case DynC.eSave_XY_Curve_datatype: 
-	this.datatype = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_XY_Curve_instance: 
-	this.instance = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_XY_Curve_instance_mask: 
-	this.instance_mask = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_XY_Curve_curve_color: 
-	this.curve_color = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_XY_Curve_fill_color: 
-	this.fill_color = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_XY_Curve_horizontal_padding: 
-	this.horizontal_padding = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_XY_Curve_x_mark1_attr: 
-	if ( tokens.length > 1)
-	  this.x_mark1_attr = tokens[1];
-	break;
-      case DynC.eSave_XY_Curve_x_mark2_attr: 
-	if ( tokens.length > 1)
-	  this.x_mark2_attr = tokens[1];
-	break;
-      case DynC.eSave_XY_Curve_y_mark1_attr: 
-	if ( tokens.length > 1)
-	  this.y_mark1_attr = tokens[1];
-	break;
-      case DynC.eSave_XY_Curve_y_mark2_attr: 
-	if ( tokens.length > 1)
-	  this.y_mark2_attr = tokens[1];
-	break;
-      case DynC.eSave_XY_Curve_mark1_color: 
-	this.mark1_color = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_XY_Curve_mark2_color: 
-	this.mark2_color = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynXYCurve");
-	break;
+      switch (key) {
+        case DynC.eSave_XY_Curve:
+          break;
+        case DynC.eSave_XY_Curve_x_attr:
+          if (tokens.length > 1) this.x_attr = tokens[1];
+          break;
+        case DynC.eSave_XY_Curve_y_attr:
+          if (tokens.length > 1) this.y_attr = tokens[1];
+          break;
+        case DynC.eSave_XY_Curve_y_minvalue_attr:
+          if (tokens.length > 1) this.y_minvalue_attr = tokens[1];
+          break;
+        case DynC.eSave_XY_Curve_y_maxvalue_attr:
+          if (tokens.length > 1) this.y_maxvalue_attr = tokens[1];
+          break;
+        case DynC.eSave_XY_Curve_x_minvalue_attr:
+          if (tokens.length > 1) this.x_minvalue_attr = tokens[1];
+          break;
+        case DynC.eSave_XY_Curve_x_maxvalue_attr:
+          if (tokens.length > 1) this.x_maxvalue_attr = tokens[1];
+          break;
+        case DynC.eSave_XY_Curve_noofpoints_attr:
+          if (tokens.length > 1) this.noofpoints_attr = tokens[1];
+          break;
+        case DynC.eSave_XY_Curve_update_attr:
+          if (tokens.length > 1) this.update_attr = tokens[1];
+          break;
+        case DynC.eSave_XY_Curve_hold_attr:
+          if (tokens.length > 1) this.hold_attr = tokens[1];
+          break;
+        case DynC.eSave_XY_Curve_y_min_value:
+          this.y_min_value = parseFloat(tokens[1]);
+          break;
+        case DynC.eSave_XY_Curve_y_max_value:
+          this.y_max_value = parseFloat(tokens[1]);
+          break;
+        case DynC.eSave_XY_Curve_x_min_value:
+          this.x_min_value = parseFloat(tokens[1]);
+          break;
+        case DynC.eSave_XY_Curve_x_max_value:
+          this.x_max_value = parseFloat(tokens[1]);
+          break;
+        case DynC.eSave_XY_Curve_datatype:
+          this.datatype = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_XY_Curve_instance:
+          this.instance = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_XY_Curve_instance_mask:
+          this.instance_mask = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_XY_Curve_curve_color:
+          this.curve_color = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_XY_Curve_fill_color:
+          this.fill_color = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_XY_Curve_horizontal_padding:
+          this.horizontal_padding = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_XY_Curve_x_mark1_attr:
+          if (tokens.length > 1) this.x_mark1_attr = tokens[1];
+          break;
+        case DynC.eSave_XY_Curve_x_mark2_attr:
+          if (tokens.length > 1) this.x_mark2_attr = tokens[1];
+          break;
+        case DynC.eSave_XY_Curve_y_mark1_attr:
+          if (tokens.length > 1) this.y_mark1_attr = tokens[1];
+          break;
+        case DynC.eSave_XY_Curve_y_mark2_attr:
+          if (tokens.length > 1) this.y_mark2_attr = tokens[1];
+          break;
+        case DynC.eSave_XY_Curve_mark1_color:
+          this.mark1_color = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_XY_Curve_mark2_color:
+          this.mark2_color = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynXYCurve");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-		
+
     return i;
   };
 
-
-  this.connect = function( object) {
-    if ( this.x_attr == null || this.y_attr == null)
-      return 1;
+  this.connect = function (object) {
+    if (this.x_attr == null || this.y_attr == null) return 1;
 
     if (this.update_attr != null && this.update_attr.trim() !== "") {
-      this.update_a = new DynReference( this.dyn, this.update_attr);
+      this.update_a = new DynReference(this.dyn, this.update_attr);
       this.update_a.connect(this.dyn);
-      if ( !this.update_a.sts) {
-	console.log( "XYCurve: " + this.update_attr);
-	this.update_a = null;
+      if (!this.update_a.sts) {
+        console.log("XYCurve: " + this.update_attr);
+        this.update_a = null;
       }
     }
 
     if (this.noofpoints_attr != null && this.noofpoints_attr.trim() !== "") {
-      this.noofpoints_a = new DynReference( this.dyn, this.noofpoints_attr);
+      this.noofpoints_a = new DynReference(this.dyn, this.noofpoints_attr);
       this.noofpoints_a.connect(this.dyn);
-      if ( !this.noofpoints_a.sts) {
-	console.log( "XYCurve: " + this.noofpoints_attr);
-	this.noofpoints_a = null;
+      if (!this.noofpoints_a.sts) {
+        console.log("XYCurve: " + this.noofpoints_attr);
+        this.noofpoints_a = null;
       }
     }
 
     if (this.y_minvalue_attr != null && this.y_minvalue_attr.trim() !== "") {
-      this.y_minvalue_a = new DynReference( this.dyn, this.y_minvalue_attr);
+      this.y_minvalue_a = new DynReference(this.dyn, this.y_minvalue_attr);
       this.y_minvalue_a.connect(this.dyn);
-      if ( !this.y_minvalue_a.sts) {
-	console.log( "XYCurve: " + this.y_minvalue_attr);
-	this.y_minvalue_a = null;
+      if (!this.y_minvalue_a.sts) {
+        console.log("XYCurve: " + this.y_minvalue_attr);
+        this.y_minvalue_a = null;
       }
     }
 
     if (this.y_maxvalue_attr != null && this.y_maxvalue_attr.trim() !== "") {
-      this.y_maxvalue_a = new DynReference( this.dyn, this.y_maxvalue_attr);
+      this.y_maxvalue_a = new DynReference(this.dyn, this.y_maxvalue_attr);
       this.y_maxvalue_a.connect(this.dyn);
-      if ( !this.y_maxvalue_a.sts) {
-	console.log( "XYCurve: " + this.y_maxvalue_attr);
-	this.y_maxvalue_a = null;
+      if (!this.y_maxvalue_a.sts) {
+        console.log("XYCurve: " + this.y_maxvalue_attr);
+        this.y_maxvalue_a = null;
       }
     }
 
     if (this.x_minvalue_attr != null && this.x_minvalue_attr.trim() !== "") {
-      this.x_minvalue_a = new DynReference( this.dyn, this.x_minvalue_attr);
+      this.x_minvalue_a = new DynReference(this.dyn, this.x_minvalue_attr);
       this.x_minvalue_a.connect(this.dyn);
-      if ( !this.x_minvalue_a.sts) {
-	console.log( "XYCurve: " + this.x_minvalue_attr);
-	this.x_minvalue_a = null;
+      if (!this.x_minvalue_a.sts) {
+        console.log("XYCurve: " + this.x_minvalue_attr);
+        this.x_minvalue_a = null;
       }
     }
 
     if (this.x_maxvalue_attr != null && this.x_maxvalue_attr.trim() !== "") {
-      this.x_maxvalue_a = new DynReference( this.dyn, this.x_maxvalue_attr);
+      this.x_maxvalue_a = new DynReference(this.dyn, this.x_maxvalue_attr);
       this.x_maxvalue_a.connect(this.dyn);
-      if ( !this.x_maxvalue_a.sts) {
-	console.log( "XYCurve: " + this.x_maxvalue_attr);
-	this.x_maxvalue_a = null;
+      if (!this.x_maxvalue_a.sts) {
+        console.log("XYCurve: " + this.x_maxvalue_attr);
+        this.x_maxvalue_a = null;
       }
     }
 
     if (this.y_mark1_attr != null && this.y_mark1_attr.trim() !== "") {
-      this.y_mark1_a = new DynReference( this.dyn, this.y_mark1_attr);
+      this.y_mark1_a = new DynReference(this.dyn, this.y_mark1_attr);
       this.y_mark1_a.connect(this.dyn);
-      if ( !this.y_mark1_a.sts) {
-	console.log( "XYCurve: " + this.y_mark1_attr);
-	this.y_mark1_a = null;
+      if (!this.y_mark1_a.sts) {
+        console.log("XYCurve: " + this.y_mark1_attr);
+        this.y_mark1_a = null;
       }
     }
 
     if (this.y_mark2_attr != null && this.y_mark2_attr.trim() !== "") {
-      this.y_mark2_a = new DynReference( this.dyn, this.y_mark2_attr);
+      this.y_mark2_a = new DynReference(this.dyn, this.y_mark2_attr);
       this.y_mark2_a.connect(this.dyn);
-      if ( !this.y_mark2_a.sts) {
-	console.log( "XYCurve: " + this.y_mark2_attr);
-	this.y_mark2_a = null;
+      if (!this.y_mark2_a.sts) {
+        console.log("XYCurve: " + this.y_mark2_attr);
+        this.y_mark2_a = null;
       }
     }
 
     // Get curve number
     this.curve_number = 0;
     var m = this.instance;
-    while( m != 0) {
+    while (m != 0) {
       m = m >> 1;
       this.curve_number++;
     }
 
     // Get number of curves
-    if ( this.instance == DynC.mInstance_1) {
+    if (this.instance == DynC.mInstance_1) {
       m = this.instance_mask;
       var noofcurves = 0;
-      while( m != 0) {
-	m = m >> 1;
-	noofcurves++;
+      while (m != 0) {
+        m = m >> 1;
+        noofcurves++;
       }
-      if (noofcurves == 0)
-	noofcurves = 1;
-      object.set_xy_noofcurves( noofcurves);
+      if (noofcurves == 0) noofcurves = 1;
+      object.set_xy_noofcurves(noofcurves);
     }
 
     this.noofpoints = object.get_no_of_points();
-    if ( Math.abs(this.y_max_value - this.y_min_value) > Number.MIN_VALUE)
-      object.set_xy_range_y( this.curve_number - 1, this.y_min_value, this.y_max_value);
-    if ( Math.abs(this.x_max_value - this.x_min_value) > Number.MIN_VALUE)
-      object.set_xy_range_x( this.curve_number - 1, this.x_min_value, this.x_max_value);
+    if (Math.abs(this.y_max_value - this.y_min_value) > Number.MIN_VALUE)
+      object.set_xy_range_y(
+        this.curve_number - 1,
+        this.y_min_value,
+        this.y_max_value,
+      );
+    if (Math.abs(this.x_max_value - this.x_min_value) > Number.MIN_VALUE)
+      object.set_xy_range_x(
+        this.curve_number - 1,
+        this.x_min_value,
+        this.x_max_value,
+      );
     //object.set_xy_curve_color( this.curve_number - 1, this.curve_color, this.fill_color);
-    if ( this.mark1_color != Glow.eDrawType_Inherit || this.mark2_color != Glow.eDrawType_Inherit)
-      object.set_mark_color( this.mark1_color, this.mark2_color);
+    if (
+      this.mark1_color != Glow.eDrawType_Inherit ||
+      this.mark2_color != Glow.eDrawType_Inherit
+    )
+      object.set_mark_color(this.mark1_color, this.mark2_color);
     return 1;
   };
 
-  this.disconnect = function() {
-    if ( this.update_a !== null)
-      this.update_a.disconnect(this.dyn);
-    if ( this.noofpoints_a !== null)
-      this.noofpoints_a.disconnect(this.dyn);
-    if ( this.y_minvalue_a !== null)
-      this.y_minvalue_a.disconnect(this.dyn);
-    if ( this.y_maxvalue_a !== null)
-      this.y_maxvalue_a.disconnect(this.dyn);
-    if ( this.x_minvalue_a !== null)
-      this.x_minvalue_a.disconnect(this.dyn);
-    if ( this.x_maxvalue_a !== null)
-      this.x_maxvalue_a.disconnect(this.dyn);
-    if ( this.x_mark1_a !== null)
-      this.x_mark1_a.disconnect(this.dyn);
-    if ( this.x_mark2_a !== null)
-      this.x_mark2_a.disconnect(this.dyn);
-    if ( this.y_mark1_a !== null)
-      this.y_mark1_a.disconnect(this.dyn);
-    if ( this.y_mark2_a !== null)
-      this.y_mark2_a.disconnect(this.dyn);
+  this.disconnect = function () {
+    if (this.update_a !== null) this.update_a.disconnect(this.dyn);
+    if (this.noofpoints_a !== null) this.noofpoints_a.disconnect(this.dyn);
+    if (this.y_minvalue_a !== null) this.y_minvalue_a.disconnect(this.dyn);
+    if (this.y_maxvalue_a !== null) this.y_maxvalue_a.disconnect(this.dyn);
+    if (this.x_minvalue_a !== null) this.x_minvalue_a.disconnect(this.dyn);
+    if (this.x_maxvalue_a !== null) this.x_maxvalue_a.disconnect(this.dyn);
+    if (this.x_mark1_a !== null) this.x_mark1_a.disconnect(this.dyn);
+    if (this.x_mark2_a !== null) this.x_mark2_a.disconnect(this.dyn);
+    if (this.y_mark1_a !== null) this.y_mark1_a.disconnect(this.dyn);
+    if (this.y_mark2_a !== null) this.y_mark2_a.disconnect(this.dyn);
   };
 
-  this.scan = function( object) {
+  this.scan = function (object) {
     var pname;
     var attrSize;
     var update = false;
@@ -9702,284 +9357,314 @@ function DynXY_Curve( dyn, instance) {
     this.object = object;
     this.noOfPoints = this.noofpoints;
 
-    if ( this.x_attr == null || this.y_attr == null)
-      return;
+    if (this.x_attr == null || this.y_attr == null) return;
 
-    if ( this.firstScan)
-      update = true;
-    if ( this.update_a !== null) {
+    if (this.firstScan) update = true;
+    if (this.update_a !== null) {
       var value = this.update_a.get_ref_value(this.dyn);
-      if ( value && !this.update_a.oldValue)
-	update = true;
+      if (value && !this.update_a.oldValue) update = true;
       this.update_a.oldValue = value;
     }
 
-    if ( this.noofpoints_a !== null) {
+    if (this.noofpoints_a !== null) {
       var value = this.noofpoints_a.get_ref_value(this.dyn);
-      if ( value != this.noofpoints_a.oldValue) {
-	update = true;
-	this.noofpoints = this.noOfPoints = value;
-	this.noofpoints_a.oldValue = value;
+      if (value != this.noofpoints_a.oldValue) {
+        update = true;
+        this.noofpoints = this.noOfPoints = value;
+        this.noofpoints_a.oldValue = value;
       }
     }
 
-    if ( this.y_minvalue_a !== null) {
+    if (this.y_minvalue_a !== null) {
       var value = this.y_minvalue_a.get_ref_value(this.dyn);
-      if ( value != this.y_min_value) {
-	this.y_min_value = value;
-	if ( Math.abs(this.y_max_value - this.y_min_value) > Number.MIN_VALUE)
-	  object.set_xy_range_y( this.curve_number - 1, this.y_min_value, this.y_max_value);
-	update = true;
+      if (value != this.y_min_value) {
+        this.y_min_value = value;
+        if (Math.abs(this.y_max_value - this.y_min_value) > Number.MIN_VALUE)
+          object.set_xy_range_y(
+            this.curve_number - 1,
+            this.y_min_value,
+            this.y_max_value,
+          );
+        update = true;
       }
     }
-    if ( this.y_maxvalue_a !== null) {
+    if (this.y_maxvalue_a !== null) {
       var value = this.y_maxvalue_a.get_ref_value(this.dyn);
-      if ( value != this.y_max_value) {
-	this.y_max_value = value;
-	if ( Math.abs(this.y_max_value - this.y_min_value) > Number.MIN_VALUE)
-	  object.set_xy_range_y( this.curve_number - 1, this.y_min_value, this.y_max_value);
-	update = true;
+      if (value != this.y_max_value) {
+        this.y_max_value = value;
+        if (Math.abs(this.y_max_value - this.y_min_value) > Number.MIN_VALUE)
+          object.set_xy_range_y(
+            this.curve_number - 1,
+            this.y_min_value,
+            this.y_max_value,
+          );
+        update = true;
       }
     }
 
-    if ( this.x_minvalue_a !== null) {
+    if (this.x_minvalue_a !== null) {
       var value = this.x_minvalue_a.get_ref_value(this.dyn);
-      if ( value != this.x_min_value) {
-	this.x_min_value = value;
-	if ( Math.abs(this.x_max_value - this.x_min_value) > Number.MIN_VALUE)
-	  object.set_xy_range_x( this.curve_number - 1, this.x_min_value, this.x_max_value);
-	update = true;
+      if (value != this.x_min_value) {
+        this.x_min_value = value;
+        if (Math.abs(this.x_max_value - this.x_min_value) > Number.MIN_VALUE)
+          object.set_xy_range_x(
+            this.curve_number - 1,
+            this.x_min_value,
+            this.x_max_value,
+          );
+        update = true;
       }
     }
-    if ( this.x_maxvalue_a !== null) {
+    if (this.x_maxvalue_a !== null) {
       var value = this.x_maxvalue_a.get_ref_value(this.dyn);
-      if ( value != this.x_max_value) {
-	this.x_max_value = value;
-	if ( Math.abs(this.x_max_value - this.x_min_value) > Number.MIN_VALUE)
-	  object.set_xy_range_x( this.curve_number - 1, this.x_min_value, this.x_max_value);
-	update = true;
+      if (value != this.x_max_value) {
+        this.x_max_value = value;
+        if (Math.abs(this.x_max_value - this.x_min_value) > Number.MIN_VALUE)
+          object.set_xy_range_x(
+            this.curve_number - 1,
+            this.x_min_value,
+            this.x_max_value,
+          );
+        update = true;
       }
     }
 
-    if ( this.x_mark1_a !== null) {
+    if (this.x_mark1_a !== null) {
       var mark1val = this.x_mark1_a.get_ref_value(this.dyn);
-      if ( this.firstScan || Math.abs( mark1val - this.x_mark1_a.oldValue) > Number.MIN_VALUE) {
-	object.set_x_mark1( mark1val);
-	this.x_mark1_a.oldValue = mark1val;
+      if (
+        this.firstScan ||
+        Math.abs(mark1val - this.x_mark1_a.oldValue) > Number.MIN_VALUE
+      ) {
+        object.set_x_mark1(mark1val);
+        this.x_mark1_a.oldValue = mark1val;
       }
     }
-    if ( this.x_mark2_a !== null) {
+    if (this.x_mark2_a !== null) {
       var mark2val = this.x_mark2_a.get_ref_value(this.dyn);
-      if ( this.firstScan || Math.abs( mark2val - this.x_mark2_a.oldValue) > Number.MIN_VALUE) {
-	object.set_x_mark2( mark2val);
-	this.x_mark2_a.oldValue = mark2val;
+      if (
+        this.firstScan ||
+        Math.abs(mark2val - this.x_mark2_a.oldValue) > Number.MIN_VALUE
+      ) {
+        object.set_x_mark2(mark2val);
+        this.x_mark2_a.oldValue = mark2val;
       }
     }
-    if ( this.y_mark1_a !== null) {
+    if (this.y_mark1_a !== null) {
       var mark1val = this.y_mark1_a.get_ref_value(this.dyn);
-      if ( this.firstScan || Math.abs( mark1val - this.y_mark1_a.oldValue) > Number.MIN_VALUE) {
-	object.set_y_mark1( mark1val);
-	this.y_mark1_a.oldValue = mark1val;
+      if (
+        this.firstScan ||
+        Math.abs(mark1val - this.y_mark1_a.oldValue) > Number.MIN_VALUE
+      ) {
+        object.set_y_mark1(mark1val);
+        this.y_mark1_a.oldValue = mark1val;
       }
     }
-    if ( this.y_mark2_a !== null) {
+    if (this.y_mark2_a !== null) {
       var mark2val = this.y_mark2_a.get_ref_value(this.dyn);
-      if ( this.firstScan || Math.abs( mark2val - this.y_mark2_a.oldValue) > Number.MIN_VALUE) {
-	object.set_y_mark2( mark2val);
-	this.y_mark2_a.oldValue = mark2val;
+      if (
+        this.firstScan ||
+        Math.abs(mark2val - this.y_mark2_a.oldValue) > Number.MIN_VALUE
+      ) {
+        object.set_y_mark2(mark2val);
+        this.y_mark2_a.oldValue = mark2val;
       }
     }
-    if ( update) {
-      pname = this.dyn.parseAttrName( this.x_attr);
+    if (update) {
+      pname = this.dyn.parseAttrName(this.x_attr);
       attrSize = pname.elements;
       this.xAttrType = pname.type;
 
-      switch ( this.datatype) {
-      case DynC.eCurveDataType_XYArrays:
-	if ( attrSize < this.noOfPoints)
-	  this.noOfPoints = attrSize;
-	size = this.noOfPoints;
-	break;
-      case DynC.eCurveDataType_PointArray:
-	if ( attrSize/2 < this.noOfPoints)
-	  this.noOfPoints = attrSize/2;
-	size = this.noOfPoints * 2;
-	break;
-      case DynC.eCurveDataType_TableObject:
-	if ( (attrSize-1)/2 < this.noOfPoints)
-	  this.noOfPoints = (attrSize-1)/2;
-	size = this.noOfPoints * 2 + 1;
-	break;
+      switch (this.datatype) {
+        case DynC.eCurveDataType_XYArrays:
+          if (attrSize < this.noOfPoints) this.noOfPoints = attrSize;
+          size = this.noOfPoints;
+          break;
+        case DynC.eCurveDataType_PointArray:
+          if (attrSize / 2 < this.noOfPoints) this.noOfPoints = attrSize / 2;
+          size = this.noOfPoints * 2;
+          break;
+        case DynC.eCurveDataType_TableObject:
+          if ((attrSize - 1) / 2 < this.noOfPoints)
+            this.noOfPoints = (attrSize - 1) / 2;
+          size = this.noOfPoints * 2 + 1;
+          break;
       }
-      
+
       // Read x-array
-      switch ( this.xAttrType) {
-      case Pwr.eType_Float32:
-	this.dyn.graph.getGdh().getObjectInfoFloatArray( pname.name, size,
-							 this.scan2, this);
-	break;
-      case Pwr.eType_Int32:
-      case Pwr.eType_Int16:
-      case Pwr.eType_Int8:
-      case Pwr.eType_UInt32:
-      case Pwr.eType_UInt16:
-      case Pwr.eType_UInt8:
-	this.dyn.graph.getGdh().getObjectInfoIntArray( pname.name, size,
-						       this.scan2, this);
-	break;
-      default:
-	return;
+      switch (this.xAttrType) {
+        case Pwr.eType_Float32:
+          this.dyn.graph
+            .getGdh()
+            .getObjectInfoFloatArray(pname.name, size, this.scan2, this);
+          break;
+        case Pwr.eType_Int32:
+        case Pwr.eType_Int16:
+        case Pwr.eType_Int8:
+        case Pwr.eType_UInt32:
+        case Pwr.eType_UInt16:
+        case Pwr.eType_UInt8:
+          this.dyn.graph
+            .getGdh()
+            .getObjectInfoIntArray(pname.name, size, this.scan2, this);
+          break;
+        default:
+          return;
       }
     }
     this.firstScan = false;
   };
 
-  this.scan2 = function( id, self, sts, value) {
-    switch ( self.xAttrType) {
-    case Pwr.eType_Float32:
-      if ( !(sts & 1))
-	return;
-      
-      switch ( self.datatype) {
-      case DynC.eCurveDataType_XYArrays:
-	self.curveX = new Array(self.noOfPoints);
-	for ( var i = 0; i < self.noOfPoints; i++)
-	  self.curveX[i] = value[i];
-	break;
-      case DynC.eCurveDataType_PointArray:
-	curveX = new Array(self.noOfPoints);
-	curveY = new Array(self.noOfPoints);
-	for ( var i = 0; i < self.noOfPoints; i++) {
-	  self.curveX[i] = value[2*i];
-	  self.curveY[i] = value[2*i+1];
-	}
-	self.dyn.repaintNow = true;
-	break;
-      case DynC.eCurveDataType_TableObject:
-	self.noOfPoints = Math.floor(value[0]);
-	if ( self.noOfPoints > self.noofpoints)
-	  self.noOfPoints = self.noofpoints;
-	if ( attrSize < self.noOfPoints)
-	  self.noOfPoints = attrSize;
-	self.curveY = new Array(self.noOfPoints);
-	self.curveX = new Array(self.noOfPoints);
-	for ( var i = 0; i < self.noOfPoints; i++) {
-	  self.curveX[i] = value[2*i+1];
-	  self.curveY[i] = value[2*i+2];
-	}
-	self.dyn.repaintNow = true;
-	break;
-      }
-      break;
-    case Pwr.eType_Int32:
-    case Pwr.eType_Int16:
-    case Pwr.eType_Int8:
-    case Pwr.eType_UInt32:
-    case Pwr.eType_UInt16:
-    case Pwr.eType_UInt8:
-      if ( !(sts & 1))
-	return;    
-      switch ( self.datatype) {
-      case DynC.eCurveDataType_XYArrays:
-	self.curveX = new Array(self.noOfPoints);
-	for ( var i = 0; i < self.noOfPoints; i++)
-	  self.curveX[i] = value[i];
-	break;
-      case DynC.eCurveDataType_PointArray:
-	self.curveX = new Array(self.noOfPoints);
-	self.curveY = new Array(self.noOfPoints);
-	for ( var i = 0; i < self.noOfPoints; i++) {
-	  self.curveX[i] = value[2*i];
-	  self.curveY[i] = value[2*i+1];
-	}
-	self.dyn.repaintNow = true;
-	break;
-      case DynC.eCurveDataType_TableObject:
-	self.noOfPoints = Math.floor(value[0]);
-	if ( self.noOfPoints > self.noofpoints)
-	  self.noOfPoints = self.noofpoints;
-	if ( attrSize < self.noOfPoints)
-	  self.noOfPoints = attrSize;
-	self.curveY = new Array(self.noOfPoints);
-	self.curveX = new Array(self.noOfPoints);
-	for ( var i = 0; i < self.noOfPoints; i++) {
-	  self.curveX[i] = value[2*i+1];
-	  self.curveY[i] = value[2*i+2];
-	}
-	self.dyn.repaintNow = true;
-	break;
-      }
-      break;
-    default:
-      return;
+  this.scan2 = function (id, self, sts, value) {
+    switch (self.xAttrType) {
+      case Pwr.eType_Float32:
+        if (!(sts & 1)) return;
+
+        switch (self.datatype) {
+          case DynC.eCurveDataType_XYArrays:
+            self.curveX = new Array(self.noOfPoints);
+            for (var i = 0; i < self.noOfPoints; i++) self.curveX[i] = value[i];
+            break;
+          case DynC.eCurveDataType_PointArray:
+            curveX = new Array(self.noOfPoints);
+            curveY = new Array(self.noOfPoints);
+            for (var i = 0; i < self.noOfPoints; i++) {
+              self.curveX[i] = value[2 * i];
+              self.curveY[i] = value[2 * i + 1];
+            }
+            self.dyn.repaintNow = true;
+            break;
+          case DynC.eCurveDataType_TableObject:
+            self.noOfPoints = Math.floor(value[0]);
+            if (self.noOfPoints > self.noofpoints)
+              self.noOfPoints = self.noofpoints;
+            if (attrSize < self.noOfPoints) self.noOfPoints = attrSize;
+            self.curveY = new Array(self.noOfPoints);
+            self.curveX = new Array(self.noOfPoints);
+            for (var i = 0; i < self.noOfPoints; i++) {
+              self.curveX[i] = value[2 * i + 1];
+              self.curveY[i] = value[2 * i + 2];
+            }
+            self.dyn.repaintNow = true;
+            break;
+        }
+        break;
+      case Pwr.eType_Int32:
+      case Pwr.eType_Int16:
+      case Pwr.eType_Int8:
+      case Pwr.eType_UInt32:
+      case Pwr.eType_UInt16:
+      case Pwr.eType_UInt8:
+        if (!(sts & 1)) return;
+        switch (self.datatype) {
+          case DynC.eCurveDataType_XYArrays:
+            self.curveX = new Array(self.noOfPoints);
+            for (var i = 0; i < self.noOfPoints; i++) self.curveX[i] = value[i];
+            break;
+          case DynC.eCurveDataType_PointArray:
+            self.curveX = new Array(self.noOfPoints);
+            self.curveY = new Array(self.noOfPoints);
+            for (var i = 0; i < self.noOfPoints; i++) {
+              self.curveX[i] = value[2 * i];
+              self.curveY[i] = value[2 * i + 1];
+            }
+            self.dyn.repaintNow = true;
+            break;
+          case DynC.eCurveDataType_TableObject:
+            self.noOfPoints = Math.floor(value[0]);
+            if (self.noOfPoints > self.noofpoints)
+              self.noOfPoints = self.noofpoints;
+            if (attrSize < self.noOfPoints) self.noOfPoints = attrSize;
+            self.curveY = new Array(self.noOfPoints);
+            self.curveX = new Array(self.noOfPoints);
+            for (var i = 0; i < self.noOfPoints; i++) {
+              self.curveX[i] = value[2 * i + 1];
+              self.curveY[i] = value[2 * i + 2];
+            }
+            self.dyn.repaintNow = true;
+            break;
+        }
+        break;
+      default:
+        return;
     }
 
     // Read y-array
-    switch ( self.datatype) {
-    case DynC.eCurveDataType_XYArrays:
-      var pname = self.dyn.parseAttrName( self.y_attr);
-      if ( pname.elements < self.noOfPoints)
-	self.noOfPoints = pname.elements;
-      self.yAttrType = pname.type;
-      self.curveY = new Array(self.noOfPoints);
+    switch (self.datatype) {
+      case DynC.eCurveDataType_XYArrays:
+        var pname = self.dyn.parseAttrName(self.y_attr);
+        if (pname.elements < self.noOfPoints) self.noOfPoints = pname.elements;
+        self.yAttrType = pname.type;
+        self.curveY = new Array(self.noOfPoints);
 
-      switch ( self.yAttrType) {
-      case Pwr.eType_Float32:
-	self.dyn.graph.getGdh().getObjectInfoFloatArray( pname.name, self.noOfPoints,
-							 self.scan3, self);
-	break;
-      case Pwr.eType_Int32:
-      case Pwr.eType_Int16:
-      case Pwr.eType_Int8:
-      case Pwr.eType_UInt32:
-      case Pwr.eType_UInt16:
-      case Pwr.eType_UInt8:
-	self.dyn.graph.getGdh().getObjectInfoIntArray( pname.name, self.noOfPoints,
-						       self.scan3, self);
-	break;
-      default:
-	return;
-      }
-      break;
+        switch (self.yAttrType) {
+          case Pwr.eType_Float32:
+            self.dyn.graph
+              .getGdh()
+              .getObjectInfoFloatArray(
+                pname.name,
+                self.noOfPoints,
+                self.scan3,
+                self,
+              );
+            break;
+          case Pwr.eType_Int32:
+          case Pwr.eType_Int16:
+          case Pwr.eType_Int8:
+          case Pwr.eType_UInt32:
+          case Pwr.eType_UInt16:
+          case Pwr.eType_UInt8:
+            self.dyn.graph
+              .getGdh()
+              .getObjectInfoIntArray(
+                pname.name,
+                self.noOfPoints,
+                self.scan3,
+                self,
+              );
+            break;
+          default:
+            return;
+        }
+        break;
     }
   };
 
+  this.scan3 = function (id, self, sts, value) {
+    if (!(sts & 1)) return;
 
-  this.scan3 = function( id, self, sts, value) {
-    if ( !(sts & 1))
-      return;
+    switch (self.datatype) {
+      case DynC.eCurveDataType_XYArrays:
+        switch (self.yAttrType) {
+          case Pwr.eType_Float32:
+            for (var i = 0; i < self.noOfPoints; i++) self.curveY[i] = value[i];
+            self.dyn.repaintNow = true;
+            break;
+          case Pwr.eType_Int32:
+          case Pwr.eType_Int16:
+          case Pwr.eType_Int8:
+          case Pwr.eType_UInt32:
+          case Pwr.eType_UInt16:
+          case Pwr.eType_UInt8:
+            for (var i = 0; i < self.noOfPoints; i++) self.curveY[i] = value[i];
 
-    switch ( self.datatype) {
-    case DynC.eCurveDataType_XYArrays:
-      switch ( self.yAttrType) {
-      case Pwr.eType_Float32:
-	for ( var i = 0; i < self.noOfPoints; i++)
-	  self.curveY[i] = value[i];
-	self.dyn.repaintNow = true;
-	break;
-      case Pwr.eType_Int32:
-      case Pwr.eType_Int16:
-      case Pwr.eType_Int8:
-      case Pwr.eType_UInt32:
-      case Pwr.eType_UInt16:
-      case Pwr.eType_UInt8:
-	for ( var i = 0; i < self.noOfPoints; i++)
-	  self.curveY[i] = value[i];
-	
-	self.dyn.repaintNow = true;
-	break;
-      default:
-	return;
-      }
-      break;
+            self.dyn.repaintNow = true;
+            break;
+          default:
+            return;
+        }
+        break;
     }
-    
-    self.object.set_xy_data( self.curveY, self.curveX, self.curve_number - 1, self.noOfPoints);
+
+    self.object.set_xy_data(
+      self.curveY,
+      self.curveX,
+      self.curve_number - 1,
+      self.noOfPoints,
+    );
   };
-};
+}
 
-
-function DynSevHist( dyn) {
+function DynSevHist(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = DynC.mDynType2_SevHist;
@@ -10028,294 +9713,261 @@ function DynSevHist( dyn) {
   this.initialized = 0;
   this.has_sevhist_object = 0;
   this.no_of_points;
-  this.oid1 = new PwrtObjid(0,0);
-  this.oid2 = new PwrtObjid(0,0);
+  this.oid1 = new PwrtObjid(0, 0);
+  this.oid2 = new PwrtObjid(0, 0);
   this.curve_cnt = 0;
   this.vtype1;
   this.vtype2;
-								    
-  this.setAttribute = function(o, name, value) {
+
+  this.setAttribute = function (o, name, value) {
     if (name === "SevHist.Object1") {
       this.sevhist_object1 = value;
       return 1;
-    }
-    else if (name === "SevHist.Object2") {
+    } else if (name === "SevHist.Object2") {
       this.sevhist_object2 = value;
       return 1;
-    }
-    else if (name === "SevHist.Attribute1") {
+    } else if (name === "SevHist.Attribute1") {
       this.attribute1 = value;
       return 1;
-    }
-    else if (name === "SevHist.Attribute2") {
+    } else if (name === "SevHist.Attribute2") {
       this.attribute2 = value;
       return 1;
-    }
-    else if (name === "SevHist.Server") {
+    } else if (name === "SevHist.Server") {
       this.server = value;
       return 1;
-    }
-    else if (name === "SevHist.TimeRange") {
+    } else if (name === "SevHist.TimeRange") {
       this.timerange = value;
       return 1;
-    }
-    else if (name === "SevHist.TimeRangeAttr") {
+    } else if (name === "SevHist.TimeRangeAttr") {
       this.timerange_attr = value;
       return 1;
-    }
-    else if (name === "SevHist.MinValueAttr1") {
+    } else if (name === "SevHist.MinValueAttr1") {
       this.minvalue_attr1 = value;
       return 1;
-    }
-    else if (name === "SevHist.MaxValueAttr1") {
+    } else if (name === "SevHist.MaxValueAttr1") {
       this.maxvalue_attr1 = value;
       return 1;
-    }
-    else if (name === "SevHist.MinValueAttr2") {
+    } else if (name === "SevHist.MinValueAttr2") {
       this.minvalue_attr2 = value;
       return 1;
-    }
-    else if (name === "SevHist.MaxValueAttr2") {
+    } else if (name === "SevHist.MaxValueAttr2") {
       this.maxvalue_attr2 = value;
       return 1;
-    }
-    else if (name === "SevHist.HoldAttr") {
+    } else if (name === "SevHist.HoldAttr") {
       this.hold_attr = value;
       return 1;
-    }
-    else if (name === "SevHist.UpdateAttr") {
+    } else if (name === "SevHist.UpdateAttr") {
       this.update_attr = value;
       return 1;
-    }
-    else if (name === "SevHist.UpdateTime") {
+    } else if (name === "SevHist.UpdateTime") {
       this.updatetime = value;
       return 1;
-    }
-    else if (name === "SevHist.Mark1Attr") {
+    } else if (name === "SevHist.Mark1Attr") {
       this.mark1_attr = value;
       return 1;
-    }
-    else if (name === "SevHist.Mark2Attr") {
+    } else if (name === "SevHist.Mark2Attr") {
       this.mark2_attr = value;
       return 1;
-    }
-    else if (name === "SevHist.Mark1Color") {
+    } else if (name === "SevHist.Mark1Color") {
       this.mark1_color = value;
       return 1;
-    }
-    else if (name === "SevHist.Mark2Color") {
+    } else if (name === "SevHist.Mark2Color") {
       this.mark2_color = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "SevHist.Object1") {
       ret.value = this.sevhist_object1;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "SevHist.Object2") {
+    } else if (name === "SevHist.Object2") {
       ret.value = this.sevhist_object2;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "SevHist.Attribute1") {
+    } else if (name === "SevHist.Attribute1") {
       ret.value = this.attribute1;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "SevHist.Attribute2") {
+    } else if (name === "SevHist.Attribute2") {
       ret.value = this.attribute2;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "SevHist.Server") {
+    } else if (name === "SevHist.Server") {
       ret.value = this.server;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "SevHist.TimeRange") {
+    } else if (name === "SevHist.TimeRange") {
       ret.value = this.timerange;
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
-    }
-    else if (name === "SevHist.TimeRangeAttr") {
+    } else if (name === "SevHist.TimeRangeAttr") {
       ret.value = this.timerange_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "SevHist.MinValueAttr1") {
+    } else if (name === "SevHist.MinValueAttr1") {
       ret.value = this.minvalue_attr1;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "SevHist.MaxValueAttr1") {
+    } else if (name === "SevHist.MaxValueAttr1") {
       ret.value = this.maxvalue_attr1;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "SevHist.MinValueAttr2") {
+    } else if (name === "SevHist.MinValueAttr2") {
       ret.value = this.minvalue_attr2;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "SevHist.MaxValueAttr2") {
+    } else if (name === "SevHist.MaxValueAttr2") {
       ret.value = this.maxvalue_attr2;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "SevHist.HoldAttr") {
+    } else if (name === "SevHist.HoldAttr") {
       ret.value = this.hold_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "SevHist.UpdateAttr") {
+    } else if (name === "SevHist.UpdateAttr") {
       ret.value = this.update_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "SevHist.UpdateTime") {
+    } else if (name === "SevHist.UpdateTime") {
       ret.value = this.updatetime;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "SevHist.Mark1Attr") {
+    } else if (name === "SevHist.Mark1Attr") {
       ret.value = this.mark1_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "SevHist.Mark2Attr") {
+    } else if (name === "SevHist.Mark2Attr") {
       ret.value = this.mark2_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "SevHist.Mark1Color") {
+    } else if (name === "SevHist.Mark1Color") {
       ret.value = this.mark1_color;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "SevHist.Mark2Color") {
+    } else if (name === "SevHist.Mark2Color") {
       ret.value = this.mark2_color;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( object) {
-
+  this.connect = function (object) {
     this.no_of_points = object.get_no_of_points();
     this.direction = object.get_direction();
     this.scan_time = object.get_scan_time();
     this.acc_time = this.scan_time;
     this.trend_hold = 0;
-    
 
-    if ( this.minvalue_attr1.trim() !== "") {
-      this.minvalue_a1 = new DynReference( this.dyn, this.minvalue_attr1);
+    if (this.minvalue_attr1.trim() !== "") {
+      this.minvalue_a1 = new DynReference(this.dyn, this.minvalue_attr1);
       this.minvalue_a1.connect(this.dyn);
-      if ( !this.minvalue_a1.sts) {
-	this.minvalue_a1 = null;
-	console.log("SevHist: " + this.minvalue_attr1);
+      if (!this.minvalue_a1.sts) {
+        this.minvalue_a1 = null;
+        console.log("SevHist: " + this.minvalue_attr1);
       }
     }
 
-    if ( this.maxvalue_attr1.trim() !== "") {
-      this.maxvalue_a1 = new DynReference( this.dyn, this.maxvalue_attr1);
+    if (this.maxvalue_attr1.trim() !== "") {
+      this.maxvalue_a1 = new DynReference(this.dyn, this.maxvalue_attr1);
       this.maxvalue_a1.connect(this.dyn);
-      if ( !this.maxvalue_a1.sts) {
-	this.maxvalue_a1 = null;
-	console.log("SevHist: " + this.maxvalue_attr1);
+      if (!this.maxvalue_a1.sts) {
+        this.maxvalue_a1 = null;
+        console.log("SevHist: " + this.maxvalue_attr1);
       }
     }
 
-    if ( this.minvalue_attr2.trim() !== "") {
-      this.minvalue_a2 = new DynReference( this.dyn, this.minvalue_attr2);
+    if (this.minvalue_attr2.trim() !== "") {
+      this.minvalue_a2 = new DynReference(this.dyn, this.minvalue_attr2);
       this.minvalue_a2.connect(this.dyn);
-      if ( !this.minvalue_a2.sts) {
-	this.minvalue_a2 = null;
-	console.log("SevHist: " + this.minvalue_attr2);
+      if (!this.minvalue_a2.sts) {
+        this.minvalue_a2 = null;
+        console.log("SevHist: " + this.minvalue_attr2);
       }
     }
 
-    if ( this.maxvalue_attr2.trim() !== "") {
-      this.maxvalue_a2 = new DynReference( this.dyn, this.maxvalue_attr2);
+    if (this.maxvalue_attr2.trim() !== "") {
+      this.maxvalue_a2 = new DynReference(this.dyn, this.maxvalue_attr2);
       this.maxvalue_a2.connect(this.dyn);
-      if ( !this.maxvalue_a2.sts) {
-	this.maxvalue_a2 = null;
-	console.log("SevHist: " + this.maxvalue_attr2);
+      if (!this.maxvalue_a2.sts) {
+        this.maxvalue_a2 = null;
+        console.log("SevHist: " + this.maxvalue_attr2);
       }
     }
 
-    if ( this.hold_attr.trim() !== "") {
-      this.hold_a = new DynReference( this.dyn, this.hold_attr);
+    if (this.hold_attr.trim() !== "") {
+      this.hold_a = new DynReference(this.dyn, this.hold_attr);
       this.hold_a.connect(this.dyn);
-      if ( !this.hold_a.sts) {
-	this.hold_a = null;
-	console.log("SevHist: " + this.hold_attr);
+      if (!this.hold_a.sts) {
+        this.hold_a = null;
+        console.log("SevHist: " + this.hold_attr);
       }
     }
 
-    if ( this.update_attr.trim() !== "") {
-      this.update_a = new DynReference( this.dyn, this.update_attr);
+    if (this.update_attr.trim() !== "") {
+      this.update_a = new DynReference(this.dyn, this.update_attr);
       this.update_a.connect(this.dyn);
-      if ( !this.update_a.sts) {
-	this.update_a = null;
-	console.log("SevHist: " + this.update_attr);
+      if (!this.update_a.sts) {
+        this.update_a = null;
+        console.log("SevHist: " + this.update_attr);
       }
     }
 
-    if ( this.mark1_attr !== null && this.mark1_attr.trim() !== "") {
-      this.mark1_a = new DynReference( this.dyn, this.mark1_attr);
+    if (this.mark1_attr !== null && this.mark1_attr.trim() !== "") {
+      this.mark1_a = new DynReference(this.dyn, this.mark1_attr);
       this.mark1_a.connect(this.dyn);
-      if ( !this.mark1_a.sts) {
-	this.mark1_a = null;
-	console.log("SevHist: " + this.mark1_attr);
+      if (!this.mark1_a.sts) {
+        this.mark1_a = null;
+        console.log("SevHist: " + this.mark1_attr);
       }
     }
 
-    if ( this.mark2_attr !== null && this.mark2_attr.trim() !== "") {
-      this.mark2_a = new DynReference( this.dyn, this.mark2_attr);
+    if (this.mark2_attr !== null && this.mark2_attr.trim() !== "") {
+      this.mark2_a = new DynReference(this.dyn, this.mark2_attr);
       this.mark2_a.connect(this.dyn);
-      if ( !this.mark2_a.sts) {
-	this.mark2_a = null;
-	console.log("SevHist: " + this.mark2_attr);
+      if (!this.mark2_a.sts) {
+        this.mark2_a = null;
+        console.log("SevHist: " + this.mark2_attr);
       }
     }
 
-    if ( this.timerange_attr !== null && this.timerange_attr.trim() !== "") {
-      this.timerange_a = new DynReference( this.dyn, this.timerange_attr);
+    if (this.timerange_attr !== null && this.timerange_attr.trim() !== "") {
+      this.timerange_a = new DynReference(this.dyn, this.timerange_attr);
       this.timerange_a.connect(this.dyn);
-      if ( !this.timerange_a.sts) {
-	this.timerange_a = null;
-	console.log("SevHist: " + this.timerange_attr);
+      if (!this.timerange_a.sts) {
+        this.timerange_a = null;
+        console.log("SevHist: " + this.timerange_attr);
       }
     }
 
     this.no_of_points = object.get_no_of_points();
-    if ( this.mark1_color != Glow.eDrawType_Inherit || this.mark2_color != Glow.eDrawType_Inherit)
-      object.set_mark_color( this.mark1_color, this.mark2_color);
+    if (
+      this.mark1_color != Glow.eDrawType_Inherit ||
+      this.mark2_color != Glow.eDrawType_Inherit
+    )
+      object.set_mark_color(this.mark1_color, this.mark2_color);
     if (this.timerange > Number.MIN_VALUE) {
       object.set_xy_range_x(0, this.timerange, 0);
       object.set_xy_range_x(1, this.timerange, 0);
     }
     if (this.sevhist_object1 !== "")
-      this.dyn.graph.getGdh().getSevHistInfo(this.sevhist_object1, 
-					     this.connect2, this);
+      this.dyn.graph
+        .getGdh()
+        .getSevHistInfo(this.sevhist_object1, this.connect2, this);
     else if (this.attribute1 !== "") {
       this.curve_cnt++;
-      if (this.attribute2 !== "")
-	this.curve_cnt++;
+      if (this.attribute2 !== "") this.curve_cnt++;
       this.initialized = 1;
     }
   };
 
-  this.connect2 = function( id, data, sts, result) {
+  this.connect2 = function (id, data, sts, result) {
     console.log("connect2", sts);
-    if ( sts & 1 != 0) {
+    if (sts & (1 != 0)) {
       var self = data;
       self.oid1 = result[0];
       self.attribute1 = result[1];
@@ -10323,17 +9975,17 @@ function DynSevHist( dyn) {
       self.has_sevhist_object;
       self.curve_cnt++;
       if (self.sevhist_object2 !== "")
-	self.dyn.graph.getGdh().getSevHistInfo(self.sevhist_object2, 
-					       self.connect3, self);
-      else
-	self.initialized = 1;
+        self.dyn.graph
+          .getGdh()
+          .getSevHistInfo(self.sevhist_object2, self.connect3, self);
+      else self.initialized = 1;
     }
     return 1;
   };
 
-  this.connect3 = function( id, data, sts, result) {
+  this.connect3 = function (id, data, sts, result) {
     console.log("connect3", sts);
-    if ( sts & 1 != 0) {
+    if (sts & (1 != 0)) {
       var self = data;
       self.oid2 = result[0];
       self.attribute2 = result[1];
@@ -10344,121 +9996,126 @@ function DynSevHist( dyn) {
     return 1;
   };
 
-  this.disconnect = function() {
-    if ( this.timerange_a != null)
-      this.timerange_a.disconnect(this.dyn);
-    if ( this.minvalue_a1 != null)
-      this.minvalue_a1.disconnect(this.dyn);
-    if ( this.maxvalue_a1 != null)
-      this.maxvalue_a1.disconnect(this.dyn);
-    if ( this.minvalue_a2 != null)
-      this.minvalue_a2.disconnect(this.dyn);
-    if ( this.maxvalue_a2 != null)
-      this.maxvalue_a2.disconnect(this.dyn);
-    if ( this.hold_a != null)
-      this.hold_a.disconnect(this.dyn);
-    if ( this.update_a != null)
-      this.update_a.disconnect(this.dyn);
-    if ( this.mark1_a != null)
-      this.mark1_a.disconnect(this.dyn);
-    if ( this.mark2_a != null)
-      this.mark2_a.disconnect(this.dyn);
+  this.disconnect = function () {
+    if (this.timerange_a != null) this.timerange_a.disconnect(this.dyn);
+    if (this.minvalue_a1 != null) this.minvalue_a1.disconnect(this.dyn);
+    if (this.maxvalue_a1 != null) this.maxvalue_a1.disconnect(this.dyn);
+    if (this.minvalue_a2 != null) this.minvalue_a2.disconnect(this.dyn);
+    if (this.maxvalue_a2 != null) this.maxvalue_a2.disconnect(this.dyn);
+    if (this.hold_a != null) this.hold_a.disconnect(this.dyn);
+    if (this.update_a != null) this.update_a.disconnect(this.dyn);
+    if (this.mark1_a != null) this.mark1_a.disconnect(this.dyn);
+    if (this.mark2_a != null) this.mark2_a.disconnect(this.dyn);
   };
 
-  this.scan = function( object) {
+  this.scan = function (object) {
     var new_curve = 0;
     var i;
-    if ( !this.initialized)
-      return;
-    if ( this.hold_a !== null && !this.firstScan) {
+    if (!this.initialized) return;
+    if (this.hold_a !== null && !this.firstScan) {
       var holdval = this.hold_a.get_ref_value(this.dyn);
-      if ( holdval)
-	return;
+      if (holdval) return;
     }
 
-    if ( this.update_a !== null) {
+    if (this.update_a !== null) {
       var value = this.update_a.get_ref_value(this.dyn);
-      if ( value && !this.update_a.oldValue)
-	new_curve = 1;
+      if (value && !this.update_a.oldValue) new_curve = 1;
       this.update_a.oldValue = value;
     }
 
-    if ( this.timerange_a !== null) {
+    if (this.timerange_a !== null) {
       this.timerange = this.timerange_a.get_ref_value(this.dyn);
-      if ( this.timerange != this.timerange_a.oldValue) {
-	object.set_xy_range_x(0, this.timerange, 0);
-	if (this.curve_cnt > 1)
-	  object.set_xy_range_x(1, this.timerange, 0);
-	this.timerange_a.oldValue = this.timerange;
-	new_curve = 1;
+      if (this.timerange != this.timerange_a.oldValue) {
+        object.set_xy_range_x(0, this.timerange, 0);
+        if (this.curve_cnt > 1) object.set_xy_range_x(1, this.timerange, 0);
+        this.timerange_a.oldValue = this.timerange;
+        new_curve = 1;
       }
     }
 
     var minval, maxval;
-    if ( this.maxvalue_a1 !== null && this.minvalue_a1 !== null) {
+    if (this.maxvalue_a1 !== null && this.minvalue_a1 !== null) {
       minval = this.minvalue_a1.get_ref_value(this.dyn);
       maxval = this.maxvalue_a1.get_ref_value(this.dyn);
-      if ( minval != this.minvalue_a1.oldValue ||
-	   maxval != this.maxvalue_a1.oldValue) {
-	if ( Math.abs( maxval - minval) > Number.MIN_VALUE)
-	  object.set_range_y( 0, minval, maxval);
-	this.minvalue_a1.oldValue = minval;
-	this.maxvalue_a1.oldValue = maxval;
-	new_curve = 1;
+      if (
+        minval != this.minvalue_a1.oldValue ||
+        maxval != this.maxvalue_a1.oldValue
+      ) {
+        if (Math.abs(maxval - minval) > Number.MIN_VALUE)
+          object.set_range_y(0, minval, maxval);
+        this.minvalue_a1.oldValue = minval;
+        this.maxvalue_a1.oldValue = maxval;
+        new_curve = 1;
       }
     }
 
-    if ( this.maxvalue_a2 !== null && this.minvalue_a2 !== null) {
+    if (this.maxvalue_a2 !== null && this.minvalue_a2 !== null) {
       minval = this.minvalue_a2.get_ref_value(this.dyn);
       maxval = this.maxvalue_a2.get_ref_value(this.dyn);
-      if ( minval != this.minvalue_a2.oldValue ||
-	   maxval != this.maxvalue_a2.oldValue) {
-	if ( Math.abs( maxval - minval) > Number.MIN_VALUE)
-	  object.set_range_y( 1, minval, maxval);
-	this.minvalue_a2.oldValue = minval;
-	this.maxvalue_a2.oldValue = maxval;
-	new_curve = 1;
+      if (
+        minval != this.minvalue_a2.oldValue ||
+        maxval != this.maxvalue_a2.oldValue
+      ) {
+        if (Math.abs(maxval - minval) > Number.MIN_VALUE)
+          object.set_range_y(1, minval, maxval);
+        this.minvalue_a2.oldValue = minval;
+        this.maxvalue_a2.oldValue = maxval;
+        new_curve = 1;
       }
     }
 
-    if ( this.mark1_a !== null) {
+    if (this.mark1_a !== null) {
       var mark1val = this.mark1_a.get_ref_value(this.dyn);
-      if ( this.firstScan || Math.abs( mark1val - this.mark1_a.oldValue) > Number.MIN_VALUE) {
-	object.set_y_mark1( mark1val);
-	this.mark1_a.oldValue = mark1val;
+      if (
+        this.firstScan ||
+        Math.abs(mark1val - this.mark1_a.oldValue) > Number.MIN_VALUE
+      ) {
+        object.set_y_mark1(mark1val);
+        this.mark1_a.oldValue = mark1val;
       }
     }
-    if ( this.mark2_a !== null) {
+    if (this.mark2_a !== null) {
       var mark2val = this.mark2_a.get_ref_value(this.dyn);
-      if ( this.firstScan || Math.abs( mark2val - this.mark2_a.oldValue) > Number.MIN_VALUE) {
-	object.set_y_mark2( mark2val);
-	this.mark2_a.oldValue = mark2val;
+      if (
+        this.firstScan ||
+        Math.abs(mark2val - this.mark2_a.oldValue) > Number.MIN_VALUE
+      ) {
+        object.set_y_mark2(mark2val);
+        this.mark2_a.oldValue = mark2val;
       }
     }
 
-    if ( this.firstScan) {
+    if (this.firstScan) {
       this.firstScan = false;
       new_curve = 1;
     }
 
-    if ( this.cycle == Glow.eCycle_Slow)
+    if (this.cycle == Glow.eCycle_Slow)
       this.acc_time += this.dyn.graph.getScanTime();
-    else
-      this.acc_time += this.dyn.graph.getFastScanTime();
-    if ( new_curve || this.acc_time + Number.MIN_VALUE >= this.updatetime) {
+    else this.acc_time += this.dyn.graph.getFastScanTime();
+    if (new_curve || this.acc_time + Number.MIN_VALUE >= this.updatetime) {
       //if (new_curve) {
       this.acc_time = 0;
 
       var data = new Array(2);
       data[0] = this;
       data[1] = object;
-      this.dyn.graph.getGdh().getSevHistData(this.timerange, this.no_of_points,
-	 this.server, this.oid1, this.attribute1, this.scan2, data);
+      this.dyn.graph
+        .getGdh()
+        .getSevHistData(
+          this.timerange,
+          this.no_of_points,
+          this.server,
+          this.oid1,
+          this.attribute1,
+          this.scan2,
+          data,
+        );
     }
   };
 
-  this.scan2 = function( id, data, sts, result) {
-    if ( sts & 1 != 0) {
+  this.scan2 = function (id, data, sts, result) {
+    if (sts & (1 != 0)) {
       var self = data[0];
       var object = data[1];
       self.vtype1 = result[0];
@@ -10467,54 +10124,61 @@ function DynSevHist( dyn) {
       var vbuf = result[3];
 
       if (self.direction == Glow.eHorizDirection_Right) {
-	for (var k = 0; k < tbuf.length; k++)
-	  tbuf[k] = self.timerange - tbuf[k];
+        for (var k = 0; k < tbuf.length; k++)
+          tbuf[k] = self.timerange - tbuf[k];
       }
 
       var tdata;
       var vdata;
       var points;
       switch (self.vtype1) {
-      case Pwr.eType_Boolean:
-	points = 0;
-	size = 2*tbuf.length;
-	tdata = new Array(size);
-	vdata = new Array(size);
-	for (var k = 0; k < tbuf.length; k++) {
-	  if (k == 0) {
-	    vdata[points] = vbuf[k];
-	    tdata[points++] = tbuf[k];
-	  }
-	  else if (vbuf[k] != vbuf[k-1]) {
-	    vdata[points] = vbuf[k-1];	  
-	    tdata[points++] = tbuf[k];
-	    vdata[points] = vbuf[k];
-	    tdata[points++] = tbuf[k];
-	  }
-	  else if (k == tbuf.lenght - 1) {
-	    vdata[points] = vbuf[k];
-	    tdata[points++] = tbuf[k];
-	  }
-	}
-	break;
-      default:
-	points = size;
-	tdata = tbuf;
-	vdata = vbuf;
+        case Pwr.eType_Boolean:
+          points = 0;
+          size = 2 * tbuf.length;
+          tdata = new Array(size);
+          vdata = new Array(size);
+          for (var k = 0; k < tbuf.length; k++) {
+            if (k == 0) {
+              vdata[points] = vbuf[k];
+              tdata[points++] = tbuf[k];
+            } else if (vbuf[k] != vbuf[k - 1]) {
+              vdata[points] = vbuf[k - 1];
+              tdata[points++] = tbuf[k];
+              vdata[points] = vbuf[k];
+              tdata[points++] = tbuf[k];
+            } else if (k == tbuf.lenght - 1) {
+              vdata[points] = vbuf[k];
+              tdata[points++] = tbuf[k];
+            }
+          }
+          break;
+        default:
+          points = size;
+          tdata = tbuf;
+          vdata = vbuf;
       }
       object.set_xy_data(vdata, tdata, 0, points);
-    }    
+    }
     if (self.curve_cnt > 1) {
       var data2 = new Array(2);
       data2[0] = self;
       data2[1] = object;
-      self.dyn.graph.getGdh().getSevHistData(self.timerange, self.no_of_points,
-	  self.server, self.oid2, self.attribute2, self.scan3, data2);
+      self.dyn.graph
+        .getGdh()
+        .getSevHistData(
+          self.timerange,
+          self.no_of_points,
+          self.server,
+          self.oid2,
+          self.attribute2,
+          self.scan3,
+          data2,
+        );
     }
   };
 
-  this.scan3 = function( id, data, sts, result) {
-    if ( sts & 1 != 0) {
+  this.scan3 = function (id, data, sts, result) {
+    if (sts & (1 != 0)) {
       var self = data[0];
       var object = data[1];
       self.vtype2 = result[0];
@@ -10524,143 +10188,126 @@ function DynSevHist( dyn) {
       //console.log("scan3", self.curve_cnt, size, self.vtype2);
 
       if (self.direction == Glow.eHorizDirection_Right) {
-	for (var k = 0; k < tbuf.length; k++)
-	  tbuf[k] = self.timerange - tbuf[k];
+        for (var k = 0; k < tbuf.length; k++)
+          tbuf[k] = self.timerange - tbuf[k];
       }
       var tdata;
       var vdata;
       var points;
       switch (self.vtype1) {
-      case Pwr.eType_Boolean:
-	points = 0;
-	size = 2*tbuf.length;
-	tdata = new Array(size);
-	vdata = new Array(size);
-	for (var k = 0; k < tbuf.length; k++) {
-	  if (k == 0) {
-	    vdata[points] = vbuf[k];
-	    tdata[points++] = tbuf[k];
-	  }
-	  else if (vbuf[k] != vbuf[k-1]) {
-	    vdata[points] = vbuf[k-1];	  
-	    tdata[points++] = tbuf[k];
-	    vdata[points] = vbuf[k];
-	    tdata[points++] = tbuf[k];
-	  }
-	  else if (k == tbuf.lenght - 1) {
-	    vdata[points] = vbuf[k];
-	    tdata[points++] = tbuf[k];
-	  }
-	}
-	break;
-      default:
-	points = size;
-	tdata = tbuf;
-	vdata = vbuf;
+        case Pwr.eType_Boolean:
+          points = 0;
+          size = 2 * tbuf.length;
+          tdata = new Array(size);
+          vdata = new Array(size);
+          for (var k = 0; k < tbuf.length; k++) {
+            if (k == 0) {
+              vdata[points] = vbuf[k];
+              tdata[points++] = tbuf[k];
+            } else if (vbuf[k] != vbuf[k - 1]) {
+              vdata[points] = vbuf[k - 1];
+              tdata[points++] = tbuf[k];
+              vdata[points] = vbuf[k];
+              tdata[points++] = tbuf[k];
+            } else if (k == tbuf.lenght - 1) {
+              vdata[points] = vbuf[k];
+              tdata[points++] = tbuf[k];
+            }
+          }
+          break;
+        default:
+          points = size;
+          tdata = tbuf;
+          vdata = vbuf;
       }
       object.set_xy_data(vdata, tdata, 1, points);
-    }    
+    }
   };
 
-  this.action = function( object, e) {
+  this.action = function (object, e) {
     return 1;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynSevHist : " + lines[i]);
+      if (this.dyn.debug) console.log("DynSevHist : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_SevHist: 
-	break;
-      case DynC.eSave_SevHist_sevhist_object1: 
-	if ( tokens.length > 1)
-	  this.sevhist_object1 = tokens[1];
-	break;
-      case DynC.eSave_SevHist_sevhist_object2: 
-	if ( tokens.length > 1)
-	  this.sevhist_object2 = tokens[1];
-	break;
-      case DynC.eSave_SevHist_attribute1: 
-	if ( tokens.length > 1)
-	  this.attribute1 = tokens[1];
-	break;
-      case DynC.eSave_SevHist_attribute2: 
-	if ( tokens.length > 1)
-	  this.attribute2 = tokens[1];
-	break;
-      case DynC.eSave_SevHist_server: 
-	if ( tokens.length > 1)
-	  this.server = tokens[1];
-	break;
-      case DynC.eSave_SevHist_timerange: 
-	this.timerange = parseFloat( tokens[1]);
-	break;
-      case DynC.eSave_SevHist_updatetime: 
-	this.updatetime = parseFloat( tokens[1]);
-	break;
-      case DynC.eSave_SevHist_timerange_attr: 
-	if ( tokens.length > 1)
-	  this.timerange_attr = tokens[1];
-	break;
-      case DynC.eSave_SevHist_minvalue_attr1: 
-	if ( tokens.length > 1)
-	  this.minvalue_attr1 = tokens[1];
-	break;
-      case DynC.eSave_SevHist_maxvalue_attr1: 
-	if ( tokens.length > 1)
-	  this.maxvalue_attr1 = tokens[1];
-	break;
-      case DynC.eSave_SevHist_minvalue_attr2: 
-	if ( tokens.length > 1)
-	  this.minvalue_attr2 = tokens[1];
-	break;
-      case DynC.eSave_SevHist_maxvalue_attr2: 
-	if ( tokens.length > 1)
-	  this.maxvalue_attr2 = tokens[1];
-	break;
-      case DynC.eSave_SevHist_hold_attr: 
-	if ( tokens.length > 1)
-	  this.hold_attr = tokens[1];
-	break;
-      case DynC.eSave_SevHist_update_attr: 
-	if ( tokens.length > 1)
-	  this.update_attr = tokens[1];
-	break;
-      case DynC.eSave_SevHist_mark1_attr: 
-	if ( tokens.length > 1)
-	  this.mark1_attr = tokens[1];
-	break;
-      case DynC.eSave_SevHist_mark2_attr: 
-	if ( tokens.length > 1)
-	  this.mark2_attr = tokens[1];
-	break;
-      case DynC.eSave_SevHist_mark1_color: 
-	this.mark1_color = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_SevHist_mark2_color: 
-	this.mark2_color = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynSevHist", row, key);
-	break;
+      switch (key) {
+        case DynC.eSave_SevHist:
+          break;
+        case DynC.eSave_SevHist_sevhist_object1:
+          if (tokens.length > 1) this.sevhist_object1 = tokens[1];
+          break;
+        case DynC.eSave_SevHist_sevhist_object2:
+          if (tokens.length > 1) this.sevhist_object2 = tokens[1];
+          break;
+        case DynC.eSave_SevHist_attribute1:
+          if (tokens.length > 1) this.attribute1 = tokens[1];
+          break;
+        case DynC.eSave_SevHist_attribute2:
+          if (tokens.length > 1) this.attribute2 = tokens[1];
+          break;
+        case DynC.eSave_SevHist_server:
+          if (tokens.length > 1) this.server = tokens[1];
+          break;
+        case DynC.eSave_SevHist_timerange:
+          this.timerange = parseFloat(tokens[1]);
+          break;
+        case DynC.eSave_SevHist_updatetime:
+          this.updatetime = parseFloat(tokens[1]);
+          break;
+        case DynC.eSave_SevHist_timerange_attr:
+          if (tokens.length > 1) this.timerange_attr = tokens[1];
+          break;
+        case DynC.eSave_SevHist_minvalue_attr1:
+          if (tokens.length > 1) this.minvalue_attr1 = tokens[1];
+          break;
+        case DynC.eSave_SevHist_maxvalue_attr1:
+          if (tokens.length > 1) this.maxvalue_attr1 = tokens[1];
+          break;
+        case DynC.eSave_SevHist_minvalue_attr2:
+          if (tokens.length > 1) this.minvalue_attr2 = tokens[1];
+          break;
+        case DynC.eSave_SevHist_maxvalue_attr2:
+          if (tokens.length > 1) this.maxvalue_attr2 = tokens[1];
+          break;
+        case DynC.eSave_SevHist_hold_attr:
+          if (tokens.length > 1) this.hold_attr = tokens[1];
+          break;
+        case DynC.eSave_SevHist_update_attr:
+          if (tokens.length > 1) this.update_attr = tokens[1];
+          break;
+        case DynC.eSave_SevHist_mark1_attr:
+          if (tokens.length > 1) this.mark1_attr = tokens[1];
+          break;
+        case DynC.eSave_SevHist_mark2_attr:
+          if (tokens.length > 1) this.mark2_attr = tokens[1];
+          break;
+        case DynC.eSave_SevHist_mark1_color:
+          this.mark1_color = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_SevHist_mark2_color:
+          this.mark2_color = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynSevHist", row, key);
+          break;
       }
 
-      if ( end)
-	break;
-    }    
+      if (end) break;
+    }
     return i;
   };
 }
@@ -10682,54 +10329,49 @@ function DynDigTransparency(dyn) {
   this.smooth_transition = 0;
   this.firstScan = true;
   this.transition_cnt = 0;
-	
-  this.setAttribute = function(o, name, value) {
+
+  this.setAttribute = function (o, name, value) {
     if (name === "DigTransparency.Attribute") {
       this.attribute = value;
       return 1;
-    }
-    else if (name === "DigTransparency.LowValue") {
+    } else if (name === "DigTransparency.LowValue") {
       this.low_value = value;
       return 1;
-    }
-    else if (name === "DigTransparency.HighValue") {
+    } else if (name === "DigTransparency.HighValue") {
       this.high_value = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "DigTransparency.Attribute") {
-      ret,value = this.attribute;
+      ret.value = this.attribute;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "DigTransparency.LowValue") {
+    } else if (name === "DigTransparency.LowValue") {
       ret.value = this.low_value;
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
-    }
-    else if (name === "DigTransparency.HighValue") {
+    } else if (name === "DigTransparency.HighValue") {
       ret.value = this.high_value;
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
-    }
-    else if (name === "DigTransparency.SmoothTransition") {
+    } else if (name === "DigTransparency.SmoothTransition") {
       ret.value = this.smooth_transition;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( o) {
+  this.connect = function (o) {
     var object = o;
 
-    this.a = new DynReference( this.dyn, this.attribute);
+    this.a = new DynReference(this.dyn, this.attribute);
     this.a.connect(this.dyn);
-    if ( !this.a.sts) {
+    if (!this.a.sts) {
       console.log("DigTransparency: " + this.attribute);
       return 1;
     }
@@ -10737,103 +10379,98 @@ function DynDigTransparency(dyn) {
     return 1;
   };
 
-  this.disconnect = function() {
-    if ( this.a !== null)
-      this.a.disconnect(this.dyn);
+  this.disconnect = function () {
+    if (this.a !== null) this.a.disconnect(this.dyn);
   };
 
-	
-  this.scan = function( o) {
+  this.scan = function (o) {
     var object = o;
-    var value = this.dyn.getDig(this.a.p, this.a.typeid, this.a.bitmask, this.a.database);
+    var value = this.dyn.getDig(
+      this.a.p,
+      this.a.typeid,
+      this.a.bitmask,
+      this.a.database,
+    );
 
-    if ( this.a.inverted)
-      value = !value;
+    if (this.a.inverted) value = !value;
 
-    if ( !this.firstScan) {
-      if ( this.a.oldValue == value && !this.transition_cnt)
-	return;
+    if (!this.firstScan) {
+      if (this.a.oldValue == value && !this.transition_cnt) return;
     }
-	
-    if ( !value) {
+
+    if (!value) {
       if (this.smooth_transition && !this.firstScan) {
-	this.transition_cnt++;
-	var sval = this.low_value + (this.high_value - this.low_value) * (5 - this.transition_cnt) / 5;
-	object.setTransparency(sval);	
-	if (this.transition_cnt == 5)
-	  this.transition_cnt = 0;
-      }
-      else 
-	object.setTransparency(this.low_value);
-    }
-    else {
+        this.transition_cnt++;
+        var sval =
+          this.low_value +
+          ((this.high_value - this.low_value) * (5 - this.transition_cnt)) / 5;
+        object.setTransparency(sval);
+        if (this.transition_cnt == 5) this.transition_cnt = 0;
+      } else object.setTransparency(this.low_value);
+    } else {
       if (this.smooth_transition && !this.firstScan) {
-	this.transition_cnt++;
-	var sval = this.low_value + (this.high_value - this.low_value) * this.transition_cnt / 5;
-	object.setTransparency(sval);	
-	if (this.transition_cnt == 5)
-	  this.transition_cnt = 0;
-      }
-      else
-	object.setTransparency(this.high_value);
+        this.transition_cnt++;
+        var sval =
+          this.low_value +
+          ((this.high_value - this.low_value) * this.transition_cnt) / 5;
+        object.setTransparency(sval);
+        if (this.transition_cnt == 5) this.transition_cnt = 0;
+      } else object.setTransparency(this.high_value);
     }
     this.dyn.repaintNow = true;
     this.a.oldValue = value;
 
-    if (this.firstScan)
-      this.firstScan = false;
+    if (this.firstScan) this.firstScan = false;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynTransparency : " + lines[i]);
+      if (this.dyn.debug) console.log("DynTransparency : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_DigTransparency: 
-	break;
-      case DynC.eSave_DigTransparency_attribute: 
-	if ( tokens.length > 1)
-	  this.attribute = tokens[1];
-	break;
-      case DynC.eSave_DigTransparency_low_value: 
-	this.low_value = parseFloat( tokens[1], 10);
-	break;
-      case DynC.eSave_DigTransparency_high_value: 
-	this.high_value = parseFloat( tokens[1], 10);
-	break;
-      case DynC.eSave_DigTransparency_smooth_transition: 
-	this.smooth_transition = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-        console.log( "Syntax error in DynDigTransparency");
-	break;
+      switch (key) {
+        case DynC.eSave_DigTransparency:
+          break;
+        case DynC.eSave_DigTransparency_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_DigTransparency_low_value:
+          this.low_value = parseFloat(tokens[1], 10);
+          break;
+        case DynC.eSave_DigTransparency_high_value:
+          this.high_value = parseFloat(tokens[1], 10);
+          break;
+        case DynC.eSave_DigTransparency_smooth_transition:
+          this.smooth_transition = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynDigTransparency");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
 
-    return i;		
+    return i;
   };
 
-  this.action = function( object, e) {
+  this.action = function (object, e) {
     return 1;
   };
 }
 
-function DynAnalogTransparency( dyn) {
+function DynAnalogTransparency(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = DynC.mDynType2_AnalogTransparency;
@@ -10849,134 +10486,119 @@ function DynAnalogTransparency( dyn) {
   this.min_value = 0.0;
   this.firstScan = true;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "AnalogTransparency.Attribute") {
       this.attribute = value;
       return 1;
-    }
-    else if (name === "AnalogTransparency.MinValue") {
+    } else if (name === "AnalogTransparency.MinValue") {
       this.min_value = value;
       return 1;
-    }
-    else if (name === "AnalogTransparency.MaxValue") {
+    } else if (name === "AnalogTransparency.MaxValue") {
       this.max_value = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "AnalogTransparency.Attribute") {
       ret.value = this.attribute;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "AnalogTransparency.MinValue") {
+    } else if (name === "AnalogTransparency.MinValue") {
       ret.value = this.min_value;
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
-    }
-    else if (name === "AnalogTransparency.MaxValue") {
+    } else if (name === "AnalogTransparency.MaxValue") {
       ret.value = this.max_value;
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( object) {
+  this.connect = function (object) {
+    if (this.attribute.trim() === null) return 0;
 
-    if ( this.attribute.trim() === null)
-      return 0;
-
-    this.a = new DynReference( this.dyn, this.attribute);
+    this.a = new DynReference(this.dyn, this.attribute);
     this.a.connect(this.dyn);
-    if ( !this.a.sts) {
+    if (!this.a.sts) {
       console.log("AnalogTransparency: " + this.attribute);
       return 1;
     }
 
     return 1;
-  }
+  };
 
-  this.disconnect = function() {
-    if ( this.a === null)
-      return;
+  this.disconnect = function () {
+    if (this.a === null) return;
     this.a.disconnect(this.dyn);
-  }
+  };
 
-  this.scan = function( object) {
-    if ( this.a === null || !this.a.sts)
-      return;
-  
+  this.scan = function (object) {
+    if (this.a === null || !this.a.sts) return;
+
     var pvalue = this.a.get_ref_value(this.dyn);
 
-    if ( !this.firstScan) {
-      if ( Math.abs( this.a.oldValue - pvalue) < Number.MIN_VALUE)
-	// No change since last time
-	return;
-    }
-    else
-      this.firstScan = false;
+    if (!this.firstScan) {
+      if (Math.abs(this.a.oldValue - pvalue) < Number.MIN_VALUE)
+        // No change since last time
+        return;
+    } else this.firstScan = false;
 
-    if ( this.max_value == this.min_value)
-      return;
+    if (this.max_value == this.min_value) return;
 
     var value = (pvalue - this.min_value) / (this.max_value - this.min_value);
-    object.setTransparency( value);
+    object.setTransparency(value);
     this.a.oldValue = pvalue;
   };
 
-  this.action = function( object, e) {
+  this.action = function (object, e) {
     return 1;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynAnalogTransparency : " + lines[i]);
+      if (this.dyn.debug) console.log("DynAnalogTransparency : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_AnalogTransparency: 
-	break;
-      case DynC.eSave_AnalogTransparency_attribute: 
-	if ( tokens.length > 1)
-	  this.attribute = tokens[1];
-	break;
-      case DynC.eSave_AnalogTransparency_min_value: 
-	this.min_value = parseFloat( tokens[1]);
-	break;
-      case DynC.eSave_AnalogTransparency_max_value: 
-	this.max_value = parseFloat( tokens[1]);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynAnalogTransparency");
-	break;
+      switch (key) {
+        case DynC.eSave_AnalogTransparency:
+          break;
+        case DynC.eSave_AnalogTransparency_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_AnalogTransparency_min_value:
+          this.min_value = parseFloat(tokens[1]);
+          break;
+        case DynC.eSave_AnalogTransparency_max_value:
+          this.max_value = parseFloat(tokens[1]);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynAnalogTransparency");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-		
+
     return i;
   };
-
 }
 
-
-function DynPie( dyn) {
+function DynPie(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = DynC.mDynType1_Pie;
   this.dyn_type2 = 0;
@@ -10997,326 +10619,282 @@ function DynPie( dyn) {
   this.connected = false;
   this.firstScan = true;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     var sname;
     for (let i = 0; i < this.PIE_MAX_SECTORS; i++) {
-      sname = "Pie.SectorColor" + (i+1).toString();
+      sname = "Pie.SectorColor" + (i + 1).toString();
       if (name === sname) {
-	o.sector_color[i] = value;
-	return 1;
+        o.sector_color[i] = value;
+        return 1;
       }
-      sname = "Pie.Attribute" + (i+1).toString();
+      sname = "Pie.Attribute" + (i + 1).toString();
       if (name === sname) {
-	this.attribute[i] = value;
-	return 1;
+        this.attribute[i] = value;
+        return 1;
       }
     }
     if (name === "Pie.FixRange") {
       this.fix_range = value;
       return 1;
-    }
-    else if (name === "Pie.Angle1") {
+    } else if (name === "Pie.Angle1") {
       o.angle1 = value;
       return 1;
-    }
-    else if (name === "Pie.Angle2") {
+    } else if (name === "Pie.Angle2") {
       o.angle2 = value;
       return 1;
-    }
-    else if (name === "Pie.ShadowWidth") {
+    } else if (name === "Pie.ShadowWidth") {
       o.shadow_width = value;
       return 1;
-    }
-    else if (name === "Pie.ShadowContrast") {
+    } else if (name === "Pie.ShadowContrast") {
       o.shadow_constrast = value;
       return 1;
-    }
-    else if (name === "Pie.GradientContrast") {
+    } else if (name === "Pie.GradientContrast") {
       o.gradient_contrast = value;
       return 1;
-    }
-    else if (name === "Pie.Gradient") {
+    } else if (name === "Pie.Gradient") {
       o.gradient = value;
       return 1;
-    }
-    else if (name === "Pie.Relief") {
+    } else if (name === "Pie.Relief") {
       o.relief = value;
       return 1;
-    }
-    else if (name === "Pie.Sectors") {
+    } else if (name === "Pie.Sectors") {
       o.sectors = value;
       return 1;
-    }
-    else if (name === "Pie.MinValue") {
+    } else if (name === "Pie.MinValue") {
       o.min_value = value;
       return 1;
-    }
-    else if (name === "Pie.MaxValue") {
+    } else if (name === "Pie.MaxValue") {
       o.max_value = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     var sname;
     for (let i = 0; i < this.PIE_MAX_SECTORS; i++) {
-      sname = "Pie.SectorColor" + (i+1).toString();
+      sname = "Pie.SectorColor" + (i + 1).toString();
       if (name === sname) {
-	ret.value = o.sector_color[i];
-	ret.decl = CcmC.K_DECL_INT;
-	return ret;
+        ret.value = o.sector_color[i];
+        ret.decl = CcmC.K_DECL_INT;
+        return ret;
       }
-      sname = "Pie.Attribute" + (i+1).toString();
+      sname = "Pie.Attribute" + (i + 1).toString();
       if (name === sname) {
-	ret.value = this.attribute[i];
-	ret.decl = CcmC.K_DECL_STRING;
-	return ret;
+        ret.value = this.attribute[i];
+        ret.decl = CcmC.K_DECL_STRING;
+        return ret;
       }
     }
     if (name === "Pie.FixRange") {
       ret.value = this.fix_range;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "Pie.Angle1") {
+    } else if (name === "Pie.Angle1") {
       ret.value = o.angle1;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "Pie.Angle2") {
+    } else if (name === "Pie.Angle2") {
       ret.value = o.angle2;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "Pie.ShadowWidth") {
+    } else if (name === "Pie.ShadowWidth") {
       ret.value = o.shadow_width;
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
-    }
-    else if (name === "Pie.ShadowContrast") {
+    } else if (name === "Pie.ShadowContrast") {
       ret.value = o.shadow_constrast;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "Pie.GradientContrast") {
+    } else if (name === "Pie.GradientContrast") {
       ret.value = o.gradient_contrast;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "Pie.Gradient") {
+    } else if (name === "Pie.Gradient") {
       ret.value = o.gradient;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "Pie.Relief") {
+    } else if (name === "Pie.Relief") {
       ret.value = o.relief;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "Pie.Sectors") {
+    } else if (name === "Pie.Sectors") {
       ret.value = o.sectors;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "Pie.MinValue") {
+    } else if (name === "Pie.MinValue") {
       ret.value = o.min_value;
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
-    }
-    else if (name === "Pie.MaxValue") {
+    } else if (name === "Pie.MaxValue") {
       ret.value = o.max_value;
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynPie : " + lines[i]);
+      if (this.dyn.debug) console.log("DynPie : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_Pie: 
-	break;
-      case DynC.eSave_Pie_fix_range: 
-	this.fix_range = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_Pie_attribute1: 
-	if ( tokens.length > 1)
-	  this.attribute[0] = tokens[1];
-	break;
-      case DynC.eSave_Pie_attribute2: 
-	if ( tokens.length > 1)
-	  this.attribute[1] = tokens[1];
-	break;
-      case DynC.eSave_Pie_attribute3: 
-	if ( tokens.length > 1)
-	  this.attribute[2] = tokens[1];
-	break;
-      case DynC.eSave_Pie_attribute4: 
-	if ( tokens.length > 1)
-	  this.attribute[3] = tokens[1];
-	break;
-      case DynC.eSave_Pie_attribute5: 
-	if ( tokens.length > 1)
-	  this.attribute[4] = tokens[1];
-	break;
-      case DynC.eSave_Pie_attribute6: 
-	if ( tokens.length > 1)
-	  this.attribute[5] = tokens[1];
-	break;
-      case DynC.eSave_Pie_attribute7: 
-	if ( tokens.length > 1)
-	  this.attribute[6] = tokens[1];
-	break;
-      case DynC.eSave_Pie_attribute8: 
-	if ( tokens.length > 1)
-	  this.attribute[7] = tokens[1];
-	break;
-      case DynC.eSave_Pie_attribute9: 
-	if ( tokens.length > 1)
-	  this.attribute[8] = tokens[1];
-	break;
-      case DynC.eSave_Pie_attribute10: 
-	if ( tokens.length > 1)
-	  this.attribute[9] = tokens[1];
-	break;
-      case DynC.eSave_Pie_attribute11: 
-	if ( tokens.length > 1)
-	  this.attribute[10] = tokens[1];
-	break;
-      case DynC.eSave_Pie_attribute12: 
-	if ( tokens.length > 1)
-	  this.attribute[11] = tokens[1];
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynPie");
-	break;
+      switch (key) {
+        case DynC.eSave_Pie:
+          break;
+        case DynC.eSave_Pie_fix_range:
+          this.fix_range = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_Pie_attribute1:
+          if (tokens.length > 1) this.attribute[0] = tokens[1];
+          break;
+        case DynC.eSave_Pie_attribute2:
+          if (tokens.length > 1) this.attribute[1] = tokens[1];
+          break;
+        case DynC.eSave_Pie_attribute3:
+          if (tokens.length > 1) this.attribute[2] = tokens[1];
+          break;
+        case DynC.eSave_Pie_attribute4:
+          if (tokens.length > 1) this.attribute[3] = tokens[1];
+          break;
+        case DynC.eSave_Pie_attribute5:
+          if (tokens.length > 1) this.attribute[4] = tokens[1];
+          break;
+        case DynC.eSave_Pie_attribute6:
+          if (tokens.length > 1) this.attribute[5] = tokens[1];
+          break;
+        case DynC.eSave_Pie_attribute7:
+          if (tokens.length > 1) this.attribute[6] = tokens[1];
+          break;
+        case DynC.eSave_Pie_attribute8:
+          if (tokens.length > 1) this.attribute[7] = tokens[1];
+          break;
+        case DynC.eSave_Pie_attribute9:
+          if (tokens.length > 1) this.attribute[8] = tokens[1];
+          break;
+        case DynC.eSave_Pie_attribute10:
+          if (tokens.length > 1) this.attribute[9] = tokens[1];
+          break;
+        case DynC.eSave_Pie_attribute11:
+          if (tokens.length > 1) this.attribute[10] = tokens[1];
+          break;
+        case DynC.eSave_Pie_attribute12:
+          if (tokens.length > 1) this.attribute[11] = tokens[1];
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynPie");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
     return i;
   };
 
-  this.connect = function( object) {
-
+  this.connect = function (object) {
     var info = object.get_conf();
     this.min_value = info.min_val;
     this.max_value = info.max_val;
     this.sectors = info.sector_num;
-    if ( this.sectors > this.PIE_MAX_SECTORS)
+    if (this.sectors > this.PIE_MAX_SECTORS)
       this.sectors = this.PIE_MAX_SECTORS;
-		 
+
     this.a = new Array(this.sectors);
-    for ( var i = 0; i < this.sectors; i++) {
-      if ( this.attribute[i] === null || this.attribute[i].trim() === "") {
-	this.a[i] = null;
-	continue;
+    for (var i = 0; i < this.sectors; i++) {
+      if (this.attribute[i] === null || this.attribute[i].trim() === "") {
+        this.a[i] = null;
+        continue;
       }
 
-      this.a[i] = new DynReference( this.dyn, this.attribute[i]);
+      this.a[i] = new DynReference(this.dyn, this.attribute[i]);
       this.a[i].connect(this.dyn);
-      if ( !this.a[i].sts) {
-	this.a[i] = null;
-        console.log("Pie: " + this.attribute[i]);	
+      if (!this.a[i].sts) {
+        this.a[i] = null;
+        console.log("Pie: " + this.attribute[i]);
         return 1;
       }
 
-      if ( i === 0)
-	this.attr_type = this.a[0].typeid;
+      if (i === 0) this.attr_type = this.a[0].typeid;
     }
     this.connected = true;
     return 1;
   };
 
-  this.disconnect = function() {
-    if ( !this.connected)
-      return;
-    for ( var i = 0; i < this.sectors; i++) {
-      if ( this.a[i] !== null)
-	this.a[i].disconnect(this.dyn);
+  this.disconnect = function () {
+    if (!this.connected) return;
+    for (var i = 0; i < this.sectors; i++) {
+      if (this.a[i] !== null) this.a[i].disconnect(this.dyn);
     }
   };
-	
-  this.action = function( object, e) {
+
+  this.action = function (object, e) {
     return 1;
   };
 
-  this.scan = function( object) {
-    if ( !this.connected)
-      return;
+  this.scan = function (object) {
+    if (!this.connected) return;
 
-    switch ( this.attr_type) {
+    switch (this.attr_type) {
       case Pwr.eType_Float32: {
-	var val = new Array(this.PIE_MAX_SECTORS);
-	for ( var i = 0; i < this.sectors; i++)
-	  val[i] = this.a[i].get_ref_value(this.dyn);
+        var val = new Array(this.PIE_MAX_SECTORS);
+        for (var i = 0; i < this.sectors; i++)
+          val[i] = this.a[i].get_ref_value(this.dyn);
 
-	if ( !this.firstScan) {
-	  var update = 0;
-	  for ( var i = 0; i < this.sectors; i++) {
-	    if ( Math.abs( this.a[i].oldValue - val[i]) > Number.MIN_VALUE) {
-	      update = 1;
-	      break;
-	    }
-	  }
-	  if ( update === 0)
-	    return;
-	}
-	else
-	  this.firstScan = false;
-		
-	if ( Math.abs( this.max_value - this.min_value) < Number.MIN_VALUE)
-	  return;
-		
-	var dval = new Array(this.PIE_MAX_SECTORS);
-	if ( this.fix_range != 0 || this.sectors == 1) {
-	  for ( var i = 0; i < this.sectors; i++)
-	    dval[i] = val[i] - this.min_value;
-	}
-	else {
-	  var sum = 0;
-	  for ( var i = 0; i < this.sectors; i++)
-	    sum += val[i] - this.min_value;
-	  for ( var i = 0; i < this.sectors; i++) {
-	    if ( Math.abs( sum) < Number.MIN_VALUE)
-	      dval[i] = 0;
-	    else
-	      dval[i] = (val[i] - this.min_value) / sum * 
-		(this.max_value - this.min_value);
-	  }
-	}
-		
-	object.set_values( dval);
-	for ( var i = 0; i < this.sectors; i++)
-	  this.a[i].oldValue = val[i];
-	break;
+        if (!this.firstScan) {
+          var update = 0;
+          for (var i = 0; i < this.sectors; i++) {
+            if (Math.abs(this.a[i].oldValue - val[i]) > Number.MIN_VALUE) {
+              update = 1;
+              break;
+            }
+          }
+          if (update === 0) return;
+        } else this.firstScan = false;
+
+        if (Math.abs(this.max_value - this.min_value) < Number.MIN_VALUE)
+          return;
+
+        var dval = new Array(this.PIE_MAX_SECTORS);
+        if (this.fix_range != 0 || this.sectors == 1) {
+          for (var i = 0; i < this.sectors; i++)
+            dval[i] = val[i] - this.min_value;
+        } else {
+          var sum = 0;
+          for (var i = 0; i < this.sectors; i++) sum += val[i] - this.min_value;
+          for (var i = 0; i < this.sectors; i++) {
+            if (Math.abs(sum) < Number.MIN_VALUE) dval[i] = 0;
+            else
+              dval[i] =
+                ((val[i] - this.min_value) / sum) *
+                (this.max_value - this.min_value);
+          }
+        }
+
+        object.set_values(dval);
+        for (var i = 0; i < this.sectors; i++) this.a[i].oldValue = val[i];
+        break;
       }
       case Pwr.eType_Int32: {
-	break;
+        break;
       }
-      default: ;
+      default:
     }
   };
 }
 
-function DynBarChart( dyn) {
+function DynBarChart(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = DynC.mDynType1_BarChart;
   this.dyn_type2 = 0;
@@ -11341,206 +10919,204 @@ function DynBarChart( dyn) {
   this.firstScan = true;
   this.connected = false;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynBarChart : " + lines[i]);
+      if (this.dyn.debug) console.log("DynBarChart : " + lines[i]);
 
-      switch ( key) {
-      case DynC.eSave_BarChart: 
-	break;
-      case DynC.eSave_BarChart_fix_range: 
-	this.fix_range = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_BarChart_attribute1: 
-	if ( tokens.length > 1)
-	  this.attribute[0] = tokens[1];
-	break;
-      case DynC.eSave_BarChart_attribute2: 
-	if ( tokens.length > 1)
-	  this.attribute[1] = tokens[1];
-	break;
-      case DynC.eSave_BarChart_attribute3: 
-	if ( tokens.length > 1)
-	  this.attribute[2] = tokens[1];
-	break;
-      case DynC.eSave_BarChart_attribute4: 
-	if ( tokens.length > 1)
-	  this.attribute[3] = tokens[1];
-	break;
-      case DynC.eSave_BarChart_attribute5: 
-	if ( tokens.length > 1)
-	  this.attribute[4] = tokens[1];
-	break;
-      case DynC.eSave_BarChart_attribute6: 
-	if ( tokens.length > 1)
-	  this.attribute[5] = tokens[1];
-	break;
-      case DynC.eSave_BarChart_attribute7: 
-	if ( tokens.length > 1)
-	  this.attribute[6] = tokens[1];
-	break;
-      case DynC.eSave_BarChart_attribute8: 
-	if ( tokens.length > 1)
-	  this.attribute[7] = tokens[1];
-	break;
-      case DynC.eSave_BarChart_attribute9: 
-	if ( tokens.length > 1)
-	  this.attribute[8] = tokens[1];
-	break;
-      case DynC.eSave_BarChart_attribute10: 
-	if ( tokens.length > 1)
-	  this.attribute[9] = tokens[1];
-	break;
-      case DynC.eSave_BarChart_attribute11: 
-	if ( tokens.length > 1)
-	  this.attribute[10] = tokens[1];
-	break;
-      case DynC.eSave_BarChart_attribute12: 
-	if ( tokens.length > 1)
-	  this.attribute[11] = tokens[1];
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynBarChart");
-	break;
+      switch (key) {
+        case DynC.eSave_BarChart:
+          break;
+        case DynC.eSave_BarChart_fix_range:
+          this.fix_range = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_BarChart_attribute1:
+          if (tokens.length > 1) this.attribute[0] = tokens[1];
+          break;
+        case DynC.eSave_BarChart_attribute2:
+          if (tokens.length > 1) this.attribute[1] = tokens[1];
+          break;
+        case DynC.eSave_BarChart_attribute3:
+          if (tokens.length > 1) this.attribute[2] = tokens[1];
+          break;
+        case DynC.eSave_BarChart_attribute4:
+          if (tokens.length > 1) this.attribute[3] = tokens[1];
+          break;
+        case DynC.eSave_BarChart_attribute5:
+          if (tokens.length > 1) this.attribute[4] = tokens[1];
+          break;
+        case DynC.eSave_BarChart_attribute6:
+          if (tokens.length > 1) this.attribute[5] = tokens[1];
+          break;
+        case DynC.eSave_BarChart_attribute7:
+          if (tokens.length > 1) this.attribute[6] = tokens[1];
+          break;
+        case DynC.eSave_BarChart_attribute8:
+          if (tokens.length > 1) this.attribute[7] = tokens[1];
+          break;
+        case DynC.eSave_BarChart_attribute9:
+          if (tokens.length > 1) this.attribute[8] = tokens[1];
+          break;
+        case DynC.eSave_BarChart_attribute10:
+          if (tokens.length > 1) this.attribute[9] = tokens[1];
+          break;
+        case DynC.eSave_BarChart_attribute11:
+          if (tokens.length > 1) this.attribute[10] = tokens[1];
+          break;
+        case DynC.eSave_BarChart_attribute12:
+          if (tokens.length > 1) this.attribute[11] = tokens[1];
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynBarChart");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-		
+
     return i;
   };
 
-  this.connect = function( object) {
+  this.connect = function (object) {
     var info = object.get_conf();
     this.min_value = info.min_value;
     this.max_value = info.max_value;
     this.bars = info.bars;
     this.barsegments = info.barsegments;
-		 
+
     this.a = new Array(this.barsegments);
 
-    for ( var i = 0; i < this.barsegments; i++) {
-      if ( this.attribute[i] === null || this.attribute[i].trim() === "") {
-	console.log("BarChart", this.attributes[i]);
-	return 1;
+    for (var i = 0; i < this.barsegments; i++) {
+      if (this.attribute[i] === null || this.attribute[i].trim() === "") {
+        console.log("BarChart", this.attributes[i]);
+        return 1;
       }
 
-      this.a[i] = new DynReference( this.dyn, this.attribute[i]);
+      this.a[i] = new DynReference(this.dyn, this.attribute[i]);
       this.a[i].connect(this.dyn);
-      
-      if ( this.a[i].elements == 0)
-	return 1;
 
-      this.bars = Math.min( this.bars, this.a[i].elements);
-      if ( i == 0) {
-	this.attr_type = this.a[i].typeid;
-	switch ( this.attr_type) {			
-	case Pwr.eType_Float32:
-	  this.valueF = new Array(this.barsegments);
-	  break;
-	case Pwr.eType_Int32:
-	  this.valueI = new Array(this.barsegments);
-	  break;
-	default:
-	  return 1;
-	}
-      }
-      else {
-	if ( this.attr_type != this.a[i].typeid) {
-	  console.log("BarChart type", this.attribute[i], this.a[i].typeid);
-	  return 1;
-	}
+      if (this.a[i].elements == 0) return 1;
+
+      this.bars = Math.min(this.bars, this.a[i].elements);
+      if (i == 0) {
+        this.attr_type = this.a[i].typeid;
+        switch (this.attr_type) {
+          case Pwr.eType_Float32:
+            this.valueF = new Array(this.barsegments);
+            break;
+          case Pwr.eType_Int32:
+            this.valueI = new Array(this.barsegments);
+            break;
+          default:
+            return 1;
+        }
+      } else {
+        if (this.attr_type != this.a[i].typeid) {
+          console.log("BarChart type", this.attribute[i], this.a[i].typeid);
+          return 1;
+        }
       }
     }
     this.connected = true;
     return 1;
-  }
+  };
 
-  this.disconnect = function() {
-    if ( !this.connected)
-      return;
-    for ( var i = 0; i < this.barsegments; i++)
-      this.a[i].disconnect(this.dyn);
-  }
-	
-  this.action = function( object, e) {
+  this.disconnect = function () {
+    if (!this.connected) return;
+    for (var i = 0; i < this.barsegments; i++) this.a[i].disconnect(this.dyn);
+  };
+
+  this.action = function (object, e) {
     return 1;
   };
 
-  this.scan = function( object) {
-    if ( !this.connected)
-      return;
-    switch ( this.attr_type) {
-      case Pwr.eType_Float32: {    
-	this.valueF = new Array(GrowBarChart.BARCHART_MAX_BARSEGMENTS);
-	for ( var i = 0; i < this.barsegments; i++) {
-	  this.valueF[i] = this.a[i].get_ref_value(this.dyn);
-	  if ( this.valueF[i].length < this.bars) {
-	    console.log("BarChart, value array to short", this.valueF[i].length);
-	    break;
-	  }
-	}
+  this.scan = function (object) {
+    if (!this.connected) return;
+    switch (this.attr_type) {
+      case Pwr.eType_Float32: {
+        this.valueF = new Array(GrowBarChart.BARCHART_MAX_BARSEGMENTS);
+        for (var i = 0; i < this.barsegments; i++) {
+          this.valueF[i] = this.a[i].get_ref_value(this.dyn);
+          if (this.valueF[i].length < this.bars) {
+            console.log(
+              "BarChart, value array to short",
+              this.valueF[i].length,
+            );
+            break;
+          }
+        }
 
-	if ( !this.firstScan) {
-	  var update = 0;
-	  if ( this.oldValueF != null) {
-	    for ( var i = 0; i < this.barsegments && this.valueF[i] != null; i++) {
-	      if ( this.oldValueF[i] === null || this.valueF[i] === null)
-		break;
-	      for ( var j = 0; j < this.bars; j++) {
-		if ( Math.abs( this.oldValueF[i][j] - this.valueF[i][j]) > Number.MIN_VALUE) {
-		  update = 1;
-		  break;
-		}
-	      }
-	      if ( update == 1)
-		break;
-	    }
-	    if ( update == 0)
-	      return;
-	  }
-	}
-	else
-	  this.firstScan = false;
-		
-	if ( Math.abs( this.max_value - this.min_value) < Number.MIN_VALUE)
-	  return;
-		
-	object.set_values( this.valueF[0], this.valueF[1], this.valueF[2], this.valueF[3], this.valueF[4], 
-			   this.valueF[5], this.valueF[6], this.valueF[7], this.valueF[8], this.valueF[9], 
-			   this.valueF[10], this.valueF[11]);
-	this.oldValueF = this.valueF;
+        if (!this.firstScan) {
+          var update = 0;
+          if (this.oldValueF != null) {
+            for (
+              var i = 0;
+              i < this.barsegments && this.valueF[i] != null;
+              i++
+            ) {
+              if (this.oldValueF[i] === null || this.valueF[i] === null) break;
+              for (var j = 0; j < this.bars; j++) {
+                if (
+                  Math.abs(this.oldValueF[i][j] - this.valueF[i][j]) >
+                  Number.MIN_VALUE
+                ) {
+                  update = 1;
+                  break;
+                }
+              }
+              if (update == 1) break;
+            }
+            if (update == 0) return;
+          }
+        } else this.firstScan = false;
 
-	break;
+        if (Math.abs(this.max_value - this.min_value) < Number.MIN_VALUE)
+          return;
+
+        object.set_values(
+          this.valueF[0],
+          this.valueF[1],
+          this.valueF[2],
+          this.valueF[3],
+          this.valueF[4],
+          this.valueF[5],
+          this.valueF[6],
+          this.valueF[7],
+          this.valueF[8],
+          this.valueF[9],
+          this.valueF[10],
+          this.valueF[11],
+        );
+        this.oldValueF = this.valueF;
+
+        break;
       }
       case Pwr.eType_Int32: {
-	break;
+        break;
       }
-      default: ;
+      default:
     }
   };
 }
 
-function DynTable( dyn) {
+function DynTable(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = DynC.mDynType1_Table;
   this.dyn_type2 = 0;
@@ -11572,190 +11148,153 @@ function DynTable( dyn) {
   this.sel_elements;
   this.bitmask;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynTable : " + lines[i]);
+      if (this.dyn.debug) console.log("DynTable : " + lines[i]);
 
-      switch ( key) {
-      case DynC.eSave_Table: 
-	break;
-      case DynC.eSave_Table_attribute1: 
-	if ( tokens.length > 1)
-	  this.attribute[0] = tokens[1];
-	break;
-      case DynC.eSave_Table_format1: 
-	if ( tokens.length > 1)
-	  this.format[0] = tokens[1];
-	break;
-      case DynC.eSave_Table_sel_attribute1: 
-	if ( tokens.length > 1)
-	  this.sel_attribute[0] = tokens[1];
-	break;
-      case DynC.eSave_Table_attribute2: 
-	if ( tokens.length > 1)
-	  this.attribute[1] = tokens[1];
-	break;
-      case DynC.eSave_Table_format2: 
-	if ( tokens.length > 1)
-	  this.format[1] = tokens[1];
-	break;
-      case DynC.eSave_Table_sel_attribute2: 
-	if ( tokens.length > 1)
-	  this.sel_attribute[1] = tokens[1];
-	break;
-      case DynC.eSave_Table_attribute3: 
-	if ( tokens.length > 1)
-	  this.attribute[2] = tokens[1];
-	break;
-      case DynC.eSave_Table_format3: 
-	if ( tokens.length > 1)
-	  this.format[2] = tokens[1];
-	break;
-      case DynC.eSave_Table_sel_attribute3: 
-	if ( tokens.length > 1)
-	  this.sel_attribute[2] = tokens[1];
-	break;
-      case DynC.eSave_Table_attribute4: 
-	if ( tokens.length > 1)
-	  this.attribute[3] = tokens[1];
-	break;
-      case DynC.eSave_Table_format4: 
-	if ( tokens.length > 1)
-	  this.format[3] = tokens[1];
-	break;
-      case DynC.eSave_Table_sel_attribute4: 
-	if ( tokens.length > 1)
-	  this.sel_attribute[3] = tokens[1];
-	break;
-      case DynC.eSave_Table_attribute5: 
-	if ( tokens.length > 1)
-	  this.attribute[4] = tokens[1];
-	break;
-      case DynC.eSave_Table_format5: 
-	if ( tokens.length > 1)
-	  this.format[4] = tokens[1];
-	break;
-      case DynC.eSave_Table_sel_attribute5: 
-	if ( tokens.length > 1)
-	  this.sel_attribute[4] = tokens[1];
-	break;
-      case DynC.eSave_Table_attribute6: 
-	if ( tokens.length > 1)
-	  this.attribute[5] = tokens[1];
-	break;
-      case DynC.eSave_Table_format6: 
-	if ( tokens.length > 1)
-	  this.format[5] = tokens[1];
-	break;
-      case DynC.eSave_Table_sel_attribute6: 
-	if ( tokens.length > 1)
-	  this.sel_attribute[5] = tokens[1];
-	break;
-      case DynC.eSave_Table_attribute7: 
-	if ( tokens.length > 1)
-	  this.attribute[6] = tokens[1];
-	break;
-      case DynC.eSave_Table_format7: 
-	if ( tokens.length > 1)
-	  this.format[6] = tokens[1];
-	break;
-      case DynC.eSave_Table_sel_attribute7: 
-	if ( tokens.length > 1)
-	  this.sel_attribute[6] = tokens[1];
-	break;
-      case DynC.eSave_Table_attribute8: 
-	if ( tokens.length > 1)
-	  this.attribute[7] = tokens[1];
-	break;
-      case DynC.eSave_Table_format8: 
-	if ( tokens.length > 1)
-	  this.format[7] = tokens[1];
-	break;
-      case DynC.eSave_Table_sel_attribute8: 
-	if ( tokens.length > 1)
-	  this.sel_attribute[7] = tokens[1];
-	break;
-      case DynC.eSave_Table_attribute9: 
-	if ( tokens.length > 1)
-	  this.attribute[8] = tokens[1];
-	break;
-      case DynC.eSave_Table_format9: 
-	if ( tokens.length > 1)
-	  this.format[8] = tokens[1];
-	break;
-      case DynC.eSave_Table_sel_attribute9: 
-	if ( tokens.length > 1)
-	  this.sel_attribute[8] = tokens[1];
-	break;
-      case DynC.eSave_Table_attribute10: 
-	if ( tokens.length > 1)
-	  this.attribute[9] = tokens[1];
-	break;
-      case DynC.eSave_Table_format10: 
-	if ( tokens.length > 1)
-	  this.format[9] = tokens[1];
-	break;
-      case DynC.eSave_Table_sel_attribute10: 
-	if ( tokens.length > 1)
-	  this.sel_attribute[9] = tokens[1];
-	break;
-      case DynC.eSave_Table_attribute11: 
-	if ( tokens.length > 1)
-	  this.attribute[10] = tokens[1];
-	break;
-      case DynC.eSave_Table_format11: 
-	if ( tokens.length > 1)
-	  this.format[10] = tokens[1];
-	break;
-      case DynC.eSave_Table_sel_attribute11: 
-	if ( tokens.length > 1)
-	  this.sel_attribute[10] = tokens[1];
-	break;
-      case DynC.eSave_Table_attribute12: 
-	if ( tokens.length > 1)
-	  this.attribute[11] = tokens[1];
-	break;
-      case DynC.eSave_Table_format12: 
-	if ( tokens.length > 1)
-	  this.format[11] = tokens[1];
-	break;
-      case DynC.eSave_Table_sel_attribute12: 
-	if ( tokens.length > 1)
-	  this.sel_attribute[11] = tokens[1];
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynTable");
-	break;
+      switch (key) {
+        case DynC.eSave_Table:
+          break;
+        case DynC.eSave_Table_attribute1:
+          if (tokens.length > 1) this.attribute[0] = tokens[1];
+          break;
+        case DynC.eSave_Table_format1:
+          if (tokens.length > 1) this.format[0] = tokens[1];
+          break;
+        case DynC.eSave_Table_sel_attribute1:
+          if (tokens.length > 1) this.sel_attribute[0] = tokens[1];
+          break;
+        case DynC.eSave_Table_attribute2:
+          if (tokens.length > 1) this.attribute[1] = tokens[1];
+          break;
+        case DynC.eSave_Table_format2:
+          if (tokens.length > 1) this.format[1] = tokens[1];
+          break;
+        case DynC.eSave_Table_sel_attribute2:
+          if (tokens.length > 1) this.sel_attribute[1] = tokens[1];
+          break;
+        case DynC.eSave_Table_attribute3:
+          if (tokens.length > 1) this.attribute[2] = tokens[1];
+          break;
+        case DynC.eSave_Table_format3:
+          if (tokens.length > 1) this.format[2] = tokens[1];
+          break;
+        case DynC.eSave_Table_sel_attribute3:
+          if (tokens.length > 1) this.sel_attribute[2] = tokens[1];
+          break;
+        case DynC.eSave_Table_attribute4:
+          if (tokens.length > 1) this.attribute[3] = tokens[1];
+          break;
+        case DynC.eSave_Table_format4:
+          if (tokens.length > 1) this.format[3] = tokens[1];
+          break;
+        case DynC.eSave_Table_sel_attribute4:
+          if (tokens.length > 1) this.sel_attribute[3] = tokens[1];
+          break;
+        case DynC.eSave_Table_attribute5:
+          if (tokens.length > 1) this.attribute[4] = tokens[1];
+          break;
+        case DynC.eSave_Table_format5:
+          if (tokens.length > 1) this.format[4] = tokens[1];
+          break;
+        case DynC.eSave_Table_sel_attribute5:
+          if (tokens.length > 1) this.sel_attribute[4] = tokens[1];
+          break;
+        case DynC.eSave_Table_attribute6:
+          if (tokens.length > 1) this.attribute[5] = tokens[1];
+          break;
+        case DynC.eSave_Table_format6:
+          if (tokens.length > 1) this.format[5] = tokens[1];
+          break;
+        case DynC.eSave_Table_sel_attribute6:
+          if (tokens.length > 1) this.sel_attribute[5] = tokens[1];
+          break;
+        case DynC.eSave_Table_attribute7:
+          if (tokens.length > 1) this.attribute[6] = tokens[1];
+          break;
+        case DynC.eSave_Table_format7:
+          if (tokens.length > 1) this.format[6] = tokens[1];
+          break;
+        case DynC.eSave_Table_sel_attribute7:
+          if (tokens.length > 1) this.sel_attribute[6] = tokens[1];
+          break;
+        case DynC.eSave_Table_attribute8:
+          if (tokens.length > 1) this.attribute[7] = tokens[1];
+          break;
+        case DynC.eSave_Table_format8:
+          if (tokens.length > 1) this.format[7] = tokens[1];
+          break;
+        case DynC.eSave_Table_sel_attribute8:
+          if (tokens.length > 1) this.sel_attribute[7] = tokens[1];
+          break;
+        case DynC.eSave_Table_attribute9:
+          if (tokens.length > 1) this.attribute[8] = tokens[1];
+          break;
+        case DynC.eSave_Table_format9:
+          if (tokens.length > 1) this.format[8] = tokens[1];
+          break;
+        case DynC.eSave_Table_sel_attribute9:
+          if (tokens.length > 1) this.sel_attribute[8] = tokens[1];
+          break;
+        case DynC.eSave_Table_attribute10:
+          if (tokens.length > 1) this.attribute[9] = tokens[1];
+          break;
+        case DynC.eSave_Table_format10:
+          if (tokens.length > 1) this.format[9] = tokens[1];
+          break;
+        case DynC.eSave_Table_sel_attribute10:
+          if (tokens.length > 1) this.sel_attribute[9] = tokens[1];
+          break;
+        case DynC.eSave_Table_attribute11:
+          if (tokens.length > 1) this.attribute[10] = tokens[1];
+          break;
+        case DynC.eSave_Table_format11:
+          if (tokens.length > 1) this.format[10] = tokens[1];
+          break;
+        case DynC.eSave_Table_sel_attribute11:
+          if (tokens.length > 1) this.sel_attribute[10] = tokens[1];
+          break;
+        case DynC.eSave_Table_attribute12:
+          if (tokens.length > 1) this.attribute[11] = tokens[1];
+          break;
+        case DynC.eSave_Table_format12:
+          if (tokens.length > 1) this.format[11] = tokens[1];
+          break;
+        case DynC.eSave_Table_sel_attribute12:
+          if (tokens.length > 1) this.sel_attribute[11] = tokens[1];
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynTable");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-		
+
     return i;
   };
 
-  this.connect = function( object) {
-    var	sts;
-    var	aname0 = null;
+  this.connect = function (object) {
+    var sts;
+    var aname0 = null;
 
     var info = object.getTableInfo();
     this.columns = info.columns;
@@ -11767,442 +11306,393 @@ function DynTable( dyn) {
     this.type_id = new Array(this.columns);
     this.headerRef = new Array(this.columns);
     this.p = new Array(this.columns);
-    for ( var i = 0; i < this.columns; i++)
-      this.p[i] = 0;
+    for (var i = 0; i < this.columns; i++) this.p[i] = 0;
     this.oldValueB = new Array(this.columns);
     this.oldValueF = new Array(this.columns);
     this.oldValueI = new Array(this.columns);
     this.oldValueS = new Array(this.columns);
     this.cFormat = new Array(this.columns);
-    for ( var i = 0; i < this.columns; i++)
-      this.cFormat[i] = new GlowCFormat( this.format[i]);
+    for (var i = 0; i < this.columns; i++)
+      this.cFormat[i] = new GlowCFormat(this.format[i]);
     this.sel_p = new Array(this.columns);
     this.sel_elements = new Array(this.columns);
     this.bitmask = new Array(this.columns);
 
-    for ( var i = 0; i < this.columns; i++) {
-      var pname = this.dyn.parseAttrName( this.attribute[i]);
-      if ( pname === null || pname.name === "") 
-	continue;
+    for (var i = 0; i < this.columns; i++) {
+      var pname = this.dyn.parseAttrName(this.attribute[i]);
+      if (pname === null || pname.name === "") continue;
 
-      if ( pname.elements == 0)
-	continue;
+      if (pname.elements == 0) continue;
 
       this.db[i] = pname.database;
 
-      if ( pname.tname.substring( 0, 7) != "$header") { 
-	switch ( this.db[i]) {
-	case GraphIfc.eDatabase_Gdh:
-	  this.p[i] = this.dyn.graph.getGdh().refObjectInfo( pname.tname, pname.type, pname.elements);
-	  if ( i === 0)
-	    aname0 = pname.name;
-	  break;
-	default:
-	  ;
-	}
-	if ( this.p[i] === 0)
-	  continue;
+      if (pname.tname.substring(0, 7) != "$header") {
+        switch (this.db[i]) {
+          case GraphIfc.eDatabase_Gdh:
+            this.p[i] = this.dyn.graph
+              .getGdh()
+              .refObjectInfo(pname.tname, pname.type, pname.elements);
+            if (i === 0) aname0 = pname.name;
+            break;
+          default:
+        }
+        if (this.p[i] === 0) continue;
 
-	this.size[i] = pname.elements;
-	this.type_id[i] = pname.type;
-	this.elements[i] = Math.min(pname.elements, this.rows);
-	this.bitmask[i] = pname.bitmask;
-      }
-      else {
-	this.headerRef[i] = true;
+        this.size[i] = pname.elements;
+        this.type_id[i] = pname.type;
+        this.elements[i] = Math.min(pname.elements, this.rows);
+        this.bitmask[i] = pname.bitmask;
+      } else {
+        this.headerRef[i] = true;
 
-	if ( aname0 == null)
-	  continue;
-		    
-	for ( var j = 0; j < this.elements[0]; j++) {
-	  var hname = aname0 + "[" + j + "]";
-	  var aname = "&(" + hname + ")" + pname.tname.substring(7);
+        if (aname0 == null) continue;
 
-	  if ( this.hp === null) {
-	    this.hp = new Array(this.columns);
-	    for ( var n = 0; n < this.columns; n++)
-	      this.hp[n] = null;
-	  }
-	  if ( this.hp[i] == null) {
-	    this.hp[i] = new Array(this.elements[0]);
-	    for ( var k = 0; k < this.elements[0]; k++) 
-	      this.hp[i][k] = 0;
-	  }
+        for (var j = 0; j < this.elements[0]; j++) {
+          var hname = aname0 + "[" + j + "]";
+          var aname = "&(" + hname + ")" + pname.tname.substring(7);
 
-	  this.hp[i][j] = this.dyn.graph.getGdh().refObjectInfo( aname, pname.type, pname.elements);
-	  console.log("Table $header " + i + " hp " + this.hp[i][j]);
-	  if ( j === 0) {
-	    this.size[i] = pname.elements;
-	    this.type_id[i] = pname.type;
-	    this.elements[i] = this.elements[0];
-	    this.bitmask[i] = pname.bitmask;
-	  }
-	}
+          if (this.hp === null) {
+            this.hp = new Array(this.columns);
+            for (var n = 0; n < this.columns; n++) this.hp[n] = null;
+          }
+          if (this.hp[i] == null) {
+            this.hp[i] = new Array(this.elements[0]);
+            for (var k = 0; k < this.elements[0]; k++) this.hp[i][k] = 0;
+          }
+
+          this.hp[i][j] = this.dyn.graph
+            .getGdh()
+            .refObjectInfo(aname, pname.type, pname.elements);
+          console.log("Table $header " + i + " hp " + this.hp[i][j]);
+          if (j === 0) {
+            this.size[i] = pname.elements;
+            this.type_id[i] = pname.type;
+            this.elements[i] = this.elements[0];
+            this.bitmask[i] = pname.bitmask;
+          }
+        }
       }
 
-      switch ( this.type_id[i]) {
-      case Pwr.eType_Float32:
-	this.oldValueF[i] = new Array(this.rows);
-	break;
-      case Pwr.eType_Boolean:
-      case GraphIfc.eType_Bit:
-	oldValueB[i] = new Array(this.rows);
-	break;
-      case Pwr.eType_Int32:
-      case Pwr.eType_Int16:
-      case Pwr.eType_Int8:
-      case Pwr.eType_UInt32:
-      case Pwr.eType_UInt16:
-      case Pwr.eType_UInt8:
-	this.oldValueI[i] = new Array(this.rows);
-	break;
-      case Pwr.eType_String:
-      case Pwr.eType_Objid:
-      case Pwr.eType_AttrRef:
-      case Pwr.eType_Time:
-      case Pwr.eType_DeltaTime:
-	this.oldValueS[i] = new Array(this.rows);
-	break;
+      switch (this.type_id[i]) {
+        case Pwr.eType_Float32:
+          this.oldValueF[i] = new Array(this.rows);
+          break;
+        case Pwr.eType_Boolean:
+        case GraphIfc.eType_Bit:
+          oldValueB[i] = new Array(this.rows);
+          break;
+        case Pwr.eType_Int32:
+        case Pwr.eType_Int16:
+        case Pwr.eType_Int8:
+        case Pwr.eType_UInt32:
+        case Pwr.eType_UInt16:
+        case Pwr.eType_UInt8:
+          this.oldValueI[i] = new Array(this.rows);
+          break;
+        case Pwr.eType_String:
+        case Pwr.eType_Objid:
+        case Pwr.eType_AttrRef:
+        case Pwr.eType_Time:
+        case Pwr.eType_DeltaTime:
+          this.oldValueS[i] = new Array(this.rows);
+          break;
       }
 
-    
       // Connect select array
       this.sel_p[i] = 0;
       pname = this.dyn.parseAttrName(this.sel_attribute[i]);
-      if ( pname === null || pname.name === "") 
-	continue;
+      if (pname === null || pname.name === "") continue;
 
-      if ( pname.type != Pwr.eType_Boolean)
-	continue;
+      if (pname.type != Pwr.eType_Boolean) continue;
 
-      switch ( pname.database) {
-      case GraphIfc.eDatabase_Gdh:
-	this.sel_p[i] = this.dyn.graph.getGdh().refObjectInfo( pname.tname, pname.type, pname.elements);
-	if ( this.sel_p[i] !== 0) {
-	  if ( this.sel_elements[i] == 0)
-	    break;
-	  this.sel_elements[i] = pname.elements;
-	  if ( this.sel_elements[i] > this.elements[i])
-	    this.sel_elements[i] = this.elements[i];
-	}
-	break;
-      default:
-	;
+      switch (pname.database) {
+        case GraphIfc.eDatabase_Gdh:
+          this.sel_p[i] = this.dyn.graph
+            .getGdh()
+            .refObjectInfo(pname.tname, pname.type, pname.elements);
+          if (this.sel_p[i] !== 0) {
+            if (this.sel_elements[i] == 0) break;
+            this.sel_elements[i] = pname.elements;
+            if (this.sel_elements[i] > this.elements[i])
+              this.sel_elements[i] = this.elements[i];
+          }
+          break;
+        default:
       }
-
     }
     object.setTableInfo(info);
 
     return 1;
   };
 
-  this.disconnect = function() {
-    for ( var i = 0; i < this.columns; i++) {
-      if ( !this.headerRef[i]) {
-	if ( this.p[i] != 0 && this.db[i] == GraphIfc.eDatabase_Gdh)
-	  this.dyn.graph.getGdh().unrefObjectInfo( this.p[i]);
-	this.p[i] = 0;
+  this.disconnect = function () {
+    for (var i = 0; i < this.columns; i++) {
+      if (!this.headerRef[i]) {
+        if (this.p[i] != 0 && this.db[i] == GraphIfc.eDatabase_Gdh)
+          this.dyn.graph.getGdh().unrefObjectInfo(this.p[i]);
+        this.p[i] = 0;
+      } else {
+        for (var j = 0; j < this.elements[i]; j++) {
+          if (this.hp[i][j] != 0)
+            this.dyn.graph.getGdh().unrefObjectInfo(this.hp[i][j]);
+        }
       }
-      else {
-	for ( var j = 0; j < this.elements[i]; j++) {
-	  if ( this.hp[i][j] != 0)
-	    this.dyn.graph.getGdh().unrefObjectInfo(this.hp[i][j]);
-	}
+      switch (this.type_id[i]) {
+        case Pwr.eType_Float32:
+          if (this.oldValueF[i] !== null) this.oldValueF[i] = null;
+          break;
+        case Pwr.eType_Boolean:
+        case GraphIfc.eType_Bit:
+          if (this.oldValueB[i] !== null) this.oldValueB[i] = null;
+          break;
+        case Pwr.eType_Int32:
+        case Pwr.eType_Int16:
+        case Pwr.eType_Int8:
+        case Pwr.eType_UInt32:
+        case Pwr.eType_UInt16:
+        case Pwr.eType_UInt8:
+          if (this.oldValueI[i] !== null) this.oldValueI[i] = null;
+          break;
+        case Pwr.eType_String:
+        case Pwr.eType_Objid:
+        case Pwr.eType_AttrRef:
+        case Pwr.eType_Time:
+        case Pwr.eType_DeltaTime:
+          if (this.oldValueS[i] !== null) this.oldValueS[i] = null;
+          break;
       }
-      switch ( this.type_id[i]) {
-      case Pwr.eType_Float32:
-	if ( this.oldValueF[i] !== null)
-	  this.oldValueF[i] = null;
-	break;
-      case Pwr.eType_Boolean:
-      case GraphIfc.eType_Bit:
-	if ( this.oldValueB[i] !== null)
-	  this.oldValueB[i] = null;
-	break;
-      case Pwr.eType_Int32:
-      case Pwr.eType_Int16:
-      case Pwr.eType_Int8:
-      case Pwr.eType_UInt32:
-      case Pwr.eType_UInt16:
-      case Pwr.eType_UInt8:
-	if ( this.oldValueI[i] !== null)
-	  this.oldValueI[i] = null;
-	break;
-      case Pwr.eType_String:
-      case Pwr.eType_Objid:
-      case Pwr.eType_AttrRef:
-      case Pwr.eType_Time:
-      case Pwr.eType_DeltaTime:
-	if ( this.oldValueS[i] !== null)
-	  this.oldValueS[i] = null;
-	break;
-      }
-      if ( this.sel_p[i] !== 0) {
-	this.dyn.graph.getGdh().unrefObjectInfo( this.sel_p[i]);
-	this.sel_p[i] = 0;
+      if (this.sel_p[i] !== 0) {
+        this.dyn.graph.getGdh().unrefObjectInfo(this.sel_p[i]);
+        this.sel_p[i] = 0;
       }
     }
   };
 
-  this.scan = function( object) {
+  this.scan = function (object) {
+    if (this.p[0] == 0) return;
 
-    if ( this.p[0] == 0)
-      return;
+    for (var i = 0; i < this.columns; i++) {
+      if (!this.headerRef[i]) {
+        if (this.p[i] === 0) continue;
 
-    for ( var i = 0; i < this.columns; i++) {
-      if ( !this.headerRef[i]) {
-	if ( this.p[i] === 0)
-	  continue;
-		
-	switch ( this.type_id[i]) {
-	case Pwr.eType_Float32: {
-	  var val = this.dyn.graph.getGdh().getObjectRefInfo( this.p[i]);
-	  if ( val === null)
-	    break;
-	  for ( var j = 0; j < Math.min(this.elements[i], val.length); j++) {
-	    if ( this.oldValueF[i][j] != val[j] || this.firstScan) {
-	      var sb = this.cFormat[i].format( val[j]);
-	      object.setValue( sb, i, j);
-	      this.oldValueF[i][j] = val[j];
-	    }
-	  }
-	  break;
-	}
-	case Pwr.eType_Boolean: {
-	  var val = this.dyn.graph.getGdh().getObjectRefInfo( this.p[i]);
-	  if ( val === null)
-	    break;
-	  for ( var j = 0; j < Math.min( this.elements[i], val.length); j++) {
-	    if ( this.firstScan || this.oldValueB[i][j] != val[j]) {
-	      if ( val[j])
-		object.setValue( "1", i, j);
-	      else
-		object.setValue( "0", i, j);
-	      oldValueB[i][j] = val[j];
-	    }
-	  }
-	  break;
-	}
-	case Pwr.eType_Int32:
-	case Pwr.eType_Int16:
-	case Pwr.eType_Int8:
-	case Pwr.eType_UInt32:
-	case Pwr.eType_UInt16:
-	case Pwr.eType_UInt8: {
-	  var val = this.dyn.graph.getGdh().getObjectRefInfo( this.p[i]);
-	  if ( val == null)
-	    break;
-	  for ( var j = 0; j < Math.min(this.elements[i], val.length); j++) {
-	    if ( this.oldValueI[i][j] != val[j] || this.firstScan) {
-	      var sb = this.cFormat[i].format( val[j]);
-	      object.setValue( sb, i, j);
-	      this.oldValueI[i][j] = val[j];
-	    }
-	  }
-	  break;
-	}
-	case Pwr.eType_String:
-	case Pwr.eType_Objid:
-	case Pwr.eType_AttrRef:
-	case Pwr.eType_Time:
-	case Pwr.eType_DeltaTime: {
-	  var val = this.dyn.graph.getGdh().getObjectRefInfo( this.p[i]);
-	  if ( val === null)
-	    break;
-	  for ( var j = 0; j < Math.min(this.elements[i], val.length); j++) {
-	    if ( this.firstScan || this.oldValueS[i][j] != val[j]) {
-	      switch ( this.type_id[i]) {
-	      case Pwr.eType_AttrRef:
-	      case Pwr.eType_Objid: {
-		if ( this.format[i] == "%1o")
-		  object.setValue(val[j], i, j);
-		else {
-		  var idx = val[j].lastIndexOf('-');
-		  if ( idx == -1)
-		    object.setValue(val[j], i, j);
-		  else
-		    object.setValue(val[j].substring(idx+1), i, j);
-		}
-					
-		break;
-	      }
-	      default:
-		object.setValue(val[j], i, j);
-	      }
-	      this.oldValueS[i][j] = val[j];
-	    }
-	  }
-	  break;
-	}
-	case GraphIfc.eType_Bit: {
-	  var val = this.dyn.graph.getGdh().getObjectRefInfo( this.p[i]);
-	  if ( val == null)
-	    break;
-	  for ( var j = 0; j < Math.min(this.elements[i], val.length); j++) {
-	    var bitval = ((this.bitmask[i] & val[j]) !== 0);
-	    if ( this.oldValueB[i][j] != bitval || this.firstScan) {
-	      if ( bitval)
-		object.setValue( "1", i, j);
-	      else
-		object.setValue( "0", i, j);
-	      this.oldValueB[i][j] = bitval;
-	    }
-	  }
-	  break;
-	}
+        switch (this.type_id[i]) {
+          case Pwr.eType_Float32: {
+            var val = this.dyn.graph.getGdh().getObjectRefInfo(this.p[i]);
+            if (val == null) break;
+            for (var j = 0; j < Math.min(this.elements[i], val.length); j++) {
+              if (this.oldValueF[i][j] != val[j] || this.firstScan) {
+                var sb = this.cFormat[i].format(val[j]);
+                object.setValue(sb, i, j);
+                this.oldValueF[i][j] = val[j];
+              }
+            }
+            break;
+          }
+          case Pwr.eType_Boolean: {
+            var val = this.dyn.graph.getGdh().getObjectRefInfo(this.p[i]);
+            if (val == null) break;
+            for (var j = 0; j < Math.min(this.elements[i], val.length); j++) {
+              if (this.firstScan || this.oldValueB[i][j] != val[j]) {
+                if (val[j]) object.setValue("1", i, j);
+                else object.setValue("0", i, j);
+                oldValueB[i][j] = val[j];
+              }
+            }
+            break;
+          }
+          case Pwr.eType_Int32:
+          case Pwr.eType_Int16:
+          case Pwr.eType_Int8:
+          case Pwr.eType_UInt32:
+          case Pwr.eType_UInt16:
+          case Pwr.eType_UInt8: {
+            var val = this.dyn.graph.getGdh().getObjectRefInfo(this.p[i]);
+            if (val == null) break;
+            for (var j = 0; j < Math.min(this.elements[i], val.length); j++) {
+              if (this.oldValueI[i][j] != val[j] || this.firstScan) {
+                var sb = this.cFormat[i].format(val[j]);
+                object.setValue(sb, i, j);
+                this.oldValueI[i][j] = val[j];
+              }
+            }
+            break;
+          }
+          case Pwr.eType_String:
+          case Pwr.eType_Objid:
+          case Pwr.eType_AttrRef:
+          case Pwr.eType_Time:
+          case Pwr.eType_DeltaTime: {
+            var val = this.dyn.graph.getGdh().getObjectRefInfo(this.p[i]);
+            if (val == null) break;
+            for (var j = 0; j < Math.min(this.elements[i], val.length); j++) {
+              if (this.firstScan || this.oldValueS[i][j] != val[j]) {
+                switch (this.type_id[i]) {
+                  case Pwr.eType_AttrRef:
+                  case Pwr.eType_Objid: {
+                    if (this.format[i] == "%1o") object.setValue(val[j], i, j);
+                    else {
+                      var idx = val[j].lastIndexOf("-");
+                      if (idx == -1) object.setValue(val[j], i, j);
+                      else object.setValue(val[j].substring(idx + 1), i, j);
+                    }
 
-	}
-      }
-      else {
-	// $header reference
-	for ( var j = 0; j < this.elements[i]; j++) {
-	  if ( this.hp[i][j] == 0)
-	    continue;
+                    break;
+                  }
+                  default:
+                    object.setValue(val[j], i, j);
+                }
+                this.oldValueS[i][j] = val[j];
+              }
+            }
+            break;
+          }
+          case GraphIfc.eType_Bit: {
+            var val = this.dyn.graph.getGdh().getObjectRefInfo(this.p[i]);
+            if (val == null) break;
+            for (var j = 0; j < Math.min(this.elements[i], val.length); j++) {
+              var bitval = (this.bitmask[i] & val[j]) !== 0;
+              if (this.oldValueB[i][j] != bitval || this.firstScan) {
+                if (bitval) object.setValue("1", i, j);
+                else object.setValue("0", i, j);
+                this.oldValueB[i][j] = bitval;
+              }
+            }
+            break;
+          }
+        }
+      } else {
+        // $header reference
+        for (var j = 0; j < this.elements[i]; j++) {
+          if (this.hp[i][j] == 0) continue;
 
-	  switch ( this.type_id[i]) {
-	  case Pwr.eType_Float32: {
-	    var val = this.dyn.graph.getGdh().getObjectRefInfo( this.hp[i][j]);
-	    if ( typeof val === 'undefined')
-	      break;
+          switch (this.type_id[i]) {
+            case Pwr.eType_Float32: {
+              var val = this.dyn.graph.getGdh().getObjectRefInfo(this.hp[i][j]);
+              if (typeof val === "undefined") break;
 
-	    if ( this.oldValueF[i][j] != val || this.firstScan) {
-	      var sb = this.cFormat[i].format( val);
-	      object.setValue( sb, i, j);
-	      this.oldValueF[i][j] = val;
-	    }
-	    break;
-	  }
-	  case Pwr.eType_Boolean: {
-	    var val = this.dyn.graph.getGdh().getObjectRefInfo( this.hp[i][j]);
-	    if ( typeof val === 'undefined')
-	      break;
+              if (this.oldValueF[i][j] != val || this.firstScan) {
+                var sb = this.cFormat[i].format(val);
+                object.setValue(sb, i, j);
+                this.oldValueF[i][j] = val;
+              }
+              break;
+            }
+            case Pwr.eType_Boolean: {
+              var val = this.dyn.graph.getGdh().getObjectRefInfo(this.hp[i][j]);
+              if (typeof val === "undefined") break;
 
-	    if ( this.firstScan || this.oldValueB[i][j] != val) {
-	      if ( val)
-		object.setValue( "1", i, j);
-	      else
-		object.setValue( "0", i, j);
-	      object.setValue( sb, i, j);
-	      this.oldValueB[i][j] = val;
-	    }
-	    break;
-	  }
-	  case Pwr.eType_Int32:
-	  case Pwr.eType_Int16:
-	  case Pwr.eType_Int8:
-	  case Pwr.eType_UInt32:
-	  case Pwr.eType_UInt16:
-	  case Pwr.eType_UInt8: {
-	    var val = this.dyn.graph.getGdh().getObjectRefInfo( this.hp[i][j]);
-	    if ( typeof val == 'undefined')
-	      break;
+              if (this.firstScan || this.oldValueB[i][j] != val) {
+                if (val) object.setValue("1", i, j);
+                else object.setValue("0", i, j);
+                object.setValue(sb, i, j);
+                this.oldValueB[i][j] = val;
+              }
+              break;
+            }
+            case Pwr.eType_Int32:
+            case Pwr.eType_Int16:
+            case Pwr.eType_Int8:
+            case Pwr.eType_UInt32:
+            case Pwr.eType_UInt16:
+            case Pwr.eType_UInt8: {
+              var val = this.dyn.graph.getGdh().getObjectRefInfo(this.hp[i][j]);
+              if (typeof val == "undefined") break;
 
-	    if ( this.oldValueI[i][j] != val || this.firstScan) {
-	      var sb = this.cFormat[i].format( val);
-	      object.setValue( sb, i, j);
-	      this.oldValueI[i][j] = val;
-	    }
-	    break;
-	  }
-	  case Pwr.eType_String:
-	  case Pwr.eType_Objid:
-	  case Pwr.eType_AttrRef:
-	  case Pwr.eType_Time:
-	  case Pwr.eType_DeltaTime: {
-	    var val = this.dyn.graph.getGdh().getObjectRefInfo( this.hp[i][j]);
-	    if ( typeof val === 'undefined')
-	      break;
-	    if ( this.firstScan || oldValueS[i][j] != val) {
-	      object.setValue( val, i, j);
-	      this.oldValueS[i][j] = val;
-	    }
-	    break;
-	  }
-	  case GraphIfc.eType_Bit: {
-	    var val = this.dyn.graph.getGdh().getObjectRefInfo( this.hp[i][j]);
-	    if ( typeof val === 'undefined')
-	      break;
+              if (this.oldValueI[i][j] != val || this.firstScan) {
+                var sb = this.cFormat[i].format(val);
+                object.setValue(sb, i, j);
+                this.oldValueI[i][j] = val;
+              }
+              break;
+            }
+            case Pwr.eType_String:
+            case Pwr.eType_Objid:
+            case Pwr.eType_AttrRef:
+            case Pwr.eType_Time:
+            case Pwr.eType_DeltaTime: {
+              var val = this.dyn.graph.getGdh().getObjectRefInfo(this.hp[i][j]);
+              if (typeof val === "undefined") break;
+              if (this.firstScan || oldValueS[i][j] != val) {
+                object.setValue(val, i, j);
+                this.oldValueS[i][j] = val;
+              }
+              break;
+            }
+            case GraphIfc.eType_Bit: {
+              var val = this.dyn.graph.getGdh().getObjectRefInfo(this.hp[i][j]);
+              if (typeof val === "undefined") break;
 
-	    var bitval = ((this.bitmask[i] & val) !== 0);
-	    if ( this.oldValueB[i][j] != bitval || this.firstScan) {
-	      if ( bitval)
-		object.setValue( "1", i, j);
-	      else
-		object.setValue( "0", i, j);
-	      this.oldValueB[i][j] = bitval;
-	    }
-	    break;
-	  }			
-
-	  }
-	}
+              var bitval = (this.bitmask[i] & val) !== 0;
+              if (this.oldValueB[i][j] != bitval || this.firstScan) {
+                if (bitval) object.setValue("1", i, j);
+                else object.setValue("0", i, j);
+                this.oldValueB[i][j] = bitval;
+              }
+              break;
+            }
+          }
+        }
       }
     }
 
     // Examine select array
     var sel_found = false;
-    for ( var i = 0; i < this.columns; i++) {
-      if ( this.sel_p[i] === 0)
-	continue;
-      var val = this.dyn.graph.getGdh().getObjectRefInfo( this.sel_p[i]);
-      if ( val === null)
-	continue;
-      for ( var j = 0; j < this.sel_elements[i]; j++) {
-	if ( val[j]) {
-	  sel_found = true;
-	  object.setSelectedCell( i, j);
-	}
+    for (var i = 0; i < this.columns; i++) {
+      if (this.sel_p[i] === 0) continue;
+      var val = this.dyn.graph.getGdh().getObjectRefInfo(this.sel_p[i]);
+      if (val === null) continue;
+      for (var j = 0; j < this.sel_elements[i]; j++) {
+        if (val[j]) {
+          sel_found = true;
+          object.setSelectedCell(i, j);
+        }
       }
     }
-    if ( !sel_found)
-      object.setSelectedCell( -1, -1);
+    if (!sel_found) object.setSelectedCell(-1, -1);
 
-    if ( this.firstScan)
-      this.firstScan = false;
+    if (this.firstScan) this.firstScan = false;
   };
 
-  this.action = function( object, e) {
-    if ( !this.dyn.graph.isAuthorized( this.dyn.access))
-      return 1;
+  this.action = function (object, e) {
+    if (!this.dyn.graph.isAuthorized(this.dyn.access)) return 1;
 
-    switch ( e.event) {
-    case Glow.eEvent_MB1Click:
-      var column, row;
-      var	value;
+    switch (e.event) {
+      case Glow.eEvent_MB1Click:
+        var column, row;
+        var value;
 
-      if ( e.type != Glow.eEventType_Table)
-	break;
+        if (e.type != Glow.eEventType_Table) break;
 
-      var event = e;
-      row = object.getSelectedCellRow();
-      column = object.getSelectedCellColumn();
-      if ( row >= 0 && this.sel_p[column] !== 0) {
-	// Reset previously selected
-	var pname = this.dyn.parseAttrName( this.sel_attribute[column]);
-	if ( pname === null || pname.name === "") 
-	  break;
-	value = false;
-	var aname = pname.name + "[" + row + "]";
-	this.dyn.graph.getGdh().setObjectInfoBoolean( aname, value);
-      }
-      if ( this.sel_p[event.column] !== 0 && 
-	   !(event.column == column && event.row == row)) {
-	// Set new selected, if not same as previous selected
-	var pname = this.dyn.parseAttrName( this.sel_attribute[event.column]);
-	if ( pname === null || pname.name === "") 
-	  break;
-	value = true;
-	var aname = pname.name + "[" + event.row + "]";
-	this.dyn.graph.getGdh().setObjectInfoBoolean( aname, value);
-	object.setSelectedCell( event.column, event.row);
-      }
-      break;
+        var event = e;
+        row = object.getSelectedCellRow();
+        column = object.getSelectedCellColumn();
+        if (row >= 0 && this.sel_p[column] !== 0) {
+          // Reset previously selected
+          var pname = this.dyn.parseAttrName(this.sel_attribute[column]);
+          if (pname === null || pname.name === "") break;
+          value = false;
+          var aname = pname.name + "[" + row + "]";
+          this.dyn.graph.getGdh().setObjectInfoBoolean(aname, value);
+        }
+        if (
+          this.sel_p[event.column] !== 0 &&
+          !(event.column == column && event.row == row)
+        ) {
+          // Set new selected, if not same as previous selected
+          var pname = this.dyn.parseAttrName(this.sel_attribute[event.column]);
+          if (pname === null || pname.name === "") break;
+          value = true;
+          var aname = pname.name + "[" + event.row + "]";
+          this.dyn.graph.getGdh().setObjectInfoBoolean(aname, value);
+          object.setSelectedCell(event.column, event.row);
+        }
+        break;
     }
     return 1;
   };
 }
 
-function DynStatusColor( dyn) {
+function DynStatusColor(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = DynC.mDynType1_StatusColor;
   this.dyn_type2 = 0;
@@ -12220,210 +11710,216 @@ function DynStatusColor( dyn) {
   this.oldStatus;
   this.on;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "StatusColor.Attribute" || name === "StatusTone.Attribute") {
       this.attribute = value;
       return 1;
-    }
-    else if (name === "StatusColor.NoStatusColor" || name === "StatusTone.NoStatusTone") {
+    } else if (
+      name === "StatusColor.NoStatusColor" ||
+      name === "StatusTone.NoStatusTone"
+    ) {
       this.nostatus_color = value;
       return 1;
-    }
-    else if (name === "StatusColor.UseColorTheme") {
+    } else if (name === "StatusColor.UseColorTheme") {
       this.use_colortheme = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "StatusColor.Attribute" || name === "StatusTone.Attribute") {
       ret.value = this.attribute;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "StatusColor.NoStatusColor" || name === "StatusTone.NoStatusTone") {
+    } else if (
+      name === "StatusColor.NoStatusColor" ||
+      name === "StatusTone.NoStatusTone"
+    ) {
       ret.value = this.nostatus_color;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "StatusColor.UseColorTheme") {
+    } else if (name === "StatusColor.UseColorTheme") {
       ret.value = this.use_colortheme;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( object) {
-
-    this.a = new DynReference( this.dyn, this.attribute);
+  this.connect = function (object) {
+    this.a = new DynReference(this.dyn, this.attribute);
     this.a.connect(this.dyn);
-    if ( !this.a.sts) {
+    if (!this.a.sts) {
       console.log("StatusColor: " + this.attribute);
       return 1;
     }
     return 1;
   };
 
-
-  this.disconnect = function() {
+  this.disconnect = function () {
     this.a.disconnect(this.dyn);
   };
-	
-  this.scan = function( object) {
-    if ( !this.a.sts || this.dyn.ignoreColor)
-      return;
 
-    if ( this.a.database == GraphIfc.eDatabase_Gdh && this.a.typeid == Pwr.eType_NetStatus) {
+  this.scan = function (object) {
+    if (!this.a.sts || this.dyn.ignoreColor) return;
+
+    if (
+      this.a.database == GraphIfc.eDatabase_Gdh &&
+      this.a.typeid == Pwr.eType_NetStatus
+    ) {
       // TODO get subscription oldness
     }
 
     var value = this.a.get_ref_value(this.dyn);
 
-    if ( !this.firstScan && this.oldStatus != DynC.ePwrStatus_Fatal) {
-      if ( this.a.oldValue == value && this.dyn.resetColor)
-	// No change since last time
-	return;
+    if (!this.firstScan && this.oldStatus != DynC.ePwrStatus_Fatal) {
+      if (this.a.oldValue == value && this.dyn.resetColor)
+        // No change since last time
+        return;
     }
 
     this.a.oldValue = value;
-    if ( value === 0)
-      value = DynC.ePwrStatus_No;
+    if (value === 0) value = DynC.ePwrStatus_No;
     else {
-      switch ( value & 7) {
-      case 3:
-      case 1:
-	value = DynC.ePwrStatus_Success;
-	break;
-      case 0:
-	value = DynC.ePwrStatus_Warning;
-	break;
-      case 2:
-	value = DynC.ePwrStatus_Error;
-	break;
-      case 4:
-	value = DynC.ePwrStatus_Fatal;
-	break;
-      default:
-	value = DynC.ePwrStatus_No;
+      switch (value & 7) {
+        case 3:
+        case 1:
+          value = DynC.ePwrStatus_Success;
+          break;
+        case 0:
+          value = DynC.ePwrStatus_Warning;
+          break;
+        case 2:
+          value = DynC.ePwrStatus_Error;
+          break;
+        case 4:
+          value = DynC.ePwrStatus_Fatal;
+          break;
+        default:
+          value = DynC.ePwrStatus_No;
       }
     }
-    if ( !this.firstScan && this.oldStatus == value && this.oldStatus != DynC.ePwrStatus_Fatal)
+    if (
+      !this.firstScan &&
+      this.oldStatus == value &&
+      this.oldStatus != DynC.ePwrStatus_Fatal
+    )
       return;
-    else
-      this.firstScan = false;
+    else this.firstScan = false;
 
-    if ( (this.dyn.total_dyn_type1 & DynC.mDynType1_Tone) !== 0) {
-      switch ( value) {
-      case DynC.ePwrStatus_No:
-	if ( this.nostatus_color >= Glow.eDrawTone__)
-	  object.setFillColor( this.nostatus_color);
-	else
-	  object.setColorTone( this.nostatus_color);
-	break;
-      case DynC.ePwrStatus_Success:
-	if ( nostatus_color >= Glow.eDrawTone__)
-	  object.resetFillColor();
-	object.resetColorTone();
-	break;
-      case DynC.ePwrStatus_Warning:
-	object.setColorTone( (this.use_colortheme !== 0) ? Glow.eDrawType_CustomColor42 : Glow.eDrawTone_Yellow);
-	break;
-      case DynC.ePwrStatus_Error:
-	object.setColorTone( (this.use_colortheme !== 0) ? Glow.eDrawType_CustomColor11 : Glow.eDrawTone_Red);
-	break;
-      case DynC.ePwrStatus_Fatal:
-	this.on = !this.on;
-	if ( this.on)
-	  object.setColorTone( (this.use_colortheme !== 0) ? Glow.eDrawType_CustomColor11 : Glow.eDrawTone_Red);
-	else {
-	  if ( this.nostatus_color >= Glow.eDrawTone__)
-	    object.setFillColor( this.nostatus_color);
-	  else
-	    object.setColorTone( this.nostatus_color);
-	}
-	break;
+    if ((this.dyn.total_dyn_type1 & DynC.mDynType1_Tone) !== 0) {
+      switch (value) {
+        case DynC.ePwrStatus_No:
+          if (this.nostatus_color >= Glow.eDrawTone__)
+            object.setFillColor(this.nostatus_color);
+          else object.setColorTone(this.nostatus_color);
+          break;
+        case DynC.ePwrStatus_Success:
+          if (nostatus_color >= Glow.eDrawTone__) object.resetFillColor();
+          object.resetColorTone();
+          break;
+        case DynC.ePwrStatus_Warning:
+          object.setColorTone(
+            this.use_colortheme !== 0
+              ? Glow.eDrawType_CustomColor42
+              : Glow.eDrawTone_Yellow,
+          );
+          break;
+        case DynC.ePwrStatus_Error:
+          object.setColorTone(
+            this.use_colortheme !== 0
+              ? Glow.eDrawType_CustomColor11
+              : Glow.eDrawTone_Red,
+          );
+          break;
+        case DynC.ePwrStatus_Fatal:
+          this.on = !this.on;
+          if (this.on)
+            object.setColorTone(
+              this.use_colortheme !== 0
+                ? Glow.eDrawType_CustomColor11
+                : Glow.eDrawTone_Red,
+            );
+          else {
+            if (this.nostatus_color >= Glow.eDrawTone__)
+              object.setFillColor(this.nostatus_color);
+            else object.setColorTone(this.nostatus_color);
+          }
+          break;
       }
       this.dyn.repaintNow = true;
-    }
-    else {
-      switch ( value) {
-      case DynC.ePwrStatus_No:
-	object.setFillColor( this.nostatus_color);
-	break;
-      case DynC.ePwrStatus_Success:
-	object.resetFillColor();
-	break;
-      case DynC.ePwrStatus_Warning:
-	object.setFillColor( Glow.eDrawType_ColorYellow);
-	break;
-      case DynC.ePwrStatus_Error:
-	object.setFillColor( Glow.eDrawType_ColorRed);
-	break;
-      case DynC.ePwrStatus_Fatal:
-	this.on = !this.on;
-	if ( this.on)
-	  object.setFillColor( Glow.eDrawType_ColorRed);
-	else
-	  object.setFillColor( this.nostatus_color);
-	break;
+    } else {
+      switch (value) {
+        case DynC.ePwrStatus_No:
+          object.setFillColor(this.nostatus_color);
+          break;
+        case DynC.ePwrStatus_Success:
+          object.resetFillColor();
+          break;
+        case DynC.ePwrStatus_Warning:
+          object.setFillColor(Glow.eDrawType_ColorYellow);
+          break;
+        case DynC.ePwrStatus_Error:
+          object.setFillColor(Glow.eDrawType_ColorRed);
+          break;
+        case DynC.ePwrStatus_Fatal:
+          this.on = !this.on;
+          if (this.on) object.setFillColor(Glow.eDrawType_ColorRed);
+          else object.setFillColor(this.nostatus_color);
+          break;
       }
       this.dyn.repaintNow = true;
     }
     this.oldStatus = value;
   };
 
-  this.action = function( object, e) {
+  this.action = function (object, e) {
     return 1;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynStatusColor : " + lines[i]);
+      if (this.dyn.debug) console.log("DynStatusColor : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_StatusColor: 
-	break;
-      case DynC.eSave_StatusColor_attribute: 
-	if ( tokens.length > 1)
-	  this.attribute = tokens[1];
-	break;
-      case DynC.eSave_StatusColor_nostatus_color: 
-	this.nostatus_color = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_StatusColor_use_colortheme:
-	this.use_colortheme = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynStatusColor");
-	break;
+      switch (key) {
+        case DynC.eSave_StatusColor:
+          break;
+        case DynC.eSave_StatusColor_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_StatusColor_nostatus_color:
+          this.nostatus_color = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_StatusColor_use_colortheme:
+          this.use_colortheme = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynStatusColor");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-		
+
     return i;
   };
-
 }
 
-
-function DynAxis( dyn) {
+function DynAxis(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = DynC.mDynType2_Axis;
@@ -12441,150 +11937,135 @@ function DynAxis( dyn) {
   this.firstScan = true;
   this.keep_settings = 0;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "Axis.MinValueAttr") {
       this.minvalue_attr = value;
       return 1;
-    }
-    else if (name === "Axis.MaxValueAttr") {
+    } else if (name === "Axis.MaxValueAttr") {
       this.maxvalue_attr = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "Axis.MinValueAttr") {
       ret.value = this.minvalue_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "Axis.MaxValueAttr") {
+    } else if (name === "Axis.MaxValueAttr") {
       ret.value = this.maxvalue_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynAxis : " + lines[i]);
+      if (this.dyn.debug) console.log("DynAxis : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_Axis: 
-	break;
-      case DynC.eSave_Axis_minvalue_attr: 
-	if ( tokens.length > 1)
-	  this.minvalue_attr = tokens[1];
-	break;
-      case DynC.eSave_Axis_maxvalue_attr: 
-	if ( tokens.length > 1)
-	  this.maxvalue_attr = tokens[1];
-	break;
-      case DynC.eSave_Axis_keep_settings: 
-	this.keep_settings = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynAxis");
-	break;
+      switch (key) {
+        case DynC.eSave_Axis:
+          break;
+        case DynC.eSave_Axis_minvalue_attr:
+          if (tokens.length > 1) this.minvalue_attr = tokens[1];
+          break;
+        case DynC.eSave_Axis_maxvalue_attr:
+          if (tokens.length > 1) this.maxvalue_attr = tokens[1];
+          break;
+        case DynC.eSave_Axis_keep_settings:
+          this.keep_settings = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynAxis");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-		
+
     return i;
   };
 
-  this.connect = function( o) {
-
-    this.minvalue_a = new DynReference( this.dyn, this.minvalue_attr);
+  this.connect = function (o) {
+    this.minvalue_a = new DynReference(this.dyn, this.minvalue_attr);
     this.minvalue_a.connect(this.dyn);
-    if ( !this.minvalue_a.sts)
-      console.log( "Axis: " + this.minvalue_attr);
-	    
-    this.maxvalue_a = new DynReference( this.dyn, this.maxvalue_attr);
+    if (!this.minvalue_a.sts) console.log("Axis: " + this.minvalue_attr);
+
+    this.maxvalue_a = new DynReference(this.dyn, this.maxvalue_attr);
     this.maxvalue_a.connect(this.dyn);
-    if ( !this.maxvalue_a.sts)
-      console.log( "Axis: " + this.maxvalue_attr);
-	    
-    if ( this.minvalue_a.sts && this.maxvalue_a.sts) {
-      if ( this.minvalue_a.typeid != this.maxvalue_a.typeid)
-	this.attr_type = 0;
-      else
-	this.attr_type = this.maxvalue_a.typeid;
-    }
-    else if ( this.maxvalue_a.sts)
-      this.attr_type = this.maxvalue_a.typeid;
-    else if ( this.minvalue_a.sts)
-      this.attr_type = this.minvalue_a.typeid;
-	    
+    if (!this.maxvalue_a.sts) console.log("Axis: " + this.maxvalue_attr);
+
+    if (this.minvalue_a.sts && this.maxvalue_a.sts) {
+      if (this.minvalue_a.typeid != this.maxvalue_a.typeid) this.attr_type = 0;
+      else this.attr_type = this.maxvalue_a.typeid;
+    } else if (this.maxvalue_a.sts) this.attr_type = this.maxvalue_a.typeid;
+    else if (this.minvalue_a.sts) this.attr_type = this.minvalue_a.typeid;
+
     return 1;
   };
 
-  this.disconnect = function() {
+  this.disconnect = function () {
     this.minvalue_a.disconnect(this.dyn);
     this.maxvalue_a.disconnect(this.dyn);
     return;
   };
 
-  this.scan = function( o) {
-
-    switch ( this.attr_type) {
+  this.scan = function (o) {
+    switch (this.attr_type) {
       case Pwr.eType_Float32: {
-	if ( !this.maxvalue_a.sts && !this.minvalue_a.sts)
-	  return;
+        if (!this.maxvalue_a.sts && !this.minvalue_a.sts) return;
 
-	var min_value = 0;
-	var max_value = 0;
+        var min_value = 0;
+        var max_value = 0;
 
-	if ( this.minvalue_a.sts)
-	  min_value = this.minvalue_a.get_ref_value(this.dyn);
-	if ( this.maxvalue_a.sts)
-	  max_value = this.maxvalue_a.get_ref_value(this.dyn);
-  
-	if ( !(this.firstScan ||
-	       (this.maxvalue_a.sts && ( max_value != this.maxvalue_a.oldValue)) ||
-	       (this.minvalue_a.sts && ( min_value != this.minvalue_a.oldValue))))
-	  return;
-	       
-	if ( this.firstScan)
-	  this.firstScan = true;
-	if ( this.minvalue_a.sts)
-	  this.minvalue_a.oldValue = min_value;
-	if ( this.maxvalue_a.sts)
-	  this.maxvalue_a.oldValue = max_value;
+        if (this.minvalue_a.sts)
+          min_value = this.minvalue_a.get_ref_value(this.dyn);
+        if (this.maxvalue_a.sts)
+          max_value = this.maxvalue_a.get_ref_value(this.dyn);
 
-	if ( max_value == min_value)
-	  return;
+        if (
+          !(
+            this.firstScan ||
+            (this.maxvalue_a.sts && max_value != this.maxvalue_a.oldValue) ||
+            (this.minvalue_a.sts && min_value != this.minvalue_a.oldValue)
+          )
+        )
+          return;
 
-	if ( o.type() == Glow.eObjectType_GrowAxis)
-	  o.set_range( min_value, max_value, this.keep_settings);
-	else if ( o.type() == Glow.eObjectType_GrowAxisArc)
-	  o.set_range( min_value, max_value, this.keep_settings);
-	break;
+        if (this.firstScan) this.firstScan = true;
+        if (this.minvalue_a.sts) this.minvalue_a.oldValue = min_value;
+        if (this.maxvalue_a.sts) this.maxvalue_a.oldValue = max_value;
+
+        if (max_value == min_value) return;
+
+        if (o.type() == Glow.eObjectType_GrowAxis)
+          o.set_range(min_value, max_value, this.keep_settings);
+        else if (o.type() == Glow.eObjectType_GrowAxisArc)
+          o.set_range(min_value, max_value, this.keep_settings);
+        break;
       }
-      default: ;
+      default:
     }
     return;
   };
 }
 
-function DynTimeoutColor( dyn) {
+function DynTimeoutColor(dyn) {
   this.dyn = dyn;
   this.dyn_type2 = DynC.mDynType2_TimeoutColor;
   this.dyn_type1 = 0;
@@ -12596,67 +12077,63 @@ function DynTimeoutColor( dyn) {
 
   this.time;
   this.color;
-	
-  this.setAttribute = function(o, name, value) {
+
+  this.setAttribute = function (o, name, value) {
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( o) {
+  this.connect = function (o) {
     return 1;
   };
-  this.disconnect = function() {
-  }	
-  this.scan = function( o) {
-  }
-  this.action = function( object, e) {
+  this.disconnect = function () {};
+  this.scan = function (o) {};
+  this.action = function (object, e) {
     return 1;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynTimeoutColor : " + lines[i]);
+      if (this.dyn.debug) console.log("DynTimeoutColor : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_TimeoutColor: 
-	break;
-      case DynC.eSave_TimeoutColor_time: 
-	this.time = Double.valueOf(tokens[1]);
-	break;
-      case DynC.eSave_TimeoutColor_color: 
-	this.color = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynTimeoutColor");
-	break;
+      switch (key) {
+        case DynC.eSave_TimeoutColor:
+          break;
+        case DynC.eSave_TimeoutColor_time:
+          this.time = Double.valueOf(tokens[1]);
+          break;
+        case DynC.eSave_TimeoutColor_color:
+          this.color = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynTimeoutColor");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-		
+
     return i;
   };
-
 }
 
-function DynHostObject( dyn) {
+function DynHostObject(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = DynC.mDynType1_HostObject;
   this.dyn_type2 = 0;
@@ -12668,65 +12145,59 @@ function DynHostObject( dyn) {
 
   this.hostobject;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( o) {
+  this.connect = function (o) {
     return 1;
   };
-  this.disconnect = function() {
-  }	
-  this.scan = function( o) {
-  }
-  this.action = function( object, e) {
+  this.disconnect = function () {};
+  this.scan = function (o) {};
+  this.action = function (object, e) {
     return 1;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynHostObject : " + lines[i]);
+      if (this.dyn.debug) console.log("DynHostObject : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_HostObject: 
-	break;
-      case DynC.eSave_HostObject_object: 
-	if ( tokens.length > 1)
-	  this.hostobject = tokens[1];
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynHostObject");
-	break;
+      switch (key) {
+        case DynC.eSave_HostObject:
+          break;
+        case DynC.eSave_HostObject_object:
+          if (tokens.length > 1) this.hostobject = tokens[1];
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynHostObject");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-		
+
     return i;
   };
-  
-
 }
 
-function DynDigSound( dyn, instance) {
+function DynDigSound(dyn, instance) {
   this.dyn = dyn;
   this.dyn_type1 = DynC.mDynType1_DigSound;
   this.dyn_type2 = 0;
@@ -12741,80 +12212,74 @@ function DynDigSound( dyn, instance) {
   this.level;
   this.interval;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( o) {
+  this.connect = function (o) {
     return 1;
   };
-  this.disconnect = function() {
-  }	
-  this.scan = function( o) {
-  }
-  this.action = function( object, e) {
+  this.disconnect = function () {};
+  this.scan = function (o) {};
+  this.action = function (object, e) {
     return 1;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynDigSound : " + lines[i]);
+      if (this.dyn.debug) console.log("DynDigSound : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_DigSound: 
-	break;
-      case DynC.eSave_DigSound_attribute: 
-	if ( tokens.length > 1)
-	  this.attribute = tokens[1];
-	break;
-      case DynC.eSave_DigSound_soundobject: 
-	if ( tokens.length > 1)
-	  this.soundobject = tokens[1];
-	break;
-      case DynC.eSave_DigSound_level: 
-	this.level = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_DigSound_interval: 
-	this.interval = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_DigSound_instance: 
-	this.instance = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_DigSound_instance_mask: 
-	this.instance_mask = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynDigSound");
-	break;
+      switch (key) {
+        case DynC.eSave_DigSound:
+          break;
+        case DynC.eSave_DigSound_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_DigSound_soundobject:
+          if (tokens.length > 1) this.soundobject = tokens[1];
+          break;
+        case DynC.eSave_DigSound_level:
+          this.level = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_DigSound_interval:
+          this.interval = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_DigSound_instance:
+          this.instance = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_DigSound_instance_mask:
+          this.instance_mask = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynDigSound");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-		
+
     return i;
   };
-
 }
 
-function DynFillLevel( dyn) {
+function DynFillLevel(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = DynC.mDynType1_FillLevel;
   this.dyn_type2 = 0;
@@ -12839,259 +12304,242 @@ function DynFillLevel( dyn) {
   this.limit_min;
   this.limit_max;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "FillLevel.Attribute") {
       this.attribute = value;
       return 1;
-    }
-    else if (name === "FillLevel.BackgroundColor" || name === "FillLevel.BackgroundTone") {
+    } else if (
+      name === "FillLevel.BackgroundColor" ||
+      name === "FillLevel.BackgroundTone"
+    ) {
       this.color = value;
       return 1;
-    }
-    else if (name === "FillLevel.Direction") {
-      if (value === "Up")
-	this.direction = Glow.eDirection_Down;
-      else if (value === "Down")
-	this.direction = Glow.eDirection_Up;
-      else if (value === "Left")
-	this.direction = Glow.eDirection_Left;
-      else if (value === "Right")
-	this.direction = Glow.eDirection_Right;
-      else
-	this.direction = value;
+    } else if (name === "FillLevel.Direction") {
+      if (value === "Up") this.direction = Glow.eDirection_Down;
+      else if (value === "Down") this.direction = Glow.eDirection_Up;
+      else if (value === "Left") this.direction = Glow.eDirection_Left;
+      else if (value === "Right") this.direction = Glow.eDirection_Right;
+      else this.direction = value;
       return 1;
-    }
-    else if (name === "FillLevel.MinValue") {
+    } else if (name === "FillLevel.MinValue") {
       this.min_value = value;
       return 1;
-    }
-    else if (name === "FillLevel.MaxValue") {
+    } else if (name === "FillLevel.MaxValue") {
       this.max_value = value;
       return 1;
-    }
-    else if (name === "FillLevel.MinValueAttr") {
+    } else if (name === "FillLevel.MinValueAttr") {
       this.minvalue_attr = value;
       return 1;
-    }
-    else if (name === "FillLevel.MaxValueAttr") {
+    } else if (name === "FillLevel.MaxValueAttr") {
       this.maxvalue_attr = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "FillLevel.Attribute") {
       ret.value = this.attribute;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "FillLevel.BackgroundColor" || name === "FillLevel.BackgroundTone") {
+    } else if (
+      name === "FillLevel.BackgroundColor" ||
+      name === "FillLevel.BackgroundTone"
+    ) {
       ret.value = this.color;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "FillLevel.Direction") {
+    } else if (name === "FillLevel.Direction") {
       ret.value = this.direction;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "FillLevel.MinValue") {
+    } else if (name === "FillLevel.MinValue") {
       ret.value = this.min_value;
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
-    }
-    else if (name === "FillLevel.MaxValue") {
+    } else if (name === "FillLevel.MaxValue") {
       ret.value = this.max_value;
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
-    }
-    else if (name === "FillLevel.MinValueAttr") {
+    } else if (name === "FillLevel.MinValueAttr") {
       ret.value = this.minvalue_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "FillLevel.MaxValueAttr") {
+    } else if (name === "FillLevel.MaxValueAttr") {
       ret.value = this.maxvalue_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( object) {
+  this.connect = function (object) {
+    this.color = this.dyn.getColor2(object, this.color);
 
-    this.color = this.dyn.getColor2( object, this.color);
+    if (this.color < 0 || this.color >= Glow.eDrawType__) return 0;
 
-    if ( this.color < 0 || this.color >= Glow.eDrawType__)
-      return 0;
+    if (this.attribute.trim() === null) return 0;
 
-    if ( this.attribute.trim() === null)
-      return 0;
-
-    this.a = new DynReference( this.dyn, this.attribute);
+    this.a = new DynReference(this.dyn, this.attribute);
     this.a.connect(this.dyn);
-    if ( !this.a.sts) {
+    if (!this.a.sts) {
       console.log("FillLevel: " + this.attribute);
       return 1;
     }
 
-    if ( (this.dyn.total_dyn_type1 & DynC.mDynType1_Tone) != 0) {
-      if ( this.color >= Glow.eDrawTone__)
-	object.setLevelFillColor( this.color);
-      else
-	object.setLevelColorTone( this.color);
-    }
-    else
-      object.setLevelFillColor( this.color);
+    if ((this.dyn.total_dyn_type1 & DynC.mDynType1_Tone) != 0) {
+      if (this.color >= Glow.eDrawTone__) object.setLevelFillColor(this.color);
+      else object.setLevelColorTone(this.color);
+    } else object.setLevelFillColor(this.color);
 
     var limits = object.getLimits();
-    if ( (limits.status & 1) !== 0) {
+    if ((limits.status & 1) !== 0) {
       this.limits_found = true;
       this.limit_min = limits.min;
       this.limit_max = limits.max;
       this.direction = limits.direction;
     }
-    object.setLevelDirection( this.direction);
+    object.setLevelDirection(this.direction);
 
-    this.minvalue_a = new DynReference( this.dyn, this.minvalue_attr);
+    this.minvalue_a = new DynReference(this.dyn, this.minvalue_attr);
     this.minvalue_a.connect(this.dyn);
 
-    this.maxvalue_a = new DynReference( this.dyn, this.maxvalue_attr);
+    this.maxvalue_a = new DynReference(this.dyn, this.maxvalue_attr);
     this.maxvalue_a.connect(this.dyn);
 
     return 1;
-  }
+  };
 
-  this.disconnect = function() {
-    if ( this.a === null)
-      return;
+  this.disconnect = function () {
+    if (this.a === null) return;
     this.a.disconnect(this.dyn);
     this.minvalue_a.disconnect(this.dyn);
     this.maxvalue_a.disconnect(this.dyn);
-  }
+  };
 
-  this.scan = function( object) {
-    if ( this.a === null || !this.a.sts)
-      return;
-  
+  this.scan = function (object) {
+    if (this.a === null || !this.a.sts) return;
+
     var minval, maxval;
     var pvalue = this.a.get_ref_value(this.dyn);
-    if ( this.maxvalue_a.sts && this.minvalue_a.sts) {
+    if (this.maxvalue_a.sts && this.minvalue_a.sts) {
       minval = this.minvalue_a.get_ref_value(this.dyn);
       maxval = this.maxvalue_a.get_ref_value(this.dyn);
-      if ( minval != this.min_value ||
-	   maxval != this.max_value) {
-	this.min_value = minval;
-	this.max_value = maxval;
-	this.firstScan = true;
+      if (minval != this.min_value || maxval != this.max_value) {
+        this.min_value = minval;
+        this.max_value = maxval;
+        this.firstScan = true;
       }
     }
 
-    if ( !this.firstScan) {
-      if ( Math.abs( this.a.oldValue - pvalue) < Number.MIN_VALUE)
-	// No change since last time
-	return;
-    }
-    else
-      this.firstScan = false;
+    if (!this.firstScan) {
+      if (Math.abs(this.a.oldValue - pvalue) < Number.MIN_VALUE)
+        // No change since last time
+        return;
+    } else this.firstScan = false;
 
-    if ( this.max_value == this.min_value)
-      return;
+    if (this.max_value == this.min_value) return;
 
     var value = 0;
-    if ( !this.limits_found)
+    if (!this.limits_found)
       value = (pvalue - this.min_value) / (this.max_value - this.min_value);
     else {
       var geom = object.measure();
-    
-      switch ( this.direction) {
-      case Glow.eDirection_Right:
-	value = ((pvalue - this.min_value) / (this.max_value - this.min_value) * ( this.limit_max - this.limit_min) 
-		 + (this.limit_min - geom.ll_x)) / (geom.ur_x - geom.ll_x);
-	break;
-      case Glow.eDirection_Left:
-	value = ((pvalue - this.min_value) / (this.max_value - this.min_value) * ( this.limit_max - this.limit_min) 
-		 + (geom.ur_x - this.limit_max)) / (geom.ur_x - geom.ll_x);
-	break;
-      case Glow.eDirection_Up:
-	value = ((pvalue - this.min_value) / (this.max_value - this.min_value) * ( this.limit_max - this.limit_min) 
-		 + (this.limit_min - geom.ll_y)) / (geom.ur_y - geom.ll_y);
-	break;
-      case Glow.eDirection_Down:
-	value = ((pvalue - this.min_value) / (this.max_value - this.min_value) * ( this.limit_max - this.limit_min) 
-		 + (geom.ur_y - this.limit_max)) / (geom.ur_y - geom.ll_y);
-	break;
-      default: ;
+
+      switch (this.direction) {
+        case Glow.eDirection_Right:
+          value =
+            (((pvalue - this.min_value) / (this.max_value - this.min_value)) *
+              (this.limit_max - this.limit_min) +
+              (this.limit_min - geom.ll_x)) /
+            (geom.ur_x - geom.ll_x);
+          break;
+        case Glow.eDirection_Left:
+          value =
+            (((pvalue - this.min_value) / (this.max_value - this.min_value)) *
+              (this.limit_max - this.limit_min) +
+              (geom.ur_x - this.limit_max)) /
+            (geom.ur_x - geom.ll_x);
+          break;
+        case Glow.eDirection_Up:
+          value =
+            (((pvalue - this.min_value) / (this.max_value - this.min_value)) *
+              (this.limit_max - this.limit_min) +
+              (this.limit_min - geom.ll_y)) /
+            (geom.ur_y - geom.ll_y);
+          break;
+        case Glow.eDirection_Down:
+          value =
+            (((pvalue - this.min_value) / (this.max_value - this.min_value)) *
+              (this.limit_max - this.limit_min) +
+              (geom.ur_y - this.limit_max)) /
+            (geom.ur_y - geom.ll_y);
+          break;
+        default:
       }
     }
-    object.setFillLevel( value);
+    object.setFillLevel(value);
     this.a.oldValue = pvalue;
   };
 
-  this.action = function( object, e) {
+  this.action = function (object, e) {
     return 1;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynFillLevel : " + lines[i]);
+      if (this.dyn.debug) console.log("DynFillLevel : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_FillLevel: 
-	break;
-      case DynC.eSave_FillLevel_attribute: 
-	if ( tokens.length > 1)
-	  this.attribute = tokens[1];
-	break;
-      case DynC.eSave_FillLevel_color: 
-	this.color = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_FillLevel_direction: 
-	this.direction = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_FillLevel_min_value: 
-	this.min_value = parseFloat( tokens[1]);
-	break;
-      case DynC.eSave_FillLevel_max_value: 
-	this.max_value = parseFloat( tokens[1]);
-	break;
-      case DynC.eSave_FillLevel_minvalue_attr: 
-	if ( tokens.length > 1)
-	  this.minvalue_attr = tokens[1];
-	break;
-      case DynC.eSave_FillLevel_maxvalue_attr: 
-	if ( tokens.length > 1)
-	  this.maxvalue_attr = tokens[1];
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynFillLevel");
-	break;
+      switch (key) {
+        case DynC.eSave_FillLevel:
+          break;
+        case DynC.eSave_FillLevel_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_FillLevel_color:
+          this.color = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_FillLevel_direction:
+          this.direction = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_FillLevel_min_value:
+          this.min_value = parseFloat(tokens[1]);
+          break;
+        case DynC.eSave_FillLevel_max_value:
+          this.max_value = parseFloat(tokens[1]);
+          break;
+        case DynC.eSave_FillLevel_minvalue_attr:
+          if (tokens.length > 1) this.minvalue_attr = tokens[1];
+          break;
+        case DynC.eSave_FillLevel_maxvalue_attr:
+          if (tokens.length > 1) this.maxvalue_attr = tokens[1];
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynFillLevel");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-		
+
     return i;
   };
-
 }
 
-function DynSetDig( dyn, instance) {
+function DynSetDig(dyn, instance) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = 0;
@@ -13103,140 +12551,133 @@ function DynSetDig( dyn, instance) {
 
   this.attribute;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     var inst = this.dyn.instance_number(this.instance);
     var iname;
     var inames = new Array(2);
-    if (inst == 1)
-      iname = "SetDig";
-    else
-      iname = "SetDig" + inst.toString();
+    if (inst == 1) iname = "SetDig";
+    else iname = "SetDig" + inst.toString();
     inames[0] = "SetDig.Instances";
     inames[1] = iname + ".Attribute";
     if (name === inames[0] && this.instance == DynC.mInstance_1) {
       this.instance_mask = value;
       this.dyn.update_elements();
       return 1;
-    }
-    else if (name === inames[1]) {
-      this.attribute =  value;
+    } else if (name === inames[1]) {
+      this.attribute = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     var inst = this.dyn.instance_number(this.instance);
     var iname;
     var inames = new Array(2);
-    if (inst == 1)
-      iname = "SetDig";
-    else
-      iname = "SetDig" + inst.toString();
+    if (inst == 1) iname = "SetDig";
+    else iname = "SetDig" + inst.toString();
     inames[0] = "SetDig.Instances";
     inames[1] = iname + ".Attribute";
     if (name === inames[0] && this.instance == DynC.mInstance_1) {
       ret.value = this.instance_mask = value;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === inames[1]) {
-      ret.value = this.attribute =  value;
+    } else if (name === inames[1]) {
+      ret.value = this.attribute = value;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( o) {
+  this.connect = function (o) {
     return 1;
   };
-  this.disconnect = function() {
-  };
-  this.scan = function( o) {
+  this.disconnect = function () {};
+  this.scan = function (o) {
     return 1;
   };
-  this.action = function( object, e) {
-    if ( !this.dyn.graph.isAuthorized( this.dyn.access))
-      return 1;
+  this.action = function (object, e) {
+    if (!this.dyn.graph.isAuthorized(this.dyn.access)) return 1;
 
-    switch ( e.event) {
-    case Glow.eEvent_MB1Down:
-      object.setColorInverse( 1);
-      this.dyn.repaintNow = true;
-      break;
-    case Glow.eEvent_MB1Up:
-      object.setColorInverse( 0);
-      this.dyn.repaintNow = true;
-      break;
-    case Glow.eEvent_MB1Click:
-      if ( (this.dyn.action_type1 & DynC.mActionType1_Confirm) !== 0)
-	break;
-		
-      var pname = this.dyn.parseAttrName( this.attribute);
-      if ( pname === null)
-	return 1;
-      var sts = null;
-      switch (pname.database) {
-      case GraphIfc.eDatabase_Gdh:
-	sts = this.dyn.graph.getGdh().setObjectInfoBoolean( pname.name, true);
-	break;
-      case GraphIfc.eDatabase_Local:
-	sts = this.dyn.graph.getLdb().setObjectInfo( this.dyn.graph, pname.name, true);
-	break;
-      default: break;
-      }
-      if ( sts.evenSts())
-	console.log( "SetDig: " + pname.name);
-      break;
-    default: break;
+    switch (e.event) {
+      case Glow.eEvent_MB1Down:
+        object.setColorInverse(1);
+        this.dyn.repaintNow = true;
+        break;
+      case Glow.eEvent_MB1Up:
+        object.setColorInverse(0);
+        this.dyn.repaintNow = true;
+        break;
+      case Glow.eEvent_MB1Click:
+        if ((this.dyn.action_type1 & DynC.mActionType1_Confirm) !== 0) break;
+
+        var pname = this.dyn.parseAttrName(this.attribute);
+        if (pname === null) return 1;
+        var sts = null;
+        switch (pname.database) {
+          case GraphIfc.eDatabase_Gdh:
+            sts = this.dyn.graph
+              .getGdh()
+              .setObjectInfoBoolean(pname.name, true);
+            break;
+          case GraphIfc.eDatabase_Local:
+            sts = this.dyn.graph
+              .getLdb()
+              .setObjectInfo(this.dyn.graph, pname.name, true);
+            break;
+          default:
+            break;
+        }
+        if (sts.evenSts()) console.log("SetDig: " + pname.name);
+        break;
+      default:
+        break;
     }
     return 1;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynSetDig : " + lines[i]);
+      if (this.dyn.debug) console.log("DynSetDig : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_SetDig: 
-	break;
-      case DynC.eSave_SetDig_attribute: 
-	if ( tokens.length > 1)
-	  this.attribute = tokens[1];
-	break;
-      case DynC.eSave_SetDig_instance: 
-	this.instance = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_SetDig_instance_mask: 
-	this.instance_mask = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynSetDig");
-	break;
+      switch (key) {
+        case DynC.eSave_SetDig:
+          break;
+        case DynC.eSave_SetDig_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_SetDig_instance:
+          this.instance = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_SetDig_instance_mask:
+          this.instance_mask = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynSetDig");
+          break;
       }
-      
-      if ( end)
-	break;
+
+      if (end) break;
     }
     return i;
-  };  
+  };
 }
 
-function DynResetDig( dyn, instance) {
+function DynResetDig(dyn, instance) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = 0;
@@ -13248,140 +12689,133 @@ function DynResetDig( dyn, instance) {
 
   this.attribute;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     var inst = this.dyn.instance_number(this.instance);
     var iname;
     var inames = new Array(2);
-    if (inst == 1)
-      iname = "ResetDig";
-    else
-      iname = "ResetDig" + inst.toString();
+    if (inst == 1) iname = "ResetDig";
+    else iname = "ResetDig" + inst.toString();
     inames[0] = "ResetDig.Instances";
     inames[1] = iname + ".Attribute";
     if (name === inames[0] && this.instance == DynC.mInstance_1) {
       this.instance_mask = value;
       this.dyn.update_elements();
       return 1;
-    }
-    else if (name === inames[1]) {
-      this.attribute =  value;
+    } else if (name === inames[1]) {
+      this.attribute = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     var inst = this.dyn.instance_number(this.instance);
     var iname;
     var inames = new Array(2);
-    if (inst == 1)
-      iname = "ResetDig";
-    else
-      iname = "ResetDig" + inst.toString();
+    if (inst == 1) iname = "ResetDig";
+    else iname = "ResetDig" + inst.toString();
     inames[0] = "ResetDig.Instances";
     inames[1] = iname + ".Attribute";
     if (name === inames[0] && this.instance == DynC.mInstance_1) {
       ret.value = this.instance_mask;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === inames[1]) {
+    } else if (name === inames[1]) {
       ret.value = this.attribute;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( o) {
+  this.connect = function (o) {
     return 1;
   };
-  this.disconnect = function() {
-  };
-  this.scan = function( o) {
+  this.disconnect = function () {};
+  this.scan = function (o) {
     return 1;
   };
-  this.action = function( object, e) {
-    if ( !this.dyn.graph.isAuthorized( this.dyn.access))
-      return 1;
+  this.action = function (object, e) {
+    if (!this.dyn.graph.isAuthorized(this.dyn.access)) return 1;
 
-    switch ( e.event) {
-    case Glow.eEvent_MB1Down:
-      object.setColorInverse( 1);
-      this.dyn.repaintNow = true;
-      break;
-    case Glow.eEvent_MB1Up:
-      object.setColorInverse( 0);
-      this.dyn.repaintNow = true;
-      break;
-    case Glow.eEvent_MB1Click:
-      if ( (this.dyn.action_type1 & DynC.mActionType1_Confirm) !== 0)
-	break;
-		
-      var pname = this.dyn.parseAttrName( this.attribute);
-      if ( pname === null)
-	return 1;
-      var sts = null;
-      switch (pname.database) {
-      case GraphIfc.eDatabase_Gdh:
-	sts = this.dyn.graph.getGdh().setObjectInfoBoolean( pname.name, false);
-	break;
-      case GraphIfc.eDatabase_Local:
-	sts = this.dyn.graph.getLdb().setObjectInfo( this.dyn.graph, pname.name, false);
-	break;
-      default: break;
-      }
-      if ( sts.evenSts())
-	console.log( "ResetDig: " + pname.name);
-      break;
-    default: break;
+    switch (e.event) {
+      case Glow.eEvent_MB1Down:
+        object.setColorInverse(1);
+        this.dyn.repaintNow = true;
+        break;
+      case Glow.eEvent_MB1Up:
+        object.setColorInverse(0);
+        this.dyn.repaintNow = true;
+        break;
+      case Glow.eEvent_MB1Click:
+        if ((this.dyn.action_type1 & DynC.mActionType1_Confirm) !== 0) break;
+
+        var pname = this.dyn.parseAttrName(this.attribute);
+        if (pname === null) return 1;
+        var sts = null;
+        switch (pname.database) {
+          case GraphIfc.eDatabase_Gdh:
+            sts = this.dyn.graph
+              .getGdh()
+              .setObjectInfoBoolean(pname.name, false);
+            break;
+          case GraphIfc.eDatabase_Local:
+            sts = this.dyn.graph
+              .getLdb()
+              .setObjectInfo(this.dyn.graph, pname.name, false);
+            break;
+          default:
+            break;
+        }
+        if (sts.evenSts()) console.log("ResetDig: " + pname.name);
+        break;
+      default:
+        break;
     }
     return 1;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynResetDig : " + lines[i]);
+      if (this.dyn.debug) console.log("DynResetDig : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_ResetDig: 
-	break;
-      case DynC.eSave_ResetDig_attribute: 
-	if ( tokens.length > 1)
-	  this.attribute = tokens[1];
-	break;
-      case DynC.eSave_ResetDig_instance: 
-	this.instance = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_ResetDig_instance_mask: 
-	this.instance_mask = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynResetDig");
-	break;
+      switch (key) {
+        case DynC.eSave_ResetDig:
+          break;
+        case DynC.eSave_ResetDig_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_ResetDig_instance:
+          this.instance = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_ResetDig_instance_mask:
+          this.instance_mask = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynResetDig");
+          break;
       }
-      
-      if ( end)
-	break;
+
+      if (end) break;
     }
     return i;
-  };  
+  };
 }
 
-function DynToggleDig( dyn) {
+function DynToggleDig(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = 0;
@@ -13393,14 +12827,14 @@ function DynToggleDig( dyn) {
 
   this.attribute;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "ToggleDig.Attribute") {
       this.attribute = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "ToggleDig.Attribute") {
       ret.value = this.attribute;
@@ -13409,92 +12843,86 @@ function DynToggleDig( dyn) {
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( o) {
+  this.connect = function (o) {
     return 1;
   };
-  this.disconnect = function() {
-  };
-  this.scan = function( o) {
+  this.disconnect = function () {};
+  this.scan = function (o) {
     return 1;
   };
-  this.action = function( object, e) {
-    if ( !this.dyn.graph.isAuthorized( this.dyn.access))
-      return 1;
+  this.action = function (object, e) {
+    if (!this.dyn.graph.isAuthorized(this.dyn.access)) return 1;
 
-    switch ( e.event) {
-    case Glow.eEvent_MB1Down:
-      object.setColorInverse( 1);
-      this.dyn.repaintNow = true;
-      this.dyn.graph.setClickActive(1);
-      break;
-    case Glow.eEvent_MB1Up:
-      object.setColorInverse( 0);
-      this.dyn.repaintNow = true;
-      this.dyn.graph.setClickActive( 0);
-      break;
-    case Glow.eEvent_MB1Click:
-      if ( (this.dyn.action_type1 & DynC.mActionType1_Confirm) != 0)
-	break;
-		
-      var pname = this.dyn.parseAttrName( this.attribute);
-      if ( pname === null)
-	return 1;
-      var sts = null;
-      switch (pname.database) {
-      case GraphIfc.eDatabase_Gdh:
-	sts = this.dyn.graph.getGdh().toggleObjectInfo( pname.name);
-	break;
-      case GraphIfc.eDatabase_Local:
-	sts = this.dyn.graph.getLdb().toggleObjectInfo( this.dyn.graph, pname.name);
-	break;
-      }
-      if ( sts.evenSts())
-	console.log( "ToggleDig: " + pname.name);
-      break;
+    switch (e.event) {
+      case Glow.eEvent_MB1Down:
+        object.setColorInverse(1);
+        this.dyn.repaintNow = true;
+        this.dyn.graph.setClickActive(1);
+        break;
+      case Glow.eEvent_MB1Up:
+        object.setColorInverse(0);
+        this.dyn.repaintNow = true;
+        this.dyn.graph.setClickActive(0);
+        break;
+      case Glow.eEvent_MB1Click:
+        if ((this.dyn.action_type1 & DynC.mActionType1_Confirm) != 0) break;
+
+        var pname = this.dyn.parseAttrName(this.attribute);
+        if (pname === null) return 1;
+        var sts = null;
+        switch (pname.database) {
+          case GraphIfc.eDatabase_Gdh:
+            sts = this.dyn.graph.getGdh().toggleObjectInfo(pname.name);
+            break;
+          case GraphIfc.eDatabase_Local:
+            sts = this.dyn.graph
+              .getLdb()
+              .toggleObjectInfo(this.dyn.graph, pname.name);
+            break;
+        }
+        if (sts.evenSts()) console.log("ToggleDig: " + pname.name);
+        break;
     }
     return 1;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynToggleDig : " + lines[i]);
+      if (this.dyn.debug) console.log("DynToggleDig : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_ToggleDig: 
-	break;
-      case DynC.eSave_ToggleDig_attribute: 
-	if ( tokens.length > 1)
-	  this.attribute = tokens[1];
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynToggleDig");
-	break;
+      switch (key) {
+        case DynC.eSave_ToggleDig:
+          break;
+        case DynC.eSave_ToggleDig_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynToggleDig");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-		
+
     return i;
   };
-
 }
 
-function DynStoDig( dyn) {
+function DynStoDig(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = 0;
@@ -13506,14 +12934,14 @@ function DynStoDig( dyn) {
 
   this.attribute;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "StoDig.Attribute") {
       this.attribute = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "StoDig.Attribute") {
       ret.value = this.attribute;
@@ -13522,102 +12950,101 @@ function DynStoDig( dyn) {
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( o) {
+  this.connect = function (o) {
     return 1;
   };
-  this.disconnect = function() {
-  };
-  this.scan = function( o) {
+  this.disconnect = function () {};
+  this.scan = function (o) {
     return 1;
   };
-  this.action = function( object, e) {
-    if ( !this.dyn.graph.isAuthorized( this.dyn.access))
-      return 1;
+  this.action = function (object, e) {
+    if (!this.dyn.graph.isAuthorized(this.dyn.access)) return 1;
 
-    switch ( e.event) {
-    case Glow.eEvent_MB1Down: {
-      object.setColorInverse( 1);
-      this.dyn.repaintNow = true;
+    switch (e.event) {
+      case Glow.eEvent_MB1Down: {
+        object.setColorInverse(1);
+        this.dyn.repaintNow = true;
 
-      if ( (this.dyn.action_type1 & DynC.mActionType1_Confirm) != 0)
-	break;
-		
-      var pname = this.dyn.parseAttrName( this.attribute);
-      var sts = null;
-      switch (pname.database) {
-      case GraphIfc.eDatabase_Gdh:
-	sts = this.dyn.graph.getGdh().setObjectInfoBoolean( pname.name, true);
-	break;
-      case GraphIfc.eDatabase_Local:
-	sts = this.dyn.graph.getLdb().setObjectInfo( this.dyn.graph, pname.name, true);
-	break;
+        if ((this.dyn.action_type1 & DynC.mActionType1_Confirm) != 0) break;
+
+        var pname = this.dyn.parseAttrName(this.attribute);
+        var sts = null;
+        switch (pname.database) {
+          case GraphIfc.eDatabase_Gdh:
+            sts = this.dyn.graph
+              .getGdh()
+              .setObjectInfoBoolean(pname.name, true);
+            break;
+          case GraphIfc.eDatabase_Local:
+            sts = this.dyn.graph
+              .getLdb()
+              .setObjectInfo(this.dyn.graph, pname.name, true);
+            break;
+        }
+        if (sts.evenSts()) console.log("StoDig: " + pname.name);
+        break;
       }
-      if ( sts.evenSts())
-	console.log( "StoDig: " + pname.name);
-      break;
-    }
-    case Glow.eEvent_MB1Up: {
-      object.setColorInverse( 0);
-      this.dyn.repaintNow = true;
+      case Glow.eEvent_MB1Up: {
+        object.setColorInverse(0);
+        this.dyn.repaintNow = true;
 
-      if ( (this.dyn.action_type1 & DynC.mActionType1_Confirm) != 0)
-	break;
-		
-      var pname = this.dyn.parseAttrName( this.attribute);
-      var sts = null;
-      switch (pname.database) {
-      case GraphIfc.eDatabase_Gdh:
-	sts = this.dyn.graph.getGdh().setObjectInfoBoolean( pname.name, false);
-	break;
-      case GraphIfc.eDatabase_Local:
-	sts = this.dyn.graph.getLdb().setObjectInfo( this.dyn.graph, pname.name, false);
-	break;
+        if ((this.dyn.action_type1 & DynC.mActionType1_Confirm) != 0) break;
+
+        var pname = this.dyn.parseAttrName(this.attribute);
+        var sts = null;
+        switch (pname.database) {
+          case GraphIfc.eDatabase_Gdh:
+            sts = this.dyn.graph
+              .getGdh()
+              .setObjectInfoBoolean(pname.name, false);
+            break;
+          case GraphIfc.eDatabase_Local:
+            sts = this.dyn.graph
+              .getLdb()
+              .setObjectInfo(this.dyn.graph, pname.name, false);
+            break;
+        }
+        if (sts.evenSts()) console.log("StoDig: " + pname.name);
+        break;
       }
-      if ( sts.evenSts())
-        console.log( "StoDig: " + pname.name);
-      break;
-    }
     }
     return 1;
-  }
+  };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynToggleDig : " + lines[i]);
+      if (this.dyn.debug) console.log("DynToggleDig : " + lines[i]);
 
-      switch ( key) {
-      case DynC.eSave_StoDig: 
-	break;
-      case DynC.eSave_StoDig_attribute: 
-	if ( tokens.length > 1)
-	  this.attribute = tokens[1];
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynStoDig");
-	break;
+      switch (key) {
+        case DynC.eSave_StoDig:
+          break;
+        case DynC.eSave_StoDig_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynStoDig");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-		
+
     return i;
   };
-
 }
 
-function DynCommand( dyn) {
+function DynCommand(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = 0;
@@ -13629,14 +13056,14 @@ function DynCommand( dyn) {
 
   this.command;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "Command.Command") {
       this.command = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "Command.Command") {
       ret.value = this.command;
@@ -13645,86 +13072,79 @@ function DynCommand( dyn) {
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( o) {
+  this.connect = function (o) {
     return 1;
   };
-  this.disconnect = function() {
-  };
-  this.scan = function( o) {
+  this.disconnect = function () {};
+  this.scan = function (o) {
     return 1;
   };
 
-  this.action = function( object, e) {
-    if ( !this.dyn.graph.isAuthorized( this.dyn.access))
-      return 1;
+  this.action = function (object, e) {
+    if (!this.dyn.graph.isAuthorized(this.dyn.access)) return 1;
 
-    switch ( e.event) {
-    case Glow.eEvent_MB1Down:
-      object.setColorInverse( 1);
-      this.dyn.repaintNow = true;
-      break;
-    case Glow.eEvent_MB1Up:
-      object.setColorInverse( 0);
-      this.dyn.repaintNow = true;
-      break;
-    case Glow.eEvent_MB1Click:
-      if ( (this.dyn.action_type1 & DynC.mActionType1_Confirm) != 0)
-	break;
-		
-      if ( this.command == null)
-	return 1;
+    switch (e.event) {
+      case Glow.eEvent_MB1Down:
+        object.setColorInverse(1);
+        this.dyn.repaintNow = true;
+        break;
+      case Glow.eEvent_MB1Up:
+        object.setColorInverse(0);
+        this.dyn.repaintNow = true;
+        break;
+      case Glow.eEvent_MB1Click:
+        if ((this.dyn.action_type1 & DynC.mActionType1_Confirm) != 0) break;
 
-      var cmd = this.dyn.graph.getCommand( this.command);
+        if (this.command == null) return 1;
 
-      var r = this.dyn.graph.ctx.gdraw.get_clip_rectangle();
-      if ( r != null)
-	this.dyn.graph.ctx.gdraw.reset_clip_rectangle();
-      
-      this.dyn.graph.command( cmd);
+        var cmd = this.dyn.graph.getCommand(this.command);
 
-      if ( r != null)
-	this.dyn.graph.ctx.gdraw.set_clip_rectangle( r.x1, r.y1, r.x2, r.y2);
+        var r = this.dyn.graph.ctx.gdraw.get_clip_rectangle();
+        if (r != null) this.dyn.graph.ctx.gdraw.reset_clip_rectangle();
 
-      break;
+        this.dyn.graph.command(cmd);
+
+        if (r != null)
+          this.dyn.graph.ctx.gdraw.set_clip_rectangle(r.x1, r.y1, r.x2, r.y2);
+
+        break;
     }
     return 1;
-  }
+  };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynCommand : " + lines[i]);
+      if (this.dyn.debug) console.log("DynCommand : " + lines[i]);
 
-      switch ( key) {
-      case DynC.eSave_Command: 
-	break;
-      case DynC.eSave_Command_command: 
-	if ( tokens.length > 1)
-	  this.command = lines[i].substring(5);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynCommand");
-	break;
+      switch (key) {
+        case DynC.eSave_Command:
+          break;
+        case DynC.eSave_Command_command:
+          if (tokens.length > 1) this.command = lines[i].substring(5);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynCommand");
+          break;
       }
 
-      if ( end)
-	break;
-    }		
+      if (end) break;
+    }
     return i;
   };
 }
 
-function DynScript( dyn) {
+function DynScript(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = 0;
@@ -13739,7 +13159,7 @@ function DynScript( dyn) {
   this.arguments;
   this.trigger_event;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "Script.TriggerEvent") {
       this.trigger_event = value;
       return 1;
@@ -13752,8 +13172,8 @@ function DynScript( dyn) {
       this.script = value;
       return 1;
     }
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "Script.TriggerEvent") {
       ret.value = this.trigger_event;
@@ -13770,117 +13190,105 @@ function DynScript( dyn) {
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
     }
-  }
+  };
 
-  this.connect = function( o) {
+  this.connect = function (o) {
     return 1;
   };
-  this.disconnect = function() {
-  };
-  this.scan = function( o) {
+  this.disconnect = function () {};
+  this.scan = function (o) {
     return 1;
   };
 
-  this.action = function( object, e) {
-    if ( !this.dyn.graph.isAuthorized( this.dyn.access))
-      return 1;
+  this.action = function (object, e) {
+    if (!this.dyn.graph.isAuthorized(this.dyn.access)) return 1;
 
-    switch ( e.event) {
-    case Glow.eEvent_MB1Down:
-      object.setColorInverse( 1);
-      this.dyn.repaintNow = true;
-      break;
-    case Glow.eEvent_MB1Up:
-      object.setColorInverse( 0);
-      this.dyn.repaintNow = true;
-      break;
-    case Glow.eEvent_MB1Click:
-      if ( (this.dyn.action_type1 & DynC.mActionType1_Confirm) != 0)
-	break;
-		
-      if ( this.script == null)
-	return 1;
+    switch (e.event) {
+      case Glow.eEvent_MB1Down:
+        object.setColorInverse(1);
+        this.dyn.repaintNow = true;
+        break;
+      case Glow.eEvent_MB1Up:
+        object.setColorInverse(0);
+        this.dyn.repaintNow = true;
+        break;
+      case Glow.eEvent_MB1Click:
+        if ((this.dyn.action_type1 & DynC.mActionType1_Confirm) != 0) break;
 
-      this.dyn.graph.script( this.script);
-      break;
+        if (this.script == null) return 1;
+
+        this.dyn.graph.script(this.script);
+        break;
     }
     return 1;
-  }
+  };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynScript : " + lines[i]);
+      if (this.dyn.debug) console.log("DynScript : " + lines[i]);
 
-      switch ( key) {
-      case DynC.eSave_Script: 
-	break;
-      case DynC.eSave_Script_script_len: 
-	this.script_len = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_Script_script: 
-	var idx;
-	var send = false;
-	this.script = "";
-	i++;
-	var line = lines[i].trim().substring(1);
+      switch (key) {
+        case DynC.eSave_Script:
+          break;
+        case DynC.eSave_Script_script_len:
+          this.script_len = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_Script_script:
+          var idx;
+          var send = false;
+          this.script = "";
+          i++;
+          var line = lines[i].trim().substring(1);
 
-	idx = 0;
-	while ( line != null) {			    
-	  while ( (idx = line.indexOf('"', idx)) != -1) {
-	    if ( idx > 0 && (line.charAt(idx-1) == '\\')) {
-	      line = line.substring(0, idx-1) + line.substring(idx);
-	    }
-	    else {				
-	      if ( idx > 0)
-		line = line.substring( 0, idx - 1);
-	      else
-		line = "";
-	      this.script += line;
-	      send = true;
-	      break;
-	    }
-	  }
-	  if ( send)
-	    break;
-	  this.script += line + "\n";
-	  i++;
-	  if ( i >= lines.length)
-	    break;
-	  
-	  line = lines[i];
-	}			
-	break;
-      case DynC.eSave_Script_arguments: 
-	if ( tokens.length > 1)
-	  this.arguments = lines[i].substring(5);
-	break;
-      case DynC.eSave_Script_trigger_event: 
-	this.trigger_event = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynScript");
-	break;
+          idx = 0;
+          while (line != null) {
+            while ((idx = line.indexOf('"', idx)) != -1) {
+              if (idx > 0 && line.charAt(idx - 1) == "\\") {
+                line = line.substring(0, idx - 1) + line.substring(idx);
+              } else {
+                if (idx > 0) line = line.substring(0, idx - 1);
+                else line = "";
+                this.script += line;
+                send = true;
+                break;
+              }
+            }
+            if (send) break;
+            this.script += line + "\n";
+            i++;
+            if (i >= lines.length) break;
+
+            line = lines[i];
+          }
+          break;
+        case DynC.eSave_Script_arguments:
+          if (tokens.length > 1) this.arguments = lines[i].substring(5);
+          break;
+        case DynC.eSave_Script_trigger_event:
+          this.trigger_event = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynScript");
+          break;
       }
 
-      if ( end)
-	break;
-    }		
-    console.log( "script : \"" + this.script + "\"");
+      if (end) break;
+    }
+    console.log('script : "' + this.script + '"');
     return i;
   };
-
 }
 
-function DynCommandDoubleClick( dyn) {
+function DynCommandDoubleClick(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = 0;
@@ -13892,14 +13300,14 @@ function DynCommandDoubleClick( dyn) {
 
   this.command;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "CommandDoubleClick.Command") {
       this.command = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "CommandDoubleClick.Command") {
       ret.value = this.command;
@@ -13908,78 +13316,72 @@ function DynCommandDoubleClick( dyn) {
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( o) {
+  this.connect = function (o) {
     return 1;
   };
-  this.disconnect = function() {
-  };
-  this.scan = function( o) {
+  this.disconnect = function () {};
+  this.scan = function (o) {
     return 1;
   };
 
-  this.action = function( object, e) {
-    if ( !this.dyn.graph.isAuthorized( this.dyn.access))
-      return 1;
+  this.action = function (object, e) {
+    if (!this.dyn.graph.isAuthorized(this.dyn.access)) return 1;
 
-    switch ( e.event) {
-    case Glow.eEvent_MB1Down:
-      object.setColorInverse( 1);
-      this.dyn.repaintNow = true;
-      break;
-    case Glow.eEvent_MB1Up:
-      object.setColorInverse( 0);
-      this.dyn.repaintNow = true;
-      break;
-    case Glow.eEvent_MB1ClickDoubleClick:
-      if ( (this.dyn.action_type1 & DynC.mActionType1_Confirm) != 0)
-	break;
-		
-      if ( this.command == null)
-	return 1;
+    switch (e.event) {
+      case Glow.eEvent_MB1Down:
+        object.setColorInverse(1);
+        this.dyn.repaintNow = true;
+        break;
+      case Glow.eEvent_MB1Up:
+        object.setColorInverse(0);
+        this.dyn.repaintNow = true;
+        break;
+      case Glow.eEvent_MB1ClickDoubleClick:
+        if ((this.dyn.action_type1 & DynC.mActionType1_Confirm) != 0) break;
 
-      var cmd = this.dyn.graph.getCommand( this.command);
+        if (this.command == null) return 1;
 
-      this.dyn.graph.command( cmd);
-      break;
+        var cmd = this.dyn.graph.getCommand(this.command);
+
+        this.dyn.graph.command(cmd);
+        break;
     }
     return 1;
-  }
+  };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynCommandDoubleClick : " + lines[i]);
+      if (this.dyn.debug) console.log("DynCommandDoubleClick : " + lines[i]);
 
-      switch ( key) {
-      case DynC.eSave_CommandDC: 
-	break;
-      case DynC.eSave_CommandDC_command: 
-	if ( tokens.length > 1)
-	  this.command = lines[i].substring(5);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynCommandDoubleClick");
-	break;
+      switch (key) {
+        case DynC.eSave_CommandDC:
+          break;
+        case DynC.eSave_CommandDC_command:
+          if (tokens.length > 1) this.command = lines[i].substring(5);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynCommandDoubleClick");
+          break;
       }
 
-      if ( end)
-	break;
-    }		
+      if (end) break;
+    }
     return i;
   };
 }
 
-function DynConfirm( dyn) {
+function DynConfirm(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = 0;
@@ -13988,150 +13390,149 @@ function DynConfirm( dyn) {
   this.prio = DynC.eDynPrio_Confirm;
   this.instance_mask = 0;
   this.instance = 0;
-  
+
   this.text;
   this.on_set;
   this.on_reset;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "Confirm.Text") {
       this.text = value;
       return 1;
-    }
-    else if (name === "Confirm.OnSet") {
+    } else if (name === "Confirm.OnSet") {
       this.on_set = value;
       return 1;
-    }
-    else if (name === "Confirm.OnReset") {
+    } else if (name === "Confirm.OnReset") {
       this.on_reset = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "Confirm.Text") {
       ret.value = this.text;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "Confirm.OnSet") {
+    } else if (name === "Confirm.OnSet") {
       ret.value = this.on_set;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "Confirm.OnReset") {
+    } else if (name === "Confirm.OnReset") {
       ret.value = this.on_reset;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( o) {
+  this.connect = function (o) {
     return 1;
   };
-  this.disconnect = function() {
-  };
-  this.scan = function( o) {
+  this.disconnect = function () {};
+  this.scan = function (o) {
     return 1;
   };
 
-  this.action = function( object, e) {
-    if ( (this.dyn.action_type1 & DynC.mActionType1_Confirm) == 0)
-      return 1;
+  this.action = function (object, e) {
+    if ((this.dyn.action_type1 & DynC.mActionType1_Confirm) == 0) return 1;
 
-    if ( !this.dyn.graph.isAuthorized( this.dyn.access))
-      return 1;
+    if (!this.dyn.graph.isAuthorized(this.dyn.access)) return 1;
 
-    switch ( e.event) {
-    case Glow.eEvent_MB1Down:
-      break;
-    case Glow.eEvent_MB1Click:
-    case Glow.eEvent_ValueChanged:
+    switch (e.event) {
+      case Glow.eEvent_MB1Down:
+        break;
+      case Glow.eEvent_MB1Click:
+      case Glow.eEvent_ValueChanged:
+        var skip = 0;
+        if (
+          ((this.on_set != 0 && this.on_reset == 0) ||
+            (this.on_reset != 0 && this.on_set == 0)) &&
+          (this.dyn.total_action_type1 & DynC.mActionType1_ToggleDig) != 0
+        ) {
+          for (var j = 0; j < this.dyn.elements.length; j++) {
+            if (
+              dyn.elements.get(j).action_type1 == DynC.mActionType1_ToggleDig
+            ) {
+              var pname = this.dyn.parseAttrName(
+                this.dyn.elements.get(j).attribute,
+              );
+              if (pname.name.substring(0, 1) == "&")
+                pname.name = this.dyn.graph.get_reference_name(pname.name);
 
-      var skip = 0;
-      if ( ((this.on_set != 0 && this.on_reset == 0) || (this.on_reset != 0 && this.on_set == 0)) &&
-	   (this.dyn.total_action_type1 & DynC.mActionType1_ToggleDig) != 0) {
-	for ( var j = 0; j < this.dyn.elements.length; j++) {
-	  if ( dyn.elements.get(j).action_type1 == DynC.mActionType1_ToggleDig) {
-	    var pname = this.dyn.parseAttrName( this.dyn.elements.get(j).attribute);
-	    if ( pname.name.substring(0,1) == "&")
-	      pname.name = this.dyn.graph.get_reference_name( pname.name);
+              switch (pname.database) {
+                case GraphIfc.eDatabase_Gdh:
+                  // TODO
+                  var ret = this.dyn.graph
+                    .getGdh()
+                    .getObjectInfoBoolean(pname.name);
+                  if (ret.oddSts()) {
+                    if (
+                      (this.on_set != 0 && ret.value) ||
+                      (this.on_reset != 0 && !ret.value)
+                    )
+                      skip = 1;
+                  } else console.log("Confirm: " + ret.getSts());
+                  break;
+                case GraphIfc.eDatabase_Ccm:
+                  // TODO
+                  break;
+                default:
+              }
+              break;
+            }
+          }
+        }
+        if (skip != 0) {
+          this.dyn.confirmedAction(e.event, object);
+          return 1;
+        }
 
-	    switch ( pname.database) {
-	    case GraphIfc.eDatabase_Gdh:
-	      // TODO
-	      var ret = this.dyn.graph.getGdh().getObjectInfoBoolean( pname.name);
-	      if (ret.oddSts()) {
-		if ( (this.on_set != 0 && ret.value) || (this.on_reset != 0 && !ret.value))
-		  skip = 1;
-	      }
-	      else
-		console.log("Confirm: " + ret.getSts());
-	      break;
-	    case GraphIfc.eDatabase_Ccm:
-	      // TODO
-	      break;
-	    default: ;
-	    }
-	    break;
-	  }
-	}
-      }
-      if ( skip != 0) {
-	this.dyn.confirmedAction(  e.event, object);
-	return 1;
-      }
-
-      this.dyn.graph.openConfirmDialog( this.dyn, this.text, object);
-      break;
+        this.dyn.graph.openConfirmDialog(this.dyn, this.text, object);
+        break;
     }
     return 1;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynConfirm : " + lines[i]);
+      if (this.dyn.debug) console.log("DynConfirm : " + lines[i]);
 
-      switch ( key) {
-      case DynC.eSave_Confirm: 
-	break;
-      case DynC.eSave_Confirm_text: 
-	if ( tokens.length > 1)
-	  this.text = lines[i].substring(5);
-	break;
-      case DynC.eSave_Confirm_on_set: 
-	this.on_set = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_Confirm_on_reset: 
-	this.on_reset = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynConfirm");
-	break;
+      switch (key) {
+        case DynC.eSave_Confirm:
+          break;
+        case DynC.eSave_Confirm_text:
+          if (tokens.length > 1) this.text = lines[i].substring(5);
+          break;
+        case DynC.eSave_Confirm_on_set:
+          this.on_set = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_Confirm_on_reset:
+          this.on_reset = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynConfirm");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
- 		
+
     return i;
   };
-
 }
 
-function DynIncrAnalog( dyn) {
+function DynIncrAnalog(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = 0;
@@ -14146,214 +13547,201 @@ function DynIncrAnalog( dyn) {
   this.min_value = 0;
   this.max_value = 0;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "IncrAnalog.Attribute") {
       this.attribute = value;
       return 1;
-    }
-    else if (name === "IncrAnalog.Increment") {
+    } else if (name === "IncrAnalog.Increment") {
       this.increment = value;
       return 1;
-    }
-    else if (name === "IncrAnalog.MinValue") {
+    } else if (name === "IncrAnalog.MinValue") {
       this.min_value = value;
       return 1;
-    }
-    else if (name === "IncrAnalog.MaxValue") {
+    } else if (name === "IncrAnalog.MaxValue") {
       this.max_value = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "IncrAnalog.Attribute") {
       ret.value = this.attribute;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "IncrAnalog.Increment") {
+    } else if (name === "IncrAnalog.Increment") {
       ret.value = this.increment;
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
-    }
-    else if (name === "IncrAnalog.MinValue") {
+    } else if (name === "IncrAnalog.MinValue") {
       ret.value = this.min_value;
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
-    }
-    else if (name === "IncrAnalog.MaxValue") {
+    } else if (name === "IncrAnalog.MaxValue") {
       ret.value = this.max_value;
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( o) {
+  this.connect = function (o) {
     return 1;
   };
-  this.disconnect = function() {
-  };
-  this.scan = function( o) {
+  this.disconnect = function () {};
+  this.scan = function (o) {
     return 1;
   };
 
-  this.action = function( object, e) {
+  this.action = function (object, e) {
+    if (!this.dyn.graph.isAuthorized(this.dyn.access)) return 1;
 
-    if ( !this.dyn.graph.isAuthorized( this.dyn.access))
-      return 1;
+    switch (e.event) {
+      case Glow.eEvent_MB1Down:
+        object.setColorInverse(1);
+        this.dyn.repaintNow = true;
+        break;
+      case Glow.eEvent_MB1Up:
+        object.setColorInverse(0);
+        this.dyn.repaintNow = true;
+        break;
+      case Glow.eEvent_MB1Click:
+        if ((this.dyn.action_type1 & DynC.mActionType1_Confirm) != 0) break;
 
-    switch ( e.event) {
-    case Glow.eEvent_MB1Down:
-      object.setColorInverse( 1);
-      this.dyn.repaintNow = true;
-      break;
-    case Glow.eEvent_MB1Up:
-      object.setColorInverse( 0);
-      this.dyn.repaintNow = true;
-      break;
-    case Glow.eEvent_MB1Click:
-      if ( (this.dyn.action_type1 & DynC.mActionType1_Confirm) != 0)
-	break;
-
-      var pname = this.dyn.parseAttrName( this.attribute);
-      if ( pname == null)
-	return 1;
-      var typeId = pname.type;
-      if ( pname.type < 0)
-	typeId = Pwr.eType_Float32;
-      switch ( typeId) {
-      case Pwr.eType_Int32:
-	switch (pname.database) {
-	case GraphIfc.eDatabase_Gdh:
-	  this.dyn.graph.getGdh().getObjectInfoInt( pname.name, this.action2, this);
-	  break;
-	case GraphIfc.eDatabase_Local:
-	  var ret = this.dyn.graph.getLdb().getObjectInfo( this.dyn.graph, pname.name);
-	  this.action2(0, this, 1, ret.value);
-	  break;
-	}
-	break;
-      default:
-	switch (pname.database) {
-	case GraphIfc.eDatabase_Gdh:
-	  this.dyn.graph.getGdh().getObjectInfoFloat( pname.name, this.action2, this);
-	  break;
-	case GraphIfc.eDatabase_Local:
-	  var ret = this.dyn.graph.getLdb().getObjectInfo( this.dyn.graph, pname.name);
-	  this.action2(0, this, 1, ret.value);
-	  break;
-	}
-      }
-      break;
+        var pname = this.dyn.parseAttrName(this.attribute);
+        if (pname == null) return 1;
+        var typeId = pname.type;
+        if (pname.type < 0) typeId = Pwr.eType_Float32;
+        switch (typeId) {
+          case Pwr.eType_Int32:
+            switch (pname.database) {
+              case GraphIfc.eDatabase_Gdh:
+                this.dyn.graph
+                  .getGdh()
+                  .getObjectInfoInt(pname.name, this.action2, this);
+                break;
+              case GraphIfc.eDatabase_Local:
+                var ret = this.dyn.graph
+                  .getLdb()
+                  .getObjectInfo(this.dyn.graph, pname.name);
+                this.action2(0, this, 1, ret.value);
+                break;
+            }
+            break;
+          default:
+            switch (pname.database) {
+              case GraphIfc.eDatabase_Gdh:
+                this.dyn.graph
+                  .getGdh()
+                  .getObjectInfoFloat(pname.name, this.action2, this);
+                break;
+              case GraphIfc.eDatabase_Local:
+                var ret = this.dyn.graph
+                  .getLdb()
+                  .getObjectInfo(this.dyn.graph, pname.name);
+                this.action2(0, this, 1, ret.value);
+                break;
+            }
+        }
+        break;
     }
     return 1;
   };
 
-  this.action2 = function( id, self, sts, value) {
-    if ( !(sts & 1))
-      return;
+  this.action2 = function (id, self, sts, value) {
+    if (!(sts & 1)) return;
 
-    var pname = self.dyn.parseAttrName( self.attribute);
-    if ( pname == null)
-      return 1;
+    var pname = self.dyn.parseAttrName(self.attribute);
+    if (pname == null) return 1;
     var typeId = pname.type;
-    if ( pname.type < 0)
-      typeId = Pwr.eType_Float32;
-    switch ( typeId) {
-    case Pwr.eType_Int32: {
-      value += self.increment;
-      if ( !( self.min_value == 0 && self.max_value == 0)) {
-	if ( value < self.min_value)
-	  value = Math.floor(self.min_value);
-	if ( value > self.max_value)
-	  value = Math.floor(self. max_value);
+    if (pname.type < 0) typeId = Pwr.eType_Float32;
+    switch (typeId) {
+      case Pwr.eType_Int32: {
+        value += self.increment;
+        if (!(self.min_value == 0 && self.max_value == 0)) {
+          if (value < self.min_value) value = Math.floor(self.min_value);
+          if (value > self.max_value) value = Math.floor(self.max_value);
+        }
+
+        var sts;
+        switch (pname.database) {
+          case GraphIfc.eDatabase_Gdh:
+            sts = self.dyn.graph.getGdh().setObjectInfoInt(pname.name, value);
+            break;
+          case GraphIfc.eDatabase_Local:
+            sts = self.dyn.graph
+              .getLdb()
+              .setObjectInfo(this.dyn.graph, pname.name, value);
+            break;
+        }
+        if (sts.evenSts()) console.log("IncrAnalog " + pname.name);
+        break;
       }
-      
-      var sts;
-      switch (pname.database) {
-      case GraphIfc.eDatabase_Gdh:
-	sts = self.dyn.graph.getGdh().setObjectInfoInt( pname.name, value);
-	break;
-      case GraphIfc.eDatabase_Local:
-	sts = self.dyn.graph.getLdb().setObjectInfo( this.dyn.graph, pname.name, value);
-	break;
+      default: {
+        value += self.increment;
+        if (!(self.min_value == 0 && self.max_value == 0)) {
+          if (value < self.min_value) value = self.min_value;
+          if (value > self.max_value) value = self.max_value;
+        }
+        var sts;
+        switch (pname.database) {
+          case GraphIfc.eDatabase_Gdh:
+            sts = self.dyn.graph.getGdh().setObjectInfoFloat(pname.name, value);
+            break;
+          case GraphIfc.eDatabase_Local:
+            sts = self.dyn.graph
+              .getLdb()
+              .setObjectInfo(this.dyn.graph, pname.name, value);
+            break;
+        }
+        if (sts.evenSts()) console.log("IncrAnalog " + pname.name);
       }
-      if ( sts.evenSts())
-	console.log( "IncrAnalog " + pname.name);
-      break;
     }
-    default: {
-      value += self.increment;
-      if ( !( self.min_value == 0 && self.max_value == 0)) {
-	if ( value < self.min_value)
-	  value = self.min_value;
-	if ( value > self.max_value)
-	  value = self.max_value;
-      }
-      var sts;
-      switch (pname.database) {
-      case GraphIfc.eDatabase_Gdh:
-	sts = self.dyn.graph.getGdh().setObjectInfoFloat( pname.name, value);
-	break;
-      case GraphIfc.eDatabase_Local:
-	sts = self.dyn.graph.getLdb().setObjectInfo( this.dyn.graph, pname.name, value);
-	break;
-      }
-      if ( sts.evenSts())
-	console.log( "IncrAnalog " + pname.name);
-    }
-    }
-    return 1;    
+    return 1;
   };
 
-
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynConfirm : " + lines[i]);
+      if (this.dyn.debug) console.log("DynConfirm : " + lines[i]);
 
-      switch ( key) {
-      case DynC.eSave_IncrAnalog: 
-	break;
-      case DynC.eSave_IncrAnalog_attribute: 
-	if ( tokens.length > 1)
-	  this.attribute = tokens[1];
-	break;
-      case DynC.eSave_IncrAnalog_increment: 
-	this.increment = parseFloat( tokens[1]);
-	break;
-      case DynC.eSave_IncrAnalog_min_value: 
-	this.min_value = parseFloat( tokens[1]);
-	break;
-      case DynC.eSave_IncrAnalog_max_value: 
-	this.max_value = parseFloat( tokens[1]);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynIncrAnalog");
-	break;
+      switch (key) {
+        case DynC.eSave_IncrAnalog:
+          break;
+        case DynC.eSave_IncrAnalog_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_IncrAnalog_increment:
+          this.increment = parseFloat(tokens[1]);
+          break;
+        case DynC.eSave_IncrAnalog_min_value:
+          this.min_value = parseFloat(tokens[1]);
+          break;
+        case DynC.eSave_IncrAnalog_max_value:
+          this.max_value = parseFloat(tokens[1]);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynIncrAnalog");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-		
+
     return i;
   };
-
 }
 
-function DynRadioButton( dyn) {
+function DynRadioButton(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = DynC.mDynType1_RadioButton;
   this.dyn_type2 = 0;
@@ -14367,14 +13755,14 @@ function DynRadioButton( dyn) {
   this.attribute;
   this.firstScan = true;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "RadioButton.Attribute") {
       this.attribute = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "RadioButton.Attribute") {
       ret.value = this.attribute;
@@ -14383,162 +13771,168 @@ function DynRadioButton( dyn) {
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( object) {
-
-    this.a = new DynReference( this.dyn, this.attribute);
+  this.connect = function (object) {
+    this.a = new DynReference(this.dyn, this.attribute);
     this.a.connect(this.dyn);
-    if ( !this.a.sts) {
+    if (!this.a.sts) {
       console.log("RadioButton: " + this.attribute);
       return 1;
     }
     return 1;
   };
 
-  this.disconnect = function() {
+  this.disconnect = function () {
     this.a.disconnect(this.dyn);
   };
 
-	
-  this.scan = function( object) {
-    if ( !this.a.sts)
-      return;
-    var value = this.dyn.getDig( this.a.p, this.a.typeid, this.a.bitmask, this.a.database);
-    if ( this.a.inverted)
-      value = !value;
+  this.scan = function (object) {
+    if (!this.a.sts) return;
+    var value = this.dyn.getDig(
+      this.a.p,
+      this.a.typeid,
+      this.a.bitmask,
+      this.a.database,
+    );
+    if (this.a.inverted) value = !value;
 
-    if ( !this.firstScan) {
-      if ( this.a.oldValue == value)
-	return;
-    }
-    else
-      this.firstScan = false;
-	
-    if ( value) {
+    if (!this.firstScan) {
+      if (this.a.oldValue == value) return;
+    } else this.firstScan = false;
+
+    if (value) {
       object.set_last_nodeclass();
-    }
-    else {
+    } else {
       object.set_root_nodeclass();
     }
     this.a.oldValue = value;
   };
 
-  this.action = function( object, e) {
+  this.action = function (object, e) {
+    if (!this.dyn.graph.isAuthorized(this.dyn.access)) return 1;
 
-    if ( !this.dyn.graph.isAuthorized( this.dyn.access))
-      return 1;
+    switch (e.event) {
+      case Glow.eEvent_MB1Down:
+        object.setColorInverse(1);
+        this.dyn.repaintNow = true;
+        break;
+      case Glow.eEvent_MB1Up:
+        object.setColorInverse(0);
+        this.dyn.repaintNow = true;
+        break;
+      case Glow.eEvent_MB1Click: {
+        if ((this.dyn.action_type1 & DynC.mActionType1_Confirm) !== 0) break;
 
-    switch ( e.event) {
-    case Glow.eEvent_MB1Down:
-      object.setColorInverse( 1);
-      this.dyn.repaintNow = true;
-      break;
-    case Glow.eEvent_MB1Up:
-      object.setColorInverse( 0);
-      this.dyn.repaintNow = true;
-      break;
-    case Glow.eEvent_MB1Click: {
-      if ( (this.dyn.action_type1 & DynC.mActionType1_Confirm) !== 0)
-	break;
+        var value;
+        var group = this.dyn.graph.getCtx().get_object_group(object);
+        if (group == null) break;
 
-      var value;
-      var group = this.dyn.graph.getCtx().get_object_group(object);
-      if ( group == null) break;
+        var list = group.get_object_list();
 
-      var list = group.get_object_list();
+        for (var i = 0; i < list.size(); i++) {
+          var oe = list.get(i);
+          if (oe != e.object && oe.type() == Glow.eObjectType_GrowNode) {
+            value = false;
+            var gm_dyn = oe.getUserData();
 
-      for ( var i = 0; i < list.size(); i++) {
-	var oe = list.get(i);
-	if ( oe != e.object &&
-	     oe.type() == Glow.eObjectType_GrowNode) {
-	  value = false;
-	  var gm_dyn = oe.getUserData();
+            if (
+              (gm_dyn.total_action_type1 & DynC.mActionType1_RadioButton) !==
+              0
+            ) {
+              for (var j = 0; j < gm_dyn.elements.length; j++) {
+                if (
+                  gm_dyn.elements[j].action_type1 ==
+                  DynC.mActionType1_RadioButton
+                ) {
+                  var pname = this.dyn.parseAttrName(
+                    gm_dyn.elements[j].attribute,
+                  );
+                  if (pname.name.substring(0, 1) == "&")
+                    pname.name = this.dyn.graph.get_reference_name(pname.name);
+                  var sts;
+                  switch (pname.database) {
+                    case GraphIfc.eDatabase_Gdh:
+                      sts = this.dyn.graph
+                        .getGdh()
+                        .setObjectInfoBoolean(pname.name, value);
+                      break;
+                    case GraphIfc.eDatabase_Local:
+                      sts = this.dyn.graph
+                        .getLdb()
+                        .setObjectInfo(this.dyn.graph, pname.name, value);
+                      break;
+                    case GraphIfc.eDatabase_Ccm:
+                      // TODO
+                      break;
+                    default:
+                  }
+                }
+              }
+            }
+          }
+        }
 
-	  if ( (gm_dyn.total_action_type1 & DynC.mActionType1_RadioButton) !== 0) {
-	    for ( var j = 0; j < gm_dyn.elements.length; j++) {
-	      if ( gm_dyn.elements[j].action_type1 == DynC.mActionType1_RadioButton) {
-		var pname = this.dyn.parseAttrName( gm_dyn.elements[j].attribute);
-		if ( pname.name.substring(0,1) == "&")
-		  pname.name = this.dyn.graph.get_reference_name( pname.name);
-		var sts;
-		switch ( pname.database) {
-		case GraphIfc.eDatabase_Gdh:
-		  sts = this.dyn.graph.getGdh().setObjectInfoBoolean( pname.name, value);
-		  break;
-		case GraphIfc.eDatabase_Local:
-		  sts = this.dyn.graph.getLdb().setObjectInfo( this.dyn.graph, pname.name, value);
-		  break;
-		case GraphIfc.eDatabase_Ccm:
-		  // TODO
-		  break;
-		default: ;
-		}
-	      }
-	    }
-	  }
-	}
+        var pname = this.dyn.parseAttrName(this.attribute);
+        if (pname.name.substring(0, 1) == "&")
+          pname.name = this.dyn.graph.get_reference_name(pname.name);
+
+        value = true;
+        var sts;
+        switch (pname.database) {
+          case GraphIfc.eDatabase_Gdh:
+            sts = this.dyn.graph
+              .getGdh()
+              .setObjectInfoBoolean(pname.name, value);
+            break;
+          case GraphIfc.eDatabase_Local:
+            sts = this.dyn.graph
+              .getLdb()
+              .setObjectInfo(this.dyn.graph, pname.name, value);
+            break;
+          case GraphIfc.eDatabase_Ccm:
+            // TODO
+            break;
+          default:
+        }
+        break;
       }
-		
-      var pname = this.dyn.parseAttrName( this.attribute);
-      if ( pname.name.substring( 0, 1) == "&")
-	pname.name = this.dyn.graph.get_reference_name( pname.name);
-
-      value = true;
-      var sts;
-      switch ( pname.database) {
-      case GraphIfc.eDatabase_Gdh:
-	sts = this.dyn.graph.getGdh().setObjectInfoBoolean( pname.name, value);
-	break;
-      case GraphIfc.eDatabase_Local:
-	sts = this.dyn.graph.getLdb().setObjectInfo( this.dyn.graph, pname.name, value);
-	break;
-      case GraphIfc.eDatabase_Ccm:
-	// TODO
-	break;
-      default: ;
-      }
-      break;
-    }
     }
     return 1;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynRadioButton : " + lines[i]);
+      if (this.dyn.debug) console.log("DynRadioButton : " + lines[i]);
 
-      switch ( key) {
-      case DynC.eSave_RadioButton: 
-	break;
-      case DynC.eSave_RadioButton_attribute: 
-	if ( tokens.length > 1)
-	  this.attribute = tokens[1];
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynRadioButton");
-	break;
+      switch (key) {
+        case DynC.eSave_RadioButton:
+          break;
+        case DynC.eSave_RadioButton_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynRadioButton");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-		
+
     return i;
   };
-
 }
 
-function DynTipText( dyn) {
+function DynTipText(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = 0;
@@ -14550,14 +13944,14 @@ function DynTipText( dyn) {
 
   this.text;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "ToolTip.Text") {
       this.text = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "ToolTip.Text") {
       ret.value = this.text;
@@ -14566,52 +13960,49 @@ function DynTipText( dyn) {
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( o) {
+  this.connect = function (o) {
     return 1;
   };
-  this.disconnect = function() {
-  };
-  this.scan = function( o) {
+  this.disconnect = function () {};
+  this.scan = function (o) {
     return 1;
   };
-  this.action = function( object, e) {
+  this.action = function (object, e) {
     return 1;
   };
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynTipText : " + lines[i]);
+      if (this.dyn.debug) console.log("DynTipText : " + lines[i]);
 
-      switch ( key) {
-      case DynC.eSave_TipText: 
-	break;
-      case DynC.eSave_TipText_text: 
-	if ( tokens.length > 1)
-	  this.text = lines[i].substring(5);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynTipText");
-	break;
+      switch (key) {
+        case DynC.eSave_TipText:
+          break;
+        case DynC.eSave_TipText_text:
+          if (tokens.length > 1) this.text = lines[i].substring(5);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynTipText");
+          break;
       }
-      
-      if ( end)
-	break;
+
+      if (end) break;
     }
     return i;
   };
 }
 
-function DynHelp( dyn) {
+function DynHelp(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = 0;
@@ -14624,108 +14015,99 @@ function DynHelp( dyn) {
   this.topic = null;
   this.bookmark = null;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "Help.Topic") {
       this.topic = value;
       return 1;
-    }
-    else if (name === "Help.Bookmark") {
+    } else if (name === "Help.Bookmark") {
       this.bookmark = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "Help.Topic") {
       ret.value = this.topic;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "Help.Bookmark") {
+    } else if (name === "Help.Bookmark") {
       ret.value = this.bookmark;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( o) {
+  this.connect = function (o) {
     return 1;
   };
-  this.disconnect = function() {
-  };
-  this.scan = function( o) {
+  this.disconnect = function () {};
+  this.scan = function (o) {
     return 1;
   };
-  this.action = function( object, e) {
-    if ( this.topic == null)
-      return 1;
+  this.action = function (object, e) {
+    if (this.topic == null) return 1;
 
-    switch ( e.event) {
-    case Glow.eEvent_MB1Down:
-      object.setColorInverse( 1);
-      this.dyn.repaintNow = true;
-      break;
-    case Glow.eEvent_MB1Up:
-      object.setColorInverse( 0);
-      this.dyn.repaintNow = true;
-      break;
-    case Glow.eEvent_MB1Click:
-      if ( (this.dyn.action_type1 & DynC.mActionType1_Confirm) != 0)
-	break;
-		
-      var command;
-      if ( this.bookmark !== null && this.bookmark !== "")
-	command = "help " + this.topic + " /bookmark=" + this.bookmark;
-      else
-	command = "help " + this.topic;
+    switch (e.event) {
+      case Glow.eEvent_MB1Down:
+        object.setColorInverse(1);
+        this.dyn.repaintNow = true;
+        break;
+      case Glow.eEvent_MB1Up:
+        object.setColorInverse(0);
+        this.dyn.repaintNow = true;
+        break;
+      case Glow.eEvent_MB1Click:
+        if ((this.dyn.action_type1 & DynC.mActionType1_Confirm) != 0) break;
 
-      this.dyn.graph.command( command);
-      break;
+        var command;
+        if (this.bookmark !== null && this.bookmark !== "")
+          command = "help " + this.topic + " /bookmark=" + this.bookmark;
+        else command = "help " + this.topic;
+
+        this.dyn.graph.command(command);
+        break;
     }
     return 1;
-  }
+  };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynHelp : " + lines[i]);
+      if (this.dyn.debug) console.log("DynHelp : " + lines[i]);
 
-      switch ( key) {
-      case DynC.eSave_Help: 
-	break;
-      case DynC.eSave_Help_topic: 
-	if ( tokens.length > 1)
-	  this.topic = tokens[1];
-	break;
-      case DynC.eSave_Help_bookmark: 
-	if ( tokens.length > 1)
-	  this.bookmark = tokens[1];
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynHelp");
-	break;
+      switch (key) {
+        case DynC.eSave_Help:
+          break;
+        case DynC.eSave_Help_topic:
+          if (tokens.length > 1) this.topic = tokens[1];
+          break;
+        case DynC.eSave_Help_bookmark:
+          if (tokens.length > 1) this.bookmark = tokens[1];
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynHelp");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-		
+
     return i;
   };
 }
 
-function DynOpenGraph( dyn) {
+function DynOpenGraph(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = 0;
@@ -14737,14 +14119,14 @@ function DynOpenGraph( dyn) {
 
   this.graph_object;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "OpenGraph.GraphObject") {
       this.graph_object = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "OpenGraph.GraphObject") {
       ret.value = this.graph_object;
@@ -14753,96 +14135,103 @@ function DynOpenGraph( dyn) {
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( o) {
+  this.connect = function (o) {
     return 1;
   };
-  this.disconnect = function() {
-  };
-  this.scan = function( o) {
+  this.disconnect = function () {};
+  this.scan = function (o) {
     return 1;
   };
-  this.action = function( o, e) {
-    if ( !this.dyn.graph.isAuthorized( this.dyn.access))
-      return 1;
+  this.action = function (o, e) {
+    if (!this.dyn.graph.isAuthorized(this.dyn.access)) return 1;
 
-    switch ( e.event) {
-    case Glow.eEvent_MB1Down:
-      o.setColorInverse( 1);
-      this.dyn.repaintNow = true;
-      break;
-    case Glow.eEvent_MB1Up:
-      o.setColorInverse( 0);
-      this.dyn.repaintNow = true;
-      break;
-    case Glow.eEvent_MB1Click:
-      if ( (this.dyn.action_type1 & DynC.mActionType1_Confirm) !== 0)
-	break;
-      var command = null;
-      if ( !(this.graph_object === null || this.graph_object === ""))
-	command = "open graph/object=" + this.graph_object;
-      else {
-	// Open classgraph for popup menu object
-	if ( (this.dyn.total_action_type1 & DynC.mActionType1_PopupMenu) !== 0) {
-	  for ( var i = 0; i < this.dyn.elements.length; i++) {
-	    if ( this.dyn.elements[i].action_type1 == DynC.mActionType1_PopupMenu) {
-	      command = "open graph/class/instance=" + this.dyn.elements[i].ref_object;
-	      break;
-	    }
-	  }
-	}
-	else if ( (this.dyn.total_dyn_type1 & DynC.mDynType1_HostObject) !== 0) {
-	  for ( var i = 0; i < this.dyn.elements.length; i++) {
-	    if ( this.dyn.elements.get(i).dyn_type1 == DynC.mDynType1_HostObject) {
-	      command = "open graph/class/instance=" + this.dyn.elements[i].hostobject;
-	      break;
-	    }
-	  }
-	}
-      }
+    switch (e.event) {
+      case Glow.eEvent_MB1Down:
+        o.setColorInverse(1);
+        this.dyn.repaintNow = true;
+        break;
+      case Glow.eEvent_MB1Up:
+        o.setColorInverse(0);
+        this.dyn.repaintNow = true;
+        break;
+      case Glow.eEvent_MB1Click:
+        if ((this.dyn.action_type1 & DynC.mActionType1_Confirm) !== 0) break;
+        var command = null;
+        if (!(this.graph_object === null || this.graph_object === ""))
+          command = "open graph/object=" + this.graph_object;
+        else {
+          // Open classgraph for popup menu object
+          if (
+            (this.dyn.total_action_type1 & DynC.mActionType1_PopupMenu) !==
+            0
+          ) {
+            for (var i = 0; i < this.dyn.elements.length; i++) {
+              if (
+                this.dyn.elements[i].action_type1 == DynC.mActionType1_PopupMenu
+              ) {
+                command =
+                  "open graph/class/instance=" +
+                  this.dyn.elements[i].ref_object;
+                break;
+              }
+            }
+          } else if (
+            (this.dyn.total_dyn_type1 & DynC.mDynType1_HostObject) !==
+            0
+          ) {
+            for (var i = 0; i < this.dyn.elements.length; i++) {
+              if (
+                this.dyn.elements.get(i).dyn_type1 == DynC.mDynType1_HostObject
+              ) {
+                command =
+                  "open graph/class/instance=" +
+                  this.dyn.elements[i].hostobject;
+                break;
+              }
+            }
+          }
+        }
 
-      this.dyn.graph.command( command);
-      break;
+        this.dyn.graph.command(command);
+        break;
     }
     return 1;
-  }
+  };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynOpenGraph : " + lines[i]);
+      if (this.dyn.debug) console.log("DynOpenGraph : " + lines[i]);
 
-      switch ( key) {
-      case DynC.eSave_OpenGraph: 
-	break;
-      case DynC.eSave_OpenGraph_graph_object: 
-	if ( tokens.length > 1)
-	  this.graph_object = tokens[1];
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynOpenGraph");
-	break;
+      switch (key) {
+        case DynC.eSave_OpenGraph:
+          break;
+        case DynC.eSave_OpenGraph_graph_object:
+          if (tokens.length > 1) this.graph_object = tokens[1];
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynOpenGraph");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-		
+
     return i;
   };
-
 }
 
-function DynOpenURL( dyn) {
+function DynOpenURL(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = 0;
@@ -14854,92 +14243,86 @@ function DynOpenURL( dyn) {
 
   this.url;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "OpenURL.URL") {
       this.url = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "OpenURL.URL") {
       ret.value = this.url;
       ret.decl = CcmC.K_DECL_STRING;
-      return ret
+      return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( o) {
+  this.connect = function (o) {
     return 1;
   };
-  this.disconnect = function() {
-  };
-  this.scan = function( o) {
+  this.disconnect = function () {};
+  this.scan = function (o) {
     return 1;
   };
-  this.action = function( object, e) {
-    if ( !this.dyn.graph.isAuthorized( this.dyn.access))
-      return 1;
+  this.action = function (object, e) {
+    if (!this.dyn.graph.isAuthorized(this.dyn.access)) return 1;
 
-    switch ( e.event) {
-    case Glow.eEvent_MB1Down:
-      object.setColorInverse( 1);
-      this.dyn.repaintNow = true;
-      break;
-    case Glow.eEvent_MB1Up:
-      object.setColorInverse( 0);
-      this.dyn.repaintNow = true;
-      break;
-    case Glow.eEvent_MB1Click:
-      if ( (this.dyn.action_type1 & DynC.mActionType1_Confirm) != 0)
-	break;
-		
-      var command = "open url \"" + this.url + "\"";
+    switch (e.event) {
+      case Glow.eEvent_MB1Down:
+        object.setColorInverse(1);
+        this.dyn.repaintNow = true;
+        break;
+      case Glow.eEvent_MB1Up:
+        object.setColorInverse(0);
+        this.dyn.repaintNow = true;
+        break;
+      case Glow.eEvent_MB1Click:
+        if ((this.dyn.action_type1 & DynC.mActionType1_Confirm) != 0) break;
 
-      this.dyn.graph.command(command);
-      break;
+        var command = 'open url "' + this.url + '"';
+
+        this.dyn.graph.command(command);
+        break;
     }
     return 1;
-  }
+  };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynOpenURL : " + lines[i]);
+      if (this.dyn.debug) console.log("DynOpenURL : " + lines[i]);
 
-      switch ( key) {
-      case DynC.eSave_OpenURL: 
-	break;
-      case DynC.eSave_OpenURL_url: 
-	if ( tokens.length > 1)
-	  this.url = tokens[1];
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-        console.log( "Syntax error in DynOpenURL");
-	break;
+      switch (key) {
+        case DynC.eSave_OpenURL:
+          break;
+        case DynC.eSave_OpenURL_url:
+          if (tokens.length > 1) this.url = tokens[1];
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynOpenURL");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-		
+
     return i;
   };
-
 }
 
-function DynInputFocus( dyn) {
+function DynInputFocus(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = 0;
@@ -14954,104 +14337,92 @@ function DynInputFocus( dyn) {
   this.next_vertical;
   this.next_tab;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "InputFocus.InitialFocus") {
       this.initial_focus = value;
       return 1;
-    }
-    else if (name === "InputFocus.NextHorizontal") {
+    } else if (name === "InputFocus.NextHorizontal") {
       this.next_horizontal = value;
       return 1;
-    }
-    else if (name === "InputFocus.NextVertical") {
+    } else if (name === "InputFocus.NextVertical") {
       this.next_vertical = value;
       return 1;
-    }
-    else if (name === "InputFocus.NextTab") {
+    } else if (name === "InputFocus.NextTab") {
       this.next_tab = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "InputFocus.InitialFocus") {
       ret.value = this.initial_focus = value;
       return 1;
-    }
-    else if (name === "InputFocus.NextHorizontal") {
+    } else if (name === "InputFocus.NextHorizontal") {
       ret.value = this.next_horizontal;
       return ret;
-    }
-    else if (name === "InputFocus.NextVertical") {
+    } else if (name === "InputFocus.NextVertical") {
       ret.value = this.next_vertical;
       return ret;
-    }
-    else if (name === "InputFocus.NextTab") {
+    } else if (name === "InputFocus.NextTab") {
       ret.value = this.next_tab;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( o) {
+  this.connect = function (o) {
     return 1;
   };
-  this.disconnect = function() {
-  };
-  this.scan = function( o) {
+  this.disconnect = function () {};
+  this.scan = function (o) {
     return 1;
   };
-  this.action = function( o, e) {
+  this.action = function (o, e) {
     return 1;
   };
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynInputFocus : " + lines[i]);
+      if (this.dyn.debug) console.log("DynInputFocus : " + lines[i]);
 
-      switch ( key) {
-      case DynC.eSave_InputFocus: 
-	break;
-      case DynC.eSave_InputFocus_initial_focus: 
-	this.initial_focus = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_InputFocus_next_horizontal: 
-	if ( tokens.length > 1)
-	  this.next_horizontal = tokens[1];
-	break;
-      case DynC.eSave_InputFocus_next_vertical: 
-	if ( tokens.length > 1)
-	  this.next_vertical = tokens[1];
-	break;
-      case DynC.eSave_InputFocus_next_tab: 
-	if ( tokens.length > 1)
-	  this.next_tab = tokens[1];
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynInputFocus");
-	break;
+      switch (key) {
+        case DynC.eSave_InputFocus:
+          break;
+        case DynC.eSave_InputFocus_initial_focus:
+          this.initial_focus = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_InputFocus_next_horizontal:
+          if (tokens.length > 1) this.next_horizontal = tokens[1];
+          break;
+        case DynC.eSave_InputFocus_next_vertical:
+          if (tokens.length > 1) this.next_vertical = tokens[1];
+          break;
+        case DynC.eSave_InputFocus_next_tab:
+          if (tokens.length > 1) this.next_tab = tokens[1];
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynInputFocus");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-		
+
     return i;
   };
-
 }
 
-function DynCloseGraph( dyn) {
+function DynCloseGraph(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = 0;
@@ -15061,76 +14432,72 @@ function DynCloseGraph( dyn) {
   this.instance_mask = 0;
   this.instance = 0;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( o) {
+  this.connect = function (o) {
     return 1;
   };
-  this.disconnect = function() {
-  };
-  this.scan = function( object) {
+  this.disconnect = function () {};
+  this.scan = function (object) {
     return 1;
   };
-  this.action = function( object, e) {
-    if ( !this.dyn.graph.isAuthorized( this.dyn.access))
-      return 1;
+  this.action = function (object, e) {
+    if (!this.dyn.graph.isAuthorized(this.dyn.access)) return 1;
 
-    switch ( e.event) {
-    case Glow.eEvent_MB1Down:
-      object.setColorInverse( 1);
-      this.dyn.repaintNow = true;
-      break;
-    case Glow.eEvent_MB1Up:
-      object.setColorInverse( 0);
-      this.dyn.repaintNow = true;
-      break;
-    case Glow.eEvent_MB1Click:
-      if ( (this.dyn.action_type1 & DynC.mActionType1_Confirm) != 0)
-	break;
+    switch (e.event) {
+      case Glow.eEvent_MB1Down:
+        object.setColorInverse(1);
+        this.dyn.repaintNow = true;
+        break;
+      case Glow.eEvent_MB1Up:
+        object.setColorInverse(0);
+        this.dyn.repaintNow = true;
+        break;
+      case Glow.eEvent_MB1Click:
+        if ((this.dyn.action_type1 & DynC.mActionType1_Confirm) != 0) break;
 
-      this.dyn.graph.closeGraph();
-      break;
+        this.dyn.graph.closeGraph();
+        break;
     }
     return 1;
-  }
+  };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynCloseGraph : " + lines[i]);
+      if (this.dyn.debug) console.log("DynCloseGraph : " + lines[i]);
 
-      switch ( key) {
-      case DynC.eSave_CloseGraph: 
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynCloseGraph");
-	break;
+      switch (key) {
+        case DynC.eSave_CloseGraph:
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynCloseGraph");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-		
+
     return i;
   };
 }
 
-function DynSlider( dyn) {
+function DynSlider(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = 0;
@@ -15157,67 +14524,58 @@ function DynSlider( dyn) {
   this.slider_disabled = true;
   this.direction;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "Slider.Attribute") {
       this.attribute = value;
       return 1;
-    }
-    else if (name === "Slider.MinValueAttr") {
+    } else if (name === "Slider.MinValueAttr") {
       this.minvalue_attr = value;
       return 1;
-    }
-    else if (name === "Slider.MaxValueAttr") {
+    } else if (name === "Slider.MaxValueAttr") {
       this.maxvalue_attr = value;
       return 1;
-    }
-    else if (name === "Slider.InsenitiveAttr") {
+    } else if (name === "Slider.InsenitiveAttr") {
       this.insensitive_attr = value;
       return 1;
-    }
-    else if (name === "Slider.ReleaseAttr") {
+    } else if (name === "Slider.ReleaseAttr") {
       this.release_attr = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "Slider.Attribute") {
       ret.value = this.attribute;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "Slider.MinValueAttr") {
+    } else if (name === "Slider.MinValueAttr") {
       ret.value = this.minvalue_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "Slider.MaxValueAttr") {
+    } else if (name === "Slider.MaxValueAttr") {
       ret.value = this.maxvalue_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "Slider.InsenitiveAttr") {
+    } else if (name === "Slider.InsenitiveAttr") {
       ret.value = this.insensitive_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "Slider.ReleaseAttr") {
+    } else if (name === "Slider.ReleaseAttr") {
       ret.value = this.release_attr;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( object) {
-    if ( this.attribute.trim() === "")
-      return 0;
+  this.connect = function (object) {
+    if (this.attribute.trim() === "") return 0;
 
-    this.a = new DynReference( this.dyn, this.attribute);
+    this.a = new DynReference(this.dyn, this.attribute);
     this.a.connect(this.dyn);
-    if ( !this.a.sts) {
+    if (!this.a.sts) {
       console.log("FillLevel: " + this.attribute);
       return 1;
     }
@@ -15227,395 +14585,461 @@ function DynSlider( dyn) {
     var background;
     var origo;
 
-    if ( !object.transformIsStored()) {
+    if (!object.transformIsStored()) {
       object.storeTransform();
       var g = object.measure();
       var info = object.get_info();
-      var b = this.dyn.graph.getCtx().getBackgroundObjectLimits(DynC.mDynType1_SliderBackground,
-								(g.ll_x + g.ur_x) / 2, (g.ll_y + g.ur_y) / 2);
-      if ( (b.sts & 1) !== 0) {
-	this.direction = b.direction;
-	origo = object.get_origo(info.direction);
+      var b = this.dyn.graph
+        .getCtx()
+        .getBackgroundObjectLimits(
+          DynC.mDynType1_SliderBackground,
+          (g.ll_x + g.ur_x) / 2,
+          (g.ll_y + g.ur_y) / 2,
+        );
+      if ((b.sts & 1) !== 0) {
+        this.direction = b.direction;
+        origo = object.get_origo(info.direction);
 
-	switch( this.direction) {
-	case Glow.eDirection_Down:
-	  info.max_position = b.max - origo;
-	  info.min_position = b.min - origo;
-	  object.set_info(info);
+        switch (this.direction) {
+          case Glow.eDirection_Down:
+            info.max_position = b.max - origo;
+            info.min_position = b.min - origo;
+            object.set_info(info);
 
-	  object.move_to(g.ll_x, info.min_position);
-	  break;
-	case Glow.eDirection_Up:
-	  info.max_position = b.max - (g.ur_y - g.ll_y - origo);
-	  info.min_position = b.min - (g.ur_y - g.ll_y - origo);
-	  object.set_info(info);
-	  object.move_to(g.ll_x, info.min_position);
-	  break;
-	case Glow.eDirection_Left:
-	  info.max_position = b.max - (g.ur_x - g.ll_x - origo);
-	  info.min_position = b.min - (g.ur_x - g.ll_x - origo);
-	  object.set_info(info);
-	  object.move_to(info.min_position, g.ll_y);
-	  break;
-	case Glow.eDirection_Right:
-	  info.max_position = b.max - origo;
-	  info.min_position = b.min - origo;
-	  object.set_info(info);
-	  object.move_to(info.min_position, g.ll_y);
-	  break;
-	default:
-	  ;
-	}
-      }
-      else
-	this.direction = info.direction;
+            object.move_to(g.ll_x, info.min_position);
+            break;
+          case Glow.eDirection_Up:
+            info.max_position = b.max - (g.ur_y - g.ll_y - origo);
+            info.min_position = b.min - (g.ur_y - g.ll_y - origo);
+            object.set_info(info);
+            object.move_to(g.ll_x, info.min_position);
+            break;
+          case Glow.eDirection_Left:
+            info.max_position = b.max - (g.ur_x - g.ll_x - origo);
+            info.min_position = b.min - (g.ur_x - g.ll_x - origo);
+            object.set_info(info);
+            object.move_to(info.min_position, g.ll_y);
+            break;
+          case Glow.eDirection_Right:
+            info.max_position = b.max - origo;
+            info.min_position = b.min - origo;
+            object.set_info(info);
+            object.move_to(info.min_position, g.ll_y);
+            break;
+          default:
+        }
+      } else this.direction = info.direction;
 
       object.storeTransform();
     }
-	    
-    this.maxvalue_a = new DynReference( this.dyn, this.maxvalue_attr);
+
+    this.maxvalue_a = new DynReference(this.dyn, this.maxvalue_attr);
     this.maxvalue_a.connect(this.dyn);
 
-    this.minvalue_a = new DynReference( this.dyn, this.minvalue_attr);
+    this.minvalue_a = new DynReference(this.dyn, this.minvalue_attr);
     this.minvalue_a.connect(this.dyn);
 
-    this.insensitive_a = new DynReference( this.dyn, this.insensitive_attr);
+    this.insensitive_a = new DynReference(this.dyn, this.insensitive_attr);
     this.insensitive_a.connect(this.dyn);
 
     return 1;
-  }
+  };
 
-  this.disconnect = function() {
-    if ( this.a == null || !this.a.sts)
-      return;
+  this.disconnect = function () {
+    if (this.a == null || !this.a.sts) return;
     this.a.disconnect(this.dyn);
     this.minvalue_a.disconnect(this.dyn);
     this.maxvalue_a.disconnect(this.dyn);
     this.insensitive_a.disconnect(this.dyn);
-  }
-	
-  this.scan = function( object) {
-    if ( this.a == null || !this.a.sts)
-      return;
-	    
+  };
+
+  this.scan = function (object) {
+    if (this.a == null || !this.a.sts) return;
+
     var value = 0;
     var ivalue = 0;
 
-    switch ( this.a.typeid) {
-    case Pwr.eType_Float32:
-      value = this.a.get_ref_value(this.dyn);
-      if ( typeof value == 'undefined')
-	value = 0;
-      break;
-    case Pwr.eType_Int32:
-      ivalue = this.a.get_ref_value(this.dyn);
-      if ( typeof ivalue == 'undefined')
-	ivalue = 0;
-      break;
-    case Pwr.eType_Boolean: {
-      var b;
-      b = this.a.get_ref_value(this.dyn);
-      if ( typeof b == 'undefined')
-	b = false;
-      ivalue = b ? 1 : 0;
-      break;
-    }
+    switch (this.a.typeid) {
+      case Pwr.eType_Float32:
+        value = this.a.get_ref_value(this.dyn);
+        if (typeof value == "undefined") value = 0;
+        break;
+      case Pwr.eType_Int32:
+      case GraphIfc.eType_Color:
+        ivalue = this.a.get_ref_value(this.dyn);
+        if (typeof ivalue == "undefined") ivalue = 0;
+        break;
+      case Pwr.eType_Boolean: {
+        var b;
+        b = this.a.get_ref_value(this.dyn);
+        if (typeof b == "undefined") b = false;
+        ivalue = b ? 1 : 0;
+        break;
+      }
     }
 
-    if ( this.insensitive_a.sts) {
+    if (this.insensitive_a.sts) {
       this.slider_disabled = this.insensitive_a.get_ref_value(this.dyn);
-      if ( this.insensitive_a.inverted)
-	this.slider_disabled = !this.slider_disabled;
-    }
-    else
-      this.slider_disabled = false;
-	    
-    if ( this.maxvalue_a.sts && this.minvalue_a.sts) {
+      if (this.insensitive_a.inverted)
+        this.slider_disabled = !this.slider_disabled;
+    } else this.slider_disabled = false;
+
+    if (this.maxvalue_a.sts && this.minvalue_a.sts) {
       this.max_value = this.maxvalue_a.get_ref_value(this.dyn);
       this.min_value = this.minvalue_a.get_ref_value(this.dyn);
-      if ( this.max_value != this.maxvalue_a.oldValue ||
-	   this.min_value != this.minvalue_a.oldValue) {
-	if ( Math.abs( this.max_value - this.min_value) > Number.MIN_VALUE)
-	  this.firstScan = true;
+      if (
+        this.max_value != this.maxvalue_a.oldValue ||
+        this.min_value != this.minvalue_a.oldValue
+      ) {
+        if (Math.abs(this.max_value - this.min_value) > Number.MIN_VALUE)
+          this.firstScan = true;
       }
       this.minvalue_a.oldValue = this.min_value;
       this.maxvalue_a.oldValue = this.max_value;
-    }      
-	    
-    if ( !this.firstScan) {
-      switch ( this.a.typeid) {
-	case Pwr.eType_Float32:
-	if ( Math.abs( this.old_value - value) < Number.MIN_VALUE)
-	  // No change since last time
-	  return;
-	break;
-	case Pwr.eType_Int32:
-	case Pwr.eType_Boolean:
-	if ( ivalue == this.old_ivalue)
-	  return;
-	break;
-	default: ;
-      }
     }
-    else
-      this.firstScan = false;
 
-    switch ( this.a.typeid) {
-    case Pwr.eType_Float32:
-      this.old_value = value;
-      break;
-    case Pwr.eType_Int32:
-    case Pwr.eType_Boolean:
-      this.old_ivalue = ivalue;
-      break;
-    default: ;
+    if (!this.firstScan) {
+      switch (this.a.typeid) {
+        case Pwr.eType_Float32:
+          if (Math.abs(this.old_value - value) < Number.MIN_VALUE)
+            // No change since last time
+            return;
+          break;
+        case Pwr.eType_Int32:
+        case GraphIfc.eType_Color:
+        case Pwr.eType_Boolean:
+          if (ivalue == this.old_ivalue) return;
+          break;
+        default:
+      }
+    } else this.firstScan = false;
+
+    switch (this.a.typeid) {
+      case Pwr.eType_Float32:
+        this.old_value = value;
+        break;
+      case Pwr.eType_Int32:
+      case GraphIfc.eType_Color:
+      case Pwr.eType_Boolean:
+        this.old_ivalue = ivalue;
+        break;
+      default:
     }
 
     var info = object.get_info();
 
-    if ( !(this.maxvalue_a.sts && this.minvalue_a.sts && this.max_value != this.min_value)) {
+    if (
+      !(
+        this.maxvalue_a.sts &&
+        this.minvalue_a.sts &&
+        this.max_value != this.min_value
+      )
+    ) {
       this.max_value = info.max_value;
       this.min_value = info.min_value;
     }
-    if ( info.min_position != info.max_position) {
-      if ( this.dyn.graph.getCurrentSlider() != object &&
-	   this.max_value != this.min_value) {
-	var pos_x, pos_y;
+    if (info.min_position != info.max_position) {
+      if (
+        this.dyn.graph.getCurrentSlider() != object &&
+        this.max_value != this.min_value
+      ) {
+        var pos_x, pos_y;
 
-	switch ( this.a.typeid) {
-	case Pwr.eType_Float32:
-	  break;
-	default:
-	  value = ivalue;
-	  break;
-	}
-          
-	switch ( this.direction) {
-	case Glow.eDirection_Down:
-	  pos_y = (this.max_value - value) / (this.max_value - this.min_value) *
-	  (info.max_position - info.min_position);
-	  if ( pos_y < 0)
-	    pos_y = 0;
-	  else if ( pos_y > info.max_position - info.min_position)
-	    pos_y = info.max_position - info.min_position;
-	  pos_x = 0;
-	  break;
-	case Glow.eDirection_Right:
-	  pos_x = info.max_position - info.min_position - 
-	  (value - this.min_value) / (this.max_value - this.min_value) *
-	  (info.max_position - info.min_position);
-	  if ( pos_x < 0)
-	    pos_x = 0;
-	  else if ( pos_x > info.max_position - info.min_position)
-	    pos_x = info.max_position - info.min_position;
-	  pos_y = 0;
-	  break;
-	case Glow.eDirection_Left:
-	  pos_x = info.max_position - info.min_position - 
-	    (this.max_value - value) / (this.max_value - this.min_value) *
-	    (info.max_position - info.min_position);
-	  if ( pos_x < 0)
-	    pos_x = 0;
-	  else if ( pos_x > info.max_position - info.min_position)
-	    pos_x = info.max_position - info.min_position;
-	  pos_y = 0;
-	  break;
-	default:   // Up
-	  pos_y = (value - this.min_value) / (this.max_value - this.min_value) *
-	  (info.max_position - info.min_position);
-	  if ( pos_y < 0)
-	    pos_y = 0;
-	  else if ( pos_y > info.max_position - info.min_position)
-	    pos_y = info.max_position - info.min_position;
-	  pos_x = 0;
-	}
-	object.set_position(pos_x, pos_y);
+        switch (this.a.typeid) {
+          case Pwr.eType_Float32:
+            break;
+          case GraphIfc.eType_Color:
+            value = this.dyn.rgb_to_hue(ivalue);
+            break;
+          default:
+            value = ivalue;
+            break;
+        }
+
+        switch (this.direction) {
+          case Glow.eDirection_Down:
+            pos_y =
+              ((this.max_value - value) / (this.max_value - this.min_value)) *
+              (info.max_position - info.min_position);
+            if (pos_y < 0) pos_y = 0;
+            else if (pos_y > info.max_position - info.min_position)
+              pos_y = info.max_position - info.min_position;
+            pos_x = 0;
+            break;
+          case Glow.eDirection_Right:
+            pos_x =
+              info.max_position -
+              info.min_position -
+              ((value - this.min_value) / (this.max_value - this.min_value)) *
+                (info.max_position - info.min_position);
+            if (pos_x < 0) pos_x = 0;
+            else if (pos_x > info.max_position - info.min_position)
+              pos_x = info.max_position - info.min_position;
+            pos_y = 0;
+            break;
+          case Glow.eDirection_Left:
+            pos_x =
+              info.max_position -
+              info.min_position -
+              ((this.max_value - value) / (this.max_value - this.min_value)) *
+                (info.max_position - info.min_position);
+            if (pos_x < 0) pos_x = 0;
+            else if (pos_x > info.max_position - info.min_position)
+              pos_x = info.max_position - info.min_position;
+            pos_y = 0;
+            break;
+          default: // Up
+            pos_y =
+              ((value - this.min_value) / (this.max_value - this.min_value)) *
+              (info.max_position - info.min_position);
+            if (pos_y < 0) pos_y = 0;
+            else if (pos_y > info.max_position - info.min_position)
+              pos_y = info.max_position - info.min_position;
+            pos_x = 0;
+        }
+        object.set_position(pos_x, pos_y);
       }
     }
-
   };
 
-  this.action = function( object, e) {
-    if ( this.slider_disabled)
-      return 1;
+  this.action = function (object, e) {
+    if (this.slider_disabled) return 1;
 
-    switch ( e.event) {
-    case Glow.eEvent_SliderMoveEnd: {
-      var pname = this.dyn.parseAttrName( this.release_attr);
-      if ( !(pname === null || pname.name === "")) {
-	var sts = null;
-	switch ( pname.type) {
-	case Pwr.eType_Boolean: {
-	  switch (pname.database) {
-	  case GraphIfc.eDatabase_Gdh:
-	    sts = this.dyn.graph.getGdh().setObjectInfoBoolean( pname.name, 1);
-	    break;
-	  case GraphIfc.eDatabase_Local:
-	    sts = this.dyn.graph.getLdb().setObjectInfo( this.dyn.graph, pname.name, 1);
-	    break;
-	  }
-	  break;
-	}
-	default: ;
-	}
+    switch (e.event) {
+      case Glow.eEvent_SliderMoveEnd: {
+        var pname = this.dyn.parseAttrName(this.release_attr);
+        if (!(pname === null || pname.name === "")) {
+          var sts = null;
+          switch (pname.type) {
+            case Pwr.eType_Boolean: {
+              switch (pname.database) {
+                case GraphIfc.eDatabase_Gdh:
+                  sts = this.dyn.graph
+                    .getGdh()
+                    .setObjectInfoBoolean(pname.name, 1);
+                  break;
+                case GraphIfc.eDatabase_Local:
+                  sts = this.dyn.graph
+                    .getLdb()
+                    .setObjectInfo(this.dyn.graph, pname.name, 1);
+                  break;
+              }
+              break;
+            }
+            default:
+          }
+        }
+        if (this.dyn.graph.getCurrentSlider() == object)
+          this.dyn.graph.setCurrentSlider(null);
+        break;
       }
-      if ( this.dyn.graph.getCurrentSlider() == object)
-	this.dyn.graph.setCurrentSlider(null);
-      break;
-    }
-    case Glow.eEvent_SliderMoveStart: {
-      if ( !this.dyn.graph.isAuthorized( this.dyn.access) ||
-	   this.slider_disabled) {
-	this.dyn.graph.getCtx().setMoveRestrictions(Glow.eMoveRestriction_Disable, 0, 0, null);
-	this.dyn.graph.setCurrentSlider(null);
-	break;
-      }
-      var info = object.get_info();
-      if ( this.direction == Glow.eDirection_Right || 
-	   this.direction == Glow.eDirection_Left)
-	this.dyn.graph.getCtx().setMoveRestrictions( Glow.eMoveRestriction_HorizontalSlider,
-						info.max_position, info.min_position, e.object);
-      else
-	this.dyn.graph.getCtx().setMoveRestrictions( Glow.eMoveRestriction_VerticalSlider,
-						info.max_position, info.min_position, e.object);
+      case Glow.eEvent_SliderMoveStart: {
+        if (
+          !this.dyn.graph.isAuthorized(this.dyn.access) ||
+          this.slider_disabled
+        ) {
+          this.dyn.graph
+            .getCtx()
+            .setMoveRestrictions(Glow.eMoveRestriction_Disable, 0, 0, null);
+          this.dyn.graph.setCurrentSlider(null);
+          break;
+        }
+        var info = object.get_info();
+        if (
+          this.direction == Glow.eDirection_Right ||
+          this.direction == Glow.eDirection_Left
+        )
+          this.dyn.graph
+            .getCtx()
+            .setMoveRestrictions(
+              Glow.eMoveRestriction_HorizontalSlider,
+              info.max_position,
+              info.min_position,
+              e.object,
+            );
+        else
+          this.dyn.graph
+            .getCtx()
+            .setMoveRestrictions(
+              Glow.eMoveRestriction_VerticalSlider,
+              info.max_position,
+              info.min_position,
+              e.object,
+            );
 
-      this.dyn.graph.setCurrentSlider( object);
-      break;
-    }
-    case Glow.eEvent_SliderMoved: {
-      var 		value;
-    
-      var info = object.get_info();
-      if ( info.min_position != info.max_position) {
-	if ( !(this.max_value_p !== 0 && this.min_value_p !== 0 && this.max_value != this.min_value)) {
-	  this.max_value = info.max_value;
-	  this.min_value = info.min_value;
-	}
-	var g = object.measure();
-        
-	switch ( this.direction) {
-	case Glow.eDirection_Down:
-	  value = ( (info.max_position - g.ll_y) / (info.max_position - info.min_position) *
-			   (this.max_value - this.min_value) + this.min_value);
-	  break;
-	case Glow.eDirection_Right:
-	  value = ( (info.max_position - g.ll_x) / (info.max_position - info.min_position) *
-			   (this.max_value - this.min_value) + this.min_value);
-	  break;
-	case Glow.eDirection_Left:
-	  value = ( (g.ll_x - info.min_position) / (info.max_position - info.min_position) *
-			   (this.max_value - this.min_value) + this.min_value);
-	  break;
-	default:
-	  value = ( (g.ll_y - info.min_position) / (info.max_position - info.min_position) *
-			   (this.max_value - this.min_value) + this.min_value);
-	}
-	if ( value > this.max_value)
-	  value = this.max_value;
-	if ( value < this.min_value)
-	  value = this.min_value;
-      
-	var pname = this.dyn.parseAttrName( this.attribute);
-	if ( pname === null || pname.name === "") 
-	  return 1;
-
-	var sts;
-	switch ( pname.type) {
-	case Pwr.eType_Float32:
-	  switch (pname.database) {
-	  case GraphIfc.eDatabase_Gdh:
-	    sts = this.dyn.graph.getGdh().setObjectInfoFloat( pname.name, value);
-	    break;
-	  case GraphIfc.eDatabase_Local:	    
-	    sts = this.dyn.graph.getLdb().setObjectInfo( this.dyn.graph, pname.name, value);
-	    break;
-	  }
-	  break;
-	case Pwr.eType_Boolean: {
-	  var bvalue = (value > 0.5 ? true : false);
-	  switch (pname.database) {
-	  case GraphIfc.eDatabase_Gdh:
-	    sts = this.dyn.graph.getGdh().setObjectInfoBoolean( pname.name, bvalue);
-	    break;
-	  case GraphIfc.eDatabase_Local:
-	    sts = this.dyn.graph.getLdb().setObjectInfo( this.dyn.graph, pname.name, bvalue);
-	    break;
-	  }
-	  break;
-	}
-	default: {
-	  var ivalue = Math.floor (value > 0 ? value + 0.5 : value - 0.5);
-	  switch (pname.database) {
-	  case GraphIfc.eDatabase_Gdh:
-	    sts = this.dyn.graph.getGdh().setObjectInfoInt( pname.name, ivalue);
-	    break;
-	  case GraphIfc.eDatabase_Local:
-	    console.log("Set ivalue", ivalue, pname.name);
-	    sts = this.dyn.graph.getLdb().setObjectInfo( this.dyn.graph, pname.name, ivalue);
-	    break;
-	  }
-	}
-	}
-	if ( sts.evenSts()) console.log("Slider error: " + this.attribute);
+        this.dyn.graph.setCurrentSlider(object);
+        break;
       }
-      break;
-    }
-    default: ;    
+      case Glow.eEvent_SliderMoved: {
+        var value;
+
+        var info = object.get_info();
+        if (info.min_position != info.max_position) {
+          if (
+            !(
+              this.max_value_p !== 0 &&
+              this.min_value_p !== 0 &&
+              this.max_value != this.min_value
+            )
+          ) {
+            this.max_value = info.max_value;
+            this.min_value = info.min_value;
+          }
+          var g = object.measure();
+
+          switch (this.direction) {
+            case Glow.eDirection_Down:
+              value =
+                ((info.max_position - g.ll_y) /
+                  (info.max_position - info.min_position)) *
+                  (this.max_value - this.min_value) +
+                this.min_value;
+              break;
+            case Glow.eDirection_Right:
+              value =
+                ((info.max_position - g.ll_x) /
+                  (info.max_position - info.min_position)) *
+                  (this.max_value - this.min_value) +
+                this.min_value;
+              break;
+            case Glow.eDirection_Left:
+              value =
+                ((g.ll_x - info.min_position) /
+                  (info.max_position - info.min_position)) *
+                  (this.max_value - this.min_value) +
+                this.min_value;
+              break;
+            default:
+              value =
+                ((g.ll_y - info.min_position) /
+                  (info.max_position - info.min_position)) *
+                  (this.max_value - this.min_value) +
+                this.min_value;
+          }
+          if (value > this.max_value) value = this.max_value;
+          if (value < this.min_value) value = this.min_value;
+
+          var pname = this.dyn.parseAttrName(this.attribute);
+          if (pname === null || pname.name === "") return 1;
+
+          var sts;
+          switch (pname.type) {
+            case Pwr.eType_Float32:
+              switch (pname.database) {
+                case GraphIfc.eDatabase_Gdh:
+                  sts = this.dyn.graph
+                    .getGdh()
+                    .setObjectInfoFloat(pname.name, value);
+                  break;
+                case GraphIfc.eDatabase_Local:
+                  sts = this.dyn.graph
+                    .getLdb()
+                    .setObjectInfo(this.dyn.graph, pname.name, value);
+                  break;
+              }
+              break;
+            case Pwr.eType_Boolean: {
+              var bvalue = value > 0.5 ? true : false;
+              switch (pname.database) {
+                case GraphIfc.eDatabase_Gdh:
+                  sts = this.dyn.graph
+                    .getGdh()
+                    .setObjectInfoBoolean(pname.name, bvalue);
+                  break;
+                case GraphIfc.eDatabase_Local:
+                  sts = this.dyn.graph
+                    .getLdb()
+                    .setObjectInfo(this.dyn.graph, pname.name, bvalue);
+                  break;
+              }
+              break;
+            }
+            case GraphIfc.eType_Color: {
+              var ivalue = this.dyn.hue_to_rgb(value);
+              switch (pname.database) {
+                case GraphIfc.eDatabase_Gdh:
+                  sts = this.dyn.graph
+                    .getGdh()
+                    .setObjectInfoInt(pname.name, ivalue);
+                  break;
+                case GraphIfc.eDatabase_Local:
+                  sts = this.dyn.graph
+                    .getLdb()
+                    .setObjectInfo(this.dyn.graph, pname.name, ivalue);
+                  break;
+              }
+              break;
+            }
+            default: {
+              var ivalue = Math.floor(value > 0 ? value + 0.5 : value - 0.5);
+              switch (pname.database) {
+                case GraphIfc.eDatabase_Gdh:
+                  sts = this.dyn.graph
+                    .getGdh()
+                    .setObjectInfoInt(pname.name, ivalue);
+                  break;
+                case GraphIfc.eDatabase_Local:
+                  console.log("Set ivalue", ivalue, pname.name);
+                  sts = this.dyn.graph
+                    .getLdb()
+                    .setObjectInfo(this.dyn.graph, pname.name, ivalue);
+                  break;
+              }
+            }
+          }
+          if (sts.evenSts()) console.log("Slider error: " + this.attribute);
+        }
+        break;
+      }
+      default:
     }
     return 1;
-  }
+  };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynSlider : " + lines[i]);
+      if (this.dyn.debug) console.log("DynSlider : " + lines[i]);
 
-      switch ( key) {
-      case DynC.eSave_Slider: 
-	break;
-      case DynC.eSave_Slider_attribute: 
-	if ( tokens.length > 1)
-	  this.attribute = tokens[1];
-	break;
-      case DynC.eSave_Slider_minvalue_attr: 
-	if ( tokens.length > 1)
-	  this.minvalue_attr = tokens[1];
-	break;
-      case DynC.eSave_Slider_maxvalue_attr: 
-	if ( tokens.length > 1)
-	  this.maxvalue_attr = tokens[1];
-	break;
-      case DynC.eSave_Slider_insensitive_attr: 
-	if ( tokens.length > 1)
-	  this.insensitive_attr = tokens[1];
-	break;
-      case DynC.eSave_Slider_release_attr: 
-	if ( tokens.length > 1)
-	  this.release_attr = tokens[1];
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynSlider");
-	break;
+      switch (key) {
+        case DynC.eSave_Slider:
+          break;
+        case DynC.eSave_Slider_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_Slider_minvalue_attr:
+          if (tokens.length > 1) this.minvalue_attr = tokens[1];
+          break;
+        case DynC.eSave_Slider_maxvalue_attr:
+          if (tokens.length > 1) this.maxvalue_attr = tokens[1];
+          break;
+        case DynC.eSave_Slider_insensitive_attr:
+          if (tokens.length > 1) this.insensitive_attr = tokens[1];
+          break;
+        case DynC.eSave_Slider_release_attr:
+          if (tokens.length > 1) this.release_attr = tokens[1];
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynSlider");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-		
+
     return i;
   };
-
 }
 
-function DynFastCurve( dyn) {
+function DynFastCurve(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = 0;
@@ -15629,90 +15053,80 @@ function DynFastCurve( dyn) {
   this.curve_index1;
   this.curve_index2;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "FastCurve.FastObject") {
       this.fast_object = value;
       return 1;
-    }
-    else if (name === "FastCurve.CurveIndex1") {
+    } else if (name === "FastCurve.CurveIndex1") {
       this.curve_index1 = value;
       return 1;
-    }
-    else if (name === "FastCurve.CurveIndex2") {
+    } else if (name === "FastCurve.CurveIndex2") {
       this.curve_index2 = value;
       return 1;
     }
     return 0;
-  }
-  this.setAttribute = function(o, name) {
+  };
+  this.setAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "FastCurve.FastObject") {
       ret.value = this.fast_object;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "FastCurve.CurveIndex1") {
+    } else if (name === "FastCurve.CurveIndex1") {
       ret.value = this.curve_index1;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "FastCurve.CurveIndex2") {
+    } else if (name === "FastCurve.CurveIndex2") {
       ret.value = this.curve_index2;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
-
-  this.connect = function( object) {
-  };
-  this.disconnect = function() {
-  };
-  this.scan = function( object) {
-  };
-  this.action = function( object, e) {
   };
 
-  this.open = function( lines, row) {
+  this.connect = function (object) {};
+  this.disconnect = function () {};
+  this.scan = function (object) {};
+  this.action = function (object, e) {};
+
+  this.open = function (lines, row) {
     var end = false;
     var i;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynSlider : " + lines[i]);
+      if (this.dyn.debug) console.log("DynSlider : " + lines[i]);
 
-      switch ( key) {
-      case DynC.eSave_FastCurve: 
-	break;
-      case DynC.eSave_FastCurve_fast_object: 
-	if ( tokens.length > 1)
-	  this.fast_object = tokens[1];
-	break;
-      case DynC.eSave_FastCurve_curve_index1: 
-	this.curve_index1 = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_FastCurve_curve_index2: 
-	this.curve_index2 = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynFastCurve");
-	break;
+      switch (key) {
+        case DynC.eSave_FastCurve:
+          break;
+        case DynC.eSave_FastCurve_fast_object:
+          if (tokens.length > 1) this.fast_object = tokens[1];
+          break;
+        case DynC.eSave_FastCurve_curve_index1:
+          this.curve_index1 = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_FastCurve_curve_index2:
+          this.curve_index2 = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynFastCurve");
+          break;
       }
-      
-      if ( end)
-	break;
+
+      if (end) break;
     }
     return i;
-  };  
+  };
 }
 
-function DynPulldownMenu( dyn) {
+function DynPulldownMenu(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = 0;
@@ -15728,10 +15142,9 @@ function DynPulldownMenu( dyn) {
   this.menu_object = null;
   this.text_size;
 
-  for ( var i = 0; i < 32; i++)
-    this.items_dyn[i] = null;
+  for (var i = 0; i < 32; i++) this.items_dyn[i] = null;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     var b_mask;
     var bname;
 
@@ -15740,10 +15153,10 @@ function DynPulldownMenu( dyn) {
 
       b_mask = DynC.mInstance_1;
       for (let j = 0; j < 32; j++) {
-	if (b_mask & this.button_mask && !this.items_dyn[j]) {
-	  this.items_dyn[j] = new Dyn(this.dyn.graph);
-	}
-	b_mask = b_mask << 1;
+        if (b_mask & this.button_mask && !this.items_dyn[j]) {
+          this.items_dyn[j] = new Dyn(this.dyn.graph);
+        }
+        b_mask = b_mask << 1;
       }
       return 1;
     }
@@ -15751,16 +15164,16 @@ function DynPulldownMenu( dyn) {
     for (let j = 0; j < 32; j++) {
       if (b_mask & this.button_mask) {
         var sts;
-	bname = "PulldownMenu.ItemText" + (j+1).toString();
-	if (name === bname) {
-	  this.items_text[j] = value;
-	  return 1;
-	}
-	bname = "PulldownMenu.ItemDyn" + (j+1).toString();
-	if (name.substring(0, 21) === bname) {
-	  sts = this.items_dyn[j].setAttribute(o, name.substring(22), value);
-	  return sts;
-	}
+        bname = "PulldownMenu.ItemText" + (j + 1).toString();
+        if (name === bname) {
+          this.items_text[j] = value;
+          return 1;
+        }
+        bname = "PulldownMenu.ItemDyn" + (j + 1).toString();
+        if (name.substring(0, 21) === bname) {
+          sts = this.items_dyn[j].setAttribute(o, name.substring(22), value);
+          return sts;
+        }
       }
       b_mask = b_mask << 1;
     }
@@ -15769,8 +15182,8 @@ function DynPulldownMenu( dyn) {
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     var b_mask;
     var bname;
@@ -15784,17 +15197,17 @@ function DynPulldownMenu( dyn) {
     for (let j = 0; j < 32; j++) {
       if (b_mask & this.button_mask) {
         var sts;
-	bname = "PulldownMenu.ItemText" + (j+1).toString();
-	if (name === bname) {
-	  ret.value = this.items_text[j];
-	  ret.decl = CcmC.K_DECL_STRING;
-	  return ret;
-	}
-	bname = "PulldownMenu.ItemDyn" + (j+1).toString();
-	if (name.substring(0, 21) === bname) {
-	  var iret = this.items_dyn[j].getAttribute(o, name.substring(22));
-	  return iret;
-	}
+        bname = "PulldownMenu.ItemText" + (j + 1).toString();
+        if (name === bname) {
+          ret.value = this.items_text[j];
+          ret.decl = CcmC.K_DECL_STRING;
+          return ret;
+        }
+        bname = "PulldownMenu.ItemDyn" + (j + 1).toString();
+        if (name.substring(0, 21) === bname) {
+          var iret = this.items_dyn[j].getAttribute(o, name.substring(22));
+          return iret;
+        }
       }
       b_mask = b_mask << 1;
     }
@@ -15805,68 +15218,80 @@ function DynPulldownMenu( dyn) {
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
+  this.action = function (object, e) {
+    if (!this.dyn.graph.isAuthorized(this.dyn.access)) return 1;
 
-  this.action = function( object, e) {
-    if ( !this.dyn.graph.isAuthorized( this.dyn.access))
-      return 1;
+    switch (e.event) {
+      case Glow.eEvent_MB1Click:
+        if (this.menu_object !== null) {
+          // Close, delete this menu and all childmenues
+          for (var j = 0; j < 32; j++) {
+            if (
+              this.items_dyn[j] !== null &&
+              (this.items_dyn[j].action_type1 &
+                DynC.mActionType1_PulldownMenu) !==
+                0
+            )
+              this.items_dyn[j].action(null, e);
+          }
+          this.dyn.graph.getCtx().remove(this.menu_object);
+          this.menu_object = null;
+        } else if (object !== null) {
+          var ll_x, ll_y, ur_x, ur_y;
+          var info = new GlowMenuInfo();
 
-    switch ( e.event) {
-    case Glow.eEvent_MB1Click:
-      if ( this.menu_object !== null) {
-	// Close, delete this menu and all childmenues
-	for ( var j = 0; j < 32; j++) {
-	  if ( this.items_dyn[j] !== null &&
-	       (this.items_dyn[j].action_type1 & DynC.mActionType1_PulldownMenu) !== 0)
-	    this.items_dyn[j].action( null, e);
-	}
-	this.dyn.graph.getCtx().remove(this.menu_object);
-	this.menu_object = null;
-      }
-      else if ( object !== null) {
-	var ll_x, ll_y, ur_x, ur_y;
-	var info = new GlowMenuInfo();
+          var b_mask = 1;
+          for (var i = 0; i < 32; i++) {
+            if ((b_mask & this.button_mask) != 0) {
+              info.item[i].occupied = true;
+              info.item[i].text = this.items_text[i];
 
-	var b_mask = 1;
-	for ( var i = 0; i < 32; i++) {
-	  if ( (b_mask & this.button_mask) != 0) {
-	    info.item[i].occupied = true;
-	    info.item[i].text = this.items_text[i];
-			    
-	    // Check access
-	    if ( (this.items_dyn[i].action_type1 & DynC.mActionType1_PulldownMenu) !== 0)
-	      info.item[i].type = Glow.eMenuItem_PulldownMenu;
-	    else {
-	      // Check access
-	      if ( this.dyn.graph.isAuthorized( this.items_dyn[i].access)) {
-		info.item[i].type = Glow.eMenuItem_Button;
-		if ( (this.items_dyn[i].dyn_type1 & DynC.mDynType1_Invisible) !== 0) {
-		  var sts;
-		  var invis_element = null;
-		  var command;
+              // Check access
+              if (
+                (this.items_dyn[i].action_type1 &
+                  DynC.mActionType1_PulldownMenu) !==
+                0
+              )
+                info.item[i].type = Glow.eMenuItem_PulldownMenu;
+              else {
+                // Check access
+                if (this.dyn.graph.isAuthorized(this.items_dyn[i].access)) {
+                  info.item[i].type = Glow.eMenuItem_Button;
+                  if (
+                    (this.items_dyn[i].dyn_type1 & DynC.mDynType1_Invisible) !==
+                    0
+                  ) {
+                    var sts;
+                    var invis_element = null;
+                    var command;
 
-		  for ( var j = 0; j < this.dyn.elements.length; j++) {
-		    if ( this.dyn.elements[j].dyn_type1 == DynC.mDynType1_Invisible) {
-		      invis_element = this.dyn.elements[j];
-		    }
-		  }
-		  if ( invis_element !== null) {
-		    var pname = this.dyn.parseAttrName( invis_element.attribute);
-		    if ( (pname !== null) && pname.name !== "") {
-		      if ( pname.name.substring(0, 5) == "$cmd(") {
-			var idx = pname.name.lastIndexOf(")");
-			if ( idx != -1) {
-			  command = pname.name.substring(5, idx);
-			  command = this.dyn.graph.getCommand(command);
-			  sts = this.dyn.graph.command(command);
-			  if ( (sts & 1) == 0)
-			    info.item[i].type = Glow.eMenuItem_ButtonDisabled;
-			}
-		      }
-		    }
-		    else {
-		      /** TODO
+                    for (var j = 0; j < this.dyn.elements.length; j++) {
+                      if (
+                        this.dyn.elements[j].dyn_type1 ==
+                        DynC.mDynType1_Invisible
+                      ) {
+                        invis_element = this.dyn.elements[j];
+                      }
+                    }
+                    if (invis_element !== null) {
+                      var pname = this.dyn.parseAttrName(
+                        invis_element.attribute,
+                      );
+                      if (pname !== null && pname.name !== "") {
+                        if (pname.name.substring(0, 5) == "$cmd(") {
+                          var idx = pname.name.lastIndexOf(")");
+                          if (idx != -1) {
+                            command = pname.name.substring(5, idx);
+                            command = this.dyn.graph.getCommand(command);
+                            sts = this.dyn.graph.command(command);
+                            if ((sts & 1) == 0)
+                              info.item[i].type = Glow.eMenuItem_ButtonDisabled;
+                          }
+                        }
+                      } else {
+                        /** TODO
 		      this.dyn.graph.getGdh().getObjectInfoBoolean( pname.name, this.action2, data);
 		      if (ret.oddSts()) {
 			if ( (!pname.inverted && ret.value) || (pname.inverted && !ret.value)) {
@@ -15877,386 +15302,368 @@ function DynPulldownMenu( dyn) {
 			}		      
 		      }
 		      **/
-		    }
-		  }
-		}
-	      }
-	      else
-		info.item[i].type = Glow.eMenuItem_ButtonDisabled;
-	    }
-	  }
-	  else
-	    info.item[i].occupied = false;
-	  b_mask = b_mask << 1;
-	}
+                      }
+                    }
+                  }
+                } else info.item[i].type = Glow.eMenuItem_ButtonDisabled;
+              }
+            } else info.item[i].occupied = false;
+            b_mask = b_mask << 1;
+          }
 
-	// Get fillcolor, and textattributes from object
-	var text_drawtype = 0, text_color = 0, bg_color = 0;
-	var text_size = 0;
-	var sts;
-	var scale = 1;
-	var text_font = 0;
-		    
-	sts = 0; // TODO sts = grow_GetObjectAnnotInfo( object, 1, &text_size, &text_drawtype, &text_color, &bg_color, &scale, &text_font);
-	if ( (sts & 1) == 0) {
-	  text_size = 3;
-	  text_drawtype = Glow.eDrawType_TextHelvetica;
-	  text_font = Glow.eFont_Helvetica;
-	  text_color = Glow.eDrawType_Line;
-	  bg_color = Glow.eDrawType_LightGray;
-	}
-	else if ( bg_color == Glow.eDrawType_No || bg_color == Glow.eDrawType_Inherit)
-	  bg_color = Glow.eDrawType_LightGray;
-		    
-	var g = object.measure();
-	this.menu_object = new GrowMenu( this.dyn.graph.getCtx());
-	this.menu_object.init( "__Menu", info, g.ll_x, g.ur_y, g.ur_x - g.ll_x,
-			       Glow.eDrawType_Line, 0, 1, 1, bg_color, text_size,
-			       text_drawtype, text_color,
-			       Glow.eDrawType_MediumGray, text_font);
-	this.menu_object.set_scale( scale, scale, 0, 0, Glow.eScaleType_LowerLeft);
-	this.dyn.graph.getCtx().insert( this.menu_object);
+          // Get fillcolor, and textattributes from object
+          var text_drawtype = 0;
+          var text_color = 0;
+          var bg_color = 0;
+          var text_size = 0;
+          var sts;
+          var scale = 1;
+          var text_font = 0;
 
-	// grow_SetMenuInputFocus( menu_object, 1);
-      }
+          sts = 0; // TODO sts = grow_GetObjectAnnotInfo( object, 1, &text_size, &text_drawtype, &text_color, &bg_color, &scale, &text_font);
+          if ((sts & 1) == 0) {
+            text_size = 3;
+            text_drawtype = Glow.eDrawType_TextHelvetica;
+            text_font = Glow.eFont_Helvetica;
+            text_color = Glow.eDrawType_Line;
+            bg_color = Glow.eDrawType_LightGray;
+          } else if (
+            bg_color == Glow.eDrawType_No ||
+            bg_color == Glow.eDrawType_Inherit
+          )
+            bg_color = Glow.eDrawType_LightGray;
 
-      break;
-    case Glow.eEvent_MenuActivated:
-      if ( this.menu_object == null)
-	break;
-      if ( e.object == this.menu_object) {
-	if ( this.items_dyn[e.item] !== null) {
-	  var event = new GlowEvent();
-	  event.event = Glow.eEvent_MB1Click;
-	  return this.items_dyn[e.item].action( e.object, event);
-	}
-      }
-      else {
-	for ( var j = 0; j < 32; j++) {
-	  if ( this.items_dyn[j] !== null && 
-	       (items_dyn[j].action_type1 & DynC.mActionType1_PulldownMenu) !== 0)
-	    this.items_dyn[j].action( null, e);
-	}
-      }
-      break;
-    case Glow.eEvent_MenuDelete:
-      if ( this.menu_object == null)
-	break;
-      if ( e.object == null || e.object == this.menu_object) {
-	// Delete this menu
-	this.dyn.graph.getCtx().remove(this.menu_object);
-	this.menu_object = null;
-      }
-      break;
+          var g = object.measure();
+          this.menu_object = new GrowMenu(this.dyn.graph.getCtx());
+          this.menu_object.init(
+            "__Menu",
+            info,
+            g.ll_x,
+            g.ur_y,
+            g.ur_x - g.ll_x,
+            Glow.eDrawType_Line,
+            0,
+            1,
+            1,
+            bg_color,
+            text_size,
+            text_drawtype,
+            text_color,
+            Glow.eDrawType_MediumGray,
+            text_font,
+          );
+          this.menu_object.set_scale(
+            scale,
+            scale,
+            0,
+            0,
+            Glow.eScaleType_LowerLeft,
+          );
+          this.dyn.graph.getCtx().insert(this.menu_object);
 
-    default: ;
+          // grow_SetMenuInputFocus( menu_object, 1);
+        }
+
+        break;
+      case Glow.eEvent_MenuActivated:
+        if (this.menu_object == null) break;
+        if (e.object == this.menu_object) {
+          if (this.items_dyn[e.item] !== null) {
+            var event = new GlowEvent();
+            event.event = Glow.eEvent_MB1Click;
+            return this.items_dyn[e.item].action(e.object, event);
+          }
+        } else {
+          for (var j = 0; j < 32; j++) {
+            if (
+              this.items_dyn[j] !== null &&
+              (items_dyn[j].action_type1 & DynC.mActionType1_PulldownMenu) !== 0
+            )
+              this.items_dyn[j].action(null, e);
+          }
+        }
+        break;
+      case Glow.eEvent_MenuDelete:
+        if (this.menu_object == null) break;
+        if (e.object == null || e.object == this.menu_object) {
+          // Delete this menu
+          this.dyn.graph.getCtx().remove(this.menu_object);
+          this.menu_object = null;
+        }
+        break;
+
+      default:
     }
     return 1;
-  }
-
-  this.connect = function( object) {
-  };
-  this.disconnect = function() {
   };
 
-  this.scan = function( object) {
-  };
+  this.connect = function (object) {};
+  this.disconnect = function () {};
 
-  this.open = function( lines, row) {
+  this.scan = function (object) {};
+
+  this.open = function (lines, row) {
     var end = false;
     var i;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynPulldownMenu : " + lines[i]);
+      if (this.dyn.debug) console.log("DynPulldownMenu : " + lines[i]);
 
-      switch ( key) {
-      case DynC.eSave_PulldownMenu: 
-	break;
-      case DynC.eSave_PulldownMenu_button_mask: 
-	this.button_mask = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_PulldownMenu_items_text0: 
-	if ( tokens.length > 1)
-	  this.items_text[0] = tokens[1];
-	break;
-      case DynC.eSave_PulldownMenu_items_text1: 
-	if ( tokens.length > 1)
-	  this.items_text[1] = tokens[1];
-	break;
-      case DynC.eSave_PulldownMenu_items_text2: 
-	if ( tokens.length > 1)
-	  this.items_text[2] = tokens[1];
-	break;
-      case DynC.eSave_PulldownMenu_items_text3: 
-	if ( tokens.length > 1)
-	  this.items_text[3] = tokens[1];
-	break;
-      case DynC.eSave_PulldownMenu_items_text4: 
-	if ( tokens.length > 1)
-	  this.items_text[4] = tokens[1];
-	break;
-      case DynC.eSave_PulldownMenu_items_text5: 
-	if ( tokens.length > 1)
-	  this.items_text[5] = tokens[1];
-	break;
-      case DynC.eSave_PulldownMenu_items_text6: 
-	if ( tokens.length > 1)
-	  this.items_text[6] = tokens[1];
-	break;
-      case DynC.eSave_PulldownMenu_items_text7: 
-	if ( tokens.length > 1)
-	  this.items_text[7] = tokens[1];
-	break;
-      case DynC.eSave_PulldownMenu_items_text8: 
-	if ( tokens.length > 1)
-	  this.items_text[8] = tokens[1];
-	break;
-      case DynC.eSave_PulldownMenu_items_text9: 
-	if ( tokens.length > 1)
-	  this.items_text[9] = tokens[1];
-	break;
-      case DynC.eSave_PulldownMenu_items_text10: 
-	if ( tokens.length > 1)
-	  this.items_text[10] = tokens[1];
-	break;
-      case DynC.eSave_PulldownMenu_items_text11: 
-	if ( tokens.length > 1)
-	  this.items_text[11] = tokens[1];
-	break;
-      case DynC.eSave_PulldownMenu_items_text12: 
-	if ( tokens.length > 1)
-	  this.items_text[12] = tokens[1];
-	break;
-      case DynC.eSave_PulldownMenu_items_text13: 
-	if ( tokens.length > 1)
-	  this.items_text[13] = tokens[1];
-	break;
-      case DynC.eSave_PulldownMenu_items_text14: 
-	if ( tokens.length > 1)
-	  this.items_text[14] = tokens[1];
-	break;
-      case DynC.eSave_PulldownMenu_items_text15: 
-	if ( tokens.length > 1)
-	  this.items_text[15] = tokens[1];
-	break;
-      case DynC.eSave_PulldownMenu_items_text16: 
-	if ( tokens.length > 1)
-	  this.items_text[16] = tokens[1];
-	break;
-      case DynC.eSave_PulldownMenu_items_text17: 
-	if ( tokens.length > 1)
-	  this.items_text[17] = tokens[1];
-	break;
-      case DynC.eSave_PulldownMenu_items_text18: 
-	if ( tokens.length > 1)
-	  this.items_text[18] = tokens[1];
-	break;
-      case DynC.eSave_PulldownMenu_items_text19: 
-	if ( tokens.length > 1)
-	  this.items_text[19] = tokens[1];
-	break;
-      case DynC.eSave_PulldownMenu_items_text20: 
-	if ( tokens.length > 1)
-	  this.items_text[20] = tokens[1];
-	break;
-      case DynC.eSave_PulldownMenu_items_text21: 
-	if ( tokens.length > 1)
-	  this.items_text[21] = tokens[1];
-	break;
-      case DynC.eSave_PulldownMenu_items_text22: 
-	if ( tokens.length > 1)
-	  this.items_text[22] = tokens[1];
-	break;
-      case DynC.eSave_PulldownMenu_items_text23: 
-	if ( tokens.length > 1)
-	  this.items_text[23] = tokens[1];
-	break;
-      case DynC.eSave_PulldownMenu_items_text24: 
-	if ( tokens.length > 1)
-	  this.items_text[24] = tokens[1];
-	break;
-      case DynC.eSave_PulldownMenu_items_text25: 
-	if ( tokens.length > 1)
-	  this.items_text[25] = tokens[1];
-	break;
-      case DynC.eSave_PulldownMenu_items_text26: 
-	if ( tokens.length > 1)
-	  this.items_text[26] = tokens[1];
-	break;
-      case DynC.eSave_PulldownMenu_items_text27: 
-	if ( tokens.length > 1)
-	  this.items_text[27] = tokens[1];
-	break;
-      case DynC.eSave_PulldownMenu_items_text28: 
-	if ( tokens.length > 1)
-	  this.items_text[28] = tokens[1];
-	break;
-      case DynC.eSave_PulldownMenu_items_text29: 
-	if ( tokens.length > 1)
-	  this.items_text[29] = tokens[1];
-	break;
-      case DynC.eSave_PulldownMenu_items_text30: 
-	if ( tokens.length > 1)
-	  this.items_text[30] = tokens[1];
-	break;
-      case DynC.eSave_PulldownMenu_items_text31: 
-	if ( tokens.length > 1)
-	  this.items_text[31] = tokens[1];
-	break;
-      case DynC.eSave_PulldownMenu_items_dyn0: 
-	this.items_dyn[0] = new Dyn(this.dyn.graph);
-	i = this.items_dyn[0].open(lines, i+1);
-	break;
-      case DynC.eSave_PulldownMenu_items_dyn1: 
-	this.items_dyn[1] = new Dyn(this.dyn.graph);
-	i = this.items_dyn[1].open(lines, i+1);
-	break;
-      case DynC.eSave_PulldownMenu_items_dyn2:
-	this.items_dyn[2] = new Dyn(this.dyn.graph);
-	i = this.items_dyn[2].open(lines, i+1);
-	break;
-      case DynC.eSave_PulldownMenu_items_dyn3: 
-	this.items_dyn[3] = new Dyn(this.dyn.graph);
-	i = this.items_dyn[3].open(lines, i+1);
-	break;
-      case DynC.eSave_PulldownMenu_items_dyn4: 
-	this.items_dyn[4] = new Dyn(this.dyn.graph);
-	i = this.items_dyn[4].open(lines, i+1);
-	break;
-      case DynC.eSave_PulldownMenu_items_dyn5: 
-	this.items_dyn[5] = new Dyn(this.dyn.graph);
-	i = this.items_dyn[5].open(lines, i+1);
-	break;
-      case DynC.eSave_PulldownMenu_items_dyn6: 
-	this.items_dyn[6] = new Dyn(this.dyn.graph);
-	i = this.items_dyn[6].open(lines, i+1);
-	break;
-      case DynC.eSave_PulldownMenu_items_dyn7: 
-	this.items_dyn[7] = new Dyn(this.dyn.graph);
-	i = this.items_dyn[7].open(lines, i+1);
-	break;
-      case DynC.eSave_PulldownMenu_items_dyn8: 
-	this.items_dyn[8] = new Dyn(this.dyn.graph);
-	i = this.items_dyn[8].open(lines, i+1);
-	break;
-      case DynC.eSave_PulldownMenu_items_dyn9: 
-	this.items_dyn[9] = new Dyn(this.dyn.graph);
-	i = this.items_dyn[9].open(lines, i+1);
-	break;
-      case DynC.eSave_PulldownMenu_items_dyn10: 
-	this.items_dyn[10] = new Dyn(this.dyn.graph);
-	i = this.items_dyn[10].open(lines, i+1);
-	break;
-      case DynC.eSave_PulldownMenu_items_dyn11: 
-	this.items_dyn[11] = new Dyn(this.dyn.graph);
-	i = this.items_dyn[11].open(lines, i+1);
-	break;
-      case DynC.eSave_PulldownMenu_items_dyn12: 
-	this.items_dyn[12] = new Dyn(this.dyn.graph);
-	i = this.items_dyn[12].open(lines, i+1);
-	break;
-      case DynC.eSave_PulldownMenu_items_dyn13: 
-	this.items_dyn[13] = new Dyn(this.dyn.graph);
-	i = this.items_dyn[13].open(lines, i+1);
-	break;
-      case DynC.eSave_PulldownMenu_items_dyn14: 
-	this.items_dyn[14] = new Dyn(this.dyn.graph);
-	i = this.items_dyn[14].open(lines, i+1);
-	break;
-      case DynC.eSave_PulldownMenu_items_dyn15: 
-	this.items_dyn[15] = new Dyn(this.dyn.graph);
-	i = this.items_dyn[15].open(lines, i+1);
-	break;
-      case DynC.eSave_PulldownMenu_items_dyn16: 
-	this.items_dyn[16] = new Dyn(this.dyn.graph);
-	i = this.items_dyn[16].open(lines, i+1);
-	break;
-      case DynC.eSave_PulldownMenu_items_dyn17: 
-	this.items_dyn[17] = new Dyn(this.dyn.graph);
-	i = this.items_dyn[17].open(lines, i+1);
-	break;
-      case DynC.eSave_PulldownMenu_items_dyn18: 
-	this.items_dyn[18] = new Dyn(this.dyn.graph);
-	i = this.items_dyn[18].open(lines, i+1);
-	break;
-      case DynC.eSave_PulldownMenu_items_dyn19: 
-	this.items_dyn[19] = new Dyn(this.dyn.graph);
-	i = this.items_dyn[19].open(lines, i+1);
-	break;
-      case DynC.eSave_PulldownMenu_items_dyn20: 
-	this.items_dyn[20] = new Dyn(this.dyn.graph);
-	i = this.items_dyn[20].open(lines, i+1);
-	break;
-      case DynC.eSave_PulldownMenu_items_dyn21: 
-	this.items_dyn[21] = new Dyn(this.dyn.graph);
-	i = this.items_dyn[21].open(lines, i+1);
-	break;
-      case DynC.eSave_PulldownMenu_items_dyn22: 
-	this.items_dyn[22] = new Dyn(this.dyn.graph);
-	i = this.items_dyn[22].open(lines, i+1);
-	break;
-      case DynC.eSave_PulldownMenu_items_dyn23: 
-	this.items_dyn[23] = new Dyn(this.dyn.graph);
-	i = this.items_dyn[23].open(lines, i+1);
-	break;
-      case DynC.eSave_PulldownMenu_items_dyn24: 
-	this.items_dyn[24] = new Dyn(this.dyn.graph);
-	i = this.items_dyn[24].open(lines, i+1);
-	break;
-      case DynC.eSave_PulldownMenu_items_dyn25: 
-	this.items_dyn[25] = new Dyn(this.dyn.graph);
-	i = this.items_dyn[25].open(lines, i+1);
-	break;
-      case DynC.eSave_PulldownMenu_items_dyn26: 
-	this.items_dyn[26] = new Dyn(this.dyn.graph);
-	i = this.items_dyn[26].open(lines, i+1);
-	break;
-      case DynC.eSave_PulldownMenu_items_dyn27: 
-	this.items_dyn[27] = new Dyn(this.dyn.graph);
-	i = this.items_dyn[27].open(lines, i+1);
-	break;
-      case DynC.eSave_PulldownMenu_items_dyn28: 
-	this.items_dyn[28] = new Dyn(this.dyn.graph);
-	i = this.items_dyn[28].open(lines, i+1);
-	break;
-      case DynC.eSave_PulldownMenu_items_dyn29: 
-	this.items_dyn[29] = new Dyn(this.dyn.graph);
-	i = this.items_dyn[29].open(lines, i+1);
-	break;
-      case DynC.eSave_PulldownMenu_items_dyn30: 
-	this.items_dyn[30] = new Dyn(this.dyn.graph);
-	i = this.items_dyn[30].open(lines, i+1);
-	break;
-      case DynC.eSave_PulldownMenu_items_dyn31: 
-	this.items_dyn[31] = new Dyn(this.dyn.graph);
-	i = this.items_dyn[31].open(lines, i+1);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynPulldownMenu");
-	break;
+      switch (key) {
+        case DynC.eSave_PulldownMenu:
+          break;
+        case DynC.eSave_PulldownMenu_button_mask:
+          this.button_mask = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_PulldownMenu_items_text0:
+          if (tokens.length > 1) this.items_text[0] = tokens[1];
+          break;
+        case DynC.eSave_PulldownMenu_items_text1:
+          if (tokens.length > 1) this.items_text[1] = tokens[1];
+          break;
+        case DynC.eSave_PulldownMenu_items_text2:
+          if (tokens.length > 1) this.items_text[2] = tokens[1];
+          break;
+        case DynC.eSave_PulldownMenu_items_text3:
+          if (tokens.length > 1) this.items_text[3] = tokens[1];
+          break;
+        case DynC.eSave_PulldownMenu_items_text4:
+          if (tokens.length > 1) this.items_text[4] = tokens[1];
+          break;
+        case DynC.eSave_PulldownMenu_items_text5:
+          if (tokens.length > 1) this.items_text[5] = tokens[1];
+          break;
+        case DynC.eSave_PulldownMenu_items_text6:
+          if (tokens.length > 1) this.items_text[6] = tokens[1];
+          break;
+        case DynC.eSave_PulldownMenu_items_text7:
+          if (tokens.length > 1) this.items_text[7] = tokens[1];
+          break;
+        case DynC.eSave_PulldownMenu_items_text8:
+          if (tokens.length > 1) this.items_text[8] = tokens[1];
+          break;
+        case DynC.eSave_PulldownMenu_items_text9:
+          if (tokens.length > 1) this.items_text[9] = tokens[1];
+          break;
+        case DynC.eSave_PulldownMenu_items_text10:
+          if (tokens.length > 1) this.items_text[10] = tokens[1];
+          break;
+        case DynC.eSave_PulldownMenu_items_text11:
+          if (tokens.length > 1) this.items_text[11] = tokens[1];
+          break;
+        case DynC.eSave_PulldownMenu_items_text12:
+          if (tokens.length > 1) this.items_text[12] = tokens[1];
+          break;
+        case DynC.eSave_PulldownMenu_items_text13:
+          if (tokens.length > 1) this.items_text[13] = tokens[1];
+          break;
+        case DynC.eSave_PulldownMenu_items_text14:
+          if (tokens.length > 1) this.items_text[14] = tokens[1];
+          break;
+        case DynC.eSave_PulldownMenu_items_text15:
+          if (tokens.length > 1) this.items_text[15] = tokens[1];
+          break;
+        case DynC.eSave_PulldownMenu_items_text16:
+          if (tokens.length > 1) this.items_text[16] = tokens[1];
+          break;
+        case DynC.eSave_PulldownMenu_items_text17:
+          if (tokens.length > 1) this.items_text[17] = tokens[1];
+          break;
+        case DynC.eSave_PulldownMenu_items_text18:
+          if (tokens.length > 1) this.items_text[18] = tokens[1];
+          break;
+        case DynC.eSave_PulldownMenu_items_text19:
+          if (tokens.length > 1) this.items_text[19] = tokens[1];
+          break;
+        case DynC.eSave_PulldownMenu_items_text20:
+          if (tokens.length > 1) this.items_text[20] = tokens[1];
+          break;
+        case DynC.eSave_PulldownMenu_items_text21:
+          if (tokens.length > 1) this.items_text[21] = tokens[1];
+          break;
+        case DynC.eSave_PulldownMenu_items_text22:
+          if (tokens.length > 1) this.items_text[22] = tokens[1];
+          break;
+        case DynC.eSave_PulldownMenu_items_text23:
+          if (tokens.length > 1) this.items_text[23] = tokens[1];
+          break;
+        case DynC.eSave_PulldownMenu_items_text24:
+          if (tokens.length > 1) this.items_text[24] = tokens[1];
+          break;
+        case DynC.eSave_PulldownMenu_items_text25:
+          if (tokens.length > 1) this.items_text[25] = tokens[1];
+          break;
+        case DynC.eSave_PulldownMenu_items_text26:
+          if (tokens.length > 1) this.items_text[26] = tokens[1];
+          break;
+        case DynC.eSave_PulldownMenu_items_text27:
+          if (tokens.length > 1) this.items_text[27] = tokens[1];
+          break;
+        case DynC.eSave_PulldownMenu_items_text28:
+          if (tokens.length > 1) this.items_text[28] = tokens[1];
+          break;
+        case DynC.eSave_PulldownMenu_items_text29:
+          if (tokens.length > 1) this.items_text[29] = tokens[1];
+          break;
+        case DynC.eSave_PulldownMenu_items_text30:
+          if (tokens.length > 1) this.items_text[30] = tokens[1];
+          break;
+        case DynC.eSave_PulldownMenu_items_text31:
+          if (tokens.length > 1) this.items_text[31] = tokens[1];
+          break;
+        case DynC.eSave_PulldownMenu_items_dyn0:
+          this.items_dyn[0] = new Dyn(this.dyn.graph);
+          i = this.items_dyn[0].open(lines, i + 1);
+          break;
+        case DynC.eSave_PulldownMenu_items_dyn1:
+          this.items_dyn[1] = new Dyn(this.dyn.graph);
+          i = this.items_dyn[1].open(lines, i + 1);
+          break;
+        case DynC.eSave_PulldownMenu_items_dyn2:
+          this.items_dyn[2] = new Dyn(this.dyn.graph);
+          i = this.items_dyn[2].open(lines, i + 1);
+          break;
+        case DynC.eSave_PulldownMenu_items_dyn3:
+          this.items_dyn[3] = new Dyn(this.dyn.graph);
+          i = this.items_dyn[3].open(lines, i + 1);
+          break;
+        case DynC.eSave_PulldownMenu_items_dyn4:
+          this.items_dyn[4] = new Dyn(this.dyn.graph);
+          i = this.items_dyn[4].open(lines, i + 1);
+          break;
+        case DynC.eSave_PulldownMenu_items_dyn5:
+          this.items_dyn[5] = new Dyn(this.dyn.graph);
+          i = this.items_dyn[5].open(lines, i + 1);
+          break;
+        case DynC.eSave_PulldownMenu_items_dyn6:
+          this.items_dyn[6] = new Dyn(this.dyn.graph);
+          i = this.items_dyn[6].open(lines, i + 1);
+          break;
+        case DynC.eSave_PulldownMenu_items_dyn7:
+          this.items_dyn[7] = new Dyn(this.dyn.graph);
+          i = this.items_dyn[7].open(lines, i + 1);
+          break;
+        case DynC.eSave_PulldownMenu_items_dyn8:
+          this.items_dyn[8] = new Dyn(this.dyn.graph);
+          i = this.items_dyn[8].open(lines, i + 1);
+          break;
+        case DynC.eSave_PulldownMenu_items_dyn9:
+          this.items_dyn[9] = new Dyn(this.dyn.graph);
+          i = this.items_dyn[9].open(lines, i + 1);
+          break;
+        case DynC.eSave_PulldownMenu_items_dyn10:
+          this.items_dyn[10] = new Dyn(this.dyn.graph);
+          i = this.items_dyn[10].open(lines, i + 1);
+          break;
+        case DynC.eSave_PulldownMenu_items_dyn11:
+          this.items_dyn[11] = new Dyn(this.dyn.graph);
+          i = this.items_dyn[11].open(lines, i + 1);
+          break;
+        case DynC.eSave_PulldownMenu_items_dyn12:
+          this.items_dyn[12] = new Dyn(this.dyn.graph);
+          i = this.items_dyn[12].open(lines, i + 1);
+          break;
+        case DynC.eSave_PulldownMenu_items_dyn13:
+          this.items_dyn[13] = new Dyn(this.dyn.graph);
+          i = this.items_dyn[13].open(lines, i + 1);
+          break;
+        case DynC.eSave_PulldownMenu_items_dyn14:
+          this.items_dyn[14] = new Dyn(this.dyn.graph);
+          i = this.items_dyn[14].open(lines, i + 1);
+          break;
+        case DynC.eSave_PulldownMenu_items_dyn15:
+          this.items_dyn[15] = new Dyn(this.dyn.graph);
+          i = this.items_dyn[15].open(lines, i + 1);
+          break;
+        case DynC.eSave_PulldownMenu_items_dyn16:
+          this.items_dyn[16] = new Dyn(this.dyn.graph);
+          i = this.items_dyn[16].open(lines, i + 1);
+          break;
+        case DynC.eSave_PulldownMenu_items_dyn17:
+          this.items_dyn[17] = new Dyn(this.dyn.graph);
+          i = this.items_dyn[17].open(lines, i + 1);
+          break;
+        case DynC.eSave_PulldownMenu_items_dyn18:
+          this.items_dyn[18] = new Dyn(this.dyn.graph);
+          i = this.items_dyn[18].open(lines, i + 1);
+          break;
+        case DynC.eSave_PulldownMenu_items_dyn19:
+          this.items_dyn[19] = new Dyn(this.dyn.graph);
+          i = this.items_dyn[19].open(lines, i + 1);
+          break;
+        case DynC.eSave_PulldownMenu_items_dyn20:
+          this.items_dyn[20] = new Dyn(this.dyn.graph);
+          i = this.items_dyn[20].open(lines, i + 1);
+          break;
+        case DynC.eSave_PulldownMenu_items_dyn21:
+          this.items_dyn[21] = new Dyn(this.dyn.graph);
+          i = this.items_dyn[21].open(lines, i + 1);
+          break;
+        case DynC.eSave_PulldownMenu_items_dyn22:
+          this.items_dyn[22] = new Dyn(this.dyn.graph);
+          i = this.items_dyn[22].open(lines, i + 1);
+          break;
+        case DynC.eSave_PulldownMenu_items_dyn23:
+          this.items_dyn[23] = new Dyn(this.dyn.graph);
+          i = this.items_dyn[23].open(lines, i + 1);
+          break;
+        case DynC.eSave_PulldownMenu_items_dyn24:
+          this.items_dyn[24] = new Dyn(this.dyn.graph);
+          i = this.items_dyn[24].open(lines, i + 1);
+          break;
+        case DynC.eSave_PulldownMenu_items_dyn25:
+          this.items_dyn[25] = new Dyn(this.dyn.graph);
+          i = this.items_dyn[25].open(lines, i + 1);
+          break;
+        case DynC.eSave_PulldownMenu_items_dyn26:
+          this.items_dyn[26] = new Dyn(this.dyn.graph);
+          i = this.items_dyn[26].open(lines, i + 1);
+          break;
+        case DynC.eSave_PulldownMenu_items_dyn27:
+          this.items_dyn[27] = new Dyn(this.dyn.graph);
+          i = this.items_dyn[27].open(lines, i + 1);
+          break;
+        case DynC.eSave_PulldownMenu_items_dyn28:
+          this.items_dyn[28] = new Dyn(this.dyn.graph);
+          i = this.items_dyn[28].open(lines, i + 1);
+          break;
+        case DynC.eSave_PulldownMenu_items_dyn29:
+          this.items_dyn[29] = new Dyn(this.dyn.graph);
+          i = this.items_dyn[29].open(lines, i + 1);
+          break;
+        case DynC.eSave_PulldownMenu_items_dyn30:
+          this.items_dyn[30] = new Dyn(this.dyn.graph);
+          i = this.items_dyn[30].open(lines, i + 1);
+          break;
+        case DynC.eSave_PulldownMenu_items_dyn31:
+          this.items_dyn[31] = new Dyn(this.dyn.graph);
+          i = this.items_dyn[31].open(lines, i + 1);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynPulldownMenu");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-		
+
     return i;
   };
 }
 
-function DynOptionMenu( dyn) {
+function DynOptionMenu(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = 0;
-  this.action_type1 = DynC.mActionType1_OptionsMenu;
+  this.action_type1 = DynC.mActionType1_OptionMenu;
   this.action_type2 = 0;
-  this.prio = DynC.eDynPrio_OptionsMenu;
+  this.prio = DynC.eDynPrio_OptionMenu;
   this.instance_mask = 0;
   this.instance = DynC.mInstance_1;
 
@@ -16276,657 +15683,625 @@ function DynOptionMenu( dyn) {
   this.menu_object = null;
   this.text_size;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "OptionMenu.Type") {
       this.optionmenu_type = value;
       return 1;
-    }
-    else if (name === "OptionMenu.Attribute") {
+    } else if (name === "OptionMenu.Attribute") {
       this.attribute = value;
       return 1;
     }
     if (this.optionmenu_type == DynC.eOptionMenuType_Dynamic) {
       if (name === "OptionMenu.TextAttribute") {
-	this.text_attribute = value;
-	return 1;
+        this.text_attribute = value;
+        return 1;
+      } else if (name === "OptionMenu.SizeAttribute") {
+        this.size_attribute = value;
+        return 1;
+      } else if (name === "OptionMenu.UpdateAttribute") {
+        this.update_attribute = value;
+        return 1;
       }
-      else if (name === "OptionMenu.SizeAttribute") {
-	this.size_attribute = value;
-	return 1;
-      }
-      else if (name === "OptionMenu.UpdateAttribute") {
-	this.update_attribute = value;
-	return 1;
-      }
-    } else {    
+    } else {
       if (name === "OptionMenu.ItemMask") {
-	this.button_mask = value;
-	return 1;
-      }
-      else {
-	var b_mask = DynC.mInstance_1;
-	var bname;
-	for (let j = 0; j < 32; j++) {
+        this.button_mask = value;
+        return 1;
+      } else {
+        var b_mask = DynC.mInstance_1;
+        var bname;
+        for (let j = 0; j < 32; j++) {
           if (b_mask & this.button_mask) {
-	    bname = "OptionMenu.ItemText" + (j+1).toString();
-	    if (name === bname) {
-	      this.items_text[j] = value;
-	      return 1;
-	    }
-	    bname = "OptionMenu.ItemEnum" + (j+1).toString();
-	    if (name === bname) {
-	      this.items_enum[j] = value;
-	      return 1;
-	    }
-	  }
-	  b_mask = b_mask << 1;
-	}
+            bname = "OptionMenu.ItemText" + (j + 1).toString();
+            if (name === bname) {
+              this.items_text[j] = value;
+              return 1;
+            }
+            bname = "OptionMenu.ItemEnum" + (j + 1).toString();
+            if (name === bname) {
+              this.items_enum[j] = value;
+              return 1;
+            }
+          }
+          b_mask = b_mask << 1;
+        }
       }
     }
 
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "OptionMenu.Type") {
       ret.value = this.optionmenu_type;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "OptionMenu.Attribute") {
+    } else if (name === "OptionMenu.Attribute") {
       ret.value = this.attribute;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
     }
     if (this.optionmenu_type == DynC.eOptionMenuType_Dynamic) {
       if (name === "OptionMenu.TextAttribute") {
-	ret.value = this.text_attribute;
-	ret.decl = CcmC.K_DECL_STRING;
-	return ret;
+        ret.value = this.text_attribute;
+        ret.decl = CcmC.K_DECL_STRING;
+        return ret;
+      } else if (name === "OptionMenu.SizeAttribute") {
+        ret.value = this.size_attribute;
+        ret.decl = CcmC.K_DECL_STRING;
+        return ret;
+      } else if (name === "OptionMenu.UpdateAttribute") {
+        ret.value = this.update_attribute;
+        ret.decl = CcmC.K_DECL_STRING;
+        return ret;
       }
-      else if (name === "OptionMenu.SizeAttribute") {
-	ret.value = this.size_attribute;
-	ret.decl = CcmC.K_DECL_STRING;
-	return ret;
-      }
-      else if (name === "OptionMenu.UpdateAttribute") {
-	ret.value = this.update_attribute;
-	ret.decl = CcmC.K_DECL_STRING;
-	return ret;
-      }
-    } else {    
+    } else {
       if (name === "OptionMenu.ItemMask") {
-	ret.value = this.button_mask;
-	ret.decl = CcmC.K_DECL_INT;
-	return ret;
-      }
-      else {
-	var b_mask = DynC.mInstance_1;
-	var bname;
-	for (let j = 0; j < 32; j++) {
+        ret.value = this.button_mask;
+        ret.decl = CcmC.K_DECL_INT;
+        return ret;
+      } else {
+        var b_mask = DynC.mInstance_1;
+        var bname;
+        for (let j = 0; j < 32; j++) {
           if (b_mask & this.button_mask) {
-	    bname = "OptionMenu.ItemText" + (j+1).toString();
-	    if (name === bname) {
-	      ret.value = this.items_text[j];
-	      ret.decl = CcmC.K_DECL_STRING;
-	      return ret;
-	    }
-	    bname = "OptionMenu.ItemEnum" + (j+1).toString();
-	    if (name === bname) {
-	      ret.value = this.items_enum[j];
-	      ret.decl = CcmC.K_DECL_INT;
-	      return ret;
-	    }
-	  }
-	  b_mask = b_mask << 1;
-	}
+            bname = "OptionMenu.ItemText" + (j + 1).toString();
+            if (name === bname) {
+              ret.value = this.items_text[j];
+              ret.decl = CcmC.K_DECL_STRING;
+              return ret;
+            }
+            bname = "OptionMenu.ItemEnum" + (j + 1).toString();
+            if (name === bname) {
+              ret.value = this.items_enum[j];
+              ret.decl = CcmC.K_DECL_INT;
+              return ret;
+            }
+          }
+          b_mask = b_mask << 1;
+        }
       }
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( object) {
-
-    this.a = new DynReference( this.dyn, this.attribute);
+  this.connect = function (object) {
+    this.a = new DynReference(this.dyn, this.attribute);
     this.a.connect(this.dyn);
-    if ( !this.a.sts) {
+    if (!this.a.sts) {
       console.log("OptionMenu: " + this.attribute);
       return 1;
     }
 
-    if ( this.text_attribute !== null && this.text_attribute !== "" && 
-	 this.update_attribute != null && this.update_attribute !== "") {
-
-      this.update_a = new DynReference( this.dyn, this.update_attribute);
+    if (
+      this.text_attribute !== null &&
+      this.text_attribute !== "" &&
+      this.update_attribute != null &&
+      this.update_attribute !== ""
+    ) {
+      this.update_a = new DynReference(this.dyn, this.update_attribute);
       this.update_a.connect(this.dyn);
-      if ( !this.update_a.sts) {
-	console.log("OptionMenu: " + this.update_attribute);
-	return 1;
+      if (!this.update_a.sts) {
+        console.log("OptionMenu: " + this.update_attribute);
+        return 1;
       }
     }
     return 1;
   };
 
-  this.disconnect = function() {
+  this.disconnect = function () {
     this.a.disconnect(this.dyn);
-    if ( this.update_a != null)
-      this.update_a.disconnect(this.dyn);
+    if (this.update_a != null) this.update_a.disconnect(this.dyn);
   };
 
-  this.scan = function( object) {
-    if ( !this.a.sts)
-      return;
+  this.scan = function (object) {
+    if (!this.a.sts) return;
 
     var update_texts = false;
-    if ( this.update_a !== null && this.update_a.sts) {
+    if (this.update_a !== null && this.update_a.sts) {
+      var value = this.dyn.getDig(
+        this.update_a.p,
+        this.update_a.typeid,
+        this.update_a.bitmask,
+        this.update_a.database,
+      );
 
-      var value = this.dyn.getDig( this.update_a.p, this.update_a.typeid, this.update_a.bitmask, this.update_a.database);
+      if (this.update_a.inverted) value = !value;
 
-      if ( this.update_a.inverted)
-	value = !value;
-
-      if ( !this.firstScan) {
-	if ( this.update_a.oldValue != value)
-	  update_texts = true;
-      }
-      else {
-	update_texts = false;
+      if (!this.firstScan) {
+        if (this.update_a.oldValue != value) update_texts = true;
+      } else {
+        update_texts = false;
       }
       this.update_a.oldValue = value;
     }
 
-
-    if ( update_texts) {
+    if (update_texts) {
     }
 
     var enum_value = 0;
-    switch ( this.a.typeid) {
-    case Pwr.eType_Float32: {
-      var value = this.a.get_ref_value(this.dyn);
-      var i;
+    switch (this.a.typeid) {
+      case Pwr.eType_Float32: {
+        var value = this.a.get_ref_value(this.dyn);
+        var i;
 
-      if ( !this.firstScan) {
-	if ( value == this.oldValueF) {
-	  return;
-	}
+        if (!this.firstScan) {
+          if (value == this.oldValueF) {
+            return;
+          }
+        } else this.firstScan = false;
+
+        enum_value = Math.floor(value + 0.5);
+        this.oldValueF = value;
+
+        break;
       }
-      else
-	this.firstScan = false;
+      case Pwr.eType_UInt32:
+      case Pwr.eType_Int32: {
+        var value = this.a.get_ref_value(this.dyn);
+        var i;
 
-      enum_value = Math.floor( value + 0.5);
-      this.oldValueF = value;
+        if (!this.firstScan) {
+          if (value == this.oldValueI) {
+            return;
+          }
+        } else this.firstScan = false;
 
-      break;
-    }
-    case Pwr.eType_UInt32:
-    case Pwr.eType_Int32: {
-      var value = this.a.get_ref_value(this.dyn);
-      var i;
+        enum_value = value;
+        this.oldValueI = value;
 
-      if ( !this.firstScan) {
-	if ( value == this.oldValueI) {
-	  return;
-	}
+        break;
       }
-      else
-	this.firstScan = false;
-
-      enum_value = value;
-      this.oldValueI = value;
-
-      break;
+      default:
+        return;
     }
-    default:
-      return;
-    }
-	    
-    if ( this.update_a === null || !this.update_a.sts) {
+
+    if (this.update_a === null || !this.update_a.sts) {
       var found = false;
-      for ( var i = 0; i < 32; i++) {
-	if ( this.items_enum[i] == enum_value) {
-	  object.setAnnotation(1, this.items_text[i]);
-	  found = true;
-	  break;
-	}
+      for (var i = 0; i < 32; i++) {
+        if (this.items_enum[i] == enum_value) {
+          object.setAnnotation(1, this.items_text[i]);
+          found = true;
+          break;
+        }
       }
-      if ( !found)
-	object.setAnnotation(1, "");
+      if (!found) object.setAnnotation(1, "");
+    } else {
     }
-    else {
-    }
+  };
 
-  }
+  this.action = function (object, e) {
+    if (!this.dyn.graph.isAuthorized(this.dyn.access)) return 1;
 
-  this.action = function( object, e) {
+    switch (e.event) {
+      case Glow.eEvent_MB1Click:
+        if (this.menu_object !== null) {
+          // Close, delete this menu
+          this.dyn.graph.getCtx().remove(this.menu_object);
+          this.menu_object = null;
+        } else {
+          var ll_x, ll_y, ur_x, ur_y;
+          var info = new GlowMenuInfo();
 
-    if ( !this.dyn.graph.isAuthorized( this.dyn.access))
-      return 1;
+          if (this.update_a === null || !this.update_a.sts) {
+            var b_mask = 1;
+            for (var i = 0; i < 32; i++) {
+              if ((b_mask & this.button_mask) !== 0) {
+                info.item[i].occupied = true;
+                info.item[i].text = this.items_text[i];
 
-    switch ( e.event) {
-    case Glow.eEvent_MB1Click:
-      if ( this.menu_object !== null) {
-	// Close, delete this menu
-	this.dyn.graph.getCtx().remove( this.menu_object);
-	this.menu_object = null;
-      }
-      else {
-	var	ll_x, ll_y, ur_x, ur_y;
-	var info = new GlowMenuInfo();
+                // Check access
+                info.item[i].type = Glow.eMenuItem_Button;
+              } else info.item[i].occupied = false;
+              b_mask = b_mask << 1;
+            }
+          } else {
+            for (var i = 0; i < 32; i++) {
+              if (i < this.text_size) {
+                info.item[i].text = this.items_text[i];
+                info.item[i].type = Glow.eMenuItem_Button;
+                info.item[i].occupied = true;
+              } else info.item[i].occupied = false;
+            }
+          }
 
-	if ( this.update_a === null || !this.update_a.sts) {
-	  var b_mask = 1;
-	  for ( var i = 0; i < 32; i++) {
-	    if ( (b_mask & this.button_mask) !== 0) {
-	      info.item[i].occupied = true;
-	      info.item[i].text = this.items_text[i];
-	    
-	      // Check access
-	      info.item[i].type = Glow.eMenuItem_Button;
-	    }
-	    else
-	      info.item[i].occupied = false;
-	    b_mask = b_mask << 1;
-	  }
-	}
-	else {
-	  for ( var i = 0; i < 32; i++) {
-	    if ( i < this.text_size) {
-	      info.item[i].text = this.items_text[i];
-	      info.item[i].type = Glow.eMenuItem_Button;
-	      info.item[i].occupied = true;
-	    }
-	    else
-	      info.item[i].occupied = false;
-	  }
-	}
+          // Get fillcolor, and textattributes from object
+          var text_drawtype = 4,
+            text_color = Glow.eDrawType_Line,
+            bg_color = Glow.eDrawType_Color32;
+          var tsize = 2;
+          var sts;
+          var scale = 1;
+          var text_font = Glow.eFont_Helvetica;
 
-	// Get fillcolor, and textattributes from object
-	var text_drawtype = 4, text_color = Glow.eDrawType_Line, bg_color = Glow.eDrawType_Color32;
-	var tsize = 2;
-	var sts;
-	var scale = 1;
-	var text_font = Glow.eFont_Helvetica;
+          sts = 0; //grow_GetObjectAnnotInfo( object, 1, &tsize, &text_drawtype, &text_color, &bg_color, &scale, &text_font);
+          if ((sts & 1) == 0) {
+            tsize = 2;
+            text_drawtype = Glow.eDrawType_TextHelveticaBold;
+            text_color = Glow.eDrawType_Line;
+            bg_color = Glow.eDrawType_LightGray;
+          } else if (
+            bg_color == Glow.eDrawType_No ||
+            bg_color == Glow.eDrawType_Inherit
+          )
+            bg_color = Glow.eDrawType_LightGray;
 
-	sts = 0; //grow_GetObjectAnnotInfo( object, 1, &tsize, &text_drawtype, &text_color, &bg_color, &scale, &text_font);
-	if ( (sts & 1) == 0) {
-	  tsize = 2;
-	  text_drawtype = Glow.eDrawType_TextHelveticaBold;
-	  text_color = Glow.eDrawType_Line;
-	  bg_color = Glow.eDrawType_LightGray;
-	}
-	else if ( bg_color == Glow.eDrawType_No || bg_color == Glow.eDrawType_Inherit)
-	  bg_color = Glow.eDrawType_LightGray;
-	
-	var g = object.measure();
-	this.menu_object = new GrowMenu( this.dyn.graph.getCtx());
-	this.menu_object.init( "__Menu", info, g.ll_x, g.ur_y, g.ur_x - g.ll_x,
-			       Glow.eDrawType_Line, 0, 1, 1, bg_color, tsize,
-			       text_drawtype, text_color,
-			       Glow.eDrawType_MediumGray, text_font);
-	this.menu_object.set_scale( scale, scale, 0, 0, Glow.eScaleType_LowerLeft);
-	this.dyn.graph.getCtx().insert( this.menu_object);
-      }
-      break;
-    case Glow.eEvent_MenuActivated:
-      if ( this.menu_object === null)
-	break;
-      if ( e.object == this.menu_object) {
-	// Set enum value to attribute
-      
-	var pname = this.dyn.parseAttrName( this.attribute);
-	if ( pname === null || pname.name === "") 
-	  return 1;
+          var g = object.measure();
+          this.menu_object = new GrowMenu(this.dyn.graph.getCtx());
+          this.menu_object.init(
+            "__Menu",
+            info,
+            g.ll_x,
+            g.ur_y,
+            g.ur_x - g.ll_x,
+            Glow.eDrawType_Line,
+            0,
+            1,
+            1,
+            bg_color,
+            tsize,
+            text_drawtype,
+            text_color,
+            Glow.eDrawType_MediumGray,
+            text_font,
+          );
+          this.menu_object.set_scale(
+            scale,
+            scale,
+            0,
+            0,
+            Glow.eScaleType_LowerLeft,
+          );
+          this.dyn.graph.getCtx().insert(this.menu_object);
+        }
+        break;
+      case Glow.eEvent_MenuActivated:
+        if (this.menu_object === null) break;
+        if (e.object == this.menu_object) {
+          // Set enum value to attribute
 
-	var sts = null;
+          var pname = this.dyn.parseAttrName(this.attribute);
+          if (pname === null || pname.name === "") return 1;
 
-	switch ( pname.database) {
-	case GraphIfc.eDatabase_Gdh:
-	  switch ( pname.type) {
-	  case Pwr.eType_Float32: {
-	    var value = this.items_enum[e.item];
-	    sts = this.dyn.graph.getGdh().setObjectInfoFloat( pname.name, value);
-	    break;
-	  }
-	  case Pwr.eType_Int32:
-	  case Pwr.eType_UInt32:
-	  case Pwr.eType_Int16:
-	  case Pwr.eType_UInt16:
-	  case Pwr.eType_Int8:
-	  case Pwr.eType_UInt8: {
-	    var value = this.items_enum[e.item];
-	    sts = this.dyn.graph.getGdh().setObjectInfoInt( pname.name, value);
-	    break;
-	  }
-	  default: ;
-	  }
-	  break;
-	case GraphIfc.eDatabase_Local:
-	  switch ( pname.type) {
-	  case Pwr.eType_Float32: {
-	    var value = this.items_enum[e.item];
-	    sts = this.dyn.graph.getLdb().setObjectInfo( this.dyn.graph, pname.name, value);
-	    break;
-	  }
-	  case Pwr.eType_Int32:
-	  case Pwr.eType_UInt32:
-	  case Pwr.eType_Int16:
-	  case Pwr.eType_UInt16:
-	  case Pwr.eType_Int8:
-	  case Pwr.eType_UInt8: {
-	    var value = this.items_enum[e.item];
-	    sts = this.dyn.graph.getLdb().setObjectInfo( this.dyn.graph, pname.name, value);
-	    break;
-	  }
-	  default: ;
-	  }
-	  break;
-	case GraphIfc.eDatabase_Ccm: {
-	  /* TODO
+          var sts = null;
+
+          switch (pname.database) {
+            case GraphIfc.eDatabase_Gdh:
+              switch (pname.type) {
+                case Pwr.eType_Float32: {
+                  var value = this.items_enum[e.item];
+                  sts = this.dyn.graph
+                    .getGdh()
+                    .setObjectInfoFloat(pname.name, value);
+                  break;
+                }
+                case Pwr.eType_Int32:
+                case Pwr.eType_UInt32:
+                case Pwr.eType_Int16:
+                case Pwr.eType_UInt16:
+                case Pwr.eType_Int8:
+                case Pwr.eType_UInt8: {
+                  var value = this.items_enum[e.item];
+                  sts = this.dyn.graph
+                    .getGdh()
+                    .setObjectInfoInt(pname.name, value);
+                  break;
+                }
+                default:
+              }
+              break;
+            case GraphIfc.eDatabase_Local:
+              switch (pname.type) {
+                case Pwr.eType_Float32: {
+                  var value = this.items_enum[e.item];
+                  sts = this.dyn.graph
+                    .getLdb()
+                    .setObjectInfo(this.dyn.graph, pname.name, value);
+                  break;
+                }
+                case Pwr.eType_Int32:
+                case Pwr.eType_UInt32:
+                case Pwr.eType_Int16:
+                case Pwr.eType_UInt16:
+                case Pwr.eType_Int8:
+                case Pwr.eType_UInt8: {
+                  var value = this.items_enum[e.item];
+                  sts = this.dyn.graph
+                    .getLdb()
+                    .setObjectInfo(this.dyn.graph, pname.name, value);
+                  break;
+                }
+                default:
+              }
+              break;
+            case GraphIfc.eDatabase_Ccm: {
+              /* TODO
 	     pwr_tInt32 value = items_enum[event.menu.item];
 	     sts = dyn.graph.ccm_set_variable( parsed_name, type_id, &value);
 	  */
-	  break;
-	}
-	default : ;
-	}
+              break;
+            }
+            default:
+          }
 
-	if ( sts == null || sts.evenSts()) console.log("Option menu error: " + pname.name);
-      }
-      break;
-    case Glow.eEvent_MenuDelete:
-      if ( this.menu_object == null)
-	break;
-      if ( e.object === null || e.object == this.menu_object) {
-	// Delete this menu
-	this.dyn.graph.getCtx().remove( this.menu_object);
-	this.menu_object = null;
-      }
-      break;
-    default: ;
+          if (sts == null || sts.evenSts())
+            console.log("Option menu error: " + pname.name);
+        }
+        break;
+      case Glow.eEvent_MenuDelete:
+        if (this.menu_object == null) break;
+        if (e.object === null || e.object == this.menu_object) {
+          // Delete this menu
+          this.dyn.graph.getCtx().remove(this.menu_object);
+          this.menu_object = null;
+        }
+        break;
+      default:
     }
 
     return 1;
-  }
+  };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "OptionsMenu : " + lines[i]);
+      if (this.dyn.debug) console.log("OptionsMenu : " + lines[i]);
 
-      switch ( key) {
-      case DynC.eSave_OptionMenu: 
-	break;
-      case DynC.eSave_OptionMenu_attribute: 
-	if ( tokens.length > 1)
-	  this.attribute = tokens[1];
-	break;
-      case DynC.eSave_OptionMenu_text_attribute: 
-	if ( tokens.length > 1)
-	  this.text_attribute = tokens[1];
-	break;
-      case DynC.eSave_OptionMenu_size_attribute: 
-	if ( tokens.length > 1)
-	  this.size_attribute = tokens[1];
-	break;
-      case DynC.eSave_OptionMenu_update_attribute: 
-	if ( tokens.length > 1)
-	  this.update_attribute = tokens[1];
-	break;
-      case DynC.eSave_OptionMenu_optionmenu_type: 
-	this.optionmenu_type = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_OptionMenu_button_mask: 
-	this.button_mask = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_OptionMenu_items_text0: 
-	if ( tokens.length > 1)
-	  this.items_text[0] = tokens[1];
-	break;
-      case DynC.eSave_OptionMenu_items_text1: 
-	if ( tokens.length > 1)
-	  this.items_text[1] = lines[i].substring(5);
-	break;
-      case DynC.eSave_OptionMenu_items_text2: 
-	if ( tokens.length > 1)
-	  this.items_text[2] = lines[i].substring(5);
-	break;
-      case DynC.eSave_OptionMenu_items_text3: 
-	if ( tokens.length > 1)
-	  this.items_text[3] = lines[i].substring(5);
-	break;
-      case DynC.eSave_OptionMenu_items_text4: 
-	if ( tokens.length > 1)
-	  this.items_text[4] = lines[i].substring(5);
-	break;
-      case DynC.eSave_OptionMenu_items_text5: 
-	if ( tokens.length > 1)
-	  this.items_text[5] = lines[i].substring(5);
-	break;
-      case DynC.eSave_OptionMenu_items_text6: 
-	if ( tokens.length > 1)
-	  this.items_text[6] = lines[i].substring(5);
-	break;
-      case DynC.eSave_OptionMenu_items_text7: 
-	if ( tokens.length > 1)
-	  this.items_text[7] = lines[i].substring(5);
-	break;
-      case DynC.eSave_OptionMenu_items_text8: 
-	if ( tokens.length > 1)
-	  this.items_text[8] = lines[i].substring(5);
-	break;
-      case DynC.eSave_OptionMenu_items_text9: 
-	if ( tokens.length > 1)
-	  this.items_text[9] = lines[i].substring(5);
-	break;
-      case DynC.eSave_OptionMenu_items_text10: 
-	if ( tokens.length > 1)
-	  this.items_text[10] = lines[i].substring(5);
-	break;
-      case DynC.eSave_OptionMenu_items_text11: 
-	if ( tokens.length > 1)
-	  this.items_text[11] = lines[i].substring(5);
-	break;
-      case DynC.eSave_OptionMenu_items_text12: 
-	if ( tokens.length > 1)
-	  this.items_text[12] = tokens[1];
-	break;
-      case DynC.eSave_OptionMenu_items_text13: 
-	if ( tokens.length > 1)
-	  this.items_text[13] = lines[i].substring(5);
-	break;
-      case DynC.eSave_OptionMenu_items_text14: 
-	if ( tokens.length > 1)
-	  this.items_text[14] = lines[i].substring(5);
-	break;
-      case DynC.eSave_OptionMenu_items_text15: 
-	if ( tokens.length > 1)
-	  this.items_text[15] = lines[i].substring(5);
-	break;
-      case DynC.eSave_OptionMenu_items_text16: 
-	if ( tokens.length > 1)
-	  this.items_text[16] = lines[i].substring(5);
-	break;
-      case DynC.eSave_OptionMenu_items_text17: 
-	if ( tokens.length > 1)
-	  this.items_text[17] = lines[i].substring(5);
-	break;
-      case DynC.eSave_OptionMenu_items_text18: 
-	if ( tokens.length > 1)
-	  this.items_text[18] = lines[i].substring(5);
-	break;
-      case DynC.eSave_OptionMenu_items_text19: 
-	if ( tokens.length > 1)
-	  this.items_text[19] = lines[i].substring(5);
-	break;
-      case DynC.eSave_OptionMenu_items_text20: 
-	if ( tokens.length > 1)
-	  this.items_text[20] = lines[i].substring(5);
-	break;
-      case DynC.eSave_OptionMenu_items_text21: 
-	if ( tokens.length > 1)
-	  this.items_text[21] = lines[i].substring(5);
-	break;
-      case DynC.eSave_OptionMenu_items_text22: 
-	if ( tokens.length > 1)
-	  this.items_text[22] = lines[i].substring(5);
-	break;
-      case DynC.eSave_OptionMenu_items_text23: 
-	if ( tokens.length > 1)
-	  this.items_text[23] = lines[i].substring(5);
-	break;
-      case DynC.eSave_OptionMenu_items_text24: 
-	if ( tokens.length > 1)
-	  this.items_text[24] = lines[i].substring(5);
-	break;
-      case DynC.eSave_OptionMenu_items_text25: 
-	if ( tokens.length > 1)
-	  this.items_text[25] = lines[i].substring(5);
-	break;
-      case DynC.eSave_OptionMenu_items_text26: 
-	if ( tokens.length > 1)
-	  this.items_text[26] = lines[i].substring(5);
-	break;
-      case DynC.eSave_OptionMenu_items_text27: 
-	if ( tokens.length > 1)
-	  this.items_text[27] = lines[i].substring(5);
-	break;
-      case DynC.eSave_OptionMenu_items_text28: 
-	if ( tokens.length > 1)
-	  this.items_text[28] = lines[i].substring(5);
-	break;
-      case DynC.eSave_OptionMenu_items_text29: 
-	if ( tokens.length > 1)
-	  this.items_text[29] = lines[i].substring(5);
-	break;
-      case DynC.eSave_OptionMenu_items_text30: 
-	if ( tokens.length > 1)
-	  this.items_text[30] = lines[i].substring(5);
-	break;
-      case DynC.eSave_OptionMenu_items_text31: 
-	if ( tokens.length > 1)
-	  this.items_text[31] = lines[i].substring(5);
-	break;
-      case DynC.eSave_OptionMenu_items_enum0: 
-	this.items_enum[0] = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_OptionMenu_items_enum1: 
-	this.items_enum[1] = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_OptionMenu_items_enum2: 
-	this.items_enum[2] = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_OptionMenu_items_enum3: 
-	this.items_enum[3] = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_OptionMenu_items_enum4: 
-	this.items_enum[4] = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_OptionMenu_items_enum5: 
-	this.items_enum[5] = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_OptionMenu_items_enum6: 
-	this.items_enum[6] = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_OptionMenu_items_enum7: 
-	this.items_enum[7] = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_OptionMenu_items_enum8: 
-	this.items_enum[8] = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_OptionMenu_items_enum9: 
-	this.items_enum[9] = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_OptionMenu_items_enum10: 
-	this.items_enum[10] = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_OptionMenu_items_enum11: 
-	this.items_enum[11] = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_OptionMenu_items_enum12: 
-	this.items_enum[12] = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_OptionMenu_items_enum13: 
-	this.items_enum[13] = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_OptionMenu_items_enum14: 
-	this.items_enum[14] = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_OptionMenu_items_enum15: 
-	this.items_enum[15] = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_OptionMenu_items_enum16: 
-	this.items_enum[16] = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_OptionMenu_items_enum17: 
-	this.items_enum[17] = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_OptionMenu_items_enum18: 
-	this.items_enum[18] = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_OptionMenu_items_enum19: 
-	this.items_enum[19] = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_OptionMenu_items_enum20: 
-	this.items_enum[20] = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_OptionMenu_items_enum21: 
-	this.items_enum[21] = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_OptionMenu_items_enum22: 
-	this.items_enum[22] = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_OptionMenu_items_enum23: 
-	this.items_enum[23] = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_OptionMenu_items_enum24: 
-	this.items_enum[24] = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_OptionMenu_items_enum25: 
-	this.items_enum[25] = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_OptionMenu_items_enum26: 
-	this.items_enum[26] = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_OptionMenu_items_enum27: 
-	this.items_enum[27] = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_OptionMenu_items_enum28: 
-	this.items_enum[28] = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_OptionMenu_items_enum29: 
-	this.items_enum[29] = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_OptionMenu_items_enum30: 
-	this.items_enum[30] = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_OptionMenu_items_enum31: 
-	this.items_enum[31] = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynOptionMenu");
-	break;
+      switch (key) {
+        case DynC.eSave_OptionMenu:
+          break;
+        case DynC.eSave_OptionMenu_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_OptionMenu_text_attribute:
+          if (tokens.length > 1) this.text_attribute = tokens[1];
+          break;
+        case DynC.eSave_OptionMenu_size_attribute:
+          if (tokens.length > 1) this.size_attribute = tokens[1];
+          break;
+        case DynC.eSave_OptionMenu_update_attribute:
+          if (tokens.length > 1) this.update_attribute = tokens[1];
+          break;
+        case DynC.eSave_OptionMenu_optionmenu_type:
+          this.optionmenu_type = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_OptionMenu_button_mask:
+          this.button_mask = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_OptionMenu_items_text0:
+          if (tokens.length > 1) this.items_text[0] = lines[i].substring(5);
+          break;
+        case DynC.eSave_OptionMenu_items_text1:
+          if (tokens.length > 1) this.items_text[1] = lines[i].substring(5);
+          break;
+        case DynC.eSave_OptionMenu_items_text2:
+          if (tokens.length > 1) this.items_text[2] = lines[i].substring(5);
+          break;
+        case DynC.eSave_OptionMenu_items_text3:
+          if (tokens.length > 1) this.items_text[3] = lines[i].substring(5);
+          break;
+        case DynC.eSave_OptionMenu_items_text4:
+          if (tokens.length > 1) this.items_text[4] = lines[i].substring(5);
+          break;
+        case DynC.eSave_OptionMenu_items_text5:
+          if (tokens.length > 1) this.items_text[5] = lines[i].substring(5);
+          break;
+        case DynC.eSave_OptionMenu_items_text6:
+          if (tokens.length > 1) this.items_text[6] = lines[i].substring(5);
+          break;
+        case DynC.eSave_OptionMenu_items_text7:
+          if (tokens.length > 1) this.items_text[7] = lines[i].substring(5);
+          break;
+        case DynC.eSave_OptionMenu_items_text8:
+          if (tokens.length > 1) this.items_text[8] = lines[i].substring(5);
+          break;
+        case DynC.eSave_OptionMenu_items_text9:
+          if (tokens.length > 1) this.items_text[9] = lines[i].substring(5);
+          break;
+        case DynC.eSave_OptionMenu_items_text10:
+          if (tokens.length > 1) this.items_text[10] = lines[i].substring(5);
+          break;
+        case DynC.eSave_OptionMenu_items_text11:
+          if (tokens.length > 1) this.items_text[11] = lines[i].substring(5);
+          break;
+        case DynC.eSave_OptionMenu_items_text12:
+          if (tokens.length > 1) this.items_text[12] = tokens[1];
+          break;
+        case DynC.eSave_OptionMenu_items_text13:
+          if (tokens.length > 1) this.items_text[13] = lines[i].substring(5);
+          break;
+        case DynC.eSave_OptionMenu_items_text14:
+          if (tokens.length > 1) this.items_text[14] = lines[i].substring(5);
+          break;
+        case DynC.eSave_OptionMenu_items_text15:
+          if (tokens.length > 1) this.items_text[15] = lines[i].substring(5);
+          break;
+        case DynC.eSave_OptionMenu_items_text16:
+          if (tokens.length > 1) this.items_text[16] = lines[i].substring(5);
+          break;
+        case DynC.eSave_OptionMenu_items_text17:
+          if (tokens.length > 1) this.items_text[17] = lines[i].substring(5);
+          break;
+        case DynC.eSave_OptionMenu_items_text18:
+          if (tokens.length > 1) this.items_text[18] = lines[i].substring(5);
+          break;
+        case DynC.eSave_OptionMenu_items_text19:
+          if (tokens.length > 1) this.items_text[19] = lines[i].substring(5);
+          break;
+        case DynC.eSave_OptionMenu_items_text20:
+          if (tokens.length > 1) this.items_text[20] = lines[i].substring(5);
+          break;
+        case DynC.eSave_OptionMenu_items_text21:
+          if (tokens.length > 1) this.items_text[21] = lines[i].substring(5);
+          break;
+        case DynC.eSave_OptionMenu_items_text22:
+          if (tokens.length > 1) this.items_text[22] = lines[i].substring(5);
+          break;
+        case DynC.eSave_OptionMenu_items_text23:
+          if (tokens.length > 1) this.items_text[23] = lines[i].substring(5);
+          break;
+        case DynC.eSave_OptionMenu_items_text24:
+          if (tokens.length > 1) this.items_text[24] = lines[i].substring(5);
+          break;
+        case DynC.eSave_OptionMenu_items_text25:
+          if (tokens.length > 1) this.items_text[25] = lines[i].substring(5);
+          break;
+        case DynC.eSave_OptionMenu_items_text26:
+          if (tokens.length > 1) this.items_text[26] = lines[i].substring(5);
+          break;
+        case DynC.eSave_OptionMenu_items_text27:
+          if (tokens.length > 1) this.items_text[27] = lines[i].substring(5);
+          break;
+        case DynC.eSave_OptionMenu_items_text28:
+          if (tokens.length > 1) this.items_text[28] = lines[i].substring(5);
+          break;
+        case DynC.eSave_OptionMenu_items_text29:
+          if (tokens.length > 1) this.items_text[29] = lines[i].substring(5);
+          break;
+        case DynC.eSave_OptionMenu_items_text30:
+          if (tokens.length > 1) this.items_text[30] = lines[i].substring(5);
+          break;
+        case DynC.eSave_OptionMenu_items_text31:
+          if (tokens.length > 1) this.items_text[31] = lines[i].substring(5);
+          break;
+        case DynC.eSave_OptionMenu_items_enum0:
+          this.items_enum[0] = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_OptionMenu_items_enum1:
+          this.items_enum[1] = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_OptionMenu_items_enum2:
+          this.items_enum[2] = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_OptionMenu_items_enum3:
+          this.items_enum[3] = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_OptionMenu_items_enum4:
+          this.items_enum[4] = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_OptionMenu_items_enum5:
+          this.items_enum[5] = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_OptionMenu_items_enum6:
+          this.items_enum[6] = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_OptionMenu_items_enum7:
+          this.items_enum[7] = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_OptionMenu_items_enum8:
+          this.items_enum[8] = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_OptionMenu_items_enum9:
+          this.items_enum[9] = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_OptionMenu_items_enum10:
+          this.items_enum[10] = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_OptionMenu_items_enum11:
+          this.items_enum[11] = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_OptionMenu_items_enum12:
+          this.items_enum[12] = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_OptionMenu_items_enum13:
+          this.items_enum[13] = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_OptionMenu_items_enum14:
+          this.items_enum[14] = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_OptionMenu_items_enum15:
+          this.items_enum[15] = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_OptionMenu_items_enum16:
+          this.items_enum[16] = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_OptionMenu_items_enum17:
+          this.items_enum[17] = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_OptionMenu_items_enum18:
+          this.items_enum[18] = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_OptionMenu_items_enum19:
+          this.items_enum[19] = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_OptionMenu_items_enum20:
+          this.items_enum[20] = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_OptionMenu_items_enum21:
+          this.items_enum[21] = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_OptionMenu_items_enum22:
+          this.items_enum[22] = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_OptionMenu_items_enum23:
+          this.items_enum[23] = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_OptionMenu_items_enum24:
+          this.items_enum[24] = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_OptionMenu_items_enum25:
+          this.items_enum[25] = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_OptionMenu_items_enum26:
+          this.items_enum[26] = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_OptionMenu_items_enum27:
+          this.items_enum[27] = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_OptionMenu_items_enum28:
+          this.items_enum[28] = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_OptionMenu_items_enum29:
+          this.items_enum[29] = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_OptionMenu_items_enum30:
+          this.items_enum[30] = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_OptionMenu_items_enum31:
+          this.items_enum[31] = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynOptionMenu");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-		
+
     return i;
   };
-
 }
 
-function DynAnalogText( dyn) {
-  DynOptionMenu.call( this, dyn);
+function DynAnalogText(dyn) {
+  DynOptionMenu.call(this, dyn);
   this.optionmenu_open = this.open;
 
   this.dyn = dyn;
@@ -16938,12 +16313,11 @@ function DynAnalogText( dyn) {
   this.instance_mask = 0;
   this.instance = 0;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "AnalogText.Attribute") {
       this.attribute = value;
       return 1;
-    }
-    else if (name === "AnalogText.TextMask") {
+    } else if (name === "AnalogText.TextMask") {
       this.button_mask = value;
       return 1;
     }
@@ -16952,29 +16326,28 @@ function DynAnalogText( dyn) {
     var bname;
     for (let j = 0; j < 32; j++) {
       if (b_mask & this.button_mask) {
-	bname = "AnalogText.Text" + (j+1).toString();
-	if (name === bname) {
-	  this.items_text[j] = value;
-	  return 1;
-	}
-	bname = "AnalogText.Enum" + (j+1).toString();
-	if (name === bname) {
-	  this.items_enum[j] = value;
-	  return 1;
-	}
+        bname = "AnalogText.Text" + (j + 1).toString();
+        if (name === bname) {
+          this.items_text[j] = value;
+          return 1;
+        }
+        bname = "AnalogText.Enum" + (j + 1).toString();
+        if (name === bname) {
+          this.items_enum[j] = value;
+          return 1;
+        }
       }
       b_mask = b_mask << 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "AnalogText.Attribute") {
       ret.value = this.attribute;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "AnalogText.TextMask") {
+    } else if (name === "AnalogText.TextMask") {
       ret.value = this.button_mask;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
@@ -16984,66 +16357,63 @@ function DynAnalogText( dyn) {
     var bname;
     for (let j = 0; j < 32; j++) {
       if (b_mask & this.button_mask) {
-	bname = "AnalogText.Text" + (j+1).toString();
-	if (name === bname) {
-	  ret.value = this.items_text[j];
-	  ret.decl = CcmC.K_DECL_STRING;
-	  return ret;
-	}
-	bname = "AnalogText.Enum" + (j+1).toString();
-	if (name === bname) {
-	  ret.value = this.items_enum[j];
-	  ret.decl = CcmC.K_DECL_INT;
-	  return ret;
-	}
+        bname = "AnalogText.Text" + (j + 1).toString();
+        if (name === bname) {
+          ret.value = this.items_text[j];
+          ret.decl = CcmC.K_DECL_STRING;
+          return ret;
+        }
+        bname = "AnalogText.Enum" + (j + 1).toString();
+        if (name === bname) {
+          ret.value = this.items_enum[j];
+          ret.decl = CcmC.K_DECL_INT;
+          return ret;
+        }
       }
       b_mask = b_mask << 1;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.action = function( o, e) {
+  this.action = function (o, e) {
     return 1;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "AnalogText : " + lines[i]);
+      if (this.dyn.debug) console.log("AnalogText : " + lines[i]);
 
-      switch ( key) {
-      case DynC.eSave_AnalogText: 
-	break;
-      case DynC.eSave_AnalogText_super: 
-	i = this.optionmenu_open( lines, i+1);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynAnalogText");
-	break;
+      switch (key) {
+        case DynC.eSave_AnalogText:
+          break;
+        case DynC.eSave_AnalogText_super:
+          i = this.optionmenu_open(lines, i + 1);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynAnalogText");
+          break;
       }
-      
-      if ( end)
-	break;
+
+      if (end) break;
     }
-		
+
     return i;
   };
-
 }
 
 DynAnalogText.prototype = Object.create(DynOptionMenu.prototype);
 
-
-function DynSetValue( dyn, instance) {
+function DynSetValue(dyn, instance) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = 0;
@@ -17056,14 +16426,12 @@ function DynSetValue( dyn, instance) {
   this.attribute;
   this.value;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     var inst = this.dyn.instance_number(this.instance);
     var iname;
     var inames = new Array(3);
-    if (inst == 1)
-      iname = "SetValue";
-    else
-      iname = "SetValue" + inst.toString();
+    if (inst == 1) iname = "SetValue";
+    else iname = "SetValue" + inst.toString();
     inames[0] = "SetValue.Instances";
     inames[1] = iname + ".Attribute";
     inames[2] = iname + ".Value";
@@ -17072,26 +16440,22 @@ function DynSetValue( dyn, instance) {
       console.log("instance_mask", this.instance_mask);
       this.dyn.update_elements();
       return 1;
-    }
-    else if (name === inames[1]) {
+    } else if (name === inames[1]) {
       this.attribute = value;
       return 1;
-    }
-    else if (name === inames[2]) {
+    } else if (name === inames[2]) {
       this.value = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     var inst = this.dyn.instance_number(this.instance);
     var iname;
     var inames = new Array(3);
-    if (inst == 1)
-      iname = "SetValue";
-    else
-      iname = "SetValue" + inst.toString();
+    if (inst == 1) iname = "SetValue";
+    else iname = "SetValue" + inst.toString();
     inames[0] = "SetValue.Instances";
     inames[1] = iname + ".Attribute";
     inames[2] = iname + ".Value";
@@ -17099,206 +16463,201 @@ function DynSetValue( dyn, instance) {
       ret.value = this.instance_mask;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === inames[1]) {
+    } else if (name === inames[1]) {
       ret.value = this.attribute;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === inames[2]) {
+    } else if (name === inames[2]) {
       ret.value = this.value;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "AnalogText : " + lines[i]);
+      if (this.dyn.debug) console.log("AnalogText : " + lines[i]);
 
-      switch ( key) {
-      case DynC.eSave_SetValue: 
-	break;
-      case DynC.eSave_SetValue_attribute: 
-	if ( tokens.length > 1)
-	  this.attribute = tokens[1];
-	break;
-      case DynC.eSave_SetValue_value: 
-	if ( tokens.length > 1)
-	  this.value = tokens[1];
-	break;
-      case DynC.eSave_SetValue_instance: 
-	this.instance = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_SetValue_instance_mask: 
-	this.instance_mask = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynSetValue");
-	break;
+      switch (key) {
+        case DynC.eSave_SetValue:
+          break;
+        case DynC.eSave_SetValue_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_SetValue_value:
+          if (tokens.length > 1) this.value = tokens[1];
+          break;
+        case DynC.eSave_SetValue_instance:
+          this.instance = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_SetValue_instance_mask:
+          this.instance_mask = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynSetValue");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-		
+
     return i;
   };
 
-  this.connect = function( object) {
-  };
-  this.disconnect = function() {
-  };
-  this.scan = function( object) {
-  };
-  this.action = function( object, e) {
+  this.connect = function (object) {};
+  this.disconnect = function () {};
+  this.scan = function (object) {};
+  this.action = function (object, e) {
+    if (!this.dyn.graph.isAuthorized(this.dyn.access)) return 1;
 
-    if ( !this.dyn.graph.isAuthorized( this.dyn.access))
-      return 1;
+    switch (e.event) {
+      case Glow.eEvent_MB1Down:
+        object.setColorInverse(1);
+        break;
+      case Glow.eEvent_MB1Up:
+        object.setColorInverse(0);
+        break;
+      case Glow.eEvent_MB1Click: {
+        var sts;
 
-    switch ( e.event) {
-    case Glow.eEvent_MB1Down:
-      object.setColorInverse( 1);
-      break;
-    case Glow.eEvent_MB1Up:
-      object.setColorInverse( 0);
-      break;
-    case Glow.eEvent_MB1Click: {
-      var sts;
-		
-      if ( (this.dyn.action_type1 & DynC.mActionType1_Confirm) != 0)
-	break;
-		
-      var pname = this.dyn.parseAttrName( this.attribute);
-		
-      switch ( pname.type) {
-      case Pwr.eType_Float32: {
-	var inputValue;
-	if (isNaN(this.value))
-	  inputValue = parseFloat( this.value.trim());
-	else
-	  inputValue = this.value;
-		    
-	switch ( pname.database) {
-	case GraphIfc.eDatabase_Gdh:
-	  sts = this.dyn.graph.getGdh().setObjectInfoFloat( pname.name, inputValue);
-	  break;
-	case GraphIfc.eDatabase_Local:
-	  sts = this.dyn.graph.getLdb().setObjectInfo( this.dyn.graph, pname.name, inputValue);
-	  break;
-	default: 
-	  return 0;
-	}
-	if ( sts.evenSts()) {			
-	  console.log( "setObjectInfoError " + sts);
-	  return 0;
-	}
-	break;
+        if ((this.dyn.action_type1 & DynC.mActionType1_Confirm) != 0) break;
+
+        var pname = this.dyn.parseAttrName(this.attribute);
+
+        switch (pname.type) {
+          case Pwr.eType_Float32: {
+            var inputValue;
+            if (isNaN(this.value)) inputValue = parseFloat(this.value.trim());
+            else inputValue = this.value;
+
+            switch (pname.database) {
+              case GraphIfc.eDatabase_Gdh:
+                sts = this.dyn.graph
+                  .getGdh()
+                  .setObjectInfoFloat(pname.name, inputValue);
+                break;
+              case GraphIfc.eDatabase_Local:
+                sts = this.dyn.graph
+                  .getLdb()
+                  .setObjectInfo(this.dyn.graph, pname.name, inputValue);
+                break;
+              default:
+                return 0;
+            }
+            if (sts.evenSts()) {
+              console.log("setObjectInfoError " + sts);
+              return 0;
+            }
+            break;
+          }
+          case Pwr.eType_Int32:
+          case Pwr.eType_UInt32:
+          case Pwr.eType_Int16:
+          case Pwr.eType_UInt16:
+          case Pwr.eType_Int8:
+          case Pwr.eType_UInt8:
+          case Pwr.eType_Mask:
+          case Pwr.eType_Enum: {
+            var inputValue;
+            if (isNaN(this.value)) inputValue = parseInt(this.value.trim(), 10);
+            else inputValue = this.value;
+
+            switch (pname.database) {
+              case GraphIfc.eDatabase_Gdh:
+                console.log("SetValue", pname.name, inputValue);
+                sts = this.dyn.graph
+                  .getGdh()
+                  .setObjectInfoInt(pname.name, inputValue);
+                break;
+              case GraphIfc.eDatabase_Local:
+                sts = this.dyn.graph
+                  .getLdb()
+                  .setObjectInfo(this.dyn.graph, pname.name, inputValue);
+                break;
+              default:
+                return 0;
+            }
+            if (sts.evenSts()) {
+              console.log("setObjectInfoError " + sts);
+              return 0;
+            }
+            break;
+          }
+          case Pwr.eType_Boolean: {
+            var inputValueInt;
+            var inputValue;
+            if (isNaN(this.value))
+              inputValueInt = parseInt(this.value.trim(), 10);
+            else inputValueInt = this.value;
+            if (inputValueInt == 0) inputValue = false;
+            else if (inputValueInt == 1) inputValue = true;
+            else break;
+
+            switch (pname.database) {
+              case GraphIfc.eDatabase_Gdh:
+                sts = this.dyn.graph
+                  .getGdh()
+                  .setObjectInfoBoolean(pname.name, inputValue);
+                break;
+              case GraphIfc.eDatabase_Local:
+                sts = this.dyn.graph
+                  .getLdb()
+                  .setObjectInfo(this.dyn.graph, pname.name, inputValue);
+                break;
+              default:
+                return 0;
+            }
+            if (sts.evenSts()) {
+              console.log("setObjectInfoError " + sts);
+              return 0;
+            }
+            break;
+          }
+          case Pwr.eType_String: {
+            switch (pname.database) {
+              case GraphIfc.eDatabase_Gdh:
+                sts = this.dyn.graph
+                  .getGdh()
+                  .setObjectInfoString(pname.name, this.value);
+                break;
+              case GraphIfc.eDatabase_Local:
+                sts = this.dyn.graph
+                  .getLdb()
+                  .setObjectInfo(this.dyn.graph, pname.name, this.value);
+                break;
+              default:
+                return 0;
+            }
+            if (sts.evenSts()) {
+              console.log("setObjectInfoError " + sts);
+              return 0;
+            }
+            break;
+          }
+          default:
+        }
+
+        break;
       }
-      case Pwr.eType_Int32:
-      case Pwr.eType_UInt32:
-      case Pwr.eType_Int16:
-      case Pwr.eType_UInt16:
-      case Pwr.eType_Int8:
-      case Pwr.eType_UInt8:
-      case Pwr.eType_Mask:
-      case Pwr.eType_Enum: {
-	var inputValue;
-	if (isNaN(this.value))
-	  inputValue = parseInt( this.value.trim(), 10);
-	else
-	  inputValue = this.value;
-		    
-	switch ( pname.database) {
-	case GraphIfc.eDatabase_Gdh:
-	  console.log("SetValue", pname.name, inputValue);
-	  sts = this.dyn.graph.getGdh().setObjectInfoInt( pname.name, inputValue);
-	  break;
-	case GraphIfc.eDatabase_Local:
-	  sts = this.dyn.graph.getLdb().setObjectInfo( this.dyn.graph, pname.name, inputValue);
-	  break;
-	default: 
-	  return 0;
-	}
-	if ( sts.evenSts()) {
-	  console.log( "setObjectInfoError " + sts);
-	  return 0;
-	}		
-	break;
-      }
-      case Pwr.eType_Boolean: {
-	var inputValueInt;
-	var inputValue;
-	if (isNaN(this.value))
-	  inputValueInt = parseInt( this.value.trim(), 10);
-	else
-	  inputValueInt = this.value;
-	if ( inputValueInt == 0)
-	  inputValue = false;
-	else if ( inputValueInt == 1)
-	  inputValue = true;
-	else
-	  break;
-	
-	switch ( pname.database) {
-	case GraphIfc.eDatabase_Gdh:
-	  sts = this.dyn.graph.getGdh().setObjectInfoBoolean( pname.name, inputValue);
-	  break;
-	case GraphIfc.eDatabase_Local:
-	  sts = this.dyn.graph.getLdb().setObjectInfo( this.dyn.graph, pname.name, inputValue);
-	  break;
-	default:
-	  return 0;
-	}
-	if ( sts.evenSts()) {
-	  console.log( "setObjectInfoError " + sts);
-	  return 0;
-	}
-	break;
-      }
-      case Pwr.eType_String: {
-	switch ( pname.database) {
-	case GraphIfc.eDatabase_Gdh:
-	  sts = this.dyn.graph.getGdh().setObjectInfoString( pname.name, this.value);
-	  break;
-	case GraphIfc.eDatabase_Local:
-	  sts = this.dyn.graph.getLdb().setObjectInfo( this.dyn.graph, pname.name, this.value);
-	  break;
-	default:
-	  return 0;
-	}
-	if ( sts.evenSts()) {
-	  console.log( "setObjectInfoError " + sts);
-	  return 0;
-	}
-	break;
-      }		    
       default:
-	;
-      }
-	       
-      break;
-    }
-    default:
-      return 0;
+        return 0;
     }
     return 1;
   };
 }
 
-
-function DynMethodToolbar( dyn, instance) {
+function DynMethodToolbar(dyn, instance) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = 0;
@@ -17319,160 +16678,151 @@ function DynMethodToolbar( dyn, instance) {
   this.mask_store = 0;
   this.o;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "MethodToolbar.Object") {
       this.method_object = value;
       return 1;
-    }
-    else if (name === "MethodToolbar.ToolbarType") {
+    } else if (name === "MethodToolbar.ToolbarType") {
       this.toolbar_type = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "MethodToolbar.Object") {
       ret.value = this.method_object;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "MethodToolbar.ToolbarType") {
+    } else if (name === "MethodToolbar.ToolbarType") {
       ret.value = this.toolbar_type;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "MethodToolbar : " + lines[i]);
+      if (this.dyn.debug) console.log("MethodToolbar : " + lines[i]);
 
-      switch ( key) {
-      case DynC.eSave_MethodToolbar: 
-	break;
-      case DynC.eSave_MethodToolbar_method_object: 
-	if ( tokens.length > 1)
-	  this.method_object = tokens[1];
-	break;
-      case DynC.eSave_MethodToolbar_toolbar_type: 
-	this.toolbar_type = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-        console.log( "Syntax error in DynMethodToolbar");
-	break;
+      switch (key) {
+        case DynC.eSave_MethodToolbar:
+          break;
+        case DynC.eSave_MethodToolbar_method_object:
+          if (tokens.length > 1) this.method_object = tokens[1];
+          break;
+        case DynC.eSave_MethodToolbar_toolbar_type:
+          this.toolbar_type = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynMethodToolbar");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
     return i;
   };
 
-  this.connect = function( object) {
+  this.connect = function (object) {
     this.o = object;
 
-    var pname = this.dyn.parseAttrName( this.method_object);
-    if ( pname === null || pname.name === "") 
-      return 1;
+    var pname = this.dyn.parseAttrName(this.method_object);
+    if (pname === null || pname.name === "") return 1;
 
     this.pname_name = pname.name;
 
     var parsed_name = this.pname_name + ".XttMethodsMask.Flags";
-    this.dyn.graph.getGdh().getObjectInfoInt( parsed_name, this.connect2, this);
+    this.dyn.graph.getGdh().getObjectInfoInt(parsed_name, this.connect2, this);
   };
 
-  this.connect2 = function( id, self, sts, value) {
-    if ( sts & 1) {
+  this.connect2 = function (id, self, sts, value) {
+    if (sts & 1) {
       self.xm_mask_flags = value;
 
-      if ( (self.xm_mask_flags & Pwrb.mXttMethodsFlagsMask_IsConfigured) == 0) {		    
-	self.mask_configure = 1;
-	self.mask_store = 1;
-	self.connect5();
-      }      
-      else {
-	var parsed_name = self.pname_name + ".XttMethodsMask.OpMethods";
-	dyn.graph.getGdh().getObjectInfoInt( parsed_name, self.connect3, self);
+      if ((self.xm_mask_flags & Pwrb.mXttMethodsFlagsMask_IsConfigured) == 0) {
+        self.mask_configure = 1;
+        self.mask_store = 1;
+        self.connect5();
+      } else {
+        var parsed_name = self.pname_name + ".XttMethodsMask.OpMethods";
+        dyn.graph.getGdh().getObjectInfoInt(parsed_name, self.connect3, self);
       }
-    }
-    else {
+    } else {
       self.mask_configure = 1;
       self.connect5();
     }
   };
 
-  this.connect3 = function( id, self, sts, value) {
-    if ( !(sts & 1)) {
+  this.connect3 = function (id, self, sts, value) {
+    if (!(sts & 1)) {
       console.log("DynMethodToolbar: " + self.pname_name);
       self.mask_configure = 1;
-    }
-    else
-      self.xm_mask_opmethods = value;
+    } else self.xm_mask_opmethods = value;
     var parsed_name = self.pname_name + ".XttMethodsMask.MntMethods";
-    dyn.graph.getGdh().getObjectInfoInt( parsed_name, self.connect4, self);
+    dyn.graph.getGdh().getObjectInfoInt(parsed_name, self.connect4, self);
   };
 
-  this.connect4 = function( id, self, sts, value) {    
-    if ( !(sts & 1)) {
+  this.connect4 = function (id, self, sts, value) {
+    if (!(sts & 1)) {
       console.log("DynMethodToolbar: " + self.pname_name);
       self.mask_configure = 1;
-    }
-    else
-      self.xm_mask_mntmethods = value;
+    } else self.xm_mask_mntmethods = value;
     self.connect5();
   };
-  
 
-  this.connect5 = function() {
-    var     	cmd, command;
-    var		sts;
-    
-    if ( this.mask_configure != 0) {
+  this.connect5 = function () {
+    var cmd, command;
+    var sts;
+
+    if (this.mask_configure != 0) {
       this.xm_mask_opmethods = 0;
-      for ( var i = 0; i < DynC.method_toolbar_op_cnt; i++) {
-	if ( DynC.method_toolbar_op_methods[i] == "")
-	  continue;
-	if ( DynC.method_toolbar_op_methods[i] == "Parent Object Graph") {
-	  if ( this.method_object.indexOf('.') != -1)
-	    this.xm_mask_opmethods |= 1 << i;
-	}
-	else {
-	  command = "check method/method=\"" + DynC.method_toolbar_op_methods[i] + "\"/object=" +
-	    this.method_object;
+      for (var i = 0; i < DynC.method_toolbar_op_cnt; i++) {
+        if (DynC.method_toolbar_op_methods[i] == "") continue;
+        if (DynC.method_toolbar_op_methods[i] == "Parent Object Graph") {
+          if (this.method_object.indexOf(".") != -1)
+            this.xm_mask_opmethods |= 1 << i;
+        } else {
+          command =
+            'check method/method="' +
+            DynC.method_toolbar_op_methods[i] +
+            '"/object=' +
+            this.method_object;
 
-	  command = this.dyn.graph.getCommand(command);
-	  sts = this.dyn.graph.command(command);
-	  if ( (sts & 1) != 0)
-	    this.xm_mask_opmethods |= 1 << i;
-	}
+          command = this.dyn.graph.getCommand(command);
+          sts = this.dyn.graph.command(command);
+          if ((sts & 1) != 0) this.xm_mask_opmethods |= 1 << i;
+        }
       }
       this.xm_mask_mntmethods = 0;
-      for ( var i = 0; i < DynC.method_toolbar_mnt_cnt; i++) {
-	if ( DynC.method_toolbar_mnt_methods[i] === "")
-	  continue;
-	command = "check method/method=\"" + DynC.method_toolbar_mnt_methods[i] + "\"/object=" +
-	  this.method_object;
-	
-	command = this.dyn.graph.getCommand(command);
-	sts = this.dyn.graph.command(command);
-	if ( (sts & 1) != 0)
-	  this.xm_mask_mntmethods |= 1 << i;
+      for (var i = 0; i < DynC.method_toolbar_mnt_cnt; i++) {
+        if (DynC.method_toolbar_mnt_methods[i] === "") continue;
+        command =
+          'check method/method="' +
+          DynC.method_toolbar_mnt_methods[i] +
+          '"/object=' +
+          this.method_object;
+
+        command = this.dyn.graph.getCommand(command);
+        sts = this.dyn.graph.command(command);
+        if ((sts & 1) != 0) this.xm_mask_mntmethods |= 1 << i;
       }
       this.xm_mask_flags |= Pwrb.mXttMethodsFlagsMask_IsConfigured;
     }
-    console.log("Method mask: " + this.xm_mask_opmethods + " " + this.xm_mask_mntmethods);
+    console.log(
+      "Method mask: " + this.xm_mask_opmethods + " " + this.xm_mask_mntmethods,
+    );
 
     var opmask = this.xm_mask_opmethods;
     var mntmask = this.xm_mask_mntmethods;
@@ -17480,96 +16830,119 @@ function DynMethodToolbar( dyn, instance) {
     var insensitive_mntmask = 0;
 
     opmask &= ~Pwrb.mXttOpMethodsMask_OpenObjectGraph;
-    if ( !this.dyn.graph.isAuthorized( Pwr.mAccess_RtEventsBlock | Pwr.mAccess_System))
+    if (
+      !this.dyn.graph.isAuthorized(
+        Pwr.mAccess_RtEventsBlock | Pwr.mAccess_System,
+      )
+    )
       insensitive_opmask |= Pwrb.mXttOpMethodsMask_BlockEvents;
-    if ( !this.dyn.graph.isAuthorized( Pwr.mAccess_RtNavigator | Pwr.mAccess_System | Pwr.mAccess_RtWrite | 
-				  Pwr.mAccess_Maintenance | Pwr.mAccess_Process | Pwr.mAccess_Instrument))
+    if (
+      !this.dyn.graph.isAuthorized(
+        Pwr.mAccess_RtNavigator |
+          Pwr.mAccess_System |
+          Pwr.mAccess_RtWrite |
+          Pwr.mAccess_Maintenance |
+          Pwr.mAccess_Process |
+          Pwr.mAccess_Instrument,
+      )
+    )
       insensitive_opmask |= Pwrb.mXttOpMethodsMask_Note;
-    if ( !this.dyn.graph.isAuthorized( Pwr.mAccess_RtNavigator | Pwr.mAccess_System))
+    if (
+      !this.dyn.graph.isAuthorized(Pwr.mAccess_RtNavigator | Pwr.mAccess_System)
+    )
       insensitive_mntmask |= Pwrb.mXttMntMethodsMask_RtNavigator;
-    if ( !this.dyn.graph.isAuthorized( Pwr.mAccess_RtPlc | Pwr.mAccess_System))
-      insensitive_mntmask |= Pwrb.mXttMntMethodsMask_OpenTrace;  
+    if (!this.dyn.graph.isAuthorized(Pwr.mAccess_RtPlc | Pwr.mAccess_System))
+      insensitive_mntmask |= Pwrb.mXttMntMethodsMask_OpenTrace;
 
-    if ( this.toolbar_type == DynC.eMethodToolbarType_Simulate)
-      opmask = 0;
+    if (this.toolbar_type == DynC.eMethodToolbarType_Simulate) opmask = 0;
 
-    this.o.configure( DynC.method_toolbar_op_subgraph, DynC.method_toolbar_mnt_subgraph,
-		      DynC.method_toolbar_op_cnt, DynC.method_toolbar_mnt_cnt, opmask, mntmask,
-		      insensitive_opmask, insensitive_mntmask);
+    this.o.configure(
+      DynC.method_toolbar_op_subgraph,
+      DynC.method_toolbar_mnt_subgraph,
+      DynC.method_toolbar_op_cnt,
+      DynC.method_toolbar_mnt_cnt,
+      opmask,
+      mntmask,
+      insensitive_opmask,
+      insensitive_mntmask,
+    );
 
     this.mask_store = 0; // Check call is not universal
-    if ( this.mask_store != 0) {
+    if (this.mask_store != 0) {
       var psts;
 
       parsed_name = this.pname_name + ".XttMethodsMask.OpMethods";
-      psts = this.dyn.graph.getGdh().setObjectInfoInt( parsed_name, this.xm_mask_opmethods);
-      if ( psts.evenSts())
-	console.log( "Set mask error " + parsed_name);
+      psts = this.dyn.graph
+        .getGdh()
+        .setObjectInfoInt(parsed_name, this.xm_mask_opmethods);
+      if (psts.evenSts()) console.log("Set mask error " + parsed_name);
 
       parsed_name = this.pname_name + ".XttMethodsMask.MntMethods";
-      psts = this.dyn.graph.getGdh().setObjectInfoInt( parsed_name, this.xm_mask_mntmethods);
-      if ( psts.evenSts())
-	console.log( "Set mask error " + parsed_name);
+      psts = this.dyn.graph
+        .getGdh()
+        .setObjectInfoInt(parsed_name, this.xm_mask_mntmethods);
+      if (psts.evenSts()) console.log("Set mask error " + parsed_name);
 
       parsed_name = this.pname_name + ".XttMethodsMask.Flags";
-      psts = this.dyn.graph.getGdh().setObjectInfoInt( parsed_name, this.xm_mask_flags);
-      if ( psts.evenSts())
-	console.log( "Set mask error " + parsed_name);
-
+      psts = this.dyn.graph
+        .getGdh()
+        .setObjectInfoInt(parsed_name, this.xm_mask_flags);
+      if (psts.evenSts()) console.log("Set mask error " + parsed_name);
     }
 
     return 1;
   };
 
-  this.action = function( object, e) {
+  this.action = function (object, e) {
+    if (!this.dyn.graph.isAuthorized(this.dyn.access)) return 1;
 
-    if ( !this.dyn.graph.isAuthorized( this.dyn.access))
-      return 1;
+    switch (e.event) {
+      case Glow.eEvent_MB1Down:
+        object.setColorInverse(1);
+        break;
+      case Glow.eEvent_MB1Up:
+        object.setColorInverse(0);
+        break;
+      case Glow.eEvent_MB1Click: {
+        var sts;
+        var command;
+        var idx = e.idx;
+        var category = e.category;
 
-    switch ( e.event) {
-    case Glow.eEvent_MB1Down:
-      object.setColorInverse( 1);
-      break;
-    case Glow.eEvent_MB1Up:
-      object.setColorInverse( 0);
-      break;
-    case Glow.eEvent_MB1Click: {
-      var sts;
-      var command;
-      var idx = e.idx;
-      var category = e.category;
+        console.log("Toolbar action " + category + " " + idx);
 
-      console.log( "Toolbar action " + category + " " + idx);
+        if (category == 1) {
+          if (DynC.method_toolbar_op_methods[idx] == "Parent Object Graph")
+            command = "open graph/class/parent/instance=" + this.method_object;
+          else
+            command =
+              'call method/method="' +
+              DynC.method_toolbar_op_methods[idx] +
+              '"/object=' +
+              this.method_object;
+        } else {
+          command =
+            'call method/method="' +
+            DynC.method_toolbar_mnt_methods[idx] +
+            '"/object=' +
+            this.method_object;
+        }
 
-      if ( category == 1) {
-	if ( DynC.method_toolbar_op_methods[idx] == "Parent Object Graph")
-	  command = "open graph/class/parent/instance=" + this.method_object;
-	else
-	  command = "call method/method=\"" + DynC.method_toolbar_op_methods[idx] + 
-	    "\"/object=" +  this.method_object;
+        command = this.dyn.graph.getCommand(command);
+        sts = this.dyn.graph.command(command);
+
+        break;
       }
-      else {
-	command = "call method/method=\"" + DynC.method_toolbar_mnt_methods[idx] + 
-	  "\"/object=" +  this.method_object;
-      }
-
-      command = this.dyn.graph.getCommand(command);
-      sts = this.dyn.graph.command(command);
-		
-      break;
-    }
-    default:
-      return 0;
+      default:
+        return 0;
     }
     return 1;
   };
-  this.disconnect = function() {
-  };
-  this.scan = function( object) {
-  };
+  this.disconnect = function () {};
+  this.scan = function (object) {};
 }
- 
-function DynMethodPulldownMenu( dyn) {
+
+function DynMethodPulldownMenu(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = 0;
@@ -17587,65 +16960,61 @@ function DynMethodPulldownMenu( dyn) {
   this.text_size = 2;
   this.o;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "MethodPulldownMenu.Object") {
       this.method_object = value;
       return 1;
-    }
-    else if (name === "MethodPulldownMenu.MenuType") {
+    } else if (name === "MethodPulldownMenu.MenuType") {
       this.menu_type = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name) {
+  };
+  this.getAttribute = function (o, name) {
     var ret = new ge_tValueReturn();
     if (name === "MethodPulldownMenu.Object") {
       ret.value = this.method_object;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "MethodPulldownMenu.MenuType") {
+    } else if (name === "MethodPulldownMenu.MenuType") {
       ret.value = this.menu_type;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "MethodToolbar : " + lines[i]);
+      if (this.dyn.debug) console.log("MethodToolbar : " + lines[i]);
 
-      switch ( key) {
-      case DynC.eSave_MethodPulldownMenu: 
-	break;
-      case DynC.eSave_MethodPulldownMenu_method_object: 
-	if ( tokens.length > 1)
-	  this.method_object = tokens[1];
-	break;
-      case DynC.eSave_MethodPulldownMenu_menu_type: 
-	this.menu_type = parseInt( tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynMethodPulldownMenu");
-	break;
+      switch (key) {
+        case DynC.eSave_MethodPulldownMenu:
+          break;
+        case DynC.eSave_MethodPulldownMenu_method_object:
+          if (tokens.length > 1) this.method_object = tokens[1];
+          break;
+        case DynC.eSave_MethodPulldownMenu_menu_type:
+          this.menu_type = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynMethodPulldownMenu");
+          break;
       }
 
-      if ( end)
-	break;
+      if (end) break;
     }
-		
+
     return i;
   };
 
@@ -17656,269 +17025,302 @@ function DynMethodPulldownMenu( dyn) {
   this.xm_mask_opmethods = 0;
   this.xm_mask_mntmethods = 0;
 
-  this.action = function( object, e) {
-    if ( !this.dyn.graph.isAuthorized( this.dyn.access))
-      return 1;
+  this.action = function (object, e) {
+    if (!this.dyn.graph.isAuthorized(this.dyn.access)) return 1;
 
     this.o = object;
-    switch ( e.event) {
-    case Glow.eEvent_MB1Click:
-      if ( this.menu_object != null) {
-	// Close, delete this menu
-	this.dyn.graph.getCtx().remove(this.menu_object);
-	this.menu_object = null;
-      }
-      else if ( object != null) {
-	var	ll_x, ll_y, ur_x, ur_y;
-	var	parsed_name;
-    
-	var pname = this.dyn.parseAttrName(this.method_object);
-	if ( pname == null || pname.name === "") 
-	  return 1;
+    switch (e.event) {
+      case Glow.eEvent_MB1Click:
+        if (this.menu_object != null) {
+          // Close, delete this menu
+          this.dyn.graph.getCtx().remove(this.menu_object);
+          this.menu_object = null;
+        } else if (object != null) {
+          var ll_x, ll_y, ur_x, ur_y;
+          var parsed_name;
 
-        this.pname_name = pname.name;
-	parsed_name = this.pname_name + ".XttMethodsMask.Flags";
-	
-	this.dyn.graph.getGdh().getObjectInfoInt( parsed_name, this.action2, this);
-      }
+          var pname = this.dyn.parseAttrName(this.method_object);
+          if (pname == null || pname.name === "") return 1;
 
-      break;
-    case Glow.eEvent_MenuActivated:
-      if ( this.menu_object == null)
-	break;
-      if ( e.object == this.menu_object) {
-      
-	var sts;
-	var command;
-	var idx = 0;
-	var found = 0;
+          this.pname_name = pname.name;
+          parsed_name = this.pname_name + ".XttMethodsMask.Flags";
 
-	for ( var i = 0; i < DynC.method_toolbar_op_cnt; i++) {
-	  if ( this.menu_type != DynC.eMethodsMenuType_Help && (DynC.method_toolbar_op_helpmask & (1 << i)) == 0)
-	    continue;
-	  if ( this.menu_type != DynC.eMethodsMenuType_Simulate)
-	    continue;
+          this.dyn.graph
+            .getGdh()
+            .getObjectInfoInt(parsed_name, this.action2, this);
+        }
 
-	  if ( (this.opmask & (1 << i)) != 0)
-	    idx++;
-	  if ( e.item + 1 == idx) {
-	    command = "call method/method=\"" + DynC.method_toolbar_op_methods[i] +
-	      "\"/object=" + this.method_object;
-	    command = this.dyn.graph.getCommand(command);
-	    sts = this.dyn.graph.command(command);
-	    found = 1;
-	    break;
-	  }
-	}
+        break;
+      case Glow.eEvent_MenuActivated:
+        if (this.menu_object == null) break;
+        if (e.object == this.menu_object) {
+          var sts;
+          var command;
+          var idx = 0;
+          var found = 0;
 
-	if ( found == 0) {
-	  for ( var i = 0; i < DynC.method_toolbar_mnt_cnt; i++) {
-	    if ( this.menu_type == DynC.eMethodsMenuType_Help && (DynC.method_toolbar_mnt_helpmask & (1 << i)) == 0)
-	      continue;
+          for (var i = 0; i < DynC.method_toolbar_op_cnt; i++) {
+            if (
+              this.menu_type != DynC.eMethodsMenuType_Help &&
+              (DynC.method_toolbar_op_helpmask & (1 << i)) == 0
+            )
+              continue;
+            if (this.menu_type != DynC.eMethodsMenuType_Simulate) continue;
 
-	    if ( (this.mntmask & (1 << i)) != 0)
-	      idx++;
-	    if ( e.item + 1 == idx) {
-	      command = "call method/method=\"" + DynC.method_toolbar_mnt_methods[i] +
-		"\"/object=" + this.method_object;
-	      command = this.dyn.graph.getCommand(command);
-	      sts = this.dyn.graph.command(command);
-	      found = 1;
-	      break;
-	    }
-	  }
-	}
-      }
-      break;
-    case Glow.eEvent_MenuDelete:
-      if ( this.menu_object == null)
-	break;
-      if ( e.object == null || e.object == this.menu_object) {
-	// Delete this menu
-	this.dyn.graph.getCtx().remove(this.menu_object);
-	this.menu_object = null;
-      }
-      break;
+            if ((this.opmask & (1 << i)) != 0) idx++;
+            if (e.item + 1 == idx) {
+              command =
+                'call method/method="' +
+                DynC.method_toolbar_op_methods[i] +
+                '"/object=' +
+                this.method_object;
+              command = this.dyn.graph.getCommand(command);
+              sts = this.dyn.graph.command(command);
+              found = 1;
+              break;
+            }
+          }
 
-    default: ;
+          if (found == 0) {
+            for (var i = 0; i < DynC.method_toolbar_mnt_cnt; i++) {
+              if (
+                this.menu_type == DynC.eMethodsMenuType_Help &&
+                (DynC.method_toolbar_mnt_helpmask & (1 << i)) == 0
+              )
+                continue;
+
+              if ((this.mntmask & (1 << i)) != 0) idx++;
+              if (e.item + 1 == idx) {
+                command =
+                  'call method/method="' +
+                  DynC.method_toolbar_mnt_methods[i] +
+                  '"/object=' +
+                  this.method_object;
+                command = this.dyn.graph.getCommand(command);
+                sts = this.dyn.graph.command(command);
+                found = 1;
+                break;
+              }
+            }
+          }
+        }
+        break;
+      case Glow.eEvent_MenuDelete:
+        if (this.menu_object == null) break;
+        if (e.object == null || e.object == this.menu_object) {
+          // Delete this menu
+          this.dyn.graph.getCtx().remove(this.menu_object);
+          this.menu_object = null;
+        }
+        break;
+
+      default:
     }
     return 1;
   };
 
-
-  this.action2 = function( id, self, sts, value) {
-    if ( sts & 1) {
+  this.action2 = function (id, self, sts, value) {
+    if (sts & 1) {
       self.xm_mask_flags = value;
 
-      if ( (self.xm_mask_flags & Pwrb.mXttMethodsFlagsMask_IsConfigured) == 0) {		    
-	self.mask_configure = 1;
-	self.mask_store = 1;
-	self.action5();
-      }      
-      else {
-	var parsed_name = self.pname_name + ".XttMethodsMask.OpMethods";
+      if ((self.xm_mask_flags & Pwrb.mXttMethodsFlagsMask_IsConfigured) == 0) {
+        self.mask_configure = 1;
+        self.mask_store = 1;
+        self.action5();
+      } else {
+        var parsed_name = self.pname_name + ".XttMethodsMask.OpMethods";
 
-	self.dyn.graph.getGdh().getObjectInfoInt( parsed_name, self.action3, self);
+        self.dyn.graph
+          .getGdh()
+          .getObjectInfoInt(parsed_name, self.action3, self);
       }
-    }
-    else {
+    } else {
       self.mask_configure = 1;
       self.action5();
     }
   };
 
-  this.action3 = function( id, self, sts, value) {
-
-    if ( !(sts & 1)) {
+  this.action3 = function (id, self, sts, value) {
+    if (!(sts & 1)) {
       console.log("DynMethodToolbar: " + self.pname__name);
       self.mask_configure = 1;
-    }
-    else
-      self.xm_mask_opmethods = value;
+    } else self.xm_mask_opmethods = value;
 
     var parsed_name = self.pname_name + ".XttMethodsMask.MntMethods";
-    self.dyn.graph.getGdh().getObjectInfoInt( parsed_name, self.action4, self);
+    self.dyn.graph.getGdh().getObjectInfoInt(parsed_name, self.action4, self);
   };
 
-  this.action4 = function( id, self, sts, value) {
-    if ( !(sts & 1)) {
+  this.action4 = function (id, self, sts, value) {
+    if (!(sts & 1)) {
       console.log("DynMethodToolbar: " + self.pname_name);
       self.mask_configure = 1;
-    }
-    else
-      self.xm_mask_mntmethods = value;
+    } else self.xm_mask_mntmethods = value;
     self.action5();
   };
 
-  this.action5 = function() {
-    var 	command;
-    var		sts;
+  this.action5 = function () {
+    var command;
+    var sts;
 
-    if ( this.mask_configure != 0) {
+    if (this.mask_configure != 0) {
       this.xm_mask_opmethods = 0;
-      for ( var i = 0; i < DynC.method_toolbar_op_cnt; i++) {
-	if ( DynC.method_toolbar_op_methods[i] == "Parent Object Graph") {
-	  if ( this.method_object.indexOf('.') != -1)
-	    this.xm_mask_opmethods |= 1 << i;
-	}
-	else {
-	  command = "check method/method=\"" + DynC.method_toolbar_op_methods[i] + "\"/object=" +
-	    this.method_object;
-	  
-	  command = this.dyn.graph.getCommand(command);
-	  sts = this.dyn.graph.command(command);
-	  if ( (sts & 1) != 0)
-	    this.xm_mask_opmethods |= 1 << i;
-	}
+      for (var i = 0; i < DynC.method_toolbar_op_cnt; i++) {
+        if (DynC.method_toolbar_op_methods[i] == "Parent Object Graph") {
+          if (this.method_object.indexOf(".") != -1)
+            this.xm_mask_opmethods |= 1 << i;
+        } else {
+          command =
+            'check method/method="' +
+            DynC.method_toolbar_op_methods[i] +
+            '"/object=' +
+            this.method_object;
+
+          command = this.dyn.graph.getCommand(command);
+          sts = this.dyn.graph.command(command);
+          if ((sts & 1) != 0) this.xm_mask_opmethods |= 1 << i;
+        }
       }
       this.xm_mask_mntmethods = 0;
-      for ( var i = 0; i < DynC.method_toolbar_mnt_cnt; i++) {
-	command = "check method/method=\"" + DynC.method_toolbar_mnt_methods[i] + "\"/object=" +
-	  this.method_object;
-	
-	command = dyn.graph.getCommand(command);
-	var sts = dyn.graph.command(command);
-	if ( (sts & 1) != 0)
-	  this.xm_mask_mntmethods |= 1 << i;
+      for (var i = 0; i < DynC.method_toolbar_mnt_cnt; i++) {
+        command =
+          'check method/method="' +
+          DynC.method_toolbar_mnt_methods[i] +
+          '"/object=' +
+          this.method_object;
+
+        command = dyn.graph.getCommand(command);
+        var sts = dyn.graph.command(command);
+        if ((sts & 1) != 0) this.xm_mask_mntmethods |= 1 << i;
       }
       this.xm_mask_flags |= Pwrb.mXttMethodsFlagsMask_IsConfigured;
     }
-    
+
     this.opmask = this.xm_mask_opmethods;
     this.mntmask = this.xm_mask_mntmethods;
     var insensitive_opmask = 0;
     var insensitive_mntmask = 0;
     var info = new GlowMenuInfo();
-    
+
     this.opmask &= ~Pwrb.mXttOpMethodsMask_OpenObjectGraph;
-    if ( !this.dyn.graph.isAuthorized( Pwr.mAccess_RtEventsBlock | Pwr.mAccess_System))
+    if (
+      !this.dyn.graph.isAuthorized(
+        Pwr.mAccess_RtEventsBlock | Pwr.mAccess_System,
+      )
+    )
       insensitive_opmask |= Pwrb.mXttOpMethodsMask_BlockEvents;
-    if ( !this.dyn.graph.isAuthorized( Pwr.mAccess_RtNavigator | Pwr.mAccess_System | Pwr.mAccess_RtWrite | 
-				       Pwr.mAccess_Maintenance | Pwr.mAccess_Process | Pwr.mAccess_Instrument))
+    if (
+      !this.dyn.graph.isAuthorized(
+        Pwr.mAccess_RtNavigator |
+          Pwr.mAccess_System |
+          Pwr.mAccess_RtWrite |
+          Pwr.mAccess_Maintenance |
+          Pwr.mAccess_Process |
+          Pwr.mAccess_Instrument,
+      )
+    )
       insensitive_opmask |= Pwrb.mXttOpMethodsMask_Note;
-    if ( !this.dyn.graph.isAuthorized( Pwr.mAccess_RtNavigator | Pwr.mAccess_System))
+    if (
+      !this.dyn.graph.isAuthorized(Pwr.mAccess_RtNavigator | Pwr.mAccess_System)
+    )
       insensitive_mntmask |= Pwrb.mXttMntMethodsMask_RtNavigator;
-    if ( !this.dyn.graph.isAuthorized( Pwr.mAccess_RtPlc | Pwr.mAccess_System))
-      insensitive_mntmask |= Pwrb.mXttMntMethodsMask_OpenTrace;    
-    
+    if (!this.dyn.graph.isAuthorized(Pwr.mAccess_RtPlc | Pwr.mAccess_System))
+      insensitive_mntmask |= Pwrb.mXttMntMethodsMask_OpenTrace;
 
     var menu_idx = 0;
-    for ( var i = 0; i < 32; i++)
-      info.item[i].occupied = false;
-    
-    for ( var i = 0; i < DynC.method_toolbar_op_cnt; i++) {
-      if ( menu_idx >= 32)
-	break;
-      
-      if ( this.menu_type == DynC.eMethodsMenuType_Help && (DynC.method_toolbar_op_helpmask & (1 << i)) == 0)
-	continue;
-      if ( this.menu_type == DynC.eMethodsMenuType_Simulate)
-	continue;
-      
-      if ( (this.opmask & (1 << i)) != 0) {
-	info.item[menu_idx].type = Glow.eMenuItem_Button;
-	info.item[menu_idx].text = new String(DynC.method_toolbar_op_methods[i]);
-	info.item[menu_idx].occupied = true;
-	if ( (insensitive_opmask & (1 << i)) != 0)
-	  info.item[menu_idx].type = Glow.eMenuItem_ButtonDisabled;
-	menu_idx++;
+    for (var i = 0; i < 32; i++) info.item[i].occupied = false;
+
+    for (var i = 0; i < DynC.method_toolbar_op_cnt; i++) {
+      if (menu_idx >= 32) break;
+
+      if (
+        this.menu_type == DynC.eMethodsMenuType_Help &&
+        (DynC.method_toolbar_op_helpmask & (1 << i)) == 0
+      )
+        continue;
+      if (this.menu_type == DynC.eMethodsMenuType_Simulate) continue;
+
+      if ((this.opmask & (1 << i)) != 0) {
+        info.item[menu_idx].type = Glow.eMenuItem_Button;
+        info.item[menu_idx].text = new String(
+          DynC.method_toolbar_op_methods[i],
+        );
+        info.item[menu_idx].occupied = true;
+        if ((insensitive_opmask & (1 << i)) != 0)
+          info.item[menu_idx].type = Glow.eMenuItem_ButtonDisabled;
+        menu_idx++;
       }
     }
-    for ( var i = 0; i < DynC.method_toolbar_mnt_cnt; i++) {
-      if ( menu_idx >= 32)
-	break;
-      
-      if ( this.menu_type == DynC.eMethodsMenuType_Help && (DynC.method_toolbar_mnt_helpmask & (1 << i)) == 0)
-	continue;
-      
-      if ( (this.mntmask & (1 << i)) != 0) {
-	info.item[menu_idx].type = Glow.eMenuItem_Button;
-	info.item[menu_idx].text = DynC.method_toolbar_mnt_methods[i];
-	info.item[menu_idx].occupied = true;
-	if ( (insensitive_mntmask & (1 << i)) != 0)
-	  info.item[menu_idx].type = Glow.eMenuItem_ButtonDisabled;
-	menu_idx++;
+    for (var i = 0; i < DynC.method_toolbar_mnt_cnt; i++) {
+      if (menu_idx >= 32) break;
+
+      if (
+        this.menu_type == DynC.eMethodsMenuType_Help &&
+        (DynC.method_toolbar_mnt_helpmask & (1 << i)) == 0
+      )
+        continue;
+
+      if ((this.mntmask & (1 << i)) != 0) {
+        info.item[menu_idx].type = Glow.eMenuItem_Button;
+        info.item[menu_idx].text = DynC.method_toolbar_mnt_methods[i];
+        info.item[menu_idx].occupied = true;
+        if ((insensitive_mntmask & (1 << i)) != 0)
+          info.item[menu_idx].type = Glow.eMenuItem_ButtonDisabled;
+        menu_idx++;
       }
     }
 
     // Get fillcolor, and textattributes from object
-    var text_drawtype = 0, text_color = 0, bg_color = 0;
+    var text_drawtype = 0,
+      text_color = 0,
+      bg_color = 0;
     var text_size = 0;
     var scale = 1;
     var text_font = 0;
-    
+
     sts = 0; // TODO sts = grow_GetObjectAnnotInfo( object, 1, &text_size, &text_drawtype, &text_color, &bg_color, &scale, &text_font);
-    if ( (sts & 1) == 0) {
+    if ((sts & 1) == 0) {
       text_size = 3;
       text_drawtype = Glow.eDrawType_TextHelvetica;
       text_font = Glow.eFont_Helvetica;
       text_color = Glow.eDrawType_Line;
       bg_color = Glow.eDrawType_LightGray;
-    }
-    else if ( bg_color == Glow.eDrawType_No || bg_color == Glow.eDrawType_Inherit)
+    } else if (
+      bg_color == Glow.eDrawType_No ||
+      bg_color == Glow.eDrawType_Inherit
+    )
       bg_color = Glow.eDrawType_LightGray;
-    
+
     var g = this.o.measure();
-    this.menu_object = new GrowMenu( this.dyn.graph.getCtx());
-    this.menu_object.init( "__Menu", info, g.ll_x, g.ur_y, g.ur_x - g.ll_x,
-			   Glow.eDrawType_Line, 0, 1, 1, bg_color, text_size,
-			   text_drawtype, text_color,
-			   Glow.eDrawType_MediumGray, text_font);
-    this.menu_object.set_scale( scale, scale, 0, 0, Glow.eScaleType_LowerLeft);
+    this.menu_object = new GrowMenu(this.dyn.graph.getCtx());
+    this.menu_object.init(
+      "__Menu",
+      info,
+      g.ll_x,
+      g.ur_y,
+      g.ur_x - g.ll_x,
+      Glow.eDrawType_Line,
+      0,
+      1,
+      1,
+      bg_color,
+      text_size,
+      text_drawtype,
+      text_color,
+      Glow.eDrawType_MediumGray,
+      text_font,
+    );
+    this.menu_object.set_scale(scale, scale, 0, 0, Glow.eScaleType_LowerLeft);
     this.dyn.graph.getCtx().insert(this.menu_object);
-    
+
     // grow_SetMenuInputFocus( menu_object, 1);
   };
-  
-  this.connect = function( object) {
-  };
-  this.disconnect = function() {
-  };
-  this.scan = function( object) {
-  };
+
+  this.connect = function (object) {};
+  this.disconnect = function () {};
+  this.scan = function (object) {};
 }
 
-function DynPopupMenu( dyn) {
+function DynPopupMenu(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = 0;
@@ -17930,14 +17332,14 @@ function DynPopupMenu( dyn) {
 
   this.ref_object;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "PopupMenu.ReferenceObject") {
       this.ref_object = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name, value) {
+  };
+  this.getAttribute = function (o, name, value) {
     var ret = new ge_tValueReturn();
     if (name === "PopupMenu.ReferenceObject") {
       ret.value = this.ref_object;
@@ -17946,66 +17348,62 @@ function DynPopupMenu( dyn) {
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( o) {
+  this.connect = function (o) {
     return 1;
   };
-  this.disconnect = function() {
-  };
-  this.scan = function( o) {
+  this.disconnect = function () {};
+  this.scan = function (o) {
     return 1;
   };
-  this.action = function( object, e) {
-    if ( !this.dyn.graph.isAuthorized( this.dyn.access))
-		return 1;
+  this.action = function (object, e) {
+    if (!this.dyn.graph.isAuthorized(this.dyn.access)) return 1;
 
-    switch ( e.event) {
-    case Glow.eEvent_MB3Press:
-      // TODO
-      //this.dyn.graph.openPopupMenu( ref_object, e.x, e.y);
-      break;
+    switch (e.event) {
+      case Glow.eEvent_MB3Press:
+        // TODO
+        //this.dyn.graph.openPopupMenu( ref_object, e.x, e.y);
+        break;
     }
     return 1;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynPopupMenu : " + lines[i]);
+      if (this.dyn.debug) console.log("DynPopupMenu : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_PopupMenu: 
-	break;
-      case DynC.eSave_PopupMenu_ref_object: 
-	if ( tokens.length > 1)
-	  this.ref_object = tokens[1];
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynPopupMenu");
-	break;
+      switch (key) {
+        case DynC.eSave_PopupMenu:
+          break;
+        case DynC.eSave_PopupMenu_ref_object:
+          if (tokens.length > 1) this.ref_object = tokens[1];
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynPopupMenu");
+          break;
       }
-      
-      if ( end)
-	break;
+
+      if (end) break;
     }
-    
+
     return i;
-  };  
+  };
 }
 
-function DynContextMenu( dyn) {
+function DynContextMenu(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = 0;
@@ -18018,329 +17416,268 @@ function DynContextMenu( dyn) {
   this.item_text = new Array(10);
   this.item_action = new Array(10);
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "ContextMenu.ItemText[0]") {
       this.item_text[0] = value;
       return 1;
-    }
-    else if (name === "ContextMenu.ItemText[1]") {
+    } else if (name === "ContextMenu.ItemText[1]") {
       this.item_text[1] = value;
       return 1;
-    }
-    else if (name === "ContextMenu.ItemText[2]") {
+    } else if (name === "ContextMenu.ItemText[2]") {
       this.item_text[2] = value;
       return 1;
-    }
-    else if (name === "ContextMenu.ItemText[3]") {
+    } else if (name === "ContextMenu.ItemText[3]") {
       this.item_text[3] = value;
       return 1;
-    }
-    else if (name === "ContextMenu.ItemText[4]") {
+    } else if (name === "ContextMenu.ItemText[4]") {
       this.item_text[4] = value;
       return 1;
-    }
-    else if (name === "ContextMenu.ItemText[5]") {
+    } else if (name === "ContextMenu.ItemText[5]") {
       this.item_text[5] = value;
       return 1;
-    }
-    else if (name === "ContextMenu.ItemText[6]") {
+    } else if (name === "ContextMenu.ItemText[6]") {
       this.item_text[6] = value;
       return 1;
-    }
-    else if (name === "ContextMenu.ItemText[7]") {
+    } else if (name === "ContextMenu.ItemText[7]") {
       this.item_text[7] = value;
       return 1;
-    }
-    else if (name === "ContextMenu.ItemText[8]") {
+    } else if (name === "ContextMenu.ItemText[8]") {
       this.item_text[8] = value;
       return 1;
-    }
-    else if (name === "ContextMenu.ItemText[9]") {
+    } else if (name === "ContextMenu.ItemText[9]") {
       this.item_text[9] = value;
       return 1;
-    }
-    else if (name === "ContextMenu.ItemAction[0]") {
+    } else if (name === "ContextMenu.ItemAction[0]") {
       this.item_action[0] = value;
       return 1;
-    }
-    else if (name === "ContextMenu.ItemAction[1]") {
+    } else if (name === "ContextMenu.ItemAction[1]") {
       this.item_action[1] = value;
       return 1;
-    }
-    else if (name === "ContextMenu.ItemAction[2]") {
+    } else if (name === "ContextMenu.ItemAction[2]") {
       this.item_action[2] = value;
       return 1;
-    }
-    else if (name === "ContextMenu.ItemAction[3]") {
+    } else if (name === "ContextMenu.ItemAction[3]") {
       this.item_action[3] = value;
       return 1;
-    }
-    else if (name === "ContextMenu.ItemAction[4]") {
+    } else if (name === "ContextMenu.ItemAction[4]") {
       this.item_action[4] = value;
       return 1;
-    }
-    else if (name === "ContextMenu.ItemAction[5]") {
+    } else if (name === "ContextMenu.ItemAction[5]") {
       this.item_action[5] = value;
       return 1;
-    }
-    else if (name === "ContextMenu.ItemAction[6]") {
+    } else if (name === "ContextMenu.ItemAction[6]") {
       this.item_action[6] = value;
       return 1;
-    }
-    else if (name === "ContextMenu.ItemAction[7]") {
+    } else if (name === "ContextMenu.ItemAction[7]") {
       this.item_action[7] = value;
       return 1;
-    }
-    else if (name === "ContextMenu.ItemAction[8]") {
+    } else if (name === "ContextMenu.ItemAction[8]") {
       this.item_action[8] = value;
       return 1;
-    }
-    else if (name === "ContextMenu.ItemAction[9]") {
+    } else if (name === "ContextMenu.ItemAction[9]") {
       this.item_action[9] = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name, value) {
+  };
+  this.getAttribute = function (o, name, value) {
     var ret = new ge_tValueReturn();
     if (name === "ContextMenu.ItemText[0]") {
       ret.value = this.item_text[0];
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "ContextMenu.ItemText[1]") {
+    } else if (name === "ContextMenu.ItemText[1]") {
       ret.value = this.item_text[1];
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "ContextMenu.ItemText[2]") {
+    } else if (name === "ContextMenu.ItemText[2]") {
       ret.value = this.item_text[2];
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "ContextMenu.ItemText[3]") {
+    } else if (name === "ContextMenu.ItemText[3]") {
       ret.value = this.item_text[3];
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "ContextMenu.ItemText[4]") {
+    } else if (name === "ContextMenu.ItemText[4]") {
       ret.value = this.item_text[4];
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "ContextMenu.ItemText[5]") {
+    } else if (name === "ContextMenu.ItemText[5]") {
       ret.value = this.item_text[5];
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "ContextMenu.ItemText[6]") {
+    } else if (name === "ContextMenu.ItemText[6]") {
       ret.value = this.item_text[6];
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "ContextMenu.ItemText[7]") {
+    } else if (name === "ContextMenu.ItemText[7]") {
       ret.value = this.item_text[7];
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "ContextMenu.ItemText[8]") {
+    } else if (name === "ContextMenu.ItemText[8]") {
       ret.value = this.item_text[8];
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "ContextMenu.ItemText[9]") {
+    } else if (name === "ContextMenu.ItemText[9]") {
       ret.value = this.item_text[9];
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "ContextMenu.ItemAction[0]") {
+    } else if (name === "ContextMenu.ItemAction[0]") {
       ret.value = this.item_action[0];
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "ContextMenu.ItemAction[1]") {
+    } else if (name === "ContextMenu.ItemAction[1]") {
       ret.value = this.item_action[1];
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "ContextMenu.ItemAction[2]") {
+    } else if (name === "ContextMenu.ItemAction[2]") {
       ret.value = this.item_action[2];
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "ContextMenu.ItemAction[3]") {
+    } else if (name === "ContextMenu.ItemAction[3]") {
       ret.value = this.item_action[3];
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "ContextMenu.ItemAction[4]") {
+    } else if (name === "ContextMenu.ItemAction[4]") {
       ret.value = this.item_action[4];
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "ContextMenu.ItemAction[5]") {
+    } else if (name === "ContextMenu.ItemAction[5]") {
       ret.value = this.item_action[5];
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "ContextMenu.ItemAction[6]") {
+    } else if (name === "ContextMenu.ItemAction[6]") {
       ret.value = this.item_action[6];
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "ContextMenu.ItemAction[7]") {
+    } else if (name === "ContextMenu.ItemAction[7]") {
       ret.value = this.item_action[7];
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "ContextMenu.ItemAction[8]") {
+    } else if (name === "ContextMenu.ItemAction[8]") {
       ret.value = this.item_action[8];
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "ContextMenu.ItemAction[9]") {
+    } else if (name === "ContextMenu.ItemAction[9]") {
       ret.value = this.item_action[9];
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
+  };
 
-  this.connect = function( o) {
+  this.connect = function (o) {
     return 1;
   };
-  this.disconnect = function() {
-  };
-  this.scan = function( o) {
+  this.disconnect = function () {};
+  this.scan = function (o) {
     return 1;
   };
-  this.action = function( object, e) {
-    if ( !this.dyn.graph.isAuthorized( this.dyn.access))
-		return 1;
+  this.action = function (object, e) {
+    if (!this.dyn.graph.isAuthorized(this.dyn.access)) return 1;
 
-    switch ( e.event) {
-    case Glow.eEvent_MB3Press:
-      // TODO
-      //this.dyn.graph.openPopupMenu( ref_object, e.x, e.y);
-      break;
+    switch (e.event) {
+      case Glow.eEvent_MB3Press:
+        // TODO
+        //this.dyn.graph.openPopupMenu( ref_object, e.x, e.y);
+        break;
     }
     return 1;
   };
 
-  this.open = function( lines, row) {
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynContextMenu : " + lines[i]);
+      if (this.dyn.debug) console.log("DynContextMenu : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_ContextMenu: 
-	break;
-      case DynC.eSave_ContextMenu_item_text1: 
-	if ( tokens.length > 1)
-	  this.item_text[0] = tokens[1];
-	break;
-      case DynC.eSave_ContextMenu_item_text2: 
-	if ( tokens.length > 1)
-	  this.item_text[1] = tokens[1];
-	break;
-      case DynC.eSave_ContextMenu_item_text3: 
-	if ( tokens.length > 1)
-	  this.item_text[2] = tokens[1];
-	break;
-      case DynC.eSave_ContextMenu_item_text4: 
-	if ( tokens.length > 1)
-	  this.item_text[3] = tokens[1];
-	break;
-      case DynC.eSave_ContextMenu_item_text5: 
-	if ( tokens.length > 1)
-	  this.item_text[4] = tokens[1];
-	break;
-      case DynC.eSave_ContextMenu_item_text6: 
-	if ( tokens.length > 1)
-	  this.item_text[5] = tokens[1];
-	break;
-      case DynC.eSave_ContextMenu_item_text7: 
-	if ( tokens.length > 1)
-	  this.item_text[6] = tokens[1];
-	break;
-      case DynC.eSave_ContextMenu_item_text8: 
-	if ( tokens.length > 1)
-	  this.item_text[7] = tokens[1];
-	break;
-      case DynC.eSave_ContextMenu_item_text9: 
-	if ( tokens.length > 1)
-	  this.item_text[8] = tokens[1];
-	break;
-      case DynC.eSave_ContextMenu_item_text10: 
-	if ( tokens.length > 1)
-	  this.item_text[9] = tokens[1];
-	break;
-      case DynC.eSave_ContextMenu_item_action1: 
-	if ( tokens.length > 1)
-	  this.item_action[0] = tokens[1];
-	break;
-      case DynC.eSave_ContextMenu_item_action2: 
-	if ( tokens.length > 1)
-	  this.item_action[1] = tokens[1];
-	break;
-      case DynC.eSave_ContextMenu_item_action3: 
-	if ( tokens.length > 1)
-	  this.item_action[2] = tokens[1];
-	break;
-      case DynC.eSave_ContextMenu_item_action4: 
-	if ( tokens.length > 1)
-	  this.item_action[3] = tokens[1];
-	break;
-      case DynC.eSave_ContextMenu_item_action5: 
-	if ( tokens.length > 1)
-	  this.item_action[4] = tokens[1];
-	break;
-      case DynC.eSave_ContextMenu_item_action6: 
-	if ( tokens.length > 1)
-	  this.item_action[5] = tokens[1];
-	break;
-      case DynC.eSave_ContextMenu_item_action7: 
-	if ( tokens.length > 1)
-	  this.item_action[6] = tokens[1];
-	break;
-      case DynC.eSave_ContextMenu_item_action8: 
-	if ( tokens.length > 1)
-	  this.item_action[7] = tokens[1];
-	break;
-      case DynC.eSave_ContextMenu_item_action9: 
-	if ( tokens.length > 1)
-	  this.item_action[8] = tokens[1];
-	break;
-      case DynC.eSave_ContextMenu_item_action10: 
-	if ( tokens.length > 1)
-	  this.item_action[9] = tokens[1];
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynContextMenu");
-	break;
+      switch (key) {
+        case DynC.eSave_ContextMenu:
+          break;
+        case DynC.eSave_ContextMenu_item_text1:
+          if (tokens.length > 1) this.item_text[0] = tokens[1];
+          break;
+        case DynC.eSave_ContextMenu_item_text2:
+          if (tokens.length > 1) this.item_text[1] = tokens[1];
+          break;
+        case DynC.eSave_ContextMenu_item_text3:
+          if (tokens.length > 1) this.item_text[2] = tokens[1];
+          break;
+        case DynC.eSave_ContextMenu_item_text4:
+          if (tokens.length > 1) this.item_text[3] = tokens[1];
+          break;
+        case DynC.eSave_ContextMenu_item_text5:
+          if (tokens.length > 1) this.item_text[4] = tokens[1];
+          break;
+        case DynC.eSave_ContextMenu_item_text6:
+          if (tokens.length > 1) this.item_text[5] = tokens[1];
+          break;
+        case DynC.eSave_ContextMenu_item_text7:
+          if (tokens.length > 1) this.item_text[6] = tokens[1];
+          break;
+        case DynC.eSave_ContextMenu_item_text8:
+          if (tokens.length > 1) this.item_text[7] = tokens[1];
+          break;
+        case DynC.eSave_ContextMenu_item_text9:
+          if (tokens.length > 1) this.item_text[8] = tokens[1];
+          break;
+        case DynC.eSave_ContextMenu_item_text10:
+          if (tokens.length > 1) this.item_text[9] = tokens[1];
+          break;
+        case DynC.eSave_ContextMenu_item_action1:
+          if (tokens.length > 1) this.item_action[0] = tokens[1];
+          break;
+        case DynC.eSave_ContextMenu_item_action2:
+          if (tokens.length > 1) this.item_action[1] = tokens[1];
+          break;
+        case DynC.eSave_ContextMenu_item_action3:
+          if (tokens.length > 1) this.item_action[2] = tokens[1];
+          break;
+        case DynC.eSave_ContextMenu_item_action4:
+          if (tokens.length > 1) this.item_action[3] = tokens[1];
+          break;
+        case DynC.eSave_ContextMenu_item_action5:
+          if (tokens.length > 1) this.item_action[4] = tokens[1];
+          break;
+        case DynC.eSave_ContextMenu_item_action6:
+          if (tokens.length > 1) this.item_action[5] = tokens[1];
+          break;
+        case DynC.eSave_ContextMenu_item_action7:
+          if (tokens.length > 1) this.item_action[6] = tokens[1];
+          break;
+        case DynC.eSave_ContextMenu_item_action8:
+          if (tokens.length > 1) this.item_action[7] = tokens[1];
+          break;
+        case DynC.eSave_ContextMenu_item_action9:
+          if (tokens.length > 1) this.item_action[8] = tokens[1];
+          break;
+        case DynC.eSave_ContextMenu_item_action10:
+          if (tokens.length > 1) this.item_action[9] = tokens[1];
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynContextMenu");
+          break;
       }
-      
-      if ( end)
-	break;
+
+      if (end) break;
     }
-    
+
     return i;
-  };  
+  };
 }
 
-function DynUnitConvert( dyn) {
+function DynUnitConvert(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = DynC.mDynType2_UnitConvert;
@@ -18354,96 +17691,90 @@ function DynUnitConvert( dyn) {
   this.db_unit;
   this.display_unit;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "UnitConvert.Entity") {
       this.entity = value;
       return 1;
-    }
-    else if (name === "UnitConvert.DbUnit") {
+    } else if (name === "UnitConvert.DbUnit") {
       this.db_unit = value;
       return 1;
-    }
-    else if (name === "UnitConvert.DisplayUnit") {
+    } else if (name === "UnitConvert.DisplayUnit") {
       this.display_unit = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name, value) {
+  };
+  this.getAttribute = function (o, name, value) {
     var ret = new ge_tValueReturn();
     if (name === "UnitConvert.Entity") {
       ret.value = this.entity;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "UnitConvert.DbUnit") {
+    } else if (name === "UnitConvert.DbUnit") {
       ret.value = this.db_unit;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
-    }
-    else if (name === "UnitConvert.DisplayUnit") {
+    } else if (name === "UnitConvert.DisplayUnit") {
       ret.value = this.display_unit;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
-
-  this.connect = function( o) {
-    return 1;
-  };
-  this.disconnect = function() {
-  };
-  this.scan = function( o) {
-    return 1;
-  };
-  this.action = function( object, e) {
-    return 1;
   };
 
-  this.open = function( lines, row) {
+  this.connect = function (o) {
+    return 1;
+  };
+  this.disconnect = function () {};
+  this.scan = function (o) {
+    return 1;
+  };
+  this.action = function (object, e) {
+    return 1;
+  };
+
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynUnitConvert : " + lines[i]);
+      if (this.dyn.debug) console.log("DynUnitConvert : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_UnitConvert: 
-	break;
-      case DynC.eSave_UnitConvert_entity:
-	this.entity = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_UnitConvert_db_unit:
-	this.db_unit = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_UnitConvert_display_unit:
-	this.display_unit = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynUnitConvert");
-	break;
+      switch (key) {
+        case DynC.eSave_UnitConvert:
+          break;
+        case DynC.eSave_UnitConvert_entity:
+          this.entity = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_UnitConvert_db_unit:
+          this.db_unit = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_UnitConvert_display_unit:
+          this.display_unit = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynUnitConvert");
+          break;
       }
-      
-      if ( end)
-	break;
+
+      if (end) break;
     }
-    
+
     return i;
-  };  
+  };
 }
 
-function DynCatchSignal( dyn) {
+function DynCatchSignal(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = 0;
@@ -18455,14 +17786,14 @@ function DynCatchSignal( dyn) {
 
   this.signal_name;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "CatchSignal.SignalName") {
       this.signal_name = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name, value) {
+  };
+  this.getAttribute = function (o, name, value) {
     var ret = new ge_tValueReturn();
     if (name === "CatchSignal.SignalName") {
       ret.value = this.signal_name;
@@ -18471,57 +17802,54 @@ function DynCatchSignal( dyn) {
     }
     ret.sts = 0;
     return ret;
-  }
-
-  this.connect = function( o) {
-    return 1;
-  };
-  this.disconnect = function() {
-  };
-  this.scan = function( o) {
-    return 1;
-  };
-  this.action = function( object, e) {
-    return 1;
   };
 
-  this.open = function( lines, row) {
+  this.connect = function (o) {
+    return 1;
+  };
+  this.disconnect = function () {};
+  this.scan = function (o) {
+    return 1;
+  };
+  this.action = function (object, e) {
+    return 1;
+  };
+
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynCatchSignal : " + lines[i]);
+      if (this.dyn.debug) console.log("DynCatchSignal : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_CatchSignal: 
-	break;
-      case DynC.eSave_CatchSignal_signal_name:
-	if ( tokens.length > 1)
-	  this.signal_name = tokens[1];
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynCatchSignal");
-	break;
+      switch (key) {
+        case DynC.eSave_CatchSignal:
+          break;
+        case DynC.eSave_CatchSignal_signal_name:
+          if (tokens.length > 1) this.signal_name = tokens[1];
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynCatchSignal");
+          break;
       }
-      
-      if ( end)
-	break;
+
+      if (end) break;
     }
-    
+
     return i;
-  };  
+  };
 }
 
-function DynEmitSignal( dyn) {
+function DynEmitSignal(dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = 0;
@@ -18534,100 +17862,336 @@ function DynEmitSignal( dyn) {
   this.signal_name;
   this.global;
 
-  this.setAttribute = function(o, name, value) {
+  this.setAttribute = function (o, name, value) {
     if (name === "EmitSignal.SignalName") {
       this.signal_name = value;
       return 1;
-    }
-    else if (name === "EmitSignal.global") {
+    } else if (name === "EmitSignal.global") {
       this.global = value;
       return 1;
     }
     return 0;
-  }
-  this.getAttribute = function(o, name, value) {
+  };
+  this.getAttribute = function (o, name, value) {
     var ret = new ge_tValueReturn();
     if (name === "EmitSignal.SignalName") {
       ret.value = this.signal_name;
       ret.decl = CcmC.K_DECL_STRING;
       return ret;
-    }
-    else if (name === "EmitSignal.Global") {
+    } else if (name === "EmitSignal.Global") {
       ret.value = this.global;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
     }
     ret.sts = 0;
     return ret;
-  }
-
-  this.connect = function( o) {
-    return 1;
-  };
-  this.disconnect = function() {
-  };
-  this.scan = function( o) {
-    return 1;
-  };
-  this.action = function( object, e) {
-    return 1;
   };
 
-  this.open = function( lines, row) {
+  this.connect = function (o) {
+    return 1;
+  };
+  this.disconnect = function () {};
+  this.scan = function (o) {
+    return 1;
+  };
+  this.action = function (object, e) {
+    return 1;
+  };
+
+  this.open = function (lines, row) {
     var end = false;
     var i;
     var elem;
 
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynEmitSignal : " + lines[i]);
+      if (this.dyn.debug) console.log("DynEmitSignal : " + lines[i]);
 
       elem = null;
 
-      switch ( key) {
-      case DynC.eSave_EmitSignal: 
-	break;
-      case DynC.eSave_EmitSignal_signal_name:
-	if ( tokens.length > 1)
-	  this.signal_name = tokens[1];
-	break;
-      case DynC.eSave_EmitSignal_global:
-	this.global = parseInt(tokens[1], 10);
-	break;
-      case DynC.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in DynEmitSignal");
-	break;
+      switch (key) {
+        case DynC.eSave_EmitSignal:
+          break;
+        case DynC.eSave_EmitSignal_signal_name:
+          if (tokens.length > 1) this.signal_name = tokens[1];
+          break;
+        case DynC.eSave_EmitSignal_global:
+          this.global = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynEmitSignal");
+          break;
       }
-      
-      if ( end)
-	break;
+
+      if (end) break;
     }
-    
+
     return i;
-  };  
+  };
 }
 
+function DynDigCommand(dyn) {
+  this.dyn = dyn;
+  this.dyn_type1 = DynC.mDynType1_DigCommand;
+  this.dyn_type2 = 0;
+  this.action_type1 = 0;
+  this.action_type2 = 0;
+  this.prio = DynC.eDynPrio_DigCommand;
+  this.instance_mask = 0;
+  this.instance = 0;
+
+  this.attribute;
+  this.command;
+  this.level;
+
+  this.setAttribute = function (o, name, value) {
+    if (name === "DigCommand.Attribute") {
+      this.attribute = value;
+      return 1;
+    } else if (name === "DigCommand.Command") {
+      this.command = value;
+      return 1;
+    } else if (name === "DigCommand.Level") {
+      this.level = value;
+      return 1;
+    }
+    return 0;
+  };
+  this.getAttribute = function (o, name, value) {
+    var ret = new ge_tValueReturn();
+    if (name === "DigCommand.Attribute") {
+      ret.value = this.attribute;
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    } else if (name === "DigCommand.Command") {
+      ret.value = this.command;
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    } else if (name === "DigCommand.Level") {
+      ret.value = this.level;
+      ret.decl = CcmC.K_DECL_INT;
+      return ret;
+    }
+    ret.sts = 0;
+    return ret;
+  };
+
+  this.connect = function (o) {
+    return 1;
+  };
+  this.disconnect = function () {};
+  this.scan = function (o) {
+    return 1;
+  };
+  this.action = function (object, e) {
+    return 1;
+  };
+
+  this.open = function (lines, row) {
+    var end = false;
+    var i;
+    var elem;
+
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
+      var key = parseInt(tokens[0], 10);
+
+      if (this.dyn.debug) console.log("DynDigCommand : " + lines[i]);
+
+      elem = null;
+
+      switch (key) {
+        case DynC.eSave_DigCommand:
+          break;
+        case DynC.eSave_DigCommand_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_DigCommand_command:
+          if (tokens.length > 1) this.command = tokens[1];
+          break;
+        case DynC.eSave_DigCommand_level:
+          this.level = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_DigCommand_instance:
+          this.instance = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_DigCommand_instance_mask:
+          this.instance_mask = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynDigCommand");
+          break;
+      }
+
+      if (end) break;
+    }
+
+    return i;
+  };
+}
+
+function DynDigScript(dyn) {
+  this.dyn = dyn;
+  this.dyn_type1 = 0;
+  this.dyn_type2 = DynC.mDynType2_DigScript;
+  this.action_type1 = 0;
+  this.action_type2 = 0;
+  this.prio = DynC.eDynPrio_DigScript;
+  this.instance_mask = 0;
+  this.instance = 0;
+
+  this.attribute;
+  this.script;
+  this.script_len;
+  this.level;
+  this.script_arguments;
+
+  this.setAttribute = function (o, name, value) {
+    if (name === "DigScript.Attribute") {
+      this.attribute = value;
+      return 1;
+    } else if (name === "DigScript.Script") {
+      this.script = value;
+      return 1;
+    } else if (name === "DigScript.Arguments") {
+      this.arguments = value;
+      return 1;
+    } else if (name === "DigScript.Level") {
+      this.level = value;
+      return 1;
+    }
+    return 0;
+  };
+  this.getAttribute = function (o, name, value) {
+    var ret = new ge_tValueReturn();
+    if (name === "DigScript.Attribute") {
+      ret.value = this.attribute;
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    } else if (name === "DigScript.Script") {
+      ret.value = this.script;
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    } else if (name === "DigScript.Arguments") {
+      ret.value = this.arguments;
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    } else if (name === "DigScript.Level") {
+      ret.value = this.level;
+      ret.decl = CcmC.K_DECL_INT;
+      return ret;
+    }
+    ret.sts = 0;
+    return ret;
+  };
+
+  this.connect = function (o) {
+    return 1;
+  };
+  this.disconnect = function () {};
+  this.scan = function (o) {
+    return 1;
+  };
+  this.action = function (object, e) {
+    return 1;
+  };
+
+  this.open = function (lines, row) {
+    var end = false;
+    var i;
+    var elem;
+
+    for (i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(" ");
+      var key = parseInt(tokens[0], 10);
+
+      if (this.dyn.debug) console.log("DynDigScript : " + lines[i]);
+
+      elem = null;
+
+      switch (key) {
+        case DynC.eSave_DigScript:
+          break;
+        case DynC.eSave_DigScript_attribute:
+          if (tokens.length > 1) this.attribute = tokens[1];
+          break;
+        case DynC.eSave_DigScript_script:
+          var idx;
+          var send = false;
+          this.script = "";
+          i++;
+          var line = lines[i].trim().substring(1);
+
+          idx = 0;
+          while (line != null) {
+            while ((idx = line.indexOf('"', idx)) != -1) {
+              if (idx > 0 && line.charAt(idx - 1) == "\\") {
+                line = line.substring(0, idx - 1) + line.substring(idx);
+              } else {
+                if (idx > 0) line = line.substring(0, idx - 1);
+                else line = "";
+                this.script += line;
+                send = true;
+                break;
+              }
+            }
+            if (send) break;
+            this.script += line + "\n";
+            i++;
+            if (i >= lines.length) break;
+
+            line = lines[i];
+          }
+          break;
+        case DynC.eSave_DigScript_arguments:
+          if (tokens.length > 1) this.arguments = tokens[1];
+          break;
+        case DynC.eSave_DigScript_script_len:
+          this.script_len = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_DigScript_level:
+          this.level = parseInt(tokens[1], 10);
+          break;
+        case DynC.eSave_End:
+          end = true;
+          break;
+        default:
+          console.log("Syntax error in DynDigScript");
+          break;
+      }
+
+      if (end) break;
+    }
+
+    return i;
+  };
+}
 
 var GraphIfc = {
-  eDatabase_Gdh 	: 0,
-  eDatabase_User	: 1,
-  eDatabase_Local 	: 2,
-  eDatabase_Ccm 	: 3,
+  eDatabase_Gdh: 0,
+  eDatabase_User: 1,
+  eDatabase_Local: 2,
+  eDatabase_Ccm: 3,
 
-  eType_Bit 		: (1 << 15) + 1
+  eType_Bit: (1 << 15) + 1,
+  eType_NodeId: (1 << 15) + 2,
+  eType_Color: (1 << 15) + 3,
 };
 
 var current_graph = null;
 function graph_get_stored_graph() {
   return current_graph;
-};
+}
 
-function Graph( appl) {
+function Graph(appl) {
   var self = this;
   this.appl = appl;
   this.ctx;
@@ -18666,125 +18230,128 @@ function Graph( appl) {
   this.windowInnerHeight;
   this.graphConfiguration = 0;
 
-#jsc_include gescript.jsi
-#jsc_include gelayout.jsi
+  // This comment may not be deleted.
+  // #jsc_include gescript.jsi
+  // #jsc_include gelayout.jsi
 
-  if ( typeof InstallTrigger !== 'undefined') {
+  if (typeof InstallTrigger !== "undefined") {
     // Firefox is not os fast...
     this.scan_time = 1;
     this.fast_scan_time = 1;
     this.animation_scan_time = 1;
   }
 
-  this.frame = new GrowFrame( this);
+  this.frame = new GrowFrame(this);
   this.priv = sessionStorage.getItem("pwr_privilege");
-  console.log("pwr_privilege" ,this.priv);
+  console.log("pwr_privilege", this.priv);
 
-  this.script_store_graph = function() {
+  this.script_store_graph = function () {
     current_graph = this;
-  }
+  };
 
-  this.read_cb = function( lines, row) {
-    self.frame.read_func( self.ctx, lines, row);
-    self.frame.register_events( self.baseCtx);
-    if ( self.frame.nogdh) {
+  this.read_cb = function (lines, row) {
+    self.frame.read_func(self.ctx, lines, row);
+    self.frame.register_events(self.baseCtx);
+    if (self.frame.nogdh) {
       self.priv = 5;
       self.ctx.traceConnect();
       self.trace_cyclic();
-    }
-    else {
+    } else {
       self.gdh = new Gdh();
       self.gdh.open_cb = self.gdh_init_cb;
       self.gdh.init();
     }
   };
 
-  this.readscript_cb = function(buffer) {
+  this.readscript_cb = function (buffer) {
     if (self.subgraph_load === null && self.attribute_load === null) {
       var bix = 0;
       var width = 0;
       var height = 0;
-      if (buffer.substring(bix, bix+17) === "!** DefaultWidth:") {
-        var idx = buffer.indexOf('\n', bix);
-        var sg = buffer.substring(bix+17, idx);
-	width = parseInt(sg, 10);
+      if (buffer.substring(bix, bix + 17) === "!** DefaultWidth:") {
+        var idx = buffer.indexOf("\n", bix);
+        var sg = buffer.substring(bix + 17, idx);
+        width = parseInt(sg, 10);
         bix = idx + 1;
         console.log("DefaultWidth", width);
       }
-      if (buffer.substring(bix, bix+18) === "!** DefaultHeight:") {
-        var idx = buffer.indexOf('\n', bix);
-        var sg = buffer.substring(bix+18, idx);
-	height = parseInt(sg, 10);
+      if (buffer.substring(bix, bix + 18) === "!** DefaultHeight:") {
+        var idx = buffer.indexOf("\n", bix);
+        var sg = buffer.substring(bix + 18, idx);
+        height = parseInt(sg, 10);
         bix = idx + 1;
         console.log("DefaultHeight", height);
       }
       if (width != 0 && height != 0) {
-	self.ctx.gdraw.canvas.width = width;
-	self.ctx.gdraw.canvas.height = height;
+        self.ctx.gdraw.canvas.width = width;
+        self.ctx.gdraw.canvas.height = height;
       }
-      var aa = []
-      if (buffer.substring(bix, bix+18) === "!** GetObjectAttr:") {
-        var idx = buffer.indexOf('\n', bix);
-        var a = buffer.substring(bix+18, idx);
-        var aa = a.split(',');
+      var aa = [];
+      if (buffer.substring(bix, bix + 18) === "!** GetObjectAttr:") {
+        var idx = buffer.indexOf("\n", bix);
+        var a = buffer.substring(bix + 18, idx);
+        var aa = a.split(",");
         bix = idx + 1;
       }
       if (aa.length > 0) {
-        for (let i = 0; i < aa.length; i++)
-	  aa[i] = aa[i].trim();
-	self.attribute_load = aa;
-	self.attribute_load_idx = 0;	
+        for (let i = 0; i < aa.length; i++) aa[i] = aa[i].trim();
+        self.attribute_load = aa;
+        self.attribute_load_idx = 0;
       }
       var sgc = [];
-      while (buffer.substring(bix, bix+9) === "!** Load:") {
-        var idx = buffer.indexOf('\n', bix);
-        var sg = buffer.substring(bix+9, idx);
-        var sga = sg.split(',');
-	sgc = sgc.concat(sga);
+      while (buffer.substring(bix, bix + 9) === "!** Load:") {
+        var idx = buffer.indexOf("\n", bix);
+        var sg = buffer.substring(bix + 9, idx);
+        var sga = sg.split(",");
+        sgc = sgc.concat(sga);
         bix = idx + 1;
       }
       if (sgc.length > 0) {
-        for (let i = 0; i < sgc.length; i++)
-	  sgc[i] = sgc[i].trim();
-	self.subgraph_load = sgc;
-	self.subgraph_load_idx = 0;	
-	
-	self.script_buffer = buffer;
-	self.loadSubGraph(self.subgraph_load[self.subgraph_load_idx]);
+        for (let i = 0; i < sgc.length; i++) sgc[i] = sgc[i].trim();
+        self.subgraph_load = sgc;
+        self.subgraph_load_idx = 0;
+
+        self.script_buffer = buffer;
+        self.loadSubGraph(self.subgraph_load[self.subgraph_load_idx]);
       } else if (aa.length > 0) {
-	self.loadAttribute(self.attribute_load[self.attribute_load_idx]);
+        self.loadAttribute(self.attribute_load[self.attribute_load_idx]);
       } else {
-	self.readscript(buffer);
+        self.readscript(buffer);
       }
     } else {
-      if ((self.subgraph_load == null || (self.subgraph_load_idx >= self.subgraph_load.length)) &&
-	  (self.attribute_load == null || (self.attribute_load_idx >= self.attribute_load.length))) {
+      if (
+        (self.subgraph_load == null ||
+          self.subgraph_load_idx >= self.subgraph_load.length) &&
+        (self.attribute_load == null ||
+          self.attribute_load_idx >= self.attribute_load.length)
+      ) {
         self.subgraph_load = null;
         self.subgraph_load_idx = 0;
         self.attribute_load = null;
         self.attribute_load_idx = 0;
-	self.readscript(buffer);
-      } else if (self.subgraph_load != null && self.subgraph_load_idx < self.subgraph_load.length) {
-	self.subgraph_load_idx++;
-	self.loadSubGraph(self.subgraph_load[self.subgraph_load_idx - 1]);
-      } else if (self.attribute_load != null){
-	self.attribute_load_idx++;
-	self.loadAttribute(self.attribute_load[self.attribute_load_idx - 1]);
+        self.readscript(buffer);
+      } else if (
+        self.subgraph_load != null &&
+        self.subgraph_load_idx < self.subgraph_load.length
+      ) {
+        self.subgraph_load_idx++;
+        self.loadSubGraph(self.subgraph_load[self.subgraph_load_idx - 1]);
+      } else if (self.attribute_load != null) {
+        self.attribute_load_idx++;
+        self.loadAttribute(self.attribute_load[self.attribute_load_idx - 1]);
       }
     }
-  }
+  };
 
-  this.readscript = function(buffer) {
+  this.readscript = function (buffer) {
     function msg_func(msg, sts, cdata) {
       console.log(msg);
     }
-    function externcmd_func(cmd, cdata) {
-    }
+    function externcmd_func(cmd, cdata) {}
     function deffilename_func(name, cdata) {
       return name;
     }
-    if (this.ccm == null)
-      this.ccm = new Ccm();
+    if (this.ccm == null) this.ccm = new Ccm();
     if (!this.ccm_func_registred) {
       this.ccm_func_registred = 1;
       this.script_func_register();
@@ -18800,82 +18367,85 @@ function Graph( appl) {
     this.script_store_graph();
 
     // Read and execute the script file
-    this.ccm.buffer_exec(buffer, null, externcmd_func, 
-      deffilename_func, msg_func, 0, 0, 0, 0, null, null);
+    this.ccm.buffer_exec(
+      buffer,
+      null,
+      externcmd_func,
+      deffilename_func,
+      msg_func,
+      0,
+      0,
+      0,
+      0,
+      null,
+      null,
+    );
 
     if (this.ctx.x1 !== this.ctx.x0 && this.ctx.y1 !== this.ctx.y0) {
-      this.ctx.mw.zoom_factor_x = window.innerWidth / (this.ctx.x1 - this.ctx.x0);
-      this.ctx.mw.zoom_factor_y = window.innerHeight / (this.ctx.y1 - this.ctx.y0);
+      this.ctx.mw.zoom_factor_x =
+        window.innerWidth / (this.ctx.x1 - this.ctx.x0);
+      this.ctx.mw.zoom_factor_y =
+        window.innerHeight / (this.ctx.y1 - this.ctx.y0);
       if (this.ctx.mw.zoom_factor_y < this.ctx.mw.zoom_factor_x)
         this.ctx.mw.zoom_factor_x = this.ctx.mw.zoom_factor_y;
-      else
-        this.ctx.mw.zoom_factor_y = this.ctx.mw.zoom_factor_x;
+      else this.ctx.mw.zoom_factor_y = this.ctx.mw.zoom_factor_x;
     }
 
     this.ctx.traceConnect();
-    this.gdh.refObjectInfoList( self.trace_connected);
-    this.frame.register_events( this.baseCtx);
+    this.gdh.refObjectInfoList(self.trace_connected);
+    this.frame.register_events(this.baseCtx);
     this.ctx.draw();
     this.read_buffer = null;
     return 1;
   };
 
-  this.read_subgraph_cb = function( lines, row) {
+  this.read_subgraph_cb = function (lines, row) {
     self.ctx.open_subgraph(lines, row);
     self.readscript_cb(self.script_buffer);
-  }
+  };
 
-  this.loadSubGraph = function(name) {
+  this.loadSubGraph = function (name) {
     var fname = name.toLowerCase() + ".pwsg";
-    this.frame.readGrowWeb( fname, this.read_subgraph_cb, true);  
-  }
+    this.frame.readGrowWeb(fname, this.read_subgraph_cb, true);
+  };
 
-  this.load_graphconf_cb = function( id, self, sts, value) {
-    if (sts & 1)
-      self.graphConfiguration = value;
+  this.load_graphconf_cb = function (id, self, sts, value) {
+    if (sts & 1) self.graphConfiguration = value;
     self.readscript_cb(self.script_buffer);
-  }
-  this.loadAttribute = function(name) {
+  };
+  this.loadAttribute = function (name) {
     if (name === "GraphConfiguration") {
       var aname = this.ctx.getOwner() + "." + name;
       this.gdh.getObjectInfoInt(aname, this.load_graphconf_cb, this);
-    }
-    else
-      self.readscript_cb(self.script_buffer);
-  }
-
-  this.gdh_init_cb = function() {
-    if ( self.priv == null)
-      self.gdh.login( "", "", self.login_cb, self);
-    self.ctx.traceConnect();
-    self.gdh.refObjectInfoList( self.trace_connected);
+    } else self.readscript_cb(self.script_buffer);
   };
 
-  this.gdh_init_cb_script = function() {
-    if ( self.priv == null)
-      self.gdh.login( "", "", self.login_cb, self);
+  this.gdh_init_cb = function () {
+    if (self.priv == null) self.gdh.login("", "", self.login_cb, self);
+    self.ctx.traceConnect();
+    self.gdh.refObjectInfoList(self.trace_connected);
+  };
+
+  this.gdh_init_cb_script = function () {
+    if (self.priv == null) self.gdh.login("", "", self.login_cb, self);
     self.frame.readGrowWeb(fname.substring(1), self.readscript_cb, false);
   };
 
-  this.login_cb = function( id, data, sts, result) {
-    console.log( "Login:", sts, result);
-    if ( sts & 1)
-      self.priv = result;
-    else
-      self.priv = 0;
+  this.login_cb = function (id, data, sts, result) {
+    console.log("Login:", sts, result);
+    if (sts & 1) self.priv = result;
+    else self.priv = 0;
   };
 
-  this.trace_connected = function( id, sts) {
+  this.trace_connected = function (id, sts) {
     self.trace_cyclic();
   };
 
-  this.trace_cyclic = function() {
-    if ( self.frame.nogdh)
-      self.trace_scan(0,0);
-    else	
-      self.gdh.getRefObjectInfoAll( self.trace_scan);
+  this.trace_cyclic = function () {
+    if (self.frame.nogdh) self.trace_scan(0, 0);
+    else self.gdh.getRefObjectInfoAll(self.trace_scan);
   };
-  this.trace_scan = function( id, sts) {
+  this.trace_scan = function (id, sts) {
     self.scan_time = self.ctx.scantime;
     self.fast_scan_time = self.ctx.fast_scantime;
     self.animation_scan_time = self.ctx.animation_scantime;
@@ -18885,147 +18455,142 @@ function Graph( appl) {
     self.ctx.draw();
 
     self.slow_scan_cnt++;
-    if (self.slow_scan_cnt
-        >= (self.scan_time / self.animation_scan_time))
+    if (self.slow_scan_cnt >= self.scan_time / self.animation_scan_time)
       self.slow_scan_cnt = 0;
 
     self.fast_scan_cnt++;
-    if (self.fast_scan_cnt
-        >= (self.fast_scan_time / self.animation_scan_time))
+    if (self.fast_scan_cnt >= self.fast_scan_time / self.animation_scan_time)
       self.fast_scan_cnt = 0;
 
-    self.timer = setTimeout( self.trace_cyclic, 1000 * self.animation_scan_time);
+    self.timer = setTimeout(self.trace_cyclic, 1000 * self.animation_scan_time);
   };
 
-  this.growUserdataOpen = function( lines, row, ctx, type) {
+  this.growUserdataOpen = function (lines, row, ctx, type) {
     var dyn;
     var ret = new UserdataCbReturn();
 
-    switch ( type) {
-    case Glow.eUserdataCbType_Ctx:
-      if ( lines[row] != "1") {
-	ret.row = row - 1;
-	ret.userdata = null;
-      }
-      else {
-	dyn = new Dyn(this);
-	dyn.userdata = this;
-	ret.userdata = dyn;
-	ret.row = dyn.open( lines, row);
-      }
-      break;
-    case Glow.eUserdataCbType_Node:
-      dyn = new Dyn(this);
-      dyn.userdata = this;
-      ret.userdata = dyn;
-      ret.row = dyn.open( lines, row);
-      break;
-    case Glow.eUserdataCbType_NodeClass:
-      dyn = new Dyn(this);
-      ret.row = dyn.open( lines, row);
-      ret.userdata = dyn;
-      break;
-    default: 
-      break;
+    switch (type) {
+      case Glow.eUserdataCbType_Ctx:
+        if (lines[row] != "1") {
+          ret.row = row - 1;
+          ret.userdata = null;
+        } else {
+          dyn = new Dyn(this);
+          dyn.userdata = this;
+          ret.userdata = dyn;
+          ret.row = dyn.open(lines, row);
+        }
+        break;
+      case Glow.eUserdataCbType_Node:
+        dyn = new Dyn(this);
+        dyn.userdata = this;
+        ret.userdata = dyn;
+        ret.row = dyn.open(lines, row);
+        break;
+      case Glow.eUserdataCbType_NodeClass:
+        dyn = new Dyn(this);
+        ret.row = dyn.open(lines, row);
+        ret.userdata = dyn;
+        break;
+      default:
+        break;
     }
     return ret;
   };
-  
-  this.event_handler = function( e) {
+
+  this.event_handler = function (e) {
     var ctx_popped = false;
     var dyn;
     var o;
-    
-    if (e.object_type != Glow.eObjectType_NoObject &&
-	e.object !== null) {
-      ctx_popped = this.ctxPop( e.object.ctx);
+
+    if (e.object_type != Glow.eObjectType_NoObject && e.object !== null) {
+      ctx_popped = this.ctxPop(e.object.ctx);
     }
 
-    switch ( e.event) {
-    case Glow.eEvent_MB1Click:
-      if ( e.object_type == Glow.eObjectType_NoObject ||
-	   e.object.type() != Glow.eObjectType_GrowMenu) {
-	// Close any open menu, if not click in menu
-	var event = new GlowEventMenu();
-	event.event = Glow.eEvent_MenuDelete;
-	event.type = Glow.eEventType_Menu;
-	event.object = null;
+    switch (e.event) {
+      case Glow.eEvent_MB1Click:
+        if (
+          e.object_type == Glow.eObjectType_NoObject ||
+          e.object.type() != Glow.eObjectType_GrowMenu
+        ) {
+          // Close any open menu, if not click in menu
+          var event = new GlowEventMenu();
+          event.event = Glow.eEvent_MenuDelete;
+          event.type = Glow.eEventType_Menu;
+          event.object = null;
 
-	var list = this.ctx.get_object_list();
-	for ( var i = 0; i < list.size(); i++) {
-	  o = list.get(i);
-	  if ( (o.type() == Glow.eObjectType_GrowNode ||
-		o.type() == Glow.eObjectType_GrowGroup) &&
-	       (e.object_type == Glow.eObjectType_NoObject ||
-		o != e.object)) {
-	    dyn = o.getUserData();
-	    if ( dyn !== null)
-	      dyn.action( o, event);
-	    var old_size = list.size(); 
-	    list = this.ctx.get_object_list();
-	    if ( old_size != list.size())
-	      // Something is deleted
-	      break;
-	  }
-	}
-      }
+          var list = this.ctx.get_object_list();
+          for (var i = 0; i < list.size(); i++) {
+            o = list.get(i);
+            if (
+              (o.type() == Glow.eObjectType_GrowNode ||
+                o.type() == Glow.eObjectType_GrowGroup) &&
+              (e.object_type == Glow.eObjectType_NoObject || o != e.object)
+            ) {
+              dyn = o.getUserData();
+              if (dyn !== null) dyn.action(o, event);
+              var old_size = list.size();
+              list = this.ctx.get_object_list();
+              if (old_size != list.size())
+                // Something is deleted
+                break;
+            }
+          }
+        }
       // Note! no break
-    case Glow.eEvent_MB1Up:
-    case Glow.eEvent_MB1Down:
-    case Glow.eEvent_MB1DoubleClick:
-    case Glow.eEvent_MB3Press:
-    case Glow.eEvent_ValueChanged:
-    case Glow.eEvent_SliderMoveStart:
-    case Glow.eEvent_SliderMoveEnd:
-    case Glow.eEvent_SliderMoved:
-    case Glow.eEvent_Signal:
-      if ( e.object !== null) {
-	var sts;
-	dyn = e.object.getUserData();
-	if ( dyn !== null)
-	  sts = dyn.action( e.object, e);
+      case Glow.eEvent_MB1Up:
+      case Glow.eEvent_MB1Down:
+      case Glow.eEvent_MB1DoubleClick:
+      case Glow.eEvent_MB3Press:
+      case Glow.eEvent_ValueChanged:
+      case Glow.eEvent_SliderMoveStart:
+      case Glow.eEvent_SliderMoveEnd:
+      case Glow.eEvent_SliderMoved:
+      case Glow.eEvent_Signal:
+        if (e.object !== null) {
+          var sts;
+          dyn = e.object.getUserData();
+          if (dyn !== null) sts = dyn.action(e.object, e);
+        }
+        break;
+      case Glow.eEvent_MenuActivated:
+      case Glow.eEvent_MenuCreate:
+      case Glow.eEvent_MenuDelete: {
+        var old_size;
+        var sts;
+
+        var list = this.ctx.get_object_list();
+
+        for (var i = 0; i < list.size(); i++) {
+          o = list.get(i);
+          if (
+            o.type() == Glow.eObjectType_GrowNode ||
+            o.type() == Glow.eObjectType_GrowGroup
+          ) {
+            dyn = o.getUserData();
+            if (dyn !== null) {
+              sts = dyn.action(o, e);
+              if (sts == Glow.GLOW__TERMINATED) return;
+
+              // Check if anything is deleted
+              old_size = list.size();
+              list = this.ctx.get_object_list();
+              if (old_size != list.size()) break;
+            }
+          }
+        }
+        break;
       }
-      break;
-    case Glow.eEvent_MenuActivated:
-    case Glow.eEvent_MenuCreate:
-    case Glow.eEvent_MenuDelete: {
-      var		old_size;
-      var		sts;
-      
-      var list = this.ctx.get_object_list();
-      
-      for ( var i = 0; i < list.size(); i++) {
-	o = list.get(i);
-	if ( o.type() == Glow.eObjectType_GrowNode ||
-	     o.type() == Glow.eObjectType_GrowGroup) {
-	  
-	  dyn = o.getUserData();
-	  if ( dyn !== null) {
-	    sts = dyn.action( o, e);
-	    if ( sts == Glow.GLOW__TERMINATED)
-	      return;
-	    
-	    // Check if anything is deleted
-	    old_size = list.size();
-	    list = this.ctx.get_object_list();
-	    if ( old_size != list.size())
-	      break;
-	  }
-	}
-      }
-      break;
+      default:
+        break;
     }
-    default: break;
-    }
-    if ( ctx_popped)
-      this.ctxPush();
+    if (ctx_popped) this.ctxPush();
   };
 
-  this.ctxPop = function( nctx) {
-    if ( this.ctx == nctx)
-      return false;
+  this.ctxPop = function (nctx) {
+    if (this.ctx == nctx) return false;
 
-    if ( this.ctxStackCnt >= 10) {
+    if (this.ctxStackCnt >= 10) {
       console.log("** Graph ctx stack overflow");
       return false;
     }
@@ -19035,218 +18600,170 @@ function Graph( appl) {
     return true;
   };
 
-  this.ctxPush = function() {
-    if ( this.ctxStackCnt > 0) {
+  this.ctxPush = function () {
+    if (this.ctxStackCnt > 0) {
       --this.ctxStackCnt;
       this.ctx = this.ctxStack[this.ctxStackCnt];
     }
   };
 
-  this.getCtx = function() {
+  this.getCtx = function () {
     return this.ctx;
   };
 
-  this.setSubwindowSource = function( name, source, owner) {
+  this.setSubwindowSource = function (name, source, owner) {
     var ctx = this.ctx;
-    if ( this.ctxStackCnt > 0)
-      ctx = this.ctxStack[this.ctxStackCnt-1];
-    ctx.setSubwindowSource( name, source, owner);
+    if (this.ctxStackCnt > 0) ctx = this.ctxStack[this.ctxStackCnt - 1];
+    ctx.setSubwindowSource(name, source, owner);
   };
 
-
-  this.setClickActive = function( active) {
+  this.setClickActive = function (active) {
     this.clickActive = active;
   };
 
-  this.getClickActive = function() {
+  this.getClickActive = function () {
     return clickActive;
   };
 
-  this.stringToType = function( str) {
+  this.stringToType = function (str) {
     var idx;
-    if ( (idx = str.indexOf('#')) != -1)
-      str = str.substring(0, idx);
-    if ( str.toLowerCase() == "boolean")
-      return Pwr.eType_Boolean;
-    if ( str.toLowerCase() == "float32")
-      return Pwr.eType_Float32;
-    if ( str.toLowerCase() == "float64")
-      return Pwr.eType_Float64;
-    if ( str.toLowerCase() == "char")
-      return Pwr.eType_Char;
-    if ( str.toLowerCase() == "int8")
-      return Pwr.eType_Int8;
-    if ( str.toLowerCase() == "int16")
-      return Pwr.eType_Int16;
-    if ( str.toLowerCase() == "int32")
-      return Pwr.eType_Int32;
-    if ( str.toLowerCase() == "int64")
-      return Pwr.eType_Int64;
-    if ( str.toLowerCase() == "uint8")
-      return Pwr.eType_UInt8;
-    if ( str.toLowerCase() == "uint16")
-      return Pwr.eType_UInt16;
-    if ( str.toLowerCase() == "uint32")
-      return Pwr.eType_UInt32;
-    if ( str.toLowerCase() == "uint64")
-      return Pwr.eType_UInt64;
-    if ( str.toLowerCase() == "objid")
-      return Pwr.eType_Objid;
-    if ( str.toLowerCase() == "time")
-      return Pwr.eType_Time;
-    if ( str.toLowerCase() == "deltatime")
-      return Pwr.eType_DeltaTime;
-    if ( str.toLowerCase() == "attrref")
-      return Pwr.eType_AttrRef;
-    if ( str.toLowerCase() == "status")
-      return Pwr.eType_Status;
-    if ( str.toLowerCase() == "netstatus")
-      return Pwr.eType_NetStatus;
-    if ( str.toLowerCase() == "enum")
-      return Pwr.eType_Enum;
-    if ( str.toLowerCase() == "mask")
-      return Pwr.eType_Mask;
-    if ( str.toLowerCase() ==  "bit")
-      return GraphIfc.eType_Bit;
-    if ( str.length >= 6 && str.substring(0,6).toLowerCase() == "string")
+    if ((idx = str.indexOf("#")) != -1) str = str.substring(0, idx);
+    if (str.toLowerCase() == "boolean") return Pwr.eType_Boolean;
+    if (str.toLowerCase() == "float32") return Pwr.eType_Float32;
+    if (str.toLowerCase() == "float64") return Pwr.eType_Float64;
+    if (str.toLowerCase() == "char") return Pwr.eType_Char;
+    if (str.toLowerCase() == "int8") return Pwr.eType_Int8;
+    if (str.toLowerCase() == "int16") return Pwr.eType_Int16;
+    if (str.toLowerCase() == "int32") return Pwr.eType_Int32;
+    if (str.toLowerCase() == "int64") return Pwr.eType_Int64;
+    if (str.toLowerCase() == "uint8") return Pwr.eType_UInt8;
+    if (str.toLowerCase() == "uint16") return Pwr.eType_UInt16;
+    if (str.toLowerCase() == "uint32") return Pwr.eType_UInt32;
+    if (str.toLowerCase() == "uint64") return Pwr.eType_UInt64;
+    if (str.toLowerCase() == "objid") return Pwr.eType_Objid;
+    if (str.toLowerCase() == "time") return Pwr.eType_Time;
+    if (str.toLowerCase() == "deltatime") return Pwr.eType_DeltaTime;
+    if (str.toLowerCase() == "attrref") return Pwr.eType_AttrRef;
+    if (str.toLowerCase() == "status") return Pwr.eType_Status;
+    if (str.toLowerCase() == "netstatus") return Pwr.eType_NetStatus;
+    if (str.toLowerCase() == "enum") return Pwr.eType_Enum;
+    if (str.toLowerCase() == "mask") return Pwr.eType_Mask;
+    if (str.toLowerCase() == "bit") return GraphIfc.eType_Bit;
+    if (str.toLowerCase() == "color") return GraphIfc.eType_Color;
+    if (str.length >= 6 && str.substring(0, 6).toLowerCase() == "string")
       return Pwr.eType_String;
     return 0;
   };
 
-  this.stringToIndex = function( str) {
+  this.stringToIndex = function (str) {
     var idx1, idx2;
     var index;
 
-    if ( (idx1 = str.indexOf('[')) != -1 &&
-	 (idx2 = str.indexOf(']')) != -1 &&
-	 idx2 > idx1) {
-      index = parseInt( str.substring(idx1+1, idx2), 10);
-      if ( isNaN( index)) {
-	console.log("Element syntax error, " + str);
-	return 1;
+    if (
+      (idx1 = str.indexOf("[")) != -1 &&
+      (idx2 = str.indexOf("]")) != -1 &&
+      idx2 > idx1
+    ) {
+      index = parseInt(str.substring(idx1 + 1, idx2), 10);
+      if (isNaN(index)) {
+        console.log("Element syntax error, " + str);
+        return 1;
       }
       return index;
     }
     return 1;
   };
 
-  this.parseAttrName = function( name) {
-    if ( name === null)
-      return null;
+  this.parseAttrName = function (name) {
+    if (name === null) return null;
 
     var idx, tidx, eidx;
     var pname = new DynParsedAttrName();
 
     var str = name.trim();
-  	
-    if ( (idx = str.indexOf("$local.")) != -1) {
-      if ( (tidx = str.indexOf('#')) == -1)
-	pname.name = str.substring(idx+1);
+
+    if ((idx = str.indexOf("$local.")) != -1) {
+      if ((tidx = str.indexOf("#")) == -1) pname.name = str.substring(idx + 1);
       else {
-	pname.name = str.substring(idx+7, tidx);
-	var type = str.substring(tidx).toUpperCase();
-	if ( type == "##FLOAT32")
-	  pname.type = Pwr.eType_Float32;
-	else if ( type == "##FLOAT64")
-	  pname.type = Pwr.eType_Float64;
-	else if ( type == "##INT32")
-	  pname.type = Pwr.eType_Int32;
-	else if ( type == "##BOOLEAN")
-	  pname.type = Pwr.eType_Boolean;
-	else
-	  pname.type = Pwr.eType_String;
+        pname.name = str.substring(idx + 7, tidx);
+        var type = str.substring(tidx).toUpperCase();
+        if (type == "##FLOAT32") pname.type = Pwr.eType_Float32;
+        else if (type == "##FLOAT64") pname.type = Pwr.eType_Float64;
+        else if (type == "##INT32") pname.type = Pwr.eType_Int32;
+        else if (type == "##BOOLEAN") pname.type = Pwr.eType_Boolean;
+        else pname.type = Pwr.eType_String;
       }
-      if ( str.substring(0, 1) == "!") {
-	str = str.substring(1);
-	str = str.trim();
-	pname.inverted = true;
-      }
-      else
-	pname.inverted = false;
+      if (str.substring(0, 1) == "!") {
+        str = str.substring(1);
+        str = str.trim();
+        pname.inverted = true;
+      } else pname.inverted = false;
 
       pname.database = GraphIfc.eDatabase_Local;
       pname.tname = name;
       return pname;
     }
 
-    if ( (idx = str.indexOf("$ccm.")) != -1) {
-      if ( (tidx = str.indexOf('#')) == -1)
-	pname.name = str.substring(idx+1);
+    if ((idx = str.indexOf("$ccm.")) != -1) {
+      if ((tidx = str.indexOf("#")) == -1) pname.name = str.substring(idx + 1);
       else {
-	pname.name = str.substring(idx+5, tidx);
-	var type2 = str.substring(tidx).toUpperCase();
-	if ( type2 == "##FLOAT32")
-	  pname.type = Pwr.eType_Float32;
-	else if ( type2 == "##INT32")
-	  pname.type = Pwr.eType_Int32;
-	else if ( type2 == "##BOOLEAN")
-	  pname.type = Pwr.eType_Boolean;
-	else
-	  pname.type = Pwr.eType_String;
+        pname.name = str.substring(idx + 5, tidx);
+        var type2 = str.substring(tidx).toUpperCase();
+        if (type2 == "##FLOAT32") pname.type = Pwr.eType_Float32;
+        else if (type2 == "##INT32") pname.type = Pwr.eType_Int32;
+        else if (type2 == "##BOOLEAN") pname.type = Pwr.eType_Boolean;
+        else pname.type = Pwr.eType_String;
       }
-      if ( str.substring(0, 1) == "!") {
-	str = str.substring(1);
-	str = str.trim();
-	pname.inverted = true;
-      }
-      else
-	pname.inverted = false;
+      if (str.substring(0, 1) == "!") {
+        str = str.substring(1);
+        str = str.trim();
+        pname.inverted = true;
+      } else pname.inverted = false;
 
       pname.database = GraphIfc.eDatabase_Ccm;
       pname.tname = new String(pname.name);
       return pname;
     }
 
-
-
-    if ( (idx = str.indexOf("$object")) != -1) {
-      if ( this.appl !== null) {
-	var oname = this.ctx.getOwner();
-	str = str.substring(0, idx) + oname + str.substring(idx+7);
+    if ((idx = str.indexOf("$object")) != -1) {
+      if (this.appl !== null) {
+        var oname = this.ctx.getOwner();
+        str = str.substring(0, idx) + oname + str.substring(idx + 7);
       }
     }
 
     pname.tname = new String(str);
-	
-    if ( (idx = str.indexOf('[')) == -1) {
-      if ((eidx = str.lastIndexOf('#')) != -1 &&
-	  str.charAt(eidx-1) != '#') {
-	pname.elements = parseInt( str.substring(eidx+1), 10);
-	if ( isNaN( pname.elements))
-	  pname.elements = 1;
-	str = str.substring(0, eidx);
-      }
-      else
-	pname.elements = 1;
-    }	    
-    else {
+
+    if ((idx = str.indexOf("[")) == -1) {
+      if ((eidx = str.lastIndexOf("#")) != -1 && str.charAt(eidx - 1) != "#") {
+        pname.elements = parseInt(str.substring(eidx + 1), 10);
+        if (isNaN(pname.elements)) pname.elements = 1;
+        str = str.substring(0, eidx);
+      } else pname.elements = 1;
+    } else {
       pname.index = this.stringToIndex(str);
       pname.elements = 1;
     }
 
-    if ( (tidx = str.indexOf("##")) != -1) {
-      if ( str.toLowerCase().substring( tidx+2, tidx+5) == "bit") {
-	var typestr = str.substring(tidx+2);
-	var bit = this.stringToIndex(typestr);
-	pname.bitmask = 1 << bit;
-	str = str.substring(0, tidx+5);
+    if ((tidx = str.indexOf("##")) != -1) {
+      if (str.toLowerCase().substring(tidx + 2, tidx + 5) == "bit") {
+        var typestr = str.substring(tidx + 2);
+        var bit = this.stringToIndex(typestr);
+        pname.bitmask = 1 << bit;
+        str = str.substring(0, tidx + 5);
       }
 
-      pname.type = this.stringToType( str.substring(tidx+2));
+      pname.type = this.stringToType(str.substring(tidx + 2));
       str = str.substring(0, tidx);
-    }
-    else
-      pname.type = 0;
+    } else pname.type = 0;
 
-    if ( str.substring(0,1) == "!") {
+    if (str.substring(0, 1) == "!") {
       str = str.substring(1);
       str = str.trim();
       pname.inverted = true;
       pname.tname = pname.tname.substring(1);
       pname.tname = pname.tname.trim();
-    }
-    else
-      pname.inverted = false;
+    } else pname.inverted = false;
 
     pname.database = GraphIfc.eDatabase_Gdh;
     pname.name = str;
@@ -19254,146 +18771,152 @@ function Graph( appl) {
     return pname;
   };
 
-  this.getLdb = function() {
+  this.getLdb = function () {
     return this.ldb;
   };
-  this.getGdh = function() {
+  this.getGdh = function () {
     return this.gdh;
   };
-  this.isAuthorized = function( access) {
-    return ( this.priv & access) ? true : false;
+  this.isAuthorized = function (access) {
+    return this.priv & access ? true : false;
     // return appl.isAuthorized( access);
   };
 
-  this.traceConnect = function( object) {
+  this.traceConnect = function (object) {
     var ctx_popped = false;
 
-    if ( object.ctx != this.ctx)
-      ctx_popped = this.ctxPop( object.ctx);
+    if (object.ctx != this.ctx) ctx_popped = this.ctxPop(object.ctx);
 
-    if ( object.userdata == null) {
-      if ( ctx_popped)
-	this.ctxPush();
+    if (object.userdata == null) {
+      if (ctx_popped) this.ctxPush();
       return;
     }
 
     var dyn = object.userdata;
-    if ( object.type() == Glow.eObjectType_GrowNode) {
+    if (object.type() == Glow.eObjectType_GrowNode) {
       var dyn_type1 = object.getClassDynType1();
 
-      if ( (((dyn_type1 & DynC.mDynType1_HostObject) != 0 && 
-	     (dyn.dyn_type1 & DynC.mDynType1_Inherit) != 0)) || 
-	   (dyn.dyn_type1 & DynC.mDynType1_HostObject) != 0) {
-	var nodeclass_dyn = object.getClassUserData();
-	dyn.setTotal(null);
-	if ( nodeclass_dyn != null) {
-	  var old_dyn = dyn;
-	  dyn = new Dyn( this);
-	  dyn.merge( old_dyn);
-	  dyn.total_dyn_type1 |= DynC.mDynType1_HostObject;
-	  dyn.merge( nodeclass_dyn);
-	  if ( old_dyn.cycle != Glow.eCycle_Inherit)
-	    dyn.cycle = old_dyn.cycle;
-	  if ( !(old_dyn.action_type1 == DynC.mActionType1_Inherit && old_dyn.action_type2 == 0))
-	    dyn.access = old_dyn.access;
-	  object.userdata = dyn;
-	  dyn.setTotal(object);
-	}
+      if (
+        ((dyn_type1 & DynC.mDynType1_HostObject) != 0 &&
+          (dyn.dyn_type1 & DynC.mDynType1_Inherit) != 0) ||
+        (dyn.dyn_type1 & DynC.mDynType1_HostObject) != 0
+      ) {
+        var nodeclass_dyn = object.getClassUserData();
+        dyn.setTotal(null);
+        if (nodeclass_dyn != null) {
+          var old_dyn = dyn;
+          dyn = new Dyn(this);
+          dyn.merge(old_dyn);
+          dyn.total_dyn_type1 |= DynC.mDynType1_HostObject;
+          dyn.merge(nodeclass_dyn);
+          if (old_dyn.cycle != Glow.eCycle_Inherit) dyn.cycle = old_dyn.cycle;
+          if (
+            !(
+              old_dyn.action_type1 == DynC.mActionType1_Inherit &&
+              old_dyn.action_type2 == 0
+            )
+          )
+            dyn.access = old_dyn.access;
+          object.userdata = dyn;
+          dyn.setTotal(object);
+        }
       }
     }
 
-    object.userdata.connect( object);
+    object.userdata.connect(object);
 
-    if ( ctx_popped)
-      this.ctxPush();
+    if (ctx_popped) this.ctxPush();
   };
-  this.traceDisconnect = function( o) {
-    if ( o.userdata !== null)
-      o.userdata.disconnect( o);
+  this.traceDisconnect = function (o) {
+    if (o.userdata !== null) o.userdata.disconnect(o);
   };
-  this.traceScan = function( o) {
-    if ( o.userdata !== null) {
+  this.traceScan = function (o) {
+    if (o.userdata !== null) {
       var dyn = o.userdata;
 
-      if (dyn.cycle == Glow.eCycle_Inherit)
-	return 1;
-      if ( dyn.cycle == Glow.eCycle_Slow && this.slow_scan_cnt != 0
-	  && !(dyn.total_dyn_type1 & DynC.mDynType1_Animation
-	       || dyn.total_dyn_type2 & DynC.mDynType2_ScrollingText))
-	return 1;
-      if (dyn.cycle == Glow.eCycle_Fast && this.fast_scan_cnt != 0
-	  && !(dyn.total_dyn_type1 & DynC.mDynType1_Animation
-	       || dyn.total_dyn_type2 & DynC.mDynType2_ScrollingText))
-	return 1;
+      if (dyn.cycle == Glow.eCycle_Inherit) return 1;
+      if (
+        dyn.cycle == Glow.eCycle_Slow &&
+        this.slow_scan_cnt != 0 &&
+        !(
+          dyn.total_dyn_type1 & DynC.mDynType1_Animation ||
+          dyn.total_dyn_type2 & DynC.mDynType2_ScrollingText
+        )
+      )
+        return 1;
+      if (
+        dyn.cycle == Glow.eCycle_Fast &&
+        this.fast_scan_cnt != 0 &&
+        !(
+          dyn.total_dyn_type1 & DynC.mDynType1_Animation ||
+          dyn.total_dyn_type2 & DynC.mDynType2_ScrollingText
+        )
+      )
+        return 1;
 
-      o.userdata.scan( o);
+      o.userdata.scan(o);
     }
   };
 
-  this.openValueInputDialog = function( dyn, text, elem) {
-    var value = prompt( text, "");
-    if ( value !== null)
-      dyn.valueInputAction( elem, value);
+  this.openValueInputDialog = function (dyn, text, elem) {
+    var value = prompt(text, "");
+    if (value !== null) dyn.valueInputAction(elem, value);
   };
 
-  this.openConfirmDialog = function( dyn, text, object) {
-    if ( appl != null)
-      appl.openConfirmDialog( dyn, text, object);
+  this.openConfirmDialog = function (dyn, text, object) {
+    if (appl != null) appl.openConfirmDialog(dyn, text, object);
   };
 
-  this.getScanTime = function() {
+  this.getScanTime = function () {
     return this.scan_time;
   };
 
-  this.getFastScanTime = function() {
+  this.getFastScanTime = function () {
     return this.fast_scan_time;
   };
 
-  this.getAnimationScanTime = function() {
-    if ( this.scan_time < this.animation_scan_time)
-      return this.scan_time;
+  this.getAnimationScanTime = function () {
+    if (this.scan_time < this.animation_scan_time) return this.scan_time;
     return this.animation_scan_time;
   };
 
-  this.command = function( cmd) {
-    if ( this.appl != null)
-      return this.appl.command( cmd);
+  this.command = function (cmd) {
+    if (this.appl != null) return this.appl.command(cmd);
     return 0;
   };
 
-  this.script = function( script) {
-    if ( this.appl != null)
-      return this.appl.script( script);
+  this.script = function (script) {
+    if (this.appl != null) return this.appl.script(script);
     return 0;
   };
 
-  this.closeGraph = function() {
+  this.closeGraph = function () {
     window.close();
   };
 
-  this.getCommand = function( cmd) {
+  this.getCommand = function (cmd) {
     var str = cmd;
     var idx;
 
-    while ( (idx = str.indexOf("$object")) != -1) {
-      if ( appl != null) {
-	var oname = this.ctx.getOwner();
-	str = str.substring(0, idx) + oname + str.substring(idx+7);
+    while ((idx = str.indexOf("$object")) != -1) {
+      if (appl != null) {
+        var oname = this.ctx.getOwner();
+        str = str.substring(0, idx) + oname + str.substring(idx + 7);
       }
     }
     return str;
   };
 
-  this.setCurrentSlider = function( slider) {
+  this.setCurrentSlider = function (slider) {
     this.currentSlider = slider;
   };
 
-  this.getCurrentSlider = function() {
+  this.getCurrentSlider = function () {
     return this.currentSlider;
   };
 
-  this.loadCtx = function( file, read_cb) {
-    return this.frame.readGrowWindow( file, read_cb);
+  this.loadCtx = function (file, read_cb) {
+    return this.frame.readGrowWindow(file, read_cb);
   };
 
   this.get_border_drawtype = function () {
@@ -19406,25 +18929,33 @@ function Graph( appl) {
     return this.text_drawtype;
   };
 
-  var fname = this.frame.get_filename();  
-  if (fname[0] == '@') {
+  var fname = this.frame.get_filename();
+  if (fname[0] == "@") {
     this.gdh = new Gdh();
     this.gdh.open_cb = this.gdh_init_cb_script;
     this.gdh.init();
-  }
-  else
-    this.frame.readGrowWeb( fname, this.read_cb, true);  
+  } else this.frame.readGrowWeb(fname, this.read_cb, true);
 
   this.ldb = new GraphLocalDb();
   // Set init values for Ge demo
-  this.ldb.setObjectInfo( this, "$local.Demo-Ge-Dynamics-ScrollingText-ScrollingText.ActualValue##String80", "ProviewR");
-  this.ldb.setObjectInfo( this, "$local.Demo-Ge-Subgraphs-DynamicAxis-Av2.ActualValue##Float32", 100);
-  this.ldb.setObjectInfo( this, "$local.Demo-Ge-Subgraphs-DynamicAxisArc-Av2.ActualValue##Float32", 100);
+  this.ldb.setObjectInfo(
+    this,
+    "$local.Demo-Ge-Dynamics-ScrollingText-ScrollingText.ActualValue##String80",
+    "ProviewR",
+  );
+  this.ldb.setObjectInfo(
+    this,
+    "$local.Demo-Ge-Subgraphs-DynamicAxis-Av2.ActualValue##Float32",
+    100,
+  );
+  this.ldb.setObjectInfo(
+    this,
+    "$local.Demo-Ge-Subgraphs-DynamicAxisArc-Av2.ActualValue##Float32",
+    100,
+  );
+}
 
-};
-
-
-function LocalSub( owner, name, typeId, refId) {
+function LocalSub(owner, name, typeId, refId) {
   this.valueFloat = 0;
   this.valueInt = 0;
   this.valueBoolean = false;
@@ -19436,516 +18967,520 @@ function LocalSub( owner, name, typeId, refId) {
   this.owner = owner;
   this.refCount = 0;
 
-  this.ref = function() {
+  this.ref = function () {
     this.refCount++;
   };
-  this.unref = function() {
+  this.unref = function () {
     this.refCount--;
   };
-  this.getRefCount = function() {
+  this.getRefCount = function () {
     return this.refCount;
   };
 }
 
 function GraphLocalDb() {
-
-
   this.subscriptions = [];
   this.subscriptionCount = 1;
 
   // Insert dummy first
   this.subscriptions[0] = null;
 
-  this.refObjectInfo = function( owner, attributeName) {
+  this.refObjectInfo = function (owner, attributeName) {
     var typeId = this.getTypeId(attributeName);
     var name = this.getName(attributeName);
-    if ( typeId === 0) {
+    if (typeId === 0) {
       return i;
     }
 
-    var id = this.nameToId( owner, name);
+    var id = this.nameToId(owner, name);
     var sub;
-    if ( id == -1) {
+    if (id == -1) {
       id = this.subscriptionCount;
-      sub = new LocalSub( owner, name, typeId, id);
+      sub = new LocalSub(owner, name, typeId, id);
       sub.ref();
       this.subscriptions[id] = sub;
       this.subscriptionCount++;
       return id;
-    }
-    else {
+    } else {
       sub = this.subscriptions[id];
       sub.ref();
-      return id; 
+      return id;
     }
   };
 
-  this.unrefObjectInfo = function( id) {
+  this.unrefObjectInfo = function (id) {
     var sub = this.subscriptions[id];
-    if ( sub === null)
-      return;
+    if (sub === null) return;
     sub.unref();
-    if ( sub.getRefCount() <= 0)
-      this.subscriptions[id] = null;
+    if (sub.getRefCount() <= 0) this.subscriptions[id] = null;
   };
 
-  this.getObjectRefInfo = function( id) {
+  this.getObjectRefInfo = function (id) {
     var sub = this.subscriptions[id];
-    if ( sub === null)
-      return 0;
-    if ( typeof sub.value == 'undefined')
-      return 0;
+    if (sub === null) return 0;
+    if (typeof sub.value == "undefined") return 0;
     return sub.value;
   };
 
-  this.getObjectInfo = function( owner, attributeName) {
-    var name = this.getName( attributeName);
-    var id = this.nameToId( owner, name);
-    if ( id == -1)
-      return new CdhrNumber( 0, 2);
-    if ( typeof this.subscriptions[id].value == 'undefined')
-      return new CdhrNumber( 0, 1);
-    return new CdhrNumber( this.subscriptions[id].value, 1);
+  this.getObjectInfo = function (owner, attributeName) {
+    var name = this.getName(attributeName);
+    var id = this.nameToId(owner, name);
+    if (id == -1) return new CdhrNumber(0, 2);
+    if (typeof this.subscriptions[id].value == "undefined")
+      return new CdhrNumber(0, 1);
+    return new CdhrNumber(this.subscriptions[id].value, 1);
   };
 
-  this.setObjectInfo = function( owner, attributeName, value) {
-    var name = this.getName( attributeName);
-    var id = this.nameToId( owner, name);
-    if ( id == -1) {
-      this.refObjectInfo( owner, attributeName);
+  this.setObjectInfo = function (owner, attributeName, value) {
+    var name = this.getName(attributeName);
+    var id = this.nameToId(owner, name);
+    if (id == -1) {
+      this.refObjectInfo(owner, attributeName);
       id = this.subscriptionCount - 1;
     }
     this.subscriptions[id].value = value;
     return new PwrtStatus(1);
   };
 
-  this.toggleObjectInfo = function( owner, attributeName) {
-    var name = this.getName( attributeName);
-    var id = this.nameToId( owner, name);
-    if ( id == -1)
-      return new PwrtStatus(2);
-    this.subscriptions[id].value = 
-	!this.subscriptions[id].value;
+  this.toggleObjectInfo = function (owner, attributeName) {
+    var name = this.getName(attributeName);
+    var id = this.nameToId(owner, name);
+    if (id == -1) return new PwrtStatus(2);
+    this.subscriptions[id].value = !this.subscriptions[id].value;
     return new PwrtStatus(1);
   };
 
-  this.nameToId = function( owner, name) {
-    for ( var i = 0; i < this.subscriptions.length; i++) {
+  this.nameToId = function (owner, name) {
+    for (var i = 0; i < this.subscriptions.length; i++) {
       var sub = this.subscriptions[i];
-      if ( sub !== null && owner == sub.owner && name.toUpperCase() === sub.name.toUpperCase())
-	return i;
+      if (
+        sub !== null &&
+        owner == sub.owner &&
+        name.toUpperCase() === sub.name.toUpperCase()
+      )
+        return i;
     }
     return -1;
   };
 
-  this.getName = function( attrName) {
-    if ( attrName.substring(0,7) == "$local.")
-      attrName = attrName.substring(7);
+  this.getName = function (attrName) {
+    if (attrName.substring(0, 7) == "$local.") attrName = attrName.substring(7);
     var idx1 = attrName.indexOf("##");
-    if ( idx1 != -1)
-      return attrName.substring(0, idx1);
+    if (idx1 != -1) return attrName.substring(0, idx1);
     return attrName;
   };
 
-  this.getTypeId = function( attrName) {
+  this.getTypeId = function (attrName) {
     var suffix;
     var idx1 = attrName.indexOf("##");
-    if(idx1 < 0) {
+    if (idx1 < 0) {
       return Pwr.eType_Boolean;
     }
 
     idx1 += 2;
-    var idx2 = attrName.indexOf('#', idx1);
-    if ( idx2 < 0)
-      suffix = attrName.substring(idx1).toUpperCase();
-    else
-      suffix = attrName.substring(idx1, idx2).toUpperCase();
-    var idx2 = attrName.indexOf('#', idx1);
-    if ( idx2 < 0)
-      suffix = attrName.substring(idx1).toUpperCase();
-    else
-      suffix = attrName.substring(idx1, idx2).toUpperCase();
-    if ( suffix == "BOOLEAN")
-      return Pwr.eType_Boolean;
-    if ( suffix == "FLOAT32")
-      return Pwr.eType_Float32;
-    if ( suffix == "INT32")
-      return Pwr.eType_Int32;
-    if ( suffix == "UINT32")
-      return Pwr.eType_UInt32;
-    if ( suffix == "INT16")
-      return Pwr.eType_Int16;
-    if ( suffix == "UINT16")
-      return Pwr.eType_UInt16;
-    if ( suffix == "INT8")
-      return Pwr.eType_Int8;
-    if ( suffix == "UINT8")
-      return Pwr.eType_UInt8;
-    if ( suffix == "CHAR")
-      return Pwr.eType_Char;
-    if ( suffix == "FLOAT64")
-      return Pwr.eType_Float64;
-    if ( suffix == "OBJID")
-      return Pwr.eType_Objid;
-    if ( suffix == "STRING")
-      return Pwr.eType_String;
-    if ( suffix == "TIME")
-      return Pwr.eType_Time;
-    if ( suffix == "DELTATIME")
-      return Pwr.eType_DeltaTime;
-    if ( suffix == "ATTRREF")
-      return Pwr.eType_AttrRef;
-    if ( suffix.substring(0, 6) == "STRING")
-      return Pwr.eType_String;
+    var idx2 = attrName.indexOf("#", idx1);
+    if (idx2 < 0) suffix = attrName.substring(idx1).toUpperCase();
+    else suffix = attrName.substring(idx1, idx2).toUpperCase();
+    var idx2 = attrName.indexOf("#", idx1);
+    if (idx2 < 0) suffix = attrName.substring(idx1).toUpperCase();
+    else suffix = attrName.substring(idx1, idx2).toUpperCase();
+    if (suffix == "BOOLEAN") return Pwr.eType_Boolean;
+    if (suffix == "FLOAT32") return Pwr.eType_Float32;
+    if (suffix == "INT32") return Pwr.eType_Int32;
+    if (suffix == "UINT32") return Pwr.eType_UInt32;
+    if (suffix == "INT16") return Pwr.eType_Int16;
+    if (suffix == "UINT16") return Pwr.eType_UInt16;
+    if (suffix == "INT8") return Pwr.eType_Int8;
+    if (suffix == "UINT8") return Pwr.eType_UInt8;
+    if (suffix == "CHAR") return Pwr.eType_Char;
+    if (suffix == "FLOAT64") return Pwr.eType_Float64;
+    if (suffix == "OBJID") return Pwr.eType_Objid;
+    if (suffix == "STRING") return Pwr.eType_String;
+    if (suffix == "TIME") return Pwr.eType_Time;
+    if (suffix == "DELTATIME") return Pwr.eType_DeltaTime;
+    if (suffix == "ATTRREF") return Pwr.eType_AttrRef;
+    if (suffix.substring(0, 6) == "STRING") return Pwr.eType_String;
     return 0;
   };
-
 }
 
-var cliTable = [ 
-		new CliTable( "OPEN", 
-			      ["cli_arg1", "cli_arg2", "/NAME", 
-			       "/FILE", "/SCROLLBAR", "/WIDTH", "/HEIGHT", "/MENU", "/NAVIGATOR", 
-			       "/CENTER", "/OBJECT", "/INSTANCE", "/NEW", "/CLASSGRAPH", "/ACCESS", "/PARENT"]),
-		new CliTable( "EXIT", null),
-		new CliTable( "HELP", 
-			      ["cli_arg1", "cli_arg2", "cli_arg3",
-			       "cli_arg4", "/HELPFILE", "/POPNAVIGATOR", "/BOOKMARK", "/INDEX",
-			       "/BASE", "/RETURNCOMMAND", "/WIDTH", "/HEIGHT", "/VERSION"]),
-		new CliTable( "SET", 
-			      ["cli_arg1", "cli_arg2",
-			       "/NAME", "/VALUE", "/BYPASS", "/SOURCE", "/OBJECT"]),
-		new CliTable( "EXAMPLE",
-			      ["/NAME", "/HIERARCHY"]),
-		new CliTable( "CHECK", 
-			      ["cli_arg1", "/METHOD", "/OBJECT"]),
-		new CliTable( "CALL", 
-			      ["cli_arg1", "/METHOD", "/OBJECT"]),
-		new CliTable( "SET", 
-			      ["cli_arg1", "dcli_arg2", "/CONTINUE"])
-		];
+var cliTable = [
+  new CliTable("OPEN", [
+    "cli_arg1",
+    "cli_arg2",
+    "/NAME",
+    "/FILE",
+    "/SCROLLBAR",
+    "/WIDTH",
+    "/HEIGHT",
+    "/MENU",
+    "/NAVIGATOR",
+    "/CENTER",
+    "/OBJECT",
+    "/INSTANCE",
+    "/NEW",
+    "/CLASSGRAPH",
+    "/ACCESS",
+    "/PARENT",
+  ]),
+  new CliTable("EXIT", null),
+  new CliTable("HELP", [
+    "cli_arg1",
+    "cli_arg2",
+    "cli_arg3",
+    "cli_arg4",
+    "/HELPFILE",
+    "/POPNAVIGATOR",
+    "/BOOKMARK",
+    "/INDEX",
+    "/BASE",
+    "/RETURNCOMMAND",
+    "/WIDTH",
+    "/HEIGHT",
+    "/VERSION",
+  ]),
+  new CliTable("SET", [
+    "cli_arg1",
+    "cli_arg2",
+    "/NAME",
+    "/VALUE",
+    "/BYPASS",
+    "/SOURCE",
+    "/OBJECT",
+  ]),
+  new CliTable("EXAMPLE", ["/NAME", "/HIERARCHY"]),
+  new CliTable("CHECK", ["cli_arg1", "/METHOD", "/OBJECT"]),
+  new CliTable("CALL", ["cli_arg1", "/METHOD", "/OBJECT"]),
+  new CliTable("SET", ["cli_arg1", "dcli_arg2", "/CONTINUE"]),
+];
 
 function Appl() {
-  this.graph = new Graph( this);
+  this.graph = new Graph(this);
 
-  this.command = function( cmd) {
+  this.command = function (cmd) {
     console.log("Command: " + cmd);
     var local_cmd = false;
 
-    if ( !this.graph.isAuthorized(Pwr.mAccess_AllRt)) {
+    if (!this.graph.isAuthorized(Pwr.mAccess_AllRt)) {
       consol.log("Not authorized");
       return 0;
     }
 
-    if ( cmd.charAt(0) == '@') {
+    if (cmd.charAt(0) == "@") {
       // Execute a script TODO
       // new JopgCcm( this, gdh, cmd.substring(1),  null);
       return 1;
     }
 
-    var cli = new Cli( cliTable);
-    var command = cli.parse( cmd);
+    var cli = new Cli(cliTable);
+    var command = cli.parse(cmd);
     if (cli.oddSts()) {
-      if ( command == ("OPEN")) {
-	if ( cli.qualifierFound("cli_arg1")) {
+      if (command == "OPEN") {
+        if (cli.qualifierFound("cli_arg1")) {
+          var jgraph = "JGRAPH";
+          var graph = "GRAPH";
+          var url = "URL";
+          var trend = "TREND";
+          var fast = "FAST";
+          var cli_arg1 = cli.getQualValue("cli_arg1").toUpperCase();
+          if (
+            jgraph.length >= cli_arg1.length &&
+            jgraph.substring(0, cli_arg1.length) == cli_arg1
+          ) {
+            // Command is "OPEN JGRAPH"
+            console.log('Command is not implemented, "OPEN JGRAPH"');
+          } else if (
+            graph.length >= cli_arg1.length &&
+            graph.substring(0, cli_arg1.length) == cli_arg1
+          ) {
+            // Command is "OPEN GRAPH"
+            var graphName = null;
+            var instanceValue = null;
+            var classGraph = false;
+            var objectValue = null;
 
-	  var jgraph = "JGRAPH";
-	  var graph = "GRAPH";
-	  var url = "URL";
-	  var trend = "TREND";
-	  var fast = "FAST";
-	  var cli_arg1 = cli.getQualValue("cli_arg1").toUpperCase();
-	  if ( jgraph.length >= cli_arg1.length &&
-	       jgraph.substring(0,cli_arg1.length) == cli_arg1) {
-	    // Command is "OPEN JGRAPH"
-	    console.log("Command is not implemented, \"OPEN JGRAPH\"");
-	  }
-	  else if ( graph.length >= cli_arg1.length &&
-		    graph.substring(0,cli_arg1.length) == cli_arg1) {
-	    // Command is "OPEN GRAPH"
-	    var graphName = null;
-	    var instanceValue = null;
-	    var classGraph = false;
-	    var objectValue = null;
-					
-	    if ( cli.qualifierFound("/OBJECT")) {
-	      objectValue = cli.getQualValue("/OBJECT");
-	      return 1;
-	    }
-	    if ( cli.qualifierFound("/INSTANCE")) {
-	      instanceValue = cli.getQualValue("/INSTANCE");
-	      classGraph = cli.qualifierFound("/CLASSGRAPH");		      
-	      var parent = cli.qualifierFound("/PARENT");
-	      if ( parent) {
-		var idx = instanceValue.lastIndexOf( '.');
-		if ( idx != -1 && idx !== 0)
-		  instanceValue = instanceValue.substring( 0, idx);
-		console.log( "open graph /parent: " + instanceValue);
-	      }
-	    }
-	    if ( classGraph) {
-	      console.log("Cmd classGraph");
-	      var newwindow = window.open("", "_blank");
-	      this.graph.gdh.getObjectFromName( instanceValue, GdhOp.GET_OP_METHOD_OBJECTGRAPH, this.open_objectgraph_cb, newwindow);	    
-	    }
-	    else {
-	      if ( ! cli.qualifierFound("cli_arg2")) {
-		console.log("Syntax error");
-		return 0;
-	      }
-        					
-	      graphName = cli.getQualValue("cli_arg2").toLowerCase();
+            if (cli.qualifierFound("/OBJECT")) {
+              objectValue = cli.getQualValue("/OBJECT");
+              return 1;
+            }
+            if (cli.qualifierFound("/INSTANCE")) {
+              instanceValue = cli.getQualValue("/INSTANCE");
+              classGraph = cli.qualifierFound("/CLASSGRAPH");
+              var parent = cli.qualifierFound("/PARENT");
+              if (parent) {
+                var idx = instanceValue.lastIndexOf(".");
+                if (idx != -1 && idx !== 0)
+                  instanceValue = instanceValue.substring(0, idx);
+                console.log("open graph /parent: " + instanceValue);
+              }
+            }
+            if (classGraph) {
+              console.log("Cmd classGraph");
+              var newwindow = window.open("", "_blank");
+              this.graph.gdh.getObjectFromName(
+                instanceValue,
+                GdhOp.GET_OP_METHOD_OBJECTGRAPH,
+                this.open_objectgraph_cb,
+                newwindow,
+              );
+            } else {
+              if (!cli.qualifierFound("cli_arg2")) {
+                console.log("Syntax error");
+                return 0;
+              }
 
-	      if ( graphName.charAt(".pwg") == -1 && graphName[0] != '@')
-		graphName = graphName + ".pwg";
+              graphName = cli.getQualValue("cli_arg2").toLowerCase();
 
-	      var href;
-	      if ( this.graph.frame.nogdh) {
-		if ( instanceValue === null)
-		  href = "ge.html?graph=" + graphName + "&instance=no&gdh=no";
-		else
-		  href = "ge.html?graph=" + graphName + "&instance=" + instanceValue + "&gdh=no";
-	      }
-	      else {
-		if ( instanceValue === null)
-		  href = "ge.html?graph=" + graphName;
-		else
-		  href = "ge.html?graph=" + graphName + "&instance=" + instanceValue;
-	      }
-	      console.log( "Cmd found: open graph", graphName, instanceValue);
-	      var newwindow = window.open( href, "_blank");
-	    }
-	  }
-	  else if ( url.length >= cli_arg1.length &&
-		    url.substring(0,cli_arg1.length) == cli_arg1) {
-	    // Command is "OPEN URL"
-	    var newFrame = true;
-	    var frameName = null;
-	    var urlValue = cli.getQualValue("cli_arg2");
+              if (graphName.charAt(".pwg") == -1 && graphName[0] != "@")
+                graphName = graphName + ".pwg";
 
-	    if ( urlValue.substring(0,5) == "pwrb_" ||
-		 urlValue.substring(0,5) == "pwrs_" ||
-		 urlValue.substring(0,5) == "nmps_" ||
-		 urlValue.substring(0,9) == "profibus_" ||
-		 urlValue.substring(0,8) == "otherio_" ||
-		 urlValue.substring(0,4) == "opc_" ||
-		 urlValue.substring(0,14) == "basecomponent_" ||
-		 urlValue.substring(0,4) == "abb_" ||
-		 urlValue.substring(0,8) == "siemens_" ||
-		 urlValue.substring(0,7) == "ssabox_")
-	      // Object reference manual
-	      urlValue = "$pwr_doc/" + getLang() + "/orm/" + urlValue;
+              var href;
+              if (this.graph.frame.nogdh) {
+                if (instanceValue === null)
+                  href = "ge.html?graph=" + graphName + "&instance=no&gdh=no";
+                else
+                  href =
+                    "ge.html?graph=" +
+                    graphName +
+                    "&instance=" +
+                    instanceValue +
+                    "&gdh=no";
+              } else {
+                if (instanceValue === null) href = "ge.html?graph=" + graphName;
+                else
+                  href =
+                    "ge.html?graph=" + graphName + "&instance=" + instanceValue;
+              }
+              console.log("Cmd found: open graph", graphName, instanceValue);
+              var newwindow = window.open(href, "_blank");
+            }
+          } else if (
+            url.length >= cli_arg1.length &&
+            url.substring(0, cli_arg1.length) == cli_arg1
+          ) {
+            // Command is "OPEN URL"
+            var newFrame = true;
+            var frameName = null;
+            var urlValue = cli.getQualValue("cli_arg2");
 
-	    console.log("open url " + urlValue);
-	    this.openURL( urlValue, null); 
-	  }
-	  else if ( trend.length >= cli_arg1.length &&
-		    trend.substring(0,cli_arg1.length) == (cli_arg1)) {
-	    // Command is "OPEN TREND"
-	    console.log("Cmd open trend");
-	  }
-	  else if ( fast.length >= cli_arg1.length &&
-		    fast.substring(0,cli_arg1.length) == (cli_arg1)) {
-	    // Command is "OPEN FAST"
-	    console.log("Cmd open fast");
-	  }
-	  else if ( command == ("HELP")) {
-	    console.log("Cmd help");
-	  }
-	}
-      }
-      else if ( command == ("SET")) {
-	if ( cli.qualifierFound("cli_arg1")) {
-	  var cli_arg1 = cli.getQualValue("cli_arg1").toUpperCase();
-	  var subwindow = "SUBWINDOW";
-	  if ( subwindow.length >= cli_arg1.length &&
-	       subwindow.substring(0,cli_arg1.length) == (cli_arg1)) {
-	    // Command is "SET SUBWINDOW"
+            if (
+              urlValue.substring(0, 5) == "pwrb_" ||
+              urlValue.substring(0, 5) == "pwrs_" ||
+              urlValue.substring(0, 5) == "nmps_" ||
+              urlValue.substring(0, 9) == "profibus_" ||
+              urlValue.substring(0, 8) == "otherio_" ||
+              urlValue.substring(0, 4) == "opc_" ||
+              urlValue.substring(0, 14) == "basecomponent_" ||
+              urlValue.substring(0, 4) == "abb_" ||
+              urlValue.substring(0, 8) == "siemens_" ||
+              urlValue.substring(0, 7) == "ssabox_"
+            )
+              // Object reference manual
+              urlValue = "$pwr_doc/" + getLang() + "/orm/" + urlValue;
 
-	    var name;
-	    var graphstr;
-	    var source;
-	    var object;
-	    var sts;
+            console.log("open url " + urlValue);
+            this.openURL(urlValue, null);
+          } else if (
+            trend.length >= cli_arg1.length &&
+            trend.substring(0, cli_arg1.length) == cli_arg1
+          ) {
+            // Command is "OPEN TREND"
+            console.log("Cmd open trend");
+          } else if (
+            fast.length >= cli_arg1.length &&
+            fast.substring(0, cli_arg1.length) == cli_arg1
+          ) {
+            // Command is "OPEN FAST"
+            console.log("Cmd open fast");
+          } else if (command == "HELP") {
+            console.log("Cmd help");
+          }
+        }
+      } else if (command == "SET") {
+        if (cli.qualifierFound("cli_arg1")) {
+          var cli_arg1 = cli.getQualValue("cli_arg1").toUpperCase();
+          var subwindow = "SUBWINDOW";
+          if (
+            subwindow.length >= cli_arg1.length &&
+            subwindow.substring(0, cli_arg1.length) == cli_arg1
+          ) {
+            // Command is "SET SUBWINDOW"
 
-	    local_cmd = true;
-	    if ( cli.qualifierFound("/NAME"))
-	      name = cli.getQualValue("/NAME");
-	    else {
-	      console.log( "Cmd: name is missing\n");
-	      return 0;
-	    }
-	    if ( cli.qualifierFound("/SOURCE"))
-	      source = cli.getQualValue("/SOURCE");
-	    else {
-	      console.log( "Cmd: source is missing\n");
-	      return 0;
-	    }
-	    if ( cli.qualifierFound("/OBJECT"))
-	      object = cli.getQualValue("/OBJECT");
-	    else
-	      object = null;
-	    if ( cli.qualifierFound("cli_arg2"))
-	      graphstr = cli.getQualValue("cli_arg2").toLowerCase();
-	    else {
-	      console.log("Syntax error");
-	      return 0;
-	    }
-				
-	    if ( source.indexOf('.') == -1)
-	      source = source + ".pwg";
+            var name;
+            var graphstr;
+            var source;
+            var object;
+            var sts;
 
-	    this.graph.setSubwindowSource( name, source, object);
-	  }
-	}
-      }
-      else if ( command == ("HELP")) {
-	var fileName = "xtt_help_";
-	var bookmarkValue = null;
+            local_cmd = true;
+            if (cli.qualifierFound("/NAME")) name = cli.getQualValue("/NAME");
+            else {
+              console.log("Cmd: name is missing\n");
+              return 0;
+            }
+            if (cli.qualifierFound("/SOURCE"))
+              source = cli.getQualValue("/SOURCE");
+            else {
+              console.log("Cmd: source is missing\n");
+              return 0;
+            }
+            if (cli.qualifierFound("/OBJECT"))
+              object = cli.getQualValue("/OBJECT");
+            else object = null;
+            if (cli.qualifierFound("cli_arg2"))
+              graphstr = cli.getQualValue("cli_arg2").toLowerCase();
+            else {
+              console.log("Syntax error");
+              return 0;
+            }
 
-	if ( cli.qualifierFound("/VERSION")) {
-	  fileName = this.pwrHost + "xtt_version_help_version.html";
-	  this.openURL( fileName, null);
-	}
-	else {
-	  if ( cli.qualifierFound("/BASE"))
-	    // Not language dependent !! TODO
-	    fileName = this.pwrHost + "help/xtt_help_";
-	  else
-	    fileName = "xtt_help_";
-			
-	  if ( cli.qualifierFound("cli_arg1"))
-	    fileName += cli.getQualValue("cli_arg1").toLowerCase();
-	  if ( cli.qualifierFound("cli_arg2"))
-	    fileName += "_" + cli.getQualValue("cli_arg2").toLowerCase();
-	  if ( cli.qualifierFound("cli_arg3"))
-	    fileName += "_" + cli.getQualValue("cli_arg3").toLowerCase();
-	  if ( cli.qualifierFound("cli_arg4"))
-	    fileName += "_" + cli.getQualValue("cli_arg4").toLowerCase();
-			
-	  if ( fileName.substring(0,5) == "pwrb_" ||
-	       fileName.substring(0,5) == "pwrs_" ||
-	       fileName.substring(0,5) == "nmps_" ||
-	       fileName.substring(0,9) == "profibus_" ||
-	       fileName.substring(0,8) == "otherio_" ||
-	       fileName.substring(0,4) == "opc_" ||
-	       fileName.substring(0,14) == "basecomponent_" ||
-	       fileName.substring(0,4) == "abb_" ||
-	       fileName.substring(0,8) == "siemens_" ||
-	       fileName.substring(0,7) == "ssabox_")
-	    // Object reference manual
-	    fileName = "$pwr_doc/orm/" + fileName;
-			
-	  if ( cli.qualifierFound("/BOOKMARK"))
-	    bookmarkValue = cli.getQualValue("/BOOKMARK");
-			
-	  fileName += ".html";
-	  console.log( "Loading helpfile \"" + fileName + "\"");
-	  this.openURL( fileName, bookmarkValue);
-	}
-	local_cmd = true;
-      }
-      else if ( command == ("CHECK")) {
-	if ( cli.qualifierFound("cli_arg1")) {
+            if (source.indexOf(".") == -1) source = source + ".pwg";
 
-	  var methodstr = "METHOD";
-	  var isattributestr = "ISATTRIBUTE";
-	  var cli_arg1 = cli.getQualValue("cli_arg1").toUpperCase();
-	  if ( methodstr.length >= cli_arg1.length &&
-	       methodstr.substring(0,cli_arg1.length) == (cli_arg1)) {
-	    // Command is "CHECK METHOD"
-	    var method;
-	    var object;
+            this.graph.setSubwindowSource(name, source, object);
+          }
+        }
+      } else if (command == "HELP") {
+        var fileName = "xtt_help_";
+        var bookmarkValue = null;
 
-	    if ( cli.qualifierFound("/METHOD"))
-	      method = cli.getQualValue("/METHOD");
-	    else {
-	      console.log( "Cmd: Method is missing\n");
-	      return 0;
-	    }
+        if (cli.qualifierFound("/VERSION")) {
+          fileName = this.pwrHost + "xtt_version_help_version.html";
+          this.openURL(fileName, null);
+        } else {
+          if (cli.qualifierFound("/BASE"))
+            // Not language dependent !! TODO
+            fileName = this.pwrHost + "help/xtt_help_";
+          else fileName = "xtt_help_";
 
-	    if ( cli.qualifierFound("/OBJECT"))
-	      object = cli.getQualValue("/OBJECT");
-	    else {
-	      console.log( "Cmd: Object is missing\n");
-	      return 0;
-	    }
-	  }	
-	  else if ( isattributestr.length >= cli_arg1.length &&
-		    isattributestr.substring(0,cli_arg1.length) == (cli_arg1)) {
-	    // Command is "CHECK ISATTRIBUTE"
-	    var method;
-	    var object;
+          if (cli.qualifierFound("cli_arg1"))
+            fileName += cli.getQualValue("cli_arg1").toLowerCase();
+          if (cli.qualifierFound("cli_arg2"))
+            fileName += "_" + cli.getQualValue("cli_arg2").toLowerCase();
+          if (cli.qualifierFound("cli_arg3"))
+            fileName += "_" + cli.getQualValue("cli_arg3").toLowerCase();
+          if (cli.qualifierFound("cli_arg4"))
+            fileName += "_" + cli.getQualValue("cli_arg4").toLowerCase();
 
-	    if ( cli.qualifierFound("/OBJECT"))
-	      object = cli.getQualValue("/OBJECT");
-	    else {
-	      console.log( "Cmd: Object is missing\n");
-	      return 0;
-	    }
-	  }
-	}
-	else if ( command == ("CALL")) {
-	  if ( cli.qualifierFound("cli_arg1")) {
+          if (
+            fileName.substring(0, 5) == "pwrb_" ||
+            fileName.substring(0, 5) == "pwrs_" ||
+            fileName.substring(0, 5) == "nmps_" ||
+            fileName.substring(0, 9) == "profibus_" ||
+            fileName.substring(0, 8) == "otherio_" ||
+            fileName.substring(0, 4) == "opc_" ||
+            fileName.substring(0, 14) == "basecomponent_" ||
+            fileName.substring(0, 4) == "abb_" ||
+            fileName.substring(0, 8) == "siemens_" ||
+            fileName.substring(0, 7) == "ssabox_"
+          )
+            // Object reference manual
+            fileName = "$pwr_doc/orm/" + fileName;
 
-	    var parameter = "METHOD";
-	    var cli_arg1 = cli.getQualValue("cli_arg1").toUpperCase();
-	    if ( parameter.length >= cli_arg1.length &&
-		 parameter.substring(0,cli_arg1.length) == (cli_arg1)) {
-	      // Command is "CHECK METHOD"
-	      var method;
-	      var object;
+          if (cli.qualifierFound("/BOOKMARK"))
+            bookmarkValue = cli.getQualValue("/BOOKMARK");
 
-	      if ( cli.qualifierFound("/METHOD"))
-		method = cli.getQualValue("/METHOD");
-	      else {
-		console.log( "Cmd: Method is missing\n");
-		return 0;
-	      }
+          fileName += ".html";
+          console.log('Loading helpfile "' + fileName + '"');
+          this.openURL(fileName, bookmarkValue);
+        }
+        local_cmd = true;
+      } else if (command == "CHECK") {
+        if (cli.qualifierFound("cli_arg1")) {
+          var methodstr = "METHOD";
+          var isattributestr = "ISATTRIBUTE";
+          var cli_arg1 = cli.getQualValue("cli_arg1").toUpperCase();
+          if (
+            methodstr.length >= cli_arg1.length &&
+            methodstr.substring(0, cli_arg1.length) == cli_arg1
+          ) {
+            // Command is "CHECK METHOD"
+            var method;
+            var object;
 
-	      if ( cli.qualifierFound("/OBJECT"))
-		object = cli.getQualValue("/OBJECT");
-	      else {
-		console.log( "Cmd: Object is missing\n");
-		return 0;
-	      }
-	    }
+            if (cli.qualifierFound("/METHOD"))
+              method = cli.getQualValue("/METHOD");
+            else {
+              console.log("Cmd: Method is missing\n");
+              return 0;
+            }
 
-	  }
-	}
-	else if ( command == ("SET")) {
-	  return 1;
-	}
-      }
-      else {
-	console.log( "JopSpider: Parse error " + cli.getStsString());
-	return 0;
+            if (cli.qualifierFound("/OBJECT"))
+              object = cli.getQualValue("/OBJECT");
+            else {
+              console.log("Cmd: Object is missing\n");
+              return 0;
+            }
+          } else if (
+            isattributestr.length >= cli_arg1.length &&
+            isattributestr.substring(0, cli_arg1.length) == cli_arg1
+          ) {
+            // Command is "CHECK ISATTRIBUTE"
+            var method;
+            var object;
+
+            if (cli.qualifierFound("/OBJECT"))
+              object = cli.getQualValue("/OBJECT");
+            else {
+              console.log("Cmd: Object is missing\n");
+              return 0;
+            }
+          }
+        } else if (command == "CALL") {
+          if (cli.qualifierFound("cli_arg1")) {
+            var parameter = "METHOD";
+            var cli_arg1 = cli.getQualValue("cli_arg1").toUpperCase();
+            if (
+              parameter.length >= cli_arg1.length &&
+              parameter.substring(0, cli_arg1.length) == cli_arg1
+            ) {
+              // Command is "CHECK METHOD"
+              var method;
+              var object;
+
+              if (cli.qualifierFound("/METHOD"))
+                method = cli.getQualValue("/METHOD");
+              else {
+                console.log("Cmd: Method is missing\n");
+                return 0;
+              }
+
+              if (cli.qualifierFound("/OBJECT"))
+                object = cli.getQualValue("/OBJECT");
+              else {
+                console.log("Cmd: Object is missing\n");
+                return 0;
+              }
+            }
+          }
+        } else if (command == "SET") {
+          return 1;
+        }
+      } else {
+        console.log("JopSpider: Parse error " + cli.getStsString());
+        return 0;
       }
     }
     return 1;
   };
-  this.script = function( script) {
-    console.log( "Appl.script", script);
+  this.script = function (script) {
+    console.log("Appl.script", script);
   };
-  this.openURL = function( url, bookmark) {
-    console.log( "URL: ", url);
-    window.open( url, "_blank");
-  }
-  this.openConfirmDialog = function( dyn, text, object) {
-    var res = confirm( text);
-    if ( res)
-      dyn.confirmedAction( Glow.eEvent_MB1Click, object);
+  this.openURL = function (url, bookmark) {
+    console.log("URL: ", url);
+    window.open(url, "_blank");
   };
-  this.open_objectgraph_cb = function( id, data, sts, result) {
-    if ( (sts & 1) != 0) {
+  this.openConfirmDialog = function (dyn, text, object) {
+    var res = confirm(text);
+    if (res) dyn.confirmedAction(Glow.eEvent_MB1Click, object);
+  };
+  this.open_objectgraph_cb = function (id, data, sts, result) {
+    if ((sts & 1) != 0) {
       console.log("param1", result.param1);
-      data.location.href = "ge.html?graph=" + result.param1 + "&instance=" + result.fullname;
+      data.location.href =
+        "ge.html?graph=" + result.param1 + "&instance=" + result.fullname;
       data.document.title = result.param1 + " " + result.fullname;
-    }
-    else
-      data.document.write("Error status " + sts);
+    } else data.document.write("Error status " + sts);
   };
-
 }
 
 var CFormatC = {
@@ -19959,246 +19494,306 @@ var CFormatC = {
   not_json: /[^j]/,
   text: /^[^\x25]+/,
   modulo: /^\x25{2}/,
-  placeholder: /^\x25(?:([1-9]\d*)\$|\(([^\)]+)\))?(\+)?(0|'[^$])?(-)?(\d+)?(?:\.(\d+))?([b-gijostTuvxXm])/,
+  placeholder:
+    /^\x25(?:([1-9]\d*)\$|\(([^\)]+)\))?(\+)?(0|'[^$])?(-)?(\d+)?(?:\.(\d+))?([b-gijostTuvxXm])/,
   key: /^([a-z_][a-z_\d]*)/i,
   key_access: /^\.([a-z_][a-z_\d]*)/i,
   index_access: /^\[(\d+)\]/,
-  sign: /^[\+\-]/
+  sign: /^[\+\-]/,
 };
 
 function GlowCFormat(key) {
   this.parse_tree;
 
-  this.format = function() {
-        var argv = arguments;
-        var cursor = 0, tree_length = this.parse_tree.length, arg, output = '', i, k, ph, pad, pad_character, pad_length, is_positive, sign;
-        for (i = 0; i < tree_length; i++) {
-            if (typeof this.parse_tree[i] === 'string') {
-                output += this.parse_tree[i];
+  this.format = function () {
+    var argv = arguments;
+    var cursor = 0,
+      tree_length = this.parse_tree.length,
+      arg,
+      output = "",
+      i,
+      k,
+      ph,
+      pad,
+      pad_character,
+      pad_length,
+      is_positive,
+      sign;
+    for (i = 0; i < tree_length; i++) {
+      if (typeof this.parse_tree[i] === "string") {
+        output += this.parse_tree[i];
+      } else if (typeof this.parse_tree[i] === "object") {
+        ph = this.parse_tree[i]; // convenience purposes only
+        if (ph.keys) {
+          // keyword argument
+          arg = argv[cursor];
+          for (k = 0; k < ph.keys.length; k++) {
+            if (arg == undefined) {
+              throw new Error(
+                sprintf(
+                  '[sprintf] Cannot access property "%s" of undefined value "%s"',
+                  ph.keys[k],
+                  ph.keys[k - 1],
+                ),
+              );
             }
-            else if (typeof this.parse_tree[i] === 'object') {
-                ph = this.parse_tree[i]; // convenience purposes only
-                if (ph.keys) { // keyword argument
-                    arg = argv[cursor];
-                    for (k = 0; k < ph.keys.length; k++) {
-                        if (arg == undefined) {
-                            throw new Error(sprintf('[sprintf] Cannot access property "%s" of undefined value "%s"', ph.keys[k], ph.keys[k-1]));
-                        }
-                        arg = arg[ph.keys[k]];
-                    }
-                }
-                else if (ph.param_no) { // positional argument (explicit)
-                    arg = argv[ph.param_no];
-                }
-                else { // positional argument (implicit)
-                    arg = argv[cursor++];
-                }
-
-                if (CFormatC.not_type.test(ph.type) && CFormatC.not_primitive.test(ph.type) && arg instanceof Function) {
-                    arg = arg();
-                }
-
-                if (CFormatC.numeric_arg.test(ph.type) && (typeof arg !== 'number' && isNaN(arg))) {
-                    throw new TypeError( "[sprintf] expecting number but found");
-                }
-
-                if (CFormatC.number.test(ph.type)) {
-                    is_positive = arg >= 0;
-                }
-
-                switch (ph.type) {
-                    case 'b':
-                        arg = parseInt(arg, 10).toString(2);
-                        break;
-                    case 'c':
-                        arg = String.fromCharCode(parseInt(arg, 10));
-                        break;
-                    case 'd':
-                    case 'i':
-                        arg = parseInt(arg, 10);
-                        break;
-                    case 'j':
-                        arg = JSON.stringify(arg, null, ph.width ? parseInt(ph.width,10) : 0);
-                        break;
-                    case 'e':
-                        arg = ph.precision ? parseFloat(arg).toExponential(ph.precision) : parseFloat(arg).toExponential();
-                        break;
-                    case 'f':
-                        arg = ph.precision ? parseFloat(arg).toFixed(ph.precision) : parseFloat(arg);
-                        break;
-                    case 'g':
-                        arg = ph.precision ? String(Number(arg.toPrecision(ph.precision))) : parseFloat(arg);
-                        break;
-                    case 'o':
-                        arg = (parseInt(arg, 10) >>> 0).toString(8);
-                        break;
-                    case 's':
-                        arg = String(arg);
-                        arg = (ph.precision ? arg.substring(0, ph.precision) : arg);
-                        break;
-                    case 't':
-                        arg = String(!!arg);
-                        arg = (ph.precision ? arg.substring(0, ph.precision) : arg);
-                        break;
-                    case 'T':
-                        arg = Object.prototype.toString.call(arg).slice(8, -1).toLowerCase();
-                        arg = (ph.precision ? arg.substring(0, ph.precision) : arg);
-                        break;
-                    case 'u':
-                        arg = parseInt(arg, 10) >>> 0;
-                        break;
-                    case 'v':
-                        arg = arg.valueOf();
-                        arg = (ph.precision ? arg.substring(0, ph.precision) : arg);
-                        break;
-                    case 'x':
-                         arg = (parseInt(arg, 10) >>> 0).toString(16);
-                        break;
-                    case 'X':
-                        arg = (parseInt(arg, 10) >>> 0).toString(16).toUpperCase();
-                        break;
-                    case 'm':
-                        arg = "Msg: " + parseInt(arg, 10);
-                        break;
-                }
-                if (CFormatC.json.test(ph.type)) {
-                    output += arg;
-                }
-                else {
-                    if (CFormatC.number.test(ph.type) && (!is_positive || ph.sign)) {
-                        sign = is_positive ? '+' : '-';
-                        arg = arg.toString().replace(CFormatC.sign, '');
-                    }
-                    else {
-                        sign = '';
-                    }
-                    pad_character = ph.pad_char ? ph.pad_char === '0' ? '0' : ph.pad_char.charAt(1) : ' ';
-                    pad_length = ph.width - (sign + arg).length;
-		    var pad_rpt = '';
-		    for ( var i = 0; i < pad_length; i++)
-		      pad_rpt += pad_character;
-                    pad = ph.width ? (pad_length > 0 ? pad_rpt : '') : '';
-                    output += ph.align ? sign + arg + pad : (pad_character === '0' ? sign + pad + arg : pad + sign + arg);
-                }
-            }
+            arg = arg[ph.keys[k]];
+          }
+        } else if (ph.param_no) {
+          // positional argument (explicit)
+          arg = argv[ph.param_no];
+        } else {
+          // positional argument (implicit)
+          arg = argv[cursor++];
         }
-        return output;
-    };
 
-    // var sprintf_cache = Object.create(null)
+        if (
+          CFormatC.not_type.test(ph.type) &&
+          CFormatC.not_primitive.test(ph.type) &&
+          arg instanceof Function
+        ) {
+          arg = arg();
+        }
 
-    this.parse = function(fmt) {
-        // if (sprintf_cache[fmt]) {
-        //    return sprintf_cache[fmt]
-        //}
+        if (
+          CFormatC.numeric_arg.test(ph.type) &&
+          typeof arg !== "number" &&
+          isNaN(arg)
+        ) {
+          throw new TypeError("[sprintf] expecting number but found");
+        }
 
-        var _fmt = fmt, match, parse_tree = [], arg_names = 0;
-        while (_fmt) {
-            if ((match = CFormatC.text.exec(_fmt)) !== null) {
-                parse_tree.push(match[0]);
-            }
-            else if ((match = CFormatC.modulo.exec(_fmt)) !== null) {
-                parse_tree.push('%');
-            }
-            else if ((match = CFormatC.placeholder.exec(_fmt)) !== null) {
-                if (match[2]) {
-                    arg_names |= 1;
-                    var field_list = [], replacement_field = match[2], field_match = [];
-                    if ((field_match = CFormatC.key.exec(replacement_field)) !== null) {
-                        field_list.push(field_match[1]);
-                        while ((replacement_field = replacement_field.substring(field_match[0].length)) !== '') {
-                            if ((field_match = CFormatC.key_access.exec(replacement_field)) !== null) {
-                                field_list.push(field_match[1]);
-                            }
-                            else if ((field_match = CFormatC.index_access.exec(replacement_field)) !== null) {
-                                field_list.push(field_match[1]);
-                            }
-                            else {
-                                throw new SyntaxError('[sprintf] failed to parse named argument key');
-                            }
-                        }
-                    }
-                    else {
-                        throw new SyntaxError('[sprintf] failed to parse named argument key');
-                    }
-                    match[2] = field_list;
-                }
-                else {
-                    arg_names |= 2;
-                }
-                if (arg_names === 3) {
-                    throw new Error('[sprintf] mixing positional and named placeholders is not (yet) supported');
-                }
+        if (CFormatC.number.test(ph.type)) {
+          is_positive = arg >= 0;
+        }
 
-                parse_tree.push(
-                    {
-                        placeholder: match[0],
-                        param_no:    match[1],
-                        keys:        match[2],
-                        sign:        match[3],
-                        pad_char:    match[4],
-                        align:       match[5],
-                        width:       match[6],
-                        precision:   match[7],
-                        type:        match[8]
-                    }
+        switch (ph.type) {
+          case "b":
+            arg = parseInt(arg, 10).toString(2);
+            break;
+          case "c":
+            arg = String.fromCharCode(parseInt(arg, 10));
+            break;
+          case "d":
+          case "i":
+            arg = parseInt(arg, 10);
+            break;
+          case "j":
+            arg = JSON.stringify(
+              arg,
+              null,
+              ph.width ? parseInt(ph.width, 10) : 0,
+            );
+            break;
+          case "e":
+            arg = ph.precision
+              ? parseFloat(arg).toExponential(ph.precision)
+              : parseFloat(arg).toExponential();
+            break;
+          case "f":
+            arg = ph.precision
+              ? parseFloat(arg).toFixed(ph.precision)
+              : parseFloat(arg);
+            break;
+          case "g":
+            arg = ph.precision
+              ? String(Number(arg.toPrecision(ph.precision)))
+              : parseFloat(arg);
+            break;
+          case "o":
+            arg = (parseInt(arg, 10) >>> 0).toString(8);
+            break;
+          case "s":
+            arg = String(arg);
+            arg = ph.precision ? arg.substring(0, ph.precision) : arg;
+            break;
+          case "t":
+            arg = String(!!arg);
+            arg = ph.precision ? arg.substring(0, ph.precision) : arg;
+            break;
+          case "T":
+            arg = Object.prototype.toString
+              .call(arg)
+              .slice(8, -1)
+              .toLowerCase();
+            arg = ph.precision ? arg.substring(0, ph.precision) : arg;
+            break;
+          case "u":
+            arg = parseInt(arg, 10) >>> 0;
+            break;
+          case "v":
+            arg = arg.valueOf();
+            arg = ph.precision ? arg.substring(0, ph.precision) : arg;
+            break;
+          case "x":
+            arg = (parseInt(arg, 10) >>> 0).toString(16);
+            break;
+          case "X":
+            arg = (parseInt(arg, 10) >>> 0).toString(16).toUpperCase();
+            break;
+          case "m":
+            arg = "Msg: " + parseInt(arg, 10);
+            break;
+        }
+        if (CFormatC.json.test(ph.type)) {
+          output += arg;
+        } else {
+          if (CFormatC.number.test(ph.type) && (!is_positive || ph.sign)) {
+            sign = is_positive ? "+" : "-";
+            arg = arg.toString().replace(CFormatC.sign, "");
+          } else {
+            sign = "";
+          }
+          pad_character = ph.pad_char
+            ? ph.pad_char === "0"
+              ? "0"
+              : ph.pad_char.charAt(1)
+            : " ";
+          pad_length = ph.width - (sign + arg).length;
+          var pad_rpt = "";
+          for (var i = 0; i < pad_length; i++) pad_rpt += pad_character;
+          pad = ph.width ? (pad_length > 0 ? pad_rpt : "") : "";
+          output += ph.align
+            ? sign + arg + pad
+            : pad_character === "0"
+              ? sign + pad + arg
+              : pad + sign + arg;
+        }
+      }
+    }
+    return output;
+  };
+
+  // var sprintf_cache = Object.create(null)
+
+  this.parse = function (fmt) {
+    // if (sprintf_cache[fmt]) {
+    //    return sprintf_cache[fmt]
+    //}
+
+    var _fmt = fmt,
+      match,
+      parse_tree = [],
+      arg_names = 0;
+    while (_fmt) {
+      if ((match = CFormatC.text.exec(_fmt)) !== null) {
+        parse_tree.push(match[0]);
+      } else if ((match = CFormatC.modulo.exec(_fmt)) !== null) {
+        parse_tree.push("%");
+      } else if ((match = CFormatC.placeholder.exec(_fmt)) !== null) {
+        if (match[2]) {
+          arg_names |= 1;
+          var field_list = [],
+            replacement_field = match[2],
+            field_match = [];
+          if ((field_match = CFormatC.key.exec(replacement_field)) !== null) {
+            field_list.push(field_match[1]);
+            while (
+              (replacement_field = replacement_field.substring(
+                field_match[0].length,
+              )) !== ""
+            ) {
+              if (
+                (field_match = CFormatC.key_access.exec(replacement_field)) !==
+                null
+              ) {
+                field_list.push(field_match[1]);
+              } else if (
+                (field_match =
+                  CFormatC.index_access.exec(replacement_field)) !== null
+              ) {
+                field_list.push(field_match[1]);
+              } else {
+                throw new SyntaxError(
+                  "[sprintf] failed to parse named argument key",
                 );
+              }
             }
-            else {
-                throw new SyntaxError('[sprintf] unexpected placeholder');
-            }
-            _fmt = _fmt.substring(match[0].length);
+          } else {
+            throw new SyntaxError(
+              "[sprintf] failed to parse named argument key",
+            );
+          }
+          match[2] = field_list;
+        } else {
+          arg_names |= 2;
         }
-        return parse_tree;
-    };
+        if (arg_names === 3) {
+          throw new Error(
+            "[sprintf] mixing positional and named placeholders is not (yet) supported",
+          );
+        }
 
-  this.parse_tree = this.parse( key);
+        parse_tree.push({
+          placeholder: match[0],
+          param_no: match[1],
+          keys: match[2],
+          sign: match[3],
+          pad_char: match[4],
+          align: match[5],
+          width: match[6],
+          precision: match[7],
+          type: match[8],
+        });
+      } else {
+        throw new SyntaxError("[sprintf] unexpected placeholder");
+      }
+      _fmt = _fmt.substring(match[0].length);
+    }
+    return parse_tree;
+  };
+
+  this.parse_tree = this.parse(key);
 }
 
-window.addEventListener('resize', function(event) {
-  var graph = graph_get_stored_graph();
-  if (!graph)
-    return;
+window.addEventListener(
+  "resize",
+  function (event) {
+    var graph = graph_get_stored_graph();
+    if (!graph) return;
 
-  var old_zx = graph.ctx.mw.zoom_factor_x;
-  var old_zy = graph.ctx.mw.zoom_factor_y;
-  var zx = window.innerWidth / (graph.ctx.x1 - graph.ctx.x0);
-  var zy = window.innerHeight / (graph.ctx.y1 - graph.ctx.y0);
-  graph.ctx.mw.zoom_factor_x = zx;
-  graph.ctx.mw.zoom_factor_y = zy;
-  if (graph.ctx.mw.zoom_factor_y < graph.ctx.mw.zoom_factor_x)
-    graph.ctx.mw.zoom_factor_x = graph.ctx.mw.zoom_factor_y;
-  else
-    graph.ctx.mw.zoom_factor_y = graph.ctx.mw.zoom_factor_x;
-  graph.ctx.gdraw.canvas.width = (graph.ctx.x1 - graph.ctx.x0) * graph.ctx.mw.zoom_factor_x;
-  graph.ctx.gdraw.canvas.height = (graph.ctx.y1 - graph.ctx.y0) * graph.ctx.mw.zoom_factor_y;
-  if (!graph.resized) {
-    graph.resized = true;
+    var old_zx = graph.ctx.mw.zoom_factor_x;
+    var old_zy = graph.ctx.mw.zoom_factor_y;
+    var zx = window.innerWidth / (graph.ctx.x1 - graph.ctx.x0);
+    var zy = window.innerHeight / (graph.ctx.y1 - graph.ctx.y0);
+    graph.ctx.mw.zoom_factor_x = zx;
+    graph.ctx.mw.zoom_factor_y = zy;
+    if (graph.ctx.mw.zoom_factor_y < graph.ctx.mw.zoom_factor_x)
+      graph.ctx.mw.zoom_factor_x = graph.ctx.mw.zoom_factor_y;
+    else graph.ctx.mw.zoom_factor_y = graph.ctx.mw.zoom_factor_x;
+    graph.ctx.gdraw.canvas.width =
+      (graph.ctx.x1 - graph.ctx.x0) * graph.ctx.mw.zoom_factor_x;
+    graph.ctx.gdraw.canvas.height =
+      (graph.ctx.y1 - graph.ctx.y0) * graph.ctx.mw.zoom_factor_y;
+    if (!graph.resized) {
+      graph.resized = true;
+      graph.windowInnerWidth = window.innerWidth;
+      graph.windowInnerHeight = window.innerHeight;
+      return;
+    }
+    if (
+      (graph.windowInnerWidth < 300 && window.innerWidth >= 300) ||
+      (graph.windowInnerWidth >= 300 && window.innerWidth < 300) ||
+      (graph.windowInnerWidth < 500 && window.innerWidth >= 500) ||
+      (graph.windowInnerWidth >= 500 && window.innerWidth < 500) ||
+      (graph.windowInnerWidth < 700 && window.innerWidth >= 700) ||
+      (graph.windowInnerWidth >= 700 && window.innerWidth < 700) ||
+      (graph.windowInnerWidth < 1000 && window.innerWidth >= 1000) ||
+      (graph.windowInnerWidth >= 1000 && window.innerWidth < 1000) ||
+      (graph.windowInnerHeight < 300 && window.innerHeight >= 300) ||
+      (graph.windowInnerHeight >= 300 && window.innerHeight < 300) ||
+      (graph.windowInnerHeight < 500 && window.innerHeight >= 500) ||
+      (graph.windowInnerHeight >= 500 && window.innerHeight < 500) ||
+      (graph.windowInnerHeight < 700 && window.innerHeight >= 700) ||
+      (graph.windowInnerHeight >= 700 && window.innerHeight < 700) ||
+      (graph.windowInnerHeight < 1000 && window.innerHeight >= 1000) ||
+      (graph.windowInnerHeight >= 1000 && window.innerHeight < 1000)
+    )
+      window.location.reload();
     graph.windowInnerWidth = window.innerWidth;
     graph.windowInnerHeight = window.innerHeight;
-    return;
-  }
-  if ((graph.windowInnerWidth < 300 && window.innerWidth >= 300) || 
-      (graph.windowInnerWidth >= 300 && window.innerWidth < 300) ||
-      (graph.windowInnerWidth < 500 && window.innerWidth >= 500) || 
-      (graph.windowInnerWidth >= 500 && window.innerWidth < 500) ||
-      (graph.windowInnerWidth < 700 && window.innerWidth >= 700) || 
-      (graph.windowInnerWidth >= 700 && window.innerWidth < 700) ||
-      (graph.windowInnerWidth < 1000 && window.innerWidth >= 1000) || 
-      (graph.windowInnerWidth >= 1000 && window.innerWidth < 1000) ||
-      (graph.windowInnerHeight < 300 && window.innerHeight >= 300) || 
-      (graph.windowInnerHeight >= 300 && window.innerHeight < 300) ||
-      (graph.windowInnerHeight < 500 && window.innerHeight >= 500) || 
-      (graph.windowInnerHeight >= 500 && window.innerHeight < 500) ||
-      (graph.windowInnerHeight < 700 && window.innerHeight >= 700) || 
-      (graph.windowInnerHeight >= 700 && window.innerHeight < 700) ||
-      (graph.windowInnerHeight < 1000 && window.innerHeight >= 1000) || 
-      (graph.windowInnerHeight >= 1000 && window.innerHeight < 1000))
-    window.location.reload();
-  graph.windowInnerWidth = window.innerWidth;
-  graph.windowInnerHeight = window.innerHeight;
-}, true);
+  },
+  true,
+);
 
 var appl = new Appl();
-
-

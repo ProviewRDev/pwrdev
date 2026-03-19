@@ -15,9 +15,11 @@
     - [Build from source](#build-from-source)
     - [Installing using prebuilt .deb packages](#installing-using-prebuilt-deb-packages)
   - [Usage](#usage)
+    - [Web application source code in java/jsw](#web-application-source-code-in-javajsw)
   - [Contributing](#contributing)
   - [License](#license)
   - [Acknowledgements](#acknowledgements)
+  - [Changelog](#changelog)
 
 ## Prerequisites
 
@@ -42,6 +44,17 @@ TODO
 ## Usage
 
 For more examples and usage, please refer to the [Wiki](https://pwrgitlab.ssab.com/pwrdev/qbus/wikis/home).
+
+### Web application source code in java/jsw
+
+Run
+
+```sh
+npm install
+npm run format
+```
+
+to format all source code in java/jsw.
 
 ## Contributing
 
