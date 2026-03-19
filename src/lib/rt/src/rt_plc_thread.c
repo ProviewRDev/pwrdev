@@ -657,6 +657,7 @@ static void scan(plc_sThread* tp)
     time_GetTimeMonotonic(&tp->before_scan);
     time_GetTime(&tp->before_scan_abs);
 
+    /* i_scan_time is in ms (min 1), see rt_plc_process.c for sub-ms handling */
     sts = plc_redu_receive(tp, tp->i_scan_time);
     if (EVEN(sts))
     {

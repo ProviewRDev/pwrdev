@@ -636,7 +636,13 @@ static void create_thread(plc_sThread* tp, plc_sProctbl* ptp, plc_sProcess* pp)
   tp->PlcThread = pwrb_PlcThread_Init(&sts, tp);
   tp->csup_lh = csup_Init(&sts, ptp->thread, tp->f_scan_time);
 
+  /* i_scan_time is in milliseconds, used as qcom timeout for redundancy receive.
+     For sub-millisecond scan times the conversion truncates to 0 which equals
+     qcom_cTmoNone (non-blocking), causing the passive redundancy node to
+     busy-spin instead of pacing itself. Clamp to a minimum of 1 ms. */
   tp->i_scan_time = tp->f_scan_time * 1000.0 + 0.5;
+  if (tp->i_scan_time < 1 && tp->f_scan_time > 0)
+    tp->i_scan_time = 1;
 
   time_FloatToD(&tp->scan_time, tp->f_scan_time);
 
