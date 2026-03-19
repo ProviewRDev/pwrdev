@@ -3690,9 +3690,15 @@ som dessa attribute pekar på visas med &() syntax.
 betyder att H1-H2-Motor.Object innehåller en pekare till ett objekt, och det är till 
 ActualValue attributet i detta objekt kopplingen kommer att göras.
 
-Kopplingen görs när grafen öppnas, och om pekaren in H1-H2-Motor.Object ändras, kommer
-kopplingen inte automatiskt att ändras. Dynamiken DigSwap kan dock användas för att
-koppla om alla kopplingar i en graf.
+Kopplingen görs när grafen öppnas, och om pekaren i H1-H2-Motor.Object ändras, kommer
+kopplingen inte automatiskt att ändras om inte objektet också har dynamiken RefUpdate.
+RefUpdate.Attribute ska då sättas till själva referensen, t ex
+
+<c>&(H1-H2-Motor.Object)
+
+När referensen ändras kopplar RefUpdate om de andra dynamikerna på samma objekt.
+DigSwap, eller RefUpdate.WholeGraph, kan användas när alla kopplingar i grafen ska
+kopplas om.
 
 <b>Variabelt vektorindex
 Vektorindex kan specificeras med attribut av typen Int32 eller UInt32. I
@@ -3836,6 +3842,7 @@ DigTransparency <t>Boolean   <t>Skiftar transparens beroende på en digital signa
 AnalogTransparency <t>Float32  <t>Skiftar transparens beroende på en analog signal. <link>GeDynAnalogTransparency
 ColorThemeLightness <t>-  <t>Anpassa ljusheten hos en komponent till färgtemat. <link>GeDynColorThemeLightness
 DigSwap   <t>Boolean  <t>Starta om alla prenumerationer i en graf. <link>GeDynDigSwap
+RefUpdate <t>Objid AttrRef <t>Koppla om indirekta dynamiker när en referens ändras. <link>GeDynRefUpdate
 UnitConvert <t>Float32  <t>Konvertera värdets enhet före visning. <link>GeDynUnitConvert
 HostObject <t>Object  <t>Dynamik för komplexa komponenter. <link>GeDynHostObject
 
@@ -4212,6 +4219,10 @@ Value.DecimalsAttr <t><t>Heltalssignal som anger antal decimaler.
 Value.DecimalsDecrease <t><t>Antalet decimaler kommer att minskas med angivet värde.
 Value.Instances <t><t>Mask för instanser, där instanser kan skapas och tas bort.
 
+Om Value.Attribute använder &()-syntaxen för att dereferera en Objid eller AttrRef,
+utvärderas kopplingen när grafen öppnas. Lägg till RefUpdate på samma objekt om det
+visade värdet ska följa en ändrad referens utan att grafen stängs och öppnas igen.
+
 <h2>Format
 För följande attribut typer finns ytterligare format definierade.
 
@@ -4517,9 +4528,39 @@ som pekar på ett objekt som innehåller attributet Lengh. Om referensen in H1-Pla
 ändras måste prenumerationerna kopplas om till den nya referensen, och det görs av DigSwap.
 DigSwap kopplas till en digital signal som aktiverar omkopplingen. 
 
+Om bara de indirekta dynamikerna på ett enskilt objekt ska följa en ändrad referens,
+är RefUpdate ofta ett bättre val. DigSwap är avsett för att koppla om hela grafen.
+
 <b>Attribut <t><t>Beskrivning
 DigSwap.Attribute <t><t>Signal i databasen av typ Boolean som ska trigga omkopplingen.
 DigSwap.ResetValue <t><t>När trigg-signalen har upptäcks återställs den av DigSwap-funktionen.
+</topic>
+
+<topic>GeDynRefUpdate <style>function
+RefUpdate
+
+RefUpdate övervakar en indirekt referens som används av de andra dynamikerna på samma
+objekt, och kopplar om dessa dynamiker när referensen ändras. Den är avsedd för
+kopplingar med &()-syntax, t ex
+
+<c>Value.Attribute &(H1-Plate.Ref).Length##Float32
+
+I det här exemplet är H1-Plate.Ref en Objid eller AttrRef som pekar på ett objekt som
+innehåller attributet Length. För att Value-dynamiken ska följa en ändrad referens utan
+att grafen stängs och öppnas igen, lägg till
+
+<c>RefUpdate.Attribute &(H1-Plate.Ref)
+
+När referensen ändras kopplar RefUpdate ner och upp de andra dynamikerna på objektet igen.
+Om RefUpdate.WholeGraph är satt, kopplas hela grafen om i stället.
+
+Observera att RefUpdate.Attribute ska innehålla själva referensen med &()-syntax. Ett
+vanligt attributnamn som H1-Plate.Ref triggar inte en omkoppling.
+
+<b>Attribut <t><t>Beskrivning
+RefUpdate.Attribute <t><t>Referensattribut av typen Objid eller AttrRef som ska övervakas.
+                    <t><t>Ange referensen med &()-syntax.
+RefUpdate.WholeGraph <t><t>Koppla om hela grafen i stället för bara det aktuella objektet.
 </topic>
 
 <topic>GeDynUnitConvert <style>function

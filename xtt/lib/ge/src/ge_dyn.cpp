@@ -18059,6 +18059,35 @@ void GeRefUpdate::open(std::ifstream& fp)
   }
 }
 
+
+static size_t ge_refupdate_copy_size(int size)
+{
+  if (size <= 0)
+    return 0;
+
+  return size > (int)sizeof(GeRefUpdate::value_u) ? sizeof(GeRefUpdate::value_u) : (size_t)size;
+}
+
+static void ge_refupdate_store_value(GeRefUpdate::value_u* dst, const void* src, int size)
+{
+  memset(dst, 0, sizeof(*dst));
+
+  size_t copy_size = ge_refupdate_copy_size(size);
+  if (!src || copy_size == 0)
+    return;
+
+  memcpy(dst, src, copy_size);
+}
+
+static bool ge_refupdate_value_changed(const void* src, const GeRefUpdate::value_u* old, int size)
+{
+  size_t copy_size = ge_refupdate_copy_size(size);
+  if (!src || copy_size == 0)
+    return false;
+
+  return memcmp(src, old, copy_size) != 0;
+}
+
 int GeRefUpdate::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   int sts;
@@ -18221,13 +18250,13 @@ int GeRefUpdate::scan(grow_tObject object)
 
     if (first_scan)
     {
-      idx_old_value[i] = *idx_p[i];
+      ge_refupdate_store_value(&idx_old_value[i], idx_p[i], idx_ref_size[i]);
       if (i == idx_ref_cnt - 1 && ref_cnt == 0)
         first_scan = false;
       continue;
     }
 
-    if (memcmp(idx_p[i], &idx_old_value[i], sizeof(pwr_tAttrRef)) != 0)
+    if (ge_refupdate_value_changed(idx_p[i], &idx_old_value[i], idx_ref_size[i]))
     {
       update = true;
       break;
@@ -18244,13 +18273,13 @@ int GeRefUpdate::scan(grow_tObject object)
 
     if (first_scan)
     {
-      old_value[i] = *p[i];
+      ge_refupdate_store_value(&old_value[i], p[i], ref_size[i]);
       if (i == ref_cnt - 1)
         first_scan = false;
       continue;
     }
 
-    if (memcmp(p[i], &old_value[i], sizeof(pwr_tAttrRef)) != 0)
+    if (ge_refupdate_value_changed(p[i], &old_value[i], ref_size[i]))
     {
       update = true;
       level = i;
@@ -18263,9 +18292,9 @@ int GeRefUpdate::scan(grow_tObject object)
     glow_sTraceData td;
 
     for (int i = 0; i < ref_cnt; i++)
-      old_value[i] = *p[i];
+      ge_refupdate_store_value(&old_value[i], p[i], ref_size[i]);
     for (int i = 0; i < idx_ref_cnt; i++)
-      idx_old_value[i] = *idx_p[i];
+      ge_refupdate_store_value(&idx_old_value[i], idx_p[i], idx_ref_size[i]);
 
     if (whole_graph)
     {
@@ -18291,9 +18320,9 @@ int GeRefUpdate::scan(grow_tObject object)
       connect(object, level + 1);
 
       for (int i = 0; i < ref_cnt; i++)
-        old_value[i] = *p[i];
+        ge_refupdate_store_value(&old_value[i], p[i], ref_size[i]);
       for (int i = 0; i < idx_ref_cnt; i++)
-        idx_old_value[i] = *idx_p[i];
+        ge_refupdate_store_value(&idx_old_value[i], idx_p[i], idx_ref_size[i]);
     }
   }
   return 1;

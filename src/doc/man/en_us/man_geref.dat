@@ -3717,8 +3717,14 @@ means that H1-H2-Motor.Object contains a pointer to an object, and it is to the
 ActualValue attribute of this object the connection is made.
 
 The connection is made when the graph is opened, and if the pointer in H1-H2-Motor.Object
-is changed, the connection will not be automatically changed. The dynamic DigSwap though 
-can be used to reconnect all connections in a graph.
+is changed, the connection will not be automatically changed unless the object also has
+the RefUpdate dynamic. RefUpdate.Attribute should then be set to the reference itself, eg
+
+<c>&(H1-H2-Motor.Object)
+
+When the reference changes, RefUpdate reconnects the other dynamics on the same object.
+DigSwap, or RefUpdate.WholeGraph, can be used when all connections in the graph should be
+reconnected.
 
 <b>Variable array index
 Array indexes can be specified with attributes of type Int32 or UInt32. In
@@ -3867,6 +3873,7 @@ AnalogTransparency <t>Float32  <t>Set transparency depending on the value of an 
 	  <t>		<t>analog signal.
 ColorThemeLightness <t>-  <t>Adapt lightness of component to color theme. <link>GeDynColorThemeLightness
 DigSwap   <t>Boolean  <t>Restart all subscriptions in the graph. <link>GeDynDigSwap
+RefUpdate <t>Objid AttrRef <t>Reconnect indirect dynamics when a reference changes. <link>GeDynRefUpdate
 UnitConvert <t>Float32  <t>Convert value unit before displaying in value field. <link>GeDynUnitConvert
 HostObject <t>Object  <t>Complex component dynamics. <link>GeDynHostObject
 
@@ -4255,6 +4262,10 @@ Value.DecimalsDecrease <t><t>The number of decimals will be decremented
 		<t><t>the specified amount.
 Value.Instances <t><t>Instance mask where instances can be added or removed.
 
+If Value.Attribute uses the &() syntax to dereference an Objid or AttrRef, the connection is
+resolved when the graph is opened. Add RefUpdate to the same object if the displayed value
+should follow a changed reference without closing and reopening the graph.
+
 <h2>Format
 For the following attributes types, some additional format strings are defined.
 
@@ -4604,11 +4615,41 @@ that points to an object containing the Length attribute. If the reference in H1
 is changed, the subscriptions has to be reconnected to the new reference, and this is done
 by DigSwap. DigSwap is connected to a digital signal that will activate the swap.
 
+If only the indirect dynamics on a single object need to follow a changed reference,
+RefUpdate is often a better choice. DigSwap is intended for reconnecting the whole graph.
+
 <b>Attribute <t><t>Description
 DigSwap.Attribute <t><t>Signal in the database of type Boolean that
  <t><t>will trigger the swap.
 DigSwap.ResetValue <t><t>When a trigger is detected the connected signal is reset by
  <t><t>the DigSwap function.
+</topic>
+
+<topic>GeDynRefUpdate <style>function
+RefUpdate
+
+RefUpdate monitors an indirect reference used by the other dynamics on the same object, and
+reconnects those dynamics when the reference changes. It is intended for connections with the
+&() syntax, eg
+
+<c>Value.Attribute &(H1-Plate.Ref).Length##Float32
+
+In this example H1-Plate.Ref is an Objid or AttrRef that points to an object containing the
+Length attribute. To make the Value dynamic follow a changed reference without closing and
+reopening the graph, add
+
+<c>RefUpdate.Attribute &(H1-Plate.Ref)
+
+When the reference changes, RefUpdate disconnects and reconnects the other dynamics on the
+object. If RefUpdate.WholeGraph is set, the whole graph is reconnected instead.
+
+Note that RefUpdate.Attribute should contain the reference itself in &() syntax. A plain
+attribute name such as H1-Plate.Ref will not trigger a reconnect.
+
+<b>Attribute <t><t>Description
+RefUpdate.Attribute <t><t>Reference attribute of type Objid or AttrRef that should be
+                    <t><t>monitored. State the reference with &() syntax.
+RefUpdate.WholeGraph <t><t>Reconnect the whole graph instead of only the current object.
 </topic>
 
 <topic>GeDynUnitConvert <style>function

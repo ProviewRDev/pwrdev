@@ -46,9 +46,6 @@
 
 #include "flow_browapi.h"
 
-#include "cow_gtk.h"
-
-#include <gtk/gtk.h>
 #include <optional>
 
 #define xhelp_cFile_BaseXtt pwr_cNameBaseXttHelp

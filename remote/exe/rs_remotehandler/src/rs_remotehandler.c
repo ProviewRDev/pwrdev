@@ -78,6 +78,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "co_dcli.h"
+#include "co_time.h"
 
 #include "pwr_systemclasses.h"
 #include "co_cdh.h"
@@ -104,7 +105,14 @@ typedef struct {
   pwr_tBoolean first;
   pid_t cpid;
   int id;
+  pwr_tUInt32 failure_streak;
+  pwr_tTime last_start;
+  pwr_tTime next_restart;
 } Transport;
+
+#define TRANSPORT_RESTART_HEALTHY_TIME 5.0F
+#define TRANSPORT_RESTART_BACKOFF_MIN 1.0F
+#define TRANSPORT_RESTART_BACKOFF_MAX 30.0F
 
 Transport tp[50];
 int tpcount;
@@ -116,6 +124,65 @@ pwr_sClass_RemoteConfig* remcfgp;
 static void AddTransports();
 
 static int StartTransport(int idx);
+static void RecordTransportExit(int idx);
+
+static void ResetTransportBackoff(Transport* t)
+{
+  t->failure_streak = 0;
+  t->next_restart.tv_sec = 0;
+  t->next_restart.tv_nsec = 0;
+}
+
+static pwr_tFloat32 RestartBackoffDelay(pwr_tUInt32 failure_streak)
+{
+  pwr_tFloat32 delay = TRANSPORT_RESTART_BACKOFF_MIN;
+  pwr_tUInt32 i;
+
+  for (i = 1; i < failure_streak && delay < TRANSPORT_RESTART_BACKOFF_MAX; i++) {
+    delay *= 2.0F;
+  }
+
+  if (delay > TRANSPORT_RESTART_BACKOFF_MAX)
+    delay = TRANSPORT_RESTART_BACKOFF_MAX;
+
+  return delay;
+}
+
+static pwr_tBoolean TransportRestartDue(Transport* t)
+{
+  pwr_tTime now;
+
+  if (t->next_restart.tv_sec == 0 && t->next_restart.tv_nsec == 0)
+    return 1;
+
+  time_GetTimeMonotonic(&now);
+  return time_Acomp(&now, &t->next_restart) != -1;
+}
+
+static void RecordTransportExit(int idx)
+{
+  pwr_tTime now;
+  pwr_tDeltaTime delay;
+  pwr_tFloat32 runtime;
+
+  if (idx >= tpcount || idx < 0)
+    return;
+
+  tp[idx].cpid = -1;
+  time_GetTimeMonotonic(&now);
+
+  if (tp[idx].last_start.tv_sec != 0 || tp[idx].last_start.tv_nsec != 0) {
+    runtime = time_AdiffToFloat(&now, &tp[idx].last_start);
+    if (runtime >= TRANSPORT_RESTART_HEALTHY_TIME) {
+      ResetTransportBackoff(&tp[idx]);
+      return;
+    }
+  }
+
+  tp[idx].failure_streak++;
+  time_FloatToD(&delay, RestartBackoffDelay(tp[idx].failure_streak));
+  time_Aadd(&tp[idx].next_restart, &now, &delay);
+}
 
 /************************************************************************
 *
@@ -451,14 +518,24 @@ static int StartTransport(int idx)
   if (idx >= tpcount || idx < 0)
     return -1;
 
-  if (*tp[idx].disable || (*tp[idx].restarts >= *tp[idx].restart_limit)) {
+  if (*tp[idx].disable
+      || (*tp[idx].restart_limit != 0
+          && *tp[idx].restarts >= *tp[idx].restart_limit)) {
     tp[idx].cpid = -1;
     return -1;
+  }
+
+  if (!TransportRestartDue(&tp[idx])) {
+    tp[idx].cpid = -1;
+    return 0;
   }
 
   if (!tp[idx].first)
     (*tp[idx].restarts)++;
   tp[idx].first = false;
+  time_GetTimeMonotonic(&tp[idx].last_start);
+  tp[idx].next_restart.tv_sec = 0;
+  tp[idx].next_restart.tv_nsec = 0;
 
   memset(arg1, 0, sizeof(arg1));
   memset(arg2, 0, sizeof(arg2));
@@ -468,8 +545,12 @@ static int StartTransport(int idx)
   sprintf(arg2, "%d", tp[idx].id);
   cdh_OidToString(arg3, sizeof(arg3), tp[idx].objid, 0);
 
-  if (((tp[idx].cpid) = fork())) {
-  } else {
+  tp[idx].cpid = fork();
+  if (tp[idx].cpid < 0) {
+    errh_Error("Can't fork transport %s, %s", tp[idx].path, strerror(errno));
+    RecordTransportExit(idx);
+    res = -1;
+  } else if (tp[idx].cpid == 0) {
     if (execlp(tp[idx].path, arg1, arg2, arg3, (char*)0) < 0) {
       errh_Warning("Can't start transport %s", tp[idx].path);
       res = -1;
@@ -598,9 +679,16 @@ int main()
       qcom_Get(&status, &qid, &get, 100); // TMO == 100 ms
       if (status == QCOM__TMO || status == QCOM__QEMPTY) {
         if (!hotswap) {
-          cpid = waitpid(-1, NULL, WNOHANG);
+          while ((cpid = waitpid(-1, NULL, WNOHANG)) > 0) {
+            for (i = 0; i < tpcount; i++) {
+              if (cpid == tp[i].cpid) {
+                RecordTransportExit(i);
+                break;
+              }
+            }
+          }
           for (i = 0; i < tpcount; i++) {
-            if (tp[i].cpid == -1 || cpid == tp[i].cpid) {
+            if (tp[i].cpid == -1) {
               sts = StartTransport(i);
               //              errh_Warning("Transport %s terminated, restarted
               //              by remotehandler", tp[i].path);

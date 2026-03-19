@@ -46,7 +46,7 @@
 #include "cow_xhelpnav.h"
 #include "rt_errh.h"
 #include "cow_msgwindow.h"
-#include <cow_xhelp_gtk.h>
+#include "cow_xhelp.h"
 
 static int help_cmp_items(const void* node1, const void* node2);
 void doubleclick_action_helper_func(CoXHelpNav* xhelpnav, int sts, char* link, char* bookmark,
@@ -57,12 +57,6 @@ static void xhelpnav_open_URL(CoXHelpNav* xhelpnav, char* url)
 {
   if (xhelpnav->open_URL_cb)
     (xhelpnav->open_URL_cb)(xhelpnav->parent_ctx, url);
-}
-
-static void __attribute__((unused)) xhelpnav_help_message_cb(void* ctx, char sev, char* text)
-{
-  CoXHelpNav* xhelpnav = (CoXHelpNav*)ctx;
-  xhelpnav->message(sev, text);
 }
 
 //
