@@ -38,10 +38,12 @@
 
 #include <stdio.h>
 
+#include <string>
 #include <typeinfo>
 
 #include "co_time.h"
 
+#include "cow_wow.h"
 #include "cow_xhelp.h"
 
 #include "wb_error.h"
@@ -59,6 +61,15 @@ void WPkg::message_cb(void* wpkg, char severity, const char* message)
 void WPkg::set_clock_cursor_cb(void* wpkg) { ((WPkg*)wpkg)->set_clock_cursor(); }
 
 void WPkg::reset_cursor_cb(void* wpkg) { ((WPkg*)wpkg)->reset_cursor(); }
+
+static void wpkg_distribute_error(WPkg* wpkg, const wb_error& e)
+{
+  std::string msg = e.what();
+
+  wpkg->message(' ', msg.c_str());
+  if (wpkg->wow && msg.find('\n') != std::string::npos)
+    wpkg->wow->DisplayError("Distribution Error", msg.c_str());
+}
 
 //
 //  Callbackfunctions from menu entries
@@ -99,7 +110,7 @@ void WPkg::activate_distribute()
       }
       catch (wb_error& e)
       {
-        message(' ', e.what().c_str());
+        wpkg_distribute_error(this, e);
         reset_cursor();
         free(itemlist);
         return;
@@ -126,7 +137,7 @@ void WPkg::activate_distribute()
       }
       catch (wb_error& e)
       {
-        message(' ', e.what().c_str());
+        wpkg_distribute_error(this, e);
         reset_cursor();
         free(itemlist);
         return;
@@ -148,7 +159,7 @@ void WPkg::activate_distribute()
       }
       catch (const wb_error& e)
       {
-        message(' ', e.what().c_str());
+        wpkg_distribute_error(this, e);
         reset_cursor();
         free(itemlist);
         return;

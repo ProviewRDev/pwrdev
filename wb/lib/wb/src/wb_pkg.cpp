@@ -65,6 +65,63 @@ static unsigned int pkg_random()
   return (unsigned int)((double)rand() / ((double)RAND_MAX + 1) * 999999);
 }
 
+static std::string pkg_log_excerpt(const char* log_file, size_t max_size = 4000)
+{
+  FILE* fp = fopen(log_file, "r");
+  if (!fp)
+    return "";
+
+  if (fseek(fp, 0, SEEK_END) != 0) {
+    fclose(fp);
+    return "";
+  }
+
+  long size = ftell(fp);
+  if (size <= 0) {
+    fclose(fp);
+    return "";
+  }
+
+  long start = size > (long)max_size ? size - (long)max_size : 0;
+  if (fseek(fp, start, SEEK_SET) != 0) {
+    fclose(fp);
+    return "";
+  }
+
+  size_t read_size = size - start;
+  std::string text(read_size, '\0');
+  size_t read_cnt = fread(&text[0], 1, read_size, fp);
+  fclose(fp);
+
+  text.resize(read_cnt);
+  if (text.empty())
+    return text;
+
+  if (start > 0) {
+    size_t nl = text.find('\n');
+    if (nl != std::string::npos)
+      text.erase(0, nl + 1);
+    text.insert(0, "...\n");
+  }
+
+  while (!text.empty() && (text[text.size() - 1] == '\n' || text[text.size() - 1] == '\r'))
+    text.erase(text.size() - 1);
+
+  return text;
+}
+
+static std::string pkg_distribute_error(const char* bootnode, const char* pack_log, int sts)
+{
+  std::string msg = std::string("Distribute command failed for boot node \"")
+      + bootnode + "\" (status " + std::to_string(sts) + "), see " + pack_log;
+  std::string excerpt = pkg_log_excerpt(pack_log);
+
+  if (!excerpt.empty())
+    msg += "\n\nLog tail:\n" + excerpt;
+
+  return msg;
+}
+
 wb_pkg::wb_pkg(char* nodelist, bool distribute, bool config_only, bool check, int* new_files)
 {
   if (nodelist)
@@ -949,8 +1006,8 @@ void pkg_node::fetchFiles(bool distribute)
     }
     catch (const co_error& e)
     {
-      sprintf(msg, "Distribute error for node %s: %s", m_name, e.what().c_str());
-      MsgWindow::message('E', msg, msgw_ePop_Yes);
+      std::string emsg = std::string("Distribute error for node ") + m_name + ": " + e.what();
+      MsgWindow::message('E', emsg.c_str(), msgw_ePop_Yes);
       throw;
     }
   }
@@ -960,6 +1017,7 @@ void pkg_node::copyPackage(char* pkg_name)
 {
   char pack_fname[200];
   char pack_log[240];
+  char pack_fifo[240];
   char bootnodes[10][80];
   int bootnode_cnt;
   int sts;
@@ -982,13 +1040,21 @@ void pkg_node::copyPackage(char* pkg_name)
     dcli_translate_filename(pack_fname, pack_fname);
     sprintf(pack_log, "$pwrp_tmp/pkg_copy_%s_%s.log", m_name, bootnodes[i]);
     dcli_translate_filename(pack_log, pack_log);
+    sprintf(pack_fifo, "$pwrp_tmp/pkg_copy_%s_%s.fifo", m_name, bootnodes[i]);
+    dcli_translate_filename(pack_fifo, pack_fifo);
     std::ofstream of(pack_fname);
     if (!of)
       throw wb_error_str(std::string("Unable to open file \"") + pack_fname + "\"");
 
     of << "#!/bin/sh\n"
        << "set -eu" << '\n'
-       << "exec > " << pack_log << " 2>&1\n"
+       << "logfile='" << pack_log << "'\n"
+       << "fifo='" << pack_fifo << "'\n"
+       << "rm -f \"$fifo\"\n"
+       << "mkfifo \"$fifo\"\n"
+       << "trap 'rm -f \"$fifo\"' EXIT HUP INT TERM\n"
+       << "tee \"$logfile\" < \"$fifo\" &\n"
+       << "{\n"
        << "echo \"-- Distribute package " << pkg_name << " to " << bootnodes[i] << " with SSH\"\n"
        << "date \"+-- Started %Y-%m-%d %H:%M:%S\"\n"
        << "cd $pwrp_load\n"
@@ -996,7 +1062,9 @@ void pkg_node::copyPackage(char* pkg_name)
        << "scp " << pkg_name << " " << m_user << "@" << bootnodes[i] << ":" << '\n'
        << "echo \"-- Install package with ssh\"\n"
        << "ssh " << m_user << "@" << bootnodes[i] << " \\$pwr_exe/pwr_pkg.sh -i " << pkg_name << '\n'
-       << "date \"+-- Finished %Y-%m-%d %H:%M:%S\"\n";
+       << "date \"+-- Finished %Y-%m-%d %H:%M:%S\"\n"
+       << "} > \"$fifo\" 2>&1\n"
+       << "wait\n";
     of.close();
 
     // Execute the pack file
@@ -1005,9 +1073,7 @@ void pkg_node::copyPackage(char* pkg_name)
 
     if ((sts = system(cmd)))
     {
-      throw co_error_str(std::string("Distribute command failed for boot node \"")
-          + bootnodes[i] + "\" (status " + std::to_string(sts) + "), see "
-          + pack_log);
+      throw co_error_str(pkg_distribute_error(bootnodes[i], pack_log, sts));
     }
     else
     {
@@ -1040,9 +1106,8 @@ void wb_pkg::copyPackage(char* pkg_name)
   }
   catch (const co_error& e)
   {
-    char msg[200];
-    sprintf(msg, "Distribute error for node %s: %s", node_name, e.what().c_str());
-    MsgWindow::message('E', msg, msgw_ePop_Yes);
+    std::string msg = std::string("Distribute error for node ") + node_name + ": " + e.what();
+    MsgWindow::message('E', msg.c_str(), msgw_ePop_Yes);
     throw;
   }
 }
