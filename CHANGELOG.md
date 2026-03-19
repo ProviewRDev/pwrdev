@@ -72,6 +72,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Closing a subwindow without adding anything to it or building it will no longer end up in an inconsistent state when trying to open that subwindow again.
 - Fixed random flickering of Flags and icons when displaying a ChanCo class item in the device listing in rt_xtt.
 - Double signal connections are now caught by syntaxcheck.
+- Fixed typos, bugs and missing features in the Web interface.
 
 ### Changed
 
