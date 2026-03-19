@@ -1113,6 +1113,11 @@ int dcli_read_line(char* line, int maxsize, FILE* file)
 
 int checkTargetLocation(const char* line, const char* target_word)
 {
+  if (!line || !target_word || target_word[0] == '\0')
+  {
+    return 0;
+  }
+
   size_t length = strlen(line);
   char lowerLine[length + 1];
 
