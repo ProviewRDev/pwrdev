@@ -106,28 +106,28 @@ int main(int argc, char* argv[])
     i = 1/0;
     printf("%d\n", i);
   */
-  if (argc > 1 && streq(argv[1], "-m")) {
+  if (argc > 1 && streq(argv[1], "-m"))
+  {
     io_methods_print();
     exit(0);
   }
 
   pp = init_process(argv[0]);
-  if (!pp) {
+  if (!pp)
+  {
     errh_Fatal("Plc process terminated");
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
   }
 
-  qcom_WaitAnd(
-      &sts, &pp->eventQ, &qcom_cQini, ini_mEvent_newPlcInit, qcom_cTmoEternal);
+  qcom_WaitAnd(&sts, &pp->eventQ, &qcom_cQini, ini_mEvent_newPlcInit, qcom_cTmoEternal);
 
   init_plc(pp, argv[0]);
   create_threads(pp);
   init_threads(pp);
 
   qcom_SignalOr(&sts, &qcom_cQini, ini_mEvent_newPlcInitDone | pp->sigmask);
-  qcom_WaitAnd(
-      &sts, &pp->eventQ, &qcom_cQini, ini_mEvent_newPlcStart, qcom_cTmoEternal);
+  qcom_WaitAnd(&sts, &pp->eventQ, &qcom_cQini, ini_mEvent_newPlcStart, qcom_cTmoEternal);
 
   set_values(pp);
   start_threads(pp);
@@ -138,10 +138,11 @@ int main(int argc, char* argv[])
 
   errh_SetStatus(PWR__SRUN);
 
-  qcom_WaitOr(&sts, &pp->eventQ, &qcom_cQini,
-      ini_mEvent_terminate | ini_mEvent_oldPlcStop, qcom_cTmoEternal, &event);
+  qcom_WaitOr(&sts, &pp->eventQ, &qcom_cQini, ini_mEvent_terminate | ini_mEvent_oldPlcStop, qcom_cTmoEternal,
+              &event);
 
-  switch (event) {
+  switch (event)
+  {
   case ini_mEvent_terminate:
     errh_SetStatus(PWR__SRVTERM);
 
@@ -186,13 +187,15 @@ static plc_sProcess* init_process(char* name)
   errh_SetStatus(PWR__SRVSTARTUP);
 
   pp = (plc_sProcess*)calloc(1, sizeof(*pp));
-  if (pp == NULL) {
+  if (pp == NULL)
+  {
     errh_Fatal("Out of virtual memory");
     exit(0);
   }
 
   sts = gdh_Init("pwr_plc");
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("gdh_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -212,42 +215,52 @@ static plc_sProcess* init_process(char* name)
     pp->is_core = 1;
 
   /* Get PlcProcess object */
-  if (!pp->is_core) {
+  if (!pp->is_core)
+  {
     busid = qcom_MyBus(&sts);
     if (EVEN(sts))
       return 0;
 
     sprintf(busidstr, "_%04d_", busid);
     s = strstr(name, busidstr);
-    if (s) {
+    if (s)
+    {
       strncpy(pp_name, s + 6, sizeof(pp_name));
       if ((s = strchr(pp_name, '.')))
         *s = 0;
-    } else {
+    }
+    else
+    {
       strcpy(pp_name, "");
     }
 
     idx = 0;
     for (sts = gdh_GetClassList(pwr_cClass_PlcProcess, &pp_oid); ODD(sts);
-         sts = gdh_GetNextObject(pp_oid, &pp_oid)) {
+         sts = gdh_GetNextObject(pp_oid, &pp_oid))
+    {
       sts = gdh_ObjidToName(pp_oid, oname, sizeof(oname), cdh_mName_object);
       if (EVEN(sts))
         return 0;
 
-      if (str_NoCaseStrcmp(pp_name, oname) == 0) {
+      if (str_NoCaseStrcmp(pp_name, oname) == 0)
+      {
         found = 1;
         break;
       }
       idx++;
     }
-  } else {
+  }
+  else
+  {
     sts = gdh_GetClassList(pwr_cClass_PlcProcess, &pp_oid);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       found = 1;
       idx = 0;
     }
   }
-  if (!found) {
+  if (!found)
+  {
     errh_Error("PlcProcess object not found, %s", pp_name);
     return 0;
   }
@@ -266,21 +279,24 @@ static plc_sProcess* init_process(char* name)
     return 0;
 
   sts = gdh_GetClassList(pwr_cClass_SimulateConfig, &sim_oid);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sts = gdh_ObjidToPointer(sim_oid, (void*)&pp->SimConfig);
     if (EVEN(sts))
       return 0;
   }
 
   qcom_CreateQ(&sts, &pp->eventQ, NULL, "plcEvent");
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("qcom_CreateQ(eventQ), %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
   }
 
   sts = thread_MutexInit(&pp->io_copy_mutex);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("thread_MutexInit(io_copy_mutex), %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -301,7 +317,8 @@ static pwr_tStatus init_plc(plc_sProcess* pp, char* name)
   pwr_tCid cid;
 
   sts = gdh_GetNodeObject(0, &oid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("gdh_GetNodeObject, %m", sts);
     exit(sts);
   }
@@ -311,11 +328,13 @@ static pwr_tStatus init_plc(plc_sProcess* pp, char* name)
     return sts;
 
 #if defined OS_LINUX
-  if (pp->PlcProcess->CpuMask != 0) {
+  if (pp->PlcProcess->CpuMask != 0)
+  {
     cpu_set_t mask;
 
     CPU_ZERO(&mask);
-    for (i = 0; i < 32; i++) {
+    for (i = 0; i < 32; i++)
+    {
       if (pp->PlcProcess->CpuMask & 1 << i)
         CPU_SET(i, &mask);
     }
@@ -330,7 +349,8 @@ static pwr_tStatus init_plc(plc_sProcess* pp, char* name)
 
   i = 0;
   sts = gdh_GetChild(pp->oid, &thread_oid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_GetObjectClass(thread_oid, &cid);
     if (EVEN(sts))
       return sts;
@@ -340,15 +360,14 @@ static pwr_tStatus init_plc(plc_sProcess* pp, char* name)
 
     sts = gdh_GetNextSibling(thread_oid, &thread_oid);
   }
-  for (; i > sizeof(pp->PlcProcess->PlcThreadObjects)
-           / sizeof(pp->PlcProcess->PlcThreadObjects[0]);
-       i++)
+  for (; i > sizeof(pp->PlcProcess->PlcThreadObjects) / sizeof(pp->PlcProcess->PlcThreadObjects[0]); i++)
     pp->PlcProcess->PlcThreadObjects[i] = pwr_cNObjid;
 
   aproc_RegisterObject(pp->oid);
 
   sts = gdh_GetClassList(pwr_cClass_IOHandler, &io_oid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Error("Found no IOHandler-object\n%m", sts);
     return sts;
   }
@@ -359,8 +378,7 @@ static pwr_tStatus init_plc(plc_sProcess* pp, char* name)
 
   /* Set subscription defaults for PLC job */
 
-  sts = gdh_SetSubscriptionDefaults(
-      (pwr_tInt32)(pp->PlcProcess->SubscriptionInterval * 1000.), 10000);
+  sts = gdh_SetSubscriptionDefaults((pwr_tInt32)(pp->PlcProcess->SubscriptionInterval * 1000.), 10000);
 
   sec = pp->PlcProcess->SubscriptionInterval;
   msec = (int)((pp->PlcProcess->SubscriptionInterval - sec) * 1000.);
@@ -384,7 +402,8 @@ static void init_threads(plc_sProcess* pp)
   pwr_tStatus sts;
   long int phase;
 
-  for (i = 0, tp = pp->thread; i < pp->thread_count; i++, tp++) {
+  for (i = 0, tp = pp->thread; i < pp->thread_count; i++, tp++)
+  {
     /* Tell thread it is time for phase 2.  */
     que_Put(&sts, &tp->q_in, &tp->event, (void*)2);
     phase = (long int)que_Get(&sts, &tp->q_out, NULL, NULL);
@@ -399,7 +418,8 @@ static void start_threads(plc_sProcess* pp)
   pwr_tStatus sts;
   long int phase;
 
-  for (i = 0, tp = pp->thread; i < pp->thread_count; i++, tp++) {
+  for (i = 0, tp = pp->thread; i < pp->thread_count; i++, tp++)
+  {
     /* Tell thread it is time for phase 3, start.  */
     que_Put(&sts, &tp->q_in, &tp->event, (void*)3);
     phase = (long int)que_Get(&sts, &tp->q_out, NULL, NULL);
@@ -414,7 +434,8 @@ static void run_threads(plc_sProcess* pp)
   pwr_tStatus sts;
   long int phase;
 
-  for (i = 0, tp = pp->thread; i < pp->thread_count; i++, tp++) {
+  for (i = 0, tp = pp->thread; i < pp->thread_count; i++, tp++)
+  {
     /* Tell thread it is time for phase 4, run.  */
     que_Put(&sts, &tp->q_in, &tp->event, (void*)4);
     phase = (long int)que_Get(&sts, &tp->q_out, NULL, NULL);
@@ -436,9 +457,10 @@ static void stop_threads(plc_sProcess* pp)
   pwr_tStatus sts;
   plc_sThread* tp;
 
-  for (i = 0, tp = pp->thread; i < pp->thread_count; i++, tp++) {
+  for (i = 0, tp = pp->thread; i < pp->thread_count; i++, tp++)
+  {
     tp->exit = TRUE;
-/* Tell thread it is time for phase 4, stop.  */
+    /* Tell thread it is time for phase 4, stop.  */
 
     que_Put(&sts, &tp->q_in, &tp->event, (void*)4);
   }
@@ -460,69 +482,67 @@ static void clean_all(plc_sProcess* pp)
 static void link_io_base_areas(plc_sProcess* pp)
 {
   dlink_area((plc_sDlink*)&pp->base.ai_a, "pwrNode-active-io-ai",
-      pp->IOHandler->AiCount * sizeof(pwr_tFloat32));
+             pp->IOHandler->AiCount * sizeof(pwr_tFloat32));
   dlink_area((plc_sDlink*)&pp->base.ao_a, "pwrNode-active-io-ao",
-      pp->IOHandler->AoCount * sizeof(pwr_tFloat32));
+             pp->IOHandler->AoCount * sizeof(pwr_tFloat32));
   dlink_area((plc_sDlink*)&pp->base.av_a, "pwrNode-active-io-av",
-      pp->IOHandler->AvCount * sizeof(pwr_tFloat32));
+             pp->IOHandler->AvCount * sizeof(pwr_tFloat32));
   dlink_area((plc_sDlink*)&pp->base.ca_a, "pwrNode-active-io-ca",
-      pp->IOHandler->CoCount * sizeof(pwr_tInt32));
+             pp->IOHandler->CoCount * sizeof(pwr_tInt32));
   dlink_area((plc_sDlink*)&pp->base.co_a, "pwrNode-active-io-co",
-      pp->IOHandler->CoCount * sizeof(pwr_tInt32));
+             pp->IOHandler->CoCount * sizeof(pwr_tInt32));
   dlink_area((plc_sDlink*)&pp->base.di_a, "pwrNode-active-io-di",
-      pp->IOHandler->DiCount * sizeof(pwr_tBoolean));
+             pp->IOHandler->DiCount * sizeof(pwr_tBoolean));
   dlink_area((plc_sDlink*)&pp->base.do_a, "pwrNode-active-io-do",
-      pp->IOHandler->DoCount * sizeof(pwr_tBoolean));
+             pp->IOHandler->DoCount * sizeof(pwr_tBoolean));
   dlink_area((plc_sDlink*)&pp->base.dv_a, "pwrNode-active-io-dv",
-      pp->IOHandler->DvCount * sizeof(pwr_tBoolean));
+             pp->IOHandler->DvCount * sizeof(pwr_tBoolean));
   dlink_area((plc_sDlink*)&pp->base.ii_a, "pwrNode-active-io-ii",
-      pp->IOHandler->IiCount * sizeof(pwr_tInt32));
+             pp->IOHandler->IiCount * sizeof(pwr_tInt32));
   dlink_area((plc_sDlink*)&pp->base.io_a, "pwrNode-active-io-io",
-      pp->IOHandler->IoCount * sizeof(pwr_tInt32));
+             pp->IOHandler->IoCount * sizeof(pwr_tInt32));
   dlink_area((plc_sDlink*)&pp->base.iv_a, "pwrNode-active-io-iv",
-      pp->IOHandler->IvCount * sizeof(pwr_tInt32));
+             pp->IOHandler->IvCount * sizeof(pwr_tInt32));
   dlink_area((plc_sDlink*)&pp->base.atv_a, "pwrNode-active-io-atv",
-      pp->IOHandler->ATvCount * sizeof(pwr_tTime));
+             pp->IOHandler->ATvCount * sizeof(pwr_tTime));
   dlink_area((plc_sDlink*)&pp->base.dtv_a, "pwrNode-active-io-dtv",
-      pp->IOHandler->DTvCount * sizeof(pwr_tDeltaTime));
+             pp->IOHandler->DTvCount * sizeof(pwr_tDeltaTime));
   dlink_area((plc_sDlink*)&pp->base.sv_a, "pwrNode-active-io-sv",
-      pp->IOHandler->SvCount * sizeof(pwr_tString80));
-  dlink_area((plc_sDlink*)&pp->base.bi_a, "pwrNode-active-io-bi",
-      pp->IOHandler->BiSize);
-  dlink_area((plc_sDlink*)&pp->base.bo_a, "pwrNode-active-io-bo",
-      pp->IOHandler->BoSize);
+             pp->IOHandler->SvCount * sizeof(pwr_tString80));
+  dlink_area((plc_sDlink*)&pp->base.bi_a, "pwrNode-active-io-bi", pp->IOHandler->BiSize);
+  dlink_area((plc_sDlink*)&pp->base.bo_a, "pwrNode-active-io-bo", pp->IOHandler->BoSize);
   dlink_area((plc_sDlink*)&pp->base.av_i, "pwrNode-active-io-av_init",
-      pp->IOHandler->AvCount * sizeof(pwr_tUInt64));
+             pp->IOHandler->AvCount * sizeof(pwr_tUInt64));
   dlink_area((plc_sDlink*)&pp->base.dv_i, "pwrNode-active-io-dv_init",
-      pp->IOHandler->DvCount * sizeof(pwr_tUInt64));
+             pp->IOHandler->DvCount * sizeof(pwr_tUInt64));
   dlink_area((plc_sDlink*)&pp->base.iv_i, "pwrNode-active-io-iv_init",
-      pp->IOHandler->IvCount * sizeof(pwr_tUInt64));
+             pp->IOHandler->IvCount * sizeof(pwr_tUInt64));
   dlink_area((plc_sDlink*)&pp->base.ai_i, "pwrNode-active-io-ai_init",
-      pp->IOHandler->AiCount * sizeof(pwr_tUInt64));
+             pp->IOHandler->AiCount * sizeof(pwr_tUInt64));
   dlink_area((plc_sDlink*)&pp->base.ao_i, "pwrNode-active-io-ao_init",
-      pp->IOHandler->AoCount * sizeof(pwr_tUInt64));
+             pp->IOHandler->AoCount * sizeof(pwr_tUInt64));
   dlink_area((plc_sDlink*)&pp->base.di_i, "pwrNode-active-io-di_init",
-      pp->IOHandler->DiCount * sizeof(pwr_tUInt64));
+             pp->IOHandler->DiCount * sizeof(pwr_tUInt64));
   dlink_area((plc_sDlink*)&pp->base.do_i, "pwrNode-active-io-do_init",
-      pp->IOHandler->DoCount * sizeof(pwr_tUInt64));
+             pp->IOHandler->DoCount * sizeof(pwr_tUInt64));
   dlink_area((plc_sDlink*)&pp->base.ii_i, "pwrNode-active-io-ii_init",
-      pp->IOHandler->IiCount * sizeof(pwr_tUInt64));
+             pp->IOHandler->IiCount * sizeof(pwr_tUInt64));
   dlink_area((plc_sDlink*)&pp->base.io_i, "pwrNode-active-io-io_init",
-      pp->IOHandler->IoCount * sizeof(pwr_tUInt64));
+             pp->IOHandler->IoCount * sizeof(pwr_tUInt64));
   dlink_area((plc_sDlink*)&pp->base.atv_i, "pwrNode-active-io-atv_init",
-      pp->IOHandler->ATvCount * sizeof(pwr_tTime));
+             pp->IOHandler->ATvCount * sizeof(pwr_tTime));
   dlink_area((plc_sDlink*)&pp->base.dtv_i, "pwrNode-active-io-dtv_init",
-      pp->IOHandler->DTvCount * sizeof(pwr_tDeltaTime));
+             pp->IOHandler->DTvCount * sizeof(pwr_tDeltaTime));
   dlink_area((plc_sDlink*)&pp->base.sv_i, "pwrNode-active-io-sv_init",
-      pp->IOHandler->SvCount * sizeof(pwr_tString80));
+             pp->IOHandler->SvCount * sizeof(pwr_tString80));
   dlink_area((plc_sDlink*)&pp->base.bi_i, "pwrNode-active-io-bi_init",
-      pp->IOHandler->BiCount * sizeof(pwr_tUInt64));
+             pp->IOHandler->BiCount * sizeof(pwr_tUInt64));
   dlink_area((plc_sDlink*)&pp->base.bi_isize, "pwrNode-active-io-bi_initsize",
-      pp->IOHandler->BiCount * sizeof(pwr_tUInt64));
+             pp->IOHandler->BiCount * sizeof(pwr_tUInt64));
   dlink_area((plc_sDlink*)&pp->base.bo_i, "pwrNode-active-io-bo_init",
-      pp->IOHandler->BoCount * sizeof(pwr_tUInt64));
+             pp->IOHandler->BoCount * sizeof(pwr_tUInt64));
   dlink_area((plc_sDlink*)&pp->base.bo_isize, "pwrNode-active-io-bo_initsize",
-      pp->IOHandler->BoCount * sizeof(pwr_tUInt64));
+             pp->IOHandler->BoCount * sizeof(pwr_tUInt64));
 }
 
 /* Link to I/O copy areas.
@@ -590,7 +610,8 @@ static void dlink_area(plc_sDlink* dp, char* name, int size)
     return; /* We have no objects of this type.  */
 
   sts = gdh_RefObjectInfo(name, &dp->p, &dp->sid, dp->size);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Error("Direct link object %s, %m", name, sts);
     exit(sts);
   }
@@ -620,9 +641,11 @@ static void create_thread(plc_sThread* tp, plc_sProctbl* ptp, plc_sProcess* pp)
 
   if (!pp->is_core)
     tp->aref = cdh_ObjidToAref(ptp->thread);
-  else {    
+  else
+  {
     sts = gdh_GetClassList(pwr_cClass_PlcThread, &oid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       errh_Error("Can't find PlcThread object, %m", sts);
       return;
     }
@@ -656,20 +679,22 @@ static void create_thread(plc_sThread* tp, plc_sProctbl* ptp, plc_sProcess* pp)
   que_Create(&sts, &tp->q_out);
 
   sts = gdh_ObjidToName(ptp->thread, tp->name, sizeof(tp->name), cdh_mNName);
-  if (EVEN(sts)) {
-    errh_Error("Get name of thread object %s, %m",
-        cdh_ObjidToString(ptp->thread, 0), sts);
+  if (EVEN(sts))
+  {
+    errh_Error("Get name of thread object %s, %m", cdh_ObjidToString(ptp->thread, 0), sts);
     return;
   }
 
   sts = gdh_ObjidToPointer(ptp->thread, (void*)&tp->PlcThread);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Error("Direct link to thread object \"%s\", %m", tp->name, sts);
     return;
   }
 
-  sts = thread_Create(&tp->tid, tp->name, (void* (*)()) & plc_thread, tp);
-  if (EVEN(sts)) {
+  sts = thread_Create(&tp->tid, tp->name, (void* (*)())&plc_thread, tp);
+  if (EVEN(sts))
+  {
     errh_Error("Creating thread \"%s\", %m", tp->name, sts);
     return;
   }
@@ -688,13 +713,16 @@ static void init_grafcet()
   pwr_sClass_initstep* o;
 
   sts = gdh_GetClassList(pwr_cClass_initstep, &oid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_ObjidToPointer(oid, (void*)&o);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       errh_Error("Initialize all GRAFCET init steps, %m", sts);
       return;
     }
-    if (!o->StatusInit) {
+    if (!o->StatusInit)
+    {
       /* This InitStep is not initialized. */
       o->Status[0] = 1;
       o->StatusInit = 1;
@@ -707,59 +735,70 @@ static void save_values(plc_sProcess* pp)
 {
   int i;
 
-  for (i = 0; i < pp->IOHandler->AvCount; i++) {
+  for (i = 0; i < pp->IOHandler->AvCount; i++)
+  {
     pwr_tFloat32* p = gdh_TranslateRtdbPointer(pp->base.av_i.p->Value[i]);
     if (p != NULL)
       *p = pp->base.av_a.p->Value[i];
   }
-  for (i = 0; i < pp->IOHandler->IvCount; i++) {
+  for (i = 0; i < pp->IOHandler->IvCount; i++)
+  {
     pwr_tInt32* p = gdh_TranslateRtdbPointer(pp->base.iv_i.p->Value[i]);
     if (p != NULL)
       *p = pp->base.iv_a.p->Value[i];
   }
-  for (i = 0; i < pp->IOHandler->DvCount; i++) {
+  for (i = 0; i < pp->IOHandler->DvCount; i++)
+  {
     pwr_tBoolean* p = gdh_TranslateRtdbPointer(pp->base.dv_i.p->Value[i]);
     if (p != NULL)
       *p = pp->base.dv_a.p->Value[i];
   }
-  for (i = 0; i < pp->IOHandler->AiCount; i++) {
+  for (i = 0; i < pp->IOHandler->AiCount; i++)
+  {
     pwr_tFloat32* p = gdh_TranslateRtdbPointer(pp->base.ai_i.p->Value[i]);
     if (p != NULL)
       *p = pp->base.ai_a.p->Value[i];
   }
-  for (i = 0; i < pp->IOHandler->AoCount; i++) {
+  for (i = 0; i < pp->IOHandler->AoCount; i++)
+  {
     pwr_tFloat32* p = gdh_TranslateRtdbPointer(pp->base.ao_i.p->Value[i]);
     if (p != NULL)
       *p = pp->base.ao_a.p->Value[i];
   }
-  for (i = 0; i < pp->IOHandler->DiCount; i++) {
+  for (i = 0; i < pp->IOHandler->DiCount; i++)
+  {
     pwr_tBoolean* p = gdh_TranslateRtdbPointer(pp->base.di_i.p->Value[i]);
     if (p != NULL)
       *p = pp->base.di_a.p->Value[i];
   }
-  for (i = 0; i < pp->IOHandler->DoCount; i++) {
+  for (i = 0; i < pp->IOHandler->DoCount; i++)
+  {
     pwr_tBoolean* p = gdh_TranslateRtdbPointer(pp->base.do_i.p->Value[i]);
     if (p != NULL)
       *p = pp->base.do_a.p->Value[i];
   }
-  for (i = 0; i < pp->IOHandler->IiCount; i++) {
+  for (i = 0; i < pp->IOHandler->IiCount; i++)
+  {
     pwr_tInt32* p = gdh_TranslateRtdbPointer(pp->base.ii_i.p->Value[i]);
     if (p != NULL)
       *p = pp->base.ii_a.p->Value[i];
   }
-  for (i = 0; i < pp->IOHandler->IoCount; i++) {
+  for (i = 0; i < pp->IOHandler->IoCount; i++)
+  {
     pwr_tInt32* p = gdh_TranslateRtdbPointer(pp->base.io_i.p->Value[i]);
     if (p != NULL)
       *p = pp->base.io_a.p->Value[i];
   }
-  for (i = 0; i < pp->IOHandler->BiCount; i++) {
+  for (i = 0; i < pp->IOHandler->BiCount; i++)
+  {
     char* p = gdh_TranslateRtdbPointer(pp->base.bi_i.p->Value[i]);
     unsigned int idx = pp->base.bi_isize.p->Value[i] >> 32;
     unsigned int size = 0xFFFFFFFF & pp->base.bi_isize.p->Value[i];
     if (p != NULL && idx + size <= pp->IOHandler->BiSize)
       memcpy(p, &pp->base.bi_a.p->Value[idx], size);
   }
-  for (i = 0; i < pp->IOHandler->BoCount; i++) {
+  for (i = 0; i < pp->IOHandler->BoCount; i++)
+  {
     char* p = gdh_TranslateRtdbPointer(pp->base.bo_i.p->Value[i]);
     unsigned int idx = pp->base.bo_isize.p->Value[i] >> 32;
     unsigned int size = 0xFFFFFFFF & pp->base.bo_isize.p->Value[i];
@@ -772,59 +811,70 @@ static void set_values(plc_sProcess* pp)
 {
   int i;
 
-  for (i = 0; i < pp->IOHandler->AvCount; i++) {
+  for (i = 0; i < pp->IOHandler->AvCount; i++)
+  {
     pwr_tFloat32* p = gdh_TranslateRtdbPointer(pp->base.av_i.p->Value[i]);
     if (p != NULL)
       pp->base.av_a.p->Value[i] = *p;
   }
-  for (i = 0; i < pp->IOHandler->IvCount; i++) {
+  for (i = 0; i < pp->IOHandler->IvCount; i++)
+  {
     pwr_tInt32* p = gdh_TranslateRtdbPointer(pp->base.iv_i.p->Value[i]);
     if (p != NULL)
       pp->base.iv_a.p->Value[i] = *p;
   }
-  for (i = 0; i < pp->IOHandler->DvCount; i++) {
+  for (i = 0; i < pp->IOHandler->DvCount; i++)
+  {
     pwr_tBoolean* p = gdh_TranslateRtdbPointer(pp->base.dv_i.p->Value[i]);
     if (p != NULL)
       pp->base.dv_a.p->Value[i] = *p;
   }
-  for (i = 0; i < pp->IOHandler->AiCount; i++) {
+  for (i = 0; i < pp->IOHandler->AiCount; i++)
+  {
     pwr_tFloat32* p = gdh_TranslateRtdbPointer(pp->base.ai_i.p->Value[i]);
     if (p != NULL)
       pp->base.ai_a.p->Value[i] = *p;
   }
-  for (i = 0; i < pp->IOHandler->AoCount; i++) {
+  for (i = 0; i < pp->IOHandler->AoCount; i++)
+  {
     pwr_tFloat32* p = gdh_TranslateRtdbPointer(pp->base.ao_i.p->Value[i]);
     if (p != NULL)
       pp->base.ao_a.p->Value[i] = *p;
   }
-  for (i = 0; i < pp->IOHandler->DiCount; i++) {
+  for (i = 0; i < pp->IOHandler->DiCount; i++)
+  {
     pwr_tBoolean* p = gdh_TranslateRtdbPointer(pp->base.di_i.p->Value[i]);
     if (p != NULL)
       pp->base.di_a.p->Value[i] = *p;
   }
-  for (i = 0; i < pp->IOHandler->DoCount; i++) {
+  for (i = 0; i < pp->IOHandler->DoCount; i++)
+  {
     pwr_tBoolean* p = gdh_TranslateRtdbPointer(pp->base.do_i.p->Value[i]);
     if (p != NULL)
       pp->base.do_a.p->Value[i] = *p;
   }
-  for (i = 0; i < pp->IOHandler->IiCount; i++) {
+  for (i = 0; i < pp->IOHandler->IiCount; i++)
+  {
     pwr_tInt32* p = gdh_TranslateRtdbPointer(pp->base.ii_i.p->Value[i]);
     if (p != NULL)
       pp->base.ii_a.p->Value[i] = *p;
   }
-  for (i = 0; i < pp->IOHandler->IoCount; i++) {
+  for (i = 0; i < pp->IOHandler->IoCount; i++)
+  {
     pwr_tInt32* p = gdh_TranslateRtdbPointer(pp->base.io_i.p->Value[i]);
     if (p != NULL)
       pp->base.io_a.p->Value[i] = *p;
   }
-  for (i = 0; i < pp->IOHandler->BiCount; i++) {
+  for (i = 0; i < pp->IOHandler->BiCount; i++)
+  {
     char* p = gdh_TranslateRtdbPointer(pp->base.bi_i.p->Value[i]);
     unsigned int idx = pp->base.bi_isize.p->Value[i] >> 32;
     unsigned int size = 0xFFFFFFFF & pp->base.bi_isize.p->Value[i];
     if (p != NULL && idx + size <= pp->IOHandler->BiSize)
       memcpy(&pp->base.bi_a.p->Value[idx], p, size);
   }
-  for (i = 0; i < pp->IOHandler->BoCount; i++) {
+  for (i = 0; i < pp->IOHandler->BoCount; i++)
+  {
     char* p = gdh_TranslateRtdbPointer(pp->base.bo_i.p->Value[i]);
     unsigned int idx = pp->base.bo_isize.p->Value[i] >> 32;
     unsigned int size = 0xFFFFFFFF & pp->base.bo_isize.p->Value[i];
