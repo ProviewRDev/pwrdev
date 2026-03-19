@@ -41,4 +41,8 @@ Prepare a new release
 ---------------------
 
 > ./pwr_release.sh V6.2.0
+> ./pwr_release.sh --docs-only
 > ./pwr_release.sh --pkgrev
+
+The release script updates pwr_version.h, upgrade.sh, changelog,
+version-stamped documentation sources, and packaging metadata.

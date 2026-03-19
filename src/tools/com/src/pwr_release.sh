@@ -36,14 +36,17 @@
 #
 #
 # pwr_release.sh -- Prepare the ProviewR tree for a new release,
-#                   or bump the packaging revision.
+#                   update docs only, or bump the packaging revision.
 #
 # Usage:
 #   pwr_release.sh [--dry-run] <new_version>
+#   pwr_release.sh [--dry-run] --docs-only [<new_version>]
 #   pwr_release.sh [--dry-run] --pkgrev
 #
 #   <new_version>  Version string in the form "V<major>.<minor>.<patch>",
 #                  e.g. V6.2.0
+#   --docs-only    Update only version-stamped documentation sources.
+#                  If <new_version> is omitted, use pwr_version.h.
 #   --pkgrev       Increment the deb/rpm packaging revision only.
 #   --dry-run      Show what would be changed without modifying any files.
 #
@@ -58,14 +61,52 @@ readonly VERSION_H="$ROOT/src/exp/inc/src/pwr_version.h"
 readonly CHANGELOG="$ROOT/CHANGELOG.md"
 readonly UPGRADE_SH="$ROOT/src/exp/com/src/upgrade.sh"
 readonly PKG_DIR="$ROOT/src/tools/pkg"
+readonly DOC_PRM_DOXYFILE="$ROOT/src/doc/prm/src/Doxyfile"
+readonly DOC_DOX_DOXYFILE="$ROOT/src/doc/dox/src/Doxyfile"
+
+# Documentation files that are version-stamped for each release.
+# Keep this list explicit so we don't rewrite historical manuals whose
+# embedded version/date reflects the document revision rather than the
+# current product release.
+DOC_WEB_VERSION_FILES=(
+  "$ROOT/src/doc/web/en_us/qguide_h.html"
+  "$ROOT/src/doc/web/en_us/pwr_about_h.html"
+  "$ROOT/src/doc/web/en_us/orm_h.html"
+  "$ROOT/src/doc/web/en_us/prm_h.html"
+  "$ROOT/src/doc/web/en_us/doc_h.html"
+  "$ROOT/src/doc/web/sv_se/pwr_about_h.html"
+  "$ROOT/src/doc/web/sv_se/orm_h.html"
+  "$ROOT/src/doc/web/sv_se/doc_h.html"
+)
+
+DOC_MANUAL_VERSION_FILES=(
+  "$ROOT/src/doc/man/en_us/man_dg.dat"
+  "$ROOT/src/doc/man/en_us/man_geref.dat"
+  "$ROOT/src/doc/man/en_us/man_opg.dat"
+  "$ROOT/src/doc/man/en_us/man_orm.dat"
+  "$ROOT/src/doc/man/en_us/man_sev.dat"
+  "$ROOT/src/doc/man/en_us/man_subgraph.dat"
+  "$ROOT/src/doc/man/sv_se/man_dg.dat"
+  "$ROOT/src/doc/man/sv_se/man_geref.dat"
+  "$ROOT/src/doc/man/sv_se/man_opg.dat"
+  "$ROOT/src/doc/man/sv_se/man_orm.dat"
+  "$ROOT/src/doc/man/sv_se/man_sev.dat"
+)
+
+DOC_DOXYFILES=(
+  "$DOC_PRM_DOXYFILE"
+  "$DOC_DOX_DOXYFILE"
+)
 
 DRY_RUN=0
 NEW_VERSION=""
 PKGREV_MODE=0
+DOCS_ONLY_MODE=0
 
 usage() {
   cat <<EOF
 Usage: $SCRIPT_NAME [--dry-run] <new_version>
+       $SCRIPT_NAME [--dry-run] --docs-only [<new_version>]
        $SCRIPT_NAME [--dry-run] --pkgrev
 
 Prepares the ProviewR source tree for a new release:
@@ -74,22 +115,32 @@ Prepares the ProviewR source tree for a new release:
   2. Updates the version in pwr_version.h (version string, binary version,
      wbdb short string, build time, and copyright macro).
   3. Updates upgrade.sh OLD/NEW version pair.
-  4. Stamps CHANGELOG.md: moves [Unreleased] to a dated release heading
+  4. Updates version-stamped documentation sources and doc copyright years.
+  5. Stamps CHANGELOG.md: moves [Unreleased] to a dated release heading
      and creates a fresh [Unreleased] section.
-  5. Updates all deb control files and RPM spec files (Version, Package
+  6. Updates all deb control files and RPM spec files (Version, Package
      names, Replaces lists, Depends references).
 
-Or, with --pkgrev, bumps only the packaging revision (-N for deb,
-Release: for RPM) without changing the upstream version.
+Or:
+
+  --docs-only     Updates only the version-stamped documentation sources.
+                  If <new_version> is omitted, the current version from
+                  pwr_version.h is used.
+
+  --pkgrev        Bumps only the packaging revision (-N for deb,
+                  Release: for RPM) without changing the upstream version.
 
 Arguments:
   <new_version>   Version in format V<major>.<minor>.<patch>, e.g. V6.2.0
+  --docs-only     Update docs only.
   --pkgrev        Bump the packaging/release revision number only.
   --dry-run       Print actions without modifying files.
 
 Example:
   $SCRIPT_NAME V6.2.0
   $SCRIPT_NAME --dry-run V6.2.0
+  $SCRIPT_NAME --docs-only
+  $SCRIPT_NAME --docs-only V6.2.0
   $SCRIPT_NAME --pkgrev
   $SCRIPT_NAME --dry-run --pkgrev
 EOF
@@ -111,17 +162,138 @@ do_sed() {
   fi
 }
 
+rewrite_manual_metadata() {
+  local file="$1"
+  local relpath="${file#"$ROOT"/}"
+  local tmp
+
+  if [ "$DRY_RUN" -eq 1 ]; then
+    info "(dry-run) $relpath: title page -> $RELEASE_DATE / Version $NEW_VERSION"
+    info "(dry-run) $relpath: doc copyright -> 2005-$YEAR"
+    return
+  fi
+
+  tmp=$(mktemp)
+  awk \
+    -v release_date="$RELEASE_DATE" \
+    -v release_version="$NEW_VERSION" \
+    -v release_year="$YEAR" '
+      BEGIN {
+        in_title_page = 0
+        title_done = 0
+        rewrite_title_block = 0
+        in_info_page = 0
+        info_done = 0
+      }
+
+      /^<topic> __DocumentTitlePage$/ {
+        in_title_page = 1
+      }
+
+      /^<topic> __DocumentInfoPage$/ {
+        in_info_page = 1
+      }
+
+      in_title_page && !title_done && /^<hr>$/ && !rewrite_title_block {
+        print
+        print release_date
+        print "Version " release_version
+        rewrite_title_block = 1
+        next
+      }
+
+      in_title_page && rewrite_title_block {
+        if (/^<hr>$/) {
+          print
+          rewrite_title_block = 0
+          title_done = 1
+          in_title_page = 0
+        }
+        next
+      }
+
+      in_info_page && !info_done && /^Copyright/ {
+        print "Copyright (C) 2005-" release_year " SSAB EMEA AB"
+        info_done = 1
+        next
+      }
+
+      {
+        print
+      }
+    ' "$file" > "$tmp"
+
+  mv "$tmp" "$file"
+  info "$relpath: title page -> $RELEASE_DATE / Version $NEW_VERSION"
+  info "$relpath: doc copyright -> 2005-$YEAR"
+}
+
+update_versioned_docs() {
+  echo "== Step 4: Update documentation version strings =="
+
+  echo "  -- Web documentation headers --"
+  for doc in "${DOC_WEB_VERSION_FILES[@]}"; do
+    relpath="${doc#"$ROOT"/}"
+    if [ ! -f "$doc" ]; then
+      warn "$relpath: missing, skipping"
+      continue
+    fi
+
+    do_sed "$relpath: pwrversion -> $NEW_VERSION" \
+      "s|<p id=\"pwrversion\">V[0-9][0-9]*\\.[0-9][0-9]*\\.[0-9][0-9]*</p>|<p id=\"pwrversion\">${NEW_VERSION}</p>|" \
+      "$doc"
+  done
+  echo ""
+
+  echo "  -- Documentation Doxyfiles --"
+  for doxyfile in "${DOC_DOXYFILES[@]}"; do
+    relpath="${doxyfile#"$ROOT"/}"
+    if [ ! -f "$doxyfile" ]; then
+      warn "$relpath: missing, skipping"
+      continue
+    fi
+
+    do_sed "$relpath: PROJECT_NUMBER -> $NEW_VERSION" \
+      "s|^PROJECT_NUMBER[[:space:]]*=.*|PROJECT_NUMBER         = ${NEW_VERSION}|" \
+      "$doxyfile"
+  done
+  echo ""
+
+  echo "  -- Manual title pages --"
+  for manual in "${DOC_MANUAL_VERSION_FILES[@]}"; do
+    if [ ! -f "$manual" ]; then
+      relpath="${manual#"$ROOT"/}"
+      warn "$relpath: missing, skipping"
+      continue
+    fi
+
+    rewrite_manual_metadata "$manual"
+  done
+  echo ""
+}
+
 # ---- parse arguments --------------------------------------------------------
 
 while [ $# -gt 0 ]; do
   case "$1" in
     --dry-run) DRY_RUN=1; shift ;;
+    --docs-only) DOCS_ONLY_MODE=1; shift ;;
     --pkgrev)  PKGREV_MODE=1; shift ;;
     -h|--help) usage ;;
     V[0-9]*) NEW_VERSION="$1"; shift ;;
     *) error "Unknown argument: $1" ;;
   esac
 done
+
+if [ "$DOCS_ONLY_MODE" -eq 1 ] && [ "$PKGREV_MODE" -eq 1 ]; then
+  error "--docs-only and --pkgrev cannot be combined"
+fi
+
+# Read current version from pwr_version.h
+CUR_VERSION=$(grep 'pwrv_cPwrVersionStr' "$VERSION_H" | head -1 | sed 's/.*"\(V[^"]*\)".*/\1/')
+if [ -z "$CUR_VERSION" ]; then
+  error "Could not read current version from $VERSION_H"
+fi
 
 # ---- --pkgrev mode: bump packaging revision only ----------------------------
 
@@ -179,7 +351,11 @@ if [ "$PKGREV_MODE" -eq 1 ]; then
   exit 0
 fi
 
-# ---- full release mode: require version argument ----------------------------
+# ---- full release/docs-only mode: resolve version ---------------------------
+
+if [ "$DOCS_ONLY_MODE" -eq 1 ] && [ -z "$NEW_VERSION" ]; then
+  NEW_VERSION="$CUR_VERSION"
+fi
 
 [ -z "$NEW_VERSION" ] && usage
 
@@ -196,12 +372,6 @@ PKG_SHORT="${VER_MAJOR}"      # e.g. 7  (for package names: pwr7, pwrdemo7)
 
 # Known versioned package base names (longest first to avoid partial matches)
 PKG_BASES="pwrrpi64 pwrdemo pwrrpi pwr"
-
-# Read current version from pwr_version.h
-CUR_VERSION=$(grep 'pwrv_cPwrVersionStr' "$VERSION_H" | head -1 | sed 's/.*"\(V[^"]*\)".*/\1/')
-if [ -z "$CUR_VERSION" ]; then
-  error "Could not read current version from $VERSION_H"
-fi
 
 # Read OLD_SHORT from the actual pwr_version.h short string (handles
 # both legacy "V61" format and new "V7" major-only format).
@@ -232,6 +402,28 @@ RELEASE_DATE=$(date +%Y-%m-%d)
 
 # Build time stamp matching existing format: DD-MON-YYYY HH:MM:SS
 BUILD_TIME=$(date -u +"%d-%^b-%Y %H:%M:%S")
+
+if [ "$DOCS_ONLY_MODE" -eq 1 ]; then
+  echo "=============================================="
+  echo " ProviewR Documentation Update"
+  echo "=============================================="
+  echo "  Repository root : $ROOT"
+  echo "  Current version : $CUR_VERSION"
+  echo "  Docs version    : $NEW_VERSION"
+  echo "  Doc date        : $RELEASE_DATE"
+  echo "  Copyright year  : $YEAR"
+  [ "$DRY_RUN" -eq 1 ] && echo "  Mode            : DRY RUN"
+  echo "=============================================="
+  echo ""
+
+  update_versioned_docs
+
+  echo "=============================================="
+  echo " Documentation update complete"
+  echo "=============================================="
+  [ "$DRY_RUN" -eq 1 ] && echo " (dry-run mode — no files were modified)"
+  exit 0
+fi
 
 echo "=============================================="
 echo " ProviewR Release Preparation"
@@ -314,9 +506,13 @@ do_sed "NEW_PWR_VERSION -> \"$NEW_MAJMIN\"" \
 
 echo ""
 
-# ---- Step 4: Stamp CHANGELOG.md --------------------------------------------
+# ---- Step 4: Update documentation version strings ---------------------------
 
-echo "== Step 4: Update $CHANGELOG =="
+update_versioned_docs
+
+# ---- Step 5: Stamp CHANGELOG.md --------------------------------------------
+
+echo "== Step 5: Update $CHANGELOG =="
 
 GITLAB_URL="https://gitlab.ssab.com/pwrdev/pwr/-/compare"
 
@@ -339,9 +535,9 @@ fi
 
 echo ""
 
-# ---- Step 5: Update packaging files ----------------------------------------
+# ---- Step 6: Update packaging files ----------------------------------------
 
-echo "== Step 5: Update packaging files =="
+echo "== Step 6: Update packaging files =="
 
 DEB_VER="${PKG_UPSTREAM}-1"  # Upstream version + debian revision reset to 1
 
