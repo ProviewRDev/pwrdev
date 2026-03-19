@@ -225,7 +225,7 @@ pwr_tStatus thread_SetPrio(thread_s* tp, int prio)
   }
 }
 
-uint64_t toNs(float f) { return ((uint64_t)f * 1000 * 1000 * 1000); }
+uint64_t toNs(float f) { return ((uint64_t)(f * 1000 * 1000 * 1000)); }
 
 pwr_tStatus thread_SetDeadline(pwr_sClass_PlcThread* o)
 {
