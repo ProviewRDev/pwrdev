@@ -150,6 +150,13 @@ ProfinetIOCR::ProfinetIOCR(pugi::xml_node&& p_IOCR, pugi::xml_node&& p_APIs)
       m_phase(p_IOCR.attribute("Phase").as_uint()), m_rt_class(p_IOCR.attribute("RT_CLASS").as_string()),
       m_startup_mode(p_IOCR.attribute("StartupMode").as_string())
 {
+  unsigned int watchdog_factor = p_IOCR.attribute("WatchdogFactor").as_uint(PWR_PN_DEFAULT_WATCHDOG_FACTOR);
+  if (watchdog_factor == 0 || watchdog_factor > 0xFFFFU)
+  {
+    watchdog_factor = PWR_PN_DEFAULT_WATCHDOG_FACTOR;
+  }
+  m_watchdog_factor = static_cast<unsigned short>(watchdog_factor);
+
   // Find and connect the refs
   for (auto const& api_ref : p_IOCR.child("APIs").children("Ref"))
   {
@@ -170,6 +177,7 @@ void ProfinetIOCR::build(pugi::xml_node&& p_iocr, uint type) const
   p_iocr.append_attribute("SendClockFactor").set_value(m_send_clock_factor);
   p_iocr.append_attribute("ReductionRatio").set_value(m_reduction_ratio);
   p_iocr.append_attribute("Phase").set_value(m_phase);
+  p_iocr.append_attribute("WatchdogFactor").set_value(m_watchdog_factor);
   p_iocr.append_attribute("RT_CLASS").set_value(m_rt_class.c_str());
   p_iocr.append_attribute("StartupMode").set_value(m_startup_mode.c_str());
 

@@ -35,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for treating char arrays as strings in ge using format '%s' on a datatype like ##Char#16.
 - PROFINET: IM0 tab in object graph for class PnDevice.
 - PROFINET: Added a configurable Startup Mode choice under Device Properties in the configurator, with guidance for when Legacy may be preferable if Advanced startup causes issues with large fragmented startup traffic.
+- PROFINET: Added configurable watchdog factor for devices. New option is found in Timing Properties in the DAP for the Device.
 
 ### Fixed
 

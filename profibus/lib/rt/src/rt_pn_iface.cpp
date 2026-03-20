@@ -769,10 +769,14 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, std::shared_ptr<Pr
 
     pIOCR->SequenceHighByte = 0; // Not supported (By stack) yet, set to 0
     pIOCR->SequenceLowByte = 0;  // Not supported (By stack) yet, set to 0
-    pIOCR->WatchdogFactorHighByte = 0;
-    pIOCR->WatchdogFactorLowByte = 10;
-    pIOCR->DataHoldFactorHighByte = 0;
-    pIOCR->DataHoldFactorLowByte = 10;
+    if (iocr.second.m_watchdog_factor == 0)
+    {
+      iocr.second.m_watchdog_factor = PWR_PN_DEFAULT_WATCHDOG_FACTOR;
+    }
+    pIOCR->WatchdogFactorHighByte = _PN_U16_HIGH_BYTE(iocr.second.m_watchdog_factor);
+    pIOCR->WatchdogFactorLowByte = _PN_U16_LOW_BYTE(iocr.second.m_watchdog_factor);
+    pIOCR->DataHoldFactorHighByte = _PN_U16_HIGH_BYTE(iocr.second.m_watchdog_factor);
+    pIOCR->DataHoldFactorLowByte = _PN_U16_LOW_BYTE(iocr.second.m_watchdog_factor);
     pIOCR->FrameSendOffsetHighWordHighByte =
         0xFF; // Not supported yet (By stack), set to as fast as possible (0xFFFFFFFF)
     pIOCR->FrameSendOffsetHighWordLowByte = 0xFF;

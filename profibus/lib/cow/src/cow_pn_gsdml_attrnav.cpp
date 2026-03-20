@@ -3533,3 +3533,45 @@ bool ItemPnPhaseInput::do_value_changed(GsdmlAttrNav* attrnav, const char* value
 }
 
 /* ======================================= END Phase Input Node ======================================= */
+
+/* ================================= Watchdog/Data Hold Factor Input Node ================================ */
+
+bool ItemPnWatchdogFactorInput::do_value_changed(GsdmlAttrNav* attrnav, const char* value_str)
+{
+  std::regex const watchdog_factor_regex("^[1-9][0-9]*$");
+
+  if (std::regex_match(value_str, watchdog_factor_regex))
+  {
+    unsigned long value = 0;
+
+    try
+    {
+      value = std::stoul(value_str);
+    }
+    catch (std::exception const&)
+    {
+      attrnav->message('E', "Invalid format! Enter a value 1 - 65535");
+      return false;
+    }
+
+    if (value <= 0xFFFFUL)
+    {
+      *m_value_p = static_cast<uint16_t>(value);
+      std::string current_value(value_str);
+      brow_SetAnnotation(m_node, 1, current_value.c_str(), current_value.length());
+    }
+    else
+    {
+      attrnav->message('E', "Watchdog/Data Hold factor must be between 1 and 65535.");
+      return false;
+    }
+  }
+  else
+  {
+    attrnav->message('E', "Invalid format! Enter a value 1 - 65535");
+    return false;
+  }
+  return true;
+}
+
+/* ============================== END Watchdog/Data Hold Factor Input Node ============================== */

@@ -914,6 +914,25 @@ public:
   ItemPnReductionRatio* m_reduction_ratio;
 };
 
+class ItemPnWatchdogFactorInput : public ItemPnValueInput<uint16_t>
+{
+public:
+  ItemPnWatchdogFactorInput(GsdmlAttrNav* attrnav, const char* name, uint16_t* value_p, const char* infotext,
+                            brow_tNode dest, flow_eDest dest_code)
+      : ItemPnValueInput<uint16_t>(attrnav, name, value_p, infotext, dest, dest_code)
+  {
+    if (*value_p == 0)
+    {
+      std::ostringstream default_value(std::ios_base::out);
+      default_value << PWR_PN_DEFAULT_WATCHDOG_FACTOR;
+      do_value_changed(attrnav, default_value.str().c_str());
+    }
+  }
+  virtual ~ItemPnWatchdogFactorInput() {}
+
+  bool do_value_changed(GsdmlAttrNav* attrnav, const char* value_str) override;
+};
+
 // Just a container for the timing properties values
 class ItemPnTimingProperties : public ItemPn
 {
@@ -923,7 +942,7 @@ public:
                          flow_eDest dest_code)
       : ItemPn(attrnav, attrnav_mItemType_Parent | attrnav_mItemType_ExpandForSave, name,
                "Timing Properties such as what RT_CLASS to run, what Send Clock factor to use and also "
-               "Reduction Ratio."),
+               "Reduction Ratio and Watchdog/Data Hold factor."),
         m_dap(dap)
   {
     m_closed_annotation = attrnav->brow->pixmap_map;
@@ -956,27 +975,34 @@ public:
   {
     new ItemPnEnumRTClass(
         m_attrnav, "RT_CLASS", m_interface_submodule,
-        &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[PROFINET_IO_CR_TYPE_INPUT].m_rt_class,
-        m_node, flow_eDest_IntoLast);
+        &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[PROFINET_IO_CR_TYPE_INPUT].m_rt_class, m_node,
+        flow_eDest_IntoLast);
 
     new ItemPnSendClock(
         m_attrnav, "Send Clock", m_interface_submodule->_ApplicationRelations,
-        &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[PROFINET_IO_CR_TYPE_INPUT]
-             .m_send_clock_factor,
+        &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[PROFINET_IO_CR_TYPE_INPUT].m_send_clock_factor,
         m_node, flow_eDest_IntoLast);
 
     ItemPnReductionRatio* iprr = new ItemPnReductionRatio(
         m_attrnav, "Reduction Ratio", m_interface_submodule->_ApplicationRelations,
-        &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[PROFINET_IO_CR_TYPE_INPUT]
-             .m_reduction_ratio,
+        &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[PROFINET_IO_CR_TYPE_INPUT].m_reduction_ratio,
         m_node, flow_eDest_IntoLast);
 
     new ItemPnPhaseInput(
         m_attrnav, "Phase",
-        &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[PROFINET_IO_CR_TYPE_INPUT]
-             .m_phase,
-        iprr, "Phase for this device. Phase cannot exceed your reduction ratio.", m_node,
-        flow_eDest_IntoLast);
+        &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[PROFINET_IO_CR_TYPE_INPUT].m_phase, iprr,
+        "Phase for this device. Phase cannot exceed your reduction ratio.", m_node, flow_eDest_IntoLast);
+
+    new ItemPnWatchdogFactorInput(
+        m_attrnav, "Watchdog/Data Hold Factor",
+        &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[PROFINET_IO_CR_TYPE_INPUT].m_watchdog_factor,
+        "This configures both WatchdogFactor and DataHoldFactor.\n"
+        "WatchdogFactor: The maximum number of cycle times to wait on the "
+        "process data, before an alarm is generated and the IOCR is aborted.\n"
+        "DataHoldFactor: The maximum number of cycle times to hold the latest "
+        "output data on the output periphery of a device, if new output data is missing from the "
+        "controller or supervisor.",
+        m_node, flow_eDest_IntoLast);
 
     return 1;
   }

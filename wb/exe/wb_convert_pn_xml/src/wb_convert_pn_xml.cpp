@@ -68,7 +68,8 @@
 #include "pwr_baseclasses.h"
 #include "pwr_profibusclasses.h"
 
-#define PWR_SCHEMA_VERSION 1
+#define PWR_SCHEMA_VERSION 2
+#define PWR_PN_DEFAULT_WATCHDOG_FACTOR 10
 
 int main(int argc, char* argv[])
 {
@@ -386,6 +387,7 @@ int main(int argc, char* argv[])
             new_iocr.append_attribute("SendClockFactor") = old_iocr.attribute("SendClockFactor").as_string();
             new_iocr.append_attribute("ReductionRatio") = old_iocr.attribute("ReductionRatio").as_string();
             new_iocr.append_attribute("Phase") = old_iocr.attribute("Phase").as_string();
+            new_iocr.append_attribute("WatchdogFactor") = PWR_PN_DEFAULT_WATCHDOG_FACTOR;
             new_iocr.append_attribute("RT_CLASS") =
                 "RT_CLASS_1"; // The previous tool had no support for anything else
             new_iocr.append_attribute("StartupMode") =

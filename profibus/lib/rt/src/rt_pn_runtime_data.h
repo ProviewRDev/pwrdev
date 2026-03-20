@@ -51,7 +51,8 @@
 #include "profinet.h"
 
 // Increment this whenever the runtime xml changes (pwr_pn_XXXXXXXXXXXXXXX.xml files that is)
-#define PWR_SCHEMA_VERSION 1
+#define PWR_SCHEMA_VERSION 2
+#define PWR_PN_DEFAULT_WATCHDOG_FACTOR 10
 
 #define RUNTIME_PARSER_STRING_MAX_LENGTH sizeof(pwr_tString256)
 #define DAP_DEFAULT_SLOT 0
@@ -103,6 +104,9 @@ public:
   unsigned short m_send_clock_factor;
   unsigned short m_reduction_ratio;
   unsigned int m_phase;            // Phase can not be greater than reduction ratio and must be > 0.
+  // This configured value is currently written to both WatchdogFactor and
+  // DataHoldFactor in the stack IOCR data.
+  unsigned short m_watchdog_factor = PWR_PN_DEFAULT_WATCHDOG_FACTOR;
   std::map<uint, uint> m_api_refs; // <api, api-index-reference>
   std::string m_rt_class;
   std::string m_startup_mode;
