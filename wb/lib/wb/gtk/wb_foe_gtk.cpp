@@ -35,8 +35,9 @@
  */
 
 //   wb_foe_gtk.cpp
-//   This module creates function object editor and handles
-//   the graphical editor.
+//   GTK implementation of FOE. Builds the Function Object Editor widgets,
+//   menus and palettes, and connects the window-level UI to the core FOE/GRE
+//   logic.
 
 #include <stdlib.h>
 

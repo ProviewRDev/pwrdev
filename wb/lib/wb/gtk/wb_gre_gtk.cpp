@@ -35,8 +35,9 @@
  */
 
 /* wb_gre_gtk.cpp
-   This module creates the flow window and handles
-   the flow callbacks.  */
+   GTK implementation of GRE. Creates the flow and navigator widgets used by
+   FOE and connects the platform-neutral GRE logic to GTK-specific widget and
+   timer handling.  */
 
 #include <math.h>
 #include <string.h>
@@ -61,7 +62,9 @@
 //
 WGreGtk::WGreGtk(
     void* wg_parent_ctx, GtkWidget* wg_parent_wid, const char* name)
-    : WGre(wg_parent_ctx, 0), parent_wid(wg_parent_wid), trace_timerid(0)
+    : WGre(wg_parent_ctx, 0), parent_wid(wg_parent_wid), gre_window(0),
+      flow_widget(0), form_widget(0), nav_shell(0), nav_widget(0),
+      trace_timerid(0)
 {
   ctx_init();
 
@@ -72,7 +75,18 @@ WGreGtk::WGreGtk(
 
 WGreGtk::~WGreGtk()
 {
-  gtk_widget_destroy(form_widget);
+  if (nav_widget) {
+    gtk_widget_destroy(nav_widget);
+    nav_widget = 0;
+  }
+  if (nav_shell) {
+    gtk_widget_destroy(nav_shell);
+    nav_shell = 0;
+  }
+  if (form_widget) {
+    gtk_widget_destroy(form_widget);
+    form_widget = 0;
+  }
 }
 
 int WGreGtk::new_navigator(GtkWidget* parent)

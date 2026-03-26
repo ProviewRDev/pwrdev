@@ -37,7 +37,13 @@
 #ifndef wb_foe_h
 #define wb_foe_h
 
-/* wb_foe.h -- function block object editor */
+/*
+ * wb_foe.h -- FOE, the Function Object Editor.
+ *
+ * WFoe owns the editor session for a plc window: menus, palettes, subwindows,
+ * save/quit flow and other window-level state. Drawing and direct canvas
+ * interaction are delegated to WGre.
+ */
 
 #include "wb.h"
 #include "wb_goen.h"
@@ -88,6 +94,9 @@ typedef struct {
   foe_eAttr type;
 } foe_sAttr;
 
+// WFoe is the top-level Function Object Editor context for one plc editor
+// window. It owns editor state and auxiliary dialogs, and uses WGre for the
+// graphics canvas itself.
 class WFoe : public WUtility {
 public:
   void* parent_ctx;

@@ -461,6 +461,18 @@ void FlowDrawGtk::invalidate(int x, int y, int width, int height)
 {
   GdkRectangle rect;
 
+  if (width <= 0 || height <= 0)
+    return;
+
+  if (!toplevel || !gtk_widget_get_realized(toplevel)) {
+    window = 0;
+    return;
+  }
+
+  window = gtk_widget_get_window(toplevel);
+  if (!GDK_IS_WINDOW(window))
+    return;
+
   rect.x = x;
   rect.y = y;
   rect.width = width;
@@ -471,6 +483,18 @@ void FlowDrawGtk::invalidate(int x, int y, int width, int height)
 void FlowDrawGtk::invalidate_nav(int x, int y, int width, int height)
 {
   GdkRectangle rect;
+
+  if (width <= 0 || height <= 0)
+    return;
+
+  if (!nav_toplevel || !gtk_widget_get_realized(nav_toplevel)) {
+    nav_window = 0;
+    return;
+  }
+
+  nav_window = gtk_widget_get_window(nav_toplevel);
+  if (!GDK_IS_WINDOW(nav_window))
+    return;
 
   rect.x = x;
   rect.y = y;

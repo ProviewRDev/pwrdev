@@ -35,8 +35,9 @@
  */
 
 //   wb_foe.cpp
-//   This module creates function object editor and handles
-//   the graphical editor.
+//   Core FOE logic. Creates and manages the Function Object Editor window,
+//   its sessions, subwindows and editor commands, and delegates canvas work
+//   to GRE.
 
 #include <stdlib.h>
 

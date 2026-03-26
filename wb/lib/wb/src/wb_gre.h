@@ -56,6 +56,9 @@
 #define GRE_POPUPMENUMODE_OBJECT 0
 #define GRE_POPUPMENUMODE_AREA 1
 
+// WGre is the graphics editor used inside FOE. It owns the flow canvas state,
+// keeps track of selections and redraws, and maps between the plc/vldh model
+// and the graphical representation shown in the editor.
 class WGre {
 public:
   void* parent_ctx;

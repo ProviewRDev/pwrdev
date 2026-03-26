@@ -35,8 +35,9 @@
  */
 
 /* wb_gre.cpp
-   This module creates the flow window and handles
-   the flow callbacks.  */
+   Core GRE logic. Creates the graphics editor used by FOE, translates plc
+   objects to flow nodes and connections, and handles flow callbacks and
+   redraw/update operations.  */
 
 #include <stdlib.h>
 
