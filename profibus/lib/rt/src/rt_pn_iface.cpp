@@ -282,7 +282,8 @@ static bool resolve_im0_read_target(ProfinetDevice const* pn_device, unsigned sh
   if (!pn_device)
     return false;
 
-  auto resolve_subslot = [&](ProfinetSlot const& dap_slot) {
+  auto resolve_subslot = [&](ProfinetSlot const& dap_slot)
+  {
     // IM0 is typically served on subslot 1. Keep this as primary preference.
     auto ss_it = dap_slot.m_subslot_map.find(1u);
     if (ss_it != dap_slot.m_subslot_map.end())
@@ -861,7 +862,9 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, std::shared_ptr<Pr
   {
     const ProfinetSlot& slot = plugged_module.second.get(); // Access the ProfinetSlot object
 
+    PN_U16 num_submodules = 0;
     total_data_length += sizeof(T_PN_MODULE);
+
     /* Fill data for MODULE */
     pModule->VersionHighByte = pSDR->VersionHighByte;
     pModule->VersionLowByte = pSDR->VersionLowByte;
@@ -873,17 +876,17 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, std::shared_ptr<Pr
     pModule->IdentNumberLowWordLowByte = _PN_U32_LOW_LOW_BYTE(slot.m_module_ident_number);
     pModule->PropertiesHighByte = 0;
     pModule->PropertiesLowByte = 0;
-    pModule->NumberOfSubmodulesHighByte = _PN_U16_HIGH_BYTE(slot.m_subslot_map.size());
-    pModule->NumberOfSubmodulesLowByte = _PN_U16_LOW_BYTE(slot.m_subslot_map.size());
     /* Fill the SUBMODULE's */
 
     pSubModule = (T_PN_SUBMODULE*)(pModule + 1);
 
     for (auto& subslot : slot.m_subslot_map)
     {
-      // Skip empty subslots here aswell
+      // Skip unconfigured subslots
       if (subslot.second.m_submodule_ID == "")
         continue;
+
+      num_submodules++;
 
       total_data_length += sizeof(T_PN_SUBMODULE);
       /* Fill data for the submodule */
@@ -920,6 +923,9 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, std::shared_ptr<Pr
 
       pSubModule = (T_PN_SUBMODULE*)pDataRecordReference;
     }
+
+    pModule->NumberOfSubmodulesHighByte = _PN_U16_HIGH_BYTE(num_submodules);
+    pModule->NumberOfSubmodulesLowByte = _PN_U16_LOW_BYTE(num_submodules);
 
     pModule = (T_PN_MODULE*)pSubModule;
   }
