@@ -112,11 +112,11 @@ public:
   std::string m_startup_mode;
 
   // Stack Runtime specifics
-  unsigned short m_rt_identifier;
-  unsigned short m_rt_io_data_length;
-  PN_U8 m_rt_io_data[PROFINET_IO_DATA_MAX_LENGTH];
-  unsigned short m_rt_clean_io_data_length;
-  unsigned char* m_rt_clean_io_data;
+  unsigned short m_rt_identifier = 0;
+  unsigned short m_rt_io_data_length = 0;
+  PN_U8 m_rt_io_data[PROFINET_IO_DATA_MAX_LENGTH] = {};
+  unsigned short m_rt_clean_io_data_length = 0;
+  unsigned char* m_rt_clean_io_data = nullptr;
   uint m_rt_properties = 0;
 };
 
