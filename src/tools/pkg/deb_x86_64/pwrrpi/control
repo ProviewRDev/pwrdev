@@ -1,10 +1,10 @@
-Package: pwrrpi7
+Package: pwrrpi
 Version: 7.0.0-1
 Section: base
 Priority: optional
 Architecture: amd64
-Depends: pwr7 (>= 7.0.0-1)
-Replaces: pwr7,pwrrpi61
+Depends: pwr (>= 7.0.0-1)
+Replaces: pwr,pwrrpi61
 Maintainer: ProviewR <postmaster@proview.se>
 Description: ProviewR RPI development package
  7.0.0-1 Base release

@@ -99,14 +99,14 @@ if [ "$1" == "-v" ]; then
   exit
 fi
 
-pkgroot=$pwre_broot/$pwre_target/bld/pkg/pwr$ver
+pkgroot=$pwre_broot/$pwre_target/bld/pkg/pwr
 pkgsrc=$pwre_sroot/tools/pkg/$hw/pwr
 
-echo "-- Building pwr$ver"
+echo "-- Building pwr"
 
 # Create directories
 mkdir -p $pkgroot/DEBIAN
-mkdir -p $pkgroot/usr/share/doc/pwr$ver
+mkdir -p $pkgroot/usr/share/doc/pwr
 mkdir -p $pkgroot/usr/share/applications
 mkdir -p $pkgroot/usr/pwrp/adm/db
 mkdir -p $pkgroot/etc
@@ -128,15 +128,15 @@ chmod 755 $pkgroot/DEBIAN/postrm
 chmod 644 $pkgroot/DEBIAN/control
 
 # copyright
-cp $pkgsrc/copyright $pkgroot/usr/share/doc/pwr$ver
+cp $pkgsrc/copyright $pkgroot/usr/share/doc/pwr
 
 # changelog
-cp $pkgsrc/changelog $pkgroot/usr/share/doc/pwr$ver
-gzip -fq --best $pkgroot/usr/share/doc/pwr$ver/changelog
+cp $pkgsrc/changelog $pkgroot/usr/share/doc/pwr
+gzip -fq --best $pkgroot/usr/share/doc/pwr/changelog
 
 # changelog.Debian
-cp $pkgsrc/changelog.Debian $pkgroot/usr/share/doc/pwr$ver
-gzip -fq --best $pkgroot/usr/share/doc/pwr$ver/changelog.Debian
+cp $pkgsrc/changelog.Debian $pkgroot/usr/share/doc/pwr
+gzip -fq --best $pkgroot/usr/share/doc/pwr/changelog.Debian
 
 # Man pages
 mkdir -p $pkgroot/usr/share/man/man1

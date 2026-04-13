@@ -21,15 +21,15 @@ if [ "$1" == "-v" ]; then
   exit
 fi
 
-pkgroot=$pwre_broot/$pwre_target/bld/pkg/pwrrpi$ver
+pkgroot=$pwre_broot/$pwre_target/bld/pkg/pwrrpi
 pkgsrc=$pwre_sroot/tools/pkg/deb_x86_64/pwrrpi
 rpi_target=os_linux/hw_arm
 
-echo "-- Building pwrrpi$ver"
+echo "-- Building pwrrpi"
 
 # Create directories
 mkdir -p $pkgroot/DEBIAN
-mkdir -p $pkgroot/usr/share/doc/pwrrpi$ver
+mkdir -p $pkgroot/usr/share/doc/pwrrpi
 mkdir -p $pkgroot/usr/pwrp
 mkdir -p $pkgroot/etc
 
@@ -46,15 +46,15 @@ chmod a+x $pkgroot/DEBIAN/postinst
 cp $pkgsrc/prerm $pkgroot/DEBIAN
 
 # copyright
-cp $pkgsrc/copyright $pkgroot/usr/share/doc/pwrrpi$ver
+cp $pkgsrc/copyright $pkgroot/usr/share/doc/pwrrpi
 
 # changelog
-cp $pkgsrc/changelog $pkgroot/usr/share/doc/pwrrpi$ver
-gzip -fq --best $pkgroot/usr/share/doc/pwrrpi$ver/changelog
+cp $pkgsrc/changelog $pkgroot/usr/share/doc/pwrrpi
+gzip -fq --best $pkgroot/usr/share/doc/pwrrpi/changelog
 
 # changelog.Debian
-cp $pkgsrc/changelog.Debian $pkgroot/usr/share/doc/pwrrpi$ver
-gzip -fq --best $pkgroot/usr/share/doc/pwrrpi$ver/changelog.Debian
+cp $pkgsrc/changelog.Debian $pkgroot/usr/share/doc/pwrrpi
+gzip -fq --best $pkgroot/usr/share/doc/pwrrpi/changelog.Debian
 
 # Copy proview
 mkdir $pkgroot/usr/pwr$ver

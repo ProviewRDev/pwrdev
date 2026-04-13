@@ -19,14 +19,14 @@ if [ -e $pwr_inc/pwr_version.h ]; then
 fi
 
 proot=$pwre_croot/project/pwrdemo
-pkgroot=$pwre_broot/$pwre_target/bld/pkg/pwrdemo$ver
+pkgroot=$pwre_broot/$pwre_target/bld/pkg/pwrdemo
 pkgsrc=$pwre_sroot/tools/pkg/$hw/pwrdemo
 
-echo "-- Building pwrdemo$ver"
+echo "-- Building pwrdemo"
 
 # Create directories
 mkdir -p $pkgroot/DEBIAN
-mkdir -p $pkgroot/usr/share/doc/pwrdemo$ver
+mkdir -p $pkgroot/usr/share/doc/pwrdemo
 mkdir -p $pkgroot/usr/share/applications
 mkdir -p $pkgroot/usr/pwrp
 
@@ -50,15 +50,15 @@ chmod 755 $pkgroot/DEBIAN/prerm
 chmod 644 $pkgroot/DEBIAN/control
 
 # copyright
-cp $pkgsrc/copyright $pkgroot/usr/share/doc/pwrdemo$ver
+cp $pkgsrc/copyright $pkgroot/usr/share/doc/pwrdemo
 
 # changelog
-cp $pkgsrc/changelog $pkgroot/usr/share/doc/pwrdemo$ver
-gzip -fq --best $pkgroot/usr/share/doc/pwrdemo$ver/changelog
+cp $pkgsrc/changelog $pkgroot/usr/share/doc/pwrdemo
+gzip -fq --best $pkgroot/usr/share/doc/pwrdemo/changelog
 
 # changelog.Debian
-cp $pkgsrc/changelog.Debian $pkgroot/usr/share/doc/pwrdemo$ver
-gzip -fq --best $pkgroot/usr/share/doc/pwrdemo$ver/changelog.Debian
+cp $pkgsrc/changelog.Debian $pkgroot/usr/share/doc/pwrdemo
+gzip -fq --best $pkgroot/usr/share/doc/pwrdemo/changelog.Debian
 
 # Man pages
 

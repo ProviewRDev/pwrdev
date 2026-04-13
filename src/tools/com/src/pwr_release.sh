@@ -162,6 +162,20 @@ do_sed() {
   fi
 }
 
+append_replaces() {
+  local ctrl="$1"
+  local pkg="$2"
+  local relpath="$3"
+
+  if grep -Eq "^Replaces:.*(^|[, ])${pkg}([, ]|$)" "$ctrl"; then
+    return
+  fi
+
+  do_sed "$relpath: Replaces += ${pkg}" \
+    "s|^\(Replaces:.*\)|\1,${pkg}|" \
+    "$ctrl"
+}
+
 rewrite_manual_metadata() {
   local file="$1"
   local relpath="${file#"$ROOT"/}"
@@ -368,7 +382,7 @@ VER_MAJOR="${BASH_REMATCH[1]}"
 VER_MINOR="${BASH_REMATCH[2]}"
 VER_PATCH="${BASH_REMATCH[3]}"
 VER_SHORT="V${VER_MAJOR}"    # e.g. V7 (for pwr_version.h / wbdb paths)
-PKG_SHORT="${VER_MAJOR}"      # e.g. 7  (for package names: pwr7, pwrdemo7)
+PKG_SHORT=""                  # Package names are versionless; Version carries V/M/m.
 
 # Known versioned package base names (longest first to avoid partial matches)
 PKG_BASES="pwrrpi64 pwrdemo pwrrpi pwr"
@@ -431,9 +445,9 @@ echo "=============================================="
 echo "  Repository root : $ROOT"
 echo "  Current version : $CUR_VERSION"
 echo "  New version     : $NEW_VERSION"
-echo "  Pkg short       : $OLD_SHORT -> $PKG_SHORT"
+echo "  Pkg suffix      : $OLD_SHORT -> <none>"
 if [ "$PKG_CHANGED" -eq 1 ]; then
-  echo "  Major version   : CHANGED (package names will be updated)"
+  echo "  Package names   : will be normalized"
 fi
 echo "  Copyright year  : $YEAR"
 echo "  Release date    : $RELEASE_DATE"
@@ -561,12 +575,12 @@ while IFS= read -r ctrl; do
     "$ctrl"
 
   if [ "$PKG_CHANGED" -eq 1 ]; then
-    # 3) Update Package: name — strip old version suffix and append <new>
-    #    Handles both legacy (pwr61) and accidentally generated (pwr_7) format
+    # 3) Update Package: name — strip old version suffix.
+    #    Handles both legacy (pwr61) and accidentally generated (pwr_7) format.
     if [[ "$orig_pkg" == *"$OLD_SHORT" ]]; then
       base_pkg="${orig_pkg%"$OLD_SHORT"}"   # strip version: pwr61->pwr, pwr_7->pwr_
       base_pkg="${base_pkg%_}"              # normalize any trailing underscore
-      new_pkg="${base_pkg}${PKG_SHORT}"     # pwr7, pwrdemo7, pwrrpi647
+      new_pkg="${base_pkg}${PKG_SHORT}"     # pwr, pwrdemo, pwrrpi64
       do_sed "$relpath: Package $orig_pkg -> $new_pkg" \
         "s|^Package: ${orig_pkg}$|Package: ${new_pkg}|" \
         "$ctrl"
@@ -577,7 +591,7 @@ while IFS= read -r ctrl; do
     for base in $PKG_BASES; do
       old_legacy="${base}${OLD_SHORT}"       # legacy format: pwr61, pwrrpi6461
       old_uscore="${base}_${OLD_SHORT}"      # bad underscore format: pwr_7, pwrrpi64_7
-      new_name="${base}${PKG_SHORT}"         # target: pwr8, pwrrpi648
+      new_name="${base}${PKG_SHORT}"         # target: pwr, pwrrpi64
 
       if grep -q "${old_uscore}\|${old_legacy}" "$ctrl" 2>/dev/null; then
         # Replace underscore format first (more specific), then legacy.
@@ -603,14 +617,14 @@ while IFS= read -r ctrl; do
     if grep -q '^Replaces:' "$ctrl"; then
       if [ "$orig_pkg" = "pwrrt" ] || [ "$orig_pkg" = "pwrsev" ]; then
         # Version-less packages: add the new dev package name
-        do_sed "$relpath: Replaces += pwr${PKG_SHORT}" \
-          "s|^\(Replaces:.*\)|\1,pwr${PKG_SHORT}|" \
-          "$ctrl"
+        append_replaces "$ctrl" "pwr${PKG_SHORT}" "$relpath"
+        append_replaces "$ctrl" "pwr${OLD_SHORT}" "$relpath"
+      elif [ "$orig_pkg" = "pwr" ]; then
+        # Keep upgrade path from the previously version-suffixed dev package.
+        append_replaces "$ctrl" "pwr${OLD_SHORT}" "$relpath"
       elif [[ "$orig_pkg" == *"$OLD_SHORT" ]]; then
         # Versioned dev package being renamed: add old name to Replaces
-        do_sed "$relpath: Replaces += ${orig_pkg}" \
-          "s|^\(Replaces:.*\)|\1,${orig_pkg}|" \
-          "$ctrl"
+        append_replaces "$ctrl" "$orig_pkg" "$relpath"
       fi
     fi
   fi
