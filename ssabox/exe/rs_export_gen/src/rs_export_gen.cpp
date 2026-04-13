@@ -1696,12 +1696,34 @@ static void set_children_enabled(AppData* app, GtkTreeIter* parent, gboolean ena
   } while (gtk_tree_model_iter_next(GTK_TREE_MODEL(app->source_store), &child));
 }
 
+static int get_node_state(AppData* app, GtkTreeIter* iter)
+{
+  gboolean selectable, enabled, inconsistent, visible;
+
+  gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), iter, COL_SELECTABLE, &selectable, COL_ENABLED, &enabled,
+                     COL_INCONSISTENT, &inconsistent, COL_VISIBLE, &visible, -1);
+
+  if (!visible)
+    return -1;
+
+  if (gtk_tree_model_iter_has_child(GTK_TREE_MODEL(app->source_store), iter))
+    return get_children_state(app, iter);
+
+  if (!selectable)
+    return -1;
+
+  if (inconsistent)
+    return 1;
+
+  return enabled ? 2 : 0;
+}
+
 /*
  * Check children state and return:
  *  0 = no children selected
  *  1 = some children selected (inconsistent)
  *  2 = all children selected
- * Only counts visible (filtered) children
+ * Only counts visible (filtered) children.
  */
 static int get_children_state(AppData* app, GtkTreeIter* parent)
 {
@@ -1710,51 +1732,33 @@ static int get_children_state(AppData* app, GtkTreeIter* parent)
     return 2; /* No children = treat as all selected */
 
   int total = 0;
-  int selected = 0;
+  bool has_selected = false;
+  bool has_unselected = false;
+  bool has_partial = false;
 
   do
   {
-    gboolean selectable, enabled, inconsistent, visible;
-    gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), &child, COL_SELECTABLE, &selectable, COL_ENABLED,
-                       &enabled, COL_INCONSISTENT, &inconsistent, COL_VISIBLE, &visible, -1);
+    int child_state = get_node_state(app, &child);
+    if (child_state < 0)
+      continue;
 
-    /* Only count visible children */
-    if (visible)
-    {
-      if (selectable)
-      {
-        total++;
-        if (enabled)
-          selected++;
-        else if (inconsistent)
-          selected++; /* Inconsistent counts as partially selected */
-      }
-      else if (gtk_tree_model_iter_has_child(GTK_TREE_MODEL(app->source_store), &child))
-      {
-        /* Non-selectable container (like "Enable") - check its children recursively */
-        int child_state = get_children_state(app, &child);
-        /* Aggregate grandchildren state into our counts */
-        total++;
-        if (child_state == 2)
-          selected++;
-        else if (child_state == 1)
-        {
-          /* Partial selection in descendants - treat as 0.5 to force inconsistent */
-          /* We achieve this by not incrementing selected, but total is incremented */
-          /* This will result in selected < total, yielding state 1 (inconsistent) */
-        }
-        /* child_state == 0 means no grandchildren selected, don't increment selected */
-      }
-    }
+    total++;
+
+    if (child_state == 0)
+      has_unselected = true;
+    else if (child_state == 1)
+      has_partial = true;
+    else
+      has_selected = true;
   } while (gtk_tree_model_iter_next(GTK_TREE_MODEL(app->source_store), &child));
 
   if (total == 0)
     return 2;
-  if (selected == 0)
-    return 0;
-  if (selected == total)
+  if (has_partial || (has_selected && has_unselected))
+    return 1;
+  if (has_selected)
     return 2;
-  return 1;
+  return 0;
 }
 
 /*
@@ -2114,13 +2118,13 @@ static void on_select_all_signals(GtkButton* button, gpointer user_data)
 
   auto select_signal = [&](GtkTreeIter* it)
   {
-    gboolean is_signal;
+    gboolean is_signal, visible;
     gchar* aref_str;
 
-    gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), it, COL_IS_SIGNAL, &is_signal, COL_AREF_STR,
-                       &aref_str, -1);
+    gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), it, COL_IS_SIGNAL, &is_signal, COL_VISIBLE, &visible,
+                       COL_AREF_STR, &aref_str, -1);
 
-    if (is_signal && aref_str && aref_str[0] != '\0')
+    if (visible && is_signal && aref_str && aref_str[0] != '\0')
     {
       gtk_tree_store_set(app->source_store, it, COL_ENABLED, TRUE, COL_INCONSISTENT, FALSE, -1);
       app->selected_names.insert(aref_str);
