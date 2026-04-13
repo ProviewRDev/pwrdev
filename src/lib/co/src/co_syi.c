@@ -44,6 +44,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#if defined(OS_CYGWIN) || defined(OS_LINUX)
+#include <pwd.h>
+#endif
 
 #include "co_errno.h"
 #include "co_syi.h"
@@ -132,15 +135,55 @@ char* syi_BootDisk(pwr_tStatus* status, char* ibuffer, int size)
 pwr_tStatus syi_UserName(char* user, int len)
 {
   char* p;
+#if defined(OS_CYGWIN) || defined(OS_LINUX)
+  struct passwd pwd;
+  struct passwd* result = NULL;
+  char* buf;
+  long bufsize;
+  int sts;
+#endif
+
+  if (!user || len <= 0)
+    return 0;
 
 #if defined(OS_CYGWIN) || defined(OS_LINUX)
-  p = cuserid(0);
+  bufsize = sysconf(_SC_GETPW_R_SIZE_MAX);
+  if (bufsize < 1024)
+    bufsize = 1024;
+
+  while (1) {
+    buf = (char*)malloc(bufsize);
+    if (!buf)
+      return 0;
+
+    sts = getpwuid_r(geteuid(), &pwd, buf, bufsize, &result);
+    if (sts != ERANGE)
+      break;
+
+    free(buf);
+    bufsize *= 2;
+  }
+
+  if (sts || !result) {
+    free(buf);
+    return 0;
+  }
+
+  p = result->pw_name;
+  if (!p) {
+    free(buf);
+    return 0;
+  }
+  strncpy(user, p, len);
+  user[len - 1] = 0;
+  free(buf);
 #else
   p = getlogin();
-#endif
   if (!p)
     return 0;
   strncpy(user, p, len);
+  user[len - 1] = 0;
+#endif
   return 1;
 }
 
