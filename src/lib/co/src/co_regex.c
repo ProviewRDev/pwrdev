@@ -251,7 +251,14 @@ int obscure_syntax = 0;
    results in it being larger than 1 << 16, then flag memory exhausted.  */
 #define EXTEND_BUFFER                                                          \
   {                                                                            \
-    char* old_buffer = bufp->buffer;                                           \
+    ptrdiff_t b_off = b - bufp->buffer;                                        \
+    ptrdiff_t fixup_jump_off                                                   \
+        = fixup_jump ? fixup_jump - bufp->buffer : 0;                          \
+    ptrdiff_t laststart_off                                                    \
+        = laststart ? laststart - bufp->buffer : 0;                            \
+    ptrdiff_t begalt_off = begalt - bufp->buffer;                              \
+    ptrdiff_t pending_exact_off                                                \
+        = pending_exact ? pending_exact - bufp->buffer : 0;                    \
     if (bufp->allocated == (1L << 16))                                         \
       goto too_big;                                                            \
     bufp->allocated *= 2;                                                      \
@@ -260,14 +267,14 @@ int obscure_syntax = 0;
     bufp->buffer = (char*)realloc(bufp->buffer, bufp->allocated);              \
     if (bufp->buffer == 0)                                                     \
       goto memory_exhausted;                                                   \
-    b = (b - old_buffer) + bufp->buffer;                                       \
+    b = bufp->buffer + b_off;                                                  \
     if (fixup_jump)                                                            \
-      fixup_jump = (fixup_jump - old_buffer) + bufp->buffer;                   \
+      fixup_jump = bufp->buffer + fixup_jump_off;                              \
     if (laststart)                                                             \
-      laststart = (laststart - old_buffer) + bufp->buffer;                     \
-    begalt = (begalt - old_buffer) + bufp->buffer;                             \
+      laststart = bufp->buffer + laststart_off;                                \
+    begalt = bufp->buffer + begalt_off;                                        \
     if (pending_exact)                                                         \
-      pending_exact = (pending_exact - old_buffer) + bufp->buffer;             \
+      pending_exact = bufp->buffer + pending_exact_off;                        \
   }
 
 /* Set the bit for character C in a character set list.  */
