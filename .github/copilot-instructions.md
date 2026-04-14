@@ -15,14 +15,41 @@ The codebase is organized into specialized modules, each with a consistent direc
 - `exp/` - Export/interface definitions
 - `doc/` - Module documentation
 
-**Key Modules:**
-- **rt** - Runtime system and core engine
-- **xtt** - Process graphics and HMI (Human Machine Interface) 
-- **wb** - Workbench/configurator tools
-- **nmps** - Network Message Passing System
-- **dataq** - Data queue management for historical data
-- **profibus/otherio** - Industrial protocol implementations
-- **java** - Java web interface components
+**Core:**
+- **src** — Core runtime engine, common libraries (`co`, `rt`, `msg`), QCom IPC, PLC execution, I/O handling, shared memory (GDB/GDH)
+- **xtt** — Process graphics HMI with Glow/Grow/Flow graphics engine, operator views, and trends
+- **wb** — Workbench configurator for system configuration, PLC programming, class editing, and build management
+
+**Data & Communication:**
+- **nmps** — Distributed data cell communication for redundant/mirrored systems
+- **dataq** — Time-series data queue with backup server for historical storage
+- **sev** — Storage Environment for historical event/trend data (MySQL, SQLite, HDF5 backends)
+- **tlog** — Trend logging for continuous time-series data collection and archival
+- **remote** — Remote communication: TCP/IP, Websphere MQ, RK512, ALCM protocols
+- **opc** — OPC XML/DA server and client for industrial interoperability
+
+**Industrial I/O & Protocols:**
+- **profibus** — Profibus DP master protocol and device support with GSD file integration
+- **otherio** — Multi-protocol I/O: Modbus TCP, GPIO, POWERLINK, CifX, USB (Arduino, joystick), UDP, MQTT
+- **ssabox** — PSS9000 modular I/O cards (DI/DO/AI/AO/PI, remote racks)
+
+**Manufacturer Equipment:**
+- **abb** — ABB frequency converters (ACS800/ACS880) via Profibus PPO and Profinet/PowerLink
+- **siemens** — Siemens ET200M/S distributed I/O, Sinamics G120 drives, diagnostic repeater
+- **klocknermoeller** — Klöckner & Moeller motor protective devices (PKZ circuit breaker)
+- **inor** — Inor temperature sensors (VRS sensor)
+- **telemecanique** — Schneider Electric (Telemecanique) industrial equipment
+- **othermanu** — Eurotherm tyristors, Danfoss FC300, SEW Movidrive, Janitza power analyzers
+
+**Utilities & Components:**
+- **bcomp** — Base component library: PID controllers, sensors, actuators, burner control, valves
+- **simul** — Signal generators (triangle, square, sine) and process simulators for testing
+- **misc** — Miscellaneous demo utilities
+- **java** — Java/web interface framework (JOP) with browser-based operator window and graphics rendering
+
+**Project & Testing:**
+- **project** — Demo projects and test configurations (`pwrdemo`, `pwrtest01`–`03`)
+- **test** — Test utilities and XTT test suite for system validation
 
 ### Build System Architecture
 
