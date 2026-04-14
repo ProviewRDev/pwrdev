@@ -43,6 +43,41 @@ ProviewR uses a sophisticated Perl-based build system (`pwre.pl`) that manages m
 
 ## Development Conventions
 
+### Debug vs Release Builds
+
+ProviewR supports two build types controlled by `pwre_btype` in `src/tools/bld/src/variables.mk`:
+
+| | Debug (`dbg`) | Release (`rls`) |
+|--|--|--|
+| Compiler flags | `-g -D_GNU_SOURCE` | `-O3 -D_GNU_SOURCE -DPWR_NDEBUG` |
+| `pwr_Assert(a)` | Checks condition, `exit()` on failure | **No-op**: `((void)0)` |
+| Optimization | None | Full (`-O3`) |
+
+**Critical rule: Never put side effects inside `pwr_Assert()`.** The expression is completely eliminated in release builds. Use proper error handling instead.
+
+### Key Macros (from `src/exp/inc/src/pwr.h`)
+
+```c
+pwr_dStatus(sts, status, ists)     // Declare local status var, init to ists
+pwr_Return(value, sts, error)      // Set *sts = error, return value
+pwr_ReturnVoid(sts, error)         // Set *sts = error, return (void)
+pwr_StatusBreak(var, error)        // Set var = error, break
+ODD(sts)                           // Success check (lowest bit set)
+EVEN(sts)                          // Failure check (lowest bit clear)
+pwr_Assert(condition)              // Debug-only assertion — NO-OP in rls!
+```
+
+Always check `EVEN(sts)` after status-returning function calls.
+
+### Shared Memory and Locking
+
+The runtime uses shared memory segments (`/tmp/pwr_rtdb_*`, `/tmp/pwr_pool_*`, `/tmp/pwr_qdb_*`). Locking conventions:
+
+- Use scoped lock macros: `gdb_ScopeLock { ... } gdb_ScopeUnlock` and `qdb_ScopeLock { ... } qdb_ScopeUnlock`
+- Use `break` (not `return`) to exit scoped lock blocks — `return` would skip the unlock
+- Recursive locks are not allowed — `qdb_LockOwned` check catches double-lock in debug
+- Shared memory struct changes require version bump (`gdb_cVersion`, `qdb_cVersion`) or runtime bugcheck
+
 ### File Organization Patterns
 - GTK implementations use `*_gtk.cpp` suffix pattern
 - Platform-neutral logic in base classes (e.g., `Xtt` base, `XttGtk` implementation)
