@@ -360,7 +360,7 @@ static pwr_tStatus init_plc(plc_sProcess* pp, char* name)
 
     sts = gdh_GetNextSibling(thread_oid, &thread_oid);
   }
-  for (; i > sizeof(pp->PlcProcess->PlcThreadObjects) / sizeof(pp->PlcProcess->PlcThreadObjects[0]); i++)
+  for (; i < sizeof(pp->PlcProcess->PlcThreadObjects) / sizeof(pp->PlcProcess->PlcThreadObjects[0]); i++)
     pp->PlcProcess->PlcThreadObjects[i] = pwr_cNObjid;
 
   aproc_RegisterObject(pp->oid);
