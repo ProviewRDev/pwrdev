@@ -1016,7 +1016,7 @@ void GrowTable::draw()
 
 void GrowTable::align(double x, double y, glow_eAlignDirection direction)
 {
-  double dx, dy;
+  double dx = 0, dy = 0;
 
   ctx->set_defered_redraw();
   draw();

@@ -1137,7 +1137,7 @@ static float mpc_interpolate(float* curve, unsigned int c_len, float val)
 /* Calculation of linear regression model */
 static float mpc_model(pwr_sClass_CompMPC_Fo* o, pwr_sClass_CompMPC* co, float out, float av0, float timestep)
 {
-  float av;
+  float av = 0;
   switch (co->Algorithm)
   {
   case pwr_eMpcAlgorithm_None:

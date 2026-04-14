@@ -200,14 +200,14 @@ static size_t bounded_string_length(const char* value, size_t max_size)
   return len;
 }
 
-static int format_bounded_string(char* buf, size_t buf_size, const char* format,
-    const void* value_ptr, int value_size, int* len)
+static int format_bounded_string(char* buf, size_t buf_size, const char* format, const void* value_ptr,
+                                 int value_size, int* len)
 {
   if (!value_ptr || value_size < 0)
     return 0;
 
   std::string safe_value((const char*)value_ptr,
-      bounded_string_length((const char*)value_ptr, (size_t)value_size));
+                         bounded_string_length((const char*)value_ptr, (size_t)value_size));
 
   *len = snprintf(buf, buf_size, format, safe_value.c_str());
   return 1;
@@ -345,8 +345,7 @@ static int table_format_width(const char* format)
   return width;
 }
 
-static int normalize_integer_format(
-    char* out, size_t out_size, const char* format, int type_id)
+static int normalize_integer_format(char* out, size_t out_size, const char* format, int type_id)
 {
   const char* modifier = "";
   size_t modifier_len = 0;
@@ -392,8 +391,8 @@ static int normalize_integer_format(
   return 1;
 }
 
-static int ge_table_format_value(char* buf, size_t buf_size, const char* format,
-    int type_id, int value_size, void* value_ptr, pwr_tMask bitmask, int* len)
+static int ge_table_format_value(char* buf, size_t buf_size, const char* format, int type_id, int value_size,
+                                 void* value_ptr, pwr_tMask bitmask, int* len)
 {
   char conv;
   char safe_format[80];
@@ -459,8 +458,8 @@ static int ge_table_format_value(char* buf, size_t buf_size, const char* format,
   default:;
   }
 
-  if (!(conv == 'd' || conv == 'i' || conv == 'u' || conv == 'o' || conv == 'x'
-          || conv == 'X' || conv == 'c'))
+  if (!(conv == 'd' || conv == 'i' || conv == 'u' || conv == 'o' || conv == 'x' || conv == 'X' ||
+        conv == 'c'))
     return 0;
 
   if (!normalize_integer_format(safe_format, sizeof(safe_format), format, type_id))
@@ -470,60 +469,56 @@ static int ge_table_format_value(char* buf, size_t buf_size, const char* format,
   {
   case pwr_eType_Boolean:
     *len = snprintf(buf, buf_size, safe_format,
-        unsigned_conv ? (unsigned int)*(pwr_tBoolean*)value_ptr
-                      : (int)*(pwr_tBoolean*)value_ptr);
+                    unsigned_conv ? (unsigned int)*(pwr_tBoolean*)value_ptr : (int)*(pwr_tBoolean*)value_ptr);
     return 1;
   case pwr_eType_Int8:
     *len = snprintf(buf, buf_size, safe_format,
-        conv == 'c' ? (int)*(pwr_tInt8*)value_ptr
-                    : (unsigned_conv ? (unsigned int)(pwr_tUInt8)(*(pwr_tInt8*)value_ptr)
-                                     : (int)*(pwr_tInt8*)value_ptr));
+                    conv == 'c' ? (int)*(pwr_tInt8*)value_ptr
+                                : (unsigned_conv ? (unsigned int)(pwr_tUInt8)(*(pwr_tInt8*)value_ptr)
+                                                 : (int)*(pwr_tInt8*)value_ptr));
     return 1;
   case pwr_eType_Char:
-    *len = snprintf(buf, buf_size, safe_format,
+    *len = snprintf(
+        buf, buf_size, safe_format,
         conv == 'c' ? (int)*(unsigned char*)value_ptr
-                    : (unsigned_conv ? (unsigned int)*(unsigned char*)value_ptr
-                                     : (int)*(char*)value_ptr));
+                    : (unsigned_conv ? (unsigned int)*(unsigned char*)value_ptr : (int)*(char*)value_ptr));
     return 1;
   case pwr_eType_UInt8:
-    *len = snprintf(buf, buf_size, safe_format,
+    *len = snprintf(
+        buf, buf_size, safe_format,
         conv == 'c' ? (int)*(pwr_tUInt8*)value_ptr
-                    : (unsigned_conv ? (unsigned int)*(pwr_tUInt8*)value_ptr
-                                     : (int)*(pwr_tUInt8*)value_ptr));
+                    : (unsigned_conv ? (unsigned int)*(pwr_tUInt8*)value_ptr : (int)*(pwr_tUInt8*)value_ptr));
     return 1;
   case pwr_eType_Int16:
     *len = snprintf(buf, buf_size, safe_format,
-        unsigned_conv ? (unsigned int)(pwr_tUInt16)(*(pwr_tInt16*)value_ptr)
-                      : (int)*(pwr_tInt16*)value_ptr);
+                    unsigned_conv ? (unsigned int)(pwr_tUInt16)(*(pwr_tInt16*)value_ptr)
+                                  : (int)*(pwr_tInt16*)value_ptr);
     return 1;
   case pwr_eType_UInt16:
     *len = snprintf(buf, buf_size, safe_format,
-        unsigned_conv ? (unsigned int)*(pwr_tUInt16*)value_ptr
-                      : (int)*(pwr_tUInt16*)value_ptr);
+                    unsigned_conv ? (unsigned int)*(pwr_tUInt16*)value_ptr : (int)*(pwr_tUInt16*)value_ptr);
     return 1;
   case pwr_eType_Int32:
   case pwr_eType_Enum:
   case pwr_eType_Status:
   case pwr_eType_NetStatus:
     *len = snprintf(buf, buf_size, safe_format,
-        unsigned_conv ? (pwr_tUInt32)(*(pwr_tInt32*)value_ptr)
-                      : *(pwr_tInt32*)value_ptr);
+                    unsigned_conv ? (pwr_tUInt32)(*(pwr_tInt32*)value_ptr) : *(pwr_tInt32*)value_ptr);
     return 1;
   case pwr_eType_UInt32:
   case pwr_eType_Mask:
     *len = snprintf(buf, buf_size, safe_format,
-        unsigned_conv ? *(pwr_tUInt32*)value_ptr
-                      : (pwr_tInt32)(*(pwr_tUInt32*)value_ptr));
+                    unsigned_conv ? *(pwr_tUInt32*)value_ptr : (pwr_tInt32)(*(pwr_tUInt32*)value_ptr));
     return 1;
   case pwr_eType_Int64:
     *len = snprintf(buf, buf_size, safe_format,
-        unsigned_conv ? (unsigned long long)(pwr_tUInt64)(*(pwr_tInt64*)value_ptr)
-                      : (long long)*(pwr_tInt64*)value_ptr);
+                    unsigned_conv ? (unsigned long long)(pwr_tUInt64)(*(pwr_tInt64*)value_ptr)
+                                  : (long long)*(pwr_tInt64*)value_ptr);
     return 1;
   case pwr_eType_UInt64:
     *len = snprintf(buf, buf_size, safe_format,
-        unsigned_conv ? (unsigned long long)*(pwr_tUInt64*)value_ptr
-                      : (long long)(pwr_tInt64)(*(pwr_tUInt64*)value_ptr));
+                    unsigned_conv ? (unsigned long long)*(pwr_tUInt64*)value_ptr
+                                  : (long long)(pwr_tInt64)(*(pwr_tUInt64*)value_ptr));
     return 1;
   default:
     return 0;
@@ -6060,488 +6055,489 @@ int GeValue::scan(grow_tObject object)
     memcpy(&old_value, p, cmp_size);
     format_bounded_string(buf, sizeof(buf), format, p, size, &len);
   }
-  else switch (annot_typeid)
-  {
-  case pwr_eType_Float32:
-  {
-    pwr_tFloat32 val = *(pwr_tFloat32*)p;
-    if (convert_element)
-      val = uc_convert((graph_eUcEntity)convert_element->entity, convert_element->db_unit,
-                       convert_element->display_unit, val);
+  else
+    switch (annot_typeid)
+    {
+    case pwr_eType_Float32:
+    {
+      pwr_tFloat32 val = *(pwr_tFloat32*)p;
+      if (convert_element)
+        val = uc_convert((graph_eUcEntity)convert_element->entity, convert_element->db_unit,
+                         convert_element->display_unit, val);
 
-    if (!first_scan)
-    {
-      if (memcmp(&old_value, &val, size) == 0)
-        // No change since last time
-        return 1;
-    }
-    else
-      first_scan = false;
-
-    if (zero_blank && fabsf(val) < FLT_EPSILON)
-    {
-      buf[0] = 0;
-      len = 0;
-    }
-    else
-      len = sprintf(buf, format, val);
-    memcpy(&old_value, &val, MIN(size, (int)sizeof(old_value)));
-    break;
-  }
-  case pwr_eType_Int32:
-  case pwr_eType_UInt32:
-  {
-    pwr_tInt32 val = *(pwr_tInt32*)p;
-
-    if (!first_scan)
-    {
-      if (memcmp(&old_value, &val, size) == 0)
-        // No change since last time
-        return 1;
-    }
-    else
-      first_scan = false;
-
-    if (zero_blank && val == 0)
-    {
-      buf[0] = 0;
-      len = 0;
-    }
-    else
-      len = sprintf(buf, format, val);
-    memcpy(&old_value, &val, MIN(size, (int)sizeof(old_value)));
-    break;
-  }
-  case pwr_eType_NetStatus:
-    if (db == graph_eDatabase_Gdh)
-    {
-      pwr_tTime t;
-      pwr_tStatus sts;
-      pwr_tBoolean old;
-
-      gdh_GetSubscriptionOldness(subid, &old, &t, &sts);
-      if (old)
-        *(pwr_tNetStatus*)p = PWR__NETTIMEOUT;
-    }
-  // No break
-  case pwr_eType_Status:
-  {
-    pwr_tStatus val = *(pwr_tStatus*)p;
-
-    if (!first_scan)
-    {
-      if (memcmp(&old_value, &val, size) == 0)
-        // No change since last time
-        return 1;
-    }
-    else
-      first_scan = false;
-
-    if (val == 0)
-    {
-      strcpy(buf, "");
-      len = 0;
-      break;
-    }
-    switch (format[1])
-    {
-    case '1':
-      // Format %1m: Write only the text
-      msg_GetText(val, buf, sizeof(buf));
-      break;
-    default:
-      msg_GetMsg(val, buf, sizeof(buf));
-    }
-    if (zero_blank && val == 0)
-    {
-      buf[0] = 0;
-      len = 0;
-    }
-    else
-      len = strlen(buf);
-    memcpy(&old_value, &val, MIN(size, (int)sizeof(old_value)));
-    break;
-  }
-  case pwr_eType_String:
-  case pwr_eType_Text:
-    cmp_size = MIN(size, (int)sizeof(old_value));
-    if (!first_scan)
-    {
-      if (strncmp(old_value, (char*)p, cmp_size) == 0)
-        // No change since last time
-        return 1;
-    }
-    else
-      first_scan = false;
-
-    memcpy(&old_value, p, cmp_size);
-
-    format_bounded_string(buf, sizeof(buf), format, p, size, &len);
-    break;
-  case pwr_eType_Objid:
-  {
-    int sts;
-    char name[120];
-    pwr_tObjid objid = *(pwr_tObjid*)p;
-
-    if (!first_scan)
-    {
-      if (memcmp(&old_value, &objid, size) == 0)
-        // No change since last time
-        return 1;
-    }
-    else
-      first_scan = false;
-
-    switch (format[1])
-    {
-    case '1':
-      // Format %1o, write path
-      sts = gdh_ObjidToName(objid, name, sizeof(name), cdh_mName_pathStrict);
-      break;
-    case '2':
-      // Format %2o, write volume and path
-      sts = gdh_ObjidToName(objid, name, sizeof(name), cdh_mName_volumeStrict);
-      break;
-    default:
-      sts = gdh_ObjidToName(objid, name, sizeof(name), cdh_mName_object);
-    }
-    if (EVEN(sts))
-      strcpy(name, "");
-
-    if (zero_blank && cdh_ObjidIsNull(objid))
-    {
-      buf[0] = 0;
-      len = 0;
-    }
-    else
-      len = snprintf(buf, sizeof(buf), "%s", name);
-    memcpy(&old_value, &objid, MIN(size, (int)sizeof(old_value)));
-    break;
-  }
-  case pwr_eType_AttrRef:
-  {
-    int sts;
-    char name[120];
-    pwr_sAttrRef aref = *(pwr_sAttrRef*)p;
-
-    if (!first_scan)
-    {
-      if (memcmp(&old_value, &aref, size) == 0)
-        // No change since last time
-        return 1;
-    }
-    else
-      first_scan = false;
-
-    if (cdh_ObjidIsNull(aref.Objid))
-      strcpy(name, "");
-    else
-    {
-      switch (format[1])
+      if (!first_scan)
       {
-      case '1':
-        // Format %1o, write path
-        sts = gdh_AttrrefToName(&aref, name, sizeof(name), cdh_mName_pathStrict);
-        break;
-      case '2':
-        // Format %2o, write volume and path
-        sts = gdh_AttrrefToName(&aref, name, sizeof(name), cdh_mName_volumeStrict);
-        break;
-      default:
-        sts = gdh_AttrrefToName(&aref, name, sizeof(name), cdh_mName_object | cdh_mName_attribute);
+        if (memcmp(&old_value, &val, size) == 0)
+          // No change since last time
+          return 1;
       }
-      if (EVEN(sts))
-        strcpy(name, "");
-    }
-    len = snprintf(buf, sizeof(buf), "%s", name);
-    memcpy(&old_value, &aref, MIN(size, (int)sizeof(old_value)));
-    break;
-  }
-  case pwr_eType_DataRef:
-  {
-    int sts;
-    char name[120];
-    pwr_tDataRef dataref = *(pwr_tDataRef*)p;
-
-    if (!first_scan)
-    {
-      if (memcmp(&old_value, &dataref, size) == 0)
-        // No change since last time
-        return 1;
-    }
-    else
-      first_scan = false;
-
-    if (cdh_ObjidIsNull(dataref.Aref.Objid))
-      strcpy(name, "");
-    else
-    {
-      switch (format[1])
-      {
-      case '1':
-        // Format %1o, write path
-        sts = gdh_AttrrefToName(&dataref.Aref, name, sizeof(name), cdh_mName_pathStrict);
-        break;
-      case '2':
-        // Format %2o, write volume and path
-        sts = gdh_AttrrefToName(&dataref.Aref, name, sizeof(name), cdh_mName_volumeStrict);
-        break;
-      default:
-        sts = gdh_AttrrefToName(&dataref.Aref, name, sizeof(name), cdh_mName_object | cdh_mName_attribute);
-      }
-      if (EVEN(sts))
-        strcpy(name, "");
-    }
-    len = snprintf(buf, sizeof(buf), "%s", name);
-    memcpy(&old_value, &dataref, MIN(size, (int)sizeof(old_value)));
-    break;
-  }
-  case pwr_eType_VolumeId:
-  {
-    pwr_tVolumeId vid = *(pwr_tVolumeId*)p;
-
-    if (!first_scan)
-    {
-      if (memcmp(&old_value, &vid, size) == 0)
-        // No change since last time
-        return 1;
-    }
-    else
-      first_scan = false;
-
-    *buf = 0;
-    cdh_VolumeIdToString(buf, sizeof(buf), vid, 0, 0);
-    len = strlen(buf);
-    memcpy(&old_value, &vid, sizeof(vid));
-    break;
-  }
-  case graph_eType_NodeId:
-  {
-    pwr_tNodeId nid = *(pwr_tNodeId*)p;
-
-    if (!first_scan)
-    {
-      if (memcmp(&old_value, &nid, size) == 0)
-        // No change since last time
-        return 1;
-    }
-    else
-      first_scan = false;
-
-    *buf = 0;
-    if (nid != 0)
-      strcpy(buf, qcom_NodeName(nid));
-    if (*buf == 0)
-      cdh_VolumeIdToString(buf, sizeof(buf), nid, 0, 0);
-    len = strlen(buf);
-    memcpy(&old_value, &nid, sizeof(nid));
-    break;
-  }
-  case pwr_eType_Time:
-  {
-    int sts;
-    char timstr[40];
-    pwr_tTime val = *(pwr_tTime*)p;
-
-    if (!first_scan)
-    {
-      if (memcmp(&old_value, &val, size) == 0)
-        // No change since last time
-        return 1;
-    }
-    else
-      first_scan = false;
-
-    switch (format[1])
-    {
-    case '1':
-      // Format %1t, only time, no hundredth
-      sts = time_AtoAscii(&val, time_eFormat_Time, timstr, sizeof(timstr));
-      timstr[8] = 0;
-      break;
-    case '2':
-      // Format %2t, only time, with hundredth
-      sts = time_AtoAscii(&val, time_eFormat_Time, timstr, sizeof(timstr));
-      break;
-    case '3':
-      // Format %3t, compressed date and time, no hundredth
-      sts = time_AtoAscii(&val, time_eFormat_ComprDateAndTime, timstr, sizeof(timstr));
-      timstr[17] = 0;
-      break;
-    case '4':
-      // Format %4t, date only
-      sts = time_AtoAscii(&val, time_eFormat_DateAndTime, timstr, sizeof(timstr));
-      timstr[11] = 0;
-      break;
-    case '5':
-      // Format %5t, compressed date only
-      sts = time_AtoAscii(&val, time_eFormat_ComprDateAndTime, timstr, sizeof(timstr));
-      timstr[8] = 0;
-      break;
-    case '6':
-      // Format %6t, 01:00:00 30/01/87
-      sts = time_AtoAscii(&val, time_eFormat_TimeAndDate, timstr, sizeof(timstr));
-      timstr[17] = 0;
-      break;
-    default:
-      sts = time_AtoAscii(&val, time_eFormat_DateAndTime, timstr, sizeof(timstr));
-    }
-    if (EVEN(sts))
-      strcpy(timstr, "-");
-    if (zero_blank && val.tv_sec == 0 && val.tv_nsec == 0)
-    {
-      buf[0] = 0;
-      len = 0;
-    }
-    else
-      len = sprintf(buf, "%s", timstr);
-    memcpy(&old_value, &val, MIN(size, (int)sizeof(old_value)));
-    break;
-  }
-  case pwr_eType_DeltaTime:
-  {
-    int sts;
-    char timstr[40];
-    pwr_tDeltaTime val = *(pwr_tDeltaTime*)p;
-
-    if (!first_scan)
-    {
-      if (memcmp(&old_value, &val, size) == 0)
-        // No change since last time
-        return 1;
-    }
-    else
-      first_scan = false;
-
-    switch (format[1])
-    {
-    case '1':
-      // Format %1t, only time, no hundredth
-      sts = time_DtoAscii(&val, 0, timstr, sizeof(timstr));
-      break;
-    default:
-      sts = time_DtoAscii(&val, 1, timstr, sizeof(timstr));
-    }
-    if (EVEN(sts))
-      strcpy(timstr, "-");
-    if (zero_blank && val.tv_sec == 0 && val.tv_nsec == 0)
-    {
-      buf[0] = 0;
-      len = 0;
-    }
-    else
-      len = sprintf(buf, "%s", timstr);
-    memcpy(&old_value, &val, MIN(size, (int)sizeof(old_value)));
-    break;
-  }
-  case pwr_eType_Enum:
-  {
-    int sts;
-    bool converted = false;
-    pwr_tInt32 val = *(pwr_tInt32*)p;
-
-    if (!first_scan)
-    {
-      if (memcmp(&old_value, &val, size) == 0)
-        // No change since last time
-        return 1;
-    }
-    else
-      first_scan = false;
-
-    switch (format[strlen(format) - 1])
-    {
-    case 's':
-    {
-      // Format %s, convert enum to string
-      gdh_sValueDef* valuedef;
-      int rows;
-
-      sts = gdh_GetEnumValueDef(tid, &valuedef, &rows);
-      if (EVEN(sts))
-        break;
-
-      for (int i = 0; i < rows; i++)
-      {
-        if (valuedef[i].Value->Value == val)
-        {
-          strcpy(buf, valuedef[i].Value->Text);
-          len = strlen(buf);
-          converted = true;
-          break;
-        }
-      }
-      free((char*)valuedef);
-      break;
-    }
-    default:;
-    }
-    if (!converted)
-    {
-      sts = cdh_AttrValueToString((pwr_eType)annot_typeid, &val, buf, sizeof(buf));
-      if (EVEN(sts))
-        sprintf(buf, "Invalid type");
-      len = strlen(buf);
-    }
-    memcpy(&old_value, &val, MIN(size, (int)sizeof(old_value)));
-    break;
-  }
-  case pwr_eType_Mask:
-  {
-    pwr_tUInt32 val = *(pwr_tUInt32*)p;
-
-    if (!first_scan)
-    {
-      if (memcmp(&old_value, &val, size) == 0)
-        // No change since last time
-        return 1;
-    }
-    else
-      first_scan = false;
-
-    switch (format[strlen(format) - 1])
-    {
-    case 'b':
-      if (str_StartsWith(&format[1], "16"))
-        cdh_MaskToBinaryString(val, 16, buf);
       else
-        cdh_MaskToBinaryString(val, 32, buf);
-      len = strlen(buf);
+        first_scan = false;
+
+      if (zero_blank && fabsf(val) < FLT_EPSILON)
+      {
+        buf[0] = 0;
+        len = 0;
+      }
+      else
+        len = sprintf(buf, format, val);
+      memcpy(&old_value, &val, MIN(size, (int)sizeof(old_value)));
       break;
+    }
+    case pwr_eType_Int32:
+    case pwr_eType_UInt32:
+    {
+      pwr_tInt32 val = *(pwr_tInt32*)p;
+
+      if (!first_scan)
+      {
+        if (memcmp(&old_value, &val, size) == 0)
+          // No change since last time
+          return 1;
+      }
+      else
+        first_scan = false;
+
+      if (zero_blank && val == 0)
+      {
+        buf[0] = 0;
+        len = 0;
+      }
+      else
+        len = sprintf(buf, format, val);
+      memcpy(&old_value, &val, MIN(size, (int)sizeof(old_value)));
+      break;
+    }
+    case pwr_eType_NetStatus:
+      if (db == graph_eDatabase_Gdh)
+      {
+        pwr_tTime t;
+        pwr_tStatus sts;
+        pwr_tBoolean old;
+
+        gdh_GetSubscriptionOldness(subid, &old, &t, &sts);
+        if (old)
+          *(pwr_tNetStatus*)p = PWR__NETTIMEOUT;
+      }
+    // No break
+    case pwr_eType_Status:
+    {
+      pwr_tStatus val = *(pwr_tStatus*)p;
+
+      if (!first_scan)
+      {
+        if (memcmp(&old_value, &val, size) == 0)
+          // No change since last time
+          return 1;
+      }
+      else
+        first_scan = false;
+
+      if (val == 0)
+      {
+        strcpy(buf, "");
+        len = 0;
+        break;
+      }
+      switch (format[1])
+      {
+      case '1':
+        // Format %1m: Write only the text
+        msg_GetText(val, buf, sizeof(buf));
+        break;
+      default:
+        msg_GetMsg(val, buf, sizeof(buf));
+      }
+      if (zero_blank && val == 0)
+      {
+        buf[0] = 0;
+        len = 0;
+      }
+      else
+        len = strlen(buf);
+      memcpy(&old_value, &val, MIN(size, (int)sizeof(old_value)));
+      break;
+    }
+    case pwr_eType_String:
+    case pwr_eType_Text:
+      cmp_size = MIN(size, (int)sizeof(old_value));
+      if (!first_scan)
+      {
+        if (strncmp(old_value, (char*)p, cmp_size) == 0)
+          // No change since last time
+          return 1;
+      }
+      else
+        first_scan = false;
+
+      memcpy(&old_value, p, cmp_size);
+
+      format_bounded_string(buf, sizeof(buf), format, p, size, &len);
+      break;
+    case pwr_eType_Objid:
+    {
+      int sts;
+      char name[120];
+      pwr_tObjid objid = *(pwr_tObjid*)p;
+
+      if (!first_scan)
+      {
+        if (memcmp(&old_value, &objid, size) == 0)
+          // No change since last time
+          return 1;
+      }
+      else
+        first_scan = false;
+
+      switch (format[1])
+      {
+      case '1':
+        // Format %1o, write path
+        sts = gdh_ObjidToName(objid, name, sizeof(name), cdh_mName_pathStrict);
+        break;
+      case '2':
+        // Format %2o, write volume and path
+        sts = gdh_ObjidToName(objid, name, sizeof(name), cdh_mName_volumeStrict);
+        break;
+      default:
+        sts = gdh_ObjidToName(objid, name, sizeof(name), cdh_mName_object);
+      }
+      if (EVEN(sts))
+        strcpy(name, "");
+
+      if (zero_blank && cdh_ObjidIsNull(objid))
+      {
+        buf[0] = 0;
+        len = 0;
+      }
+      else
+        len = snprintf(buf, sizeof(buf), "%s", name);
+      memcpy(&old_value, &objid, MIN(size, (int)sizeof(old_value)));
+      break;
+    }
+    case pwr_eType_AttrRef:
+    {
+      int sts;
+      char name[120];
+      pwr_sAttrRef aref = *(pwr_sAttrRef*)p;
+
+      if (!first_scan)
+      {
+        if (memcmp(&old_value, &aref, size) == 0)
+          // No change since last time
+          return 1;
+      }
+      else
+        first_scan = false;
+
+      if (cdh_ObjidIsNull(aref.Objid))
+        strcpy(name, "");
+      else
+      {
+        switch (format[1])
+        {
+        case '1':
+          // Format %1o, write path
+          sts = gdh_AttrrefToName(&aref, name, sizeof(name), cdh_mName_pathStrict);
+          break;
+        case '2':
+          // Format %2o, write volume and path
+          sts = gdh_AttrrefToName(&aref, name, sizeof(name), cdh_mName_volumeStrict);
+          break;
+        default:
+          sts = gdh_AttrrefToName(&aref, name, sizeof(name), cdh_mName_object | cdh_mName_attribute);
+        }
+        if (EVEN(sts))
+          strcpy(name, "");
+      }
+      len = snprintf(buf, sizeof(buf), "%s", name);
+      memcpy(&old_value, &aref, MIN(size, (int)sizeof(old_value)));
+      break;
+    }
+    case pwr_eType_DataRef:
+    {
+      int sts;
+      char name[120];
+      pwr_tDataRef dataref = *(pwr_tDataRef*)p;
+
+      if (!first_scan)
+      {
+        if (memcmp(&old_value, &dataref, size) == 0)
+          // No change since last time
+          return 1;
+      }
+      else
+        first_scan = false;
+
+      if (cdh_ObjidIsNull(dataref.Aref.Objid))
+        strcpy(name, "");
+      else
+      {
+        switch (format[1])
+        {
+        case '1':
+          // Format %1o, write path
+          sts = gdh_AttrrefToName(&dataref.Aref, name, sizeof(name), cdh_mName_pathStrict);
+          break;
+        case '2':
+          // Format %2o, write volume and path
+          sts = gdh_AttrrefToName(&dataref.Aref, name, sizeof(name), cdh_mName_volumeStrict);
+          break;
+        default:
+          sts = gdh_AttrrefToName(&dataref.Aref, name, sizeof(name), cdh_mName_object | cdh_mName_attribute);
+        }
+        if (EVEN(sts))
+          strcpy(name, "");
+      }
+      len = snprintf(buf, sizeof(buf), "%s", name);
+      memcpy(&old_value, &dataref, MIN(size, (int)sizeof(old_value)));
+      break;
+    }
+    case pwr_eType_VolumeId:
+    {
+      pwr_tVolumeId vid = *(pwr_tVolumeId*)p;
+
+      if (!first_scan)
+      {
+        if (memcmp(&old_value, &vid, size) == 0)
+          // No change since last time
+          return 1;
+      }
+      else
+        first_scan = false;
+
+      *buf = 0;
+      cdh_VolumeIdToString(buf, sizeof(buf), vid, 0, 0);
+      len = strlen(buf);
+      memcpy(&old_value, &vid, sizeof(vid));
+      break;
+    }
+    case graph_eType_NodeId:
+    {
+      pwr_tNodeId nid = *(pwr_tNodeId*)p;
+
+      if (!first_scan)
+      {
+        if (memcmp(&old_value, &nid, size) == 0)
+          // No change since last time
+          return 1;
+      }
+      else
+        first_scan = false;
+
+      *buf = 0;
+      if (nid != 0)
+        strcpy(buf, qcom_NodeName(nid));
+      if (*buf == 0)
+        cdh_VolumeIdToString(buf, sizeof(buf), nid, 0, 0);
+      len = strlen(buf);
+      memcpy(&old_value, &nid, sizeof(nid));
+      break;
+    }
+    case pwr_eType_Time:
+    {
+      int sts;
+      char timstr[40];
+      pwr_tTime val = *(pwr_tTime*)p;
+
+      if (!first_scan)
+      {
+        if (memcmp(&old_value, &val, size) == 0)
+          // No change since last time
+          return 1;
+      }
+      else
+        first_scan = false;
+
+      switch (format[1])
+      {
+      case '1':
+        // Format %1t, only time, no hundredth
+        sts = time_AtoAscii(&val, time_eFormat_Time, timstr, sizeof(timstr));
+        timstr[8] = 0;
+        break;
+      case '2':
+        // Format %2t, only time, with hundredth
+        sts = time_AtoAscii(&val, time_eFormat_Time, timstr, sizeof(timstr));
+        break;
+      case '3':
+        // Format %3t, compressed date and time, no hundredth
+        sts = time_AtoAscii(&val, time_eFormat_ComprDateAndTime, timstr, sizeof(timstr));
+        timstr[17] = 0;
+        break;
+      case '4':
+        // Format %4t, date only
+        sts = time_AtoAscii(&val, time_eFormat_DateAndTime, timstr, sizeof(timstr));
+        timstr[11] = 0;
+        break;
+      case '5':
+        // Format %5t, compressed date only
+        sts = time_AtoAscii(&val, time_eFormat_ComprDateAndTime, timstr, sizeof(timstr));
+        timstr[8] = 0;
+        break;
+      case '6':
+        // Format %6t, 01:00:00 30/01/87
+        sts = time_AtoAscii(&val, time_eFormat_TimeAndDate, timstr, sizeof(timstr));
+        timstr[17] = 0;
+        break;
+      default:
+        sts = time_AtoAscii(&val, time_eFormat_DateAndTime, timstr, sizeof(timstr));
+      }
+      if (EVEN(sts))
+        strcpy(timstr, "-");
+      if (zero_blank && val.tv_sec == 0 && val.tv_nsec == 0)
+      {
+        buf[0] = 0;
+        len = 0;
+      }
+      else
+        len = sprintf(buf, "%s", timstr);
+      memcpy(&old_value, &val, MIN(size, (int)sizeof(old_value)));
+      break;
+    }
+    case pwr_eType_DeltaTime:
+    {
+      int sts;
+      char timstr[40];
+      pwr_tDeltaTime val = *(pwr_tDeltaTime*)p;
+
+      if (!first_scan)
+      {
+        if (memcmp(&old_value, &val, size) == 0)
+          // No change since last time
+          return 1;
+      }
+      else
+        first_scan = false;
+
+      switch (format[1])
+      {
+      case '1':
+        // Format %1t, only time, no hundredth
+        sts = time_DtoAscii(&val, 0, timstr, sizeof(timstr));
+        break;
+      default:
+        sts = time_DtoAscii(&val, 1, timstr, sizeof(timstr));
+      }
+      if (EVEN(sts))
+        strcpy(timstr, "-");
+      if (zero_blank && val.tv_sec == 0 && val.tv_nsec == 0)
+      {
+        buf[0] = 0;
+        len = 0;
+      }
+      else
+        len = sprintf(buf, "%s", timstr);
+      memcpy(&old_value, &val, MIN(size, (int)sizeof(old_value)));
+      break;
+    }
+    case pwr_eType_Enum:
+    {
+      int sts;
+      bool converted = false;
+      pwr_tInt32 val = *(pwr_tInt32*)p;
+
+      if (!first_scan)
+      {
+        if (memcmp(&old_value, &val, size) == 0)
+          // No change since last time
+          return 1;
+      }
+      else
+        first_scan = false;
+
+      switch (format[strlen(format) - 1])
+      {
+      case 's':
+      {
+        // Format %s, convert enum to string
+        gdh_sValueDef* valuedef;
+        int rows;
+
+        sts = gdh_GetEnumValueDef(tid, &valuedef, &rows);
+        if (EVEN(sts))
+          break;
+
+        for (int i = 0; i < rows; i++)
+        {
+          if (valuedef[i].Value->Value == val)
+          {
+            strcpy(buf, valuedef[i].Value->Text);
+            len = strlen(buf);
+            converted = true;
+            break;
+          }
+        }
+        free((char*)valuedef);
+        break;
+      }
+      default:;
+      }
+      if (!converted)
+      {
+        sts = cdh_AttrValueToString((pwr_eType)annot_typeid, &val, buf, sizeof(buf));
+        if (EVEN(sts))
+          sprintf(buf, "Invalid type");
+        len = strlen(buf);
+      }
+      memcpy(&old_value, &val, MIN(size, (int)sizeof(old_value)));
+      break;
+    }
+    case pwr_eType_Mask:
+    {
+      pwr_tUInt32 val = *(pwr_tUInt32*)p;
+
+      if (!first_scan)
+      {
+        if (memcmp(&old_value, &val, size) == 0)
+          // No change since last time
+          return 1;
+      }
+      else
+        first_scan = false;
+
+      switch (format[strlen(format) - 1])
+      {
+      case 'b':
+        if (str_StartsWith(&format[1], "16"))
+          cdh_MaskToBinaryString(val, 16, buf);
+        else
+          cdh_MaskToBinaryString(val, 32, buf);
+        len = strlen(buf);
+        break;
+      default:
+      {
+        int sts;
+        sts = cdh_AttrValueToString((pwr_eType)annot_typeid, &val, buf, sizeof(buf));
+        if (EVEN(sts))
+          sprintf(buf, "Invalid type");
+        len = strlen(buf);
+      }
+      }
+      memcpy(&old_value, &val, MIN(size, (int)sizeof(old_value)));
+      break;
+    }
     default:
     {
       int sts;
-      sts = cdh_AttrValueToString((pwr_eType)annot_typeid, &val, buf, sizeof(buf));
+
+      if (!first_scan)
+      {
+        if (memcmp(&old_value, p, size) == 0)
+          // No change since last time
+          return 1;
+      }
+      else
+        first_scan = false;
+
+      memcpy(&old_value, p, MIN(size, (int)sizeof(old_value)));
+
+      sts = cdh_AttrValueToString((pwr_eType)annot_typeid, p, buf, sizeof(buf));
       if (EVEN(sts))
         sprintf(buf, "Invalid type");
       len = strlen(buf);
     }
     }
-    memcpy(&old_value, &val, MIN(size, (int)sizeof(old_value)));
-    break;
-  }
-  default:
-  {
-    int sts;
-
-    if (!first_scan)
-    {
-      if (memcmp(&old_value, p, size) == 0)
-        // No change since last time
-        return 1;
-    }
-    else
-      first_scan = false;
-
-    memcpy(&old_value, p, MIN(size, (int)sizeof(old_value)));
-
-    sts = cdh_AttrValueToString((pwr_eType)annot_typeid, p, buf, sizeof(buf));
-    if (EVEN(sts))
-      sprintf(buf, "Invalid type");
-    len = strlen(buf);
-  }
-  }
   int annot_num = GeDyn::instance_to_number(instance);
   // if ( annot_num == 1)
   // grow_SetAnnotationBrief( object, annot_num, buf, len);
@@ -7890,7 +7886,7 @@ int GeAnalogColor::scan(grow_tObject object)
 int GeAnalogColor::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   char name[80];
-  int e_common_attr;
+  int e_common_attr = 0;
   if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
     sprintf(name, "%sAnalogTone", prefix);
   else
@@ -11385,8 +11381,8 @@ int GeBar::scan(grow_tObject object)
   {
     bool update = false;
 
-    pwr_tFloat32 maxval;
-    pwr_tFloat32 minval;
+    pwr_tFloat32 maxval = 0;
+    pwr_tFloat32 minval = 0;
     if (max_value_p)
     {
       maxval = *max_value_p;
@@ -11959,8 +11955,8 @@ int GeTrend::scan(grow_tObject object)
   {
     bool update = false;
 
-    pwr_tFloat32 maxval;
-    pwr_tFloat32 minval;
+    pwr_tFloat32 maxval = 0;
+    pwr_tFloat32 minval = 0;
     if (max_value1_p)
     {
       maxval = *max_value1_p;
@@ -11996,8 +11992,8 @@ int GeTrend::scan(grow_tObject object)
   {
     bool update = false;
 
-    pwr_tFloat32 maxval;
-    pwr_tFloat32 minval;
+    pwr_tFloat32 maxval = 0;
+    pwr_tFloat32 minval = 0;
     if (max_value2_p)
     {
       maxval = *max_value2_p;
@@ -13956,9 +13952,8 @@ int GeTable::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
     case pwr_eType_Char:
     case pwr_eType_Enum:
     case pwr_eType_Mask:
-      info.column_size[i]
-          = MAX(cdh_TypeToMaxStrSize((pwr_eType)type_id[i], size[i], 1),
-              MAX(14, table_format_width(format[i])));
+      info.column_size[i] = MAX(cdh_TypeToMaxStrSize((pwr_eType)type_id[i], size[i], 1),
+                                MAX(14, table_format_width(format[i])));
       break;
     case graph_eType_Bit:
       info.column_size[i] = 1;
@@ -14088,117 +14083,118 @@ int GeTable::scan(grow_tObject object)
             continue;
         }
 
-        if (ge_table_format_value(buf, sizeof(buf), format[i], type_id[i], size[i],
-                headerref_p[i][j], bitmask[i], &len))
+        if (ge_table_format_value(buf, sizeof(buf), format[i], type_id[i], size[i], headerref_p[i][j],
+                                  bitmask[i], &len))
           ;
-        else switch (type_id[i])
-        {
-        case pwr_eType_Objid:
-        {
-          int sts;
-          pwr_tOName name;
-          pwr_tObjid objid = *(pwr_tObjid*)headerref_p[i][j];
-
-          switch (format[i][1])
+        else
+          switch (type_id[i])
           {
-          case '1':
-            // Format %1o, write path
-            sts = gdh_ObjidToName(objid, name, sizeof(name), cdh_mName_pathStrict);
+          case pwr_eType_Objid:
+          {
+            int sts;
+            pwr_tOName name;
+            pwr_tObjid objid = *(pwr_tObjid*)headerref_p[i][j];
+
+            switch (format[i][1])
+            {
+            case '1':
+              // Format %1o, write path
+              sts = gdh_ObjidToName(objid, name, sizeof(name), cdh_mName_pathStrict);
+              break;
+            case '2':
+              // Format %2o, write volume and path
+              sts = gdh_ObjidToName(objid, name, sizeof(name), cdh_mName_volumeStrict);
+              break;
+            default:
+              sts = gdh_ObjidToName(objid, name, sizeof(name), cdh_mName_object);
+            }
+            if (EVEN(sts))
+              strcpy(name, "");
+            len = sprintf(buf, "%s", name);
             break;
-          case '2':
-            // Format %2o, write volume and path
-            sts = gdh_ObjidToName(objid, name, sizeof(name), cdh_mName_volumeStrict);
-            break;
-          default:
-            sts = gdh_ObjidToName(objid, name, sizeof(name), cdh_mName_object);
           }
-          if (EVEN(sts))
-            strcpy(name, "");
-          len = sprintf(buf, "%s", name);
-          break;
-        }
-        case pwr_eType_Time:
-        {
-          int sts;
-          char timstr[40];
-
-          if (memcmp(headerref_p[i][j], &pwr_cNTime, sizeof(pwr_tTime)) == 0)
-            strcpy(timstr, "");
-          else
+          case pwr_eType_Time:
           {
+            int sts;
+            char timstr[40];
+
+            if (memcmp(headerref_p[i][j], &pwr_cNTime, sizeof(pwr_tTime)) == 0)
+              strcpy(timstr, "");
+            else
+            {
+              switch (format[i][1])
+              {
+              case '1':
+                // Format %1t, only time, no hundredth
+                sts = time_AtoAscii((pwr_tTime*)headerref_p[i][j], time_eFormat_Time, timstr, sizeof(timstr));
+                timstr[8] = 0;
+                break;
+              case '2':
+                // Format %2t, only time, with hundredth
+                sts = time_AtoAscii((pwr_tTime*)headerref_p[i][j], time_eFormat_Time, timstr, sizeof(timstr));
+                break;
+              case '3':
+                // Format %3t, compressed date and time, no hundredth
+                sts = time_AtoAscii((pwr_tTime*)headerref_p[i][j], time_eFormat_ComprDateAndTime, timstr,
+                                    sizeof(timstr));
+                timstr[17] = 0;
+                break;
+              case '4':
+                // Format %4t, date only
+                sts = time_AtoAscii((pwr_tTime*)headerref_p[i][j], time_eFormat_DateAndTime, timstr,
+                                    sizeof(timstr));
+                timstr[11] = 0;
+                break;
+              case '5':
+                // Format %5t, compressed date only
+                sts = time_AtoAscii((pwr_tTime*)headerref_p[i][j], time_eFormat_ComprDateAndTime, timstr,
+                                    sizeof(timstr));
+                timstr[8] = 0;
+                break;
+              case '6':
+                // Format %6t, 01:00:00 30/01/87
+                sts = time_AtoAscii((pwr_tTime*)headerref_p[i][j], time_eFormat_TimeAndDate, timstr,
+                                    sizeof(timstr));
+                timstr[17] = 0;
+                break;
+              default:
+                sts = time_AtoAscii((pwr_tTime*)headerref_p[i][j], time_eFormat_DateAndTime, timstr,
+                                    sizeof(timstr));
+              }
+              if (EVEN(sts))
+                strcpy(timstr, "-");
+            }
+            len = sprintf(buf, "%s", timstr);
+            break;
+          }
+          case pwr_eType_DeltaTime:
+          {
+            int sts;
+            char timstr[40];
+
             switch (format[i][1])
             {
             case '1':
               // Format %1t, only time, no hundredth
-              sts = time_AtoAscii((pwr_tTime*)headerref_p[i][j], time_eFormat_Time, timstr, sizeof(timstr));
-              timstr[8] = 0;
-              break;
-            case '2':
-              // Format %2t, only time, with hundredth
-              sts = time_AtoAscii((pwr_tTime*)headerref_p[i][j], time_eFormat_Time, timstr, sizeof(timstr));
-              break;
-            case '3':
-              // Format %3t, compressed date and time, no hundredth
-              sts = time_AtoAscii((pwr_tTime*)headerref_p[i][j], time_eFormat_ComprDateAndTime, timstr,
-                                  sizeof(timstr));
-              timstr[17] = 0;
-              break;
-            case '4':
-              // Format %4t, date only
-              sts = time_AtoAscii((pwr_tTime*)headerref_p[i][j], time_eFormat_DateAndTime, timstr,
-                                  sizeof(timstr));
-              timstr[11] = 0;
-              break;
-            case '5':
-              // Format %5t, compressed date only
-              sts = time_AtoAscii((pwr_tTime*)headerref_p[i][j], time_eFormat_ComprDateAndTime, timstr,
-                                  sizeof(timstr));
-              timstr[8] = 0;
-              break;
-            case '6':
-              // Format %6t, 01:00:00 30/01/87
-              sts = time_AtoAscii((pwr_tTime*)headerref_p[i][j], time_eFormat_TimeAndDate, timstr,
-                                  sizeof(timstr));
-              timstr[17] = 0;
+              sts = time_DtoAscii((pwr_tDeltaTime*)headerref_p[i][j], 0, timstr, sizeof(timstr));
               break;
             default:
-              sts = time_AtoAscii((pwr_tTime*)headerref_p[i][j], time_eFormat_DateAndTime, timstr,
-                                  sizeof(timstr));
+              sts = time_DtoAscii((pwr_tDeltaTime*)headerref_p[i][j], 1, timstr, sizeof(timstr));
             }
             if (EVEN(sts))
               strcpy(timstr, "-");
-          }
-          len = sprintf(buf, "%s", timstr);
-          break;
-        }
-        case pwr_eType_DeltaTime:
-        {
-          int sts;
-          char timstr[40];
-
-          switch (format[i][1])
-          {
-          case '1':
-            // Format %1t, only time, no hundredth
-            sts = time_DtoAscii((pwr_tDeltaTime*)headerref_p[i][j], 0, timstr, sizeof(timstr));
+            len = sprintf(buf, "%s", timstr);
             break;
-          default:
-            sts = time_DtoAscii((pwr_tDeltaTime*)headerref_p[i][j], 1, timstr, sizeof(timstr));
           }
-          if (EVEN(sts))
-            strcpy(timstr, "-");
-          len = sprintf(buf, "%s", timstr);
-          break;
-        }
-        default:
-        {
-          int sts;
-          sts = cdh_AttrValueToString((pwr_eType)type_id[i], headerref_p[i][j], buf, sizeof(buf));
-          if (EVEN(sts))
-            sprintf(buf, "Invalid type");
-          len = strlen(buf);
-        }
-        }
+          default:
+          {
+            int sts;
+            sts = cdh_AttrValueToString((pwr_eType)type_id[i], headerref_p[i][j], buf, sizeof(buf));
+            if (EVEN(sts))
+              sprintf(buf, "Invalid type");
+            len = strlen(buf);
+          }
+          }
 
         grow_SetCellValue(object, i, j, buf);
         memcpy(old_value[i] + offs, headerref_p[i][j], size[i]);
@@ -14218,143 +14214,146 @@ int GeTable::scan(grow_tObject object)
             continue;
         }
 
-        if (ge_table_format_value(buf, sizeof(buf), format[i], type_id[i], size[i],
-                p[i] + offs, bitmask[i], &len))
+        if (ge_table_format_value(buf, sizeof(buf), format[i], type_id[i], size[i], p[i] + offs, bitmask[i],
+                                  &len))
           ;
-        else switch (type_id[i])
-        {
-        case pwr_eType_Objid:
-        {
-          int sts;
-          pwr_tOName name;
-          pwr_tObjid objid = *(pwr_tObjid*)(p[i] + offs);
-          switch (format[i][1])
+        else
+          switch (type_id[i])
           {
-          case '1':
-            // Format %1o, write path
-            sts = gdh_ObjidToName(objid, name, sizeof(name), cdh_mName_pathStrict);
-            break;
-          case '2':
-            // Format %2o, write volume and path
-            sts = gdh_ObjidToName(objid, name, sizeof(name), cdh_mName_volumeStrict);
-            break;
-          default:
-            sts = gdh_ObjidToName(objid, name, sizeof(name), cdh_mName_object);
-          }
-          if (EVEN(sts))
-            strcpy(name, "");
-          len = sprintf(buf, "%s", name);
-          break;
-        }
-        case pwr_eType_AttrRef:
-        {
-          int sts;
-          pwr_tOName name;
-          pwr_tAttrRef aref = *(pwr_tAttrRef*)(p[i] + offs);
-
-          if (cdh_ObjidIsNull(aref.Objid))
-            strcpy(name, "");
-          else
+          case pwr_eType_Objid:
           {
+            int sts;
+            pwr_tOName name;
+            pwr_tObjid objid = *(pwr_tObjid*)(p[i] + offs);
             switch (format[i][1])
             {
             case '1':
               // Format %1o, write path
-              sts = gdh_AttrrefToName(&aref, name, sizeof(name), cdh_mName_pathStrict);
+              sts = gdh_ObjidToName(objid, name, sizeof(name), cdh_mName_pathStrict);
               break;
             case '2':
               // Format %2o, write volume and path
-              sts = gdh_AttrrefToName(&aref, name, sizeof(name), cdh_mName_volumeStrict);
+              sts = gdh_ObjidToName(objid, name, sizeof(name), cdh_mName_volumeStrict);
               break;
             default:
-              sts = gdh_AttrrefToName(&aref, name, sizeof(name), cdh_mName_object | cdh_mName_attribute);
+              sts = gdh_ObjidToName(objid, name, sizeof(name), cdh_mName_object);
             }
             if (EVEN(sts))
               strcpy(name, "");
+            len = sprintf(buf, "%s", name);
+            break;
           }
-          len = sprintf(buf, "%s", name);
-          break;
-        }
-        case pwr_eType_Time:
-        {
-          int sts;
-          char timstr[40];
-
-          if (memcmp(p[i] + offs, &pwr_cNTime, sizeof(pwr_tTime)) == 0)
-            strcpy(timstr, "");
-          else
+          case pwr_eType_AttrRef:
           {
+            int sts;
+            pwr_tOName name;
+            pwr_tAttrRef aref = *(pwr_tAttrRef*)(p[i] + offs);
+
+            if (cdh_ObjidIsNull(aref.Objid))
+              strcpy(name, "");
+            else
+            {
+              switch (format[i][1])
+              {
+              case '1':
+                // Format %1o, write path
+                sts = gdh_AttrrefToName(&aref, name, sizeof(name), cdh_mName_pathStrict);
+                break;
+              case '2':
+                // Format %2o, write volume and path
+                sts = gdh_AttrrefToName(&aref, name, sizeof(name), cdh_mName_volumeStrict);
+                break;
+              default:
+                sts = gdh_AttrrefToName(&aref, name, sizeof(name), cdh_mName_object | cdh_mName_attribute);
+              }
+              if (EVEN(sts))
+                strcpy(name, "");
+            }
+            len = sprintf(buf, "%s", name);
+            break;
+          }
+          case pwr_eType_Time:
+          {
+            int sts;
+            char timstr[40];
+
+            if (memcmp(p[i] + offs, &pwr_cNTime, sizeof(pwr_tTime)) == 0)
+              strcpy(timstr, "");
+            else
+            {
+              switch (format[i][1])
+              {
+              case '1':
+                // Format %1t, only time, no hundredth
+                sts = time_AtoAscii((pwr_tTime*)(p[i] + offs), time_eFormat_Time, timstr, sizeof(timstr));
+                timstr[8] = 0;
+                break;
+              case '2':
+                // Format %2t, only time, with hundredth
+                sts = time_AtoAscii((pwr_tTime*)(p[i] + offs), time_eFormat_Time, timstr, sizeof(timstr));
+                break;
+              case '3':
+                // Format %3t, compressed date and time, no hundredth
+                sts = time_AtoAscii((pwr_tTime*)(p[i] + offs), time_eFormat_ComprDateAndTime, timstr,
+                                    sizeof(timstr));
+                timstr[17] = 0;
+                break;
+              case '4':
+                // Format %4t, date only
+                sts =
+                    time_AtoAscii((pwr_tTime*)p[i] + offs, time_eFormat_DateAndTime, timstr, sizeof(timstr));
+                timstr[11] = 0;
+                break;
+              case '5':
+                // Format %5t, compressed date only
+                sts = time_AtoAscii((pwr_tTime*)p[i] + offs, time_eFormat_ComprDateAndTime, timstr,
+                                    sizeof(timstr));
+                timstr[8] = 0;
+                break;
+              case '6':
+                // Format %6t, 01:00:00 30/01/87
+                sts =
+                    time_AtoAscii((pwr_tTime*)p[i] + offs, time_eFormat_TimeAndDate, timstr, sizeof(timstr));
+                timstr[17] = 0;
+                break;
+              default:
+                sts = time_AtoAscii((pwr_tTime*)(p[i] + offs), time_eFormat_DateAndTime, timstr,
+                                    sizeof(timstr));
+              }
+              if (EVEN(sts))
+                strcpy(timstr, "-");
+            }
+            len = sprintf(buf, "%s", timstr);
+            break;
+          }
+          case pwr_eType_DeltaTime:
+          {
+            int sts;
+            char timstr[40];
+
             switch (format[i][1])
             {
             case '1':
               // Format %1t, only time, no hundredth
-              sts = time_AtoAscii((pwr_tTime*)(p[i] + offs), time_eFormat_Time, timstr, sizeof(timstr));
-              timstr[8] = 0;
-              break;
-            case '2':
-              // Format %2t, only time, with hundredth
-              sts = time_AtoAscii((pwr_tTime*)(p[i] + offs), time_eFormat_Time, timstr, sizeof(timstr));
-              break;
-            case '3':
-              // Format %3t, compressed date and time, no hundredth
-              sts = time_AtoAscii((pwr_tTime*)(p[i] + offs), time_eFormat_ComprDateAndTime, timstr,
-                                  sizeof(timstr));
-              timstr[17] = 0;
-              break;
-            case '4':
-              // Format %4t, date only
-              sts = time_AtoAscii((pwr_tTime*)p[i] + offs, time_eFormat_DateAndTime, timstr, sizeof(timstr));
-              timstr[11] = 0;
-              break;
-            case '5':
-              // Format %5t, compressed date only
-              sts = time_AtoAscii((pwr_tTime*)p[i] + offs, time_eFormat_ComprDateAndTime, timstr,
-                                  sizeof(timstr));
-              timstr[8] = 0;
-              break;
-            case '6':
-              // Format %6t, 01:00:00 30/01/87
-              sts = time_AtoAscii((pwr_tTime*)p[i] + offs, time_eFormat_TimeAndDate, timstr, sizeof(timstr));
-              timstr[17] = 0;
+              sts = time_DtoAscii((pwr_tDeltaTime*)(p[i] + offs), 0, timstr, sizeof(timstr));
               break;
             default:
-              sts =
-                  time_AtoAscii((pwr_tTime*)(p[i] + offs), time_eFormat_DateAndTime, timstr, sizeof(timstr));
+              sts = time_DtoAscii((pwr_tDeltaTime*)(p[i] + offs), 1, timstr, sizeof(timstr));
             }
             if (EVEN(sts))
               strcpy(timstr, "-");
-          }
-          len = sprintf(buf, "%s", timstr);
-          break;
-        }
-        case pwr_eType_DeltaTime:
-        {
-          int sts;
-          char timstr[40];
-
-          switch (format[i][1])
-          {
-          case '1':
-            // Format %1t, only time, no hundredth
-            sts = time_DtoAscii((pwr_tDeltaTime*)(p[i] + offs), 0, timstr, sizeof(timstr));
+            len = sprintf(buf, "%s", timstr);
             break;
-          default:
-            sts = time_DtoAscii((pwr_tDeltaTime*)(p[i] + offs), 1, timstr, sizeof(timstr));
           }
-          if (EVEN(sts))
-            strcpy(timstr, "-");
-          len = sprintf(buf, "%s", timstr);
-          break;
-        }
-        default:
-        {
-          int sts;
-          sts = cdh_AttrValueToString((pwr_eType)type_id[i], p[i] + offs, buf, sizeof(buf));
-          if (EVEN(sts))
-            sprintf(buf, "Invalid type");
-          len = strlen(buf);
-        }
-        }
+          default:
+          {
+            int sts;
+            sts = cdh_AttrValueToString((pwr_eType)type_id[i], p[i] + offs, buf, sizeof(buf));
+            if (EVEN(sts))
+              sprintf(buf, "Invalid type");
+            len = strlen(buf);
+          }
+          }
 
         grow_SetCellValue(object, i, j, buf);
         memcpy(old_value[i] + offs, p[i] + offs, size[i]);
@@ -18058,7 +18057,6 @@ void GeRefUpdate::open(std::ifstream& fp)
       break;
   }
 }
-
 
 static size_t ge_refupdate_copy_size(int size)
 {
@@ -24160,8 +24158,8 @@ int GeDsTrend::scan(grow_tObject object)
   {
     bool update = false;
 
-    pwr_tFloat32 maxval;
-    pwr_tFloat32 minval;
+    pwr_tFloat32 maxval = 0;
+    pwr_tFloat32 minval = 0;
     if (max_value1_p)
     {
       maxval = *max_value1_p;
@@ -24198,8 +24196,8 @@ int GeDsTrend::scan(grow_tObject object)
   {
     bool update = false;
 
-    pwr_tFloat32 maxval;
-    pwr_tFloat32 minval;
+    pwr_tFloat32 maxval = 0;
+    pwr_tFloat32 minval = 0;
     if (max_value2_p)
     {
       maxval = *max_value2_p;
@@ -24828,8 +24826,8 @@ int GeDsTrendCurve::scan(grow_tObject object)
   {
     bool update = false;
 
-    pwr_tFloat32 maxval;
-    pwr_tFloat32 minval;
+    pwr_tFloat32 maxval = 0;
+    pwr_tFloat32 minval = 0;
     if (max_value1_p)
     {
       maxval = *max_value1_p;
@@ -24866,8 +24864,8 @@ int GeDsTrendCurve::scan(grow_tObject object)
   {
     bool update = false;
 
-    pwr_tFloat32 maxval;
-    pwr_tFloat32 minval;
+    pwr_tFloat32 maxval = 0;
+    pwr_tFloat32 minval = 0;
     if (max_value2_p)
     {
       maxval = *max_value2_p;
@@ -25634,8 +25632,8 @@ int GeSevHist::scan(grow_tObject object)
   {
     bool update = false;
 
-    pwr_tFloat32 maxval;
-    pwr_tFloat32 minval;
+    pwr_tFloat32 maxval = 0;
+    pwr_tFloat32 minval = 0;
     if (max_value1_p)
     {
       maxval = *max_value1_p;
@@ -25672,8 +25670,8 @@ int GeSevHist::scan(grow_tObject object)
   {
     bool update = false;
 
-    pwr_tFloat32 maxval;
-    pwr_tFloat32 minval;
+    pwr_tFloat32 maxval = 0;
+    pwr_tFloat32 minval = 0;
     if (max_value2_p)
     {
       maxval = *max_value2_p;

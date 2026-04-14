@@ -1047,7 +1047,7 @@ void GrowImage::set_transform(GlowTransform* t)
 
 void GrowImage::align(double x, double y, glow_eAlignDirection direction)
 {
-  double dx, dy;
+  double dx = 0, dy = 0;
 
   if (fixposition)
     return;

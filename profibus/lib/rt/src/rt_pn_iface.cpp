@@ -1242,7 +1242,7 @@ int unpack_write_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local)
   int i;
   io_sAgent* ap = local->args.ap;
   io_sRack* slave_list;
-  pwr_sClass_PnDevice* sp;
+  pwr_sClass_PnDevice* sp = NULL;
   pwr_tUInt32 saved_counter;
   unsigned short device_ref = pSdb->DeviceRef;
 
@@ -1351,7 +1351,7 @@ int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local
     unsigned short ii, jj;
 
     std::shared_ptr<ProfinetDevice> pn_device;
-    std::unordered_map<uint, ProfinetChannelDiag>* device_channel_diag_map;
+    std::unordered_map<uint, ProfinetChannelDiag>* device_channel_diag_map = nullptr;
 
     pGAC = (T_PN_SERVICE_GET_ALARM_CON*)(pSdb + 1);
 

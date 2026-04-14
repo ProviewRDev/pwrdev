@@ -7578,7 +7578,7 @@ char* Graph::get_next_object_name(const char* prefix, const char* suffix)
 
 void Graph::set_text_coding(lng_eCoding coding)
 {
-  glow_eTextCoding c;
+  glow_eTextCoding c = glow_eTextCoding_ISO8859_1;
 
   switch (coding)
   {

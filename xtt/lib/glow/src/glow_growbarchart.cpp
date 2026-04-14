@@ -49,15 +49,13 @@
 #define nearbyint rint
 #endif
 
-GrowBarChart::GrowBarChart(GrowCtx* glow_ctx, const char* name, double x,
-    double y, double w, double h, glow_eDrawType border_d_type, int line_w,
-    int display_border, int display_shadow, glow_eDrawType fill_d_type,
-    int nodraw)
-    : GrowRect(glow_ctx, name, x, y, w, h, border_d_type, line_w, 0,
-          glow_mDisplayLevel_1, 1, display_border, display_shadow, fill_d_type,
-          nodraw),
-      bars(1), barsegments(1), min_value(0), max_value(1), vertical_lines(0),
-      horizontal_lines(0), line_color(glow_eDrawType_Line)
+GrowBarChart::GrowBarChart(GrowCtx* glow_ctx, const char* name, double x, double y, double w, double h,
+                           glow_eDrawType border_d_type, int line_w, int display_border, int display_shadow,
+                           glow_eDrawType fill_d_type, int nodraw)
+    : GrowRect(glow_ctx, name, x, y, w, h, border_d_type, line_w, 0, glow_mDisplayLevel_1, 1, display_border,
+               display_shadow, fill_d_type, nodraw),
+      bars(1), barsegments(1), min_value(0), max_value(1), vertical_lines(0), horizontal_lines(0),
+      line_color(glow_eDrawType_Line)
 {
   memset(bar_color, 0, sizeof(bar_color));
   memset(bar_values, 0, sizeof(bar_values));
@@ -66,9 +64,7 @@ GrowBarChart::GrowBarChart(GrowCtx* glow_ctx, const char* name, double x,
     draw();
 }
 
-GrowBarChart::~GrowBarChart()
-{
-}
+GrowBarChart::~GrowBarChart() {}
 
 void GrowBarChart::save(std::ofstream& fp, glow_eSaveMode mode)
 {
@@ -76,20 +72,16 @@ void GrowBarChart::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_GrowBarChart_rect_part) << '\n';
   GrowRect::save(fp, mode);
   fp << int(glow_eSave_GrowBarChart_bars) << FSPACE << bars << '\n';
-  fp << int(glow_eSave_GrowBarChart_barsegments) << FSPACE << barsegments
-     << '\n';
+  fp << int(glow_eSave_GrowBarChart_barsegments) << FSPACE << barsegments << '\n';
   fp << int(glow_eSave_GrowBarChart_min_value) << FSPACE << min_value << '\n';
   fp << int(glow_eSave_GrowBarChart_max_value) << FSPACE << max_value << '\n';
-  fp << int(glow_eSave_GrowBarChart_horizontal_lines) << FSPACE
-     << horizontal_lines << '\n';
-  fp << int(glow_eSave_GrowBarChart_vertical_lines) << FSPACE << vertical_lines
-     << '\n';
-  fp << int(glow_eSave_GrowBarChart_line_color) << FSPACE << (int)line_color
-     << '\n';
+  fp << int(glow_eSave_GrowBarChart_horizontal_lines) << FSPACE << horizontal_lines << '\n';
+  fp << int(glow_eSave_GrowBarChart_vertical_lines) << FSPACE << vertical_lines << '\n';
+  fp << int(glow_eSave_GrowBarChart_line_color) << FSPACE << (int)line_color << '\n';
   for (int i = 0; i < BARCHART_MAX_BARSEGMENTS; i++)
-    fp << int(glow_eSave_GrowBarChart_bar_color1) + i << FSPACE
-       << (int)bar_color[i] << '\n';
-  if (user_data && ctx->userdata_save_callback) {
+    fp << int(glow_eSave_GrowBarChart_bar_color1) + i << FSPACE << (int)bar_color[i] << '\n';
+  if (user_data && ctx->userdata_save_callback)
+  {
     fp << int(glow_eSave_GrowBarChart_userdata_cb) << '\n';
     (ctx->userdata_save_callback)(&fp, this, glow_eUserdataCbType_Node);
   }
@@ -103,15 +95,18 @@ void GrowBarChart::open(std::ifstream& fp)
   char dummy[40];
   int tmp;
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GrowBarChart: \"%d %s\"\n", type, dummy);
     }
 
     fp >> type;
-    switch (type) {
+    switch (type)
+    {
     case glow_eSave_GrowBarChart:
       break;
     case glow_eSave_GrowBarChart_rect_part:
@@ -228,23 +223,24 @@ void GrowBarChart::draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y)
 {
   int tmp;
 
-  if (ll_x > ur_x) {
+  if (ll_x > ur_x)
+  {
     /* Shift */
     tmp = ll_x;
     ll_x = ur_x;
     ur_x = tmp;
   }
-  if (ll_y > ur_y) {
+  if (ll_y > ur_y)
+  {
     /* Shift */
     tmp = ll_y;
     ll_y = ur_y;
     ur_y = tmp;
   }
 
-  if (x_right * w->zoom_factor_x - w->offset_x >= ll_x
-      && x_left * w->zoom_factor_x - w->offset_x <= ur_x
-      && y_high * w->zoom_factor_y - w->offset_y >= ll_y
-      && y_low * w->zoom_factor_y - w->offset_y <= ur_y) {
+  if (x_right * w->zoom_factor_x - w->offset_x >= ll_x && x_left * w->zoom_factor_x - w->offset_x <= ur_x &&
+      y_high * w->zoom_factor_y - w->offset_y >= ll_y && y_low * w->zoom_factor_y - w->offset_y <= ur_y)
+  {
     draw(w, (GlowTransform*)NULL, highlight, hot, NULL, NULL, NULL);
   }
 }
@@ -257,21 +253,23 @@ void GrowBarChart::draw(GlowWind* w, int* ll_x, int* ll_y, int* ur_x, int* ur_y)
   int obj_ur_y = int(y_high * w->zoom_factor_y) - w->offset_y;
   int obj_ll_y = int(y_low * w->zoom_factor_y) - w->offset_y;
 
-  if (*ll_x > *ur_x) {
+  if (*ll_x > *ur_x)
+  {
     /* Shift */
     tmp = *ll_x;
     *ll_x = *ur_x;
     *ur_x = tmp;
   }
-  if (*ll_y > *ur_y) {
+  if (*ll_y > *ur_y)
+  {
     /* Shift */
     tmp = *ll_y;
     *ll_y = *ur_y;
     *ur_y = tmp;
   }
 
-  if (obj_ur_x >= *ll_x && obj_ll_x <= *ur_x && obj_ur_y >= *ll_y
-      && obj_ll_y <= *ur_y) {
+  if (obj_ur_x >= *ll_x && obj_ll_x <= *ur_x && obj_ur_y >= *ll_y && obj_ll_y <= *ur_y)
+  {
     draw(w, (GlowTransform*)NULL, highlight, hot, NULL, NULL, NULL);
 
     // Increase the redraw area
@@ -292,24 +290,29 @@ void GrowBarChart::set_highlight(int on)
   draw();
 }
 
-void GrowBarChart::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
-    void* node, void* colornode, void *transpnode)
+void GrowBarChart::draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node, void* colornode,
+                        void* transpnode)
 {
   if (ctx->nodraw)
     return;
-  if (w == &ctx->navw) {
+  if (w == &ctx->navw)
+  {
     if (ctx->no_nav)
       return;
     hot = 0;
   }
   int chot = 0;
-  if (hot && ctx->environment != glow_eEnv_Development) {
+  if (hot && ctx->environment != glow_eEnv_Development)
+  {
     if (ctx->hot_indication == glow_eHotIndication_No)
       hot = 0;
-    else if (ctx->hot_indication == glow_eHotIndication_DarkColor) {
+    else if (ctx->hot_indication == glow_eHotIndication_DarkColor)
+    {
       chot = hot;
       hot = 0;
-    } else if (ctx->hot_indication == glow_eHotIndication_LightColor) {
+    }
+    else if (ctx->hot_indication == glow_eHotIndication_LightColor)
+    {
       chot = -hot;
       hot = 0;
     }
@@ -319,9 +322,7 @@ void GrowBarChart::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   glow_eDrawType drawtype;
 
   if (node && ((GrowNode*)node)->line_width)
-    idx = int(
-        w->zoom_factor_y / w->base_zoom_factor * ((GrowNode*)node)->line_width
-        - 1);
+    idx = int(w->zoom_factor_y / w->base_zoom_factor * ((GrowNode*)node)->line_width - 1);
   else
     idx = int(w->zoom_factor_y / w->base_zoom_factor * line_width - 1);
   idx += hot;
@@ -329,13 +330,16 @@ void GrowBarChart::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
   int x1, y1, x2, y2, ll_x, ll_y, ur_x, ur_y;
 
-  if (!t) {
+  if (!t)
+  {
     x1 = int(trf.x(ll.x, ll.y) * w->zoom_factor_x + 0.5) - w->offset_x;
     y1 = int(trf.y(ll.x, ll.y) * w->zoom_factor_y + 0.5) - w->offset_y;
     x2 = int(trf.x(ur.x, ur.y) * w->zoom_factor_x + 0.5) - w->offset_x;
     y2 = int(trf.y(ur.x, ur.y) * w->zoom_factor_y + 0.5) - w->offset_y;
     rot = int(trf.rot());
-  } else {
+  }
+  else
+  {
     x1 = int(trf.x(t, ll.x, ll.y) * w->zoom_factor_x + 0.5) - w->offset_x;
     y1 = int(trf.y(t, ll.x, ll.y) * w->zoom_factor_y + 0.5) - w->offset_y;
     x2 = int(trf.x(t, ur.x, ur.y) * w->zoom_factor_x + 0.5) - w->offset_x;
@@ -349,23 +353,23 @@ void GrowBarChart::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   ur_y = MAX(y1, y2);
 
   glow_eGradient grad = gradient;
-  if (gradient == glow_eGradient_No
-      && (node && ((GrowNode*)node)->gradient != glow_eGradient_No)
-      && !disable_gradient)
+  if (gradient == glow_eGradient_No && (node && ((GrowNode*)node)->gradient != glow_eGradient_No) &&
+      !disable_gradient)
     grad = ((GrowNode*)node)->gradient;
 
   int skip;
   int bar_ll_x, bar_ur_x;
   int bar_up_ll_y, bar_up_ur_y;
   double f_bar_up_ll_y;
-  int bar_down_ll_y, bar_down_ur_y, border_bar_down_ur_y;
-  double f_bar_down_ur_y;
+  int bar_down_ll_y, bar_down_ur_y = 0, border_bar_down_ur_y = 0;
+  double f_bar_down_ur_y = 0;
   double width;
   int brect_ll_x = 0, brect_ll_y = 0, brect_width = 0, brect_height = 0;
 
   width = double(ur_x - ll_x) / bars;
   bar_ur_x = ll_x;
-  for (int j = 0; j < bars; j++) {
+  for (int j = 0; j < bars; j++)
+  {
     bar_ll_x = bar_ur_x;
 
     if (j == bars - 1)
@@ -373,210 +377,227 @@ void GrowBarChart::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
     else
       bar_ur_x = ll_x + (j + 1) * width;
 
-    if ( min_value >= 0) {
+    if (min_value >= 0)
+    {
       bar_up_ll_y = ur_y;
       f_bar_up_ll_y = ur_y;
-      
-    } else {
+    }
+    else
+    {
       bar_up_ll_y = ur_y + min_value * (ur_y - ll_y) / (max_value - min_value);
       f_bar_up_ll_y = bar_up_ll_y;
       bar_down_ur_y = ur_y + min_value * (ur_y - ll_y) / (max_value - min_value);
       f_bar_down_ur_y = bar_down_ur_y;
     }
 
-    for (int i = 0; i < barsegments + 1; i++) {
+    for (int i = 0; i < barsegments + 1; i++)
+    {
       glow_eDrawType fillcolor = glow_eDrawType_Line;
 
-      if ( min_value >= 0 || bar_values[i][j] > 0) {
-	skip = 0;
-	bar_up_ur_y = bar_up_ll_y;
+      if (min_value >= 0 || bar_values[i][j] > 0)
+      {
+        skip = 0;
+        bar_up_ur_y = bar_up_ll_y;
 
-	if (i == barsegments) {
-	  if (bar_up_ll_y <= ll_y)
-	    skip = 1;
-	  else
-	    bar_up_ll_y = ll_y;
-	  fillcolor = ctx->get_drawtype(fill_drawtype,
-	      glow_eDrawType_FillHighlight, highlight, (GrowNode*)colornode, 1);
-	} else {
-	  if (bar_values[i][j] <= min_value)
-	    skip = 1;
-	  else if (bar_up_ur_y <= ll_y)
-	    skip = 1;
-	  else {
-	    f_bar_up_ll_y
-	        -= bar_values[i][j] * (ur_y - ll_y) / (max_value - min_value);
-	    bar_up_ll_y = f_bar_up_ll_y;
-	    if (bar_up_ll_y < ll_y)
-	      bar_up_ll_y = ll_y;
+        if (i == barsegments)
+        {
+          if (bar_up_ll_y <= ll_y)
+            skip = 1;
+          else
+            bar_up_ll_y = ll_y;
+          fillcolor = ctx->get_drawtype(fill_drawtype, glow_eDrawType_FillHighlight, highlight,
+                                        (GrowNode*)colornode, 1);
+        }
+        else
+        {
+          if (bar_values[i][j] <= min_value)
+            skip = 1;
+          else if (bar_up_ur_y <= ll_y)
+            skip = 1;
+          else
+          {
+            f_bar_up_ll_y -= bar_values[i][j] * (ur_y - ll_y) / (max_value - min_value);
+            bar_up_ll_y = f_bar_up_ll_y;
+            if (bar_up_ll_y < ll_y)
+              bar_up_ll_y = ll_y;
 
-	    fillcolor = ctx->get_drawtype(bar_color[i],
-	        glow_eDrawType_FillHighlight, highlight, (GrowNode*)colornode, 1);
-	  }
-	}
-	if (!skip) {
-	  if (grad == glow_eGradient_No || fillcolor == glow_eDrawType_ColorRed
-	      || i == barsegments) {
-	    if (chot)
-	      drawtype = GlowColor::shift_drawtype(fillcolor, chot, 0);
-	    else
-	      drawtype = fillcolor;
-	    ctx->gdraw->fill_rect(w, bar_ll_x, bar_up_ll_y, bar_ur_x - bar_ll_x,
-	        bar_up_ur_y - bar_up_ll_y, drawtype);
-	  } else {
-	    glow_eDrawType f1, f2;
-	    if (gradient_contrast >= 0) {
-	      f2 = GlowColor::shift_drawtype(
-	          fillcolor, -gradient_contrast / 2 + chot, 0);
-	      f1 = GlowColor::shift_drawtype(
-	          fillcolor, int(float(gradient_contrast) / 2 + 0.6) + chot, 0);
-	    } else {
-	      f2 = GlowColor::shift_drawtype(
-	          fillcolor, -int(float(gradient_contrast) / 2 - 0.6) + chot, 0);
-	      f1 = GlowColor::shift_drawtype(
-                  fillcolor, gradient_contrast / 2 + chot, 0);
-	  }
-	    ctx->gdraw->gradient_fill_rect(w, bar_ll_x, bar_up_ll_y,
-	        bar_ur_x - bar_ll_x, bar_up_ur_y - bar_up_ll_y, fillcolor, f1, f2,
-	        grad, transparency);
-	  }
-	}
+            fillcolor = ctx->get_drawtype(bar_color[i], glow_eDrawType_FillHighlight, highlight,
+                                          (GrowNode*)colornode, 1);
+          }
+        }
+        if (!skip)
+        {
+          if (grad == glow_eGradient_No || fillcolor == glow_eDrawType_ColorRed || i == barsegments)
+          {
+            if (chot)
+              drawtype = GlowColor::shift_drawtype(fillcolor, chot, 0);
+            else
+              drawtype = fillcolor;
+            ctx->gdraw->fill_rect(w, bar_ll_x, bar_up_ll_y, bar_ur_x - bar_ll_x, bar_up_ur_y - bar_up_ll_y,
+                                  drawtype);
+          }
+          else
+          {
+            glow_eDrawType f1, f2;
+            if (gradient_contrast >= 0)
+            {
+              f2 = GlowColor::shift_drawtype(fillcolor, -gradient_contrast / 2 + chot, 0);
+              f1 = GlowColor::shift_drawtype(fillcolor, int(float(gradient_contrast) / 2 + 0.6) + chot, 0);
+            }
+            else
+            {
+              f2 = GlowColor::shift_drawtype(fillcolor, -int(float(gradient_contrast) / 2 - 0.6) + chot, 0);
+              f1 = GlowColor::shift_drawtype(fillcolor, gradient_contrast / 2 + chot, 0);
+            }
+            ctx->gdraw->gradient_fill_rect(w, bar_ll_x, bar_up_ll_y, bar_ur_x - bar_ll_x,
+                                           bar_up_ur_y - bar_up_ll_y, fillcolor, f1, f2, grad, transparency);
+          }
+        }
+      }
+      else
+      {
+        // negative value, draw bar downwards
+        skip = 0;
+        bar_down_ll_y = bar_down_ur_y;
 
-      } else { 
-	// negative value, draw bar downwards
-	skip = 0;
-	bar_down_ll_y = bar_down_ur_y;
+        if (i == barsegments)
+        {
+          border_bar_down_ur_y = bar_down_ur_y;
+          if (bar_down_ur_y >= ur_y)
+            skip = 1;
+          else
+            bar_down_ur_y = ur_y;
+          fillcolor = ctx->get_drawtype(fill_drawtype, glow_eDrawType_FillHighlight, highlight,
+                                        (GrowNode*)colornode, 1);
+        }
+        else
+        {
+          if (bar_values[i][j] >= 0)
+            skip = 1;
+          else if (bar_down_ll_y >= ur_y)
+            skip = 1;
+          else
+          {
+            f_bar_down_ur_y -= bar_values[i][j] * (ur_y - ll_y) / (max_value - min_value);
+            bar_down_ur_y = f_bar_down_ur_y;
+            if (bar_down_ur_y > ur_y)
+              bar_down_ur_y = ur_y;
 
-	if (i == barsegments) {
-	  border_bar_down_ur_y = bar_down_ur_y;
-	  if (bar_down_ur_y >= ur_y)
-	    skip = 1;
-	  else
-	    bar_down_ur_y = ur_y;
-	  fillcolor = ctx->get_drawtype(fill_drawtype,
-	      glow_eDrawType_FillHighlight, highlight, (GrowNode*)colornode, 1);
-	} else {
-	  if (bar_values[i][j] >= 0)
-	    skip = 1;
-	  else if (bar_down_ll_y >= ur_y)
-	    skip = 1;
-	  else {
-	    f_bar_down_ur_y
-	        -= bar_values[i][j] * (ur_y - ll_y) / (max_value - min_value);
-	    bar_down_ur_y = f_bar_down_ur_y;
-	    if (bar_down_ur_y > ur_y)
-	      bar_down_ur_y = ur_y;
+            fillcolor = ctx->get_drawtype(bar_color[i], glow_eDrawType_FillHighlight, highlight,
+                                          (GrowNode*)colornode, 1);
+          }
+        }
 
-	    fillcolor = ctx->get_drawtype(bar_color[i],
-	        glow_eDrawType_FillHighlight, highlight, (GrowNode*)colornode, 1);
-	  }
-	}
-
-	if (!skip) {
-	  if (grad == glow_eGradient_No || fillcolor == glow_eDrawType_ColorRed
-	      || i == barsegments) {
-	    if (chot)
-	      drawtype = GlowColor::shift_drawtype(fillcolor, chot, 0);
-	    else
-	      drawtype = fillcolor;
-	    ctx->gdraw->rect(w, bar_ll_x, bar_down_ll_y, bar_ur_x - bar_ll_x,
-	         bar_down_ur_y - bar_down_ll_y, drawtype, 1, 0);
-	    if (bar_up_ll_y > ll_y)
-	      ctx->gdraw->rect(w, bar_ll_x, ll_y, bar_ur_x - bar_ll_x,
-			       bar_up_ll_y - ll_y, drawtype, 1, 0);
-	  } else {
-	    glow_eDrawType f1, f2;
-	    if (gradient_contrast >= 0) {
-	      f2 = GlowColor::shift_drawtype(
-	          fillcolor, -gradient_contrast / 2 + chot, 0);
-	      f1 = GlowColor::shift_drawtype(
-	          fillcolor, int(float(gradient_contrast) / 2 + 0.6) + chot, 0);
-	    } else {
-	      f2 = GlowColor::shift_drawtype(
-	          fillcolor, -int(float(gradient_contrast) / 2 - 0.6) + chot, 0);
-	      f1 = GlowColor::shift_drawtype(
-                  fillcolor, gradient_contrast / 2 + chot, 0);
-	    }
-	    ctx->gdraw->gradient_fill_rect(w, bar_ll_x, bar_down_ll_y,
-		bar_ur_x - bar_ll_x, bar_down_ur_y - bar_down_ll_y, fillcolor, f1, f2,
-		grad, transparency);
-	  }
-	}
+        if (!skip)
+        {
+          if (grad == glow_eGradient_No || fillcolor == glow_eDrawType_ColorRed || i == barsegments)
+          {
+            if (chot)
+              drawtype = GlowColor::shift_drawtype(fillcolor, chot, 0);
+            else
+              drawtype = fillcolor;
+            ctx->gdraw->rect(w, bar_ll_x, bar_down_ll_y, bar_ur_x - bar_ll_x, bar_down_ur_y - bar_down_ll_y,
+                             drawtype, 1, 0);
+            if (bar_up_ll_y > ll_y)
+              ctx->gdraw->rect(w, bar_ll_x, ll_y, bar_ur_x - bar_ll_x, bar_up_ll_y - ll_y, drawtype, 1, 0);
+          }
+          else
+          {
+            glow_eDrawType f1, f2;
+            if (gradient_contrast >= 0)
+            {
+              f2 = GlowColor::shift_drawtype(fillcolor, -gradient_contrast / 2 + chot, 0);
+              f1 = GlowColor::shift_drawtype(fillcolor, int(float(gradient_contrast) / 2 + 0.6) + chot, 0);
+            }
+            else
+            {
+              f2 = GlowColor::shift_drawtype(fillcolor, -int(float(gradient_contrast) / 2 - 0.6) + chot, 0);
+              f1 = GlowColor::shift_drawtype(fillcolor, gradient_contrast / 2 + chot, 0);
+            }
+            ctx->gdraw->gradient_fill_rect(w, bar_ll_x, bar_down_ll_y, bar_ur_x - bar_ll_x,
+                                           bar_down_ur_y - bar_down_ll_y, fillcolor, f1, f2, grad,
+                                           transparency);
+          }
+        }
       }
 
-      if (border && i == barsegments) {
-	// Draw previous bar border
-	if (j > 0) {
-	  drawtype = ctx->get_drawtype(draw_type, glow_eDrawType_LineHighlight,
-	     highlight, (GrowNode*)colornode, 0);
+      if (border && i == barsegments)
+      {
+        // Draw previous bar border
+        if (j > 0)
+        {
+          drawtype =
+              ctx->get_drawtype(draw_type, glow_eDrawType_LineHighlight, highlight, (GrowNode*)colornode, 0);
 
-	  ctx->gdraw->rect(w, brect_ll_x, brect_ll_y, brect_width, brect_height,
-              drawtype, idx, 0);
-	}
-	if ( min_value >= 0) {
-	  brect_ll_x = bar_ll_x;
-	  brect_ll_y = int(f_bar_up_ll_y);
-	  brect_width = bar_ur_x - bar_ll_x;
-	  brect_height = ur_y - int(f_bar_up_ll_y);
-	} else {
-	  brect_ll_x = bar_ll_x;
-	  brect_ll_y = bar_up_ll_y;
-	  brect_width = bar_ur_x - bar_ll_x;
-	  brect_height = ur_y + min_value * (ur_y - ll_y) / (max_value - min_value) - bar_up_ll_y;
-	}
-	if (j == bars - 1) {
-	  // Draw last bar border
-	  drawtype = ctx->get_drawtype(draw_type, glow_eDrawType_LineHighlight,
-              highlight, (GrowNode*)colornode, 0);
+          ctx->gdraw->rect(w, brect_ll_x, brect_ll_y, brect_width, brect_height, drawtype, idx, 0);
+        }
+        if (min_value >= 0)
+        {
+          brect_ll_x = bar_ll_x;
+          brect_ll_y = int(f_bar_up_ll_y);
+          brect_width = bar_ur_x - bar_ll_x;
+          brect_height = ur_y - int(f_bar_up_ll_y);
+        }
+        else
+        {
+          brect_ll_x = bar_ll_x;
+          brect_ll_y = bar_up_ll_y;
+          brect_width = bar_ur_x - bar_ll_x;
+          brect_height = ur_y + min_value * (ur_y - ll_y) / (max_value - min_value) - bar_up_ll_y;
+        }
+        if (j == bars - 1)
+        {
+          // Draw last bar border
+          drawtype =
+              ctx->get_drawtype(draw_type, glow_eDrawType_LineHighlight, highlight, (GrowNode*)colornode, 0);
 
-	  ctx->gdraw->rect(w, brect_ll_x, brect_ll_y, brect_width, brect_height,
-	      drawtype, idx, 0);
-	}
+          ctx->gdraw->rect(w, brect_ll_x, brect_ll_y, brect_width, brect_height, drawtype, idx, 0);
+        }
 
+        // Draw negative bar border
+        if (min_value < 0)
+        {
+          if (j > 0)
+          {
+            drawtype = ctx->get_drawtype(draw_type, glow_eDrawType_LineHighlight, highlight,
+                                         (GrowNode*)colornode, 0);
 
-	// Draw negative bar border
-	if ( min_value < 0) {
-	  if (j > 0) {
-	    drawtype = ctx->get_drawtype(draw_type, glow_eDrawType_LineHighlight,
-                highlight, (GrowNode*)colornode, 0);
+            ctx->gdraw->rect(w, brect_ll_x, brect_ll_y, brect_width, brect_height, drawtype, idx, 0);
+          }
+          brect_ll_x = bar_ll_x;
+          brect_ll_y = ur_y + min_value * (ur_y - ll_y) / (max_value - min_value);
+          brect_width = bar_ur_x - bar_ll_x;
+          brect_height = border_bar_down_ur_y - brect_ll_y;
+          if (j == bars - 1)
+          {
+            // Draw last bar border
+            drawtype = ctx->get_drawtype(draw_type, glow_eDrawType_LineHighlight, highlight,
+                                         (GrowNode*)colornode, 0);
 
-	    ctx->gdraw->rect(w, brect_ll_x, brect_ll_y, brect_width, brect_height,
-                drawtype, idx, 0);
-	  }
-	  brect_ll_x = bar_ll_x;
-	  brect_ll_y = ur_y + min_value * (ur_y - ll_y) / (max_value - min_value);
-	  brect_width = bar_ur_x - bar_ll_x;
-	  brect_height = border_bar_down_ur_y - brect_ll_y;
-	  if (j == bars - 1) {
-	    // Draw last bar border
-	    drawtype = ctx->get_drawtype(draw_type, glow_eDrawType_LineHighlight,
-                highlight, (GrowNode*)colornode, 0);
-
-	    ctx->gdraw->rect(w, brect_ll_x, brect_ll_y, brect_width, brect_height,
-	        drawtype, idx, 0);
-	  }
-	}
+            ctx->gdraw->rect(w, brect_ll_x, brect_ll_y, brect_width, brect_height, drawtype, idx, 0);
+          }
+        }
       }
-	
     }
   }
 
-  drawtype = ctx->get_drawtype(line_color, glow_eDrawType_LineHighlight,
-      highlight, (GrowNode*)colornode, 0);
+  drawtype = ctx->get_drawtype(line_color, glow_eDrawType_LineHighlight, highlight, (GrowNode*)colornode, 0);
 
-  for (int i = 0; i < vertical_lines; i++) {
+  for (int i = 0; i < vertical_lines; i++)
+  {
     int x = int(ll_x + double(ur_x - ll_x) / (vertical_lines + 1) * (i + 1));
     ctx->gdraw->line(w, x, ll_y, x, ur_y, drawtype, 0, 0);
   }
 
-  for (int i = 0; i < horizontal_lines; i++) {
+  for (int i = 0; i < horizontal_lines; i++)
+  {
     int y = int(ll_y + double(ur_y - ll_y) / (horizontal_lines + 1) * (i + 1));
     ctx->gdraw->line(w, ll_x, y, ur_x, y, drawtype, 0, 0);
   }
 
-  if (border) {
-    drawtype = ctx->get_drawtype(draw_type, glow_eDrawType_LineHighlight,
-        highlight, (GrowNode*)colornode, 0);
+  if (border)
+  {
+    drawtype = ctx->get_drawtype(draw_type, glow_eDrawType_LineHighlight, highlight, (GrowNode*)colornode, 0);
 
     // printf( "draw: %d %d\n", ll_x, ll_y);
     ctx->gdraw->rect(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, drawtype, idx, 0);
@@ -639,25 +660,24 @@ void GrowBarChart::erase(GlowWind* w, GlowTransform* t, int hot, void* node)
 
 void GrowBarChart::draw()
 {
-  ctx->draw(&ctx->mw,
-      x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
-      y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
-      x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
-      y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
-  ctx->draw(&ctx->navw,
-      x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
-      y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
-      x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
-      y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
+  ctx->draw(&ctx->mw, x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
+            y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
+            x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
+            y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
+  ctx->draw(&ctx->navw, x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
+            y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
+            x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
+            y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
 }
 
 void GrowBarChart::align(double x, double y, glow_eAlignDirection direction)
 {
-  double dx, dy;
+  double dx = 0, dy = 0;
 
   ctx->set_defered_redraw();
   draw();
-  switch (direction) {
+  switch (direction)
+  {
   case glow_eAlignDirection_CenterVert:
     dx = x - (x_right + x_left) / 2;
     dy = 0;
@@ -697,21 +717,23 @@ void GrowBarChart::align(double x, double y, glow_eAlignDirection direction)
   ctx->redraw_defered();
 }
 
-void GrowBarChart::export_javabean(GlowTransform* t, void* node,
-    glow_eExportPass pass, int* shape_cnt, int node_cnt, int in_nc,
-    std::ofstream& fp)
+void GrowBarChart::export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt,
+                                   int node_cnt, int in_nc, std::ofstream& fp)
 {
   double x1, y1, x2, y2, ll_x, ll_y, ur_x, ur_y;
   double rotation;
   double ish;
   int gc1, gc2;
 
-  if (!t) {
+  if (!t)
+  {
     x1 = trf.x(ll.x, ll.y) * ctx->mw.zoom_factor_x - ctx->mw.offset_x;
     y1 = trf.y(ll.x, ll.y) * ctx->mw.zoom_factor_y - ctx->mw.offset_y;
     x2 = trf.x(ur.x, ur.y) * ctx->mw.zoom_factor_x - ctx->mw.offset_x;
     y2 = trf.y(ur.x, ur.y) * ctx->mw.zoom_factor_y - ctx->mw.offset_y;
-  } else {
+  }
+  else
+  {
     x1 = trf.x(t, ll.x, ll.y) * ctx->mw.zoom_factor_x - ctx->mw.offset_x;
     y1 = trf.y(t, ll.x, ll.y) * ctx->mw.zoom_factor_y - ctx->mw.offset_y;
     x2 = trf.x(t, ur.x, ur.y) * ctx->mw.zoom_factor_x - ctx->mw.offset_x;
@@ -730,23 +752,25 @@ void GrowBarChart::export_javabean(GlowTransform* t, void* node,
 
   ish = shadow_width / 100 * MIN(ur_x - ll_x, ur_y - ll_y);
 
-  if (gradient_contrast >= 0) {
+  if (gradient_contrast >= 0)
+  {
     gc1 = gradient_contrast / 2;
     gc2 = -int(float(gradient_contrast) / 2 + 0.6);
-  } else {
+  }
+  else
+  {
     gc1 = int(float(gradient_contrast) / 2 - 0.6);
     gc2 = -gradient_contrast / 2;
   }
 
-  ctx->export_jbean->barchart(ll_x, ll_y, ur_x, ur_y, draw_type, fill_drawtype,
-      fill, border, bars, barsegments, bar_color, min_value, max_value,
-      line_width, rotation, ish, shadow, gradient, gc1, gc2, vertical_lines,
-      horizontal_lines, line_color, pass, shape_cnt, node_cnt, fp);
+  ctx->export_jbean->barchart(ll_x, ll_y, ur_x, ur_y, draw_type, fill_drawtype, fill, border, bars,
+                              barsegments, bar_color, min_value, max_value, line_width, rotation, ish, shadow,
+                              gradient, gc1, gc2, vertical_lines, horizontal_lines, line_color, pass,
+                              shape_cnt, node_cnt, fp);
 }
 
-void GrowBarChart::set_conf(int bar_num, int barsegment_num, double min_val,
-    double max_val, int vert_lines, int horiz_lines, glow_eDrawType lcolor,
-    glow_eDrawType* color)
+void GrowBarChart::set_conf(int bar_num, int barsegment_num, double min_val, double max_val, int vert_lines,
+                            int horiz_lines, glow_eDrawType lcolor, glow_eDrawType* color)
 {
   bars = bar_num;
   barsegments = barsegment_num;
@@ -760,8 +784,7 @@ void GrowBarChart::set_conf(int bar_num, int barsegment_num, double min_val,
   draw();
 }
 
-void GrowBarChart::get_conf(
-    int* bar_num, int* barsegment_num, double* min_val, double* max_val)
+void GrowBarChart::get_conf(int* bar_num, int* barsegment_num, double* min_val, double* max_val)
 {
   *bar_num = bars;
   *barsegment_num = barsegments;
@@ -769,10 +792,9 @@ void GrowBarChart::get_conf(
   *max_val = max_value;
 }
 
-void GrowBarChart::set_values(float* values1, float* values2, float* values3,
-    float* values4, float* values5, float* values6, float* values7,
-    float* values8, float* values9, float* values10, float* values11,
-    float* values12)
+void GrowBarChart::set_values(float* values1, float* values2, float* values3, float* values4, float* values5,
+                              float* values6, float* values7, float* values8, float* values9, float* values10,
+                              float* values11, float* values12)
 {
   if (barsegments > 0 && values1)
     memcpy(bar_values[0], values1, bars * sizeof(bar_values[0][0]));
@@ -801,6 +823,4 @@ void GrowBarChart::set_values(float* values1, float* values2, float* values3,
   draw();
 }
 
-void GrowBarChart::convert(glow_eConvert version)
-{
-}
+void GrowBarChart::convert(glow_eConvert version) {}

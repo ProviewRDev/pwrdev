@@ -56,15 +56,9 @@
 */
 #define LOGNAV__SUCCESS 1
 
-void LogNav::message(char sev, const char* text)
-{
-  (message_cb)(parent_ctx, sev, text);
-}
+void LogNav::message(char sev, const char* text) { (message_cb)(parent_ctx, sev, text); }
 
-void LogNav::print(char* filename)
-{
-  brow_Print(brow->ctx, filename);
-}
+void LogNav::print(char* filename) { brow_Print(brow->ctx, filename); }
 
 //
 //  Free pixmaps
@@ -89,9 +83,8 @@ void LogNavBrow::allocate_pixmaps()
 //
 // Create the navigator widget
 //
-LogNav::LogNav(void* xn_parent_ctx, LogNav_hier *xn_tree, pwr_tStatus* status)
-  : parent_ctx(xn_parent_ctx), tree(xn_tree),
-    message_cb(NULL)
+LogNav::LogNav(void* xn_parent_ctx, LogNav_hier* xn_tree, pwr_tStatus* status)
+    : parent_ctx(xn_parent_ctx), tree(xn_tree), message_cb(NULL)
 {
   *status = 1;
 }
@@ -99,14 +92,9 @@ LogNav::LogNav(void* xn_parent_ctx, LogNav_hier *xn_tree, pwr_tStatus* status)
 //
 //  Delete a nav context
 //
-LogNav::~LogNav()
-{
-}
+LogNav::~LogNav() {}
 
-LogNavBrow::~LogNavBrow()
-{
-  free_pixmaps();
-}
+LogNavBrow::~LogNavBrow() { free_pixmaps(); }
 
 //
 // Callbacks from brow
@@ -116,7 +104,8 @@ static int lognav_brow_cb(FlowCtx* ctx, flow_tEvent event)
   LogNav* lognav;
   ItemBase* item;
 
-  if (event->event == flow_eEvent_ObjectDeleted) {
+  if (event->event == flow_eEvent_ObjectDeleted)
+  {
     brow_GetUserData(event->object.object, (void**)&item);
     delete item;
     return 1;
@@ -125,43 +114,55 @@ static int lognav_brow_cb(FlowCtx* ctx, flow_tEvent event)
   brow_GetCtxUserData((BrowCtx*)ctx, (void**)&lognav);
 
   lognav->message(' ', "");
-  switch (event->event) {
-  case flow_eEvent_Key_PageDown: {
+  switch (event->event)
+  {
+  case flow_eEvent_Key_PageDown:
+  {
     brow_Page(lognav->brow->ctx, 0.8);
     break;
   }
-  case flow_eEvent_Key_PageUp: {
+  case flow_eEvent_Key_PageUp:
+  {
     brow_Page(lognav->brow->ctx, -0.8);
     break;
   }
-  case flow_eEvent_ScrollDown: {
+  case flow_eEvent_ScrollDown:
+  {
     brow_Page(lognav->brow->ctx, 0.1);
     break;
   }
-  case flow_eEvent_ScrollUp: {
+  case flow_eEvent_ScrollUp:
+  {
     brow_Page(lognav->brow->ctx, -0.1);
     break;
   }
-  case flow_eEvent_Key_Up: {
+  case flow_eEvent_Key_Up:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
     int sts;
 
     brow_GetSelectedNodes(lognav->brow->ctx, &node_list, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       sts = brow_GetLastVisible(lognav->brow->ctx, &object);
       if (EVEN(sts))
         return 1;
-    } else {
-      if (!brow_IsVisible(
-              lognav->brow->ctx, node_list[0], flow_eVisible_Partial)) {
+    }
+    else
+    {
+      if (!brow_IsVisible(lognav->brow->ctx, node_list[0], flow_eVisible_Partial))
+      {
         sts = brow_GetLastVisible(lognav->brow->ctx, &object);
         if (EVEN(sts))
           return 1;
-      } else {
+      }
+      else
+      {
         sts = brow_GetPrevious(lognav->brow->ctx, node_list[0], &object);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           if (node_count)
             free(node_list);
           return 1;
@@ -177,26 +178,33 @@ static int lognav_brow_cb(FlowCtx* ctx, flow_tEvent event)
       free(node_list);
     break;
   }
-  case flow_eEvent_Key_Down: {
+  case flow_eEvent_Key_Down:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
     int sts;
 
     brow_GetSelectedNodes(lognav->brow->ctx, &node_list, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       sts = brow_GetFirstVisible(lognav->brow->ctx, &object);
       if (EVEN(sts))
         return 1;
-    } else {
-      if (!brow_IsVisible(
-              lognav->brow->ctx, node_list[0], flow_eVisible_Partial)) {
+    }
+    else
+    {
+      if (!brow_IsVisible(lognav->brow->ctx, node_list[0], flow_eVisible_Partial))
+      {
         sts = brow_GetFirstVisible(lognav->brow->ctx, &object);
         if (EVEN(sts))
           return 1;
-      } else {
+      }
+      else
+      {
         sts = brow_GetNext(lognav->brow->ctx, node_list[0], &object);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           if (node_count)
             free(node_list);
           return 1;
@@ -215,15 +223,18 @@ static int lognav_brow_cb(FlowCtx* ctx, flow_tEvent event)
   case flow_eEvent_SelectClear:
     brow_ResetSelectInverse(lognav->brow->ctx);
     break;
-  case flow_eEvent_MB1Click: {
+  case flow_eEvent_MB1Click:
+  {
     // Select
     double ll_x, ll_y, ur_x, ur_y;
     int sts;
 
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_MeasureNode(event->object.object, &ll_x, &ll_y, &ur_x, &ur_y);
-      if (event->object.x < ll_x + 1.0) {
+      if (event->object.x < ll_x + 1.0)
+      {
         // Simulate doubleclick
         flow_tEvent doubleclick_event;
 
@@ -235,9 +246,12 @@ static int lognav_brow_cb(FlowCtx* ctx, flow_tEvent event)
         return sts;
       }
 
-      if (brow_FindSelectedObject(lognav->brow->ctx, event->object.object)) {
+      if (brow_FindSelectedObject(lognav->brow->ctx, event->object.object))
+      {
         brow_SelectClear(lognav->brow->ctx);
-      } else {
+      }
+      else
+      {
         brow_SelectClear(lognav->brow->ctx);
         brow_SetInverse(event->object.object, 1);
         brow_SelectInsert(lognav->brow->ctx, event->object.object);
@@ -248,7 +262,8 @@ static int lognav_brow_cb(FlowCtx* ctx, flow_tEvent event)
     }
     break;
   }
-  case flow_eEvent_Key_Left: {
+  case flow_eEvent_Key_Left:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
@@ -261,10 +276,12 @@ static int lognav_brow_cb(FlowCtx* ctx, flow_tEvent event)
     if (brow_IsOpen(node_list[0]))
       // Close this node
       object = node_list[0];
-    else {
+    else
+    {
       // Close parent
       sts = brow_GetParent(lognav->brow->ctx, node_list[0], &object);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         free(node_list);
         return 1;
       }
@@ -280,7 +297,8 @@ static int lognav_brow_cb(FlowCtx* ctx, flow_tEvent event)
     free(node_list);
     break;
   }
-  case flow_eEvent_Key_Right: {
+  case flow_eEvent_Key_Right:
+  {
     brow_tNode* node_list;
     int node_count;
 
@@ -289,7 +307,8 @@ static int lognav_brow_cb(FlowCtx* ctx, flow_tEvent event)
       return 1;
 
     brow_GetUserData(node_list[0], (void**)&item);
-    switch (item->type) {
+    switch (item->type)
+    {
     case lognav_eItemType_Hier:
       ((ItemHier*)item)->open_children(lognav, 0, 0);
       break;
@@ -300,16 +319,16 @@ static int lognav_brow_cb(FlowCtx* ctx, flow_tEvent event)
     }
   }
   case flow_eEvent_MB1DoubleClick:
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_GetUserData(event->object.object, (void**)&item);
-      switch (item->type) {
+      switch (item->type)
+      {
       case lognav_eItemType_Hier:
-        ((ItemHier*)item)
-            ->open_children(lognav, event->object.x, event->object.y);
+        ((ItemHier*)item)->open_children(lognav, event->object.x, event->object.y);
       case lognav_eItemType_Entry:
-        ((ItemEntry*)item)
-            ->open_children(lognav, event->object.x, event->object.y);
+        ((ItemEntry*)item)->open_children(lognav, event->object.x, event->object.y);
         break;
       default:;
       }
@@ -331,73 +350,58 @@ void LogNavBrow::create_nodeclasses()
 
   // Create red class
 
-  brow_CreateNodeClass(
-      ctx, "Red", flow_eNodeGroup_Common, &nc_red);
+  brow_CreateNodeClass(ctx, "Red", flow_eNodeGroup_Common, &nc_red);
   brow_AddAnnotPixmap(nc_red, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddFilledRect(nc_red, 1.05, 0.05, 0.6, 0.6, flow_eDrawType_LineRed);
   brow_AddRect(nc_red, 1.05, 0.05, 0.6, 0.6, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_red, 2, 0.6, 0, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_red, 9.5, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_red, 2, 0.6, 0, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_red, 9.5, 0.6, 1, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_red, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Create green class
 
-  brow_CreateNodeClass(
-      ctx, "Green", flow_eNodeGroup_Common, &nc_green);
+  brow_CreateNodeClass(ctx, "Green", flow_eNodeGroup_Common, &nc_green);
   brow_AddAnnotPixmap(nc_green, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddFilledRect(nc_green, 1.05, 0.05, 0.6, 0.6, flow_eDrawType_Green);
   brow_AddRect(nc_green, 1.05, 0.05, 0.6, 0.6, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_green, 2, 0.6, 0, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_green, 9.5, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_green, 2, 0.6, 0, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_green, 9.5, 0.6, 1, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_green, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Create yellow class
 
-  brow_CreateNodeClass(
-      ctx, "Yellow", flow_eNodeGroup_Common, &nc_yellow);
+  brow_CreateNodeClass(ctx, "Yellow", flow_eNodeGroup_Common, &nc_yellow);
   brow_AddAnnotPixmap(nc_yellow, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddFilledRect(nc_yellow, 1.05, 0.05, 0.6, 0.6, flow_eDrawType_Yellow);
   brow_AddRect(nc_yellow, 1.05, 0.05, 0.6, 0.6, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_yellow, 2, 0.6, 0, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_yellow, 9.5, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_yellow, 2, 0.6, 0, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_yellow, 9.5, 0.6, 1, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_yellow, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Create white class
 
-  brow_CreateNodeClass(
-      ctx, "White", flow_eNodeGroup_Common, &nc_white);
+  brow_CreateNodeClass(ctx, "White", flow_eNodeGroup_Common, &nc_white);
   brow_AddAnnotPixmap(nc_white, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddRect(nc_white, 1.05, 0.05, 0.6, 0.6, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_white, 2, 0.6, 0, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_white, 9.5, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_white, 2, 0.6, 0, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_white, 9.5, 0.6, 1, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_white, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Create without mark
 
-  brow_CreateNodeClass(
-      ctx, "NoMark", flow_eNodeGroup_Common, &nc_nomark);
+  brow_CreateNodeClass(ctx, "NoMark", flow_eNodeGroup_Common, &nc_nomark);
   brow_AddAnnotPixmap(nc_nomark, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_nomark, 2, 0.6, 0, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_nomark, 9.5, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_nomark, 2, 0.6, 0, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_nomark, 9.5, 0.6, 1, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_nomark, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
-
 }
 
 int LogNav::create_items()
 {
   brow_SetNodraw(brow->ctx);
 
-  for (int i = 0; i < tree->child.size(); i++) {
+  for (int i = 0; i < tree->child.size(); i++)
+  {
     new ItemHier(this, &tree->child[i], NULL, flow_eDest_IntoLast);
   }
   brow_ResetNodraw(brow->ctx);
@@ -418,34 +422,20 @@ void LogNavBrow::brow_setup()
   brow_SetAttributes(ctx, &brow_attr, mask);
   brow_SetCtxUserData(ctx, lognav);
 
-  brow_EnableEvent(
-      ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, lognav_brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack,
-      lognav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, lognav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack, lognav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack, lognav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack, lognav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Right, flow_eEventType_CallBack, lognav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Left, flow_eEventType_CallBack, lognav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_PF3, flow_eEventType_CallBack, lognav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Radiobutton, flow_eEventType_CallBack, lognav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_PageUp, flow_eEventType_CallBack, lognav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_PageDown, flow_eEventType_CallBack, lognav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, lognav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, lognav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, lognav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, lognav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, lognav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack, lognav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack, lognav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack, lognav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Right, flow_eEventType_CallBack, lognav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Left, flow_eEventType_CallBack, lognav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PF3, flow_eEventType_CallBack, lognav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Radiobutton, flow_eEventType_CallBack, lognav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PageUp, flow_eEventType_CallBack, lognav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PageDown, flow_eEventType_CallBack, lognav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, lognav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, lognav_brow_cb);
 }
 
 //
@@ -465,7 +455,8 @@ int LogNav::init_brow_cb(FlowCtx* fctx, void* client_data)
   // Create the root items
   lognav->create_items();
 
-  if (lognav->command_cb) {
+  if (lognav->command_cb)
+  {
     pwr_tCmd cmd = "@$HOME/test_xtt_setup";
     lognav->command_cb(lognav->parent_ctx, cmd);
   }
@@ -490,49 +481,33 @@ int LogNav::get_select(ItemBase** item)
 //
 //  Get zoom
 //
-void LogNav::get_zoom(double* zoom_factor)
-{
-  brow_GetZoom(brow->ctx, zoom_factor);
-}
+void LogNav::get_zoom(double* zoom_factor) { brow_GetZoom(brow->ctx, zoom_factor); }
 
 //
 //  Zoom
 //
-void LogNav::zoom(double zoom_factor)
-{
-  brow_Zoom(brow->ctx, zoom_factor);
-}
+void LogNav::zoom(double zoom_factor) { brow_Zoom(brow->ctx, zoom_factor); }
 
 //
 //  Return to base zoom factor
 //
-void LogNav::unzoom()
-{
-  brow_UnZoom(brow->ctx);
-}
+void LogNav::unzoom() { brow_UnZoom(brow->ctx); }
 
-ItemBase::ItemBase(lognav_eItemType t) : type(t)
-{
-}
+ItemBase::ItemBase(lognav_eItemType t) : type(t) {}
 
-ItemBase::~ItemBase()
-{
-}
+ItemBase::~ItemBase() {}
 
-int ItemBase::close(LogNav* lognav, double x, double y)
-{
-  return 1;
-}
+int ItemBase::close(LogNav* lognav, double x, double y) { return 1; }
 
-ItemHier ::ItemHier (LogNav* lognav, LogNav_hier* xitem,
-    brow_tNode dest, flow_eDest dest_code)
+ItemHier ::ItemHier(LogNav* lognav, LogNav_hier* xitem, brow_tNode dest, flow_eDest dest_code)
     : ItemBase(lognav_eItemType_Hier), item(xitem)
 {
-  brow_tNodeClass nc;
+  brow_tNodeClass nc = 0;
 
   type = lognav_eItemType_Hier;
 
-  switch (item->severity) {
+  switch (item->severity)
+  {
   case lognav_eSeverity_Fatal:
   case lognav_eSeverity_Error:
   case lognav_eSeverity_DetailError:
@@ -549,8 +524,7 @@ ItemHier ::ItemHier (LogNav* lognav, LogNav_hier* xitem,
     nc = lognav->brow->nc_nomark;
     break;
   }
-  brow_CreateNode(lognav->brow->ctx, "HierItem", nc, dest,
-      dest_code, (void*)this, 1, &node);
+  brow_CreateNode(lognav->brow->ctx, "HierItem", nc, dest, dest_code, (void*)this, 1, &node);
 
   if (item->child.size() == 0)
     brow_SetAnnotPixmap(node, 0, lognav->brow->pixmap_leaf);
@@ -566,7 +540,8 @@ int ItemHier::open_children(LogNav* lognav, double x, double y)
 
   brow_GetNodePosition(node, &node_x, &node_y);
 
-  if (brow_IsOpen(node)) {
+  if (brow_IsOpen(node))
+  {
     // Close
     brow_SetNodraw(lognav->brow->ctx);
     brow_CloseNode(lognav->brow->ctx, node);
@@ -574,15 +549,18 @@ int ItemHier::open_children(LogNav* lognav, double x, double y)
     brow_ResetOpen(node, lognav_mOpen_All);
     brow_ResetNodraw(lognav->brow->ctx);
     brow_Redraw(lognav->brow->ctx, node_y);
-  } else {
+  }
+  else
+  {
 
     brow_SetNodraw(lognav->brow->ctx);
 
-    for (int i = 0; i < item->child.size(); i++) {
+    for (int i = 0; i < item->child.size(); i++)
+    {
       if (item->child[i].type == lognav_eItemType_Hier)
-	new ItemHier(lognav, &item->child[i], node, flow_eDest_IntoLast);
+        new ItemHier(lognav, &item->child[i], node, flow_eDest_IntoLast);
       else
-	new ItemEntry(lognav, &item->child[i], node, flow_eDest_IntoLast);
+        new ItemEntry(lognav, &item->child[i], node, flow_eDest_IntoLast);
     }
     brow_SetAnnotPixmap(node, 0, lognav->brow->pixmap_openmap);
     brow_SetOpen(node, lognav_mOpen_Children);
@@ -598,7 +576,8 @@ int ItemHier::close(LogNav* lognav, double x, double y)
 
   brow_GetNodePosition(node, &node_x, &node_y);
 
-  if (brow_IsOpen(node)) {
+  if (brow_IsOpen(node))
+  {
     // Close
     brow_SetNodraw(lognav->brow->ctx);
     brow_CloseNode(lognav->brow->ctx, node);
@@ -610,16 +589,16 @@ int ItemHier::close(LogNav* lognav, double x, double y)
   return 1;
 }
 
-ItemEntry ::ItemEntry (LogNav* lognav, LogNav_hier* xitem,
-    brow_tNode dest, flow_eDest dest_code)
+ItemEntry ::ItemEntry(LogNav* lognav, LogNav_hier* xitem, brow_tNode dest, flow_eDest dest_code)
     : ItemBase(lognav_eItemType_Hier), item(xitem)
 {
   char timstr[40];
-  brow_tNodeClass nc;
+  brow_tNodeClass nc = 0;
 
   type = lognav_eItemType_Entry;
 
-  switch (item->severity) {
+  switch (item->severity)
+  {
   case lognav_eSeverity_Fatal:
   case lognav_eSeverity_Error:
   case lognav_eSeverity_DetailError:
@@ -636,9 +615,8 @@ ItemEntry ::ItemEntry (LogNav* lognav, LogNav_hier* xitem,
     nc = lognav->brow->nc_nomark;
     break;
   }
-  
-  brow_CreateNode(lognav->brow->ctx, "EntryItem", nc, dest,
-      dest_code, (void*)this, 1, &node);
+
+  brow_CreateNode(lognav->brow->ctx, "EntryItem", nc, dest, dest_code, (void*)this, 1, &node);
 
   if (item->child.size() == 0)
     brow_SetAnnotPixmap(node, 0, lognav->brow->pixmap_leaf);
@@ -658,7 +636,8 @@ int ItemEntry::open_children(LogNav* lognav, double x, double y)
 
   brow_GetNodePosition(node, &node_x, &node_y);
 
-  if (brow_IsOpen(node)) {
+  if (brow_IsOpen(node))
+  {
     // Close
     brow_SetNodraw(lognav->brow->ctx);
     brow_CloseNode(lognav->brow->ctx, node);
@@ -666,15 +645,18 @@ int ItemEntry::open_children(LogNav* lognav, double x, double y)
     brow_ResetOpen(node, lognav_mOpen_All);
     brow_ResetNodraw(lognav->brow->ctx);
     brow_Redraw(lognav->brow->ctx, node_y);
-  } else {
+  }
+  else
+  {
 
     brow_SetNodraw(lognav->brow->ctx);
 
-    for (int i = 0; i < item->child.size(); i++) {
+    for (int i = 0; i < item->child.size(); i++)
+    {
       if (item->child[i].type == lognav_eItemType_Hier)
-	new ItemHier(lognav, &item->child[i], node, flow_eDest_IntoLast);
+        new ItemHier(lognav, &item->child[i], node, flow_eDest_IntoLast);
       else
-	new ItemEntry(lognav, &item->child[i], node, flow_eDest_IntoLast);
+        new ItemEntry(lognav, &item->child[i], node, flow_eDest_IntoLast);
     }
     brow_SetAnnotPixmap(node, 0, lognav->brow->pixmap_openmap);
     brow_SetOpen(node, lognav_mOpen_Children);
@@ -690,7 +672,8 @@ int ItemEntry::close(LogNav* lognav, double x, double y)
 
   brow_GetNodePosition(node, &node_x, &node_y);
 
-  if (brow_IsOpen(node)) {
+  if (brow_IsOpen(node))
+  {
     // Close
     brow_SetNodraw(lognav->brow->ctx);
     brow_CloseNode(lognav->brow->ctx, node);
@@ -701,4 +684,3 @@ int ItemEntry::close(LogNav* lognav, double x, double y)
   }
   return 1;
 }
-

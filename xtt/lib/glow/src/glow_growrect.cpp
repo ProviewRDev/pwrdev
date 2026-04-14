@@ -1023,7 +1023,7 @@ int GrowRect::get_annot_background(
 
 void GrowRect::align(double x, double y, glow_eAlignDirection direction)
 {
-  double dx, dy;
+  double dx = 0, dy = 0;
 
   if (fixposition)
     return;

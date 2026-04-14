@@ -1454,7 +1454,7 @@ void GrowPolyLine::add_and_shift_y_values_filled(
 
 void GrowPolyLine::align(double x, double y, glow_eAlignDirection direction)
 {
-  double dx, dy;
+  double dx = 0, dy = 0;
 
   if (fixposition)
     return;

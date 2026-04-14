@@ -10405,7 +10405,7 @@ static int xnav_setsubwindow_func(void* filectx, ccm_sArg* arg_list, int arg_cou
 {
   XNav* xnav;
   XttGe* gectx;
-  int sts;
+  int sts = 0;
   ccm_sArg *arg_p2, *arg_p3, *arg_p4, *arg_p5;
   XttMultiView* mvctx;
   pwr_tOName graph_str;

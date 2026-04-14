@@ -127,112 +127,112 @@ static int wnav_clone_func(void* client_data, void* client_flag);
 static int wnav_backup_func(void* client_data, void* client_flag);
 
 dcli_tCmdTable wnav_command_table[] = {
-  { "SHOW", &wnav_show_func,
-      { "dcli_arg1", "dcli_arg2", "/NAME", "/CLASS", "/HIERARCHY", "/PARAMETER",
-          "/OBJID", "/FILE", "/LOCAL", "/INITSTEP", "/MAXOBJECTS", "/VOLUME",
-          "/ALL", "/TYPE", "/OPTION", "/TERMINAL", "/OUTPUT", "/FULL",
-	  "/APPEND", "/EXACTORDER", "/HEXADECIMAL", "" } },
-  { "COMPILE", &wnav_compile_func,
-      { "/MODIFIED", "/DEBUG", "/HIERARCHY", "/PLCPGM", "/WINDOW",
-          "/FROM_PLCPGM", "/ALLPLCPGM", "/VOLALL", "/VOLUMES", "/PLCEMBED",
-          "" } },
-  { "PRINT", &wnav_print_func,
-      { "/ALL", "/NODOCUMENT", "/NOOVERVIEW", "/HIERARCHY", "/PLCPGM",
-          "/FROM_PLCPGM", "/PDF", "" } },
-  { "REDRAW", &wnav_redraw_func,
-      { "/ALL", "/HIERARCHY", "/PLCPGM", "/FROM_PLCPGM", "/TEMPLATE", "" } },
-  { "RENAME", &wnav_rename_func, { "/SOURCE", "/NAME", "" } },
-  { "LIST", &wnav_list_func,
-      { "dcli_arg1", "/OUTPUT", "/HIERARCHY", "/OBJECT", "/ALLVOLUMES",
-          "/VOLUMES", "/DESCRIPTOR", "/SHORTNAME", "/NODE", "/PLCPGM", "" } },
-  { "CONFIGURE", &wnav_configure_func,
-      { "dcli_arg1", "/RACK", "/CARDNAME", "/CARDCLASS", "/CHANNELNAME",
-          "/CHANIDENTITY", "/CHANDESCRIPTION", "/TABLE", "" } },
-  { "SORT", &wnav_sort_func, { "/SIGNALS", "/CLASS", "/PARENT", "" } },
-  { "COPY", &wnav_copy_func,
-      { "dcli_arg1", "/FIRST", "/LAST", "/AFTER", "/BEFORE", "/HIERARCHY",
-          "/SOURCE", "/DESTINATION", "/NAME", "/KEEPREFERENCES",
-	  "/IGNORE_ERRORS", "/KEEPOID", "/KEEPSYMBOLS", "" } },
-  { "CUT", &wnav_cut_func, { "/KEEPREFERENCES", "" } },
-  { "PASTE", &wnav_paste_func,
-      { "dcli_arg1", "/INTO", "/BUFFER", "/KEEPOID", "/TOPLEVEL", "" } },
-  { "MOVE", &wnav_move_func,
-      { "dcli_arg1", "/FIRST", "/LAST", "/AFTER", "/BEFORE", "/SOURCE",
-          "/DESTINATION", "/RENAME", "" } },
-  { "OPEN", &wnav_open_func,
-      { "dcli_arg1", "dcli_arg2", "/NAME", "/FILE", "/SCROLLBAR", "/WIDTH",
-          "/HEIGHT", "/MENU", "/NAVIGATOR", "/CENTER", "/OBJECT", "/MODAL",
-          "/INSTANCE", "/TITLE", "/VOLUME", "/ITEM", "/SHOWITEM", "/CATEGORIES",
-          "" } },
-  { "CLOSE", &wnav_close_func,
-      { "dcli_arg1", "dcli_arg2", "/FILE", "/INSTANCE", "" } },
-  { "CREATE", &wnav_create_func,
-      { "dcli_arg1", "dcli_arg2", "/TEXT", "/MENU", "/DESTINATION", "/COMMAND",
-          "/AFTER", "/BEFORE", "/FIRSTCHILD", "/LASTCHILD", "/VOLUME", "/ALL",
-          "/CLASS", "/DEBUG", "/NODECONFIG", "/NAME", "/IDENTITY", "/FILES",
-          "/OUT", "/IGNORE", "/DIRECTORY", "/DATABASE", "/SERVER", "/PLCPGM",
-          "/HIERARCHY", "/FROM_PLCPGM", "/TEMPLATE", "/SIMULATION", "/GRAPH",
-          "/RTONLY", "/DEPENDENCY", "/DESCRIPTION", "" } },
-  { "NEW", &wnav_new_func, { "dcli_arg1", "/NAME", "" } },
-  { "DELETE", &wnav_delete_func, { "dcli_arg1", "/NAME", "/CLASS", "/HIERARCHY",
-                                     "/NOCONFIRM", "/NOLOG", "" } },
-  { "CONNECT", &wnav_connect_func,
-      { "/SOURCE", "/DESTINATION", "/RECONNECT", "" } },
-  { "DISCONNECT", &wnav_disconnect_func, { "/SOURCE", "" } },
-  { "WB", &wnav_wb_func, { "dcli_arg1", "/OUTPUT", "/HIERARCHY", "/LOADFILE",
-                             "/NOINDEX", "/KEEPNAME", "/NOFOCODE", "" } },
-  { "EXIT", &wnav_exit_func, { "" } }, { "QUIT", &wnav_exit_func, { "" } },
-  { "DEFINE", &wnav_define_func,
-      { "dcli_arg1", "dcli_arg2", "dcli_arg3", "dcli_arg4", "" } },
-  { "HELP", &wnav_help_func,
-      { "dcli_arg1", "dcli_arg2", "dcli_arg3", "dcli_arg4", "/HELPFILE",
-          "/POPNAVIGATOR", "/BOOKMARK", "/INDEX", "/BASE", "/PROJECT",
-          "/STRICT", "/VERSION", "" } },
-  { "LOGOUT", &wnav_logout_func, { "" } },
-  { "LOGIN", &wnav_login_func,
-      { "dcli_arg1", "dcli_arg2", "/ADMINISTRATOR", "" } },
-  { "TWO", &wnav_two_func, { "" } }, { "ONE", &wnav_one_func, { "" } },
-  { "EDIT", &wnav_edit_func, { "" } }, { "NOEDIT", &wnav_noedit_func, { "" } },
-  { "SET", &wnav_set_func,
-      { "dcli_arg1", "dcli_arg2", "/LOCAL", "/WIDTH", "/HEIGHT", "/TERMINAL",
-          "/OUTPUT", "/NOCONFIRM", "/LOG", "/CLASS", "/HIERARCHY", "/NAME",
-          "/ATTRIBUTE", "/SIGNALOBJECTSEG", "/SIGCHANCONSEG", "/SHOSIGCHANCON",
-          "/SHODETECTTEXT", "/VOLUMENAME", "/VALUE", "/SOURCE", "/MODAL",
-	  "/IGNOREMISSING", "/INDEX", "" } },
-  { "SETUP", &wnav_setup_func,
-      {
-          "",
-      } },
-  { "SEARCH", &wnav_search_func,
-      { "dcli_arg1", "/REGULAREXPRESSION", "/NEXT", "" } },
-  { "SAVE", &wnav_save_func, { "/QUIET", "" } },
-  { "REVERT", &wnav_revert_func, { "/NOCONFIRM", "/CONFIRM", "" } },
-  { "REVISION", &wnav_revision_func, { "dcli_arg1", "/NAME", "" } },
-  { "DISPLAY", &wnav_display_func,
-      { "dcli_arg1", "/NAME", "/CLASS", "/ROOT", "/DEPTH", "/HIERARCHY",
-          "/ATTRIBUTE", "" } },
-  { "GENERATE", &wnav_generate_func, { "dcli_arg1", "/FILE", "" } },
-  { "CROSSREFERENCE", &wnav_crossref_func,
-      { "dcli_arg1", "/NAME", "/FILE", "/STRING", "/BRIEF", "/FUNCTION",
-          "/CASE_SENSITIVE", "/WINDOW", "" } },
-  { "DISTRIBUTE", &wnav_distribute_func,
-      { "/NODE", "/PACKAGE", "/FILE", "/CHECK", "" } },
-  { "RELEASE", &wnav_release_func, { "dcli_arg1", "dcli_arg2", "" } },
-  { "BUILD", &wnav_build_func,
-      { "dcli_arg1", "dcli_arg2", "/FORCE", "/DEBUG", "/CROSSREFERENCE",
-	"/MANUAL", "/SYNTAX", "/NAME", "/WINDOW", "/NODE", "/EXPORT", 
-	"/NOCLASSVOLUMES", "/FLOWFILES", "" } },
-  { "CHECK", &wnav_check_func,
-      { "dcli_arg1", "/VOLUME", "/NAME", "/NODE", "" } },
-  { "UPDATE", &wnav_update_func, { "dcli_arg1", "" } },
-  { "CLONE", &wnav_clone_func, { "dcli_arg1", "/NAME", "/VID", "" } },
-  {
-      "BACKUP", &wnav_backup_func,
-      { "dcli_arg1", "dcli_arg2", "dcli_arg13", "/FILE", "/FILE1", "/FILE2",
-          "/OUT", "/WINDOW", "" },
-  },
-  { "", NULL, { "" } }
-};
+    {"SHOW", &wnav_show_func, {"dcli_arg1",    "dcli_arg2", "/NAME", "/CLASS",  "/HIERARCHY",
+                               "/PARAMETER",   "/OBJID",    "/FILE", "/LOCAL",  "/INITSTEP",
+                               "/MAXOBJECTS",  "/VOLUME",   "/ALL",  "/TYPE",   "/OPTION",
+                               "/TERMINAL",    "/OUTPUT",   "/FULL", "/APPEND", "/EXACTORDER",
+                               "/HEXADECIMAL", ""}},
+    {"COMPILE",
+     &wnav_compile_func,
+     {"/MODIFIED", "/DEBUG", "/HIERARCHY", "/PLCPGM", "/WINDOW", "/FROM_PLCPGM", "/ALLPLCPGM", "/VOLALL",
+      "/VOLUMES", "/PLCEMBED", ""}},
+    {"PRINT",
+     &wnav_print_func,
+     {"/ALL", "/NODOCUMENT", "/NOOVERVIEW", "/HIERARCHY", "/PLCPGM", "/FROM_PLCPGM", "/PDF", ""}},
+    {"REDRAW", &wnav_redraw_func, {"/ALL", "/HIERARCHY", "/PLCPGM", "/FROM_PLCPGM", "/TEMPLATE", ""}},
+    {"RENAME", &wnav_rename_func, {"/SOURCE", "/NAME", ""}},
+    {"LIST",
+     &wnav_list_func,
+     {"dcli_arg1", "/OUTPUT", "/HIERARCHY", "/OBJECT", "/ALLVOLUMES", "/VOLUMES", "/DESCRIPTOR", "/SHORTNAME",
+      "/NODE", "/PLCPGM", ""}},
+    {"CONFIGURE",
+     &wnav_configure_func,
+     {"dcli_arg1", "/RACK", "/CARDNAME", "/CARDCLASS", "/CHANNELNAME", "/CHANIDENTITY", "/CHANDESCRIPTION",
+      "/TABLE", ""}},
+    {"SORT", &wnav_sort_func, {"/SIGNALS", "/CLASS", "/PARENT", ""}},
+    {"COPY",
+     &wnav_copy_func,
+     {"dcli_arg1", "/FIRST", "/LAST", "/AFTER", "/BEFORE", "/HIERARCHY", "/SOURCE", "/DESTINATION", "/NAME",
+      "/KEEPREFERENCES", "/IGNORE_ERRORS", "/KEEPOID", "/KEEPSYMBOLS", ""}},
+    {"CUT", &wnav_cut_func, {"/KEEPREFERENCES", ""}},
+    {"PASTE", &wnav_paste_func, {"dcli_arg1", "/INTO", "/BUFFER", "/KEEPOID", "/TOPLEVEL", ""}},
+    {"MOVE",
+     &wnav_move_func,
+     {"dcli_arg1", "/FIRST", "/LAST", "/AFTER", "/BEFORE", "/SOURCE", "/DESTINATION", "/RENAME", ""}},
+    {"OPEN",
+     &wnav_open_func,
+     {"dcli_arg1", "dcli_arg2", "/NAME", "/FILE", "/SCROLLBAR", "/WIDTH", "/HEIGHT", "/MENU", "/NAVIGATOR",
+      "/CENTER", "/OBJECT", "/MODAL", "/INSTANCE", "/TITLE", "/VOLUME", "/ITEM", "/SHOWITEM", "/CATEGORIES",
+      ""}},
+    {"CLOSE", &wnav_close_func, {"dcli_arg1", "dcli_arg2", "/FILE", "/INSTANCE", ""}},
+    {"CREATE", &wnav_create_func, {"dcli_arg1",   "dcli_arg2",    "/TEXT",
+                                   "/MENU",       "/DESTINATION", "/COMMAND",
+                                   "/AFTER",      "/BEFORE",      "/FIRSTCHILD",
+                                   "/LASTCHILD",  "/VOLUME",      "/ALL",
+                                   "/CLASS",      "/DEBUG",       "/NODECONFIG",
+                                   "/NAME",       "/IDENTITY",    "/FILES",
+                                   "/OUT",        "/IGNORE",      "/DIRECTORY",
+                                   "/DATABASE",   "/SERVER",      "/PLCPGM",
+                                   "/HIERARCHY",  "/FROM_PLCPGM", "/TEMPLATE",
+                                   "/SIMULATION", "/GRAPH",       "/RTONLY",
+                                   "/DEPENDENCY", "/DESCRIPTION", ""}},
+    {"NEW", &wnav_new_func, {"dcli_arg1", "/NAME", ""}},
+    {"DELETE", &wnav_delete_func, {"dcli_arg1", "/NAME", "/CLASS", "/HIERARCHY", "/NOCONFIRM", "/NOLOG", ""}},
+    {"CONNECT", &wnav_connect_func, {"/SOURCE", "/DESTINATION", "/RECONNECT", ""}},
+    {"DISCONNECT", &wnav_disconnect_func, {"/SOURCE", ""}},
+    {"WB",
+     &wnav_wb_func,
+     {"dcli_arg1", "/OUTPUT", "/HIERARCHY", "/LOADFILE", "/NOINDEX", "/KEEPNAME", "/NOFOCODE", ""}},
+    {"EXIT", &wnav_exit_func, {""}},
+    {"QUIT", &wnav_exit_func, {""}},
+    {"DEFINE", &wnav_define_func, {"dcli_arg1", "dcli_arg2", "dcli_arg3", "dcli_arg4", ""}},
+    {"HELP",
+     &wnav_help_func,
+     {"dcli_arg1", "dcli_arg2", "dcli_arg3", "dcli_arg4", "/HELPFILE", "/POPNAVIGATOR", "/BOOKMARK", "/INDEX",
+      "/BASE", "/PROJECT", "/STRICT", "/VERSION", ""}},
+    {"LOGOUT", &wnav_logout_func, {""}},
+    {"LOGIN", &wnav_login_func, {"dcli_arg1", "dcli_arg2", "/ADMINISTRATOR", ""}},
+    {"TWO", &wnav_two_func, {""}},
+    {"ONE", &wnav_one_func, {""}},
+    {"EDIT", &wnav_edit_func, {""}},
+    {"NOEDIT", &wnav_noedit_func, {""}},
+    {"SET",
+     &wnav_set_func,
+     {"dcli_arg1",  "dcli_arg2",        "/LOCAL",         "/WIDTH",         "/HEIGHT",        "/TERMINAL",
+      "/OUTPUT",    "/NOCONFIRM",       "/LOG",           "/CLASS",         "/HIERARCHY",     "/NAME",
+      "/ATTRIBUTE", "/SIGNALOBJECTSEG", "/SIGCHANCONSEG", "/SHOSIGCHANCON", "/SHODETECTTEXT", "/VOLUMENAME",
+      "/VALUE",     "/SOURCE",          "/MODAL",         "/IGNOREMISSING", "/INDEX",         ""}},
+    {"SETUP",
+     &wnav_setup_func,
+     {
+         "",
+     }},
+    {"SEARCH", &wnav_search_func, {"dcli_arg1", "/REGULAREXPRESSION", "/NEXT", ""}},
+    {"SAVE", &wnav_save_func, {"/QUIET", ""}},
+    {"REVERT", &wnav_revert_func, {"/NOCONFIRM", "/CONFIRM", ""}},
+    {"REVISION", &wnav_revision_func, {"dcli_arg1", "/NAME", ""}},
+    {"DISPLAY",
+     &wnav_display_func,
+     {"dcli_arg1", "/NAME", "/CLASS", "/ROOT", "/DEPTH", "/HIERARCHY", "/ATTRIBUTE", ""}},
+    {"GENERATE", &wnav_generate_func, {"dcli_arg1", "/FILE", ""}},
+    {"CROSSREFERENCE",
+     &wnav_crossref_func,
+     {"dcli_arg1", "/NAME", "/FILE", "/STRING", "/BRIEF", "/FUNCTION", "/CASE_SENSITIVE", "/WINDOW", ""}},
+    {"DISTRIBUTE", &wnav_distribute_func, {"/NODE", "/PACKAGE", "/FILE", "/CHECK", ""}},
+    {"RELEASE", &wnav_release_func, {"dcli_arg1", "dcli_arg2", ""}},
+    {"BUILD",
+     &wnav_build_func,
+     {"dcli_arg1", "dcli_arg2", "/FORCE", "/DEBUG", "/CROSSREFERENCE", "/MANUAL", "/SYNTAX", "/NAME",
+      "/WINDOW", "/NODE", "/EXPORT", "/NOCLASSVOLUMES", "/FLOWFILES", ""}},
+    {"CHECK", &wnav_check_func, {"dcli_arg1", "/VOLUME", "/NAME", "/NODE", ""}},
+    {"UPDATE", &wnav_update_func, {"dcli_arg1", ""}},
+    {"CLONE", &wnav_clone_func, {"dcli_arg1", "/NAME", "/VID", ""}},
+    {
+        "BACKUP",
+        &wnav_backup_func,
+        {"dcli_arg1", "dcli_arg2", "dcli_arg13", "/FILE", "/FILE1", "/FILE2", "/OUT", "/WINDOW", ""},
+    },
+    {"", NULL, {""}}};
 
 static void wnav_store_wnav(WNav* wnav)
 {
@@ -621,7 +621,8 @@ static int wnav_noedit_func(void* client_data, void* client_flag)
   WNav* wnav = (WNav*)client_data;
   pwr_tStatus sts;
 
-  if (wnav->window_type == wnav_eWindowType_No) {
+  if (wnav->window_type == wnav_eWindowType_No)
+  {
     ldh_sSessInfo info;
 
     sts = wnav_wccm_get_ldhsession_cb(wnav, &wnav->ldhses);
@@ -632,11 +633,13 @@ static int wnav_noedit_func(void* client_data, void* client_flag)
     if (EVEN(sts))
       return sts;
 
-    if (!info.Empty) {
+    if (!info.Empty)
+    {
       wnav->message('E', "Session is not empty");
       return WNAV__CMDMODE;
     }
-    if (info.Access == ldh_eAccess_ReadOnly) {
+    if (info.Access == ldh_eAccess_ReadOnly)
+    {
       wnav->message('E', "Session is already readonly");
       return WNAV__CMDMODE;
     }
@@ -1588,18 +1591,22 @@ static int wnav_set_func(void* client_data, void* client_flag)
     {
       wnav->message('E', "Graph not found");
     }
-  } else if (str_NoCaseStrncmp(arg1_str, "COLORTHEME", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "COLORTHEME", strlen(arg1_str)) == 0)
+  {
     // Command is "SET COLORTHEME"
     char idx_str[20];
     int idx;
     int num;
 
-    if (EVEN(dcli_get_qualifier("/INDEX", idx_str, sizeof(idx_str)))) {
+    if (EVEN(dcli_get_qualifier("/INDEX", idx_str, sizeof(idx_str))))
+    {
       wnav->message('E', "Type syntax error");
       return WNAV__HOLDCOMMAND;
     }
     num = sscanf(idx_str, "%d", &idx);
-    if (num != 1) {
+    if (num != 1)
+    {
       wnav->message('E', "Type syntax error");
       return WNAV__HOLDCOMMAND;
     }
@@ -1607,7 +1614,9 @@ static int wnav_set_func(void* client_data, void* client_flag)
     idx = CoWow::SetColorTheme(idx);
     if (wnav->update_color_theme_cb)
       (wnav->update_color_theme_cb)(wnav->parent_ctx, idx);
-  } else {
+  }
+  else
+  {
     wnav->message('E', "Syntax error");
     return WNAV__SYNTAX;
   }
@@ -4755,8 +4764,7 @@ static int wnav_wb_func(void* client_data, void* client_flag)
     if (EVEN(sts))
       return sts;
 
-    sts = ldh_WbDump(
-        wnav->ldhses, hierarchystr_p, outputstr, keepname, noindex, nofocode);
+    sts = ldh_WbDump(wnav->ldhses, hierarchystr_p, outputstr, keepname, noindex, nofocode);
     if (EVEN(sts))
       wnav->message(' ', wnav_get_message(sts));
     return sts;
@@ -5362,7 +5370,8 @@ static int wnav_build_func(void* client_data, void* client_flag)
     sprintf(cmd, "co_convert -po -d $pwrp_inc $pwrp_db/%s.wb_load", namestr);
     system(cmd);
     // Create dbs-file
-    sprintf(cmd, "create snapshot /file=\"$pwrp_db/%s.wb_load\" /out=\"$pwrp_load/%s.dbs\"", namestr, namestr);
+    sprintf(cmd, "create snapshot /file=\"$pwrp_db/%s.wb_load\" /out=\"$pwrp_load/%s.dbs\"", namestr,
+            namestr);
     sts = wnav->command(cmd);
   }
   else if (str_NoCaseStrncmp(arg1_str, "OBJECT", strlen(arg1_str)) == 0)
@@ -6174,9 +6183,9 @@ static int wnav_clone_func(void* client_data, void* client_flag)
       if (clone_cnt > 1)
       {
         // Open list dialog
-        char(*clone_vect)[80];
+        char (*clone_vect)[80];
 
-        clone_vect = (char(*)[80])calloc(clone_cnt + 1, 80);
+        clone_vect = (char (*)[80])calloc(clone_cnt + 1, 80);
         clone_cnt = 0;
         for (int idx = 0; idx < volumecount; idx++)
         {
@@ -6811,7 +6820,7 @@ static int wnav_confirmdialog_func(void* filectx, ccm_sArg* arg_list, int arg_co
   WNav* wnav;
   ccm_sArg *arg_p2, *arg_p3;
   int sts;
-  int cancel;
+  int cancel = 0;
 
   if (!(arg_count == 2 || arg_count == 3))
     return CCM__ARGMISM;
@@ -6929,7 +6938,7 @@ static int wnav_promptdialog_func(void* filectx, ccm_sArg* arg_list, int arg_cou
   WNav* wnav;
   ccm_sArg *arg_p2, *arg_p3;
   int sts;
-  char* value;
+  char* value = NULL;
   char str[80];
 
   if (arg_count != 3)
@@ -7099,7 +7108,8 @@ static int wnav_ccm_errormessage_func(char* msg, int severity, void* client_data
 {
   WNav* wnav = (WNav*)client_data;
 
-  switch(severity) {
+  switch (severity)
+  {
   case msg_eSeverity_Info:
   case msg_eSeverity_Success:
     wnav->message('I', msg);

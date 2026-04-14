@@ -476,6 +476,8 @@ unsigned int Receive()
   int buf_ix; /* Current position in receive buffer */
   remote_tcp_header header;
 
+  memset(&header, 0, sizeof(header));
+
   static char saved_buffer[65536];
   static int saved_fl = 0;
   static int saved_size;

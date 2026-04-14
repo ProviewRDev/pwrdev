@@ -54,10 +54,7 @@ void XColWind::message_cb(void* xcolwind, char severity, const char* message)
   ((XColWind*)xcolwind)->message(severity, message);
 }
 
-void XColWind::change_value_cb(void* xcolwind)
-{
-  ((XColWind*)xcolwind)->change_value(1);
-}
+void XColWind::change_value_cb(void* xcolwind) { ((XColWind*)xcolwind)->change_value(1); }
 
 //
 //  Callbackfunctions from menu entries
@@ -85,7 +82,8 @@ void XColWind::activate_save()
 
   dcli_translate_filename(fname, filename);
   std::ofstream fp(fname);
-  if (!fp) {
+  if (!fp)
+  {
     char tmp[280];
     snprintf(tmp, sizeof(tmp), "Unable to open file \"%s\"", fname);
     message('E', tmp);
@@ -101,25 +99,28 @@ void XColWind::activate_save()
      << "#\n";
 
   brow_GetObjectList(xattnav->brow->ctx, &object_list, &object_cnt);
-  for (i = 0; i < object_cnt; i++) {
+  for (i = 0; i < object_cnt; i++)
+  {
     brow_GetUserData(object_list[i], (void**)&item);
 
-    switch (item->type) {
+    switch (item->type)
+    {
     case xnav_eItemType_Collect:
-      if (i == object_cnt - 1) {
+      if (i == object_cnt - 1)
+      {
         if (i == 0)
           fp << "collect /name=" << item->name << " /newwindow /last"
-             << " /width=" << width << " /height=" << height
-             << " /zoomfactor=" << zoomfactor << " /scantime=" << scantime
-             << " /title=\"" << title << "\"\n";
+             << " /width=" << width << " /height=" << height << " /zoomfactor=" << zoomfactor
+             << " /scantime=" << scantime << " /title=\"" << title << "\"\n";
         else
           fp << "collect /name=" << item->name << " /addwindow /last\n";
-      } else {
+      }
+      else
+      {
         if (i == 0)
           fp << "collect /name=" << item->name << " /newwindow"
-             << " /width=" << width << " /height=" << height
-             << " /zoomfactor=" << zoomfactor << " /scantime=" << scantime
-             << " /title=\"" << title << "\"\n";
+             << " /width=" << width << " /height=" << height << " /zoomfactor=" << zoomfactor
+             << " /scantime=" << scantime << " /title=\"" << title << "\"\n";
         else
           fp << "collect /name=" << item->name << " /addwindow\n";
       }
@@ -134,9 +135,10 @@ void XColWind::activate_save()
 int XColWind::init_cb(void* ctx)
 {
   XColWind* xcolwind = (XColWind*)ctx;
-  int sts;
+  int sts = 0;
 
-  switch (xcolwind->type) {
+  switch (xcolwind->type)
+  {
   case xcolwind_eType_Collect:
     sts = xcolwind->collect_add(xcolwind->objar_list);
     free(xcolwind->objar_list);
@@ -162,8 +164,7 @@ void XColWind::file_selected_cb(void* ctx, void* data, char* text)
 
 void XColWind::activate_saveas()
 {
-  wow->CreateInputDialog(
-      this, "Save as", "Enter filename", file_selected_cb, 0, 40, 0, 0);
+  wow->CreateInputDialog(this, "Save as", "Enter filename", file_selected_cb, 0, 40, 0, 0);
 }
 
 void XColWind::activate_display_object()
@@ -175,10 +176,10 @@ void XColWind::activate_display_object()
   if (EVEN(sts))
     return;
 
-  if (call_method_cb) {
-    (call_method_cb)(parent_ctx, "$Object-RtNavigator",
-        "$Object-RtNavigatorFilter", aref, xmenu_eItemType_Object,
-        xmenu_mUtility_AttrEditor, NULL);
+  if (call_method_cb)
+  {
+    (call_method_cb)(parent_ctx, "$Object-RtNavigator", "$Object-RtNavigatorFilter", aref,
+                     xmenu_eItemType_Object, xmenu_mUtility_AttrEditor, NULL);
   }
 }
 
@@ -191,10 +192,10 @@ void XColWind::activate_show_cross()
   if (EVEN(sts))
     return;
 
-  if (call_method_cb) {
-    (call_method_cb)(parent_ctx, "$Object-OpenCrossref",
-        "$Object-OpenCrossrefFilter", aref, xmenu_eItemType_Object,
-        xmenu_mUtility_AttrEditor, NULL);
+  if (call_method_cb)
+  {
+    (call_method_cb)(parent_ctx, "$Object-OpenCrossref", "$Object-OpenCrossrefFilter", aref,
+                     xmenu_eItemType_Object, xmenu_mUtility_AttrEditor, NULL);
   }
 }
 
@@ -207,10 +208,10 @@ void XColWind::activate_open_classgraph()
   if (EVEN(sts))
     return;
 
-  if (call_method_cb) {
-    (call_method_cb)(parent_ctx, "$Object-OpenObjectGraph",
-        "$Object-OpenObjectGraphFilter", aref, xmenu_eItemType_Object,
-        xmenu_mUtility_AttrEditor, NULL);
+  if (call_method_cb)
+  {
+    (call_method_cb)(parent_ctx, "$Object-OpenObjectGraph", "$Object-OpenObjectGraphFilter", aref,
+                     xmenu_eItemType_Object, xmenu_mUtility_AttrEditor, NULL);
   }
 }
 
@@ -223,9 +224,10 @@ void XColWind::activate_open_plc()
   if (EVEN(sts))
     return;
 
-  if (call_method_cb) {
-    (call_method_cb)(parent_ctx, "$Object-OpenTrace", "$Object-OpenTraceFilter",
-        aref, xmenu_eItemType_Object, xmenu_mUtility_AttrEditor, NULL);
+  if (call_method_cb)
+  {
+    (call_method_cb)(parent_ctx, "$Object-OpenTrace", "$Object-OpenTraceFilter", aref, xmenu_eItemType_Object,
+                     xmenu_mUtility_AttrEditor, NULL);
   }
 }
 
@@ -236,14 +238,18 @@ void XColWind::activate_collect_insert()
   int sts;
   pwr_tOName attr;
 
-  if (get_select_cb) {
+  if (get_select_cb)
+  {
     sts = (get_select_cb)(parent_ctx, &aref, &is_attr);
     if (EVEN(sts))
       return;
 
-    if (!aref.Flags.b.Object && !aref.Flags.b.ObjectAttr) {
+    if (!aref.Flags.b.Object && !aref.Flags.b.ObjectAttr)
+    {
       collect_insert(&aref);
-    } else {
+    }
+    else
+    {
       sts = XNav::get_trace_attr(&aref, attr);
       if (EVEN(sts))
         return;
@@ -273,7 +279,8 @@ void XColWind::activate_moveup()
   int node_count;
 
   brow_GetSelectedNodes(xattnav->brow->ctx, &node_list, &node_count);
-  if (node_count == 1) {
+  if (node_count == 1)
+  {
     brow_MoveUp(xattnav->brow->ctx, node_list[0]);
     brow_Redraw(xattnav->brow->ctx, 0);
   }
@@ -285,7 +292,8 @@ void XColWind::activate_movedown()
   int node_count;
 
   brow_GetSelectedNodes(xattnav->brow->ctx, &node_list, &node_count);
-  if (node_count == 1) {
+  if (node_count == 1)
+  {
     brow_MoveDown(xattnav->brow->ctx, node_list[0]);
     brow_Redraw(xattnav->brow->ctx, 0);
   }
@@ -314,33 +322,31 @@ int XColWind::open_changevalue(char* name)
   return XATT__SUCCESS;
 }
 
-void XColWind::swap(int mode)
-{
-  xattnav->swap(mode);
-}
+void XColWind::swap(int mode) { xattnav->swap(mode); }
 
-XColWind::~XColWind()
-{
-}
+XColWind::~XColWind() {}
 
-XColWind::XColWind(void* xa_parent_ctx, pwr_sAttrRef* xa_objar_list,
-    char* xa_title, int xa_advanced_user, xcolwind_eType xa_type, int* xa_sts)
-    : parent_ctx(xa_parent_ctx), objar_list(xa_objar_list), input_open(0),
-      input_multiline(0), close_cb(0), redraw_cb(0), popup_menu_cb(0),
-      call_method_cb(0), command_cb(0), get_select_cb(0), client_data(0),
+XColWind::XColWind(void* xa_parent_ctx, pwr_sAttrRef* xa_objar_list, char* xa_title, int xa_advanced_user,
+                   xcolwind_eType xa_type, int* xa_sts)
+    : parent_ctx(xa_parent_ctx), objar_list(xa_objar_list), input_open(0), input_multiline(0), close_cb(0),
+      redraw_cb(0), popup_menu_cb(0), call_method_cb(0), command_cb(0), get_select_cb(0), client_data(0),
       type(xa_type)
 {
-  if (xa_title && !streq(xa_title, "")) {
+  if (xa_title && !streq(xa_title, ""))
+  {
     strcpy(title, xa_title);
     set_filename(title);
-  } else {
-    if (type == xcolwind_eType_CollectSignals
-        || type == xcolwind_eType_CollectIOSignals) {
+  }
+  else
+  {
+    if (type == xcolwind_eType_CollectSignals || type == xcolwind_eType_CollectIOSignals)
+    {
       pwr_tAName aname;
       pwr_tStatus sts;
 
       sts = gdh_AttrrefToName(objar_list, aname, sizeof(aname), cdh_mNName);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         *xa_sts = sts;
         return;
       }
@@ -348,7 +354,9 @@ XColWind::XColWind(void* xa_parent_ctx, pwr_sAttrRef* xa_objar_list,
       strcpy(title, "Signals ");
       strncat(title, aname, sizeof(title) - strlen(title) - 1);
       strcpy(filename, "");
-    } else {
+    }
+    else
+    {
       strcpy(title, "Collection");
       strcpy(filename, "");
     }
@@ -358,10 +366,12 @@ XColWind::XColWind(void* xa_parent_ctx, pwr_sAttrRef* xa_objar_list,
 
 void XColWind::set_filename(char* name)
 {
-  if (!strchr(name, '/')) {
+  if (!strchr(name, '/'))
+  {
     strcpy(filename, "$pwrp_load/");
     strcat(filename, name);
-  } else
+  }
+  else
     strcpy(filename, name);
 
   if (!strchr(name, '.'))
@@ -377,12 +387,11 @@ void XColWind::collect_insert(pwr_tAttrRef* aref)
   free(areflist);
 }
 
-void XColWind::xcolwind_popup_menu_cb(void* ctx, pwr_sAttrRef attrref,
-    unsigned long item_type, unsigned long utility, char* arg, int x, int y)
+void XColWind::xcolwind_popup_menu_cb(void* ctx, pwr_sAttrRef attrref, unsigned long item_type,
+                                      unsigned long utility, char* arg, int x, int y)
 {
   if (((XColWind*)ctx)->popup_menu_cb)
-    (((XColWind*)ctx)->popup_menu_cb)(
-        ((XColWind*)ctx)->parent_ctx, attrref, item_type, utility, arg, x, y);
+    (((XColWind*)ctx)->popup_menu_cb)(((XColWind*)ctx)->parent_ctx, attrref, item_type, utility, arg, x, y);
 }
 
 int XColWind::xcolwind_is_authorized_cb(void* ctx, unsigned int access)
@@ -416,15 +425,9 @@ void XColWind::activate_zoomout()
   xattnav->zoom(1.0 / 1.18);
 }
 
-void XColWind::set_scantime(int t)
-{
-  xattnav->set_scantime(t);
-}
+void XColWind::set_scantime(int t) { xattnav->set_scantime(t); }
 
-void XColWind::zoom(double zoom_factor)
-{
-  brow_ZoomAbsolute(xattnav->brow->ctx, zoom_factor);
-}
+void XColWind::zoom(double zoom_factor) { brow_ZoomAbsolute(xattnav->brow->ctx, zoom_factor); }
 
 int XColWind::collect_add(pwr_tAttrRef* areflist)
 {
@@ -446,18 +449,19 @@ int XColWind::collect_add(pwr_tAttrRef* areflist)
 
   brow_SetNodraw(xattnav->brow->ctx);
 
-  for (arp = areflist; cdh_ObjidIsNotNull(arp->Objid); arp++) {
+  for (arp = areflist; cdh_ObjidIsNotNull(arp->Objid); arp++)
+  {
     sts = gdh_AttrrefToName(arp, name, sizeof(name), cdh_mNName);
     if (EVEN(sts))
       return sts;
 
-    if (!arp->Flags.b.Object && !arp->Flags.b.ObjectAttr) {
+    if (!arp->Flags.b.Object && !arp->Flags.b.ObjectAttr)
+    {
       if ((s = strchr(name, '.')) == 0)
         return 0;
       strcpy(attr, s + 1);
 
-      sts = gdh_GetAttributeCharAttrref(
-          arp, &a_type_id, &a_size, &a_offset, &a_dim);
+      sts = gdh_GetAttributeCharAttrref(arp, &a_type_id, &a_size, &a_offset, &a_dim);
       if (EVEN(sts))
         return sts;
 
@@ -468,11 +472,12 @@ int XColWind::collect_add(pwr_tAttrRef* areflist)
       sts = gdh_GetAttrRefTid(arp, &a_tid);
       if (EVEN(sts))
         return sts;
-    } else
+    }
+    else
       continue;
 
-    item = new ItemCollect(xattnav->brow, arp->Objid, attr, NULL,
-        flow_eDest_IntoLast, a_type_id, a_tid, a_size, a_flags, 0);
+    item = new ItemCollect(xattnav->brow, arp->Objid, attr, NULL, flow_eDest_IntoLast, a_type_id, a_tid,
+                           a_size, a_flags, 0);
   }
 
   brow_ResetNodraw(xattnav->brow->ctx);
@@ -510,8 +515,8 @@ int XColWind::name_to_objid_cb(void* ctx, char* name, pwr_tObjid* objid)
   return gdh_NameToObjid(name, objid);
 }
 
-void XColWind::signal_insert_cb(void* ctx, void* parent_node,
-    navc_eItemType item_type, char* text1, char* text2, int write)
+void XColWind::signal_insert_cb(void* ctx, void* parent_node, navc_eItemType item_type, char* text1,
+                                char* text2, int write)
 {
   XColWind* xcolwind = (XColWind*)ctx;
   XNavBrow* brow = xcolwind->xattnav->brow;
@@ -534,12 +539,14 @@ void XColWind::signal_insert_cb(void* ctx, void* parent_node,
   if (EVEN(sts))
     return;
 
-  if (xcolwind->type == xcolwind_eType_CollectIOSignals) {
+  if (xcolwind->type == xcolwind_eType_CollectIOSignals)
+  {
     sts = gdh_GetAttrRefTid(&aref, &cid);
     if (EVEN(sts))
       return;
 
-    switch (cid) {
+    switch (cid)
+    {
     case pwr_cClass_Di:
     case pwr_cClass_Do:
     case pwr_cClass_Ai:
@@ -557,11 +564,13 @@ void XColWind::signal_insert_cb(void* ctx, void* parent_node,
   if (EVEN(sts))
     return;
 
-  if ((s = strchr(text1, '.'))) {
+  if ((s = strchr(text1, '.')))
+  {
     strcpy(attr, s + 1);
     strcat(attr, ".");
     strcat(attr, trace_attr);
-  } else
+  }
+  else
     strcpy(attr, trace_attr);
 
   strcpy(name, text1);
@@ -572,8 +581,7 @@ void XColWind::signal_insert_cb(void* ctx, void* parent_node,
   if (EVEN(sts))
     return;
 
-  sts = gdh_GetAttributeCharAttrref(
-      &ar, &a_type_id, &a_size, &a_offset, &a_dim);
+  sts = gdh_GetAttributeCharAttrref(&ar, &a_type_id, &a_size, &a_offset, &a_dim);
   if (EVEN(sts))
     return;
 
@@ -585,6 +593,6 @@ void XColWind::signal_insert_cb(void* ctx, void* parent_node,
   if (EVEN(sts))
     return;
 
-  item = new ItemCollect(brow, aref.Objid, attr, NULL, flow_eDest_IntoLast,
-      a_type_id, a_tid, a_size, a_flags, 0);
+  item = new ItemCollect(brow, aref.Objid, attr, NULL, flow_eDest_IntoLast, a_type_id, a_tid, a_size, a_flags,
+                         0);
 }

@@ -5796,7 +5796,7 @@ pwr_tStatus gdh_SetObjectInfoStr(const char* name, /**< Attribute name */
 pwr_tStatus gdh_GetClassInfo(pwr_tCid cid, gdh_sClassInfo* info)
 {
   gdb_sClass* cp;
-  pwr_sClassDef* cdef;
+  pwr_sClassDef* cdef = NULL;
   pwr_tStatus sts = GDH__SUCCESS;
 
   gdh_ScopeLock

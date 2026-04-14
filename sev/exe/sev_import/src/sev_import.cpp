@@ -57,9 +57,8 @@
 #include "sev_import.h"
 
 sev_exportitem::sev_exportitem()
-  : oid(pwr_cNOid), type(pwr_eType_), size(0), elem(0), refid(pwr_cNRefId),
-    sevid(pwr_cNRefId), scantime(0), options(0), idx(0),
-    deleted(0)
+    : oid(pwr_cNOid), type(pwr_eType_), size(0), elem(0), refid(pwr_cNRefId), sevid(pwr_cNRefId), scantime(0),
+      options(0), idx(0), deleted(0)
 {
   strcpy(oname, "");
   strcpy(aname, "");
@@ -67,9 +66,8 @@ sev_exportitem::sev_exportitem()
 }
 
 sev_exportitem::sev_exportitem(const sev_exportitem& x)
-  : oid(x.oid), type(x.type), size(x.size), elem(x.elem), refid(x.refid),
-    sevid(x.sevid), scantime(x.scantime), options(x.options), idx(x.idx),
-    deleted(x.deleted)
+    : oid(x.oid), type(x.type), size(x.size), elem(x.elem), refid(x.refid), sevid(x.sevid),
+      scantime(x.scantime), options(x.options), idx(x.idx), deleted(x.deleted)
 {
   strncpy(oname, x.oname, sizeof(oname));
   strncpy(aname, x.aname, sizeof(aname));
@@ -120,20 +118,22 @@ int sev_import::init(void)
     throw co_error(m_sts);
 
   sts = gdh_GetClassList(pwr_cClass_SevImportServer, &conf_oid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_CErrLog(PWR__SRVNOTCONF, 0);
     exit(0);
   }
 
   pwr_sAttrRef aref = cdh_ObjidToAref(conf_oid);
   sts = gdh_DLRefObjectInfoAttrref(&aref, (void**)&m_config, &m_config_dlid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_CErrLog(PWR__SRVNOTCONF, 0);
     exit(0);
   }
 
-  m_refid = tree_CreateTable(&sts, sizeof(pwr_tRefId), offsetof(sev_sRefid, id),
-      sizeof(sev_sRefid), 100, sev_comp_refid);
+  m_refid = tree_CreateTable(&sts, sizeof(pwr_tRefId), offsetof(sev_sRefid, id), sizeof(sev_sRefid), 100,
+                             sev_comp_refid);
 
   // Create a queue to server
   qcom_sQattr attr;
@@ -144,15 +144,19 @@ int sev_import::init(void)
   attr.type = qcom_eQtype_private;
   attr.quota = 200;
 
-  if (!qcom_CreateQ(&sts, &qid, &attr, "SevImport")) {
-    if (sts == QCOM__QALLREXIST) {
-      if (!qcom_AttachQ(&sts, &qid)) {
+  if (!qcom_CreateQ(&sts, &qid, &attr, "SevImport"))
+  {
+    if (sts == QCOM__QALLREXIST)
+    {
+      if (!qcom_AttachQ(&sts, &qid))
+      {
         if (!qcom_DeleteQ(&sts, &qid))
           throw co_error(sts);
         if (!qcom_CreateQ(&sts, &qid, &attr, "SevImport"))
           throw co_error(sts);
       }
-    } else
+    }
+    else
       throw co_error(sts);
   }
 
@@ -170,7 +174,8 @@ int sev_import::init(void)
   strncpy(myn.name, node.name, sizeof(myn.name));
   m_nodes.push_back(myn);
 
-  for (nid = qcom_cNNid; qcom_NextNode(&sts, &node, nid); nid = node.nid) {
+  for (nid = qcom_cNNid; qcom_NextNode(&sts, &node, nid); nid = node.nid)
+  {
     sev_node n;
 
     n.nid = node.nid;
@@ -194,7 +199,8 @@ int sev_import::connect(void)
   // Wait for qmon to start
   sleep(5);
 
-  for (unsigned int i = 0; i < m_nodes.size(); i++) {
+  for (unsigned int i = 0; i < m_nodes.size(); i++)
+  {
     tgt.nid = m_nodes[i].nid;
     tgt.qix = sev_eProcSevClient;
 
@@ -211,13 +217,13 @@ int sev_import::connect(void)
     put.data = msg;
     put.allocate = 0;
 
-    if (!qcom_Put(&sts, &tgt, &put)) {
+    if (!qcom_Put(&sts, &tgt, &put))
+    {
       qcom_Free(&sts, put.data);
-      errh_Info("No connection to %s (%s)", m_nodes[i].name,
-          cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
-    } else
-      errh_Info("Connect sent to %s (%s)", m_nodes[i].name,
-          cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
+      errh_Info("No connection to %s (%s)", m_nodes[i].name, cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
+    }
+    else
+      errh_Info("Connect sent to %s (%s)", m_nodes[i].name, cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
   }
 
   return 1;
@@ -246,7 +252,8 @@ int sev_import::request_items(pwr_tNid nid)
   put.data = msg;
   put.allocate = 0;
 
-  if (!qcom_Put(&sts, &tgt, &put)) {
+  if (!qcom_Put(&sts, &tgt, &put))
+  {
     qcom_Free(&sts, put.data);
   }
 
@@ -266,7 +273,8 @@ int sev_import::mainloop(void)
 
   m_server_status = PWR__SRUN;
 
-  for (;;) {
+  for (;;)
+  {
     memset(&get, 0, sizeof(get));
 
     mp = qcom_Get(&sts, &qid, &get, tmo);
@@ -274,16 +282,17 @@ int sev_import::mainloop(void)
     if (sts == QCOM__TMO || !mp)
       continue;
 
-    switch ((int)get.type.b) {
+    switch ((int)get.type.b)
+    {
     case sev_cMsgClass:
-      switch ((int)get.type.s) {
+      switch ((int)get.type.s)
+      {
       case sev_eMsgType_NodeUp:
         errh_Info("Node up %s", cdh_NodeIdToString(0, get.reply.nid, 0, 0));
         request_items(get.reply.nid);
         break;
       case sev_eMsgType_ExportItems:
-        errh_Info(
-            "ExportItemlist received %s", cdh_NodeIdToString(0, get.reply.nid, 0, 0));
+        errh_Info("ExportItemlist received %s", cdh_NodeIdToString(0, get.reply.nid, 0, 0));
         check_exportitems((sev_sMsgExportItems*)mp, get.size);
         break;
       case sev_eMsgType_ExportData:
@@ -292,12 +301,14 @@ int sev_import::mainloop(void)
       default:;
       }
       break;
-    case qcom_eBtype_event: {
+    case qcom_eBtype_event:
+    {
       ini_mEvent new_event;
       qcom_sEvent* ep = (qcom_sEvent*)get.data;
 
       new_event.m = ep->mask;
-      if (new_event.b.terminate) {
+      if (new_event.b.terminate)
+      {
         exit(0);
       }
       break;
@@ -322,14 +333,16 @@ int sev_import::check_exportitems(sev_sMsgExportItems* msg, unsigned int size)
   sev_sRefid* succ_rp;
   pwr_tRefId rk;
   sev_sRefid* rp = (sev_sRefid*)tree_Minimum(&sts, m_refid);
-  while (rp) {
+  while (rp)
+  {
     succ_rp = (sev_sRefid*)tree_Successor(&sts, m_refid, rp);
     if (rp->id.nid == nid)
       tree_Remove(&sts, m_refid, &rp->id);
     rp = succ_rp;
   }
 
-  for (int i = 0; i < item_cnt; i++) {
+  for (int i = 0; i < item_cnt; i++)
+  {
     sev_sExportItem* buffP = &msg->Items[i];
     sev_exportitem eitem;
 
@@ -370,26 +383,28 @@ int sev_import::tree_update(void)
   pwr_tOid oid;
   pwr_tCid cid = 0;
   char* s;
-  unsigned int osize;
+  unsigned int osize = 0;
   pwr_sClass_SevExpItem ritem;
   char oname_array[20][pwr_cSizObjName + 1];
   char root[] = "pwrNode-sev";
 
   // Check root object
   sts = gdh_NameToObjid(root, &oid);
-  if (EVEN(sts)) {
-    sts = gdh_CreateObject(
-        root, pwr_eClass_NodeHier, 0, &oid, pwr_cNObjid, 0, pwr_cNObjid);
+  if (EVEN(sts))
+  {
+    sts = gdh_CreateObject(root, pwr_eClass_NodeHier, 0, &oid, pwr_cNObjid, 0, pwr_cNObjid);
     if (EVEN(sts))
       return sts;
   }
 
-  for (unsigned int i = 0; i < m_items.size(); i++) {
+  for (unsigned int i = 0; i < m_items.size(); i++)
+  {
     if (m_items[i].deleted)
       continue;
 
     printf("Tree update item %s.%s\n", m_items[i].oname, m_items[i].aname);
-    switch (m_items[i].type) {
+    switch (m_items[i].type)
+    {
     case pwr_eType_Float32:
     case pwr_eType_Float64:
     case pwr_eType_Int8:
@@ -419,147 +434,163 @@ int sev_import::tree_update(void)
       s++;
     else
       s = m_items[i].oname;
-    
+
     strcpy(aname, s);
     strcat(aname, ".");
     strcat(aname, m_items[i].aname);
-    onum = dcli_parse(aname, "-", "", (char*)oname_array,
-	sizeof(oname_array) / sizeof(oname_array[0]), sizeof(oname_array[0]),
-        0);
+    onum = dcli_parse(aname, "-", "", (char*)oname_array, sizeof(oname_array) / sizeof(oname_array[0]),
+                      sizeof(oname_array[0]), 0);
 
-    num = dcli_parse(aname, "-.", "", (char*)oname_array,
-        sizeof(oname_array) / sizeof(oname_array[0]), sizeof(oname_array[0]),
-        0);
+    num = dcli_parse(aname, "-.", "", (char*)oname_array, sizeof(oname_array) / sizeof(oname_array[0]),
+                     sizeof(oname_array[0]), 0);
 
     strcpy(hname, root);
-    for (int k = 0; k < num - 1; k++) {
+    for (int k = 0; k < num - 1; k++)
+    {
       strcat(hname, "-");
       strcat(hname, oname_array[k]);
-      
-      if (!new_item)
-	sts = gdh_NameToObjid(hname, &oid);
-      if (new_item || EVEN(sts)) {
-	// Create object
-	if (k < onum - 1)
-	  cid = pwr_eClass_NodeHier;
-	else if (k == onum - 1)
-	  cid = pwr_eClass_Block;
-	else
-	  cid = pwr_eClass_SubBlock;
 
-	sts = gdh_CreateObject(hname, cid, 0, &oid, pwr_cNObjid,
-			       0, pwr_cNObjid);
-	if (EVEN(sts))
-	  return sts;
-	  
-	new_item = 1;
+      if (!new_item)
+        sts = gdh_NameToObjid(hname, &oid);
+      if (new_item || EVEN(sts))
+      {
+        // Create object
+        if (k < onum - 1)
+          cid = pwr_eClass_NodeHier;
+        else if (k == onum - 1)
+          cid = pwr_eClass_Block;
+        else
+          cid = pwr_eClass_SubBlock;
+
+        sts = gdh_CreateObject(hname, cid, 0, &oid, pwr_cNObjid, 0, pwr_cNObjid);
+        if (EVEN(sts))
+          return sts;
+
+        new_item = 1;
       }
     }
     strcat(hname, "-");
     strcat(hname, oname_array[num - 1]);
     if (!new_item)
       sts = gdh_NameToObjid(hname, &oid);
-    if (new_item || EVEN(sts)) {
-      switch (m_items[i].type) {
+    if (new_item || EVEN(sts))
+    {
+      switch (m_items[i].type)
+      {
       case pwr_eType_Float32:
-	if ( m_items[i].size == sizeof(pwr_tFloat32)) {
-	  cid = pwr_cClass_SevExpItemFloat32;
-	  osize = 0;
-	}
-	else {
-	  cid = pwr_cClass_SevExpItemFloat32Array;
-	  osize = offsetof(pwr_sClass_SevExpItemFloat32Array, Value) + m_items[i].size;
-	}
-	break;
+        if (m_items[i].size == sizeof(pwr_tFloat32))
+        {
+          cid = pwr_cClass_SevExpItemFloat32;
+          osize = 0;
+        }
+        else
+        {
+          cid = pwr_cClass_SevExpItemFloat32Array;
+          osize = offsetof(pwr_sClass_SevExpItemFloat32Array, Value) + m_items[i].size;
+        }
+        break;
       case pwr_eType_Float64:
-	if ( m_items[i].size == sizeof(pwr_tFloat64)) {
-	  cid = pwr_cClass_SevExpItemFloat64;
-	  osize = 0;
-	}
-	else {
-	  cid = pwr_cClass_SevExpItemFloat64Array;
-	  osize = offsetof(pwr_sClass_SevExpItemFloat64Array, Value) + m_items[i].size;
-	}
-	break;
+        if (m_items[i].size == sizeof(pwr_tFloat64))
+        {
+          cid = pwr_cClass_SevExpItemFloat64;
+          osize = 0;
+        }
+        else
+        {
+          cid = pwr_cClass_SevExpItemFloat64Array;
+          osize = offsetof(pwr_sClass_SevExpItemFloat64Array, Value) + m_items[i].size;
+        }
+        break;
       case pwr_eType_Int32:
       case pwr_eType_UInt32:
       case pwr_eType_Enum:
       case pwr_eType_Mask:
-	if ( m_items[i].size == sizeof(pwr_tInt32)) {
-	  cid = pwr_cClass_SevExpItemInt32;
-	  osize = 0;
-	}
-	else {
-	  cid = pwr_cClass_SevExpItemInt32Array;
-	  osize = offsetof(pwr_sClass_SevExpItemInt32Array, Value) + m_items[i].size;
-	}
-	break;
+        if (m_items[i].size == sizeof(pwr_tInt32))
+        {
+          cid = pwr_cClass_SevExpItemInt32;
+          osize = 0;
+        }
+        else
+        {
+          cid = pwr_cClass_SevExpItemInt32Array;
+          osize = offsetof(pwr_sClass_SevExpItemInt32Array, Value) + m_items[i].size;
+        }
+        break;
       case pwr_eType_Int64:
       case pwr_eType_UInt64:
-	if ( m_items[i].size == sizeof(pwr_tInt64)) {
-	  cid = pwr_cClass_SevExpItemInt64;
-	  osize = 0;
-	}
-	else {
-	  cid = pwr_cClass_SevExpItemInt64Array;
-	  osize = offsetof(pwr_sClass_SevExpItemInt64Array, Value) + m_items[i].size;
-	}
-	break;
+        if (m_items[i].size == sizeof(pwr_tInt64))
+        {
+          cid = pwr_cClass_SevExpItemInt64;
+          osize = 0;
+        }
+        else
+        {
+          cid = pwr_cClass_SevExpItemInt64Array;
+          osize = offsetof(pwr_sClass_SevExpItemInt64Array, Value) + m_items[i].size;
+        }
+        break;
       case pwr_eType_Int8:
       case pwr_eType_Int16:
       case pwr_eType_UInt8:
       case pwr_eType_UInt16:
-	continue;
+        continue;
       case pwr_eType_Time:
-	if ( m_items[i].size == sizeof(pwr_tTime)) {
-	  cid = pwr_cClass_SevExpItemTime;
-	  osize = 0;
-	}
-	else
-	  continue;
-	break;
+        if (m_items[i].size == sizeof(pwr_tTime))
+        {
+          cid = pwr_cClass_SevExpItemTime;
+          osize = 0;
+        }
+        else
+          continue;
+        break;
       case pwr_eType_DeltaTime:
-	if ( m_items[i].size == sizeof(pwr_tDeltaTime)) {
-	  cid = pwr_cClass_SevExpItemDeltaTime;
-	  osize = 0;
-	}
-	else
-	  continue;
-	break;
+        if (m_items[i].size == sizeof(pwr_tDeltaTime))
+        {
+          cid = pwr_cClass_SevExpItemDeltaTime;
+          osize = 0;
+        }
+        else
+          continue;
+        break;
       case pwr_eType_Status:
       case pwr_eType_NetStatus:
-	if ( m_items[i].size == sizeof(pwr_tStatus)) {
-	  cid = pwr_cClass_SevExpItemStatus;
-	  osize = 0;
-	}
-	else
-	  continue;
-	break;
+        if (m_items[i].size == sizeof(pwr_tStatus))
+        {
+          cid = pwr_cClass_SevExpItemStatus;
+          osize = 0;
+        }
+        else
+          continue;
+        break;
       case pwr_eType_Boolean:
-	if ( m_items[i].size == sizeof(pwr_tBoolean)) {
-	  cid = pwr_cClass_SevExpItemBoolean;
-	  osize = 0;
-	}
-	else {
-	  cid = pwr_cClass_SevExpItemBooleanArray;
-	  osize = offsetof(pwr_sClass_SevExpItemBooleanArray, Value) + m_items[i].size;
-	}
-	break;
+        if (m_items[i].size == sizeof(pwr_tBoolean))
+        {
+          cid = pwr_cClass_SevExpItemBoolean;
+          osize = 0;
+        }
+        else
+        {
+          cid = pwr_cClass_SevExpItemBooleanArray;
+          osize = offsetof(pwr_sClass_SevExpItemBooleanArray, Value) + m_items[i].size;
+        }
+        break;
       case pwr_eType_String:
-	if ( m_items[i].size == sizeof(pwr_tString80)) {
-	  cid = pwr_cClass_SevExpItemString80;
-	  osize = 0;
-	}
-	else {
-	  cid = pwr_cClass_SevExpItemString80Array;
-	  osize = offsetof(pwr_sClass_SevExpItemString80Array, Value) + m_items[i].size;
-	}
-	break;
+        if (m_items[i].size == sizeof(pwr_tString80))
+        {
+          cid = pwr_cClass_SevExpItemString80;
+          osize = 0;
+        }
+        else
+        {
+          cid = pwr_cClass_SevExpItemString80Array;
+          osize = offsetof(pwr_sClass_SevExpItemString80Array, Value) + m_items[i].size;
+        }
+        break;
       default:;
       }
       sts = gdh_CreateObject(hname, cid, osize, &oid, pwr_cNObjid, 0, pwr_cNObjid);
       if (EVEN(sts))
-	return sts;
+        return sts;
 
       memset(&ritem, 0, sizeof(ritem));
       strncpy(ritem.ObjectName, m_items[i].oname, sizeof(ritem.ObjectName));
@@ -568,29 +599,27 @@ int sev_import::tree_update(void)
       ritem.Oid = m_items[i].oid;
       ritem.Options = m_items[i].options;
       ritem.ScanTime = m_items[i].scantime;
-      strncpy(
-	 ritem.Description, m_items[i].description, sizeof(ritem.Description));
+      strncpy(ritem.Description, m_items[i].description, sizeof(ritem.Description));
 
       sts = gdh_SetObjectInfo(hname, &ritem, sizeof(ritem));
       if (EVEN(sts))
-	return sts;
+        return sts;
     }
 
-    if (!m_items[i].ip) {
+    if (!m_items[i].ip)
+    {
       //  Get pointer to object
-	
+
       pwr_tAttrRef aref = cdh_ObjidToAref(oid);
-      sts = gdh_DLRefObjectInfoAttrref(
-	    &aref, (void**)&m_items[i].ip, &m_items[i].refid);
+      sts = gdh_DLRefObjectInfoAttrref(&aref, (void**)&m_items[i].ip, &m_items[i].refid);
       if (EVEN(sts))
-	return sts;
+        return sts;
     }
   }
   return SEV__SUCCESS;
 }
 
-int sev_import::receive_exportdata( sev_sMsgExportData* msg, unsigned int size, 
-				    pwr_tNid nid)
+int sev_import::receive_exportdata(sev_sMsgExportData* msg, unsigned int size, pwr_tNid nid)
 {
   pwr_tStatus sts;
   sev_sHistData* dp;
@@ -600,15 +629,16 @@ int sev_import::receive_exportdata( sev_sMsgExportData* msg, unsigned int size,
   dp = (sev_sHistData*)&msg->Data;
   data_size = size - (sizeof(*msg) - sizeof(msg->Data));
 
-  while ((char*)dp - (char*)msg < (int)size) {
+  while ((char*)dp - (char*)msg < (int)size)
+  {
     sev_sRefid* rp;
     pwr_tRefId rk = dp->sevid;
 
     rp = (sev_sRefid*)tree_Find(&sts, m_refid, &rk);
 
-    if (!rp) {
-      dp = (sev_sHistData*)((char*)dp + sizeof(*dp) - sizeof(dp->data)
-			    + dp->size);
+    if (!rp)
+    {
+      dp = (sev_sHistData*)((char*)dp + sizeof(*dp) - sizeof(dp->data) + dp->size);
       continue;
     }
 
@@ -616,14 +646,13 @@ int sev_import::receive_exportdata( sev_sMsgExportData* msg, unsigned int size,
 
     time = net_NetTimeToTime(&msg->Time);
     store_value(idx, time, &dp->data, dp->size);
-    
-    dp = (sev_sHistData*)((char*)dp + sizeof(*dp) - sizeof(dp->data)
-			  + dp->size);
+
+    dp = (sev_sHistData*)((char*)dp + sizeof(*dp) - sizeof(dp->data) + dp->size);
   }
   return 1;
 }
 
-int sev_import::store_value(int item_idx, pwr_tTime time, void *buf, int size)
+int sev_import::store_value(int item_idx, pwr_tTime time, void* buf, int size)
 {
   float value;
   pwr_tTime prev_time;
@@ -635,29 +664,35 @@ int sev_import::store_value(int item_idx, pwr_tTime time, void *buf, int size)
   prev_time = m_items[item_idx].ip->LastTime;
   m_items[item_idx].ip->LastTime = time;
 
-  switch (m_items[item_idx].type) {
-  case pwr_eType_Float32: {
-    if ( size == sizeof(pwr_tFloat32)) {
-      ((pwr_sClass_SevExpItemFloat32*)m_items[item_idx].ip)->Value
-	= *(pwr_tFloat32*)buf;
+  switch (m_items[item_idx].type)
+  {
+  case pwr_eType_Float32:
+  {
+    if (size == sizeof(pwr_tFloat32))
+    {
+      ((pwr_sClass_SevExpItemFloat32*)m_items[item_idx].ip)->Value = *(pwr_tFloat32*)buf;
       value = ((pwr_sClass_SevExpItemFloat32*)m_items[item_idx].ip)->Value;
     }
-    else {
-      value = *(pwr_tFloat32 *)buf;
-      memcpy(&((pwr_sClass_SevExpItemFloat32*)m_items[item_idx].ip)->Value, buf, MIN(size, m_items[item_idx].size));
+    else
+    {
+      value = *(pwr_tFloat32*)buf;
+      memcpy(&((pwr_sClass_SevExpItemFloat32*)m_items[item_idx].ip)->Value, buf,
+             MIN(size, m_items[item_idx].size));
     }
     ((pwr_sClass_SevExpItem*)m_items[item_idx].ip)->ReceiveCount++;
     break;
   }
   case pwr_eType_Float64:
-    if ( size == sizeof(pwr_tFloat64)) {
-      ((pwr_sClass_SevExpItemFloat64*)m_items[item_idx].ip)->Value
-	= *(pwr_tFloat64*)buf;
+    if (size == sizeof(pwr_tFloat64))
+    {
+      ((pwr_sClass_SevExpItemFloat64*)m_items[item_idx].ip)->Value = *(pwr_tFloat64*)buf;
       value = ((pwr_sClass_SevExpItemFloat64*)m_items[item_idx].ip)->Value;
     }
-    else {
-      value = *(pwr_tFloat64 *)buf;
-      memcpy(&((pwr_sClass_SevExpItemFloat64*)m_items[item_idx].ip)->Value, buf, MIN(size, m_items[item_idx].size));
+    else
+    {
+      value = *(pwr_tFloat64*)buf;
+      memcpy(&((pwr_sClass_SevExpItemFloat64*)m_items[item_idx].ip)->Value, buf,
+             MIN(size, m_items[item_idx].size));
     }
     ((pwr_sClass_SevExpItem*)m_items[item_idx].ip)->ReceiveCount++;
     break;
@@ -665,26 +700,30 @@ int sev_import::store_value(int item_idx, pwr_tTime time, void *buf, int size)
   case pwr_eType_UInt32:
   case pwr_eType_Enum:
   case pwr_eType_Mask:
-    if ( size == sizeof(pwr_tInt32)) {
-      ((pwr_sClass_SevExpItemInt32*)m_items[item_idx].ip)->Value
-	= *(pwr_tInt32*)buf;
+    if (size == sizeof(pwr_tInt32))
+    {
+      ((pwr_sClass_SevExpItemInt32*)m_items[item_idx].ip)->Value = *(pwr_tInt32*)buf;
       value = ((pwr_sClass_SevExpItemInt32*)m_items[item_idx].ip)->Value;
     }
-    else {
-      value = *(pwr_tInt32 *)buf;
-      memcpy(&((pwr_sClass_SevExpItemInt32*)m_items[item_idx].ip)->Value, buf, MIN(size, m_items[item_idx].size));
+    else
+    {
+      value = *(pwr_tInt32*)buf;
+      memcpy(&((pwr_sClass_SevExpItemInt32*)m_items[item_idx].ip)->Value, buf,
+             MIN(size, m_items[item_idx].size));
     }
     ((pwr_sClass_SevExpItem*)m_items[item_idx].ip)->ReceiveCount++;
     break;
   case pwr_eType_Int64:
-    if ( size == sizeof(pwr_tInt64)) {
-      ((pwr_sClass_SevExpItemInt64*)m_items[item_idx].ip)->Value
-	= *(pwr_tInt64*)buf;
+    if (size == sizeof(pwr_tInt64))
+    {
+      ((pwr_sClass_SevExpItemInt64*)m_items[item_idx].ip)->Value = *(pwr_tInt64*)buf;
       value = ((pwr_sClass_SevExpItemInt64*)m_items[item_idx].ip)->Value;
     }
-    else {
-      value = *(pwr_tInt64 *)buf;
-      memcpy(&((pwr_sClass_SevExpItemInt64*)m_items[item_idx].ip)->Value, buf, MIN(size, m_items[item_idx].size));
+    else
+    {
+      value = *(pwr_tInt64*)buf;
+      memcpy(&((pwr_sClass_SevExpItemInt64*)m_items[item_idx].ip)->Value, buf,
+             MIN(size, m_items[item_idx].size));
     }
     ((pwr_sClass_SevExpItem*)m_items[item_idx].ip)->ReceiveCount++;
     break;
@@ -703,50 +742,55 @@ int sev_import::store_value(int item_idx, pwr_tTime time, void *buf, int size)
     break;
 #endif
   case pwr_eType_Boolean:
-    if ( size == sizeof(pwr_tBoolean)) {
-      ((pwr_sClass_SevExpItemBoolean*)m_items[item_idx].ip)->Value
-	= *(pwr_tBoolean*)buf;
+    if (size == sizeof(pwr_tBoolean))
+    {
+      ((pwr_sClass_SevExpItemBoolean*)m_items[item_idx].ip)->Value = *(pwr_tBoolean*)buf;
       value = ((pwr_sClass_SevExpItemBoolean*)m_items[item_idx].ip)->Value;
     }
-    else {
-      value = *(pwr_tBoolean *)buf;
-      memcpy(&((pwr_sClass_SevExpItemBoolean*)m_items[item_idx].ip)->Value, buf, MIN(size, m_items[item_idx].size));
+    else
+    {
+      value = *(pwr_tBoolean*)buf;
+      memcpy(&((pwr_sClass_SevExpItemBoolean*)m_items[item_idx].ip)->Value, buf,
+             MIN(size, m_items[item_idx].size));
     }
     ((pwr_sClass_SevExpItem*)m_items[item_idx].ip)->ReceiveCount++;
     break;
   case pwr_eType_String:
-    if ( size == sizeof(pwr_tString80)) {
-      strncpy(((pwr_sClass_SevExpItemString80*)m_items[item_idx].ip)->Value, (const char *)buf, 80);
+    if (size == sizeof(pwr_tString80))
+    {
+      strncpy(((pwr_sClass_SevExpItemString80*)m_items[item_idx].ip)->Value, (const char*)buf, 80);
       ((pwr_sClass_SevExpItemString80*)m_items[item_idx].ip)->Value[79] = 0;
       value = 0;
     }
-    else {
+    else
+    {
       value = 0;
-      memcpy(&((pwr_sClass_SevExpItemBoolean*)m_items[item_idx].ip)->Value, buf, MIN(size, m_items[item_idx].size));
+      memcpy(&((pwr_sClass_SevExpItemBoolean*)m_items[item_idx].ip)->Value, buf,
+             MIN(size, m_items[item_idx].size));
     }
     ((pwr_sClass_SevExpItem*)m_items[item_idx].ip)->ReceiveCount++;
     break;
   case pwr_eType_Time:
-    if ( size == sizeof(pwr_tTime)) {
-      ((pwr_sClass_SevExpItemTime*)m_items[item_idx].ip)->Value
-	= *(pwr_tTime*)buf;
+    if (size == sizeof(pwr_tTime))
+    {
+      ((pwr_sClass_SevExpItemTime*)m_items[item_idx].ip)->Value = *(pwr_tTime*)buf;
       value = 0;
     }
     ((pwr_sClass_SevExpItem*)m_items[item_idx].ip)->ReceiveCount++;
     break;
   case pwr_eType_DeltaTime:
-    if ( size == sizeof(pwr_tDeltaTime)) {
-      ((pwr_sClass_SevExpItemDeltaTime*)m_items[item_idx].ip)->Value
-	= *(pwr_tDeltaTime*)buf;
+    if (size == sizeof(pwr_tDeltaTime))
+    {
+      ((pwr_sClass_SevExpItemDeltaTime*)m_items[item_idx].ip)->Value = *(pwr_tDeltaTime*)buf;
       value = 0;
     }
     ((pwr_sClass_SevExpItem*)m_items[item_idx].ip)->ReceiveCount++;
     break;
   case pwr_eType_Status:
   case pwr_eType_NetStatus:
-    if ( size == sizeof(pwr_tStatus)) {
-      ((pwr_sClass_SevExpItemStatus*)m_items[item_idx].ip)->Value
-	= *(pwr_tStatus*)buf;
+    if (size == sizeof(pwr_tStatus))
+    {
+      ((pwr_sClass_SevExpItemStatus*)m_items[item_idx].ip)->Value = *(pwr_tStatus*)buf;
       value = 0;
     }
     ((pwr_sClass_SevExpItem*)m_items[item_idx].ip)->ReceiveCount++;
@@ -760,38 +804,39 @@ int sev_import::store_value(int item_idx, pwr_tTime time, void *buf, int size)
   else if (m_items[item_idx].options & pwr_mSevExportOptionsMask_MeanValue2)
     interval = m_config->MeanValueInterval2;
 
-  if (!feqf(interval, 0.0f)) {
+  if (!feqf(interval, 0.0f))
+  {
     pwr_tDeltaTime dtime;
     float scantime;
     float prev_deviation;
-    if (prev_time.tv_sec != 0) {
+    if (prev_time.tv_sec != 0)
+    {
       time_Adiff(&dtime, &time, &prev_time);
       time_DToFloat(&scantime, &dtime);
       prev_deviation = value - m_items[item_idx].mean_value;
-    } else {
+    }
+    else
+    {
       scantime = m_items[item_idx].scantime;
       prev_deviation = 0;
     }
 
-    m_items[item_idx].mean_value
-        = (value * scantime
-              + m_items[item_idx].mean_value * m_items[item_idx].mean_acc_time)
-          / (scantime + m_items[item_idx].mean_acc_time);
+    m_items[item_idx].mean_value =
+        (value * scantime + m_items[item_idx].mean_value * m_items[item_idx].mean_acc_time) /
+        (scantime + m_items[item_idx].mean_acc_time);
     m_items[item_idx].mean_acc_time += scantime;
-    m_items[item_idx].variance_acc
-        = prev_deviation * (value - m_items[item_idx].mean_value);
+    m_items[item_idx].variance_acc = prev_deviation * (value - m_items[item_idx].mean_value);
     m_items[item_idx].variance_cnt++;
 
-    if (m_items[item_idx].mean_acc_time
-	>= (interval - m_items[item_idx].scantime / 2)) {
+    if (m_items[item_idx].mean_acc_time >= (interval - m_items[item_idx].scantime / 2))
+    {
       m_items[item_idx].ip->MeanValue = m_items[item_idx].mean_value;
       m_items[item_idx].ip->MeanValueTime = time;
       if (m_items[item_idx].variance_cnt > 1)
-	m_items[item_idx].ip->StandardDeviation
-            = sqrt(m_items[item_idx].variance_acc
-                / (m_items[item_idx].variance_cnt - 1));
+        m_items[item_idx].ip->StandardDeviation =
+            sqrt(m_items[item_idx].variance_acc / (m_items[item_idx].variance_cnt - 1));
       else
-	m_items[item_idx].ip->StandardDeviation = 0;
+        m_items[item_idx].ip->StandardDeviation = 0;
       m_items[item_idx].mean_acc_time = 0;
       m_items[item_idx].variance_acc = 0;
       m_items[item_idx].variance_cnt = 0;
@@ -800,9 +845,7 @@ int sev_import::store_value(int item_idx, pwr_tTime time, void *buf, int size)
   return SEV__SUCCESS;
 }
 
-sev_import::~sev_import()
-{
-}
+sev_import::~sev_import() {}
 
 int main(int argc, char* argv[])
 {

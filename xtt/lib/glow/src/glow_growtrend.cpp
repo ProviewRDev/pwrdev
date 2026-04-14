@@ -841,7 +841,7 @@ void GrowTrend::add_value(double value, int idx)
 */
 void GrowTrend::align(double x, double y, glow_eAlignDirection direction)
 {
-  double dx, dy;
+  double dx = 0, dy = 0;
 
   ctx->set_defered_redraw();
   draw();

@@ -75,7 +75,8 @@
 #define UTL_FULLPRINT_NOSYSBODY 32
 #define UTL_FULLPRINT_SIGNAL 64
 
-typedef struct {
+typedef struct
+{
   pwr_tString40 Parameter;
   pwr_tString40 ColumnHeader;
   pwr_tString40 MarginString;
@@ -87,7 +88,8 @@ typedef struct {
   char filler_12[2];
 } utl_t_listpar;
 
-typedef struct {
+typedef struct
+{
   pwr_tString80 Title;
   pwr_tString80 PageHeader;
   pwr_tBoolean Crossreference;
@@ -122,7 +124,8 @@ typedef struct {
   utl_t_listpar ParDescription[UTL_PARDESCRIPTION];
 } utl_t_listbody;
 
-typedef struct utl_s_list {
+typedef struct utl_s_list
+{
   pwr_sAttrRef o;
   unsigned long specification;
   pwr_sAttrRef refo;
@@ -131,13 +134,15 @@ typedef struct utl_s_list {
   struct utl_s_list* next;
 } utl_t_list;
 
-typedef struct s_contlist {
+typedef struct s_contlist
+{
   int page;
   char text[120];
   struct s_contlist* next;
 } utl_t_contlist;
 
-typedef struct {
+typedef struct
+{
   FILE* output_file;
   int terminal;
   int confirm;
@@ -158,7 +163,8 @@ typedef struct {
   int contcount;
 } utl_t_ctx, *utl_ctx;
 
-typedef struct {
+typedef struct
+{
   pwr_tCid cid;
   char body[32];
   char attr[32];
@@ -172,7 +178,7 @@ typedef struct {
 #define CRR_READ 0
 #define CRR_WRITE 1
 #define CRR_GETFROMOBJECT 2
-//#define CRR_IGNORE 3
+// #define CRR_IGNORE 3
 #define CRR_REF 4
 
 static void u_row(utl_ctx utlctx);
@@ -189,121 +195,107 @@ static void u_subheader(utl_ctx utlctx, const char* title, const char* spec);
 
 static void u_posit(utl_ctx utlctx, int tabs, int len);
 
-static int u_open(
-    utl_ctx utlctx, const char* filename, int terminal, int append);
+static int u_open(utl_ctx utlctx, const char* filename, int terminal, int append);
 
 static void u_close(utl_ctx utlctx);
 
 static void u_print(utl_ctx utlctx, const char* format, ...
-    /*	unsigned long	a1, */
-    /*  unsigned long	a2, */
-    /*  unsigned long	a3, */
-    /*  unsigned long	a4 */
-    );
+                    /*	unsigned long	a1, */
+                    /*  unsigned long	a2, */
+                    /*  unsigned long	a3, */
+                    /*  unsigned long	a4 */
+);
 
 /*
  * Prototypes
  */
-static int utl_list_sort(
-    utl_t_list** list, int size, ldh_tSesContext ldhses, unsigned long type);
+static int utl_list_sort(utl_t_list** list, int size, ldh_tSesContext ldhses, unsigned long type);
 
-static int utl_list_classsort(
-    utl_t_list** list, int size, ldh_tSesContext ldhses, unsigned long type);
+static int utl_list_classsort(utl_t_list** list, int size, ldh_tSesContext ldhses, unsigned long type);
 
-static int utl_list_insert(utl_t_list** list, int* count, pwr_sAttrRef* arp,
-    unsigned long specification, int check, int dum);
+static int utl_list_insert(utl_t_list** list, int* count, pwr_sAttrRef* arp, unsigned long specification,
+                           int check, int dum);
 
-static int utl_list_sublist(utl_ctx utlctx, pwr_tObjid listobjdid,
-    utl_t_list** list, int* listcount, pwr_sAttrRef* rootarp);
+static int utl_list_sublist(utl_ctx utlctx, pwr_tObjid listobjdid, utl_t_list** list, int* listcount,
+                            pwr_sAttrRef* rootarp);
 
-static int utl_list_sublist_print(utl_ctx utlctx, pwr_tObjid listobjdid,
-    utl_t_list* list, int listcount, int* first);
+static int utl_list_sublist_print(utl_ctx utlctx, pwr_tObjid listobjdid, utl_t_list* list, int listcount,
+                                  int* first);
 
-static int utl_list_print_par(utl_ctx utlctx, pwr_sAttrRef* o,
-    int specification, pwr_sAttrRef* oref, utl_t_listbody* listbody_ptr,
-    int parindex, int new_row);
+static int utl_list_print_par(utl_ctx utlctx, pwr_sAttrRef* o, int specification, pwr_sAttrRef* oref,
+                              utl_t_listbody* listbody_ptr, int parindex, int new_row);
 
-static int utl_list_get_parvalue(
-    utl_ctx utlctx, pwr_tObjid Objdid, utl_t_listpar* list_desc, char* text);
+static int utl_list_get_parvalue(utl_ctx utlctx, pwr_tObjid Objdid, utl_t_listpar* list_desc, char* text);
 
-static int utl_list_print_columnheader(
-    utl_ctx utlctx, utl_t_listbody* listbody_ptr);
+static int utl_list_print_columnheader(utl_ctx utlctx, utl_t_listbody* listbody_ptr);
 
 static int utl_in_libhier(ldh_tSesContext ldhses, pwr_tOid oid);
 
-static void utl_ctx_new(utl_ctx* utlctx, ldh_tSesContext ldhses,
-    const char* page_title, int landscape);
+static void utl_ctx_new(utl_ctx* utlctx, ldh_tSesContext ldhses, const char* page_title, int landscape);
 
 static int utl_ctx_delete(utl_ctx utlctx);
 
 static int utl_ctx_free_sublist(utl_t_list* list, int listcount);
 
-static int utl_tableofcont_insert(
-    utl_ctx utlctx, pwr_sAttrRef* arp, int segments, char* marginstr, int page);
+static int utl_tableofcont_insert(utl_ctx utlctx, pwr_sAttrRef* arp, int segments, char* marginstr, int page);
 
 static int utl_tableofcont_print(utl_ctx utlctx);
 
-static int utl_ctxlist_insert(pwr_sAttrRef* arp, utl_t_list** list, int* count,
-    unsigned long specification, int check, int dum);
+static int utl_ctxlist_insert(pwr_sAttrRef* arp, utl_t_list** list, int* count, unsigned long specification,
+                              int check, int dum);
 
-static int utl_print_object(pwr_tObjid objid, ldh_tSesContext ldhses,
-    utl_ctx utlctx, int full, char* parameter, int* element);
-static int utl_print_aref(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
-    utl_ctx utlctx, int full, char* parameter, int* element);
+static int utl_print_object(pwr_tObjid objid, ldh_tSesContext ldhses, utl_ctx utlctx, int full,
+                            char* parameter, int* element);
+static int utl_print_aref(pwr_sAttrRef* arp, ldh_tSesContext ldhses, utl_ctx utlctx, int full,
+                          char* parameter, int* element);
 
-static int utl_print_object_full(
-    pwr_sAttrRef* arp, ldh_tSesContext ldhses, utl_ctx utlctx, int code);
+static int utl_print_object_full(pwr_sAttrRef* arp, ldh_tSesContext ldhses, utl_ctx utlctx, int code);
 
-static int utl_print_object_par(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
-    utl_ctx utlctx, char* parameter, int* element);
+static int utl_print_object_par(pwr_sAttrRef* arp, ldh_tSesContext ldhses, utl_ctx utlctx, char* parameter,
+                                int* element);
 
-static int utl_print_class(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
-    utl_ctx utlctx, int full, unsigned long dum3, unsigned long dum4);
+static int utl_print_class(pwr_sAttrRef* arp, ldh_tSesContext ldhses, utl_ctx utlctx, int full,
+                           unsigned long dum3, unsigned long dum4);
 
-static int utl_print_class_full(
-    pwr_tObjid klass, ldh_tSesContext ldhses, utl_ctx utlctx);
+static int utl_print_class_full(pwr_tObjid klass, ldh_tSesContext ldhses, utl_ctx utlctx);
 
-static int utl_crossref(ldh_tSesContext ldhses, pwr_sAttrRef* arp,
-    utl_ctx utlctx, unsigned long dum2, unsigned long dum3, unsigned long dum4);
+static int utl_crossref(ldh_tSesContext ldhses, pwr_sAttrRef* arp, utl_ctx utlctx, unsigned long dum2,
+                        unsigned long dum3, unsigned long dum4);
 
-static int utl_externref(
-    utl_ctx utlctx, pwr_tObjid Objdid, utl_t_list** crrlist, int* crrcount);
+static int utl_externref(utl_ctx utlctx, pwr_tObjid Objdid, utl_t_list** crrlist, int* crrcount);
 
-static int utl_signalref(
-    utl_ctx utlctx, pwr_tObjid Objdid, utl_t_list** crrlist, int* crrcount);
+static int utl_signalref(utl_ctx utlctx, pwr_tObjid Objdid, utl_t_list** crrlist, int* crrcount);
 
-static int utl_childref(
-    utl_ctx utlctx, pwr_tObjid Objdid, utl_t_list** crrlist, int* crrcount);
+static int utl_childref(utl_ctx utlctx, pwr_tObjid Objdid, utl_t_list** crrlist, int* crrcount);
 
-static int crr_refobject(
-    utl_ctx utlctx, pwr_tObjid Objdid, utl_t_list** crrlist, int* crrcount);
+static int crr_refobject(utl_ctx utlctx, pwr_tObjid Objdid, utl_t_list** crrlist, int* crrcount);
 
-static int utl_object_changed(pwr_tObjid Objdid, ldh_tSesContext ldhses,
-    utl_ctx utlctx, int* changed, int code);
+static int utl_object_changed(pwr_tObjid Objdid, ldh_tSesContext ldhses, utl_ctx utlctx, int* changed,
+                              int code);
 
-static int utl_set_parameter(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
-    char* parameter, char* invaluestr, int element, utl_ctx utlctx);
+static int utl_set_parameter(pwr_sAttrRef* arp, ldh_tSesContext ldhses, char* parameter, char* invaluestr,
+                             int element, utl_ctx utlctx);
 
-static int utl_content(pwr_tObjid Objdid, ldh_tSesContext ldhses,
-    utl_ctx utlctx, unsigned long dum2, unsigned long dum3, unsigned long dum4);
+static int utl_content(pwr_tObjid Objdid, ldh_tSesContext ldhses, utl_ctx utlctx, unsigned long dum2,
+                       unsigned long dum3, unsigned long dum4);
 
-static int utl_object_delete(pwr_tObjid Objdid, ldh_tSesContext ldhses,
-    utl_ctx utlctx, unsigned long dum1, unsigned long dum2, unsigned long dum3);
+static int utl_object_delete(pwr_tObjid Objdid, ldh_tSesContext ldhses, utl_ctx utlctx, unsigned long dum1,
+                             unsigned long dum2, unsigned long dum3);
 
-static int utl_tree_delete(pwr_tObjid Objdid, ldh_tSesContext ldhses,
-    utl_ctx utlctx, unsigned long dum1, unsigned long dum2, unsigned long dum3);
+static int utl_tree_delete(pwr_tObjid Objdid, ldh_tSesContext ldhses, utl_ctx utlctx, unsigned long dum1,
+                           unsigned long dum2, unsigned long dum3);
 
 static int utl_config_replace(char* instr, char* outstr, int index);
 
-static int utl_get_listconfig_object(
-    ldh_tSesContext ldhses, int* landscape_rows, int* portrait_rows);
+static int utl_get_listconfig_object(ldh_tSesContext ldhses, int* landscape_rows, int* portrait_rows);
 
 /*************************************************************************
-*
-* Cross reference list functions.
-*
-**************************************************************************/
-typedef struct crossdoc_tag {
+ *
+ * Cross reference list functions.
+ *
+ **************************************************************************/
+typedef struct crossdoc_tag
+{
   pwr_tObjid objid;
   pwr_tObjid parent;
   float ll_x;
@@ -314,7 +306,8 @@ typedef struct crossdoc_tag {
   struct crossdoc_tag* next;
 } crossdoc_t_list;
 
-typedef struct cross_tag {
+typedef struct cross_tag
+{
   pwr_sAttrRef o;
   pwr_sAttrRef refo;
   pwr_tObjid parent;
@@ -322,36 +315,32 @@ typedef struct cross_tag {
   struct cross_tag* next;
 } cross_t_list;
 
-static int cross_doclist_add(crossdoc_t_list** doclist, int* doclist_count,
-    pwr_tObjid objid, pwr_tObjid parent, float ll_x, float ll_y, float ur_x,
-    float ur_y, char* page);
+static int cross_doclist_add(crossdoc_t_list** doclist, int* doclist_count, pwr_tObjid objid,
+                             pwr_tObjid parent, float ll_x, float ll_y, float ur_x, float ur_y, char* page);
 
-static int cross_doclist_object_insert(pwr_sAttrRef* arp,
-    ldh_tSesContext ldhses, int dum1, int dum2, int dum3, int dum4);
+static int cross_doclist_object_insert(pwr_sAttrRef* arp, ldh_tSesContext ldhses, int dum1, int dum2,
+                                       int dum3, int dum4);
 
 static int cross_doclist_load(ldh_tSesContext ldhses);
 
 static int cross_doclist_unload();
 
-static int cross_get_object_page(
-    ldh_tSesContext ldhses, pwr_tObjid objid, char* page);
+static int cross_get_object_page(ldh_tSesContext ldhses, pwr_tObjid objid, char* page);
 
-static int cross_crosslist_add(cross_t_list** crosslist, int* crosslist_count,
-    int dum, pwr_sAttrRef* arp, pwr_sAttrRef* refarp,
-    unsigned long specification);
+static int cross_crosslist_add(cross_t_list** crosslist, int* crosslist_count, int dum, pwr_sAttrRef* arp,
+                               pwr_sAttrRef* refarp, unsigned long specification);
 
-static int cross_crosslist_object_insert(pwr_sAttrRef* arp,
-    ldh_tSesContext ldhses, int dum1, int dum2, int dum3, int dum4);
+static int cross_crosslist_object_insert(pwr_sAttrRef* arp, ldh_tSesContext ldhses, int dum1, int dum2,
+                                         int dum3, int dum4);
 
 static int cross_crosslist_load(ldh_tSesContext ldhses);
 
 static int cross_crosslist_unload();
 
-static int crr_crossref_children(ldh_tSesContext ldhses, pwr_tObjid objid,
-    utl_t_list** crrlist, int* crrcount);
+static int crr_crossref_children(ldh_tSesContext ldhses, pwr_tObjid objid, utl_t_list** crrlist,
+                                 int* crrcount);
 
-static int crr_crossref(ldh_tSesContext ldhses, pwr_sAttrRef* arp,
-    utl_t_list** crrlist, int* crrcount);
+static int crr_crossref(ldh_tSesContext ldhses, pwr_sAttrRef* arp, utl_t_list** crrlist, int* crrcount);
 
 static bool is_focodeobject(ldh_tSesContext ldhses, pwr_tCid cid)
 {
@@ -360,8 +349,7 @@ static bool is_focodeobject(ldh_tSesContext ldhses, pwr_tCid cid)
   pwr_tStatus sts;
   int size;
 
-  sts = ldh_GetClassBody(
-      ldhses, cid, "GraphPlcNode", &bodyclass, (char**)&graphbody, &size);
+  sts = ldh_GetClassBody(ldhses, cid, "GraphPlcNode", &bodyclass, (char**)&graphbody, &size);
   if (EVEN(sts))
     return false;
 
@@ -370,69 +358,60 @@ static bool is_focodeobject(ldh_tSesContext ldhses, pwr_tCid cid)
   return false;
 }
 
-wb_utl::wb_utl()
-{
-}
+wb_utl::wb_utl() {}
 
-wb_utl::~wb_utl()
-{
-}
+wb_utl::~wb_utl() {}
 
-int wb_utl::create_mainwindow(int argc, char** argv)
-{
-  return 0;
-}
+int wb_utl::create_mainwindow(int argc, char** argv) { return 0; }
 
-int wb_utl::destroy_mainwindow()
+int wb_utl::destroy_mainwindow() { return 0; }
+
+int wb_utl::utl_foe_new(const char* name, pwr_tOid plcpgm, ldh_tWBContext ldhwbctx, ldh_tSesContext ldhsesctx,
+                        WFoe** foectx, int map_window, ldh_eAccess access)
 {
   return 0;
 }
 
-int wb_utl::utl_foe_new(const char* name, pwr_tOid plcpgm,
-    ldh_tWBContext ldhwbctx, ldh_tSesContext ldhsesctx, WFoe** foectx,
-    int map_window, ldh_eAccess access)
-{
-  return 0;
-}
-
-int wb_utl::utl_foe_new_local(WFoe* foectx, const char* name, pwr_tOid plcpgm,
-    ldh_tWBContext ldhwbctx, ldh_tSesContext ldhsesctx, vldh_t_node nodeobject,
-    unsigned long windowindex, unsigned long new_window, WFoe** return_foectx,
-    int map_window, ldh_eAccess access, foe_eFuncAccess function_access)
+int wb_utl::utl_foe_new_local(WFoe* foectx, const char* name, pwr_tOid plcpgm, ldh_tWBContext ldhwbctx,
+                              ldh_tSesContext ldhsesctx, vldh_t_node nodeobject, unsigned long windowindex,
+                              unsigned long new_window, WFoe** return_foectx, int map_window,
+                              ldh_eAccess access, foe_eFuncAccess function_access)
 {
   return 0;
 }
 
 /*************************************************************************
-*
-* Name:		print_plc()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* unsigned int 	argc		I	command arguments
-* char 		**argv		I	command arguments
-* ldh_tSesContext ldhses		I	ldh session
-* ldh_tWBContext  ldhwb		I	ldh workbench
-* char *	plcstring	I	Name of Plcpgm object
-*
-* Description: 	Prints all documents in a plcpgm.
-*
-**************************************************************************/
+ *
+ * Name:		print_plc()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * unsigned int 	argc		I	command arguments
+ * char 		**argv		I	command arguments
+ * ldh_tSesContext ldhses		I	ldh session
+ * ldh_tWBContext  ldhwb		I	ldh workbench
+ * char *	plcstring	I	Name of Plcpgm object
+ *
+ * Description: 	Prints all documents in a plcpgm.
+ *
+ **************************************************************************/
 
-int wb_utl::print_plc(ldh_tSesContext ldhses, ldh_tWBContext ldhwb,
-    char* plcstring, int document, int overview, int pdf)
+int wb_utl::print_plc(ldh_tSesContext ldhses, ldh_tWBContext ldhwb, char* plcstring, int document,
+                      int overview, int pdf)
 {
   int sts;
   pwr_tObjid plc;
 
   /* Get objdid for the plcpgm */
   sts = ldh_NameToObjid(ldhses, &plc, plcstring);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     return FOE__PLCNOTFOUND;
   }
   /* Check that this is a plcpgm object */
-  if (!vldh_check_plcpgm(ldhses, plc)) {
+  if (!vldh_check_plcpgm(ldhses, plc))
+  {
     return FOE__NOPLC;
   }
 
@@ -444,24 +423,23 @@ int wb_utl::print_plc(ldh_tSesContext ldhses, ldh_tWBContext ldhwb,
 }
 
 /*************************************************************************
-*
-* Name:		print_plc_hier()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session
-* ldh_tWBContext  ldhwb		I	ldh workbench
-* char 		*hiername	I	Name of an object in the hierarchy
-*
-* Description: 	Prints all documents in plcpgm's that
-*		is found below the specified object in the hierarchy.
-*
-**************************************************************************/
+ *
+ * Name:		print_plc_hier()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session
+ * ldh_tWBContext  ldhwb		I	ldh workbench
+ * char 		*hiername	I	Name of an object in the hierarchy
+ *
+ * Description: 	Prints all documents in plcpgm's that
+ *		is found below the specified object in the hierarchy.
+ *
+ **************************************************************************/
 
-int wb_utl::print_plc_hier(ldh_tSesContext ldhses, ldh_tWBContext ldhwb,
-    char* hiername, char* fromname, int document, int overview, int all,
-    int pdf)
+int wb_utl::print_plc_hier(ldh_tSesContext ldhses, ldh_tWBContext ldhwb, char* hiername, char* fromname,
+                           int document, int overview, int all, int pdf)
 {
   int sts, size;
   pwr_tClassId* classp;
@@ -481,24 +459,30 @@ int wb_utl::print_plc_hier(ldh_tSesContext ldhses, ldh_tWBContext ldhwb,
   class_vect[1] = 0;
   classp = class_vect;
 
-  if (!all) {
+  if (!all)
+  {
     /* Get objdid for the hierarchy object */
     sts = ldh_NameToObjid(ldhses, &hierobjdid, hiername);
     if (EVEN(sts))
       return FOE__HIERNAME;
-  } else
+  }
+  else
     hierobjdid = pwr_cNObjid;
 
-  if (fromname != NULL) {
+  if (fromname != NULL)
+  {
     sts = ldh_NameToObjid(ldhses, &fromobjdid, fromname);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       return FOE__OBJECT;
     }
     from = 1;
-  } else
+  }
+  else
     from = 0;
 
-  if (pdf && all && !from) {
+  if (pdf && all && !from)
+  {
     // Open a html file with links to pdf files
     pwr_tFileName fname = "$pwrp_tmp/plc.html";
     ldh_sSessInfo info;
@@ -508,8 +492,7 @@ int wb_utl::print_plc_hier(ldh_tSesContext ldhses, ldh_tWBContext ldhwb,
     if (EVEN(sts))
       return sts;
 
-    sts = ldh_VolumeIdToName(
-        ldh_SessionToWB(ldhses), info.Vid, vname, sizeof(vname), &size);
+    sts = ldh_VolumeIdToName(ldh_SessionToWB(ldhses), info.Vid, vname, sizeof(vname), &size);
     if (EVEN(sts))
       return sts;
 
@@ -517,8 +500,7 @@ int wb_utl::print_plc_hier(ldh_tSesContext ldhses, ldh_tWBContext ldhwb,
     dcli_translate_filename(fname, fname);
 
     plclink = fopen(fname, "w");
-    fprintf(plclink,
-        "<html>\n  <head>\n    <title>Plc code</title>\n  <style type=\"text/css\">\n\
+    fprintf(plclink, "<html>\n  <head>\n    <title>Plc code</title>\n  <style type=\"text/css\">\n\
 h2 {font-family: sans-serif; font-size: 16pt; font-weight: bold; color: #5263aa; text-align: left; text-decoration: none;}\n\
 a:link {font-family: sans-serif; font-size: 11pt; font-weight: bold; color: #5263aa; text-align: left; text-decoration: none;}\n\
 a:visited {font-family: sans-serif; font-size: 11pt; font-weight: bold; color: #5263aa; text-align: left; text-decoration: none;}\n\
@@ -530,9 +512,10 @@ a:hover {font-family: sans-serif; font-size: 11pt; font-weight: bold; color: #35
 
   plcpgmcount = 0;
   plcpgmlist = 0;
-  sts = trv_get_objects_hier_class_name(ldhses, hierobjdid, classp, NULL,
-      &utl_objidlist_insert, &plcpgmlist, &plcpgmcount, 0, 0, 0);
-  if (EVEN(sts)) {
+  sts = trv_get_objects_hier_class_name(ldhses, hierobjdid, classp, NULL, &utl_objidlist_insert, &plcpgmlist,
+                                        &plcpgmcount, 0, 0, 0);
+  if (EVEN(sts))
+  {
     if (plclink)
       fclose(plclink);
     return sts;
@@ -540,31 +523,37 @@ a:hover {font-family: sans-serif; font-size: 11pt; font-weight: bold; color: #35
 
   list_ptr = plcpgmlist;
   from_found = 0;
-  while (list_ptr) {
-    if (from) {
-      if (!from_found) {
-        if (cdh_ObjidIsEqual(list_ptr->objid, fromobjdid)) {
+  while (list_ptr)
+  {
+    if (from)
+    {
+      if (!from_found)
+      {
+        if (cdh_ObjidIsEqual(list_ptr->objid, fromobjdid))
+        {
           /* Start to print from now on 	*/
           from_found = 1;
-        } else {
+        }
+        else
+        {
           list_ptr = list_ptr->next;
           continue;
         }
       }
     }
 
-    sts = ldh_ObjidToName(ldhses, list_ptr->objid, ldh_eName_Hierarchy, plcname,
-        sizeof(plcname), &size);
-    if (EVEN(sts)) {
+    sts = ldh_ObjidToName(ldhses, list_ptr->objid, ldh_eName_Hierarchy, plcname, sizeof(plcname), &size);
+    if (EVEN(sts))
+    {
       if (plclink)
         fclose(plclink);
       return sts;
     }
     printf("Plcpgm  %s\n", plcname);
 
-    sts = print_document(
-        list_ptr->objid, ldhses, ldhwb, document, overview, pdf, plclink);
-    if (EVEN(sts)) {
+    sts = print_document(list_ptr->objid, ldhses, ldhwb, document, overview, pdf, plclink);
+    if (EVEN(sts))
+    {
       if (plclink)
         fclose(plclink);
       return sts;
@@ -574,7 +563,8 @@ a:hover {font-family: sans-serif; font-size: 11pt; font-weight: bold; color: #35
   }
   utl_objidlist_free(plcpgmlist);
 
-  if (plclink) {
+  if (plclink)
+  {
     fprintf(plclink, "  </body>\n</html>\n");
     fclose(plclink);
   }
@@ -583,25 +573,24 @@ a:hover {font-family: sans-serif; font-size: 11pt; font-weight: bold; color: #35
 }
 
 /*************************************************************************
-*
-* Name:		utl_print_document()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* pwr_tObjid  Objdid		I	objdid of plcpgm object
-* Wiget		parent_widget	I	parent widget
-* ldh_tSesContext ldhses		I	ldh session
-* ldh_tWBContext  ldhwb		I	ldh workbench
-* unsigned long	dum1		I	dummy argument.
-*
-* Description: 	Prints all documents found in a plcpgm.
-*
-**************************************************************************/
+ *
+ * Name:		utl_print_document()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * pwr_tObjid  Objdid		I	objdid of plcpgm object
+ * Wiget		parent_widget	I	parent widget
+ * ldh_tSesContext ldhses		I	ldh session
+ * ldh_tWBContext  ldhwb		I	ldh workbench
+ * unsigned long	dum1		I	dummy argument.
+ *
+ * Description: 	Prints all documents found in a plcpgm.
+ *
+ **************************************************************************/
 
-int wb_utl::print_document(pwr_tObjid Objdid, ldh_tSesContext ldhses,
-    ldh_tWBContext ldhwb, unsigned long document, unsigned long overview,
-    int pdf, FILE* plclink)
+int wb_utl::print_document(pwr_tObjid Objdid, ldh_tSesContext ldhses, ldh_tWBContext ldhwb,
+                           unsigned long document, unsigned long overview, int pdf, FILE* plclink)
 {
   int sts, size;
   int j;
@@ -625,10 +614,12 @@ int wb_utl::print_document(pwr_tObjid Objdid, ldh_tSesContext ldhses,
 
   /* Get the windows */
   sts = trv_get_plc_window(ldhses, plc, &window);
-  if (sts == GSX__NOSUBWINDOW) {
+  if (sts == GSX__NOSUBWINDOW)
+  {
     /* No subwindows on this window, return */
     return FOE__SUCCESS;
-  } else if (EVEN(sts))
+  }
+  else if (EVEN(sts))
     return sts;
 
   sts = trv_get_window_windows(ldhses, window, &wind_count, &windlist);
@@ -638,38 +629,40 @@ int wb_utl::print_document(pwr_tObjid Objdid, ldh_tSesContext ldhses,
   /* We don't want to see foe on the screen */
 
   /* Start foe for the root window */
-  sts = utl_foe_new(
-      "AutoPrint", plc, ldhwb, ldhses, &foe, 0, ldh_eAccess_ReadOnly);
+  sts = utl_foe_new("AutoPrint", plc, ldhwb, ldhses, &foe, 0, ldh_eAccess_ReadOnly);
   if (EVEN(sts))
     return sts;
 
-  if (pdf) {
+  if (pdf)
+  {
     sts = foe->print_pdf_overview();
     if (EVEN(sts))
       return sts;
 
-    if (plclink) {
+    if (plclink)
+    {
       pwr_tOName name;
       pwr_tOid w;
 
-      sts = ldh_ObjidToName(
-          ldhses, plc, ldh_eName_Hierarchy, name, sizeof(name), &size);
+      sts = ldh_ObjidToName(ldhses, plc, ldh_eName_Hierarchy, name, sizeof(name), &size);
       if (ODD(sts))
         sts = ldh_GetChild(ldhses, plc, &w);
       if (ODD(sts))
-        fprintf(plclink,
-            "<a target=\"_blank\" href=\"pssdoc%s.pdf\">%s</a><br>\n",
-            vldh_IdToStr(0, w), name);
+        fprintf(plclink, "<a target=\"_blank\" href=\"pssdoc%s.pdf\">%s</a><br>\n", vldh_IdToStr(0, w), name);
     }
-  } else {
-    if (document) {
+  }
+  else
+  {
+    if (document)
+    {
       /* Print the documents */
       sts = foe->print_document();
       if (EVEN(sts))
         return sts;
     }
 
-    if (overview) {
+    if (overview)
+    {
       sts = foe->print_overview();
       if (EVEN(sts))
         return sts;
@@ -679,7 +672,8 @@ int wb_utl::print_document(pwr_tObjid Objdid, ldh_tSesContext ldhses,
   windlist_ptr = windlist;
   windlist_ptr++;
 
-  for (j = 1; j < (int)wind_count; j++) {
+  for (j = 1; j < (int)wind_count; j++)
+  {
     /* Get parent in ldh and find him in vldh */
     sts = ldh_GetParent(ldhses, *windlist_ptr, &nodeobjdid);
     if (EVEN(sts))
@@ -695,8 +689,10 @@ int wb_utl::print_document(pwr_tObjid Objdid, ldh_tSesContext ldhses,
     pwr_tOid p = nodeobjdid;
     bool next = false;
     sts = ldh_GetObjectClass(ldhses, p, &cid);
-    while (cid != pwr_cClass_plc) {
-      if (is_focodeobject(ldhses, cid)) {
+    while (cid != pwr_cClass_plc)
+    {
+      if (is_focodeobject(ldhses, cid))
+      {
         next = true;
         break;
       }
@@ -708,7 +704,8 @@ int wb_utl::print_document(pwr_tObjid Objdid, ldh_tSesContext ldhses,
       if (EVEN(sts))
         break;
     }
-    if (next) {
+    if (next)
+    {
       windlist_ptr++;
       continue;
     }
@@ -722,8 +719,8 @@ int wb_utl::print_document(pwr_tObjid Objdid, ldh_tSesContext ldhses,
       return sts;
 
     /* Get the window index for this window */
-    sts = ldh_GetObjectBuffer(ldhses, *windlist_ptr, "DevBody", "PlcWindow",
-        &eclass, (char**)&windbuffer, &size);
+    sts = ldh_GetObjectBuffer(ldhses, *windlist_ptr, "DevBody", "PlcWindow", &eclass, (char**)&windbuffer,
+                              &size);
     if (EVEN(sts))
       return sts;
 
@@ -734,24 +731,26 @@ int wb_utl::print_document(pwr_tObjid Objdid, ldh_tSesContext ldhses,
     foe = (WFoe*)parentwind->hw.foe;
 
     /* Create subwindow */
-    sts = utl_foe_new_local(foe, node->hn.name, pwr_cNObjid, 0,
-        parentwind->hw.ldhses, node, windowindex, new_window, &foe, 0,
-        ldh_eAccess_ReadOnly, foe_eFuncAccess_Edit);
+    sts = utl_foe_new_local(foe, node->hn.name, pwr_cNObjid, 0, parentwind->hw.ldhses, node, windowindex,
+                            new_window, &foe, 0, ldh_eAccess_ReadOnly, foe_eFuncAccess_Edit);
 
     /* Print the documents */
-    if (pdf) {
+    if (pdf)
+    {
       sts = foe->print_pdf_overview();
       if (EVEN(sts))
         return sts;
 
-      if (plclink) {
+      if (plclink)
+      {
         pwr_tOName name;
         pwr_tOid w, p;
         int indent;
         pwr_tCid cid = 0;
 
         p = node->ln.oid;
-        for (indent = 0; cid != pwr_cClass_plc; indent++) {
+        for (indent = 0; cid != pwr_cClass_plc; indent++)
+        {
           sts = ldh_GetParent(ldhses, p, &p);
           if (EVEN(sts))
             break;
@@ -762,26 +761,29 @@ int wb_utl::print_document(pwr_tObjid Objdid, ldh_tSesContext ldhses,
         }
         indent = indent / 2;
 
-        sts = ldh_ObjidToName(
-            ldhses, node->ln.oid, ldh_eName_Object, name, sizeof(name), &size);
+        sts = ldh_ObjidToName(ldhses, node->ln.oid, ldh_eName_Object, name, sizeof(name), &size);
         if (ODD(sts))
           sts = ldh_GetChild(ldhses, node->ln.oid, &w);
-        if (ODD(sts)) {
+        if (ODD(sts))
+        {
           for (int i = 0; i < indent; i++)
             fprintf(plclink, "&nbsp;&nbsp;&nbsp;");
-          fprintf(plclink,
-              "&nbsp;<a target=\"_blank\" href=\"pssdoc%s.pdf\">%s</a><br>\n",
-              vldh_IdToStr(0, w), name);
+          fprintf(plclink, "&nbsp;<a target=\"_blank\" href=\"pssdoc%s.pdf\">%s</a><br>\n",
+                  vldh_IdToStr(0, w), name);
         }
       }
-    } else {
-      if (document) {
+    }
+    else
+    {
+      if (document)
+      {
         sts = foe->print_document();
         if (EVEN(sts))
           return sts;
       }
 
-      if (overview) {
+      if (overview)
+      {
         sts = foe->print_overview();
         if (EVEN(sts))
           return sts;
@@ -792,7 +794,8 @@ int wb_utl::print_document(pwr_tObjid Objdid, ldh_tSesContext ldhses,
   }
 
   /* Delete all foe */
-  for (j = 0; j < (int)wind_count; j++) {
+  for (j = 0; j < (int)wind_count; j++)
+  {
     windlist_ptr--;
     sts = vldh_get_wind_objdid(*windlist_ptr, &parentwind);
     if (EVEN(sts))
@@ -810,15 +813,14 @@ int wb_utl::print_document(pwr_tObjid Objdid, ldh_tSesContext ldhses,
 }
 
 /*************************************************************************
-*
-* Description: 	Find all plcpgm and open all windows and call the callback
-*		function.
-*
-**************************************************************************/
+ *
+ * Description: 	Find all plcpgm and open all windows and call the callback
+ *		function.
+ *
+ **************************************************************************/
 
-int wb_utl::exec_plcpgms(ldh_tSesContext ldhses, ldh_tWBContext ldhwb,
-    char* hiername, char* fromname, int all, int templ, int no_focode,
-    int (*cb)(void*, void*))
+int wb_utl::exec_plcpgms(ldh_tSesContext ldhses, ldh_tWBContext ldhwb, char* hiername, char* fromname,
+                         int all, int templ, int no_focode, int (*cb)(void*, void*))
 {
   int sts, sts2, size;
   pwr_tClassId* classp;
@@ -843,26 +845,33 @@ int wb_utl::exec_plcpgms(ldh_tSesContext ldhses, ldh_tWBContext ldhwb,
   class_vect[1] = 0;
   classp = class_vect;
 
-  if (templ) {
+  if (templ)
+  {
     /* Get objdid for the hierarchy object */
     sts = ldh_NameToObjid(ldhses, &hierobjdid, "Class");
     if (EVEN(sts))
       return FOE__HIERNAME;
-  } else if (!all) {
+  }
+  else if (!all)
+  {
     /* Get objdid for the hierarchy object */
     sts = ldh_NameToObjid(ldhses, &hierobjdid, hiername);
     if (EVEN(sts))
       return FOE__HIERNAME;
-  } else
+  }
+  else
     hierobjdid = pwr_cNObjid;
 
-  if (fromname != NULL) {
+  if (fromname != NULL)
+  {
     sts = ldh_NameToObjid(ldhses, &fromobjdid, fromname);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       return FOE__OBJECT;
     }
     from = 1;
-  } else
+  }
+  else
     from = 0;
 
   /* Check that the utilily session is saved */
@@ -881,50 +890,61 @@ int wb_utl::exec_plcpgms(ldh_tSesContext ldhses, ldh_tWBContext ldhwb,
   plcpgmcount = 0;
   plcpgmlist = 0;
 
-  if (cdh_ObjidIsNotNull(hierobjdid)) {
+  if (cdh_ObjidIsNotNull(hierobjdid))
+  {
     sts = ldh_GetObjectClass(ldhses, hierobjdid, &cid);
     if (EVEN(sts))
       return sts;
-  } else
+  }
+  else
     cid = 0;
 
-  if (cid == pwr_cClass_plc || cid == pwr_cClass_PlcTemplate) {
+  if (cid == pwr_cClass_plc || cid == pwr_cClass_PlcTemplate)
+  {
     pwr_tAttrRef aref = cdh_ObjidToAref(hierobjdid);
     utl_objidlist_insert(&aref, &plcpgmlist, &plcpgmcount, 0, 0, 0);
-  } else {
-    sts = trv_get_objects_hier_class_name(ldhses, hierobjdid, classp, NULL,
-        &utl_objidlist_insert, &plcpgmlist, &plcpgmcount, 0, 0, 0);
+  }
+  else
+  {
+    sts = trv_get_objects_hier_class_name(ldhses, hierobjdid, classp, NULL, &utl_objidlist_insert,
+                                          &plcpgmlist, &plcpgmcount, 0, 0, 0);
     if (EVEN(sts))
       goto error_return;
   }
 
   list_ptr = plcpgmlist;
   from_found = 0;
-  while (list_ptr) {
-    if (from) {
-      if (!from_found) {
-        if (cdh_ObjidIsEqual(list_ptr->objid, fromobjdid)) {
+  while (list_ptr)
+  {
+    if (from)
+    {
+      if (!from_found)
+      {
+        if (cdh_ObjidIsEqual(list_ptr->objid, fromobjdid))
+        {
           /* Start to redraw from now on 	*/
           from_found = 1;
-        } else {
+        }
+        else
+        {
           list_ptr = list_ptr->next;
           continue;
         }
       }
     }
 
-    sts = ldh_ObjidToName(ldhses, list_ptr->objid, ldh_eName_Hierarchy, plcname,
-        sizeof(plcname), &size);
+    sts = ldh_ObjidToName(ldhses, list_ptr->objid, ldh_eName_Hierarchy, plcname, sizeof(plcname), &size);
     if (EVEN(sts))
       goto error_return;
-    sts = ldh_ObjidToName(ldhses, list_ptr->objid, ldh_eName_Objid,
-        plc_objid_str, sizeof(plc_objid_str), &size);
+    sts = ldh_ObjidToName(ldhses, list_ptr->objid, ldh_eName_Objid, plc_objid_str, sizeof(plc_objid_str),
+                          &size);
     if (EVEN(sts))
       goto error_return;
 
     printf("-- Executing Plcpgm  %s\n", plcname);
 
-    if (!utl_in_libhier(ldhses, list_ptr->objid)) {
+    if (!utl_in_libhier(ldhses, list_ptr->objid))
+    {
       sts = exec_plcpgm_windows(list_ptr->objid, ldhses, ldhwb, no_focode, cb);
       if (EVEN(sts))
         goto error_return;
@@ -949,13 +969,13 @@ error_return:
 }
 
 /*************************************************************************
-*
-* Description: 	Find all windows in a plcpgm and call the backcall function.
-*
-**************************************************************************/
+ *
+ * Description: 	Find all windows in a plcpgm and call the backcall function.
+ *
+ **************************************************************************/
 
-int wb_utl::exec_plcpgm_windows(pwr_tObjid Objdid, ldh_tSesContext ldhses,
-    ldh_tWBContext ldhwb, int no_focode, int (*cb)(void*, void*))
+int wb_utl::exec_plcpgm_windows(pwr_tObjid Objdid, ldh_tSesContext ldhses, ldh_tWBContext ldhwb,
+                                int no_focode, int (*cb)(void*, void*))
 {
   int sts, size;
   int j;
@@ -979,10 +999,12 @@ int wb_utl::exec_plcpgm_windows(pwr_tObjid Objdid, ldh_tSesContext ldhses,
 
   /* Get the windows */
   sts = trv_get_plc_window(ldhses, plc, &window);
-  if (sts == GSX__NOSUBWINDOW) {
+  if (sts == GSX__NOSUBWINDOW)
+  {
     /* No subwindows on this window, return */
     return FOE__SUCCESS;
-  } else if (EVEN(sts))
+  }
+  else if (EVEN(sts))
     return sts;
 
   sts = trv_get_window_windows(ldhses, window, &wind_count, &windlist);
@@ -992,8 +1014,7 @@ int wb_utl::exec_plcpgm_windows(pwr_tObjid Objdid, ldh_tSesContext ldhses,
   /* We don't want to see foe on the screen */
 
   /* Start foe for the root window */
-  sts = utl_foe_new(
-      "AutoPrint", plc, ldhwb, ldhses, &foe, 0, ldh_eAccess_SharedReadWrite);
+  sts = utl_foe_new("AutoPrint", plc, ldhwb, ldhses, &foe, 0, ldh_eAccess_SharedReadWrite);
   if (EVEN(sts))
     return sts;
 
@@ -1005,7 +1026,8 @@ int wb_utl::exec_plcpgm_windows(pwr_tObjid Objdid, ldh_tSesContext ldhses,
   windlist_ptr = windlist;
   windlist_ptr++;
 
-  for (j = 1; j < (int)wind_count; j++) {
+  for (j = 1; j < (int)wind_count; j++)
+  {
     /* Get parent in ldh and find him in vldh */
     sts = ldh_GetParent(ldhses, *windlist_ptr, &nodeobjdid);
     if (EVEN(sts))
@@ -1016,14 +1038,17 @@ int wb_utl::exec_plcpgm_windows(pwr_tObjid Objdid, ldh_tSesContext ldhses,
     if (EVEN(sts))
       return sts;
 
-    if (no_focode) {
+    if (no_focode)
+    {
       // Don't execute FoCode objects
       pwr_tCid cid;
       pwr_tOid p = nodeobjdid;
       bool next = false;
       sts = ldh_GetObjectClass(ldhses, p, &cid);
-      while (cid != pwr_cClass_plc) {
-        if (is_focodeobject(ldhses, cid)) {
+      while (cid != pwr_cClass_plc)
+      {
+        if (is_focodeobject(ldhses, cid))
+        {
           next = true;
           break;
         }
@@ -1035,7 +1060,8 @@ int wb_utl::exec_plcpgm_windows(pwr_tObjid Objdid, ldh_tSesContext ldhses,
         if (EVEN(sts))
           break;
       }
-      if (next) {
+      if (next)
+      {
         windlist_ptr++;
         continue;
       }
@@ -1050,8 +1076,8 @@ int wb_utl::exec_plcpgm_windows(pwr_tObjid Objdid, ldh_tSesContext ldhses,
       return sts;
 
     /* Get the window index for this window */
-    sts = ldh_GetObjectBuffer(ldhses, *windlist_ptr, "DevBody", "PlcWindow",
-        &eclass, (char**)&windbuffer, &size);
+    sts = ldh_GetObjectBuffer(ldhses, *windlist_ptr, "DevBody", "PlcWindow", &eclass, (char**)&windbuffer,
+                              &size);
     if (EVEN(sts))
       return sts;
 
@@ -1062,9 +1088,8 @@ int wb_utl::exec_plcpgm_windows(pwr_tObjid Objdid, ldh_tSesContext ldhses,
     foe = (WFoe*)parentwind->hw.foe;
 
     /* Create subwindow */
-    sts = utl_foe_new_local(foe, node->hn.name, pwr_cNObjid, 0,
-        parentwind->hw.ldhses, node, windowindex, new_window, &foe, 0,
-        ldh_eAccess_SharedReadWrite, foe_eFuncAccess_Edit);
+    sts = utl_foe_new_local(foe, node->hn.name, pwr_cNObjid, 0, parentwind->hw.ldhses, node, windowindex,
+                            new_window, &foe, 0, ldh_eAccess_SharedReadWrite, foe_eFuncAccess_Edit);
 
     /* Redraw the window */
     sts = (cb)(this, foe);
@@ -1075,7 +1100,8 @@ int wb_utl::exec_plcpgm_windows(pwr_tObjid Objdid, ldh_tSesContext ldhses,
   }
 
   /* Delete all foe */
-  for (j = 0; j < (int)wind_count; j++) {
+  for (j = 0; j < (int)wind_count; j++)
+  {
     windlist_ptr--;
     sts = vldh_get_wind_objdid(*windlist_ptr, &parentwind);
     if (EVEN(sts))
@@ -1092,11 +1118,10 @@ int wb_utl::exec_plcpgm_windows(pwr_tObjid Objdid, ldh_tSesContext ldhses,
   return FOE__SUCCESS;
 }
 
-int wb_utl::create_flow_plc(ldh_tSesContext ldhses, ldh_tWBContext ldhwb,
-    char* hiername, char* fromname, int all, int templ)
+int wb_utl::create_flow_plc(ldh_tSesContext ldhses, ldh_tWBContext ldhwb, char* hiername, char* fromname,
+                            int all, int templ)
 {
-  return exec_plcpgms(
-      ldhses, ldhwb, hiername, fromname, all, templ, 1, create_flow_cb);
+  return exec_plcpgms(ldhses, ldhwb, hiername, fromname, all, templ, 1, create_flow_cb);
 }
 
 int wb_utl::create_flow_cb(void* utl, void* foe)
@@ -1108,35 +1133,31 @@ int wb_utl::create_flow_cb(void* utl, void* foe)
   return sts;
 }
 
-int wb_utl::redraw_plc_hier(ldh_tSesContext ldhses, ldh_tWBContext ldhwb,
-    char* hiername, char* fromname, int all, int templ)
+int wb_utl::redraw_plc_hier(ldh_tSesContext ldhses, ldh_tWBContext ldhwb, char* hiername, char* fromname,
+                            int all, int templ)
 {
   printf("-- Redraw plc\n");
-  return exec_plcpgms(
-      ldhses, ldhwb, hiername, fromname, all, templ, 1, plc_redraw_cb);
+  return exec_plcpgms(ldhses, ldhwb, hiername, fromname, all, templ, 1, plc_redraw_cb);
 }
 
-int wb_utl::plc_redraw_cb(void* utl, void* foe)
-{
-  return ((WFoe*)foe)->redraw_and_save();
-}
+int wb_utl::plc_redraw_cb(void* utl, void* foe) { return ((WFoe*)foe)->redraw_and_save(); }
 
 /*_Methods defined for this module_______________________________________*/
 
 /*************************************************************************
-*
-* Name:		utl_toupper()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* char		*str		I	input string.
-* char		*upper_str	I	string converted to upper case.
-*
-* Description:
-*	Converts a string to upper case.
-*
-**************************************************************************/
+ *
+ * Name:		utl_toupper()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * char		*str		I	input string.
+ * char		*upper_str	I	string converted to upper case.
+ *
+ * Description:
+ *	Converts a string to upper case.
+ *
+ **************************************************************************/
 
 int utl_toupper(char* str_upper, char* str)
 {
@@ -1145,28 +1166,28 @@ int utl_toupper(char* str_upper, char* str)
 }
 
 /*************************************************************************
-*
-* Name:		utl_parse()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* char		*string		I	string to be parsed.
-* char		*parse_char	I	parse charachter(s).
-* char		*inc_parse_char	I	parse charachter(s) that will be
-*					included in the parsed string.
-* char		*outstr		O	parsed strings.
-* int		max_rows	I	maximum number of chars in a parsed
-*					string.
-* int 		max_cols	I	maximum number of parsed elements.
-*
-* Description:
-*	Parses a string.
-*
-**************************************************************************/
+ *
+ * Name:		utl_parse()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * char		*string		I	string to be parsed.
+ * char		*parse_char	I	parse charachter(s).
+ * char		*inc_parse_char	I	parse charachter(s) that will be
+ *					included in the parsed string.
+ * char		*outstr		O	parsed strings.
+ * int		max_rows	I	maximum number of chars in a parsed
+ *					string.
+ * int 		max_cols	I	maximum number of parsed elements.
+ *
+ * Description:
+ *	Parses a string.
+ *
+ **************************************************************************/
 
-int utl_parse(const char* instring, const char* parse_char,
-    const char* inc_parse_char, char* outstr, int max_rows, int max_cols)
+int utl_parse(const char* instring, const char* parse_char, const char* inc_parse_char, char* outstr,
+              int max_rows, int max_cols)
 {
   char* string;
   int row;
@@ -1186,12 +1207,14 @@ int utl_parse(const char* instring, const char* parse_char,
   char_found = 0;
   next_token = 0;
   nullstr = 0;
-  while (*string != '\0') {
+  while (*string != '\0')
+  {
     char_ptr = (char*)parse_char;
     inc_char_ptr = (char*)inc_parse_char;
     parsechar_found = 0;
     inc_parsechar_found = 0;
-    if (*string == '"') {
+    if (*string == '"')
+    {
       one_token = !one_token;
       if (!one_token && col == 0)
         nullstr = 1;
@@ -1200,13 +1223,17 @@ int utl_parse(const char* instring, const char* parse_char,
       string++;
       continue;
     }
-    if (!one_token) {
-      while (*char_ptr != '\0') {
+    if (!one_token)
+    {
+      while (*char_ptr != '\0')
+      {
         /* Check if this is a parse charachter */
-        if (*string == *char_ptr) {
+        if (*string == *char_ptr)
+        {
           parsechar_found = 1;
           /* Next token */
-          if (col > 0 || nullstr) {
+          if (col > 0 || nullstr)
+          {
             *(outstr + row * max_cols + col) = '\0';
             row++;
             if (row >= max_rows)
@@ -1218,13 +1245,16 @@ int utl_parse(const char* instring, const char* parse_char,
         }
         char_ptr++;
       }
-      while (*inc_char_ptr != '\0') {
+      while (*inc_char_ptr != '\0')
+      {
         /* Check if this is a parse charachter */
-        if (*string == *inc_char_ptr) {
+        if (*string == *inc_char_ptr)
+        {
           parsechar_found = 1;
           inc_parsechar_found = 1;
           /* Next token */
-          if (col > 0) {
+          if (col > 0)
+          {
             *(outstr + row * max_cols + col) = '\0';
             row++;
             if (row >= max_rows)
@@ -1237,12 +1267,14 @@ int utl_parse(const char* instring, const char* parse_char,
         inc_char_ptr++;
       }
     }
-    if (!parsechar_found && !next_token) {
+    if (!parsechar_found && !next_token)
+    {
       char_found++;
       *(outstr + row * max_cols + col) = *string;
       col++;
     }
-    if (inc_parsechar_found) {
+    if (inc_parsechar_found)
+    {
       *(outstr + row * max_cols + col) = *inc_char_ptr;
       col++;
     }
@@ -1261,19 +1293,19 @@ int utl_parse(const char* instring, const char* parse_char,
 }
 
 /*************************************************************************
-*
-* Name:		utl_parse_indexstring()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	This parses a string of numbers and returns a byte
-*	array with the specified numbers set to 1.
-*	ex 2,4,7-10,12 will return 001010011110100..
-*
-**************************************************************************/
+ *
+ * Name:		utl_parse_indexstring()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	This parses a string of numbers and returns a byte
+ *	array with the specified numbers set to 1.
+ *	ex 2,4,7-10,12 will return 001010011110100..
+ *
+ **************************************************************************/
 
 int utl_parse_indexstring(char* indexstring, char* indexarray, int size)
 {
@@ -1284,21 +1316,27 @@ int utl_parse_indexstring(char* indexstring, char* indexarray, int size)
 
   memset(indexarray, 0, size);
 
-  nr = utl_parse(indexstring, " ", "", (char*)index_str_b,
-      sizeof(index_str_b) / sizeof(index_str_b[0]), sizeof(index_str_b[0]));
-  for (i = 0; i < nr; i++) {
-    num = utl_parse(index_str_b[i], "-", "", (char*)index_str,
-        sizeof(index_str) / sizeof(index_str[0]), sizeof(index_str[0]));
-    if (num == 1) {
+  nr = utl_parse(indexstring, " ", "", (char*)index_str_b, sizeof(index_str_b) / sizeof(index_str_b[0]),
+                 sizeof(index_str_b[0]));
+  for (i = 0; i < nr; i++)
+  {
+    num = utl_parse(index_str_b[i], "-", "", (char*)index_str, sizeof(index_str) / sizeof(index_str[0]),
+                    sizeof(index_str[0]));
+    if (num == 1)
+    {
       sscanf((char*)&index_str[0], "%d", &index[0]);
       index[1] = index[0];
-    } else if (num == 2) {
+    }
+    else if (num == 2)
+    {
       sscanf((char*)index_str[0], "%d", &index[0]);
       sscanf((char*)index_str[1], "%d", &index[1]);
-    } else
+    }
+    else
       return 0;
 
-    for (j = 0; j < size; j++) {
+    for (j = 0; j < size; j++)
+    {
       if ((j >= index[0]) && (j <= index[1]))
         *(indexarray + j) = 1;
     }
@@ -1307,21 +1345,20 @@ int utl_parse_indexstring(char* indexstring, char* indexarray, int size)
 }
 
 /*************************************************************************
-*
-* Name:		utl_list_sort()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* utl_t_list	*list		I	object list.
-*
-* Description:
-*	This function sorts objects.
-*
-**************************************************************************/
+ *
+ * Name:		utl_list_sort()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * utl_t_list	*list		I	object list.
+ *
+ * Description:
+ *	This function sorts objects.
+ *
+ **************************************************************************/
 
-static int utl_list_sort(
-    utl_t_list** list, int size, ldh_tSesContext ldhses, unsigned long type)
+static int utl_list_sort(utl_t_list** list, int size, ldh_tSesContext ldhses, unsigned long type)
 {
   int i, j;
   utl_t_list* next_ptr;
@@ -1338,63 +1375,68 @@ static int utl_list_sort(
   if ((*list)->next == NULL)
     return FOE__SUCCESS;
 
-  for (i = size - 1; i > 0; i--) {
+  for (i = size - 1; i > 0; i--)
+  {
     prev = list;
     list_ptr = *list;
     next_ptr = list_ptr->next;
-    for (j = 0; j < i; j++) {
-      if (type < 2) {
+    for (j = 0; j < i; j++)
+    {
+      if (type < 2)
+      {
         /* Compare hierarchy name */
-        sts = ldh_AttrRefToName(
-            ldhses, &list_ptr->o, ldh_eName_Hierarchy, &np, &nsize);
+        sts = ldh_AttrRefToName(ldhses, &list_ptr->o, ldh_eName_Hierarchy, &np, &nsize);
         if (EVEN(sts))
           return sts;
         strncpy(name1, np, sizeof(name1));
 
-        sts = ldh_AttrRefToName(
-            ldhses, &next_ptr->o, ldh_eName_Hierarchy, &np, &nsize);
+        sts = ldh_AttrRefToName(ldhses, &next_ptr->o, ldh_eName_Hierarchy, &np, &nsize);
         if (EVEN(sts))
           return sts;
         strncpy(name2, np, sizeof(name2));
-      } else if (type == 2) {
+      }
+      else if (type == 2)
+      {
         /* Compare last segment in object name */
-        sts = ldh_AttrRefToName(
-            ldhses, &list_ptr->o, ldh_eName_Object, &np, &nsize);
+        sts = ldh_AttrRefToName(ldhses, &list_ptr->o, ldh_eName_Object, &np, &nsize);
         if (EVEN(sts))
           return sts;
         strncpy(name1, np, sizeof(name1));
 
-        sts = ldh_AttrRefToName(
-            ldhses, &next_ptr->o, ldh_eName_Object, &np, &nsize);
+        sts = ldh_AttrRefToName(ldhses, &next_ptr->o, ldh_eName_Object, &np, &nsize);
         if (EVEN(sts))
           return sts;
         strncpy(name2, np, sizeof(name2));
-      } else if (type == 3) {
+      }
+      else if (type == 3)
+      {
         /* Compare referenced object name */
-        sts = ldh_AttrRefToName(
-            ldhses, &list_ptr->refo, ldh_eName_Object, &np, &nsize);
+        sts = ldh_AttrRefToName(ldhses, &list_ptr->refo, ldh_eName_Object, &np, &nsize);
         if (EVEN(sts))
           return sts;
         strncpy(name1, np, sizeof(name1));
 
-        sts = ldh_AttrRefToName(
-            ldhses, &next_ptr->refo, ldh_eName_Object, &np, &nsize);
+        sts = ldh_AttrRefToName(ldhses, &next_ptr->refo, ldh_eName_Object, &np, &nsize);
         if (EVEN(sts))
           return sts;
         strncpy(name2, np, sizeof(name2));
-      } else if (type == 4) {
+      }
+      else if (type == 4)
+      {
         pwr_sAttrRef* conobj_ptr;
 
         /* Compare SigChanCon */
-        sts = ldh_GetAttrObjectPar(ldhses, &list_ptr->o, "RtBody", "SigChanCon",
-            (char**)&conobj_ptr, &nsize);
-        if (ODD(sts)) {
-          if (cdh_ObjidIsNull(conobj_ptr->Objid)) {
+        sts = ldh_GetAttrObjectPar(ldhses, &list_ptr->o, "RtBody", "SigChanCon", (char**)&conobj_ptr, &nsize);
+        if (ODD(sts))
+        {
+          if (cdh_ObjidIsNull(conobj_ptr->Objid))
+          {
             strcpy(name1, "-");
             free((char*)conobj_ptr);
-          } else {
-            sts = ldh_AttrRefToName(
-                ldhses, conobj_ptr, ldh_eName_Hierarchy, &np, &nsize);
+          }
+          else
+          {
+            sts = ldh_AttrRefToName(ldhses, conobj_ptr, ldh_eName_Hierarchy, &np, &nsize);
             if (ODD(sts))
               strcpy(name1, np);
             else
@@ -1402,15 +1444,17 @@ static int utl_list_sort(
           }
         }
 
-        sts = ldh_GetAttrObjectPar(ldhses, &next_ptr->o, "RtBody", "SigChanCon",
-            (char**)&conobj_ptr, &nsize);
-        if (ODD(sts)) {
-          if (cdh_ObjidIsNull(conobj_ptr->Objid)) {
+        sts = ldh_GetAttrObjectPar(ldhses, &next_ptr->o, "RtBody", "SigChanCon", (char**)&conobj_ptr, &nsize);
+        if (ODD(sts))
+        {
+          if (cdh_ObjidIsNull(conobj_ptr->Objid))
+          {
             strcpy(name2, "-");
             free((char*)conobj_ptr);
-          } else {
-            sts = ldh_AttrRefToName(
-                ldhses, conobj_ptr, ldh_eName_Hierarchy, &np, &nsize);
+          }
+          else
+          {
+            sts = ldh_AttrRefToName(ldhses, conobj_ptr, ldh_eName_Hierarchy, &np, &nsize);
             if (ODD(sts))
               strcpy(name2, np);
             else
@@ -1419,7 +1463,8 @@ static int utl_list_sort(
         }
       }
 
-      if (str_NoCaseStrcmp(name1, name2) > 0) {
+      if (str_NoCaseStrcmp(name1, name2) > 0)
+      {
         /* Change order */
         *prev = next_ptr;
         list_ptr->next = next_ptr->next;
@@ -1436,21 +1481,20 @@ static int utl_list_sort(
 }
 
 /*************************************************************************
-*
-* Name:		utl_list_classsort()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* utl_t_list	*list		I	object list.
-*
-* Description:
-*	This function sorts objects.
-*
-**************************************************************************/
+ *
+ * Name:		utl_list_classsort()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * utl_t_list	*list		I	object list.
+ *
+ * Description:
+ *	This function sorts objects.
+ *
+ **************************************************************************/
 
-static int utl_list_classsort(
-    utl_t_list** list, int size, ldh_tSesContext ldhses, unsigned long type)
+static int utl_list_classsort(utl_t_list** list, int size, ldh_tSesContext ldhses, unsigned long type)
 {
   int i, j;
   utl_t_list* next_ptr;
@@ -1472,20 +1516,20 @@ static int utl_list_classsort(
   if ((*list)->next == NULL)
     return FOE__SUCCESS;
 
-  for (i = size - 1; i > 0; i--) {
+  for (i = size - 1; i > 0; i--)
+  {
     prev = list;
     list_ptr = *list;
     next_ptr = list_ptr->next;
-    for (j = 0; j < i; j++) {
+    for (j = 0; j < i; j++)
+    {
       /* Compare last segment in object name */
-      sts = ldh_AttrRefToName(
-          ldhses, &list_ptr->o, ldh_eName_Object, &np, &namesize);
+      sts = ldh_AttrRefToName(ldhses, &list_ptr->o, ldh_eName_Object, &np, &namesize);
       if (EVEN(sts))
         return sts;
       strncpy(name1, np, sizeof(name1));
 
-      sts = ldh_AttrRefToName(
-          ldhses, &next_ptr->o, ldh_eName_Object, &np, &namesize);
+      sts = ldh_AttrRefToName(ldhses, &next_ptr->o, ldh_eName_Object, &np, &namesize);
       if (EVEN(sts))
         return sts;
       strncpy(name2, np, sizeof(name2));
@@ -1500,101 +1544,136 @@ static int utl_list_classsort(
       sts = ldh_GetAttrRefTid(ldhses, &next_ptr->o, &class2);
       if (EVEN(sts))
         return sts;
-      sts = ldh_ObjidToName(ldhses, cdh_ClassIdToObjid(class1),
-          ldh_eName_Object, classname1, sizeof(classname1), &namesize);
+      sts = ldh_ObjidToName(ldhses, cdh_ClassIdToObjid(class1), ldh_eName_Object, classname1,
+                            sizeof(classname1), &namesize);
       if (EVEN(sts))
         return sts;
-      sts = ldh_ObjidToName(ldhses, cdh_ClassIdToObjid(class2),
-          ldh_eName_Object, classname2, sizeof(classname2), &namesize);
+      sts = ldh_ObjidToName(ldhses, cdh_ClassIdToObjid(class2), ldh_eName_Object, classname2,
+                            sizeof(classname2), &namesize);
       if (EVEN(sts))
         return sts;
 
-      if (type <= 2) {
+      if (type <= 2)
+      {
         /* Put hierarchy and plcpgm objects first */
-        if (streq(classname1, "$PlantHier")) {
+        if (streq(classname1, "$PlantHier"))
+        {
           strcpy(dummytxt, name1);
           strcpy(name1, "000");
           strcat(name1, dummytxt);
-        } else if (streq(classname1, "PlcPgm")) {
+        }
+        else if (streq(classname1, "PlcPgm"))
+        {
           strcpy(dummytxt, name1);
           strcpy(name1, "001");
           strcat(name1, dummytxt);
         }
 
-        if (streq(classname2, "$PlantHier")) {
+        if (streq(classname2, "$PlantHier"))
+        {
           strcpy(dummytxt, name2);
           strcpy(name2, "000");
           strcat(name2, dummytxt);
-        } else if (streq(classname2, "PlcPgm")) {
+        }
+        else if (streq(classname2, "PlcPgm"))
+        {
           strcpy(dummytxt, name2);
           strcpy(name2, "001");
           strcat(name2, dummytxt);
         }
       }
 
-      if (type == 2) {
-        if (streq(classname1, "Ai")) {
+      if (type == 2)
+      {
+        if (streq(classname1, "Ai"))
+        {
           strcpy(dummytxt, name1);
           strcpy(name1, "002");
           strcat(name1, dummytxt);
-        } else if (streq(classname1, "Ao")) {
+        }
+        else if (streq(classname1, "Ao"))
+        {
           strcpy(dummytxt, name1);
           strcpy(name1, "003");
           strcat(name1, dummytxt);
-        } else if (streq(classname1, "Av")) {
+        }
+        else if (streq(classname1, "Av"))
+        {
           strcpy(dummytxt, name1);
           strcpy(name1, "004");
           strcat(name1, dummytxt);
-        } else if (streq(classname1, "Co")) {
+        }
+        else if (streq(classname1, "Co"))
+        {
           strcpy(dummytxt, name1);
           strcpy(name1, "005");
           strcat(name1, dummytxt);
-        } else if (streq(classname1, "Di")) {
+        }
+        else if (streq(classname1, "Di"))
+        {
           strcpy(dummytxt, name1);
           strcpy(name1, "006");
           strcat(name1, dummytxt);
-        } else if (streq(classname1, "Do")) {
+        }
+        else if (streq(classname1, "Do"))
+        {
           strcpy(dummytxt, name1);
           strcpy(name1, "007");
           strcat(name1, dummytxt);
-        } else if (streq(classname1, "Dv")) {
+        }
+        else if (streq(classname1, "Dv"))
+        {
           strcpy(dummytxt, name1);
           strcpy(name1, "008");
           strcat(name1, dummytxt);
         }
 
-        if (streq(classname2, "Ai")) {
+        if (streq(classname2, "Ai"))
+        {
           strcpy(dummytxt, name2);
           strcpy(name2, "002");
           strcat(name2, dummytxt);
-        } else if (streq(classname2, "Ao")) {
+        }
+        else if (streq(classname2, "Ao"))
+        {
           strcpy(dummytxt, name2);
           strcpy(name2, "003");
           strcat(name2, dummytxt);
-        } else if (streq(classname2, "Av")) {
+        }
+        else if (streq(classname2, "Av"))
+        {
           strcpy(dummytxt, name2);
           strcpy(name2, "004");
           strcat(name2, dummytxt);
-        } else if (streq(classname2, "Co")) {
+        }
+        else if (streq(classname2, "Co"))
+        {
           strcpy(dummytxt, name2);
           strcpy(name2, "005");
           strcat(name2, dummytxt);
-        } else if (streq(classname2, "Di")) {
+        }
+        else if (streq(classname2, "Di"))
+        {
           strcpy(dummytxt, name2);
           strcpy(name2, "006");
           strcat(name2, dummytxt);
-        } else if (streq(classname2, "Do")) {
+        }
+        else if (streq(classname2, "Do"))
+        {
           strcpy(dummytxt, name2);
           strcpy(name2, "007");
           strcat(name2, dummytxt);
-        } else if (streq(classname2, "Dv")) {
+        }
+        else if (streq(classname2, "Dv"))
+        {
           strcpy(dummytxt, name2);
           strcpy(name2, "008");
           strcat(name2, dummytxt);
         }
       }
 
-      if (type == 3) {
+      if (type == 3)
+      {
         /* Order first in classes and then in alpabeth order */
         strcpy(dummytxt, name1);
         strcpy(name1, "00000000000000000000");
@@ -1607,7 +1686,8 @@ static int utl_list_classsort(
         strcat(name2, dummytxt);
       }
 
-      if (strcmp(name1, name2) > 0) {
+      if (strcmp(name1, name2) > 0)
+      {
         /* Change order */
         *prev = next_ptr;
         list_ptr->next = next_ptr->next;
@@ -1624,25 +1704,24 @@ static int utl_list_classsort(
 }
 
 /*************************************************************************
-*
-* Name:		utl_ctx_new()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* utl_ctx	*utlctx		O	created utl context
-* ldh_tSesContext ldhses		I	ldh session;
-*
-* Description:
-*	Create a utl context.
-*
-**************************************************************************/
+ *
+ * Name:		utl_ctx_new()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * utl_ctx	*utlctx		O	created utl context
+ * ldh_tSesContext ldhses		I	ldh session;
+ *
+ * Description:
+ *	Create a utl context.
+ *
+ **************************************************************************/
 
-static void utl_ctx_new(utl_ctx* utlctx, ldh_tSesContext ldhses,
-    const char* page_title, int landscape)
+static void utl_ctx_new(utl_ctx* utlctx, ldh_tSesContext ldhses, const char* page_title, int landscape)
 {
   int sts;
-  int landscape_rows;
+  int landscape_rows = 0;
   int portrait_rows;
 
   /* Create the context */
@@ -1659,19 +1738,19 @@ static void utl_ctx_new(utl_ctx* utlctx, ldh_tSesContext ldhses,
 }
 
 /*************************************************************************
-*
-* Name:		utl_ctx_delete()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* utl_ctx	utlctx		I	utl context.
-*
-* Description:
-*	Delete a context.
-*	Free's all allocated memory in the utl context.
-*
-**************************************************************************/
+ *
+ * Name:		utl_ctx_delete()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * utl_ctx	utlctx		I	utl context.
+ *
+ * Description:
+ *	Delete a context.
+ *	Free's all allocated memory in the utl context.
+ *
+ **************************************************************************/
 
 static int utl_ctx_delete(utl_ctx utlctx)
 {
@@ -1681,8 +1760,10 @@ static int utl_ctx_delete(utl_ctx utlctx)
 
   /* Free sublists here !!! ... */
 
-  for (i = 0; i < UTL_LIST_MAX; i++) {
-    if (utlctx->list[i] != 0) {
+  for (i = 0; i < UTL_LIST_MAX; i++)
+  {
+    if (utlctx->list[i] != 0)
+    {
       utl_ctx_free_sublist(utlctx->list[i], utlctx->listcount[i]);
     }
   }
@@ -1691,25 +1772,27 @@ static int utl_ctx_delete(utl_ctx utlctx)
 }
 
 /*************************************************************************
-*
-* Name:		utl_ctx_free_sublist()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* utl_ctx	utlctx		I	utl context.
-*
-* Description:
-*	Free's allocated memory in a sublist.
-*
-**************************************************************************/
+ *
+ * Name:		utl_ctx_free_sublist()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * utl_ctx	utlctx		I	utl context.
+ *
+ * Description:
+ *	Free's allocated memory in a sublist.
+ *
+ **************************************************************************/
 
 static int utl_ctx_free_sublist(utl_t_list* list, int listcount)
 {
   int i;
 
-  for (i = 0; i < UTL_LIST_MAX; i++) {
-    if (list->sublistcount[i] != 0) {
+  for (i = 0; i < UTL_LIST_MAX; i++)
+  {
+    if (list->sublistcount[i] != 0)
+    {
       utl_ctx_free_sublist(list->sublist[i], list->sublistcount[i]);
     }
   }
@@ -1718,39 +1801,45 @@ static int utl_ctx_free_sublist(utl_t_list* list, int listcount)
 }
 
 /*************************************************************************
-*
-* Name:		utl_list_insert()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* utl_ctx	utlctx		I	utl context.
-*
-* Description:
-*	Insert the node in the list in utl context.
-*	Check first that the object is not already inserted.
-*
-**************************************************************************/
+ *
+ * Name:		utl_list_insert()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * utl_ctx	utlctx		I	utl context.
+ *
+ * Description:
+ *	Insert the node in the list in utl context.
+ *	Check first that the object is not already inserted.
+ *
+ **************************************************************************/
 
-static int utl_list_insert(utl_t_list** list, int* count, pwr_sAttrRef* arp,
-    unsigned long specification, int check, int dum)
+static int utl_list_insert(utl_t_list** list, int* count, pwr_sAttrRef* arp, unsigned long specification,
+                           int check, int dum)
 {
   int found;
   utl_t_list* list_ptr = NULL;
 
   /* Check if the attrref already is inserted */
   found = 0;
-  if (*list) {
+  if (*list)
+  {
     list_ptr = *list;
-    if (check) {
-      while (list_ptr->next) {
-        if (cdh_ArefIsEqual(&list_ptr->o, arp)) {
+    if (check)
+    {
+      while (list_ptr->next)
+      {
+        if (cdh_ArefIsEqual(&list_ptr->o, arp))
+        {
           found = 1;
           break;
         }
         list_ptr = list_ptr->next;
       }
-    } else {
+    }
+    else
+    {
       while (list_ptr->next)
         list_ptr = list_ptr->next;
     }
@@ -1759,12 +1848,15 @@ static int utl_list_insert(utl_t_list** list, int* count, pwr_sAttrRef* arp,
     return FOE__SUCCESS;
 
   /* The objdid was not found, insert it */
-  if (*list) {
+  if (*list)
+  {
     list_ptr->next = (utl_t_list*)calloc(1, sizeof(utl_t_list));
     if (list_ptr->next == 0)
       return FOE__NOMEMORY;
     list_ptr = list_ptr->next;
-  } else {
+  }
+  else
+  {
     list_ptr = (utl_t_list*)calloc(1, sizeof(utl_t_list));
     if (list_ptr == 0)
       return FOE__NOMEMORY;
@@ -1778,25 +1870,26 @@ static int utl_list_insert(utl_t_list** list, int* count, pwr_sAttrRef* arp,
 }
 
 /*************************************************************************
-*
-* Name:		utl_objidlist_free()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* utl_ctx	utlctx		I	utl context.
-*
-* Description:
-*	Free a utl short list.
-*
-**************************************************************************/
+ *
+ * Name:		utl_objidlist_free()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * utl_ctx	utlctx		I	utl context.
+ *
+ * Description:
+ *	Free a utl short list.
+ *
+ **************************************************************************/
 void utl_objidlist_free(utl_t_objidlist* list)
 {
   utl_t_objidlist* list_ptr;
   utl_t_objidlist* next_ptr;
 
   list_ptr = list;
-  while (list_ptr) {
+  while (list_ptr)
+  {
     next_ptr = list_ptr->next;
     free((char*)list_ptr);
     list_ptr = next_ptr;
@@ -1804,27 +1897,27 @@ void utl_objidlist_free(utl_t_objidlist* list)
 }
 
 /*************************************************************************
-*
-* Name:		utl_objidlist_insert()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* utl_ctx	utlctx		I	utl context.
-*
-* Description:
-*	Insert the node in a utl short list.
-*
-**************************************************************************/
+ *
+ * Name:		utl_objidlist_insert()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * utl_ctx	utlctx		I	utl context.
+ *
+ * Description:
+ *	Insert the node in a utl short list.
+ *
+ **************************************************************************/
 
-int utl_objidlist_insert(
-    pwr_sAttrRef* arp, void* l, void* c, void* dum1, void* dum2, void* dum3)
+int utl_objidlist_insert(pwr_sAttrRef* arp, void* l, void* c, void* dum1, void* dum2, void* dum3)
 {
   utl_t_objidlist* list_ptr;
   utl_t_objidlist** list = (utl_t_objidlist**)l;
   int* count = (int*)c;
 
-  if (*list) {
+  if (*list)
+  {
     list_ptr = *list;
     while (list_ptr->next)
       list_ptr = list_ptr->next;
@@ -1833,7 +1926,9 @@ int utl_objidlist_insert(
     if (list_ptr->next == 0)
       return FOE__NOMEMORY;
     list_ptr = list_ptr->next;
-  } else {
+  }
+  else
+  {
     list_ptr = (utl_t_objidlist*)calloc(1, sizeof(utl_t_objidlist));
     if (list_ptr == 0)
       return FOE__NOMEMORY;
@@ -1844,29 +1939,27 @@ int utl_objidlist_insert(
   return FOE__SUCCESS;
 }
 
-int utl_list_count(
-    pwr_tObjid Objdid, int* count, int dum1, int dum2, int dum3, int dum4)
+int utl_list_count(pwr_tObjid Objdid, int* count, int dum1, int dum2, int dum3, int dum4)
 {
   (*count)++;
   return FOE__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		utl_tableofcont_insert()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* utl_ctx	utlctx		I	utl context.
-*
-* Description:
-*	Insert the node in the table of contentes list in utl context.
-*
-**************************************************************************/
+ *
+ * Name:		utl_tableofcont_insert()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * utl_ctx	utlctx		I	utl context.
+ *
+ * Description:
+ *	Insert the node in the table of contentes list in utl context.
+ *
+ **************************************************************************/
 
-static int utl_tableofcont_insert(
-    utl_ctx utlctx, pwr_sAttrRef* arp, int segments, char* marginstr, int page)
+static int utl_tableofcont_insert(utl_ctx utlctx, pwr_sAttrRef* arp, int segments, char* marginstr, int page)
 {
   int size, sts;
   utl_t_contlist* list_ptr;
@@ -1882,7 +1975,8 @@ static int utl_tableofcont_insert(
   if (segments != 0)
     utl_cut_segments(hier_name, hier_name, segments);
 
-  if (utlctx->contlist) {
+  if (utlctx->contlist)
+  {
     list_ptr = utlctx->contlist;
     while (list_ptr->next)
       list_ptr = list_ptr->next;
@@ -1891,7 +1985,9 @@ static int utl_tableofcont_insert(
     if (list_ptr->next == 0)
       return FOE__NOMEMORY;
     list_ptr = list_ptr->next;
-  } else {
+  }
+  else
+  {
     list_ptr = (utl_t_contlist*)calloc(1, sizeof(utl_t_contlist));
     if (list_ptr == 0)
       return FOE__NOMEMORY;
@@ -1906,18 +2002,18 @@ static int utl_tableofcont_insert(
 }
 
 /*************************************************************************
-*
-* Name:		utl_tableofcont_print()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* utl_ctx	utlctx		I	utl context.
-*
-* Description:
-*	Print the table of contentes list in utl context.
-*
-**************************************************************************/
+ *
+ * Name:		utl_tableofcont_print()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * utl_ctx	utlctx		I	utl context.
+ *
+ * Description:
+ *	Print the table of contentes list in utl context.
+ *
+ **************************************************************************/
 
 static int utl_tableofcont_print(utl_ctx utlctx)
 {
@@ -1926,10 +2022,12 @@ static int utl_tableofcont_print(utl_ctx utlctx)
   char text[120];
 
   list_ptr = utlctx->contlist;
-  while (list_ptr) {
+  while (list_ptr)
+  {
     strcpy(text, list_ptr->text);
     strcat(text, " .");
-    for (j = strlen(list_ptr->text); j < 65; j++) {
+    for (j = strlen(list_ptr->text); j < 65; j++)
+    {
       strcat(text, ".");
     }
     u_print(utlctx, "%s", text);
@@ -1942,37 +2040,37 @@ static int utl_tableofcont_print(utl_ctx utlctx)
 }
 
 /*************************************************************************
-*
-* Name:		utl_ctxlist_insert()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description: 	Backcall routine used to insert an object into a list.
-*
-**************************************************************************/
+ *
+ * Name:		utl_ctxlist_insert()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description: 	Backcall routine used to insert an object into a list.
+ *
+ **************************************************************************/
 
-static int utl_ctxlist_insert(pwr_sAttrRef* arp, utl_t_list** list, int* count,
-    unsigned long specification, int check, int dum)
+static int utl_ctxlist_insert(pwr_sAttrRef* arp, utl_t_list** list, int* count, unsigned long specification,
+                              int check, int dum)
 {
   utl_list_insert(list, count, arp, specification, check, dum);
   return FOE__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		u_pagebreak()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* utl_ctx	utlctx		I	utl context.
-*
-* Description:
-*	Prints a page break.
-*
-**************************************************************************/
+ *
+ * Name:		u_pagebreak()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * utl_ctx	utlctx		I	utl context.
+ *
+ * Description:
+ *	Prints a page break.
+ *
+ **************************************************************************/
 
 static void u_pagebreak(utl_ctx utlctx)
 {
@@ -1983,12 +2081,14 @@ static void u_pagebreak(utl_ctx utlctx)
   else
     tabs = 5;
 
-  if (!utlctx->page_first) {
+  if (!utlctx->page_first)
+  {
     IF_OUT u_print(utlctx, utlctx->page_title);
     IF_OUT u_row(utlctx);
     utlctx->page_first = 1;
   }
-  if (utlctx->row >= utlctx->rows) {
+  if (utlctx->row >= utlctx->rows)
+  {
     IF_OUT u_print(utlctx, "\n");
     IF_OUT u_posit(utlctx, tabs, 0);
     IF_OUT u_print(utlctx, "- %d -\n\f", utlctx->page);
@@ -2005,18 +2105,18 @@ static void u_pagebreak(utl_ctx utlctx)
 }
 
 /*************************************************************************
-*
-* Name:		u_row()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* utl_ctx	utlctx		I	utl context.
-*
-* Description:
-*	Prints a new row.
-*
-**************************************************************************/
+ *
+ * Name:		u_row()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * utl_ctx	utlctx		I	utl context.
+ *
+ * Description:
+ *	Prints a new row.
+ *
+ **************************************************************************/
 
 static void u_row(utl_ctx utlctx)
 {
@@ -2025,18 +2125,18 @@ static void u_row(utl_ctx utlctx)
 }
 
 /*************************************************************************
-*
-* Name:		u_pageend()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* utl_ctx	utlctx		I	utl context.
-*
-* Description:
-*	Prints a page break on last page
-*
-**************************************************************************/
+ *
+ * Name:		u_pageend()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * utl_ctx	utlctx		I	utl context.
+ *
+ * Description:
+ *	Prints a page break on last page
+ *
+ **************************************************************************/
 
 static void u_pageend(utl_ctx utlctx)
 {
@@ -2059,22 +2159,23 @@ static void u_pageend(utl_ctx utlctx)
 }
 
 /*************************************************************************
-*
-* Name:		u_force_pagebreak()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* utl_ctx	utlctx		I	utl context.
-*
-* Description:
-*	Prints a page break
-*
-**************************************************************************/
+ *
+ * Name:		u_force_pagebreak()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * utl_ctx	utlctx		I	utl context.
+ *
+ * Description:
+ *	Prints a page break
+ *
+ **************************************************************************/
 
 static void u_force_pagebreak(utl_ctx utlctx)
 {
-  while (utlctx->row < utlctx->rows) {
+  while (utlctx->row < utlctx->rows)
+  {
     u_row(utlctx);
   }
 
@@ -2082,17 +2183,17 @@ static void u_force_pagebreak(utl_ctx utlctx)
 }
 
 /*************************************************************************
-*
-* Name:		u_header()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-*
-* Description: Prints a header.
-*
-**************************************************************************/
+ *
+ * Name:		u_header()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ *
+ * Description: Prints a header.
+ *
+ **************************************************************************/
 
 static void u_header(utl_ctx utlctx, ldh_tSesContext ldhses, const char* title)
 {
@@ -2126,16 +2227,16 @@ static void u_header(utl_ctx utlctx, ldh_tSesContext ldhses, const char* title)
 }
 
 /*************************************************************************
-*
-* Name:		u_subheader()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		u_subheader()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
 
 static void u_subheader(utl_ctx utlctx, const char* title, const char* spec)
 {
@@ -2146,10 +2247,13 @@ static void u_subheader(utl_ctx utlctx, const char* title, const char* spec)
   char* s;
   int row;
 
-  if (utlctx->landscape) {
+  if (utlctx->landscape)
+  {
     tabs = 8;
     max_spec = 46;
-  } else {
+  }
+  else
+  {
     tabs = 4;
     max_spec = 31;
   }
@@ -2157,15 +2261,19 @@ static void u_subheader(utl_ctx utlctx, const char* title, const char* spec)
   IF_OUT u_posit(utlctx, tabs, 0);
   if (title != 0)
     IF_OUT u_print(utlctx, "%s", title);
-  if (spec != 0) {
+  if (spec != 0)
+  {
     row = 0;
     offs = 0;
-    while (offs < (int)strlen(spec)) {
+    while (offs < (int)strlen(spec))
+    {
       strncpy(str, spec + offs, max_spec);
       str[max_spec] = 0;
-      if (strlen(str) < strlen(spec + offs)) {
+      if (strlen(str) < strlen(spec + offs))
+      {
         s = strrchr(str, ',');
-        if (s != 0) {
+        if (s != 0)
+        {
           s++;
           *s = 0;
         }
@@ -2184,16 +2292,16 @@ static void u_subheader(utl_ctx utlctx, const char* title, const char* spec)
 }
 
 /*************************************************************************
-*
-* Name:		u_posit()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		u_posit()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
 
 static void u_posit(utl_ctx utlctx, int tabs, int len)
 {
@@ -2213,26 +2321,26 @@ static void u_posit(utl_ctx utlctx, int tabs, int len)
 }
 
 /*************************************************************************
-*
-* Name:		u_open()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		u_open()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-static int u_open(
-    utl_ctx utlctx, const char* filename, int terminal, int append)
+static int u_open(utl_ctx utlctx, const char* filename, int terminal, int append)
 {
   pwr_tFileName fname;
 
   /* Open file */
   if (*filename == '\0')
     utlctx->output_file = NULL;
-  else {
+  else
+  {
     dcli_translate_filename(fname, filename);
     if (append)
       utlctx->output_file = fopen(fname, "a");
@@ -2250,33 +2358,30 @@ static int u_open(
 }
 
 /*************************************************************************
-*
-* Name:		u_close()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		u_close()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-static void u_close(utl_ctx utlctx)
-{
-  IF_OUT fclose(utlctx->output_file);
-}
+static void u_close(utl_ctx utlctx) { IF_OUT fclose(utlctx->output_file); }
 
 /*************************************************************************
-*
-* Name:		u_print()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		u_print()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
 
 static void u_print(utl_ctx utlctx, const char* format, ...)
 {
@@ -2289,17 +2394,17 @@ static void u_print(utl_ctx utlctx, const char* format, ...)
 }
 
 /*************************************************************************
-*
-* Name:		utl_show_node()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-*
-* Description: Prints all objects of class $Node found in the database.
-*
-**************************************************************************/
+ *
+ * Name:		utl_show_node()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ *
+ * Description: Prints all objects of class $Node found in the database.
+ *
+ **************************************************************************/
 
 int utl_show_node(ldh_tSesContext ldhses, int terminal, char* filename)
 {
@@ -2314,7 +2419,8 @@ int utl_show_node(ldh_tSesContext ldhses, int terminal, char* filename)
   /* Open file */
   utl_ctx_new(&utlctx, ldhses, "", UTL_PORTRAIT);
   sts = u_open(utlctx, filename, terminal, 0);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     utl_ctx_delete(utlctx);
     return sts;
   }
@@ -2328,10 +2434,10 @@ int utl_show_node(ldh_tSesContext ldhses, int terminal, char* filename)
     return sts;
 
   rtnodelist_ptr = rtnodelist;
-  for (i = 0; i < (int)rtnode_count; i++) {
+  for (i = 0; i < (int)rtnode_count; i++)
+  {
     /* Get the name of the connected object */
-    sts = ldh_ObjidToName(ldhses, *rtnodelist_ptr, ldh_eName_Hierarchy,
-        hier_name, sizeof(hier_name), &size);
+    sts = ldh_ObjidToName(ldhses, *rtnodelist_ptr, ldh_eName_Hierarchy, hier_name, sizeof(hier_name), &size);
 
     IF_OUT u_pagebreak(utlctx);
     u_print(utlctx, "  %s", hier_name);
@@ -2354,17 +2460,17 @@ int utl_show_node(ldh_tSesContext ldhses, int terminal, char* filename)
 }
 
 /*************************************************************************
-*
-* Name:		utl_show_plcpgm()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-*
-* Description: 	Prints all Plcpgm objects in a volume.
-*
-**************************************************************************/
+ *
+ * Name:		utl_show_plcpgm()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ *
+ * Description: 	Prints all Plcpgm objects in a volume.
+ *
+ **************************************************************************/
 
 int utl_show_plcpgm(ldh_tSesContext ldhses, int terminal, char* filename)
 {
@@ -2380,7 +2486,8 @@ int utl_show_plcpgm(ldh_tSesContext ldhses, int terminal, char* filename)
   /* Open file */
   utl_ctx_new(&utlctx, ldhses, "", UTL_PORTRAIT);
   sts = u_open(utlctx, filename, terminal, 0);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     utl_ctx_delete(utlctx);
     return sts;
   }
@@ -2396,13 +2503,12 @@ int utl_show_plcpgm(ldh_tSesContext ldhses, int terminal, char* filename)
     return sts;
 
   plclist_ptr = plclist;
-  for (j = 0; j < (int)plc_count; j++) {
+  for (j = 0; j < (int)plc_count; j++)
+  {
     /* Get the name of the connected object */
-    sts = ldh_ObjidToName(ldhses, *plclist_ptr, ldh_eName_Hierarchy, hier_name,
-        sizeof(hier_name), &size);
+    sts = ldh_ObjidToName(ldhses, *plclist_ptr, ldh_eName_Hierarchy, hier_name, sizeof(hier_name), &size);
     /* Get the scantime */
-    sts = ldh_GetObjectPar(ldhses, *plclist_ptr, "DevBody", "ScanTime",
-        (char**)&scantime_ptr, &size);
+    sts = ldh_GetObjectPar(ldhses, *plclist_ptr, "DevBody", "ScanTime", (char**)&scantime_ptr, &size);
     if (EVEN(sts))
       return sts;
 
@@ -2429,21 +2535,20 @@ int utl_show_plcpgm(ldh_tSesContext ldhses, int terminal, char* filename)
 }
 
 /*************************************************************************
-*
-* Name:		utl_show_window()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* char *	plcstring	I	Name of Plcpgm object
-*
-* Description: 	Prints all windows found in a plcpgm.
-*
-**************************************************************************/
+ *
+ * Name:		utl_show_window()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * char *	plcstring	I	Name of Plcpgm object
+ *
+ * Description: 	Prints all windows found in a plcpgm.
+ *
+ **************************************************************************/
 
-int utl_show_window(
-    ldh_tSesContext ldhses, char* plcstring, int terminal, char* filename)
+int utl_show_window(ldh_tSesContext ldhses, char* plcstring, int terminal, char* filename)
 {
   utl_ctx utlctx;
   int sts, size;
@@ -2457,14 +2562,16 @@ int utl_show_window(
 
   /* Get objdid for the plcpgm */
   sts = ldh_NameToObjid(ldhses, &plc, plcstring);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     return FOE__PLCNOTFOUND;
   }
 
   /* Open file */
   utl_ctx_new(&utlctx, ldhses, "", UTL_PORTRAIT);
   sts = u_open(utlctx, filename, terminal, 0);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     utl_ctx_delete(utlctx);
     return sts;
   }
@@ -2486,11 +2593,11 @@ int utl_show_window(
     return sts;
 
   windlist_ptr = windlist;
-  for (i = 0; i < (int)wind_count; i++) {
+  for (i = 0; i < (int)wind_count; i++)
+  {
     IF_OUT u_pagebreak(utlctx);
     /* Get the name of the object */
-    sts = ldh_ObjidToName(ldhses, *windlist_ptr, ldh_eName_Hierarchy, hier_name,
-        sizeof(hier_name), &size);
+    sts = ldh_ObjidToName(ldhses, *windlist_ptr, ldh_eName_Hierarchy, hier_name, sizeof(hier_name), &size);
     u_print(utlctx, "  %s", hier_name);
     u_row(utlctx);
     windlist_ptr++;
@@ -2508,23 +2615,23 @@ int utl_show_window(
 }
 
 /*************************************************************************
-*
-* Name:		utl_show_modules()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* char *	objdid		I	Objdid of the window or plcpgm
-* char *	name		I	Name of the window or plcpgm
-*
-* Description: show modules from the library pwrp_lib:ra_plc.olb_eln.
-* If name is send should only the modules with that name.
-*
-**************************************************************************/
+ *
+ * Name:		utl_show_modules()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * char *	objdid		I	Objdid of the window or plcpgm
+ * char *	name		I	Name of the window or plcpgm
+ *
+ * Description: show modules from the library pwrp_lib:ra_plc.olb_eln.
+ * If name is send should only the modules with that name.
+ *
+ **************************************************************************/
 
-int utl_show_modules(ldh_tSesContext ldhses, char* objdidstr, char* name,
-    char* hiername, int terminal, char* filename)
+int utl_show_modules(ldh_tSesContext ldhses, char* objdidstr, char* name, char* hiername, int terminal,
+                     char* filename)
 {
   pwr_tTime comp_time;
   pwr_tTime mod_time;
@@ -2547,18 +2654,17 @@ int utl_show_modules(ldh_tSesContext ldhses, char* objdidstr, char* name,
   int modification;
   pwr_mOpSys os;
   pwr_sAttrRef aref;
-  char title[]
-      = "   Object				          Saved               "
-        "Compiled";
+  char title[] = "   Object				          Saved               "
+                 "Compiled";
 
-  if (objdidstr != 0) {
+  if (objdidstr != 0)
+  {
     sts = vldh_StrToId(objdidstr, &objdid);
     if (EVEN(sts))
       return sts;
 
     /* Get the name of the object */
-    sts = ldh_ObjidToName(ldhses, objdid, ldh_eName_Hierarchy, hier_name,
-        sizeof(hier_name), &size);
+    sts = ldh_ObjidToName(ldhses, objdid, ldh_eName_Hierarchy, hier_name, sizeof(hier_name), &size);
     if (EVEN(sts))
       return FOE__OBJECT;
     name = hier_name;
@@ -2573,41 +2679,47 @@ int utl_show_modules(ldh_tSesContext ldhses, char* objdidstr, char* name,
   classp = class_vect;
 
   /* Check if hierarchy */
-  if (hiername != NULL) {
+  if (hiername != NULL)
+  {
     /* Get objdid for the hierarchy object */
     sts = ldh_NameToObjid(ldhses, &hierobjdid, hiername);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       return FOE__HIERNAME;
     }
-  } else
+  }
+  else
     hierobjdid = pwr_cNObjid;
 
   utl_ctx_new(&utlctx, ldhses, title, UTL_LANDSCAPE);
 
   /* Check if name */
-  if (name != NULL) {
+  if (name != NULL)
+  {
     /* Check that name includes a wildcard */
     s = strchr(name, '*');
-    if (s == 0) {
+    if (s == 0)
+    {
       /* Print this object */
       /* Get objdid for the object */
       sts = ldh_NameToObjid(ldhses, &objdid, name);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         return FOE__OBJECT;
       }
       aref = cdh_ObjidToAref(objdid);
-      utl_ctxlist_insert(
-          &aref, &(utlctx->list[0]), &(utlctx->listcount[0]), 0, 0, 0);
+      utl_ctxlist_insert(&aref, &(utlctx->list[0]), &(utlctx->listcount[0]), 0, 0, 0);
       if (EVEN(sts))
         return sts;
       single_object = 1;
     }
   }
 
-  if (!single_object) {
+  if (!single_object)
+  {
     sts = trv_get_attrobjects(ldhses, hierobjdid, classp, name, trv_eDepth_Deep,
-        (trv_tBcFunc)utl_ctxlist_insert, &(utlctx->list[0]),
-        &(utlctx->listcount[0]), 0, 0, 0);
+                              (trv_tBcFunc)utl_ctxlist_insert, &(utlctx->list[0]), &(utlctx->listcount[0]), 0,
+                              0, 0);
     if (EVEN(sts))
       return sts;
   }
@@ -2615,7 +2727,8 @@ int utl_show_modules(ldh_tSesContext ldhses, char* objdidstr, char* name,
 
   /* Open file */
   sts = u_open(utlctx, filename, terminal, 0);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     utl_ctx_delete(utlctx);
     return sts;
   }
@@ -2634,52 +2747,56 @@ int utl_show_modules(ldh_tSesContext ldhses, char* objdidstr, char* name,
     u_row(utlctx);
 
   list_ptr = utlctx->list[0];
-  while (list_ptr) {
+  while (list_ptr)
+  {
     objdid = list_ptr->o.Objid;
 
     /* Get the name of the object */
-    sts = ldh_ObjidToName(ldhses, objdid, ldh_eName_Hierarchy, hier_name,
-        sizeof(hier_name), &size);
+    sts = ldh_ObjidToName(ldhses, objdid, ldh_eName_Hierarchy, hier_name, sizeof(hier_name), &size);
     if (EVEN(sts))
       return sts;
 
     sts = gcg_wind_to_operating_system(ldhses, objdid, &os);
 
     /* Get modification time in parameter Modified */
-    comp_sts = ldh_GetObjectPar(
-        ldhses, objdid, "DevBody", "Compiled", (char**)&comp_time_ptr, &size);
-    if (ODD(comp_sts)) {
+    comp_sts = ldh_GetObjectPar(ldhses, objdid, "DevBody", "Compiled", (char**)&comp_time_ptr, &size);
+    if (ODD(comp_sts))
+    {
       memcpy(&comp_time, comp_time_ptr, sizeof(comp_time));
       /* Convert to ascii */
-      sts = time_AtoAscii(comp_time_ptr, time_eFormat_DateAndTime,
-          comp_time_str, sizeof(comp_time_str));
+      sts = time_AtoAscii(comp_time_ptr, time_eFormat_DateAndTime, comp_time_str, sizeof(comp_time_str));
       if (EVEN(sts))
         strcpy(comp_time_str, "-");
-      else {
+      else
+      {
         comp_time_str[20] = 0;
         strcpy(&comp_time_str[7], &comp_time_str[9]);
       }
       free((char*)comp_time_ptr);
-    } else {
+    }
+    else
+    {
       strcpy(comp_time_str, "-");
     }
 
     /* Get modification time in parameter Modified */
-    mod_sts = ldh_GetObjectPar(
-        ldhses, objdid, "DevBody", "Modified", (char**)&mod_time_ptr, &size);
-    if (ODD(mod_sts)) {
+    mod_sts = ldh_GetObjectPar(ldhses, objdid, "DevBody", "Modified", (char**)&mod_time_ptr, &size);
+    if (ODD(mod_sts))
+    {
       memcpy(&mod_time, mod_time_ptr, sizeof(mod_time));
       /* Convert to ascii */
-      sts = time_AtoAscii(mod_time_ptr, time_eFormat_DateAndTime, mod_time_str,
-          sizeof(mod_time_str));
+      sts = time_AtoAscii(mod_time_ptr, time_eFormat_DateAndTime, mod_time_str, sizeof(mod_time_str));
       if (EVEN(sts))
         strcpy(mod_time_str, "-");
-      else {
+      else
+      {
         mod_time_str[20] = 0;
         strcpy(&mod_time_str[7], &mod_time_str[9]);
       }
       free((char*)mod_time_ptr);
-    } else {
+    }
+    else
+    {
       strcpy(mod_time_str, "-");
     }
 
@@ -2710,24 +2827,24 @@ int utl_show_modules(ldh_tSesContext ldhses, char* objdidstr, char* name,
 }
 
 /*************************************************************************
-*
-* Name:		utl_show_object()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* char *	windowstring	I	Name of the window or plcpgm
-* unsigned long	sendobjdid	I	Objdid of the window.
-*
-* Description: 	Print all objects ( not connectionsobjects)
-*		found in a window. Either the
-*		name of the window or the objdid can be sent as input.
-*
-**************************************************************************/
+ *
+ * Name:		utl_show_object()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * char *	windowstring	I	Name of the window or plcpgm
+ * unsigned long	sendobjdid	I	Objdid of the window.
+ *
+ * Description: 	Print all objects ( not connectionsobjects)
+ *		found in a window. Either the
+ *		name of the window or the objdid can be sent as input.
+ *
+ **************************************************************************/
 
-int utl_show_object(ldh_tSesContext ldhses, char* windowstring,
-    pwr_tObjid sendobjdid, int terminal, char* filename)
+int utl_show_object(ldh_tSesContext ldhses, char* windowstring, pwr_tObjid sendobjdid, int terminal,
+                    char* filename)
 {
   utl_ctx utlctx = NULL;
   int sts, size;
@@ -2741,17 +2858,20 @@ int utl_show_object(ldh_tSesContext ldhses, char* windowstring,
   pwr_tObjid* objectlist_ptr;
   char objidstr[80];
 
-  if (cdh_ObjidIsNull(sendobjdid)) {
+  if (cdh_ObjidIsNull(sendobjdid))
+  {
     /* Get objdid for the plcpgm */
     sts = ldh_NameToObjid(ldhses, &window, windowstring);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       return FOE__WINDNOTFOUND;
     }
 
     /* Open file */
     utl_ctx_new(&utlctx, ldhses, "", UTL_PORTRAIT);
     sts = u_open(utlctx, filename, terminal, 0);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       utl_ctx_delete(utlctx);
       return sts;
     }
@@ -2768,17 +2888,18 @@ int utl_show_object(ldh_tSesContext ldhses, char* windowstring,
       return sts;
 
     objectlist_ptr = objectlist;
-
-  } else {
+  }
+  else
+  {
     /* an objdid has been send */
     object_count = 1;
     objectlist_ptr = &sendobjdid;
   }
 
-  for (i = 0; i < (int)object_count; i++, objectlist_ptr++) {
+  for (i = 0; i < (int)object_count; i++, objectlist_ptr++)
+  {
     /* Get the name of the object */
-    sts = ldh_ObjidToName(ldhses, *objectlist_ptr, ldh_eName_Hierarchy,
-        hier_name, sizeof(hier_name), &size);
+    sts = ldh_ObjidToName(ldhses, *objectlist_ptr, ldh_eName_Hierarchy, hier_name, sizeof(hier_name), &size);
     if (EVEN(sts))
       return sts;
 
@@ -2788,12 +2909,11 @@ int utl_show_object(ldh_tSesContext ldhses, char* windowstring,
       return sts;
 
     /* Get the name of the class object */
-    sts = ldh_ObjidToName(ldhses, cdh_ClassIdToObjid(cid), ldh_eName_Object,
-        class_hier_name, sizeof(class_hier_name), &size);
+    sts = ldh_ObjidToName(ldhses, cdh_ClassIdToObjid(cid), ldh_eName_Object, class_hier_name,
+                          sizeof(class_hier_name), &size);
     if (EVEN(sts))
       return sts;
-    sts = ldh_ObjidToName(ldhses, *objectlist_ptr, ldh_eName_Object, objidstr,
-        sizeof(objidstr), &size);
+    sts = ldh_ObjidToName(ldhses, *objectlist_ptr, ldh_eName_Object, objidstr, sizeof(objidstr), &size);
     if (EVEN(sts))
       return sts;
 
@@ -2803,7 +2923,8 @@ int utl_show_object(ldh_tSesContext ldhses, char* windowstring,
     u_print(utlctx, " %s   %s", objidstr, class_hier_name);
     u_row(utlctx);
   }
-  if (cdh_ObjidIsNull(sendobjdid)) {
+  if (cdh_ObjidIsNull(sendobjdid))
+  {
     if (object_count > 0)
       free((char*)objectlist);
   }
@@ -2819,28 +2940,29 @@ int utl_show_object(ldh_tSesContext ldhses, char* windowstring,
 }
 
 /*************************************************************************
-*
-* Name:		utl_set_object_parameter()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* char *	hiername	I	Name of a object in the hierarchy.
-* char *	class		I	Name of the class.
-*
-*
-* Description: 	Prints all objects of a specified class that is found
-*		below a specific object in the hierarchy.
-*
-**************************************************************************/
+ *
+ * Name:		utl_set_object_parameter()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * char *	hiername	I	Name of a object in the hierarchy.
+ * char *	class		I	Name of the class.
+ *
+ *
+ * Description: 	Prints all objects of a specified class that is found
+ *		below a specific object in the hierarchy.
+ *
+ **************************************************************************/
 
 int utl_revert(ldh_tSesContext ldhses, int confirm)
 {
   char ans;
   int sts;
 
-  if (confirm) {
+  if (confirm)
+  {
     // TODO
     printf("[Y/n]: ");
     scanf("%c", &ans);
@@ -2854,25 +2976,25 @@ int utl_revert(ldh_tSesContext ldhses, int confirm)
 }
 
 /*************************************************************************
-*
-* Name:		utl_set_object_parameter()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* char *	hiername	I	Name of a object in the hierarchy.
-* char *	class		I	Name of the class.
-*
-*
-* Description: 	Prints all objects of a specified class that is found
-*		below a specific object in the hierarchy.
-*
-**************************************************************************/
+ *
+ * Name:		utl_set_object_parameter()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * char *	hiername	I	Name of a object in the hierarchy.
+ * char *	class		I	Name of the class.
+ *
+ *
+ * Description: 	Prints all objects of a specified class that is found
+ *		below a specific object in the hierarchy.
+ *
+ **************************************************************************/
 
-int utl_set_object_parameter(ldh_tSesContext ldhses, char* hiername,
-    char* classname, char* name, char* parameter, char* valuestr, int terminal,
-    const char* filename, int confirm, int log, int ignore_missing)
+int utl_set_object_parameter(ldh_tSesContext ldhses, char* hiername, char* classname, char* name,
+                             char* parameter, char* valuestr, int terminal, const char* filename, int confirm,
+                             int log, int ignore_missing)
 {
   utl_ctx utlctx;
   int sts, i;
@@ -2888,71 +3010,87 @@ int utl_set_object_parameter(ldh_tSesContext ldhses, char* hiername,
   int nr;
   pwr_sAttrRef aref;
 
-  if (name != NULL) {
-    if ((strchr(name, '*') != 0) && (classname == NULL)
-        && (parameter != NULL)) {
+  if (name != NULL)
+  {
+    if ((strchr(name, '*') != 0) && (classname == NULL) && (parameter != NULL))
+    {
       /* Wildcard and no class is not allowed for show parameter */
       return FOE__CLASSQUAL;
     }
   }
 
   /* Check if class */
-  if (classname != NULL) {
-    nr = utl_parse(classname, ", ", "", (char*)class_str,
-        sizeof(class_str) / sizeof(class_str[0]), sizeof(class_str[0]));
+  if (classname != NULL)
+  {
+    nr = utl_parse(classname, ", ", "", (char*)class_str, sizeof(class_str) / sizeof(class_str[0]),
+                   sizeof(class_str[0]));
     if ((nr == 0) || (nr > UTL_INPUTLIST_MAX))
       return FOE__CLASSYNT;
 
-    for (i = 0; i < nr; i++) {
+    for (i = 0; i < nr; i++)
+    {
       sts = ldh_ClassNameToId(ldhses, &class_vect[i], class_str[i]);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         return FOE__CLASSNAME;
       }
     }
     class_vect[nr] = 0;
     classp = class_vect;
-  } else
+  }
+  else
     classp = 0;
 
   /* Check if hierarchy */
-  if (hiername != NULL) {
+  if (hiername != NULL)
+  {
     /* Get objdid for the hierarchy object */
     sts = ldh_NameToObjid(ldhses, &hierobjdid, hiername);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       return FOE__HIERNAME;
     }
-  } else
+  }
+  else
     hierobjdid = pwr_cNObjid;
 
   /* Check index in parameter */
   s = strchr(parameter, '[');
   if (s == 0)
     element = UTL_NOELEMENT;
-  else {
+  else
+  {
     t = strchr(parameter, ']');
-    if (t == 0) {
+    if (t == 0)
+    {
       return FOE__PARSYNT;
-    } else {
+    }
+    else
+    {
       len = t - s - 1;
       strncpy(elementstr, s + 1, len);
       elementstr[len] = 0;
       sscanf(elementstr, "%d", &element);
       *s = '\0';
-      if ((element < 0) || (element > 10000)) {
+      if ((element < 0) || (element > 10000))
+      {
         return FOE__PARELSYNT;
       }
     }
   }
 
   /* Check if name */
-  if (name != NULL) {
+  if (name != NULL)
+  {
     /* Check that name includes a wildcard */
     s = strchr(name, '*');
-    if (s == 0) {
+    if (s == 0)
+    {
       /* Print this object */
       /* Get objdid for the object */
       sts = ldh_NameToAttrRef(ldhses, name, &aref);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         return FOE__OBJECT;
       }
       utl_ctx_new(&utlctx, ldhses, "", UTL_PORTRAIT);
@@ -2960,7 +3098,8 @@ int utl_set_object_parameter(ldh_tSesContext ldhses, char* hiername,
       utlctx->ignore_missing = ignore_missing;
       utlctx->log = log;
       sts = u_open(utlctx, filename, terminal, 0);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         utl_ctx_delete(utlctx);
         return sts;
       }
@@ -2969,8 +3108,7 @@ int utl_set_object_parameter(ldh_tSesContext ldhses, char* hiername,
       IF_OUT u_subheader(utlctx, "Name", name);
       IF_OUT u_row(utlctx);
 
-      sts = utl_set_parameter(
-          &aref, ldhses, parameter, valuestr, element, utlctx);
+      sts = utl_set_parameter(&aref, ldhses, parameter, valuestr, element, utlctx);
       if (sts != FOE__ABORTSEARCH)
         if (EVEN(sts))
           return sts;
@@ -2988,7 +3126,8 @@ int utl_set_object_parameter(ldh_tSesContext ldhses, char* hiername,
   utlctx->ignore_missing = ignore_missing;
   utlctx->log = log;
   sts = u_open(utlctx, filename, terminal, 0);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     utl_ctx_delete(utlctx);
     return sts;
   }
@@ -3002,9 +3141,8 @@ int utl_set_object_parameter(ldh_tSesContext ldhses, char* hiername,
     IF_OUT u_subheader(utlctx, "Name", name);
   IF_OUT u_row(utlctx);
 
-  sts = trv_get_objects_hier_class_name(ldhses, hierobjdid, classp, name,
-      (trv_tBcFunc)utl_set_parameter, ldhses, parameter, valuestr,
-      (void*)((long int)element), utlctx);
+  sts = trv_get_objects_hier_class_name(ldhses, hierobjdid, classp, name, (trv_tBcFunc)utl_set_parameter,
+                                        ldhses, parameter, valuestr, (void*)((long int)element), utlctx);
   if (sts != FOE__ABORTSEARCH)
     if (EVEN(sts))
       return sts;
@@ -3016,25 +3154,25 @@ int utl_set_object_parameter(ldh_tSesContext ldhses, char* hiername,
 }
 
 /*************************************************************************
-*
-* Name:		utl_show_objects_hier_class_name()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* char *	hiername	I	Name of a object in the hierarchy.
-* char *	class		I	Name of the class.
-*
-*
-* Description: 	Prints all objects of a specified class that is found
-*		below a specific object in the hierarchy.
-*
-**************************************************************************/
+ *
+ * Name:		utl_show_objects_hier_class_name()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * char *	hiername	I	Name of a object in the hierarchy.
+ * char *	class		I	Name of the class.
+ *
+ *
+ * Description: 	Prints all objects of a specified class that is found
+ *		below a specific object in the hierarchy.
+ *
+ **************************************************************************/
 
-int utl_show_obj_hier_class_name(ldh_tSesContext ldhses, char* hiername,
-    char* classname, char* name, char* parameter, char* volume, int terminal,
-    char* filename, int full, int allvolumes, int append, int exactorder)
+int utl_show_obj_hier_class_name(ldh_tSesContext ldhses, char* hiername, char* classname, char* name,
+                                 char* parameter, char* volume, int terminal, char* filename, int full,
+                                 int allvolumes, int append, int exactorder)
 {
   utl_ctx utlctx;
   int sts, i;
@@ -3058,68 +3196,82 @@ int utl_show_obj_hier_class_name(ldh_tSesContext ldhses, char* hiername,
   pwr_tClassId vol_class;
   pwr_tVolumeId vol_id;
   pwr_sAttrRef aref;
-  char page_title[]
-      = "  Object							 Class";
+  char page_title[] = "  Object							 Class";
 
-  if (name != NULL) {
-    if ((strchr(name, '*') != 0) && (classname == NULL)
-        && (parameter != NULL)) {
+  if (name != NULL)
+  {
+    if ((strchr(name, '*') != 0) && (classname == NULL) && (parameter != NULL))
+    {
       /* Wildcard and no class is not allowed for show parameter */
       return FOE__CLASSQUAL;
     }
   }
 
   /* Check if class */
-  if (classname != NULL) {
-    nr = utl_parse(classname, ", ", "", (char*)class_str,
-        sizeof(class_str) / sizeof(class_str[0]), sizeof(class_str[0]));
+  if (classname != NULL)
+  {
+    nr = utl_parse(classname, ", ", "", (char*)class_str, sizeof(class_str) / sizeof(class_str[0]),
+                   sizeof(class_str[0]));
     if ((nr == 0) || (nr > UTL_INPUTLIST_MAX))
       return FOE__CLASSYNT;
 
-    for (i = 0; i < nr; i++) {
+    for (i = 0; i < nr; i++)
+    {
       sts = ldh_ClassNameToId(ldhses, &class_vect[i], class_str[i]);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         return FOE__CLASSNAME;
       }
     }
     class_vect[nr] = 0;
     classp = class_vect;
-  } else
+  }
+  else
     classp = 0;
 
   /* Check if hierarchy */
-  if (hiername != NULL) {
+  if (hiername != NULL)
+  {
     /* Get objdid for the hierarchy object */
     sts = ldh_NameToObjid(ldhses, &hierobjdid, hiername);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       return FOE__HIERNAME;
     }
-  } else
+  }
+  else
     hierobjdid = pwr_cNObjid;
 
-  if (parameter != NULL) {
-    nr = utl_parse(parameter, ", ", "", (char*)par_str,
-        sizeof(par_str) / sizeof(par_str[0]), sizeof(par_str[0]));
+  if (parameter != NULL)
+  {
+    nr = utl_parse(parameter, ", ", "", (char*)par_str, sizeof(par_str) / sizeof(par_str[0]),
+                   sizeof(par_str[0]));
     par_str[nr][0] = 0;
     if ((nr == 0) || (nr > UTL_INPUTLIST_MAX))
       return FOE__PARSYNT;
 
-    for (i = 0; i < nr; i++) {
+    for (i = 0; i < nr; i++)
+    {
       /* Check index in parameter */
       s = strchr(par_str[i], '[');
       if (s == 0)
         element[i] = UTL_NOELEMENT;
-      else {
+      else
+      {
         t = strchr(par_str[i], ']');
-        if (t == 0) {
+        if (t == 0)
+        {
           return FOE__PARSYNT;
-        } else {
+        }
+        else
+        {
           len = t - s - 1;
           strncpy(elementstr, s + 1, len);
           elementstr[len] = 0;
           sscanf(elementstr, "%d", &element[i]);
           *s = '\0';
-          if ((element[i] < 0) || (element[i] > 100)) {
+          if ((element[i] < 0) || (element[i] > 100))
+          {
             return FOE__PARELSYNT;
           }
         }
@@ -3127,35 +3279,39 @@ int utl_show_obj_hier_class_name(ldh_tSesContext ldhses, char* hiername,
     }
   }
 
-  if (volume != NULL) {
+  if (volume != NULL)
+  {
     /* Parse the volumestr */
-    nr = utl_parse(volume, ", ", "", (char*)vol_str,
-        sizeof(vol_str) / sizeof(vol_str[0]), sizeof(vol_str[0]));
+    nr =
+        utl_parse(volume, ", ", "", (char*)vol_str, sizeof(vol_str) / sizeof(vol_str[0]), sizeof(vol_str[0]));
     if ((nr == 0) || (nr > UTL_INPUTLIST_MAX))
       return FOE__PARSYNT;
 
-    for (i = 0; i < nr; i++) {
-      sts = ldh_VolumeNameToId(
-          ldh_SessionToWB(ldhses), vol_str[i], &volume_vect[i]);
+    for (i = 0; i < nr; i++)
+    {
+      sts = ldh_VolumeNameToId(ldh_SessionToWB(ldhses), vol_str[i], &volume_vect[i]);
       if (EVEN(sts))
         return sts;
     }
     volume_vect[nr] = 0;
     volume_p = volume_vect;
-  } else
+  }
+  else
     volume_p = 0;
 
-  if (allvolumes) {
+  if (allvolumes)
+  {
     /* Get all volumes that is not class and wb volumes */
     i = 0;
     sts = ldh_GetVolumeList(ldh_SessionToWB(ldhses), &vol_id);
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       sts = ldh_GetVolumeClass(ldh_SessionToWB(ldhses), vol_id, &vol_class);
       if (EVEN(sts))
         return sts;
 
-      if (!(vol_class == pwr_eClass_ClassVolume
-              || vol_class == pwr_eClass_WorkBenchVolume)) {
+      if (!(vol_class == pwr_eClass_ClassVolume || vol_class == pwr_eClass_WorkBenchVolume))
+      {
         volume_vect[i] = vol_id;
         i++;
         if (i > UTL_INPUTLIST_MAX)
@@ -3168,20 +3324,24 @@ int utl_show_obj_hier_class_name(ldh_tSesContext ldhses, char* hiername,
   }
 
   /* Check if name */
-  if (name != NULL) {
+  if (name != NULL)
+  {
     /* Check that name includes a wildcard */
     s = strchr(name, '*');
-    if (s == 0) {
+    if (s == 0)
+    {
       /* Print this object */
       /* Get objdid for the object */
       sts = ldh_NameToObjid(ldhses, &objdid, name);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         return FOE__OBJECT;
       }
       aref = cdh_ObjidToAref(objdid);
       utl_ctx_new(&utlctx, ldhses, page_title, UTL_PORTRAIT);
       sts = u_open(utlctx, filename, terminal, append);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         utl_ctx_delete(utlctx);
         return sts;
       }
@@ -3212,8 +3372,8 @@ int utl_show_obj_hier_class_name(ldh_tSesContext ldhses, char* hiername,
   if (EVEN(sts))
     return sts;
 
-  sts = trv_object_search(trvctx, (trv_tBcFunc)utl_ctxlist_insert,
-      &(utlctx->list[0]), &(utlctx->listcount[0]), 0, 0, 0);
+  sts = trv_object_search(trvctx, (trv_tBcFunc)utl_ctxlist_insert, &(utlctx->list[0]),
+                          &(utlctx->listcount[0]), 0, 0, 0);
   if (EVEN(sts))
     return sts;
 
@@ -3224,7 +3384,8 @@ int utl_show_obj_hier_class_name(ldh_tSesContext ldhses, char* hiername,
 
   /* Open file */
   sts = u_open(utlctx, filename, terminal, append);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     utl_ctx_delete(utlctx);
     return sts;
   }
@@ -3243,7 +3404,8 @@ int utl_show_obj_hier_class_name(ldh_tSesContext ldhses, char* hiername,
   IF_OUT u_row(utlctx);
 
   list_ptr = utlctx->list[0];
-  while (list_ptr) {
+  while (list_ptr)
+  {
     objdid = list_ptr->o.Objid;
     if (parameter == NULL)
       utl_print_object(objdid, ldhses, utlctx, full, 0, 0);
@@ -3260,20 +3422,20 @@ int utl_show_obj_hier_class_name(ldh_tSesContext ldhses, char* hiername,
 }
 
 /*************************************************************************
-*
-* Name:		utl_show_volumes()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* char		*objdidstring 	I	objdidstring.
-*
-*
-* Description: 	Prints all objects of a specified class that is found
-*		below a specific object in the hierarchy.
-*
-**************************************************************************/
+ *
+ * Name:		utl_show_volumes()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * char		*objdidstring 	I	objdidstring.
+ *
+ *
+ * Description: 	Prints all objects of a specified class that is found
+ *		below a specific object in the hierarchy.
+ *
+ **************************************************************************/
 
 pwr_tStatus utl_show_volumes(ldh_tSesContext ldhses, int allvolumes)
 {
@@ -3291,25 +3453,25 @@ pwr_tStatus utl_show_volumes(ldh_tSesContext ldhses, int allvolumes)
 
   /* Get all volumes that is not class and wb volumes */
   sts = ldh_GetVolumeList(ldh_SessionToWB(ldhses), &vol_id);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = ldh_GetVolumeClass(ldh_SessionToWB(ldhses), vol_id, &vol_class);
     if (EVEN(sts))
       return sts;
 
-    if (cdh_isClassVolumeClass(vol_class)
-        || vol_class == pwr_eClass_WorkBenchVolume) {
-      if (!allvolumes) {
+    if (cdh_isClassVolumeClass(vol_class) || vol_class == pwr_eClass_WorkBenchVolume)
+    {
+      if (!allvolumes)
+      {
         sts = ldh_GetNextVolume(ldh_SessionToWB(ldhses), vol_id, &vol_id);
         continue;
       }
     }
-    sts = ldh_VolumeIdToName(
-        ldh_SessionToWB(ldhses), vol_id, vol_name, sizeof(vol_name), &size);
+    sts = ldh_VolumeIdToName(ldh_SessionToWB(ldhses), vol_id, vol_name, sizeof(vol_name), &size);
     if (EVEN(sts))
       return sts;
 
-    sts = ldh_ClassIdToName(
-        ldhses, vol_class, class_name, sizeof(class_name), &size);
+    sts = ldh_ClassIdToName(ldhses, vol_class, class_name, sizeof(class_name), &size);
     if (EVEN(sts))
       return sts;
     utl_cut_segments(class_name, class_name, 1);
@@ -3328,7 +3490,8 @@ pwr_tStatus utl_show_volumes(ldh_tSesContext ldhses, int allvolumes)
     if (EVEN(sts))
       return sts;
 
-    switch (info.VolRep) {
+    switch (info.VolRep)
+    {
     case ldh_eVolRep_Db:
       u_print(utlctx, " Db ");
       break;
@@ -3366,23 +3529,22 @@ pwr_tStatus utl_show_volumes(ldh_tSesContext ldhses, int allvolumes)
 }
 
 /*************************************************************************
-*
-* Name:		utl_show_object_objdid()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* char		*objdidstring 	I	objdidstring.
-*
-*
-* Description: 	Prints all objects of a specified class that is found
-*		below a specific object in the hierarchy.
-*
-**************************************************************************/
+ *
+ * Name:		utl_show_object_objdid()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * char		*objdidstring 	I	objdidstring.
+ *
+ *
+ * Description: 	Prints all objects of a specified class that is found
+ *		below a specific object in the hierarchy.
+ *
+ **************************************************************************/
 
-int utl_show_object_objdid(
-    ldh_tSesContext ldhses, char* objdidstring, int terminal, char* filename)
+int utl_show_object_objdid(ldh_tSesContext ldhses, char* objdidstring, int terminal, char* filename)
 {
   utl_ctx utlctx;
   int sts, size;
@@ -3396,20 +3558,21 @@ int utl_show_object_objdid(
 
   /* Check if the objdid exists */
   sts = ldh_GetObjectClass(ldhses, objdid, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     return FOE__OBJDID;
   }
 
   /* Print this object */
   utl_ctx_new(&utlctx, ldhses, "", UTL_PORTRAIT);
   sts = u_open(utlctx, filename, terminal, 0);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     utl_ctx_delete(utlctx);
     return sts;
   }
 
-  sts = ldh_ObjidToName(
-      ldhses, objdid, ldh_eName_Objid, objdidstr, sizeof(objdidstr), &size);
+  sts = ldh_ObjidToName(ldhses, objdid, ldh_eName_Objid, objdidstr, sizeof(objdidstr), &size);
   if (EVEN(sts))
     return sts;
 
@@ -3425,18 +3588,18 @@ int utl_show_object_objdid(
 }
 
 /*************************************************************************
-*
-* Name:		utl_show_hierarchy()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-*
-* Description: 	Prints all objects of class $Hierarchy found in
-*		planthier or nodehier.
-*
-**************************************************************************/
+ *
+ * Name:		utl_show_hierarchy()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ *
+ * Description: 	Prints all objects of class $Hierarchy found in
+ *		planthier or nodehier.
+ *
+ **************************************************************************/
 
 int utl_show_hierarchy(ldh_tSesContext ldhses, int terminal, char* filename)
 {
@@ -3446,14 +3609,16 @@ int utl_show_hierarchy(ldh_tSesContext ldhses, int terminal, char* filename)
 
   /* Get objdid and class for the object */
   sts = ldh_ClassNameToId(ldhses, &cid, "$PlantHier");
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     return FOE__CLASSNAME;
   }
 
   /* Open file */
   utl_ctx_new(&utlctx, ldhses, "", UTL_PORTRAIT);
   sts = u_open(utlctx, filename, terminal, 0);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     utl_ctx_delete(utlctx);
     return sts;
   }
@@ -3461,8 +3626,7 @@ int utl_show_hierarchy(ldh_tSesContext ldhses, int terminal, char* filename)
   IF_OUT u_header(utlctx, ldhses, "LIST OF HIERARCHY");
   IF_OUT u_row(utlctx);
 
-  sts = trv_get_objects_class(
-      ldhses, cid, (trv_tBcFunc)utl_print_aref, ldhses, utlctx, 0, 0, 0);
+  sts = trv_get_objects_class(ldhses, cid, (trv_tBcFunc)utl_print_aref, ldhses, utlctx, 0, 0, 0);
   if (EVEN(sts))
     return sts;
 
@@ -3473,71 +3637,82 @@ int utl_show_hierarchy(ldh_tSesContext ldhses, int terminal, char* filename)
 }
 
 /*************************************************************************
-*
-* Name:		utl_show_class_classhier()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* char *	classhiername	I	Name of the $ClassHier object.
-*
-*
-* Description: 	Prints all objects of class $ClassDef found below
-* 		the specified $ClassHier object. That is prints all
-*		classes in BaseClasses, SystemClasses or MpsClasses etc.
-*
-**************************************************************************/
+ *
+ * Name:		utl_show_class_classhier()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * char *	classhiername	I	Name of the $ClassHier object.
+ *
+ *
+ * Description: 	Prints all objects of class $ClassDef found below
+ * 		the specified $ClassHier object. That is prints all
+ *		classes in BaseClasses, SystemClasses or MpsClasses etc.
+ *
+ **************************************************************************/
 
-pwr_tStatus utl_show_class_classhier(ldh_tSesContext ldhses, char* hiername,
-    char* name, int terminal, char* filename, int full, int contents, int all)
+pwr_tStatus utl_show_class_classhier(ldh_tSesContext ldhses, char* hiername, char* name, int terminal,
+                                     char* filename, int full, int contents, int all)
 {
   utl_ctx utlctx;
   pwr_tStatus sts;
   pwr_tObjid hierobjdid;
   char* s;
   pwr_tObjid objdid;
-  pwr_tClassId classclass[2] = { 0, 0 };
+  pwr_tClassId classclass[2] = {0, 0};
   pwr_tClassId* classclass_ptr;
 
   /* Check if hierarchy */
-  if (hiername != NULL) {
+  if (hiername != NULL)
+  {
     /* Get objdid for the hierarchy object */
     sts = ldh_NameToObjid(ldhses, &hierobjdid, hiername);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       return FOE__HIERNAME;
     }
-  } else {
-    if (name == NULL) {
+  }
+  else
+  {
+    if (name == NULL)
+    {
       /* Not hier and not name, take baseclasses as default */
       sts = ldh_NameToObjid(ldhses, &hierobjdid, "pwrb:Class");
       if (EVEN(sts))
         return sts;
-    } else
+    }
+    else
       hierobjdid = pwr_cNObjid;
   }
 
   if (all)
     classclass_ptr = NULL;
-  else {
+  else
+  {
     classclass[0] = pwr_eClass_ClassDef;
     classclass_ptr = classclass;
   }
 
   /* Check if name */
-  if (name != NULL) {
+  if (name != NULL)
+  {
     /* Check that name includes a wildcard */
     s = strchr(name, '*');
-    if (s == 0) {
+    if (s == 0)
+    {
       /* Print this object */
       /* Get objdid for the object */
       sts = ldh_NameToObjid(ldhses, &objdid, name);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         return FOE__OBJECT;
       }
       utl_ctx_new(&utlctx, ldhses, "", UTL_PORTRAIT);
       sts = u_open(utlctx, filename, terminal, 0);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         utl_ctx_delete(utlctx);
         return sts;
       }
@@ -3548,7 +3723,8 @@ pwr_tStatus utl_show_class_classhier(ldh_tSesContext ldhses, char* hiername,
 
       if (contents || all)
         utl_print_object(objdid, ldhses, utlctx, contents, 0, 0);
-      else {
+      else
+      {
         pwr_sAttrRef aref = cdh_ObjidToAref(objdid);
         utl_print_class(&aref, ldhses, utlctx, full, 0, 0);
       }
@@ -3562,7 +3738,8 @@ pwr_tStatus utl_show_class_classhier(ldh_tSesContext ldhses, char* hiername,
   /* Open file */
   utl_ctx_new(&utlctx, ldhses, "", UTL_PORTRAIT);
   sts = u_open(utlctx, filename, terminal, 0);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     utl_ctx_delete(utlctx);
     return sts;
   }
@@ -3574,16 +3751,17 @@ pwr_tStatus utl_show_class_classhier(ldh_tSesContext ldhses, char* hiername,
     IF_OUT u_subheader(utlctx, "Name", name);
   IF_OUT u_row(utlctx);
 
-  if (contents || all) {
-    sts = trv_get_class_hier(ldhses, hierobjdid, name, classclass_ptr,
-        (trv_tBcFunc)utl_print_aref, ldhses, utlctx,
-        (void*)((long int)contents), 0, 0);
+  if (contents || all)
+  {
+    sts = trv_get_class_hier(ldhses, hierobjdid, name, classclass_ptr, (trv_tBcFunc)utl_print_aref, ldhses,
+                             utlctx, (void*)((long int)contents), 0, 0);
     if (EVEN(sts))
       return sts;
-  } else {
-    sts = trv_get_class_hier(ldhses, hierobjdid, name, classclass_ptr,
-        (trv_tBcFunc)utl_print_class, ldhses, utlctx, (void*)((long int)full),
-        0, 0);
+  }
+  else
+  {
+    sts = trv_get_class_hier(ldhses, hierobjdid, name, classclass_ptr, (trv_tBcFunc)utl_print_class, ldhses,
+                             utlctx, (void*)((long int)full), 0, 0);
     if (EVEN(sts))
       return sts;
   }
@@ -3595,27 +3773,27 @@ pwr_tStatus utl_show_class_classhier(ldh_tSesContext ldhses, char* hiername,
 }
 
 /*************************************************************************
-*
-* Name:		utl_print_object()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* pwr_tObjid  objdid		I	objdid for the object.
-* ldh_tSesContext ldhses		I	ldh session.
-* unsigned long	dum1		I	dummy parameter.
-* unsigned long	dum2		I	dummy parameter.
-* unsigned long	dum3		I	dummy parameter.
-* unsigned long	dum4		I	dummy parameter.
-*
-*
-* Description: 	Backcall routine used by utl_show_... routines
-*		to print information of an object.
-*
-**************************************************************************/
+ *
+ * Name:		utl_print_object()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * pwr_tObjid  objdid		I	objdid for the object.
+ * ldh_tSesContext ldhses		I	ldh session.
+ * unsigned long	dum1		I	dummy parameter.
+ * unsigned long	dum2		I	dummy parameter.
+ * unsigned long	dum3		I	dummy parameter.
+ * unsigned long	dum4		I	dummy parameter.
+ *
+ *
+ * Description: 	Backcall routine used by utl_show_... routines
+ *		to print information of an object.
+ *
+ **************************************************************************/
 
-static int utl_print_object(pwr_tObjid Objdid, ldh_tSesContext ldhses,
-    utl_ctx utlctx, int full, char* parameter, int* element)
+static int utl_print_object(pwr_tObjid Objdid, ldh_tSesContext ldhses, utl_ctx utlctx, int full,
+                            char* parameter, int* element)
 {
   int sts, size;
   pwr_tClassId cid;
@@ -3625,24 +3803,23 @@ static int utl_print_object(pwr_tObjid Objdid, ldh_tSesContext ldhses,
   pwr_sAttrRef aref = cdh_ObjidToAref(Objdid);
 
   /* Print the name of the actual object */
-  sts = ldh_ObjidToName(
-      ldhses, Objdid, ldh_eName_Hierarchy, hier_name, sizeof(hier_name), &size);
+  sts = ldh_ObjidToName(ldhses, Objdid, ldh_eName_Hierarchy, hier_name, sizeof(hier_name), &size);
   if (EVEN(sts))
     return sts;
 
   sts = ldh_GetObjectClass(utlctx->ldhses, Objdid, &cid);
   if (EVEN(sts))
     return sts;
-  sts = ldh_ObjidToName(utlctx->ldhses, cdh_ClassIdToObjid(cid),
-      ldh_eName_Object, class_name, sizeof(class_name), &size);
+  sts = ldh_ObjidToName(utlctx->ldhses, cdh_ClassIdToObjid(cid), ldh_eName_Object, class_name,
+                        sizeof(class_name), &size);
   if (EVEN(sts))
     return sts;
 
   IF_OUT u_pagebreak(utlctx);
   u_print(utlctx, "  %s", hier_name);
-  if (full && (parameter == NULL)) {
-    sts = ldh_ObjidToName(
-        ldhses, Objdid, ldh_eName_Objid, objdid_str, sizeof(objdid_str), &size);
+  if (full && (parameter == NULL))
+  {
+    sts = ldh_ObjidToName(ldhses, Objdid, ldh_eName_Objid, objdid_str, sizeof(objdid_str), &size);
     if (EVEN(sts))
       return sts;
 
@@ -3650,18 +3827,22 @@ static int utl_print_object(pwr_tObjid Objdid, ldh_tSesContext ldhses,
     u_print(utlctx, " %s", objdid_str);
     u_posit(utlctx, 1, strlen(objdid_str) + 1);
     u_print(utlctx, " %s", class_name);
-  } else {
+  }
+  else
+  {
     u_posit(utlctx, 8, strlen(hier_name) + 2);
     u_print(utlctx, " %s", class_name);
   }
   u_row(utlctx);
 
-  if (full && (parameter == NULL)) {
+  if (full && (parameter == NULL))
+  {
     sts = utl_print_object_full(&aref, ldhses, utlctx, 0);
     if (EVEN(sts))
       return sts;
   }
-  if (parameter != NULL) {
+  if (parameter != NULL)
+  {
     sts = utl_print_object_par(&aref, ldhses, utlctx, parameter, element);
     if (EVEN(sts))
       return sts;
@@ -3669,8 +3850,8 @@ static int utl_print_object(pwr_tObjid Objdid, ldh_tSesContext ldhses,
   return FOE__SUCCESS;
 }
 
-static int utl_print_aref(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
-    utl_ctx utlctx, int full, char* parameter, int* element)
+static int utl_print_aref(pwr_sAttrRef* arp, ldh_tSesContext ldhses, utl_ctx utlctx, int full,
+                          char* parameter, int* element)
 {
   int sts, size;
   pwr_tClassId cid;
@@ -3688,16 +3869,16 @@ static int utl_print_aref(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
   sts = ldh_GetAttrRefTid(utlctx->ldhses, arp, &cid);
   if (EVEN(sts))
     return sts;
-  sts = ldh_ObjidToName(utlctx->ldhses, cdh_ClassIdToObjid(cid),
-      ldh_eName_Object, class_name, sizeof(class_name), &size);
+  sts = ldh_ObjidToName(utlctx->ldhses, cdh_ClassIdToObjid(cid), ldh_eName_Object, class_name,
+                        sizeof(class_name), &size);
   if (EVEN(sts))
     return sts;
 
   IF_OUT u_pagebreak(utlctx);
   u_print(utlctx, "  %s", hier_name);
-  if (full && (parameter == NULL)) {
-    sts = ldh_ObjidToName(ldhses, arp->Objid, ldh_eName_Objid, objdid_str,
-        sizeof(objdid_str), &size);
+  if (full && (parameter == NULL))
+  {
+    sts = ldh_ObjidToName(ldhses, arp->Objid, ldh_eName_Objid, objdid_str, sizeof(objdid_str), &size);
     if (EVEN(sts))
       return sts;
 
@@ -3705,18 +3886,22 @@ static int utl_print_aref(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
     u_print(utlctx, " %s", objdid_str);
     u_posit(utlctx, 1, strlen(objdid_str) + 1);
     u_print(utlctx, " %s", class_name);
-  } else {
+  }
+  else
+  {
     u_posit(utlctx, 8, strlen(hier_name) + 2);
     u_print(utlctx, " %s", class_name);
   }
   u_row(utlctx);
 
-  if (full && (parameter == NULL)) {
+  if (full && (parameter == NULL))
+  {
     sts = utl_print_object_full(arp, ldhses, utlctx, 0);
     if (EVEN(sts))
       return sts;
   }
-  if (parameter != NULL) {
+  if (parameter != NULL)
+  {
     sts = utl_print_object_par(arp, ldhses, utlctx, parameter, element);
     if (EVEN(sts))
       return sts;
@@ -3725,23 +3910,23 @@ static int utl_print_aref(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
 }
 
 /*************************************************************************
-*
-* Name:		utl_object_changed()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* pwr_tObjid  Objdid		I	objdid for the object.
-* ldh_tSesContext ldhses		I	ldh session.
-* unsigned long	utlctx		I	output specification.
-*
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		utl_object_changed()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * pwr_tObjid  Objdid		I	objdid for the object.
+ * ldh_tSesContext ldhses		I	ldh session.
+ * unsigned long	utlctx		I	output specification.
+ *
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-static int utl_object_changed(pwr_tObjid Objdid, ldh_tSesContext ldhses,
-    utl_ctx utlctx, int* changed, int code)
+static int utl_object_changed(pwr_tObjid Objdid, ldh_tSesContext ldhses, utl_ctx utlctx, int* changed,
+                              int code)
 {
   int sts, size, i, j;
   pwr_tClassId cid;
@@ -3767,9 +3952,9 @@ static int utl_object_changed(pwr_tObjid Objdid, ldh_tSesContext ldhses,
 
   /* Get the first child to the object */
   sts = ldh_GetChild(ldhses, cdh_ClassIdToObjid(cid), &templ);
-  while (ODD(sts)) {
-    sts = ldh_ObjidToName(
-        ldhses, templ, ldh_eName_Object, name, sizeof(name), &size);
+  while (ODD(sts))
+  {
+    sts = ldh_ObjidToName(ldhses, templ, ldh_eName_Object, name, sizeof(name), &size);
     if (EVEN(sts))
       return sts;
 
@@ -3792,18 +3977,24 @@ static int utl_object_changed(pwr_tObjid Objdid, ldh_tSesContext ldhses,
             return FOE__SUCCESS;
           }
   ********/
-  for (i = 0; i < 3; i++) {
-    if (i == 0) {
+  for (i = 0; i < 3; i++)
+  {
+    if (i == 0)
+    {
       if (code & UTL_FULLPRINT_NORTBODY)
         /* Exclude rtbody */
         continue;
       strcpy(body, "RtBody");
-    } else if (i == 1) {
+    }
+    else if (i == 1)
+    {
       if (code & UTL_FULLPRINT_NODEVBODY)
         /* Exclude devbody */
         continue;
       strcpy(body, "DevBody");
-    } else {
+    }
+    else
+    {
       if (code & UTL_FULLPRINT_NOSYSBODY)
         /* Exclude sysbody */
         continue;
@@ -3815,11 +4006,11 @@ static int utl_object_changed(pwr_tObjid Objdid, ldh_tSesContext ldhses,
     if (EVEN(sts))
       continue;
 
-    for (j = 0; j < rows; j++) {
+    for (j = 0; j < rows; j++)
+    {
       strcpy(parname, bodydef[j].ParName);
       /* Get the parameter value in the object */
-      sts = ldh_GetObjectPar(
-          ldhses, Objdid, body, parname, (char**)&object_par, &parsize);
+      sts = ldh_GetObjectPar(ldhses, Objdid, body, parname, (char**)&object_par, &parsize);
       if (EVEN(sts))
         return sts;
 
@@ -3833,15 +4024,15 @@ static int utl_object_changed(pwr_tObjid Objdid, ldh_tSesContext ldhses,
         elements = 1;
 
       /* Get the parameter value in the template object */
-      sts = ldh_GetObjectPar(
-          ldhses, templ, body, parname, (char**)&template_par, &size);
+      sts = ldh_GetObjectPar(ldhses, templ, body, parname, (char**)&template_par, &size);
       if (EVEN(sts))
         return sts;
 
       object_element = object_par;
       template_element = template_par;
 
-      switch (bodydef[j].Par->Output.Info.Type) {
+      switch (bodydef[j].Par->Output.Info.Type)
+      {
       case pwr_eType_Boolean:
       case pwr_eType_Float32:
       case pwr_eType_Float64:
@@ -3865,10 +4056,12 @@ static int utl_object_changed(pwr_tObjid Objdid, ldh_tSesContext ldhses,
       case pwr_eType_VolumeId:
       case pwr_eType_ObjectIx:
       case pwr_eType_Mask:
-      case pwr_eType_Enum: {
+      case pwr_eType_Enum:
+      {
         /* If the parameters in object and template are node equal,
              print them */
-        if (memcmp(template_element, object_element, parsize) != 0) {
+        if (memcmp(template_element, object_element, parsize) != 0)
+        {
           *changed = 1;
         }
 
@@ -3892,23 +4085,22 @@ static int utl_object_changed(pwr_tObjid Objdid, ldh_tSesContext ldhses,
 }
 
 /*************************************************************************
-*
-* Name:		utl_print_object_full()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* pwr_tObjid  Objdid		I	objdid for the object.
-* ldh_tSesContext ldhses		I	ldh session.
-* unsigned long	utlctx		I	output specification.
-*
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		utl_print_object_full()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * pwr_tObjid  Objdid		I	objdid for the object.
+ * ldh_tSesContext ldhses		I	ldh session.
+ * unsigned long	utlctx		I	output specification.
+ *
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-static int utl_print_object_full(
-    pwr_sAttrRef* arp, ldh_tSesContext ldhses, utl_ctx utlctx, int code)
+static int utl_print_object_full(pwr_sAttrRef* arp, ldh_tSesContext ldhses, utl_ctx utlctx, int code)
 {
   int sts, size, i, j, k;
   pwr_tClassId cid;
@@ -3958,9 +4150,9 @@ static int utl_print_object_full(
 
   /* Get the first child to the object */
   sts = ldh_GetChild(ldhses, cdh_ClassIdToObjid(cid), &templ);
-  while (ODD(sts)) {
-    sts = ldh_ObjidToName(
-        ldhses, templ, ldh_eName_Object, name, sizeof(name), &size);
+  while (ODD(sts))
+  {
+    sts = ldh_ObjidToName(ldhses, templ, ldh_eName_Object, name, sizeof(name), &size);
     if (EVEN(sts))
       return sts;
 
@@ -3971,18 +4163,24 @@ static int utl_print_object_full(
   if (EVEN(sts))
     return sts;
 
-  for (i = 0; i < 3; i++) {
-    if (i == 0) {
+  for (i = 0; i < 3; i++)
+  {
+    if (i == 0)
+    {
       if (code & UTL_FULLPRINT_NORTBODY)
         /* Exclude rtbody */
         continue;
       strcpy(body, "RtBody");
-    } else if (i == 1) {
+    }
+    else if (i == 1)
+    {
       if (code & UTL_FULLPRINT_NODEVBODY)
         /* Exclude devbody */
         continue;
       strcpy(body, "DevBody");
-    } else {
+    }
+    else
+    {
       if (code & UTL_FULLPRINT_NOSYSBODY)
         /* Exclude sysbody */
         continue;
@@ -3994,18 +4192,20 @@ static int utl_print_object_full(
     if (EVEN(sts))
       continue;
 
-    for (j = 0; j < rows; j++) {
+    for (j = 0; j < rows; j++)
+    {
       strcpy(parname, bodydef[j].ParName);
       /* Get the parameter value in the object */
       s = strchr(aname, '.');
-      if (s) {
+      if (s)
+      {
         strcpy(pname, s + 1);
         strcat(pname, ".");
         strcat(pname, parname);
-      } else
+      }
+      else
         strcpy(pname, parname);
-      sts = ldh_GetObjectPar(
-          ldhses, arp->Objid, body, pname, (char**)&object_par, &parsize);
+      sts = ldh_GetObjectPar(ldhses, arp->Objid, body, pname, (char**)&object_par, &parsize);
       if (EVEN(sts))
         return sts;
 
@@ -4019,21 +4219,23 @@ static int utl_print_object_full(
         elements = 1;
 
       /* Get the parameter value in the template object */
-      sts = ldh_GetObjectPar(
-          ldhses, templ, body, parname, (char**)&template_par, &size);
+      sts = ldh_GetObjectPar(ldhses, templ, body, parname, (char**)&template_par, &size);
       if (EVEN(sts))
         return sts;
 
       object_element = object_par;
       template_element = template_par;
 
-      for (k = 0; k < elements; k++) {
+      for (k = 0; k < elements; k++)
+      {
         IF_OUT u_pagebreak(utlctx);
 
         /* If the parameters in object and template are node equal,
            print them */
-        if (memcmp(template_element, object_element, parsize / elements) != 0) {
-          if (code & UTL_FULLPRINT_SIGNAL) {
+        if (memcmp(template_element, object_element, parsize / elements) != 0)
+        {
+          if (code & UTL_FULLPRINT_SIGNAL)
+          {
             if (bodydef[j].Par->Output.Info.Flags & PWR_MASK_RTVIRTUAL)
               /* This is probably a getdi, or get.., print the
                   signalobject also */
@@ -4041,14 +4243,18 @@ static int utl_print_object_full(
           }
 
           IF_OUT u_pagebreak(utlctx);
-          switch (bodydef[j].Par->Output.Info.Type) {
-          case pwr_eType_Boolean: {
+          switch (bodydef[j].Par->Output.Info.Type)
+          {
+          case pwr_eType_Boolean:
+          {
             p_Boolean = (pwr_tBoolean*)object_element;
             u_print(utlctx, "    %s", parname);
-            if (elements > 1) {
+            if (elements > 1)
+            {
               u_print(utlctx, "[%2d]", k);
               u_posit(utlctx, 4, strlen(parname) + 8);
-            } else
+            }
+            else
               u_posit(utlctx, 4, strlen(parname) + 4);
             if (*p_Boolean == 0)
               u_print(utlctx, " FALSE");
@@ -4057,31 +4263,38 @@ static int utl_print_object_full(
             u_row(utlctx);
             break;
           }
-          case pwr_eType_Float32: {
+          case pwr_eType_Float32:
+          {
             p_Float32 = (pwr_tFloat32*)object_element;
             u_print(utlctx, "    %s", parname);
-            if (elements > 1) {
+            if (elements > 1)
+            {
               u_print(utlctx, "[%2d]", k);
               u_posit(utlctx, 4, strlen(parname) + 8);
-            } else
+            }
+            else
               u_posit(utlctx, 4, strlen(parname) + 4);
             u_print(utlctx, " %f", *p_Float32);
             u_row(utlctx);
             break;
           }
-          case pwr_eType_Float64: {
+          case pwr_eType_Float64:
+          {
             p_Float64 = (pwr_tFloat64*)object_element;
             u_print(utlctx, "    %s", parname);
-            if (elements > 1) {
+            if (elements > 1)
+            {
               u_print(utlctx, "[%2d]", k);
               u_posit(utlctx, 4, strlen(parname) + 8);
-            } else
+            }
+            else
               u_posit(utlctx, 4, strlen(parname) + 4);
             u_print(utlctx, " %f", *p_Float64);
             u_row(utlctx);
             break;
           }
-          case pwr_eType_Char: {
+          case pwr_eType_Char:
+          {
             p_Char = object_element;
             u_print(utlctx, "    %s", parname);
             u_posit(utlctx, 4, strlen(parname) + 4);
@@ -4089,25 +4302,31 @@ static int utl_print_object_full(
             u_row(utlctx);
             break;
           }
-          case pwr_eType_Int8: {
+          case pwr_eType_Int8:
+          {
             p_Int8 = (pwr_tInt8*)object_element;
             u_print(utlctx, "    %s", parname);
-            if (elements > 1) {
+            if (elements > 1)
+            {
               u_print(utlctx, "[%2d]", k);
               u_posit(utlctx, 4, strlen(parname) + 8);
-            } else
+            }
+            else
               u_posit(utlctx, 4, strlen(parname) + 4);
             u_print(utlctx, " %d", *p_Int8);
             u_row(utlctx);
             break;
           }
-          case pwr_eType_Int16: {
+          case pwr_eType_Int16:
+          {
             p_Int16 = (pwr_tInt16*)object_element;
             u_print(utlctx, "    %s", parname);
-            if (elements > 1) {
+            if (elements > 1)
+            {
               u_print(utlctx, "[%2d]", k);
               u_posit(utlctx, 4, strlen(parname) + 8);
-            } else
+            }
+            else
               u_posit(utlctx, 4, strlen(parname) + 4);
             u_print(utlctx, " %d", *p_Int16);
             u_row(utlctx);
@@ -4118,49 +4337,61 @@ static int utl_print_object_full(
           case pwr_eType_TypeId:
           case pwr_eType_CastId:
           case pwr_eType_VolumeId:
-          case pwr_eType_ObjectIx: {
+          case pwr_eType_ObjectIx:
+          {
             p_Int32 = (pwr_tInt32*)object_element;
             u_print(utlctx, "    %s", parname);
-            if (elements > 1) {
+            if (elements > 1)
+            {
               u_print(utlctx, "[%2d]", k);
               u_posit(utlctx, 4, strlen(parname) + 8);
-            } else
+            }
+            else
               u_posit(utlctx, 4, strlen(parname) + 4);
             u_print(utlctx, " %d", *p_Int32);
             u_row(utlctx);
             break;
           }
-          case pwr_eType_Int64: {
+          case pwr_eType_Int64:
+          {
             p_Int64 = (pwr_tInt64*)object_element;
             u_print(utlctx, "    %s", parname);
-            if (elements > 1) {
+            if (elements > 1)
+            {
               u_print(utlctx, "[%2d]", k);
               u_posit(utlctx, 4, strlen(parname) + 8);
-            } else
+            }
+            else
               u_posit(utlctx, 4, strlen(parname) + 4);
             u_print(utlctx, " %lld", *p_Int64);
             u_row(utlctx);
             break;
           }
-          case pwr_eType_UInt8: {
+          case pwr_eType_UInt8:
+          {
             p_UInt8 = (pwr_tUInt8*)object_element;
             u_print(utlctx, "    %s", parname);
-            if (elements > 1) {
+            if (elements > 1)
+            {
               u_print(utlctx, "[%2d]", k);
               u_posit(utlctx, 4, strlen(parname) + 8);
-            } else
+            }
+            else
               u_posit(utlctx, 4, strlen(parname) + 4);
             u_print(utlctx, " %u", *p_UInt8);
             u_row(utlctx);
             break;
           }
-          case pwr_eType_UInt16: {
+          case pwr_eType_UInt16:
+          {
             p_UInt16 = (pwr_tUInt16*)object_element;
             u_print(utlctx, "    %s", parname);
-            if (elements > 1) {
+            if (elements > 1)
+            {
               u_print(utlctx, "[%2d]", k);
               u_posit(utlctx, 4, strlen(parname) + 8);
-            } else
+            }
+            else
               u_posit(utlctx, 4, strlen(parname) + 4);
             u_print(utlctx, " %u", *p_UInt16);
             u_row(utlctx);
@@ -4168,66 +4399,81 @@ static int utl_print_object_full(
           }
           case pwr_eType_UInt32:
           case pwr_eType_Mask:
-          case pwr_eType_Enum: {
+          case pwr_eType_Enum:
+          {
             p_UInt32 = (pwr_tUInt32*)object_element;
             u_print(utlctx, "    %s", parname);
-            if (elements > 1) {
+            if (elements > 1)
+            {
               u_print(utlctx, "[%2d]", k);
               u_posit(utlctx, 4, strlen(parname) + 8);
-            } else
+            }
+            else
               u_posit(utlctx, 4, strlen(parname) + 4);
             u_print(utlctx, " %lu", *p_UInt32);
             u_row(utlctx);
             break;
           }
-          case pwr_eType_UInt64: {
+          case pwr_eType_UInt64:
+          {
             p_UInt64 = (pwr_tUInt64*)object_element;
             u_print(utlctx, "    %s", parname);
-            if (elements > 1) {
+            if (elements > 1)
+            {
               u_print(utlctx, "[%2d]", k);
               u_posit(utlctx, 4, strlen(parname) + 8);
-            } else
+            }
+            else
               u_posit(utlctx, 4, strlen(parname) + 4);
             u_print(utlctx, " %llu", *p_UInt64);
             u_row(utlctx);
             break;
           }
-          case pwr_eType_String: {
+          case pwr_eType_String:
+          {
             p_String = object_element;
             u_print(utlctx, "    %s", parname);
-            if (elements > 1) {
+            if (elements > 1)
+            {
               u_print(utlctx, "[%2d]", k);
               u_posit(utlctx, 4, strlen(parname) + 8);
-            } else
+            }
+            else
               u_posit(utlctx, 4, strlen(parname) + 4);
             u_print(utlctx, " \"%s\"", p_String);
             u_row(utlctx);
             break;
           }
-          case pwr_eType_Text: {
+          case pwr_eType_Text:
+          {
             p_String = object_element;
             u_print(utlctx, "    %s", parname);
-            if (elements > 1) {
+            if (elements > 1)
+            {
               u_print(utlctx, "[%2d]", k);
               u_posit(utlctx, 4, strlen(parname) + 8);
-            } else
+            }
+            else
               u_posit(utlctx, 4, strlen(parname) + 4);
             u_row(utlctx);
             u_print(utlctx, "\"%s\"", p_String);
             u_row(utlctx);
             break;
           }
-          case pwr_eType_ObjDId: {
+          case pwr_eType_ObjDId:
+          {
             /* Get the object name from ldh */
             p_ObjDId = (pwr_tObjid*)object_element;
             u_print(utlctx, "    %s", parname);
-            if (elements > 1) {
+            if (elements > 1)
+            {
               u_print(utlctx, "[%2d]", k);
               u_posit(utlctx, 4, strlen(parname) + 8);
-            } else
+            }
+            else
               u_posit(utlctx, 4, strlen(parname) + 4);
-            sts = ldh_ObjidToName(ldhses, *p_ObjDId, ldh_eName_Hierarchy,
-                hier_name, sizeof(hier_name), &size);
+            sts =
+                ldh_ObjidToName(ldhses, *p_ObjDId, ldh_eName_Hierarchy, hier_name, sizeof(hier_name), &size);
             if (EVEN(sts))
               u_print(utlctx, " Undefined Object");
             else
@@ -4235,17 +4481,19 @@ static int utl_print_object_full(
             u_row(utlctx);
             break;
           }
-          case pwr_eType_AttrRef: {
+          case pwr_eType_AttrRef:
+          {
             /* Get the object name from ldh */
             p_AttrRef = (pwr_sAttrRef*)object_element;
             u_print(utlctx, "    %s", parname);
-            if (elements > 1) {
+            if (elements > 1)
+            {
               u_print(utlctx, "[%2d]", k);
               u_posit(utlctx, 4, strlen(parname) + 8);
-            } else
+            }
+            else
               u_posit(utlctx, 4, strlen(parname) + 4);
-            sts = ldh_AttrRefToName(
-                ldhses, p_AttrRef, ldh_eName_Aref, &hier_name_p, &size);
+            sts = ldh_AttrRefToName(ldhses, p_AttrRef, ldh_eName_Aref, &hier_name_p, &size);
             if (EVEN(sts))
               u_print(utlctx, " Undefined attribute");
             else
@@ -4253,17 +4501,19 @@ static int utl_print_object_full(
             u_row(utlctx);
             break;
           }
-          case pwr_eType_Time: {
+          case pwr_eType_Time:
+          {
             /* Convert time to ascii */
 
-            sts = time_AtoAscii((pwr_tTime*)object_element,
-                time_eFormat_DateAndTime, timbuf, sizeof(timbuf));
+            sts = time_AtoAscii((pwr_tTime*)object_element, time_eFormat_DateAndTime, timbuf, sizeof(timbuf));
             timbuf[20] = 0;
             u_print(utlctx, "    %s", parname);
-            if (elements > 1) {
+            if (elements > 1)
+            {
               u_print(utlctx, "[%2d]", k);
               u_posit(utlctx, 4, strlen(parname) + 8);
-            } else
+            }
+            else
               u_posit(utlctx, 4, strlen(parname) + 4);
             u_print(utlctx, " %s", timbuf);
             u_row(utlctx);
@@ -4285,23 +4535,23 @@ static int utl_print_object_full(
 }
 
 /*************************************************************************
-*
-* Name:		utl_print_object_par()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* pwr_tObjid  Objdid		I	objdid for the object.
-* ldh_tSesContext ldhses		I	ldh session.
-* unsigned long	utlctx		I	output specification.
-*
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		utl_print_object_par()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * pwr_tObjid  Objdid		I	objdid for the object.
+ * ldh_tSesContext ldhses		I	ldh session.
+ * unsigned long	utlctx		I	output specification.
+ *
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-static int utl_print_object_par(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
-    utl_ctx utlctx, char* parameter, int* element)
+static int utl_print_object_par(pwr_sAttrRef* arp, ldh_tSesContext ldhses, utl_ctx utlctx, char* parameter,
+                                int* element)
 {
   int sts, size, i, j = 0, k;
   pwr_tClassId cid;
@@ -4344,14 +4594,19 @@ static int utl_print_object_par(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
   /* Get the class of the object */
   sts = ldh_GetAttrRefTid(ldhses, arp, &cid);
 
-  while (*parameter != 0) {
+  while (*parameter != 0)
+  {
     /* Find the parameter */
-    if (streq(parameter, "WANTEDNODE")) {
+    if (streq(parameter, "WANTEDNODE"))
+    {
       u_print(utlctx, " %s", "WantedNode is obsolete");
       u_row(utlctx);
-    } else {
+    }
+    else
+    {
       found = 0;
-      for (i = 0; i < 3; i++) {
+      for (i = 0; i < 3; i++)
+      {
         if (i == 0)
           strcpy(body, "RtBody");
         else if (i == 1)
@@ -4364,8 +4619,10 @@ static int utl_print_object_par(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
         if (EVEN(sts))
           continue;
 
-        for (j = 0; j < rows; j++) {
-          if (str_NoCaseStrcmp(parameter, bodydef[j].ParName) == 0) {
+        for (j = 0; j < rows; j++)
+        {
+          if (str_NoCaseStrcmp(parameter, bodydef[j].ParName) == 0)
+          {
             found = 1;
             break;
           }
@@ -4374,7 +4631,8 @@ static int utl_print_object_par(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
           break;
         free((char*)bodydef);
       }
-      if (!found) {
+      if (!found)
+      {
         /* The attribute didn't exist */
         return FOE__NOPAR;
       }
@@ -4387,7 +4645,8 @@ static int utl_print_object_par(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
         elements = 1;
 
       if (*element != UTL_NOELEMENT)
-        if (*element + 1 > elements) {
+        if (*element + 1 > elements)
+        {
           /* Error in element */
           free((char*)bodydef);
           return FOE__ELEMENT;
@@ -4395,38 +4654,47 @@ static int utl_print_object_par(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
 
       /* Get the parameter value in object */
       s = strchr(hier_name, '.');
-      if (s) {
+      if (s)
+      {
         strcpy(pname, s + 1);
         strcat(pname, ".");
         strcat(pname, parname);
-      } else
+      }
+      else
         strcpy(pname, parname);
-      sts = ldh_GetObjectPar(
-          ldhses, arp->Objid, body, pname, (char**)&object_par, &size);
+      sts = ldh_GetObjectPar(ldhses, arp->Objid, body, pname, (char**)&object_par, &size);
       if (EVEN(sts))
         return sts;
 
-      if (*element == UTL_NOELEMENT) {
+      if (*element == UTL_NOELEMENT)
+      {
         /* No element given, show all the elements */
         first_element = 0;
         last_element = elements - 1;
-      } else {
+      }
+      else
+      {
         first_element = *element;
         last_element = *element;
       }
 
-      for (k = first_element; k < last_element + 1; k++) {
+      for (k = first_element; k < last_element + 1; k++)
+      {
         IF_OUT u_pagebreak(utlctx);
 
         object_element = object_par + k * size / elements;
-        switch (bodydef[j].Par->Output.Info.Type) {
-        case pwr_eType_Boolean: {
+        switch (bodydef[j].Par->Output.Info.Type)
+        {
+        case pwr_eType_Boolean:
+        {
           p_Boolean = (pwr_tBoolean*)object_element;
           u_print(utlctx, "    %s", parname);
-          if (elements > 1) {
+          if (elements > 1)
+          {
             u_print(utlctx, "[%2d]", k);
             u_posit(utlctx, 4, strlen(parname) + 8);
-          } else
+          }
+          else
             u_posit(utlctx, 4, strlen(parname) + 4);
           if (*p_Boolean == 0)
             u_print(utlctx, " FALSE");
@@ -4435,31 +4703,38 @@ static int utl_print_object_par(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
           u_row(utlctx);
           break;
         }
-        case pwr_eType_Float32: {
+        case pwr_eType_Float32:
+        {
           p_Float32 = (pwr_tFloat32*)object_element;
           u_print(utlctx, "    %s", parname);
-          if (elements > 1) {
+          if (elements > 1)
+          {
             u_print(utlctx, "[%2d]", k);
             u_posit(utlctx, 4, strlen(parname) + 8);
-          } else
+          }
+          else
             u_posit(utlctx, 4, strlen(parname) + 4);
           u_print(utlctx, " %f", *p_Float32);
           u_row(utlctx);
           break;
         }
-        case pwr_eType_Float64: {
+        case pwr_eType_Float64:
+        {
           p_Float64 = (pwr_tFloat64*)object_element;
           u_print(utlctx, "    %s", parname);
-          if (elements > 1) {
+          if (elements > 1)
+          {
             u_print(utlctx, "[%2d]", k);
             u_posit(utlctx, 4, strlen(parname) + 8);
-          } else
+          }
+          else
             u_posit(utlctx, 4, strlen(parname) + 4);
           u_print(utlctx, " %f", *p_Float64);
           u_row(utlctx);
           break;
         }
-        case pwr_eType_Char: {
+        case pwr_eType_Char:
+        {
           p_Char = object_element;
           u_print(utlctx, "    %s", parname);
           u_posit(utlctx, 4, strlen(parname) + 4);
@@ -4467,73 +4742,91 @@ static int utl_print_object_par(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
           u_row(utlctx);
           break;
         }
-        case pwr_eType_Int8: {
+        case pwr_eType_Int8:
+        {
           p_Int8 = (pwr_tInt8*)object_element;
           u_print(utlctx, "    %s", parname);
-          if (elements > 1) {
+          if (elements > 1)
+          {
             u_print(utlctx, "[%2d]", k);
             u_posit(utlctx, 4, strlen(parname) + 8);
-          } else
+          }
+          else
             u_posit(utlctx, 4, strlen(parname) + 4);
           u_print(utlctx, " %d", *p_Int8);
           u_row(utlctx);
           break;
         }
-        case pwr_eType_Int16: {
+        case pwr_eType_Int16:
+        {
           p_Int16 = (pwr_tInt16*)object_element;
           u_print(utlctx, "    %s", parname);
-          if (elements > 1) {
+          if (elements > 1)
+          {
             u_print(utlctx, "[%2d]", k);
             u_posit(utlctx, 4, strlen(parname) + 8);
-          } else
+          }
+          else
             u_posit(utlctx, 4, strlen(parname) + 4);
           u_print(utlctx, " %d", *p_Int16);
           u_row(utlctx);
           break;
         }
-        case pwr_eType_Int32: {
+        case pwr_eType_Int32:
+        {
           p_Int32 = (pwr_tInt32*)object_element;
           u_print(utlctx, "    %s", parname);
-          if (elements > 1) {
+          if (elements > 1)
+          {
             u_print(utlctx, "[%2d]", k);
             u_posit(utlctx, 4, strlen(parname) + 8);
-          } else
+          }
+          else
             u_posit(utlctx, 4, strlen(parname) + 4);
           u_print(utlctx, " %d", *p_Int32);
           u_row(utlctx);
           break;
         }
-        case pwr_eType_Int64: {
+        case pwr_eType_Int64:
+        {
           p_Int64 = (pwr_tInt64*)object_element;
           u_print(utlctx, "    %s", parname);
-          if (elements > 1) {
+          if (elements > 1)
+          {
             u_print(utlctx, "[%2d]", k);
             u_posit(utlctx, 4, strlen(parname) + 8);
-          } else
+          }
+          else
             u_posit(utlctx, 4, strlen(parname) + 4);
           u_print(utlctx, " %lld", *p_Int64);
           u_row(utlctx);
           break;
         }
-        case pwr_eType_UInt8: {
+        case pwr_eType_UInt8:
+        {
           p_UInt8 = (pwr_tUInt8*)object_element;
           u_print(utlctx, "    %s", parname);
-          if (elements > 1) {
+          if (elements > 1)
+          {
             u_print(utlctx, "[%2d]", k);
             u_posit(utlctx, 4, strlen(parname) + 8);
-          } else
+          }
+          else
             u_posit(utlctx, 4, strlen(parname) + 4);
           u_print(utlctx, " %u", *p_UInt8);
           u_row(utlctx);
           break;
         }
-        case pwr_eType_UInt16: {
+        case pwr_eType_UInt16:
+        {
           p_UInt16 = (pwr_tUInt16*)object_element;
           u_print(utlctx, "    %s", parname);
-          if (elements > 1) {
+          if (elements > 1)
+          {
             u_print(utlctx, "[%2d]", k);
             u_posit(utlctx, 4, strlen(parname) + 8);
-          } else
+          }
+          else
             u_posit(utlctx, 4, strlen(parname) + 4);
           u_print(utlctx, " %u", *p_UInt16);
           u_row(utlctx);
@@ -4546,66 +4839,80 @@ static int utl_print_object_par(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
         case pwr_eType_TypeId:
         case pwr_eType_CastId:
         case pwr_eType_VolumeId:
-        case pwr_eType_ObjectIx: {
+        case pwr_eType_ObjectIx:
+        {
           p_UInt32 = (pwr_tUInt32*)object_element;
           u_print(utlctx, "    %s", parname);
-          if (elements > 1) {
+          if (elements > 1)
+          {
             u_print(utlctx, "[%2d]", k);
             u_posit(utlctx, 4, strlen(parname) + 8);
-          } else
+          }
+          else
             u_posit(utlctx, 4, strlen(parname) + 4);
           u_print(utlctx, " %lu", *p_UInt32);
           u_row(utlctx);
           break;
         }
-        case pwr_eType_UInt64: {
+        case pwr_eType_UInt64:
+        {
           p_UInt64 = (pwr_tUInt64*)object_element;
           u_print(utlctx, "    %s", parname);
-          if (elements > 1) {
+          if (elements > 1)
+          {
             u_print(utlctx, "[%2d]", k);
             u_posit(utlctx, 4, strlen(parname) + 8);
-          } else
+          }
+          else
             u_posit(utlctx, 4, strlen(parname) + 4);
           u_print(utlctx, " %llu", *p_UInt64);
           u_row(utlctx);
           break;
         }
-        case pwr_eType_String: {
+        case pwr_eType_String:
+        {
           p_String = object_element;
           u_print(utlctx, "    %s", parname);
-          if (elements > 1) {
+          if (elements > 1)
+          {
             u_print(utlctx, "[%2d]", k);
             u_posit(utlctx, 4, strlen(parname) + 8);
-          } else
+          }
+          else
             u_posit(utlctx, 4, strlen(parname) + 4);
           u_print(utlctx, " \"%s\"", p_String);
           u_row(utlctx);
           break;
         }
-        case pwr_eType_Text: {
+        case pwr_eType_Text:
+        {
           p_String = object_element;
           u_print(utlctx, "    %s", parname);
-          if (elements > 1) {
+          if (elements > 1)
+          {
             u_print(utlctx, "[%2d]", k);
             u_posit(utlctx, 4, strlen(parname) + 8);
-          } else
+          }
+          else
             u_posit(utlctx, 4, strlen(parname) + 4);
           u_row(utlctx);
           u_print(utlctx, "\"%s\"", p_String);
           u_row(utlctx);
           break;
         }
-        case pwr_eType_ObjDId: {
+        case pwr_eType_ObjDId:
+        {
           /* Get the object name from ldh */
           p_ObjDId = (pwr_tObjid*)object_element;
           u_print(utlctx, "    %s", parname);
-          if (elements > 1) {
+          if (elements > 1)
+          {
             u_print(utlctx, "[%2d]", k);
             u_posit(utlctx, 4, strlen(parname) + 8);
-          } else
+          }
+          else
             u_posit(utlctx, 4, strlen(parname) + 4);
-          sts = ldh_ObjidToName(ldhses, *p_ObjDId, ldh_eName_Hierarchy,
-              hier_name, sizeof(hier_name), &size);
+          sts = ldh_ObjidToName(ldhses, *p_ObjDId, ldh_eName_Hierarchy, hier_name, sizeof(hier_name), &size);
           if (EVEN(sts))
             u_print(utlctx, " Undefined Object");
           else
@@ -4613,17 +4920,19 @@ static int utl_print_object_par(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
           u_row(utlctx);
           break;
         }
-        case pwr_eType_AttrRef: {
+        case pwr_eType_AttrRef:
+        {
           /* Get the object name from ldh */
           p_AttrRef = (pwr_sAttrRef*)object_element;
           u_print(utlctx, "    %s", parname);
-          if (elements > 1) {
+          if (elements > 1)
+          {
             u_print(utlctx, "[%2d]", k);
             u_posit(utlctx, 4, strlen(parname) + 8);
-          } else
+          }
+          else
             u_posit(utlctx, 4, strlen(parname) + 4);
-          sts = ldh_AttrRefToName(
-              ldhses, p_AttrRef, ldh_eName_Aref, &hier_name_p, &size);
+          sts = ldh_AttrRefToName(ldhses, p_AttrRef, ldh_eName_Aref, &hier_name_p, &size);
           if (EVEN(sts))
             u_print(utlctx, " Undefined attribute");
           else
@@ -4631,16 +4940,18 @@ static int utl_print_object_par(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
           u_row(utlctx);
           break;
         }
-        case pwr_eType_Time: {
+        case pwr_eType_Time:
+        {
           /* Convert time to ascii */
-          sts = time_AtoAscii((pwr_tTime*)object_element,
-              time_eFormat_DateAndTime, timbuf, sizeof(timbuf));
+          sts = time_AtoAscii((pwr_tTime*)object_element, time_eFormat_DateAndTime, timbuf, sizeof(timbuf));
           timbuf[20] = 0;
           u_print(utlctx, "    %s", parname);
-          if (elements > 1) {
+          if (elements > 1)
+          {
             u_print(utlctx, "[%2d]", k);
             u_posit(utlctx, 4, strlen(parname) + 8);
-          } else
+          }
+          else
             u_posit(utlctx, 4, strlen(parname) + 4);
           u_print(utlctx, " %s", timbuf);
           u_row(utlctx);
@@ -4660,32 +4971,30 @@ static int utl_print_object_par(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
 }
 
 /*************************************************************************
-*
-* Name:		utl_print_class()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		utl_print_class()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-static int utl_print_class(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
-    utl_ctx utlctx, int full, unsigned long dum3, unsigned long dum4)
+static int utl_print_class(pwr_sAttrRef* arp, ldh_tSesContext ldhses, utl_ctx utlctx, int full,
+                           unsigned long dum3, unsigned long dum4)
 {
   int sts, size;
   pwr_tOName hier_name;
   char class_str[80];
 
   /* Print the name of the actual object */
-  sts = ldh_ObjidToName(ldhses, arp->Objid, ldh_eName_Hierarchy, hier_name,
-      sizeof(hier_name), &size);
+  sts = ldh_ObjidToName(ldhses, arp->Objid, ldh_eName_Hierarchy, hier_name, sizeof(hier_name), &size);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_ObjidToName(
-      ldhses, arp->Objid, ldh_eName_Objid, class_str, sizeof(class_str), &size);
+  sts = ldh_ObjidToName(ldhses, arp->Objid, ldh_eName_Objid, class_str, sizeof(class_str), &size);
   if (EVEN(sts))
     return sts;
 
@@ -4702,23 +5011,22 @@ static int utl_print_class(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
 }
 
 /*************************************************************************
-*
-* Name:		utl_print_class_full()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* pwr_tObjid  Objdid		I	objdid for the object.
-* ldh_tSesContext ldhses		I	ldh session.
-* unsigned long	utlctx		I	output specification.
-*
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		utl_print_class_full()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * pwr_tObjid  Objdid		I	objdid for the object.
+ * ldh_tSesContext ldhses		I	ldh session.
+ * unsigned long	utlctx		I	output specification.
+ *
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-static int utl_print_class_full(
-    pwr_tObjid klass, ldh_tSesContext ldhses, utl_ctx utlctx)
+static int utl_print_class_full(pwr_tObjid klass, ldh_tSesContext ldhses, utl_ctx utlctx)
 {
   int sts, i, j;
   ldh_sParDef* bodydef;
@@ -4726,7 +5034,8 @@ static int utl_print_class_full(
   char body[20];
   char parname[32];
 
-  for (i = 0; i < 3; i++) {
+  for (i = 0; i < 3; i++)
+  {
     if (i == 0)
       strcpy(body, "RtBody");
     else if (i == 1)
@@ -4735,145 +5044,176 @@ static int utl_print_class_full(
       strcpy(body, "SysBody");
 
     /* Get the runtime paramters for this class */
-    sts = ldh_GetObjectBodyDef(
-        ldhses, cdh_ClassObjidToId(klass), body, 1, &bodydef, &rows);
+    sts = ldh_GetObjectBodyDef(ldhses, cdh_ClassObjidToId(klass), body, 1, &bodydef, &rows);
     if (EVEN(sts))
       continue;
 
     u_print(utlctx, "    %s", body);
     u_row(utlctx);
 
-    for (j = 0; j < rows; j++) {
+    for (j = 0; j < rows; j++)
+    {
       strcpy(parname, bodydef[j].ParName);
       if (bodydef[j].Par->Output.Info.Flags & PWR_MASK_ARRAY)
-        sprintf(&parname[strlen(parname)], "[%d]",
-            bodydef[j].Par->Output.Info.Elements);
+        sprintf(&parname[strlen(parname)], "[%d]", bodydef[j].Par->Output.Info.Elements);
       IF_OUT u_pagebreak(utlctx);
       u_print(utlctx, "      %s", parname);
       u_posit(utlctx, 4, strlen(parname) + 6);
 
-      switch (bodydef[j].ParClass) {
-      case pwr_eClass_Input: {
+      switch (bodydef[j].ParClass)
+      {
+      case pwr_eClass_Input:
+      {
         u_print(utlctx, " $Input		");
         break;
       }
-      case pwr_eClass_Intern: {
+      case pwr_eClass_Intern:
+      {
         u_print(utlctx, " $Intern	");
         break;
       }
-      case pwr_eClass_Output: {
+      case pwr_eClass_Output:
+      {
         u_print(utlctx, " $Output	");
         break;
       }
-      case pwr_eClass_Param: {
+      case pwr_eClass_Param:
+      {
         u_print(utlctx, " $Attribute		");
         break;
       }
-      case pwr_eClass_TargetAttribute: {
+      case pwr_eClass_TargetAttribute:
+      {
         u_print(utlctx, " $TargetAttribute		");
         break;
       }
-      case pwr_eClass_Buffer: {
+      case pwr_eClass_Buffer:
+      {
         u_print(utlctx, " $Buffer	");
         break;
       }
-      case pwr_eClass_ObjXRef: {
+      case pwr_eClass_ObjXRef:
+      {
         u_print(utlctx, " $ObjXRef	");
         break;
       }
-      default: {
+      default:
+      {
         u_print(utlctx, "		");
       }
       }
 
       /* If the parameters in object and template are node equal,
          print them */
-      switch (bodydef[j].Par->Output.Info.Type) {
-      case pwr_eType_Boolean: {
+      switch (bodydef[j].Par->Output.Info.Type)
+      {
+      case pwr_eType_Boolean:
+      {
         u_print(utlctx, "Boolean	");
         break;
       }
-      case pwr_eType_Float32: {
+      case pwr_eType_Float32:
+      {
         u_print(utlctx, "Float32	");
         break;
       }
-      case pwr_eType_Float64: {
+      case pwr_eType_Float64:
+      {
         u_print(utlctx, "Float64	");
         break;
       }
-      case pwr_eType_Int8: {
+      case pwr_eType_Int8:
+      {
         u_print(utlctx, "Int8	");
         break;
       }
-      case pwr_eType_Int16: {
+      case pwr_eType_Int16:
+      {
         u_print(utlctx, "Int16	");
         break;
       }
-      case pwr_eType_Int32: {
+      case pwr_eType_Int32:
+      {
         u_print(utlctx, "Int32	");
         break;
       }
-      case pwr_eType_Int64: {
+      case pwr_eType_Int64:
+      {
         u_print(utlctx, "Int64	");
         break;
       }
-      case pwr_eType_UInt8: {
+      case pwr_eType_UInt8:
+      {
         u_print(utlctx, "UInt8	");
         break;
       }
-      case pwr_eType_UInt16: {
+      case pwr_eType_UInt16:
+      {
         u_print(utlctx, "UInt16	");
         break;
       }
-      case pwr_eType_UInt32: {
+      case pwr_eType_UInt32:
+      {
         u_print(utlctx, "UInt32	");
         break;
       }
-      case pwr_eType_UInt64: {
+      case pwr_eType_UInt64:
+      {
         u_print(utlctx, "UInt64	");
         break;
       }
-      case pwr_eType_String: {
+      case pwr_eType_String:
+      {
         u_print(utlctx, "String	");
         break;
       }
-      case pwr_eType_Text: {
+      case pwr_eType_Text:
+      {
         u_print(utlctx, "Text  	");
         break;
       }
-      case pwr_eType_ObjDId: {
+      case pwr_eType_ObjDId:
+      {
         u_print(utlctx, "ObjDId	");
         break;
       }
-      case pwr_eType_AttrRef: {
+      case pwr_eType_AttrRef:
+      {
         u_print(utlctx, "AttrRef	");
         break;
       }
-      case pwr_eType_Buffer: {
+      case pwr_eType_Buffer:
+      {
         u_print(utlctx, "Buffer	");
         break;
       }
-      case pwr_eType_Enum: {
+      case pwr_eType_Enum:
+      {
         u_print(utlctx, "Enum	");
         break;
       }
-      case pwr_eType_Struct: {
+      case pwr_eType_Struct:
+      {
         u_print(utlctx, "Struct	");
         break;
       }
-      case pwr_eType_Mask: {
+      case pwr_eType_Mask:
+      {
         u_print(utlctx, "Mask	");
         break;
       }
-      case pwr_eType_Array: {
+      case pwr_eType_Array:
+      {
         u_print(utlctx, "Array	");
         break;
       }
-      case pwr_eType_Time: {
+      case pwr_eType_Time:
+      {
         u_print(utlctx, "Time	");
         break;
       }
-      default: {
+      default:
+      {
         u_print(utlctx, "	");
       }
       }
@@ -4893,23 +5233,23 @@ static int utl_print_class_full(
 }
 
 /*************************************************************************
-*
-* Name:		utl_set_parameter()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* pwr_tObjid  objdid		I	objdid for the object.
-* ldh_tSesContext ldhses		I	ldh session.
-* unsigned long	utlctx		I	output specification.
-*
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		utl_set_parameter()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * pwr_tObjid  objdid		I	objdid for the object.
+ * ldh_tSesContext ldhses		I	ldh session.
+ * unsigned long	utlctx		I	output specification.
+ *
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-static int utl_set_parameter(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
-    char* parameter, char* invaluestr, int element, utl_ctx utlctx)
+static int utl_set_parameter(pwr_sAttrRef* arp, ldh_tSesContext ldhses, char* parameter, char* invaluestr,
+                             int element, utl_ctx utlctx)
 {
   char* valuestr;
   int sts, size, k;
@@ -4967,7 +5307,8 @@ static int utl_set_parameter(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
   if (EVEN(sts))
     return sts;
 
-  if (info.flags & PWR_MASK_POINTER) {
+  if (info.flags & PWR_MASK_POINTER)
+  {
     /* Don't write pointers */
     return FOE__SETPTR;
   }
@@ -4978,22 +5319,27 @@ static int utl_set_parameter(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
     elements = 1;
 
   if (element != UTL_NOELEMENT)
-    if (element + 1 > elements) {
+    if (element + 1 > elements)
+    {
       /* Error in element */
       return FOE__ELEMENT;
     }
 
-  if (element == UTL_NOELEMENT) {
+  if (element == UTL_NOELEMENT)
+  {
     /* No element given, show all the elements */
     first_element = 0;
     last_element = elements - 1;
-  } else {
+  }
+  else
+  {
     first_element = element;
     last_element = element;
   }
 
   parsize = info.size;
-  for (k = first_element; k < last_element + 1; k++) {
+  for (k = first_element; k < last_element + 1; k++)
+  {
     /* Get the parameter */
     object_par = (char*)calloc(1, info.size);
     sts = ldh_ReadAttribute(ldhses, &aref, object_par, info.size);
@@ -5006,7 +5352,8 @@ static int utl_set_parameter(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
       sprintf(logstrptr + strlen(logstr), "[%d]", k);
 
     /* Get the value if not passed */
-    if (invaluestr == NULL) {
+    if (invaluestr == NULL)
+    {
       printf("%s\n", logstr);
       // TODO
       printf("Enter value: ");
@@ -5014,42 +5361,49 @@ static int utl_set_parameter(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
       valuestr = (char*)&value;
       if (*valuestr == '\0')
         continue;
-    } else
+    }
+    else
       valuestr = invaluestr;
 
     sprintf(logstrptr + strlen(logstr), " = ");
 
     /* Put the value in the parameter buffer */
-    switch (info.type) {
-    case pwr_eType_Boolean: {
+    switch (info.type)
+    {
+    case pwr_eType_Boolean:
+    {
       p_Boolean = (pwr_tBoolean*)object_element;
       sprintf(logstrptr + strlen(logstr), "( %d ) ", *p_Boolean);
       sscanf(valuestr, "%d", p_Boolean);
       sprintf(logstrptr + strlen(logstr), "%d", *p_Boolean);
       break;
     }
-    case pwr_eType_Float32: {
+    case pwr_eType_Float32:
+    {
       p_Float32 = (pwr_tFloat32*)object_element;
       sprintf(logstrptr + strlen(logstr), "( %f ) ", *p_Float32);
       sscanf(valuestr, "%f", p_Float32);
       sprintf(logstrptr + strlen(logstr), "%f", *p_Float32);
       break;
     }
-    case pwr_eType_Float64: {
+    case pwr_eType_Float64:
+    {
       p_Float64 = (pwr_tFloat64*)object_element;
       sprintf(logstrptr + strlen(logstr), "( %f ) ", *p_Float64);
       sscanf(valuestr, "%lf", p_Float64);
       sprintf(logstrptr + strlen(logstr), "%f", *p_Float64);
       break;
     }
-    case pwr_eType_Char: {
+    case pwr_eType_Char:
+    {
       p_Char = object_element;
       sprintf(logstrptr + strlen(logstr), "( %c ) ", *p_Char);
       sscanf(valuestr, "%c", p_Char);
       sprintf(logstrptr + strlen(logstr), "%c", *p_Char);
       break;
     }
-    case pwr_eType_Int8: {
+    case pwr_eType_Int8:
+    {
       pwr_tInt16 i16;
       pwr_tInt8 i8;
       p_Int8 = (pwr_tInt8*)object_element;
@@ -5060,29 +5414,32 @@ static int utl_set_parameter(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
       sprintf(logstrptr + strlen(logstr), "%d", *p_Int8);
       break;
     }
-    case pwr_eType_Int16: {
+    case pwr_eType_Int16:
+    {
       p_Int16 = (pwr_tInt16*)object_element;
       sprintf(logstrptr + strlen(logstr), "( %d ) ", *p_Int16);
       sscanf(valuestr, "%hd", p_Int16);
       sprintf(logstrptr + strlen(logstr), "%d", *p_Int16);
       break;
     }
-    case pwr_eType_Int32: {
+    case pwr_eType_Int32:
+    {
       p_Int32 = (pwr_tInt32*)object_element;
       sprintf(logstrptr + strlen(logstr), "( %d ) ", *p_Int32);
       sscanf(valuestr, "%d", p_Int32);
       sprintf(logstrptr + strlen(logstr), "%d", *p_Int32);
       break;
     }
-    case pwr_eType_Int64: {
+    case pwr_eType_Int64:
+    {
       p_Int64 = (pwr_tInt64*)object_element;
-      sprintf(
-          logstrptr + strlen(logstr), "( " pwr_dFormatInt64 " ) ", *p_Int64);
+      sprintf(logstrptr + strlen(logstr), "( " pwr_dFormatInt64 " ) ", *p_Int64);
       sscanf(valuestr, pwr_dFormatInt64, p_Int64);
       sprintf(logstrptr + strlen(logstr), pwr_dFormatInt64, *p_Int64);
       break;
     }
-    case pwr_eType_UInt8: {
+    case pwr_eType_UInt8:
+    {
       pwr_tUInt16 i16;
       pwr_tUInt8 i8;
       p_UInt8 = (pwr_tUInt8*)object_element;
@@ -5093,7 +5450,8 @@ static int utl_set_parameter(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
       sprintf(logstrptr + strlen(logstr), "%u", *p_UInt8);
       break;
     }
-    case pwr_eType_UInt16: {
+    case pwr_eType_UInt16:
+    {
       p_UInt16 = (pwr_tUInt16*)object_element;
       sprintf(logstrptr + strlen(logstr), "( %u ) ", *p_UInt16);
       sscanf(valuestr, "%hd", p_UInt16);
@@ -5108,22 +5466,24 @@ static int utl_set_parameter(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
     case pwr_eType_CastId:
     case pwr_eType_VolumeId:
     case pwr_eType_ObjectIx:
-    case pwr_eType_DisableAttr: {
+    case pwr_eType_DisableAttr:
+    {
       p_UInt32 = (pwr_tUInt32*)object_element;
       sprintf(logstrptr + strlen(logstr), "( %u ) ", *p_UInt32);
       sscanf(valuestr, "%d", p_UInt32);
       sprintf(logstrptr + strlen(logstr), "%u", *p_UInt32);
       break;
     }
-    case pwr_eType_UInt64: {
+    case pwr_eType_UInt64:
+    {
       p_UInt64 = (pwr_tUInt64*)object_element;
-      sprintf(
-          logstrptr + strlen(logstr), "( " pwr_dFormatUInt64 " ) ", *p_UInt64);
+      sprintf(logstrptr + strlen(logstr), "( " pwr_dFormatUInt64 " ) ", *p_UInt64);
       sscanf(valuestr, pwr_dFormatUInt64, p_UInt64);
       sprintf(logstrptr + strlen(logstr), pwr_dFormatUInt64, *p_UInt64);
       break;
     }
-    case pwr_eType_String: {
+    case pwr_eType_String:
+    {
       p_String = object_element;
       sprintf(logstrptr + strlen(logstr), "( %s ) ", p_String);
       strncpy(p_String, valuestr, info.size / info.nElement);
@@ -5133,15 +5493,19 @@ static int utl_set_parameter(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
         printf("%%FOE-W-LONG_STRING, parameter size is exceeded\n");
       break;
     }
-    case pwr_eType_Text: {
+    case pwr_eType_Text:
+    {
       p_String = object_element;
       sprintf(logstrptr + strlen(logstr), "( %s ) ", p_String);
       char* s = p_String;
-      for (char* c = valuestr; *c; c++) {
-        if (*c == '\\' && *(c + 1) == 'n') {
+      for (char* c = valuestr; *c; c++)
+      {
+        if (*c == '\\' && *(c + 1) == 'n')
+        {
           *s = 10;
           c++;
-        } else
+        }
+        else
           *s = *c;
         s++;
         if (s - p_String >= info.size / info.nElement)
@@ -5154,32 +5518,37 @@ static int utl_set_parameter(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
         printf("%%FOE-W-LONG_STRING, parameter size is exceeded\n");
       break;
     }
-    case pwr_eType_Time: {
+    case pwr_eType_Time:
+    {
       sts = time_AsciiToA(valuestr, (pwr_tTime*)object_element);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         printf("Time format syntax error\n");
         return FOE__SUCCESS;
       }
       sprintf(logstrptr + strlen(logstr), "%s", valuestr);
       break;
     }
-    case pwr_eType_DeltaTime: {
+    case pwr_eType_DeltaTime:
+    {
       sts = time_AsciiToD(valuestr, (pwr_tDeltaTime*)object_element);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         printf("DeltaTime format syntax error\n");
         return FOE__SUCCESS;
       }
       sprintf(logstrptr + strlen(logstr), "%s", valuestr);
       break;
     }
-    case pwr_eType_ObjDId: {
+    case pwr_eType_ObjDId:
+    {
       pwr_tOName objdid_name;
 
       /* Get the object name from ldh */
       p_ObjDId = (pwr_tObjid*)object_element;
-      sts = ldh_ObjidToName(ldhses, *p_ObjDId, ldh_eName_Hierarchy, objdid_name,
-          sizeof(objdid_name), &size);
-      if (EVEN(sts)) {
+      sts = ldh_ObjidToName(ldhses, *p_ObjDId, ldh_eName_Hierarchy, objdid_name, sizeof(objdid_name), &size);
+      if (EVEN(sts))
+      {
         objdid_name[0] = '\0';
       }
       sprintf(logstrptr + strlen(logstr), "( %s ) ", objdid_name);
@@ -5187,38 +5556,39 @@ static int utl_set_parameter(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
         sts = cdh_StringToObjid(valuestr, p_ObjDId);
       else
         sts = ldh_NameToObjid(ldhses, p_ObjDId, valuestr);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         printf("Object does not exist\n");
         return FOE__SUCCESS;
       }
-      sts = ldh_ObjidToName(ldhses, *p_ObjDId, ldh_eName_Hierarchy, objdid_name,
-          sizeof(objdid_name), &size);
-      if (EVEN(sts)) {
+      sts = ldh_ObjidToName(ldhses, *p_ObjDId, ldh_eName_Hierarchy, objdid_name, sizeof(objdid_name), &size);
+      if (EVEN(sts))
+      {
         objdid_name[0] = '\0';
       }
       sprintf(logstrptr + strlen(logstr), "%s", objdid_name);
       break;
     }
-    case pwr_eType_AttrRef: {
+    case pwr_eType_AttrRef:
+    {
       pwr_tAName objdid_name;
       char* objdid_name_p;
 
       /* Get the object name from ldh */
       p_AttrRef = (pwr_sAttrRef*)object_element;
-      sts = ldh_AttrRefToName(
-          ldhses, p_AttrRef, ldh_eName_Aref, &objdid_name_p, &size);
+      sts = ldh_AttrRefToName(ldhses, p_AttrRef, ldh_eName_Aref, &objdid_name_p, &size);
       if (EVEN(sts))
         objdid_name[0] = '\0';
       else
         strcpy(objdid_name, objdid_name_p);
       sprintf(logstrptr + strlen(logstr), "( %s ) ", objdid_name);
       sts = ldh_NameToAttrRef(ldhses, valuestr, p_AttrRef);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         printf("Attribute does not exist\n");
         return FOE__SUCCESS;
       }
-      sts = ldh_AttrRefToName(
-          ldhses, p_AttrRef, ldh_eName_Aref, &objdid_name_p, &size);
+      sts = ldh_AttrRefToName(ldhses, p_AttrRef, ldh_eName_Aref, &objdid_name_p, &size);
       if (EVEN(sts))
         objdid_name[0] = '\0';
       else
@@ -5226,12 +5596,14 @@ static int utl_set_parameter(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
       sprintf(logstrptr + strlen(logstr), "%s", objdid_name);
       break;
     }
-    default: {
+    default:
+    {
       printf("Parameter type not correct\n");
     }
     }
 
-    if (utlctx->confirm) {
+    if (utlctx->confirm)
+    {
       printf("%s ", logstr);
       // TODO
       printf("[Y/n/q/a]: ");
@@ -5249,7 +5621,8 @@ static int utl_set_parameter(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
 
     /* Set the parameter */
     sts = ldh_WriteAttribute(ldhses, &aref, object_par, parsize);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       printf("FEL: sts=%d\n", sts);
       printf("FEL2: utlctx->ignore_missing=%d\n", utlctx->ignore_missing);
     }
@@ -5268,21 +5641,20 @@ static int utl_set_parameter(pwr_sAttrRef* arp, ldh_tSesContext ldhses,
 }
 
 /*************************************************************************
-*
-* Name:		utl_show_connection()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* char *	windowstring	I	Name of the window
-*
-* Description: 	Prints all connection objects found in a window.
-*
-**************************************************************************/
+ *
+ * Name:		utl_show_connection()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * char *	windowstring	I	Name of the window
+ *
+ * Description: 	Prints all connection objects found in a window.
+ *
+ **************************************************************************/
 
-int utl_show_connection(
-    ldh_tSesContext ldhses, char* windowstring, int terminal, char* filename)
+int utl_show_connection(ldh_tSesContext ldhses, char* windowstring, int terminal, char* filename)
 {
   utl_ctx utlctx;
   int sts, size;
@@ -5296,14 +5668,16 @@ int utl_show_connection(
 
   /* Get objdid for the plcpgm */
   sts = ldh_NameToObjid(ldhses, &window, windowstring);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     return FOE__WINDNOTFOUND;
   }
 
   /* Open file */
   utl_ctx_new(&utlctx, ldhses, "", UTL_PORTRAIT);
   sts = u_open(utlctx, filename, terminal, 0);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     utl_ctx_delete(utlctx);
     return sts;
   }
@@ -5320,12 +5694,11 @@ int utl_show_connection(
     exit(sts);
 
   objectlist_ptr = objectlist;
-  for (i = 0; i < (int)object_count; i++) {
+  for (i = 0; i < (int)object_count; i++)
+  {
     /* Get the name of the object */
-    sts = ldh_ObjidToName(ldhses, *objectlist_ptr, ldh_eName_Hierarchy,
-        hier_name, sizeof(hier_name), &size);
-    sts = ldh_ObjidToName(ldhses, *objectlist_ptr, ldh_eName_Objid, objid_str,
-        sizeof(objid_str), &size);
+    sts = ldh_ObjidToName(ldhses, *objectlist_ptr, ldh_eName_Hierarchy, hier_name, sizeof(hier_name), &size);
+    sts = ldh_ObjidToName(ldhses, *objectlist_ptr, ldh_eName_Objid, objid_str, sizeof(objid_str), &size);
     IF_OUT u_pagebreak(utlctx);
     u_print(utlctx, "  %s", hier_name);
     u_posit(utlctx, 7, strlen(hier_name) + 2);
@@ -5346,18 +5719,18 @@ int utl_show_connection(
 }
 
 /*************************************************************************
-*
-* Name:		utl_link()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* char *	nodename	I	Name of the node.
-*
-* Description: 	Creates process modules and links the plcprogram of a node.
-*
-**************************************************************************/
+ *
+ * Name:		utl_link()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * char *	nodename	I	Name of the node.
+ *
+ * Description: 	Creates process modules and links the plcprogram of a node.
+ *
+ **************************************************************************/
 
 int utl_link(ldh_tSesContext ldhses, char* nodename, int debug)
 {
@@ -5377,31 +5750,30 @@ int utl_link(ldh_tSesContext ldhses, char* nodename, int debug)
 }
 
 /*************************************************************************
-*
-* Name:		utl_compile()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* ldh_tWBContext  ldhwb		I	ldh workbench.
-* char *	objectname	I	Name of a window, plcpgm or node.
-*
-* Description: 	Compiling one or a number of windows depending of
-*		the class of the object given in objectname. If the
-* 		class is a window the window is compiled. If the class
-*		is plcpgm all windows in the plcpgm is compiled. If the
-*		class i node all windows in plcpgms connected to the
-*		node is compiled.
-*		Everytime a window is compiled, the module for the plcpgm
-*		is also compiled.
-*
-*
-**************************************************************************/
+ *
+ * Name:		utl_compile()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * ldh_tWBContext  ldhwb		I	ldh workbench.
+ * char *	objectname	I	Name of a window, plcpgm or node.
+ *
+ * Description: 	Compiling one or a number of windows depending of
+ *		the class of the object given in objectname. If the
+ * 		class is a window the window is compiled. If the class
+ *		is plcpgm all windows in the plcpgm is compiled. If the
+ *		class i node all windows in plcpgms connected to the
+ *		node is compiled.
+ *		Everytime a window is compiled, the module for the plcpgm
+ *		is also compiled.
+ *
+ *
+ **************************************************************************/
 
-int utl_compile(ldh_tSesContext ldhses, ldh_tWBContext ldhwb, char* plcname,
-    char* windowname, char* hiername, char* fromname, int modified, int debug,
-    int allvolumes, char* volumes)
+int utl_compile(ldh_tSesContext ldhses, ldh_tWBContext ldhwb, char* plcname, char* windowname, char* hiername,
+                char* fromname, int modified, int debug, int allvolumes, char* volumes)
 {
   int sts, size;
   int i, nr;
@@ -5448,63 +5820,75 @@ int utl_compile(ldh_tSesContext ldhses, ldh_tWBContext ldhwb, char* plcname,
   if (EVEN(sts))
     return sts;
 
-  if (fromname != NULL) {
+  if (fromname != NULL)
+  {
     sts = ldh_NameToObjid(ldhses, &fromobjdid, fromname);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       status = FOE__OBJECT;
       goto error_return;
     }
     from = 1;
-  } else
+  }
+  else
     from = 0;
 
-  if (volumes == NULL && !allvolumes && hiername == NULL && plcname == NULL
-      && windowname == NULL) {
+  if (volumes == NULL && !allvolumes && hiername == NULL && plcname == NULL && windowname == NULL)
+  {
     sts = ldh_GetVolumeInfo(ldh_SessionToVol(ldhses), &volinfo);
     if (EVEN(sts))
       return sts;
     current_volid = volinfo.Volume;
     thisvolume = 1;
-  } else
+  }
+  else
     thisvolume = 0;
 
-  if (hiername != NULL || allvolumes || volumes != NULL || thisvolume) {
-    if (volumes != NULL) {
+  if (hiername != NULL || allvolumes || volumes != NULL || thisvolume)
+  {
+    if (volumes != NULL)
+    {
       /* Parse the volumestr */
-      nr = utl_parse(volumes, ", ", "", (char*)vol_str,
-          sizeof(vol_str) / sizeof(vol_str[0]), sizeof(vol_str[0]));
-      if ((nr == 0) || (nr > UTL_INPUTLIST_MAX)) {
+      nr = utl_parse(volumes, ", ", "", (char*)vol_str, sizeof(vol_str) / sizeof(vol_str[0]),
+                     sizeof(vol_str[0]));
+      if ((nr == 0) || (nr > UTL_INPUTLIST_MAX))
+      {
         status = FOE__PARSYNT;
         goto error_return;
       }
 
-      for (i = 0; i < nr; i++) {
-        sts = ldh_VolumeNameToId(
-            ldh_SessionToWB(ldhses), vol_str[i], &volume_vect[i]);
-        if (EVEN(sts)) {
+      for (i = 0; i < nr; i++)
+      {
+        sts = ldh_VolumeNameToId(ldh_SessionToWB(ldhses), vol_str[i], &volume_vect[i]);
+        if (EVEN(sts))
+        {
           status = sts;
           goto error_return;
         }
       }
       volume_vect[nr] = 0;
       volume_p = volume_vect;
-    } else
+    }
+    else
       volume_p = 0;
 
-    if (allvolumes) {
+    if (allvolumes)
+    {
       /* Get all volumes that is not class and wb volumes */
       i = 0;
       sts = ldh_GetVolumeList(ldh_SessionToWB(ldhses), &vol_id);
-      while (ODD(sts)) {
+      while (ODD(sts))
+      {
         sts = ldh_GetVidInfo(ldh_SessionToWB(ldhses), vol_id, &volinfo);
         if (EVEN(sts))
           return sts;
 
-        if (volinfo.VolRep == ldh_eVolRep_Db
-            || volinfo.VolRep == ldh_eVolRep_Dbms) { // Todo!!!! Handle dbms
+        if (volinfo.VolRep == ldh_eVolRep_Db || volinfo.VolRep == ldh_eVolRep_Dbms)
+        { // Todo!!!! Handle dbms
           volume_vect[i] = vol_id;
           i++;
-          if (i > UTL_INPUTLIST_MAX) {
+          if (i > UTL_INPUTLIST_MAX)
+          {
             return FOE__MAXITEM;
           }
         }
@@ -5514,24 +5898,30 @@ int utl_compile(ldh_tSesContext ldhses, ldh_tWBContext ldhwb, char* plcname,
       volume_p = volume_vect;
     }
 
-    if (hiername != NULL) {
+    if (hiername != NULL)
+    {
       sts = ldh_NameToObjid(ldhses, &hierobjdid, hiername);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         status = FOE__OBJNAME;
         goto error_return;
       }
 
-      if (!(allvolumes || volumes != NULL)) {
+      if (!(allvolumes || volumes != NULL))
+      {
         /* Hierobjdid has to be in the current volume */
-        if (!ldh_LocalObject(ldhses, hierobjdid)) {
+        if (!ldh_LocalObject(ldhses, hierobjdid))
+        {
           status = FOE__OBJECTVOL;
           goto error_return;
         }
       }
-    } else
+    }
+    else
       hierobjdid = pwr_cNObjid;
 
-    if (thisvolume) {
+    if (thisvolume)
+    {
       volume_vect[0] = current_volid;
       volume_vect[1] = 0;
     }
@@ -5544,13 +5934,11 @@ int utl_compile(ldh_tSesContext ldhses, ldh_tWBContext ldhwb, char* plcname,
     plcpgmcount = 0;
     plcpgmlist = 0;
 
-    sts = trv_create_ctx(
-        &trvctx, ldhses, hierobjdid, class_ptr, NULL, volume_p);
+    sts = trv_create_ctx(&trvctx, ldhses, hierobjdid, class_ptr, NULL, volume_p);
     if (EVEN(sts))
       return sts;
 
-    sts = trv_object_search(
-        trvctx, &utl_objidlist_insert, &plcpgmlist, &plcpgmcount, 0, 0, 0);
+    sts = trv_object_search(trvctx, &utl_objidlist_insert, &plcpgmlist, &plcpgmcount, 0, 0, 0);
     if (EVEN(sts))
       return sts;
 
@@ -5558,13 +5946,19 @@ int utl_compile(ldh_tSesContext ldhses, ldh_tWBContext ldhwb, char* plcname,
 
     list_ptr = plcpgmlist;
     from_found = 0;
-    while (list_ptr) {
-      if (from) {
-        if (!from_found) {
-          if (cdh_ObjidIsEqual(list_ptr->objid, fromobjdid)) {
+    while (list_ptr)
+    {
+      if (from)
+      {
+        if (!from_found)
+        {
+          if (cdh_ObjidIsEqual(list_ptr->objid, fromobjdid))
+          {
             /* Start to complie from now on 	*/
             from_found = 1;
-          } else {
+          }
+          else
+          {
             list_ptr = list_ptr->next;
             continue;
           }
@@ -5572,25 +5966,28 @@ int utl_compile(ldh_tSesContext ldhses, ldh_tWBContext ldhwb, char* plcname,
       }
 
       other_volume_attached = 0;
-      if (!ldh_LocalObject(ldhses, list_ptr->objid)) {
+      if (!ldh_LocalObject(ldhses, list_ptr->objid))
+      {
         /* Attach this volume */
         sts = ldh_AttachVolume(ldhwb, list_ptr->objid.vid, &volctx);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           status = sts;
           goto error_return;
         }
         other_volume_attached = 1;
 
         /* Open a read session */
-        sts = ldh_OpenSession(
-            &l_ldhses, volctx, ldh_eAccess_ReadOnly, ldh_eUtility_Pwr);
-        if (EVEN(sts)) {
+        sts = ldh_OpenSession(&l_ldhses, volctx, ldh_eAccess_ReadOnly, ldh_eUtility_Pwr);
+        if (EVEN(sts))
+        {
           if (other_volume_attached)
             ldh_DetachVolume(ldhwb, volctx);
           status = sts;
           goto error_return;
         }
-      } else
+      }
+      else
         l_ldhses = ldhses;
 
       /* Get the rootwindow to this plcpgm */
@@ -5600,14 +5997,17 @@ int utl_compile(ldh_tSesContext ldhses, ldh_tWBContext ldhwb, char* plcname,
 
       /* Compile the windows */
       sts = gcg_wind_comp_all(ldhwb, l_ldhses, window, 1, modified, debug, 0);
-      if (other_volume_attached) {
+      if (other_volume_attached)
+      {
         ldh_CloseSession(l_ldhses);
         ldh_DetachVolume(ldhwb, volctx);
       }
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         status = sts;
         goto error_return;
-      } else if (sts == GSX__NOMODIF)
+      }
+      else if (sts == GSX__NOMODIF)
         status = sts;
       list_ptr = list_ptr->next;
     }
@@ -5615,16 +6015,19 @@ int utl_compile(ldh_tSesContext ldhses, ldh_tWBContext ldhwb, char* plcname,
   }
 
   /* Check if this is a plcpgm */
-  if (plcname != NULL) {
+  if (plcname != NULL)
+  {
     /* This i a plc */
     sts = ldh_NameToObjid(ldhses, &plcobjdid, plcname);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       status = FOE__OBJNAME;
       goto error_return;
     }
 
     /* Plc has to be in the current volume */
-    if (!ldh_LocalObject(ldhses, plcobjdid)) {
+    if (!ldh_LocalObject(ldhses, plcobjdid))
+    {
       status = FOE__OBJECTVOL;
       goto error_return;
     }
@@ -5632,14 +6035,16 @@ int utl_compile(ldh_tSesContext ldhses, ldh_tWBContext ldhwb, char* plcname,
     /* Find out which typ of object it is  */
     sts = ldh_GetObjectClass(ldhses, plcobjdid, &cid);
 
-    if (cid != pwr_cClass_plc) {
+    if (cid != pwr_cClass_plc)
+    {
       status = FOE__CLASS;
       goto error_return;
     }
 
     /* Get the rootwindow to this plcpgm */
     sts = trv_get_plc_window(ldhses, plcobjdid, &window);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       // No window, skip this plc
       status = GSX__SUCCESS;
       goto error_return;
@@ -5647,27 +6052,32 @@ int utl_compile(ldh_tSesContext ldhses, ldh_tWBContext ldhwb, char* plcname,
 
     /* Compile the windows */
     sts = gcg_wind_comp_all(ldhwb, ldhses, window, 1, modified, debug, 0);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       status = sts;
       goto error_return;
-    } else if (sts != GSX__NOMODIF)
+    }
+    else if (sts != GSX__NOMODIF)
       status = sts;
   }
 
-  if (windowname != NULL) {
+  if (windowname != NULL)
+  {
     sts = ldh_NameToObjid(ldhses, &window, windowname);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       status = FOE__OBJNAME;
       goto error_return;
     }
     /* Window has to be in the current volume */
-    if (!ldh_LocalObject(ldhses, window)) {
+    if (!ldh_LocalObject(ldhses, window))
+    {
       status = FOE__OBJECTVOL;
       goto error_return;
     }
 
-    if (EVEN(ldh_GetObjectBuffer(ldhses, window, "DevBody", "PlcWindow",
-            &e_class, &windbuffer, &size))) {
+    if (EVEN(ldh_GetObjectBuffer(ldhses, window, "DevBody", "PlcWindow", &e_class, &windbuffer, &size)))
+    {
       status = FOE__CLASS;
       goto error_return;
     }
@@ -5677,10 +6087,12 @@ int utl_compile(ldh_tSesContext ldhses, ldh_tWBContext ldhwb, char* plcname,
 
     /* Compile the windows */
     sts = gcg_wind_comp_all(ldhwb, ldhses, window, 1, modified, debug, 0);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       status = sts;
       goto error_return;
-    } else if (sts != GSX__NOMODIF)
+    }
+    else if (sts != GSX__NOMODIF)
       status = sts;
   }
 
@@ -5700,22 +6112,21 @@ error_return:
 }
 
 /*************************************************************************
-*
-* Name:		utl_crossref_object()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* char *	objectname	I	Name of the object
-*
-* Description: 	Searches for crossreferenses to the specified object.
-*		All found references is printed.
-*
-**************************************************************************/
+ *
+ * Name:		utl_crossref_object()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * char *	objectname	I	Name of the object
+ *
+ * Description: 	Searches for crossreferenses to the specified object.
+ *		All found references is printed.
+ *
+ **************************************************************************/
 
-int utl_crossref_object(
-    ldh_tSesContext ldhses, char* objectname, int terminal, char* filename)
+int utl_crossref_object(ldh_tSesContext ldhses, char* objectname, int terminal, char* filename)
 {
   int sts;
   pwr_sAttrRef aref;
@@ -5729,7 +6140,8 @@ int utl_crossref_object(
   /* Open file */
   utl_ctx_new(&utlctx, ldhses, "", UTL_PORTRAIT);
   sts = u_open(utlctx, filename, terminal, 0);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     utl_ctx_delete(utlctx);
     return sts;
   }
@@ -5750,25 +6162,25 @@ int utl_crossref_object(
 }
 
 /*************************************************************************
-*
-* Name:		utl_crossref(_hier_class()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* char *	hiername	I	Name of an object in the hierarchy
-* char *	classname	I	Name of class
-*
-* Description: 	Searches for crossreferenses to all objects in the
-*		database that is a member of the specified class and that
-*		is found below the specified object in the hierarchy.
-*		All found references is printed.
-*
-**************************************************************************/
+ *
+ * Name:		utl_crossref(_hier_class()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * char *	hiername	I	Name of an object in the hierarchy
+ * char *	classname	I	Name of class
+ *
+ * Description: 	Searches for crossreferenses to all objects in the
+ *		database that is a member of the specified class and that
+ *		is found below the specified object in the hierarchy.
+ *		All found references is printed.
+ *
+ **************************************************************************/
 
-int utl_crossref_hier_class_name(ldh_tSesContext ldhses, char* hiername,
-    char* classname, char* name, int terminal, char* filename)
+int utl_crossref_hier_class_name(ldh_tSesContext ldhses, char* hiername, char* classname, char* name,
+                                 int terminal, char* filename)
 {
   int sts, size, i;
   pwr_tClassId* classp;
@@ -5777,8 +6189,7 @@ int utl_crossref_hier_class_name(ldh_tSesContext ldhses, char* hiername,
   char* s;
   utl_t_list* list_ptr;
   utl_t_list* crrlist_ptr;
-  char title[]
-      = "  Object							 Class";
+  char title[] = "  Object							 Class";
   pwr_tAName crrhier_name;
   char crrclass_name[80];
   pwr_tClassId crrclass;
@@ -5790,68 +6201,78 @@ int utl_crossref_hier_class_name(ldh_tSesContext ldhses, char* hiername,
   char* np;
 
   /* Check if class */
-  if (classname != NULL) {
-    nr = utl_parse(classname, ", ", "", (char*)class_str,
-        sizeof(class_str) / sizeof(class_str[0]), sizeof(class_str[0]));
+  if (classname != NULL)
+  {
+    nr = utl_parse(classname, ", ", "", (char*)class_str, sizeof(class_str) / sizeof(class_str[0]),
+                   sizeof(class_str[0]));
     if ((nr == 0) || (nr > UTL_INPUTLIST_MAX))
       return FOE__CLASSYNT;
 
-    for (i = 0; i < nr; i++) {
+    for (i = 0; i < nr; i++)
+    {
       sts = ldh_ClassNameToId(ldhses, &class_vect[i], class_str[i]);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         return FOE__CLASSNAME;
       }
     }
     class_vect[nr] = 0;
     classp = class_vect;
-  } else
+  }
+  else
     classp = 0;
 
   /* Check if hierarchy */
-  if (hiername != NULL) {
+  if (hiername != NULL)
+  {
     /* Get objdid for the hierarchy object */
     sts = ldh_NameToObjid(ldhses, &hierobjdid, hiername);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       return FOE__HIERNAME;
     }
-  } else
+  }
+  else
     hierobjdid = pwr_cNObjid;
 
   utl_ctx_new(&utlctx, ldhses, title, UTL_PORTRAIT);
 
   /* Check if name */
-  if (name != NULL) {
+  if (name != NULL)
+  {
     /* Check that name includes a wildcard */
     s = strchr(name, '*');
-    if (s == 0) {
+    if (s == 0)
+    {
       /* Print this object */
       /* Get objdid for the object */
       sts = ldh_NameToAttrRef(ldhses, name, &aref);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         return FOE__OBJECT;
       }
-      sts = utl_ctxlist_insert(
-          &aref, &(utlctx->list[0]), &(utlctx->listcount[0]), 0, 0, 0);
+      sts = utl_ctxlist_insert(&aref, &(utlctx->list[0]), &(utlctx->listcount[0]), 0, 0, 0);
       if (EVEN(sts))
         return sts;
       single_object = 1;
     }
   }
 
-  if (!single_object) {
+  if (!single_object)
+  {
     sts = trv_get_attrobjects(ldhses, hierobjdid, classp, name, trv_eDepth_Deep,
-        (trv_tBcFunc)utl_ctxlist_insert, &(utlctx->list[0]),
-        &(utlctx->listcount[0]), 0, 0, 0);
+                              (trv_tBcFunc)utl_ctxlist_insert, &(utlctx->list[0]), &(utlctx->listcount[0]), 0,
+                              0, 0);
     if (EVEN(sts))
       return sts;
   }
   utl_list_sort(&utlctx->list[0], utlctx->listcount[0], ldhses, 0);
 
   list_ptr = utlctx->list[0];
-  while (list_ptr) {
+  while (list_ptr)
+  {
     /* Call the crossreference method for this objdid */
-    sts = crr_crossref(ldhses, &list_ptr->o, &(list_ptr->sublist[0]),
-        &(list_ptr->sublistcount[0]));
+    sts = crr_crossref(ldhses, &list_ptr->o, &(list_ptr->sublist[0]), &(list_ptr->sublistcount[0]));
     if (EVEN(sts))
       return sts;
     utl_list_sort(&list_ptr->sublist[0], list_ptr->sublistcount[0], ldhses, 0);
@@ -5861,7 +6282,8 @@ int utl_crossref_hier_class_name(ldh_tSesContext ldhses, char* hiername,
 
   /* Open file */
   sts = u_open(utlctx, filename, terminal, 0);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     utl_ctx_delete(utlctx);
     return sts;
   }
@@ -5876,18 +6298,19 @@ int utl_crossref_hier_class_name(ldh_tSesContext ldhses, char* hiername,
   IF_OUT u_row(utlctx);
 
   list_ptr = utlctx->list[0];
-  while (list_ptr) {
+  while (list_ptr)
+  {
     sts = utl_print_aref(&list_ptr->o, ldhses, utlctx, 0, 0, 0);
     if (EVEN(sts))
       return sts;
 
     crrlist_ptr = list_ptr->sublist[0];
-    while (crrlist_ptr) {
+    while (crrlist_ptr)
+    {
       IF_OUT u_pagebreak(utlctx);
 
       /* Get the name of the object */
-      sts = ldh_AttrRefToName(
-          ldhses, &crrlist_ptr->o, ldh_eName_Hierarchy, &np, &size);
+      sts = ldh_AttrRefToName(ldhses, &crrlist_ptr->o, ldh_eName_Hierarchy, &np, &size);
       if (EVEN(sts))
         return sts;
       strcpy(crrhier_name, np);
@@ -5897,15 +6320,18 @@ int utl_crossref_hier_class_name(ldh_tSesContext ldhses, char* hiername,
       if (EVEN(sts))
         return sts;
 
-      sts = ldh_ObjidToName(ldhses, cdh_ClassIdToObjid(crrclass),
-          ldh_eName_Object, crrclass_name, sizeof(crrclass_name), &size);
+      sts = ldh_ObjidToName(ldhses, cdh_ClassIdToObjid(crrclass), ldh_eName_Object, crrclass_name,
+                            sizeof(crrclass_name), &size);
       if (EVEN(sts))
         return sts;
 
       IF_OUT u_pagebreak(utlctx);
-      if (crrlist_ptr->specification) {
+      if (crrlist_ptr->specification)
+      {
         u_print(utlctx, "     #");
-      } else {
+      }
+      else
+      {
         u_print(utlctx, "      ");
       }
       u_print(utlctx, "  %s", crrhier_name);
@@ -5925,29 +6351,29 @@ int utl_crossref_hier_class_name(ldh_tSesContext ldhses, char* hiername,
 }
 
 /*************************************************************************
-*
-* Name:		utl_crossref()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* pwr_tObjid  objdid		I	Objdid for the object.
-* ldh_tSesContext ldhses		I	ldh session.
-* unsigned long	dum1		I	dummy parameter.
-* unsigned long	dum2		I	dummy parameter.
-* unsigned long	dum3		I	dummy parameter.
-* unsigned long	dum4		I	dummy parameter.
-*
-* Description: 	Backcallroutine for utl_crossref_... routines.
-*		The routine is called when traversing the database
-*		an object of the desired class and hierachy is found.
-*		The crossreference method for the object is called
-*		and the returnd crossreferencelist is printed.
-*
-**************************************************************************/
+ *
+ * Name:		utl_crossref()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * pwr_tObjid  objdid		I	Objdid for the object.
+ * ldh_tSesContext ldhses		I	ldh session.
+ * unsigned long	dum1		I	dummy parameter.
+ * unsigned long	dum2		I	dummy parameter.
+ * unsigned long	dum3		I	dummy parameter.
+ * unsigned long	dum4		I	dummy parameter.
+ *
+ * Description: 	Backcallroutine for utl_crossref_... routines.
+ *		The routine is called when traversing the database
+ *		an object of the desired class and hierachy is found.
+ *		The crossreference method for the object is called
+ *		and the returnd crossreferencelist is printed.
+ *
+ **************************************************************************/
 
-static int utl_crossref(ldh_tSesContext ldhses, pwr_sAttrRef* arp,
-    utl_ctx utlctx, unsigned long dum2, unsigned long dum3, unsigned long dum4)
+static int utl_crossref(ldh_tSesContext ldhses, pwr_sAttrRef* arp, utl_ctx utlctx, unsigned long dum2,
+                        unsigned long dum3, unsigned long dum4)
 {
   int sts;
   utl_t_list* crrlist;
@@ -5962,19 +6388,18 @@ static int utl_crossref(ldh_tSesContext ldhses, pwr_sAttrRef* arp,
 }
 
 /*************************************************************************
-*
-* Name:		utl_externref()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		utl_externref()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-static int utl_externref(
-    utl_ctx utlctx, pwr_tObjid oid, utl_t_list** crrlist, int* crrcount)
+static int utl_externref(utl_ctx utlctx, pwr_tObjid oid, utl_t_list** crrlist, int* crrcount)
 {
   int sts, size;
   pwr_tClassId cid;
@@ -5986,50 +6411,51 @@ static int utl_externref(
   crr_t_searchlist* searchlist_ptr;
   pwr_sAttrRef* aref_ptr;
 
-  static crr_t_searchlist searchlist[]
-      = { { pwr_cClass_stodp, "DevBody", "Object", CRR_WRITE, 0 },
-          { pwr_cClass_setdp, "DevBody", "Object", CRR_WRITE, 0 },
-          { pwr_cClass_resdp, "DevBody", "Object", CRR_WRITE, 0 },
-          { pwr_cClass_GetDp, "DevBody", "DpObject", CRR_READ, 0 },
-          { pwr_cClass_cstoap, "DevBody", "Object", CRR_WRITE, 0 },
-          { pwr_cClass_GetAp, "DevBody", "ApObject", CRR_READ, 0 },
-          { pwr_cClass_stoap, "DevBody", "Object", CRR_WRITE, 0 },
-          { pwr_cClass_CStoIp, "DevBody", "Object", CRR_WRITE, 0 },
-          { pwr_cClass_GetIp, "DevBody", "IpObject", CRR_READ, 0 },
-          { pwr_cClass_StoIp, "DevBody", "Object", CRR_WRITE, 0 },
-          { 0, "", "", 0, 0 } };
+  static crr_t_searchlist searchlist[] = {{pwr_cClass_stodp, "DevBody", "Object", CRR_WRITE, 0},
+                                          {pwr_cClass_setdp, "DevBody", "Object", CRR_WRITE, 0},
+                                          {pwr_cClass_resdp, "DevBody", "Object", CRR_WRITE, 0},
+                                          {pwr_cClass_GetDp, "DevBody", "DpObject", CRR_READ, 0},
+                                          {pwr_cClass_cstoap, "DevBody", "Object", CRR_WRITE, 0},
+                                          {pwr_cClass_GetAp, "DevBody", "ApObject", CRR_READ, 0},
+                                          {pwr_cClass_stoap, "DevBody", "Object", CRR_WRITE, 0},
+                                          {pwr_cClass_CStoIp, "DevBody", "Object", CRR_WRITE, 0},
+                                          {pwr_cClass_GetIp, "DevBody", "IpObject", CRR_READ, 0},
+                                          {pwr_cClass_StoIp, "DevBody", "Object", CRR_WRITE, 0},
+                                          {0, "", "", 0, 0}};
 
   /* get all the children to the object */
   childlistcount = 0;
   childlist = 0;
-  sts = trv_get_children_class_name(utlctx->ldhses, oid, 0, 0,
-      (trv_tBcFunc)utl_objidlist_insert, &childlist, &childlistcount, 0, 0, 0);
+  sts = trv_get_children_class_name(utlctx->ldhses, oid, 0, 0, (trv_tBcFunc)utl_objidlist_insert, &childlist,
+                                    &childlistcount, 0, 0, 0);
   if (EVEN(sts))
     return sts;
 
   list_ptr = childlist;
-  while (list_ptr) {
+  while (list_ptr)
+  {
     /* Look if it is a member of the searchlist */
     sts = ldh_GetObjectClass(utlctx->ldhses, list_ptr->objid, &cid);
     if (EVEN(sts))
       return sts;
 
     searchlist_ptr = searchlist;
-    while (searchlist_ptr->cid != 0) {
-      if (cid == searchlist_ptr->cid) {
+    while (searchlist_ptr->cid != 0)
+    {
+      if (cid == searchlist_ptr->cid)
+      {
         /* Check if the objdid in the parameter is correct */
-        sts = ldh_GetObjectPar(utlctx->ldhses, list_ptr->objid,
-            searchlist_ptr->body, searchlist_ptr->attr, (char**)&aref_ptr,
-            &size);
+        sts = ldh_GetObjectPar(utlctx->ldhses, list_ptr->objid, searchlist_ptr->body, searchlist_ptr->attr,
+                               (char**)&aref_ptr, &size);
         if (EVEN(sts))
           return sts;
 
         /* Check if objdid is ok */
         sts = ldh_GetAttrRefTid(utlctx->ldhses, aref_ptr, &refclass);
-        if (ODD(sts)) {
+        if (ODD(sts))
+        {
           /* Insert object i list */
-          utl_list_insert(
-              crrlist, crrcount, aref_ptr, searchlist_ptr->write, 0, 0);
+          utl_list_insert(crrlist, crrcount, aref_ptr, searchlist_ptr->write, 0, 0);
           /* Set the current object as refobj */
           crrlist_ptr = (*crrlist);
           while (crrlist_ptr->next)
@@ -6048,19 +6474,18 @@ static int utl_externref(
 }
 
 /*************************************************************************
-*
-* Name:		utl_signalref()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		utl_signalref()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-static int utl_signalref(
-    utl_ctx utlctx, pwr_tObjid Objdid, utl_t_list** crrlist, int* crrcount)
+static int utl_signalref(utl_ctx utlctx, pwr_tObjid Objdid, utl_t_list** crrlist, int* crrcount)
 {
   int sts, size;
   pwr_tClassId cid;
@@ -6073,63 +6498,64 @@ static int utl_signalref(
   crr_t_searchlist* searchlist_ptr;
   pwr_sAttrRef* aref_ptr;
 
-  static crr_t_searchlist searchlist[]
-      = { { pwr_cClass_resdv, "DevBody", "DvObject", CRR_WRITE, 0 },
-          { pwr_cClass_setdv, "DevBody", "DvObject", CRR_WRITE, 0 },
-          { pwr_cClass_stodv, "DevBody", "DvObject", CRR_WRITE, 0 },
-          { pwr_cClass_GetDv, "DevBody", "DvObject", CRR_READ, 0 },
-          { pwr_cClass_GetDo, "DevBody", "DoObject", CRR_READ, 0 },
-          { pwr_cClass_resdo, "DevBody", "DoObject", CRR_WRITE, 0 },
-          { pwr_cClass_setdo, "DevBody", "DoObject", CRR_WRITE, 0 },
-          { pwr_cClass_stodo, "DevBody", "DoObject", CRR_WRITE, 0 },
-          { pwr_cClass_GetDi, "DevBody", "DiObject", CRR_READ, 0 },
-          { pwr_cClass_cstoav, "DevBody", "AvObject", CRR_WRITE, 0 },
-          { pwr_cClass_GetAv, "DevBody", "AvObject", CRR_READ, 0 },
-          { pwr_cClass_stoav, "DevBody", "AvObject", CRR_WRITE, 0 },
-          { pwr_cClass_cstoao, "DevBody", "AoObject", CRR_WRITE, 0 },
-          { pwr_cClass_GetAo, "DevBody", "AoObject", CRR_READ, 0 },
-          { pwr_cClass_stoao, "DevBody", "AoObject", CRR_WRITE, 0 },
-          { pwr_cClass_GetAi, "DevBody", "AiObject", CRR_READ, 0 },
-          { pwr_cClass_pos3p, "DevBody", "DoOpen", CRR_WRITE, 0 },
-          { pwr_cClass_pos3p, "DevBody", "DoClose", CRR_WRITE, 0 },
-          { pwr_cClass_inc3p, "DevBody", "DoOpen", CRR_WRITE, 0 },
-          { pwr_cClass_inc3p, "DevBody", "DoClose", CRR_WRITE, 0 },
-          { pwr_cClass_GetPi, "DevBody", "CoObject", CRR_READ, 0 },
-          { 0, "", "", 0, 0 } };
+  static crr_t_searchlist searchlist[] = {{pwr_cClass_resdv, "DevBody", "DvObject", CRR_WRITE, 0},
+                                          {pwr_cClass_setdv, "DevBody", "DvObject", CRR_WRITE, 0},
+                                          {pwr_cClass_stodv, "DevBody", "DvObject", CRR_WRITE, 0},
+                                          {pwr_cClass_GetDv, "DevBody", "DvObject", CRR_READ, 0},
+                                          {pwr_cClass_GetDo, "DevBody", "DoObject", CRR_READ, 0},
+                                          {pwr_cClass_resdo, "DevBody", "DoObject", CRR_WRITE, 0},
+                                          {pwr_cClass_setdo, "DevBody", "DoObject", CRR_WRITE, 0},
+                                          {pwr_cClass_stodo, "DevBody", "DoObject", CRR_WRITE, 0},
+                                          {pwr_cClass_GetDi, "DevBody", "DiObject", CRR_READ, 0},
+                                          {pwr_cClass_cstoav, "DevBody", "AvObject", CRR_WRITE, 0},
+                                          {pwr_cClass_GetAv, "DevBody", "AvObject", CRR_READ, 0},
+                                          {pwr_cClass_stoav, "DevBody", "AvObject", CRR_WRITE, 0},
+                                          {pwr_cClass_cstoao, "DevBody", "AoObject", CRR_WRITE, 0},
+                                          {pwr_cClass_GetAo, "DevBody", "AoObject", CRR_READ, 0},
+                                          {pwr_cClass_stoao, "DevBody", "AoObject", CRR_WRITE, 0},
+                                          {pwr_cClass_GetAi, "DevBody", "AiObject", CRR_READ, 0},
+                                          {pwr_cClass_pos3p, "DevBody", "DoOpen", CRR_WRITE, 0},
+                                          {pwr_cClass_pos3p, "DevBody", "DoClose", CRR_WRITE, 0},
+                                          {pwr_cClass_inc3p, "DevBody", "DoOpen", CRR_WRITE, 0},
+                                          {pwr_cClass_inc3p, "DevBody", "DoClose", CRR_WRITE, 0},
+                                          {pwr_cClass_GetPi, "DevBody", "CoObject", CRR_READ, 0},
+                                          {0, "", "", 0, 0}};
 
   /* get all the children to the object */
   childcount = 0;
   childlist = 0;
 
-  sts = trv_get_children_class_name(utlctx->ldhses, Objdid, 0, 0,
-      (trv_tBcFunc)utl_objidlist_insert, &childlist, &childlistcount, 0, 0, 0);
+  sts = trv_get_children_class_name(utlctx->ldhses, Objdid, 0, 0, (trv_tBcFunc)utl_objidlist_insert,
+                                    &childlist, &childlistcount, 0, 0, 0);
   if (EVEN(sts))
     return sts;
 
   *crrlist = 0;
   list_ptr = childlist;
-  while (list_ptr) {
+  while (list_ptr)
+  {
     /* Look if a member of the searchlist */
     sts = ldh_GetObjectClass(utlctx->ldhses, list_ptr->objid, &cid);
     if (EVEN(sts))
       return sts;
 
     searchlist_ptr = searchlist;
-    while (searchlist_ptr->cid != 0) {
-      if (cid == searchlist_ptr->cid) {
+    while (searchlist_ptr->cid != 0)
+    {
+      if (cid == searchlist_ptr->cid)
+      {
         /* Check if the objdid in the parameter is correct */
-        sts = ldh_GetObjectPar(utlctx->ldhses, list_ptr->objid,
-            searchlist_ptr->body, searchlist_ptr->attr, (char**)&aref_ptr,
-            &size);
+        sts = ldh_GetObjectPar(utlctx->ldhses, list_ptr->objid, searchlist_ptr->body, searchlist_ptr->attr,
+                               (char**)&aref_ptr, &size);
         if (EVEN(sts))
           return sts;
 
         /* Check if objdid is ok */
         sts = ldh_GetAttrRefTid(utlctx->ldhses, aref_ptr, &refclass);
-        if (ODD(sts)) {
+        if (ODD(sts))
+        {
           /* Insert object i list */
-          utl_list_insert(
-              crrlist, crrcount, aref_ptr, searchlist_ptr->write, 1, 0);
+          utl_list_insert(crrlist, crrcount, aref_ptr, searchlist_ptr->write, 1, 0);
           /* Set the current object as refobj */
           crrlist_ptr = *crrlist;
           while (crrlist_ptr->next)
@@ -6149,19 +6575,18 @@ static int utl_signalref(
 }
 
 /*************************************************************************
-*
-* Name:		utl_childref()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		utl_childref()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-static int utl_childref(
-    utl_ctx utlctx, pwr_tObjid Objdid, utl_t_list** crrlist, int* crrcount)
+static int utl_childref(utl_ctx utlctx, pwr_tObjid Objdid, utl_t_list** crrlist, int* crrcount)
 {
   int sts;
 
@@ -6173,18 +6598,18 @@ static int utl_childref(
 }
 
 /*************************************************************************
-*
-* Name:		utl_print_repage()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-*
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		utl_print_repage()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ *
+ *
+ * Description:
+ *
+ **************************************************************************/
 
 int utl_print_repage(ldh_tSesContext ldhses)
 {
@@ -6204,17 +6629,18 @@ int utl_print_repage(ldh_tSesContext ldhses)
 
   plcpgmcount = 0;
   plcpgmlist = 0;
-  sts = trv_get_objects_hier_class_name(ldhses, pwr_cNObjid, classp, NULL,
-      &utl_objidlist_insert, &plcpgmlist, &plcpgmcount, 0, 0, 0);
+  sts = trv_get_objects_hier_class_name(ldhses, pwr_cNObjid, classp, NULL, &utl_objidlist_insert, &plcpgmlist,
+                                        &plcpgmcount, 0, 0, 0);
   if (EVEN(sts))
     return sts;
 
   plcpgm_page = 1;
   list_ptr = plcpgmlist;
-  while (plcpgmlist) {
+  while (plcpgmlist)
+  {
     doc_page = 1;
-    sts = trv_get_docobjects(ldhses, list_ptr->objid, (trv_tBcFunc)utl_repage,
-        ldhses, (void*)plcpgm_page, &doc_page, 0, 0);
+    sts = trv_get_docobjects(ldhses, list_ptr->objid, (trv_tBcFunc)utl_repage, ldhses, (void*)plcpgm_page,
+                             &doc_page, 0, 0);
     if (EVEN(sts))
       return sts;
     plcpgm_page++;
@@ -6226,18 +6652,18 @@ int utl_print_repage(ldh_tSesContext ldhses)
 }
 
 /*************************************************************************
-*
-* Name:		utl_print_content()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-*
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		utl_print_content()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ *
+ *
+ * Description:
+ *
+ **************************************************************************/
 
 int utl_print_content(ldh_tSesContext ldhses, int terminal, char* filename)
 {
@@ -6249,7 +6675,8 @@ int utl_print_content(ldh_tSesContext ldhses, int terminal, char* filename)
   /* Open file */
   utl_ctx_new(&utlctx, ldhses, "", UTL_PORTRAIT);
   sts = u_open(utlctx, filename, terminal, 0);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     utl_ctx_delete(utlctx);
     return sts;
   }
@@ -6259,16 +6686,17 @@ int utl_print_content(ldh_tSesContext ldhses, int terminal, char* filename)
   IF_OUT u_row(utlctx);
 
   sts = trv_get_docobjects(ldhses, pwr_cNObjid,
-      /*		utl_content, ldhses, utlctx, 0, 0, 0);*/
-      (trv_tBcFunc)utl_ctxlist_insert, &(utlctx->list[0]),
-      &(utlctx->listcount[0]), 0, 0, 0);
+                           /*		utl_content, ldhses, utlctx, 0, 0, 0);*/
+                           (trv_tBcFunc)utl_ctxlist_insert, &(utlctx->list[0]), &(utlctx->listcount[0]), 0, 0,
+                           0);
   if (EVEN(sts))
     return sts;
 
   utl_list_sort(&utlctx->list[0], utlctx->listcount[0], ldhses, 0);
 
   list_ptr = utlctx->list[0];
-  while (list_ptr) {
+  while (list_ptr)
+  {
     objdid = list_ptr->o.Objid;
     utl_content(objdid, ldhses, utlctx, 0, 0, 0);
     list_ptr = list_ptr->next;
@@ -6282,27 +6710,26 @@ int utl_print_content(ldh_tSesContext ldhses, int terminal, char* filename)
 }
 
 /*************************************************************************
-*
-* Name:		utl_repage()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* pwr_tObjid  objdid		I	objdid for the object.
-* ldh_tSesContext ldhses		I	ldh session.
-* unsigned long	dum1		I	dummy parameter.
-* unsigned long	dum2		I	dummy parameter.
-* unsigned long	dum3		I	dummy parameter.
-* unsigned long	dum4		I	dummy parameter.
-*
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		utl_repage()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * pwr_tObjid  objdid		I	objdid for the object.
+ * ldh_tSesContext ldhses		I	ldh session.
+ * unsigned long	dum1		I	dummy parameter.
+ * unsigned long	dum2		I	dummy parameter.
+ * unsigned long	dum3		I	dummy parameter.
+ * unsigned long	dum4		I	dummy parameter.
+ *
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-int utl_repage(pwr_tObjid Objdid, ldh_tSesContext ldhses,
-    unsigned long plcpgm_page, unsigned long* doc_page, unsigned long dum3,
-    unsigned long dum4)
+int utl_repage(pwr_tObjid Objdid, ldh_tSesContext ldhses, unsigned long plcpgm_page, unsigned long* doc_page,
+               unsigned long dum3, unsigned long dum4)
 {
   int sts, size;
   char page_str[20];
@@ -6317,46 +6744,45 @@ int utl_repage(pwr_tObjid Objdid, ldh_tSesContext ldhses,
 }
 
 /*************************************************************************
-*
-* Name:		utl_content()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* pwr_tObjid  objdid		I	objdid for the object.
-* ldh_tSesContext ldhses		I	ldh session.
-* unsigned long	dum1		I	dummy parameter.
-* unsigned long	dum2		I	dummy parameter.
-* unsigned long	dum3		I	dummy parameter.
-* unsigned long	dum4		I	dummy parameter.
-*
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		utl_content()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * pwr_tObjid  objdid		I	objdid for the object.
+ * ldh_tSesContext ldhses		I	ldh session.
+ * unsigned long	dum1		I	dummy parameter.
+ * unsigned long	dum2		I	dummy parameter.
+ * unsigned long	dum3		I	dummy parameter.
+ * unsigned long	dum4		I	dummy parameter.
+ *
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-static int utl_content(pwr_tObjid Objdid, ldh_tSesContext ldhses,
-    utl_ctx utlctx, unsigned long dum2, unsigned long dum3, unsigned long dum4)
+static int utl_content(pwr_tObjid Objdid, ldh_tSesContext ldhses, utl_ctx utlctx, unsigned long dum2,
+                       unsigned long dum3, unsigned long dum4)
 {
   int sts, size, i;
   pwr_tOName hier_name;
   char* page;
 
   /* Get the page parameter if there is one */
-  sts = ldh_GetObjectPar(
-      ldhses, Objdid, "DevBody", "Page", (char**)&page, &size);
+  sts = ldh_GetObjectPar(ldhses, Objdid, "DevBody", "Page", (char**)&page, &size);
   if (EVEN(sts))
     return FOE__SUCCESS;
 
   /* Print the name of the actual object and page */
-  sts = ldh_ObjidToName(
-      ldhses, Objdid, ldh_eName_Hierarchy, hier_name, sizeof(hier_name), &size);
+  sts = ldh_ObjidToName(ldhses, Objdid, ldh_eName_Hierarchy, hier_name, sizeof(hier_name), &size);
   if (EVEN(sts))
     return sts;
 
   IF_OUT u_pagebreak(utlctx);
   u_print(utlctx, "%s .", hier_name);
-  for (i = strlen(hier_name); i < 55; i++) {
+  for (i = strlen(hier_name); i < 55; i++)
+  {
     u_print(utlctx, ".");
   }
 
@@ -6368,21 +6794,20 @@ static int utl_content(pwr_tObjid Objdid, ldh_tSesContext ldhses,
 }
 
 /*************************************************************************
-*
-* Name:		utl_list()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		utl_list()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-int utl_list(ldh_tSesContext ldhses, char* list_str, char* hier_str,
-    char* object_str, char* filename, int print, int allvolumes, char* volumes,
-    int keep_crosslist)
+int utl_list(ldh_tSesContext ldhses, char* list_str, char* hier_str, char* object_str, char* filename,
+             int print, int allvolumes, char* volumes, int keep_crosslist)
 {
   pwr_tObjid listobjdid;
   int i, j;
@@ -6408,7 +6833,7 @@ int utl_list(ldh_tSesContext ldhses, char* list_str, char* hier_str,
   char par_str[10][80];
   char* par_ptr;
   int single_object;
-  pwr_tClassId listclass[2] = { 0, 0 };
+  pwr_tClassId listclass[2] = {0, 0};
   utl_t_objidlist* listobject_list;
   utl_t_objidlist* listobject_ptr;
   int listobject_count;
@@ -6433,17 +6858,18 @@ int utl_list(ldh_tSesContext ldhses, char* list_str, char* hier_str,
 
   /* Get the node objdid */
   sts = ldh_NameToObjid(ldhses, &listobjdid, list_str);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     return FOE__LISTOBJECT;
   }
 
   /* Read the list object */
-  sts = ldh_GetObjectBody(
-      ldhses, listobjdid, "DevBody", (void**)&listbody_ptr, &size);
+  sts = ldh_GetObjectBody(ldhses, listobjdid, "DevBody", (void**)&listbody_ptr, &size);
   if (EVEN(sts))
     return sts;
 
-  if (*filename == '\0') {
+  if (*filename == '\0')
+  {
     /* No file is supplied, create one */
     utl_get_filename(filename);
   }
@@ -6473,104 +6899,124 @@ int utl_list(ldh_tSesContext ldhses, char* list_str, char* hier_str,
   else
     parameter = listbody_ptr->Parameter;
 
-  if (name != NULL) {
-    if ((strchr(name, '*') != 0) && (classname == NULL)
-        && (parameter != NULL)) {
+  if (name != NULL)
+  {
+    if ((strchr(name, '*') != 0) && (classname == NULL) && (parameter != NULL))
+    {
       /* Wildcard and no class is not allowed for show parameter */
       return FOE__CLASSQUAL;
     }
   }
 
   /* Check if class */
-  if (classname != NULL) {
-    nr = utl_parse(classname, ", ", "", (char*)class_str,
-        sizeof(class_str) / sizeof(class_str[0]), sizeof(class_str[0]));
+  if (classname != NULL)
+  {
+    nr = utl_parse(classname, ", ", "", (char*)class_str, sizeof(class_str) / sizeof(class_str[0]),
+                   sizeof(class_str[0]));
     if ((nr == 0) || (nr > UTL_INPUTLIST_MAX))
       return FOE__CLASSYNT;
 
-    for (i = 0; i < nr; i++) {
+    for (i = 0; i < nr; i++)
+    {
       sts = ldh_ClassNameToId(ldhses, &class_vect[i], class_str[i]);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         return FOE__CLASSNAME;
       }
     }
     class_vect[nr] = 0;
     classp = class_vect;
-  } else
+  }
+  else
     classp = 0;
 
   /* Check if hierarchy */
-  if (hiername != NULL) {
+  if (hiername != NULL)
+  {
     /* Get objdid for the hierarchy object */
     sts = ldh_NameToObjid(ldhses, &hierobjdid, hiername);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       return FOE__HIERNAME;
     }
-  } else
+  }
+  else
     hierobjdid = pwr_cNObjid;
 
-  if (parameter != NULL) {
+  if (parameter != NULL)
+  {
     utl_toupper(parameter, parameter);
-    nr = utl_parse(parameter, ", ", "", (char*)par_str,
-        sizeof(par_str) / sizeof(par_str[0]), sizeof(par_str[0]));
+    nr = utl_parse(parameter, ", ", "", (char*)par_str, sizeof(par_str) / sizeof(par_str[0]),
+                   sizeof(par_str[0]));
     par_str[nr][0] = 0;
     if (nr == 0)
       return FOE__PARSYNT;
 
-    for (i = 0; i < nr; i++) {
+    for (i = 0; i < nr; i++)
+    {
       /* Check index in parameter */
       s = strchr((char*)par_str[i], '[');
       if (s == 0)
         element[i] = 0;
-      else {
+      else
+      {
         t = strchr((char*)par_str[i], ']');
-        if (t == 0) {
+        if (t == 0)
+        {
           return FOE__PARSYNT;
-        } else {
+        }
+        else
+        {
           len = t - s - 1;
           strncpy(elementstr, s + 1, len);
           elementstr[len] = 0;
           sscanf(elementstr, "%d", &element[i]);
           *s = '\0';
-          if ((element[i] < 0) || (element[i] > 100)) {
+          if ((element[i] < 0) || (element[i] > 100))
+          {
             return FOE__PARELSYNT;
           }
         }
       }
     }
     par_ptr = (char*)par_str;
-  } else
+  }
+  else
     par_ptr = NULL;
 
-  if (volumes != NULL) {
+  if (volumes != NULL)
+  {
     /* Parse the volumestr */
-    nr = utl_parse(volumes, ", ", "", (char*)vol_str,
-        sizeof(vol_str) / sizeof(vol_str[0]), sizeof(vol_str[0]));
+    nr = utl_parse(volumes, ", ", "", (char*)vol_str, sizeof(vol_str) / sizeof(vol_str[0]),
+                   sizeof(vol_str[0]));
     if ((nr == 0) || (nr > UTL_INPUTLIST_MAX))
       return FOE__PARSYNT;
 
-    for (i = 0; i < nr; i++) {
-      sts = ldh_VolumeNameToId(
-          ldh_SessionToWB(ldhses), vol_str[i], &volume_vect[i]);
+    for (i = 0; i < nr; i++)
+    {
+      sts = ldh_VolumeNameToId(ldh_SessionToWB(ldhses), vol_str[i], &volume_vect[i]);
       if (EVEN(sts))
         return sts;
     }
     volume_vect[nr] = 0;
     volume_p = volume_vect;
-  } else
+  }
+  else
     volume_p = 0;
 
-  if (allvolumes) {
+  if (allvolumes)
+  {
     /* Get all volumes that is not class and wb volumes */
     i = 0;
     sts = ldh_GetVolumeList(ldh_SessionToWB(ldhses), &vol_id);
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       sts = ldh_GetVolumeClass(ldh_SessionToWB(ldhses), vol_id, &vol_class);
       if (EVEN(sts))
         return sts;
 
-      if (!(cdh_isClassVolumeClass(vol_class)
-              || vol_class == pwr_eClass_WorkBenchVolume)) {
+      if (!(cdh_isClassVolumeClass(vol_class) || vol_class == pwr_eClass_WorkBenchVolume))
+      {
         volume_vect[i] = vol_id;
         i++;
         if (i > UTL_INPUTLIST_MAX)
@@ -6583,25 +7029,28 @@ int utl_list(ldh_tSesContext ldhses, char* list_str, char* hier_str,
   }
 
   /* Create a string of the volumes for presentation */
-  if (volume_p) {
+  if (volume_p)
+  {
     i = 0;
     strcpy(volumestr, "");
-    while (volume_vect[i]) {
-      sts = ldh_VolumeIdToName(ldh_SessionToWB(ldhses), volume_vect[i],
-          volumename, sizeof(volumename), &size);
+    while (volume_vect[i])
+    {
+      sts =
+          ldh_VolumeIdToName(ldh_SessionToWB(ldhses), volume_vect[i], volumename, sizeof(volumename), &size);
       if (i != 0)
         strncat(volumestr, ", ", sizeof(volumestr) - strlen(volumestr) - 1);
       strncat(volumestr, volumename, sizeof(volumestr) - strlen(volumestr) - 1);
       i++;
     }
-  } else {
+  }
+  else
+  {
     /* Get the name of the current volume */
     sts = ldh_GetVolumeInfo(ldh_SessionToVol(ldhses), &info);
     if (EVEN(sts))
       return sts;
 
-    sts = ldh_VolumeIdToName(ldh_SessionToWB(ldhses), info.Volume, volumename,
-        sizeof(volumename), &size);
+    sts = ldh_VolumeIdToName(ldh_SessionToWB(ldhses), info.Volume, volumename, sizeof(volumename), &size);
     if (EVEN(sts))
       return sts;
     strcpy(volumestr, volumename);
@@ -6612,38 +7061,43 @@ int utl_list(ldh_tSesContext ldhses, char* list_str, char* hier_str,
   single_object = 0;
 
   /* Check if name */
-  if (name != NULL) {
+  if (name != NULL)
+  {
     /* Check that name includes a wildcard */
     s = strchr(name, '*');
-    if (s == 0) {
+    if (s == 0)
+    {
       /* Print this object */
       /* Get objdid for the object */
       sts = ldh_NameToAttrRef(ldhses, name, &aref);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         return FOE__OBJECT;
       }
 
-      utl_ctxlist_insert(
-          &aref, &(utlctx->list[0]), &(utlctx->listcount[0]), 0, 0, 0);
+      utl_ctxlist_insert(&aref, &(utlctx->list[0]), &(utlctx->listcount[0]), 0, 0, 0);
       single_object = 1;
     }
   }
 
-  if (!single_object) {
-    if (listbody_ptr->Externreference == 4) {
+  if (!single_object)
+  {
+    if (listbody_ptr->Externreference == 4)
+    {
       /* List all object in cross referencelist that is not signals */
-      sts = crr_refobject(
-          utlctx, hierobjdid, &(utlctx->list[0]), &(utlctx->listcount[0]));
+      sts = crr_refobject(utlctx, hierobjdid, &(utlctx->list[0]), &(utlctx->listcount[0]));
       if (EVEN(sts))
         return sts;
-    } else {
+    }
+    else
+    {
       /* Search for objects */
       sts = trv_create_ctx(&trvctx, ldhses, hierobjdid, classp, name, volume_p);
       if (EVEN(sts))
         return sts;
 
-      sts = trv_aobject_search(trvctx, (trv_tBcFunc)utl_ctxlist_insert,
-          &(utlctx->list[0]), &(utlctx->listcount[0]), 0, 0, 0);
+      sts = trv_aobject_search(trvctx, (trv_tBcFunc)utl_ctxlist_insert, &(utlctx->list[0]),
+                               &(utlctx->listcount[0]), 0, 0, 0);
       if (EVEN(sts))
         return sts;
 
@@ -6658,19 +7112,19 @@ int utl_list(ldh_tSesContext ldhses, char* list_str, char* hier_str,
 
   listobject_list = 0;
   listobject_count = 0;
-  sts = trv_get_children_class_name(ldhses, listobjdid, listclass, 0,
-      (trv_tBcFunc)utl_objidlist_insert, &listobject_list, &listobject_count, 0,
-      0, 0);
+  sts = trv_get_children_class_name(ldhses, listobjdid, listclass, 0, (trv_tBcFunc)utl_objidlist_insert,
+                                    &listobject_list, &listobject_count, 0, 0, 0);
   if (EVEN(sts))
     return sts;
 
   listobject_ptr = listobject_list;
-  for (i = 0; i < MIN(listobject_count, UTL_LIST_MAX); i++) {
+  for (i = 0; i < MIN(listobject_count, UTL_LIST_MAX); i++)
+  {
     sublist_ptr = utlctx->list[0];
-    while (sublist_ptr) {
-      sts = utl_list_sublist(utlctx, listobject_ptr->objid,
-          &(sublist_ptr->sublist[i]), &(sublist_ptr->sublistcount[i]),
-          &sublist_ptr->o);
+    while (sublist_ptr)
+    {
+      sts = utl_list_sublist(utlctx, listobject_ptr->objid, &(sublist_ptr->sublist[i]),
+                             &(sublist_ptr->sublistcount[i]), &sublist_ptr->o);
       if (EVEN(sts))
         return sts;
       sublist_ptr = sublist_ptr->next;
@@ -6682,13 +7136,15 @@ int utl_list(ldh_tSesContext ldhses, char* list_str, char* hier_str,
 
   /* Open file */
   sts = u_open(utlctx, filename, terminal, 0);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     utl_ctx_delete(utlctx);
     return sts;
   }
   strcpy((utlctx->page_title), listbody_ptr->PageHeader);
 
-  if (!listbody_ptr->TableOfContents) {
+  if (!listbody_ptr->TableOfContents)
+  {
     /* No page title of first page */
     utlctx->page_first = 1;
     u_header(utlctx, ldhses, listbody_ptr->Title);
@@ -6699,7 +7155,9 @@ int utl_list(ldh_tSesContext ldhses, char* list_str, char* hier_str,
     if (hier_str != 0)
       u_subheader(utlctx, "Hierarchy", hier_str);
     u_row(utlctx);
-  } else {
+  }
+  else
+  {
     utlctx->page_first = 0;
     u_pagebreak(utlctx);
   }
@@ -6708,22 +7166,25 @@ int utl_list(ldh_tSesContext ldhses, char* list_str, char* hier_str,
     utl_list_print_columnheader(utlctx, listbody_ptr);
 
   if (listbody_ptr->AlphaOrder)
-    utl_list_sort(&utlctx->list[0], utlctx->listcount[0], ldhses,
-        listbody_ptr->AlphaOrder);
+    utl_list_sort(&utlctx->list[0], utlctx->listcount[0], ldhses, listbody_ptr->AlphaOrder);
 
   first = 1;
   list_ptr = utlctx->list[0];
-  while (list_ptr) {
+  while (list_ptr)
+  {
     pwr_sAttrRef* arefp = &list_ptr->o;
 
     print_ok = 1;
     if (listbody_ptr->NoPrint)
       print_ok = 0;
 
-    if (listbody_ptr->NoPrintIfNoList) {
+    if (listbody_ptr->NoPrintIfNoList)
+    {
       print_ok = 0;
-      for (j = 0; j < MIN(listobject_count, UTL_LIST_MAX); j++) {
-        if (list_ptr->sublistcount[j] != 0) {
+      for (j = 0; j < MIN(listobject_count, UTL_LIST_MAX); j++)
+      {
+        if (list_ptr->sublistcount[j] != 0)
+        {
           print_ok = 1;
           break;
         }
@@ -6732,7 +7193,8 @@ int utl_list(ldh_tSesContext ldhses, char* list_str, char* hier_str,
 
     page = utlctx->page;
 
-    if (print_ok) {
+    if (print_ok)
+    {
       /* Print this object */
 
       /* Print a columnheader at pagebreak */
@@ -6744,9 +7206,11 @@ int utl_list(ldh_tSesContext ldhses, char* list_str, char* hier_str,
         u_force_pagebreak(utlctx);
 
       /* Print pagebreak if specified */
-      if ((listbody_ptr->PageBreak) && (!first)) {
+      if ((listbody_ptr->PageBreak) && (!first))
+      {
         u_force_pagebreak(utlctx);
-        if (listbody_ptr->PageBreak == 2) {
+        if (listbody_ptr->PageBreak == 2)
+        {
           /* Reset page nr */
           utlctx->page = 1;
           page = utlctx->page;
@@ -6756,60 +7220,73 @@ int utl_list(ldh_tSesContext ldhses, char* list_str, char* hier_str,
       u_pagebreak(utlctx);
 
       /* Print clear rows if specified */
-      if (listbody_ptr->Full != UTL_FULLPRINT_COND) {
-        for (j = 0; j < listbody_ptr->ClearRowsPre; j++) {
+      if (listbody_ptr->Full != UTL_FULLPRINT_COND)
+      {
+        for (j = 0; j < listbody_ptr->ClearRowsPre; j++)
+        {
           u_pagebreak(utlctx);
           u_row(utlctx);
         }
       }
       page = utlctx->page;
       new_row = 1;
-      for (j = 0; j < UTL_PARDESCRIPTION; j++) {
-        sts = utl_list_print_par(utlctx, arefp, list_ptr->specification,
-            &list_ptr->refo, listbody_ptr, j, new_row);
+      for (j = 0; j < UTL_PARDESCRIPTION; j++)
+      {
+        sts = utl_list_print_par(utlctx, arefp, list_ptr->specification, &list_ptr->refo, listbody_ptr, j,
+                                 new_row);
         new_row = listbody_ptr->ParDescription[j].CarriageRet;
         if (listbody_ptr->ParDescription[j].Parameter[0] == 0)
           break;
       }
-      if (j == 0) {
-        if (listbody_ptr->Full == UTL_FULLPRINT_COND) {
+      if (j == 0)
+      {
+        if (listbody_ptr->Full == UTL_FULLPRINT_COND)
+        {
           /* No print if object not modified */
-          sts = utl_object_changed(
-              arefp->Objid, ldhses, utlctx, &changed, listbody_ptr->Full);
+          sts = utl_object_changed(arefp->Objid, ldhses, utlctx, &changed, listbody_ptr->Full);
           if (EVEN(sts))
             return sts;
-          if (changed) {
-            for (j = 0; j < listbody_ptr->ClearRowsPre; j++) {
+          if (changed)
+          {
+            for (j = 0; j < listbody_ptr->ClearRowsPre; j++)
+            {
               u_pagebreak(utlctx);
               u_row(utlctx);
             }
           }
-        } else
+        }
+        else
           changed = 1;
 
-        if (changed) {
+        if (changed)
+        {
           sts = utl_print_aref(arefp, ldhses, utlctx, 0, 0, 0);
           if (EVEN(sts))
             return sts;
         }
       }
-      if (listbody_ptr->Full) {
-        if (changed) {
-          sts = utl_print_object_full(
-              arefp, ldhses, utlctx, listbody_ptr->Full);
+      if (listbody_ptr->Full)
+      {
+        if (changed)
+        {
+          sts = utl_print_object_full(arefp, ldhses, utlctx, listbody_ptr->Full);
           if (EVEN(sts))
             return sts;
         }
-      } else if (parameter != NULL) {
+      }
+      else if (parameter != NULL)
+      {
         sts = utl_print_object_par(arefp, ldhses, utlctx, par_ptr, element);
         if (EVEN(sts))
           return sts;
       }
 
       /* Print clear rows if specified */
-      if ((listbody_ptr->Full != UTL_FULLPRINT_COND)
-          || ((listbody_ptr->Full == UTL_FULLPRINT_COND) && changed)) {
-        for (j = 0; j < listbody_ptr->ClearRowsPost; j++) {
+      if ((listbody_ptr->Full != UTL_FULLPRINT_COND) ||
+          ((listbody_ptr->Full == UTL_FULLPRINT_COND) && changed))
+      {
+        for (j = 0; j < listbody_ptr->ClearRowsPost; j++)
+        {
           u_pagebreak(utlctx);
           u_row(utlctx);
         }
@@ -6817,16 +7294,17 @@ int utl_list(ldh_tSesContext ldhses, char* list_str, char* hier_str,
       first = 0;
     }
 
-    if ((listbody_ptr->TableOfContents == 2)
-        || ((listbody_ptr->TableOfContents == 1) && print_ok)) {
-      sts = utl_tableofcont_insert(utlctx, arefp, listbody_ptr->TCSegments,
-          listbody_ptr->TCMarginString, page);
+    if ((listbody_ptr->TableOfContents == 2) || ((listbody_ptr->TableOfContents == 1) && print_ok))
+    {
+      sts =
+          utl_tableofcont_insert(utlctx, arefp, listbody_ptr->TCSegments, listbody_ptr->TCMarginString, page);
     }
 
     listobject_ptr = listobject_list;
-    for (j = 0; j < MIN(listobject_count, UTL_LIST_MAX); j++) {
-      sts = utl_list_sublist_print(utlctx, listobject_ptr->objid,
-          list_ptr->sublist[j], list_ptr->sublistcount[j], &first);
+    for (j = 0; j < MIN(listobject_count, UTL_LIST_MAX); j++)
+    {
+      sts = utl_list_sublist_print(utlctx, listobject_ptr->objid, list_ptr->sublist[j],
+                                   list_ptr->sublistcount[j], &first);
       if (EVEN(sts))
         return sts;
       listobject_ptr = listobject_ptr->next;
@@ -6834,7 +7312,8 @@ int utl_list(ldh_tSesContext ldhses, char* list_str, char* hier_str,
     list_ptr = list_ptr->next;
   }
 
-  if (listbody_ptr->TableOfContents) {
+  if (listbody_ptr->TableOfContents)
+  {
     u_force_pagebreak(utlctx);
     u_header(utlctx, ldhses, listbody_ptr->Title);
     u_subheader(utlctx, "Descriptor", list_str);
@@ -6845,19 +7324,22 @@ int utl_list(ldh_tSesContext ldhses, char* list_str, char* hier_str,
     u_row(utlctx);
 
     utl_tableofcont_print(utlctx);
-  } else
+  }
+  else
     IF_OUT u_pageend(utlctx);
 
   u_close(utlctx);
 
-  if (print) {
+  if (print)
+  {
     /* Send the file to the printer */
     if (utlctx->landscape)
       sprintf(cmd, "pwr_foe_print_land %s", filename);
     else
       sprintf(cmd, "pwr_foe_print %s", filename);
     sts = system(cmd);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       utl_objidlist_free(listobject_list);
       free((char*)listbody_ptr);
       utl_ctx_delete(utlctx);
@@ -6873,19 +7355,19 @@ int utl_list(ldh_tSesContext ldhses, char* list_str, char* hier_str,
 }
 
 /*************************************************************************
-*
-* Name:		utl_list_sublist()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		utl_list_sublist()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-static int utl_list_sublist(utl_ctx utlctx, pwr_tObjid listobjdid,
-    utl_t_list** list, int* listcount, pwr_sAttrRef* rootarp)
+static int utl_list_sublist(utl_ctx utlctx, pwr_tObjid listobjdid, utl_t_list** list, int* listcount,
+                            pwr_sAttrRef* rootarp)
 {
   int i, j;
   utl_t_listbody* listbody_ptr;
@@ -6897,7 +7379,7 @@ static int utl_list_sublist(utl_ctx utlctx, pwr_tObjid listobjdid,
   int sts, size;
   pwr_tClassId* classp;
   char* s;
-  pwr_tClassId listclass[2] = { 0, 0 };
+  pwr_tClassId listclass[2] = {0, 0};
   utl_t_objidlist* listobject_list;
   utl_t_objidlist* listobject_ptr;
   int listobject_count;
@@ -6907,8 +7389,7 @@ static int utl_list_sublist(utl_ctx utlctx, pwr_tObjid listobjdid,
   int nr;
 
   /* Read the list object */
-  sts = ldh_GetObjectBody(
-      utlctx->ldhses, listobjdid, "DevBody", (void**)&listbody_ptr, &size);
+  sts = ldh_GetObjectBody(utlctx->ldhses, listobjdid, "DevBody", (void**)&listbody_ptr, &size);
   if (EVEN(sts))
     return sts;
 
@@ -6929,88 +7410,108 @@ static int utl_list_sublist(utl_ctx utlctx, pwr_tObjid listobjdid,
   else
     parameter = listbody_ptr->Parameter;
 
-  if (name != NULL) {
-    if ((strchr(name, '*') != 0) && (classname == NULL)
-        && (parameter != NULL)) {
+  if (name != NULL)
+  {
+    if ((strchr(name, '*') != 0) && (classname == NULL) && (parameter != NULL))
+    {
       /* Wildcard and no class is not allowed for show parameter */
       return FOE__CLASSQUAL;
     }
   }
 
   /* Check if class */
-  if (classname != NULL) {
-    nr = utl_parse(classname, ", ", "", (char*)class_str,
-        sizeof(class_str) / sizeof(class_str[0]), sizeof(class_str[0]));
+  if (classname != NULL)
+  {
+    nr = utl_parse(classname, ", ", "", (char*)class_str, sizeof(class_str) / sizeof(class_str[0]),
+                   sizeof(class_str[0]));
     if ((nr == 0) || (nr > UTL_INPUTLIST_MAX))
       return FOE__CLASSYNT;
 
-    for (i = 0; i < nr; i++) {
+    for (i = 0; i < nr; i++)
+    {
       sts = ldh_ClassNameToId(utlctx->ldhses, &class_vect[i], class_str[i]);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         return FOE__CLASSNAME;
       }
     }
     class_vect[nr] = 0;
     classp = class_vect;
-  } else
+  }
+  else
     classp = 0;
 
   /* Check if name */
-  if (name != NULL) {
+  if (name != NULL)
+  {
     /* Check that name includes a wildcard */
     s = strchr(name, '*');
-    if (s == 0) {
+    if (s == 0)
+    {
       return FOE__NOWILD;
     }
   }
 
-  if (listbody_ptr->Crossreference) {
+  if (listbody_ptr->Crossreference)
+  {
     /* Call the crossreference method for this objdid */
     sts = crr_crossref(utlctx->ldhses, rootarp, list, listcount);
     if (EVEN(sts))
       return sts;
-  } else if (listbody_ptr->Externreference == 1) {
+  }
+  else if (listbody_ptr->Externreference == 1)
+  {
     /* Call the externreference for this objdid */
     sts = utl_externref(utlctx, rootarp->Objid, list, listcount);
     if (EVEN(sts))
       return sts;
-  } else if (listbody_ptr->Externreference == 2) {
+  }
+  else if (listbody_ptr->Externreference == 2)
+  {
     /* Call the externreference for this objdid */
     sts = utl_signalref(utlctx, rootarp->Objid, list, listcount);
     if (EVEN(sts))
       return sts;
-  } else if (listbody_ptr->Externreference == 3) {
+  }
+  else if (listbody_ptr->Externreference == 3)
+  {
     /* Call the externreference for this objdid */
     sts = utl_childref(utlctx, rootarp->Objid, list, listcount);
     if (EVEN(sts))
       return sts;
-  } else if (listbody_ptr->Externreference == 4) {
+  }
+  else if (listbody_ptr->Externreference == 4)
+  {
     /* List all object in referencelist that is node objects */
     sts = crr_refobject(utlctx, rootarp->Objid, list, listcount);
     if (EVEN(sts))
       return sts;
-  } else if (listbody_ptr->Deep) {
-    if (classp) {
-      sts = trv_get_attrobjects(utlctx->ldhses, rootarp->Objid, classp, name,
-          trv_eDepth_Deep, (trv_tBcFunc)utl_ctxlist_insert, list, listcount, 0,
-          0, 0);
-    } else {
+  }
+  else if (listbody_ptr->Deep)
+  {
+    if (classp)
+    {
+      sts = trv_get_attrobjects(utlctx->ldhses, rootarp->Objid, classp, name, trv_eDepth_Deep,
+                                (trv_tBcFunc)utl_ctxlist_insert, list, listcount, 0, 0, 0);
+    }
+    else
+    {
       /* Search for objects */
-      sts = trv_get_objects_hier_class_name(utlctx->ldhses, rootarp->Objid,
-          classp, name, (trv_tBcFunc)utl_ctxlist_insert, list, listcount, 0, 0,
-          0);
+      sts = trv_get_objects_hier_class_name(utlctx->ldhses, rootarp->Objid, classp, name,
+                                            (trv_tBcFunc)utl_ctxlist_insert, list, listcount, 0, 0, 0);
     }
     if (EVEN(sts))
       return sts;
-  } else {
+  }
+  else
+  {
     /* Search for children */
     if (classp)
-      trv_get_attrobjects(utlctx->ldhses, rootarp->Objid, classp, name,
-          trv_eDepth_Children, (trv_tBcFunc)utl_ctxlist_insert, list, listcount,
-          0, 0, 0);
+      trv_get_attrobjects(utlctx->ldhses, rootarp->Objid, classp, name, trv_eDepth_Children,
+                          (trv_tBcFunc)utl_ctxlist_insert, list, listcount, 0, 0, 0);
     else
-      sts = trv_get_children_class_name(utlctx->ldhses, rootarp->Objid, classp,
-          name, (trv_tBcFunc)utl_ctxlist_insert, list, listcount, 0, 0, 0);
+      sts = trv_get_children_class_name(utlctx->ldhses, rootarp->Objid, classp, name,
+                                        (trv_tBcFunc)utl_ctxlist_insert, list, listcount, 0, 0, 0);
     if (EVEN(sts))
       return sts;
   }
@@ -7025,18 +7526,19 @@ static int utl_list_sublist(utl_ctx utlctx, pwr_tObjid listobjdid,
 
   listobject_count = 0;
   listobject_list = 0;
-  sts = trv_get_children_class_name(utlctx->ldhses, listobjdid, listclass, 0,
-      (trv_tBcFunc)utl_objidlist_insert, &listobject_list, &listobject_count, 0,
-      0, 0);
+  sts =
+      trv_get_children_class_name(utlctx->ldhses, listobjdid, listclass, 0, (trv_tBcFunc)utl_objidlist_insert,
+                                  &listobject_list, &listobject_count, 0, 0, 0);
   if (EVEN(sts))
     return sts;
   sublist_ptr = *list;
-  while (sublist_ptr) {
+  while (sublist_ptr)
+  {
     listobject_ptr = listobject_list;
-    for (j = 0; j < MIN(listobject_count, UTL_LIST_MAX); j++) {
-      sts = utl_list_sublist(utlctx, listobject_ptr->objid,
-          &(sublist_ptr->sublist[j]), &(sublist_ptr->sublistcount[j]),
-          &sublist_ptr->o);
+    for (j = 0; j < MIN(listobject_count, UTL_LIST_MAX); j++)
+    {
+      sts = utl_list_sublist(utlctx, listobject_ptr->objid, &(sublist_ptr->sublist[j]),
+                             &(sublist_ptr->sublistcount[j]), &sublist_ptr->o);
       if (EVEN(sts))
         return sts;
       listobject_ptr = listobject_ptr->next;
@@ -7050,19 +7552,19 @@ static int utl_list_sublist(utl_ctx utlctx, pwr_tObjid listobjdid,
 }
 
 /*************************************************************************
-*
-* Name:		utl_list_sublist_print()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		utl_list_sublist_print()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-static int utl_list_sublist_print(utl_ctx utlctx, pwr_tObjid listobjdid,
-    utl_t_list* list, int listcount, int* first)
+static int utl_list_sublist_print(utl_ctx utlctx, pwr_tObjid listobjdid, utl_t_list* list, int listcount,
+                                  int* first)
 {
   int i, j, k;
   int changed = 0;
@@ -7079,7 +7581,7 @@ static int utl_list_sublist_print(utl_ctx utlctx, pwr_tObjid listobjdid,
   char par_str[10][80];
   char* par_ptr;
   int nr;
-  pwr_tClassId listclass[2] = { 0, 0 };
+  pwr_tClassId listclass[2] = {0, 0};
   utl_t_objidlist* listobject_list;
   utl_t_objidlist* listobject_ptr;
   int listobject_count;
@@ -7089,8 +7591,7 @@ static int utl_list_sublist_print(utl_ctx utlctx, pwr_tObjid listobjdid,
   int page;
 
   /* Read the list object */
-  sts = ldh_GetObjectBody(
-      utlctx->ldhses, listobjdid, "DevBody", (void**)&listbody_ptr, &size);
+  sts = ldh_GetObjectBody(utlctx->ldhses, listobjdid, "DevBody", (void**)&listbody_ptr, &size);
   if (EVEN(sts))
     return sts;
 
@@ -7099,37 +7600,45 @@ static int utl_list_sublist_print(utl_ctx utlctx, pwr_tObjid listobjdid,
   else
     parameter = listbody_ptr->Parameter;
 
-  if (parameter != NULL) {
+  if (parameter != NULL)
+  {
     utl_toupper(parameter, parameter);
-    nr = utl_parse(parameter, ", ", "", (char*)par_str,
-        sizeof(par_str) / sizeof(par_str[0]), sizeof(par_str[0]));
+    nr = utl_parse(parameter, ", ", "", (char*)par_str, sizeof(par_str) / sizeof(par_str[0]),
+                   sizeof(par_str[0]));
     par_str[nr][0] = 0;
     if (nr == 0)
       return FOE__PARSYNT;
 
-    for (i = 0; i < nr; i++) {
+    for (i = 0; i < nr; i++)
+    {
       /* Check index in parameter */
       s = strchr((char*)par_str[i], '[');
       if (s == 0)
         element[i] = 0;
-      else {
+      else
+      {
         t = strchr((char*)par_str[i], ']');
-        if (t == 0) {
+        if (t == 0)
+        {
           return FOE__PARSYNT;
-        } else {
+        }
+        else
+        {
           len = t - s - 1;
           strncpy(elementstr, s + 1, len);
           elementstr[len] = 0;
           sscanf(elementstr, "%d", &element[i]);
           *s = '\0';
-          if ((element[i] < 0) || (element[i] > 100)) {
+          if ((element[i] < 0) || (element[i] > 100))
+          {
             return FOE__PARELSYNT;
           }
         }
       }
     }
     par_ptr = (char*)par_str;
-  } else
+  }
+  else
     par_ptr = NULL;
 
   /* Get child listobjects */
@@ -7139,23 +7648,28 @@ static int utl_list_sublist_print(utl_ctx utlctx, pwr_tObjid listobjdid,
 
   listobject_count = 0;
   listobject_list = 0;
-  sts = trv_get_children_class_name(utlctx->ldhses, listobjdid, listclass, 0,
-      (trv_tBcFunc)utl_objidlist_insert, &listobject_list, &listobject_count, 0,
-      0, 0);
+  sts =
+      trv_get_children_class_name(utlctx->ldhses, listobjdid, listclass, 0, (trv_tBcFunc)utl_objidlist_insert,
+                                  &listobject_list, &listobject_count, 0, 0, 0);
   if (EVEN(sts))
     return sts;
 
   if (listbody_ptr->AlphaOrder)
     utl_list_sort(&list, listcount, utlctx->ldhses, listbody_ptr->AlphaOrder);
 
-  if (listcount > 0) {
+  if (listcount > 0)
+  {
     /* Check if any object will written, if not don't write header */
-    if (listbody_ptr->NoPrintIfNoList || listbody_ptr->NoPrint) {
+    if (listbody_ptr->NoPrintIfNoList || listbody_ptr->NoPrint)
+    {
       list_ptr = list;
-      while (list_ptr) {
+      while (list_ptr)
+      {
         printlist_ok = 0;
-        for (j = 0; j < MIN(listobject_count, UTL_LIST_MAX); j++) {
-          if (list_ptr->sublistcount[j] != 0) {
+        for (j = 0; j < MIN(listobject_count, UTL_LIST_MAX); j++)
+        {
+          if (list_ptr->sublistcount[j] != 0)
+          {
             printlist_ok = 1;
             break;
           }
@@ -7164,11 +7678,14 @@ static int utl_list_sublist_print(utl_ctx utlctx, pwr_tObjid listobjdid,
           break;
         list_ptr = list_ptr->next;
       }
-    } else
+    }
+    else
       printlist_ok = 1;
 
-    if (printlist_ok) {
-      for (j = 0; j < listbody_ptr->ClearRowsPreList; j++) {
+    if (printlist_ok)
+    {
+      for (j = 0; j < listbody_ptr->ClearRowsPreList; j++)
+      {
         u_row(utlctx);
         u_pagebreak(utlctx);
       }
@@ -7178,15 +7695,19 @@ static int utl_list_sublist_print(utl_ctx utlctx, pwr_tObjid listobjdid,
   }
 
   list_ptr = list;
-  while (list_ptr) {
+  while (list_ptr)
+  {
     print_ok = 1;
     if (listbody_ptr->NoPrint)
       print_ok = 0;
 
-    if (listbody_ptr->NoPrintIfNoList) {
-      for (j = 0; j < MIN(listobject_count, UTL_LIST_MAX); j++) {
+    if (listbody_ptr->NoPrintIfNoList)
+    {
+      for (j = 0; j < MIN(listobject_count, UTL_LIST_MAX); j++)
+      {
         print_ok = 0;
-        if (list_ptr->sublistcount[j] != 0) {
+        if (list_ptr->sublistcount[j] != 0)
+        {
           print_ok = 1;
           break;
         }
@@ -7194,7 +7715,8 @@ static int utl_list_sublist_print(utl_ctx utlctx, pwr_tObjid listobjdid,
     }
 
     page = utlctx->page;
-    if (print_ok) {
+    if (print_ok)
+    {
       /* Print this objekt */
 
       /* Print a columnheader at pagebreak */
@@ -7206,9 +7728,11 @@ static int utl_list_sublist_print(utl_ctx utlctx, pwr_tObjid listobjdid,
         u_force_pagebreak(utlctx);
 
       /* Print pagebreak if specified */
-      if ((listbody_ptr->PageBreak) && (!(*first))) {
+      if ((listbody_ptr->PageBreak) && (!(*first)))
+      {
         u_force_pagebreak(utlctx);
-        if (listbody_ptr->PageBreak == 2) {
+        if (listbody_ptr->PageBreak == 2)
+        {
           /* Reset page nr */
           utlctx->page = 1;
           page = utlctx->page;
@@ -7218,8 +7742,10 @@ static int utl_list_sublist_print(utl_ctx utlctx, pwr_tObjid listobjdid,
       u_pagebreak(utlctx);
 
       /* Print clear rows if specified */
-      if (listbody_ptr->Full != UTL_FULLPRINT_COND) {
-        for (j = 0; j < listbody_ptr->ClearRowsPre; j++) {
+      if (listbody_ptr->Full != UTL_FULLPRINT_COND)
+      {
+        for (j = 0; j < listbody_ptr->ClearRowsPre; j++)
+        {
           u_pagebreak(utlctx);
           u_row(utlctx);
         }
@@ -7227,53 +7753,63 @@ static int utl_list_sublist_print(utl_ctx utlctx, pwr_tObjid listobjdid,
 
       page = utlctx->page;
       new_row = 1;
-      for (j = 0; j < UTL_PARDESCRIPTION; j++) {
-        sts = utl_list_print_par(utlctx, &list_ptr->o, list_ptr->specification,
-            &list_ptr->refo, listbody_ptr, j, new_row);
+      for (j = 0; j < UTL_PARDESCRIPTION; j++)
+      {
+        sts = utl_list_print_par(utlctx, &list_ptr->o, list_ptr->specification, &list_ptr->refo, listbody_ptr,
+                                 j, new_row);
         new_row = listbody_ptr->ParDescription[j].CarriageRet;
         if (listbody_ptr->ParDescription[j].Parameter[0] == 0)
           break;
       }
-      if (j == 0) {
-        if (listbody_ptr->Full & UTL_FULLPRINT_COND) {
+      if (j == 0)
+      {
+        if (listbody_ptr->Full & UTL_FULLPRINT_COND)
+        {
           /* No print if object not modified */
-          sts = utl_object_changed(list_ptr->o.Objid, utlctx->ldhses, utlctx,
-              &changed, listbody_ptr->Full);
+          sts = utl_object_changed(list_ptr->o.Objid, utlctx->ldhses, utlctx, &changed, listbody_ptr->Full);
           if (EVEN(sts))
             return sts;
-          if (changed) {
-            for (j = 0; j < listbody_ptr->ClearRowsPre; j++) {
+          if (changed)
+          {
+            for (j = 0; j < listbody_ptr->ClearRowsPre; j++)
+            {
               u_pagebreak(utlctx);
               u_row(utlctx);
             }
           }
-        } else
+        }
+        else
           changed = 1;
 
-        if (changed) {
+        if (changed)
+        {
           sts = utl_print_aref(&list_ptr->o, utlctx->ldhses, utlctx, 0, 0, 0);
           if (EVEN(sts))
             return sts;
         }
       }
-      if (listbody_ptr->Full) {
-        if (changed) {
-          sts = utl_print_object_full(
-              &list_ptr->o, utlctx->ldhses, utlctx, listbody_ptr->Full);
+      if (listbody_ptr->Full)
+      {
+        if (changed)
+        {
+          sts = utl_print_object_full(&list_ptr->o, utlctx->ldhses, utlctx, listbody_ptr->Full);
           if (EVEN(sts))
             return sts;
         }
-      } else if (parameter != NULL) {
-        utl_print_object_par(
-            &list_ptr->o, utlctx->ldhses, utlctx, par_ptr, element);
+      }
+      else if (parameter != NULL)
+      {
+        utl_print_object_par(&list_ptr->o, utlctx->ldhses, utlctx, par_ptr, element);
         if (EVEN(sts))
           return sts;
       }
 
       /* Print clear rows if specified */
-      if ((listbody_ptr->Full != UTL_FULLPRINT_COND)
-          || ((listbody_ptr->Full == UTL_FULLPRINT_COND) && changed)) {
-        for (j = 0; j < listbody_ptr->ClearRowsPost; j++) {
+      if ((listbody_ptr->Full != UTL_FULLPRINT_COND) ||
+          ((listbody_ptr->Full == UTL_FULLPRINT_COND) && changed))
+      {
+        for (j = 0; j < listbody_ptr->ClearRowsPost; j++)
+        {
           u_pagebreak(utlctx);
           u_row(utlctx);
         }
@@ -7281,22 +7817,25 @@ static int utl_list_sublist_print(utl_ctx utlctx, pwr_tObjid listobjdid,
       *first = 0;
     }
 
-    if ((listbody_ptr->TableOfContents == 2)
-        || ((listbody_ptr->TableOfContents == 1) && print_ok)) {
-      sts = utl_tableofcont_insert(utlctx, &list_ptr->o,
-          listbody_ptr->TCSegments, listbody_ptr->TCMarginString, page);
+    if ((listbody_ptr->TableOfContents == 2) || ((listbody_ptr->TableOfContents == 1) && print_ok))
+    {
+      sts = utl_tableofcont_insert(utlctx, &list_ptr->o, listbody_ptr->TCSegments,
+                                   listbody_ptr->TCMarginString, page);
     }
     listobject_ptr = listobject_list;
-    for (k = 0; k < MIN(listobject_count, UTL_LIST_MAX); k++) {
-      utl_list_sublist_print(utlctx, listobject_ptr->objid,
-          list_ptr->sublist[k], list_ptr->sublistcount[k], first);
+    for (k = 0; k < MIN(listobject_count, UTL_LIST_MAX); k++)
+    {
+      utl_list_sublist_print(utlctx, listobject_ptr->objid, list_ptr->sublist[k], list_ptr->sublistcount[k],
+                             first);
       listobject_ptr = listobject_ptr->next;
     }
     list_ptr = list_ptr->next;
   }
-  if (printlist_ok) {
+  if (printlist_ok)
+  {
     /* Print clear rows if specified */
-    for (j = 0; j < listbody_ptr->ClearRowsPostList; j++) {
+    for (j = 0; j < listbody_ptr->ClearRowsPostList; j++)
+    {
       u_row(utlctx);
       u_pagebreak(utlctx);
     }
@@ -7310,20 +7849,19 @@ static int utl_list_sublist_print(utl_ctx utlctx, pwr_tObjid listobjdid,
 }
 
 /*************************************************************************
-*
-* Name:		utl_list_print_par()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		utl_list_print_par()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-static int utl_list_print_par(utl_ctx utlctx, pwr_sAttrRef* o,
-    int specification, pwr_sAttrRef* refo, utl_t_listbody* listbody_ptr,
-    int parindex, int new_row)
+static int utl_list_print_par(utl_ctx utlctx, pwr_sAttrRef* o, int specification, pwr_sAttrRef* refo,
+                              utl_t_listbody* listbody_ptr, int parindex, int new_row)
 {
   char text[1200];
   pwr_tAName hier_name;
@@ -7346,10 +7884,11 @@ static int utl_list_print_par(utl_ctx utlctx, pwr_sAttrRef* o,
   else
     strcpy(text, "");
 
-  if (streq((list_pardesc->Parameter), "PrintObjName")) {
+  if (streq((list_pardesc->Parameter), "PrintObjName"))
+  {
     /* If crossreference list, print read or write */
-    if ((listbody_ptr->Crossreference)
-        || (listbody_ptr->Externreference == 3)) {
+    if ((listbody_ptr->Crossreference) || (listbody_ptr->Externreference == 3))
+    {
       if (specification == CRR_WRITE)
         strcat(text, "# ");
       else if (specification == CRR_REF)
@@ -7360,7 +7899,8 @@ static int utl_list_print_par(utl_ctx utlctx, pwr_sAttrRef* o,
 
     if (cdh_ObjidIsNull(o->Objid))
       strcat(text, "-");
-    else {
+    else
+    {
       /* Print the name of the object */
       sts = ldh_AttrRefToName(utlctx->ldhses, o, ldh_eName_Aref, &np, &size);
       if (EVEN(sts))
@@ -7374,36 +7914,45 @@ static int utl_list_print_par(utl_ctx utlctx, pwr_sAttrRef* o,
 
       strcat(text, hier_name);
     }
-  } else if (streq((list_pardesc->Parameter), "PrintObjClass")) {
+  }
+  else if (streq((list_pardesc->Parameter), "PrintObjClass"))
+  {
     /* Print the name of the object */
     sts = ldh_GetAttrRefTid(utlctx->ldhses, o, &cid);
     if (ODD(sts))
-      sts = ldh_ObjidToName(utlctx->ldhses, cdh_ClassIdToObjid(cid),
-          ldh_eName_Object, hier_name, sizeof(hier_name), &size);
+      sts = ldh_ObjidToName(utlctx->ldhses, cdh_ClassIdToObjid(cid), ldh_eName_Object, hier_name,
+                            sizeof(hier_name), &size);
     if (EVEN(sts))
       strcpy(hier_name, "-");
     if (list_pardesc->PrintParName)
       strcat(text, "Class = ");
     strcat(text, hier_name);
-  } else if (streq((list_pardesc->Parameter), "PrintNode")) {
+  }
+  else if (streq((list_pardesc->Parameter), "PrintNode"))
+  {
     /* Print the name of the object */
     strcat(text, "* Obsolete * ");
-  } else if (streq((list_pardesc->Parameter), "PrintVolume")) {
+  }
+  else if (streq((list_pardesc->Parameter), "PrintVolume"))
+  {
     /* Print the name of the volume */
     if (list_pardesc->PrintParName)
       strcat(text, "Volume = ");
 
-    sts = ldh_VolumeIdToName(ldh_SessionToWB(utlctx->ldhses), o->Objid.vid,
-        hier_name, sizeof(hier_name), &size);
+    sts = ldh_VolumeIdToName(ldh_SessionToWB(utlctx->ldhses), o->Objid.vid, hier_name, sizeof(hier_name),
+                             &size);
     if (EVEN(sts))
       strcat(text, "-");
     else
       strcat(text, hier_name);
-  } else if (streq((list_pardesc->Parameter), "PrintObjRefPar")) {
+  }
+  else if (streq((list_pardesc->Parameter), "PrintObjRefPar"))
+  {
     /* Print the name of the object and the referenced parameter */
     if (cdh_ObjidIsNull(o->Objid))
       strcat(text, "-");
-    else {
+    else
+    {
       sts = ldh_AttrRefToName(utlctx->ldhses, o, ldh_eName_Aref, &np, &size);
       strcpy(hier_name, np);
       if (list_pardesc->PrintParName)
@@ -7414,19 +7963,22 @@ static int utl_list_print_par(utl_ctx utlctx, pwr_sAttrRef* o,
       strcat(text, hier_name);
 
       /* Print the parameter if the object has a parameter named parameter*/
-      sts = ldh_GetAttrObjectPar(utlctx->ldhses, refo, "DevBody", "Parameter",
-          (char**)&parameter, &size);
-      if (ODD(sts)) {
+      sts = ldh_GetAttrObjectPar(utlctx->ldhses, refo, "DevBody", "Parameter", (char**)&parameter, &size);
+      if (ODD(sts))
+      {
         strcat(text, ".");
         strcat(text, parameter);
         free((char*)parameter);
       }
     }
-  } else if (streq((list_pardesc->Parameter), "PrintRefObjPar")) {
+  }
+  else if (streq((list_pardesc->Parameter), "PrintRefObjPar"))
+  {
     /* Print the name of the referenced object */
     if (cdh_ObjidIsNull(refo->Objid))
       strcat(text, "-");
-    else {
+    else
+    {
       sts = ldh_AttrRefToName(utlctx->ldhses, refo, ldh_eName_Aref, &np, &size);
       strcpy(hier_name, np);
       if (list_pardesc->PrintParName)
@@ -7437,19 +7989,22 @@ static int utl_list_print_par(utl_ctx utlctx, pwr_sAttrRef* o,
       strcat(text, hier_name);
 
       /* Print the parameter if the object has a parameter named parameter*/
-      sts = ldh_GetAttrObjectPar(
-          utlctx->ldhses, o, "DevBody", "Parameter", (char**)&parameter, &size);
-      if (ODD(sts)) {
+      sts = ldh_GetAttrObjectPar(utlctx->ldhses, o, "DevBody", "Parameter", (char**)&parameter, &size);
+      if (ODD(sts))
+      {
         strcat(text, ".");
         strcat(text, parameter);
         free((char*)parameter);
       }
     }
-  } else if (streq((list_pardesc->Parameter), "PrintRefObj")) {
+  }
+  else if (streq((list_pardesc->Parameter), "PrintRefObj"))
+  {
     /* Print the name of the referenced object */
     if (cdh_ObjidIsNull(refo->Objid))
       strcat(text, "-");
-    else {
+    else
+    {
       sts = ldh_AttrRefToName(utlctx->ldhses, refo, ldh_eName_Aref, &np, &size);
       strcpy(hier_name, np);
       if (EVEN(sts))
@@ -7461,28 +8016,34 @@ static int utl_list_print_par(utl_ctx utlctx, pwr_sAttrRef* o,
 
       strcat(text, hier_name);
     }
-  } else if (streq((list_pardesc->Parameter), "PrintRefClass")) {
+  }
+  else if (streq((list_pardesc->Parameter), "PrintRefClass"))
+  {
     /* Print the name of the object */
     sts = ldh_GetAttrRefTid(utlctx->ldhses, refo, &cid);
     if (ODD(sts))
-      sts = ldh_ObjidToName(utlctx->ldhses, cdh_ClassIdToObjid(cid),
-          ldh_eName_Object, hier_name, sizeof(hier_name), &size);
+      sts = ldh_ObjidToName(utlctx->ldhses, cdh_ClassIdToObjid(cid), ldh_eName_Object, hier_name,
+                            sizeof(hier_name), &size);
     if (EVEN(sts))
       strcpy(hier_name, "-");
     if (list_pardesc->PrintParName)
       strcat(text, "RefClass = ");
     strcat(text, hier_name);
-  } else if (streq((list_pardesc->Parameter), "PrintSigChan")) {
+  }
+  else if (streq((list_pardesc->Parameter), "PrintSigChan"))
+  {
     /* Print the name of the referenced object */
-    sts = ldh_GetAttrObjectPar(
-        utlctx->ldhses, o, "RtBody", "SigChanCon", (char**)&conobj_ptr, &size);
-    if (ODD(sts)) {
-      if (cdh_ObjidIsNull(conobj_ptr->Objid)) {
+    sts = ldh_GetAttrObjectPar(utlctx->ldhses, o, "RtBody", "SigChanCon", (char**)&conobj_ptr, &size);
+    if (ODD(sts))
+    {
+      if (cdh_ObjidIsNull(conobj_ptr->Objid))
+      {
         strcat(text, "-");
         free((char*)conobj_ptr);
-      } else {
-        sts = ldh_AttrRefToName(
-            utlctx->ldhses, conobj_ptr, ldh_eName_Hierarchy, &np, &size);
+      }
+      else
+      {
+        sts = ldh_AttrRefToName(utlctx->ldhses, conobj_ptr, ldh_eName_Hierarchy, &np, &size);
         if (ODD(sts))
           strcpy(hier_name, np);
         else
@@ -7495,27 +8056,31 @@ static int utl_list_print_par(utl_ctx utlctx, pwr_sAttrRef* o,
 
         strcat(text, hier_name);
       }
-    } else {
+    }
+    else
+    {
       /* Just print the class */
       sts = ldh_GetAttrRefTid(utlctx->ldhses, o, &cid);
       if (ODD(sts))
-        sts = ldh_ObjidToName(utlctx->ldhses, cdh_ClassIdToObjid(cid),
-            ldh_eName_Object, hier_name, sizeof(hier_name), &size);
+        sts = ldh_ObjidToName(utlctx->ldhses, cdh_ClassIdToObjid(cid), ldh_eName_Object, hier_name,
+                              sizeof(hier_name), &size);
       if (EVEN(sts))
         strcpy(hier_name, "-");
       if (list_pardesc->PrintParName)
         strcat(text, "Class = ");
       strcat(text, hier_name);
     }
-  } else if (streq((list_pardesc->Parameter), "PrintSigChanId")) {
+  }
+  else if (streq((list_pardesc->Parameter), "PrintSigChanId"))
+  {
     /* Print the Id of the referenced object */
-    sts = ldh_GetAttrObjectPar(
-        utlctx->ldhses, o, "RtBody", "SigChanCon", (char**)&conobj_ptr, &size);
-    if (ODD(sts)) {
-      sts = ldh_GetAttrObjectPar(utlctx->ldhses, conobj_ptr, "RtBody",
-          "Identity", (char**)&parameter, &size);
+    sts = ldh_GetAttrObjectPar(utlctx->ldhses, o, "RtBody", "SigChanCon", (char**)&conobj_ptr, &size);
+    if (ODD(sts))
+    {
+      sts = ldh_GetAttrObjectPar(utlctx->ldhses, conobj_ptr, "RtBody", "Identity", (char**)&parameter, &size);
       free((char*)conobj_ptr);
-      if (ODD(sts)) {
+      if (ODD(sts))
+      {
         if (list_pardesc->PrintParName)
           strcat(text, "SigChanId = ");
 
@@ -7523,31 +8088,40 @@ static int utl_list_print_par(utl_ctx utlctx, pwr_sAttrRef* o,
         free((char*)parameter);
       }
     }
-  } else if (streq((list_pardesc->Parameter), "PrintWrite")) {
+  }
+  else if (streq((list_pardesc->Parameter), "PrintWrite"))
+  {
     /* Print read or write, defined in the parameter Write.
        Used for ExternRef objects */
-    sts = ldh_GetAttrObjectPar(
-        utlctx->ldhses, o, "DevBody", "Write", (char**)&write_ptr, &size);
-    if (ODD(sts)) {
+    sts = ldh_GetAttrObjectPar(utlctx->ldhses, o, "DevBody", "Write", (char**)&write_ptr, &size);
+    if (ODD(sts))
+    {
       if (*write_ptr)
         strcat(text, "# ");
       else
         strcat(text, "  ");
     }
-  } else if (streq((list_pardesc->Parameter), "PrintObjPage")) {
+  }
+  else if (streq((list_pardesc->Parameter), "PrintObjPage"))
+  {
     /* Print the page of the object */
     sts = cross_get_object_page(utlctx->ldhses, o->Objid, page);
     strcat(text, page);
-  } else {
+  }
+  else
+  {
     sts = utl_list_get_parvalue(utlctx, o->Objid, list_pardesc, text);
     if (EVEN(sts))
       return sts;
   }
 
-  if (list_pardesc->SizeTabs == -1) {
+  if (list_pardesc->SizeTabs == -1)
+  {
     u_print(utlctx, " ");
     u_print(utlctx, "%s", text);
-  } else {
+  }
+  else
+  {
     if (list_pardesc->SizeTabs != 0)
       text[list_pardesc->SizeTabs * 8 - 1] = 0;
     u_print(utlctx, "%s", text);
@@ -7561,22 +8135,21 @@ static int utl_list_print_par(utl_ctx utlctx, pwr_sAttrRef* o,
 }
 
 /*************************************************************************
-*
-* Name:		utl_list_get_parvalue()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* unsigned long	utlctx		I	output specification.
-* pwr_tObjid  objdid		I	objdid for the object.
-*
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		utl_list_get_parvalue()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * unsigned long	utlctx		I	output specification.
+ * pwr_tObjid  objdid		I	objdid for the object.
+ *
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-static int utl_list_get_parvalue(
-    utl_ctx utlctx, pwr_tObjid Objdid, utl_t_listpar* list_desc, char* text)
+static int utl_list_get_parvalue(utl_ctx utlctx, pwr_tObjid Objdid, utl_t_listpar* list_desc, char* text)
 {
   int sts, size, i, j = 0;
   pwr_tClassId cid;
@@ -7620,17 +8193,22 @@ static int utl_list_get_parvalue(
   s = strchr(parameter, '[');
   if (s == 0)
     element = 0;
-  else {
+  else
+  {
     t = strchr(parameter, ']');
-    if (t == 0) {
+    if (t == 0)
+    {
       return FOE__PARSYNT;
-    } else {
+    }
+    else
+    {
       len = t - s - 1;
       strncpy(elementstr, s + 1, len);
       elementstr[len] = 0;
       sscanf(elementstr, "%d", &element);
       *s = '\0';
-      if ((element < 0) || (element > 100)) {
+      if ((element < 0) || (element > 100))
+      {
         return FOE__PARELSYNT;
       }
     }
@@ -7638,7 +8216,8 @@ static int utl_list_get_parvalue(
 
   /* Find the parameter */
   found = 0;
-  for (i = 0; i < 3; i++) {
+  for (i = 0; i < 3; i++)
+  {
     if (i == 0)
       strcpy(body, "RtBody");
     else if (i == 1)
@@ -7651,10 +8230,12 @@ static int utl_list_get_parvalue(
     if (EVEN(sts))
       continue;
 
-    for (j = 0; j < rows; j++) {
+    for (j = 0; j < rows; j++)
+    {
       cdh_SuppressSuper(parname, bodydef[j].ParName);
 
-      if (str_NoCaseStrcmp(parameter, parname) == 0) {
+      if (str_NoCaseStrcmp(parameter, parname) == 0)
+      {
         found = 1;
         break;
       }
@@ -7663,7 +8244,8 @@ static int utl_list_get_parvalue(
       break;
     free((char*)bodydef);
   }
-  if (!found) {
+  if (!found)
+  {
     /* Parametern fanns ej */
     return FOE__NOPAR;
   }
@@ -7675,28 +8257,31 @@ static int utl_list_get_parvalue(
   else
     elements = 1;
 
-  if (element + 1 > elements) {
+  if (element + 1 > elements)
+  {
     /* Error in element */
     return FOE__ELEMENT;
   }
 
   /* Get the parameter value in object */
-  sts = ldh_GetObjectPar(
-      utlctx->ldhses, Objdid, body, parname, (char**)&object_par, &size);
+  sts = ldh_GetObjectPar(utlctx->ldhses, Objdid, body, parname, (char**)&object_par, &size);
   if (EVEN(sts))
     return sts;
 
   object_element = object_par + element * size / elements;
 
-  if (list_desc->PrintParName) {
+  if (list_desc->PrintParName)
+  {
     strcat(text, parname);
     if (elements > 1)
       sprintf(text + strlen(text), "[%2d]", element);
     strcat(text, " = ");
   }
 
-  switch (bodydef[j].Par->Output.Info.Type) {
-  case pwr_eType_Boolean: {
+  switch (bodydef[j].Par->Output.Info.Type)
+  {
+  case pwr_eType_Boolean:
+  {
     p_Boolean = (pwr_tBoolean*)object_element;
     if (*p_Boolean == 0)
       strcat(text, "FALSE");
@@ -7704,86 +8289,102 @@ static int utl_list_get_parvalue(
       strcat(text, "TRUE");
     break;
   }
-  case pwr_eType_Float32: {
+  case pwr_eType_Float32:
+  {
     p_Float32 = (pwr_tFloat32*)object_element;
     sprintf(text + strlen(text), "%f", *p_Float32);
     break;
   }
-  case pwr_eType_Float64: {
+  case pwr_eType_Float64:
+  {
     p_Float64 = (pwr_tFloat64*)object_element;
     sprintf(text + strlen(text), "%f", *p_Float64);
     break;
   }
-  case pwr_eType_Char: {
+  case pwr_eType_Char:
+  {
     p_Char = object_element;
     sprintf(text + strlen(text), "%c", *p_Char);
     break;
   }
-  case pwr_eType_Int8: {
+  case pwr_eType_Int8:
+  {
     p_Int8 = (pwr_tInt8*)object_element;
     sprintf(text + strlen(text), "%d", *p_Int8);
     break;
   }
-  case pwr_eType_Int16: {
+  case pwr_eType_Int16:
+  {
     p_Int16 = (pwr_tInt16*)object_element;
     sprintf(text + strlen(text), "%d", *p_Int16);
     break;
   }
-  case pwr_eType_Int32: {
+  case pwr_eType_Int32:
+  {
     p_Int32 = (pwr_tInt32*)object_element;
     sprintf(text + strlen(text), "%d", *p_Int32);
     break;
   }
-  case pwr_eType_Int64: {
+  case pwr_eType_Int64:
+  {
     p_Int64 = (pwr_tInt64*)object_element;
     sprintf(text + strlen(text), pwr_dFormatInt64, *p_Int64);
     break;
   }
-  case pwr_eType_UInt8: {
+  case pwr_eType_UInt8:
+  {
     p_UInt8 = (pwr_tUInt8*)object_element;
     sprintf(text + strlen(text), "%u", *p_UInt8);
     break;
   }
-  case pwr_eType_UInt16: {
+  case pwr_eType_UInt16:
+  {
     p_UInt16 = (pwr_tUInt16*)object_element;
     sprintf(text + strlen(text), "%u", *p_UInt16);
     break;
   }
   case pwr_eType_UInt32:
   case pwr_eType_Mask:
-  case pwr_eType_Enum: {
+  case pwr_eType_Enum:
+  {
     p_UInt32 = (pwr_tUInt32*)object_element;
     sprintf(text + strlen(text), "%u", *p_UInt32);
     break;
   }
-  case pwr_eType_UInt64: {
+  case pwr_eType_UInt64:
+  {
     p_UInt64 = (pwr_tUInt64*)object_element;
     sprintf(text + strlen(text), pwr_dFormatUInt64, *p_UInt64);
     break;
   }
-  case pwr_eType_String: {
+  case pwr_eType_String:
+  {
     p_String = object_element;
     sprintf(text + strlen(text), "%s", p_String);
     break;
   }
-  case pwr_eType_Text: {
+  case pwr_eType_Text:
+  {
     p_String = object_element;
     sprintf(text + strlen(text), "%s", p_String);
     break;
   }
-  case pwr_eType_ObjDId: {
+  case pwr_eType_ObjDId:
+  {
     pwr_tOName hier_name;
 
     /* Get the object name from ldh */
     p_ObjDId = (pwr_tObjid*)object_element;
     if (cdh_ObjidIsNull(*p_ObjDId))
       strcat(text, "-");
-    else {
-      sts = ldh_ObjidToName(utlctx->ldhses, *p_ObjDId, ldh_eName_Hierarchy,
-          hier_name, sizeof(hier_name), &size);
+    else
+    {
+      sts = ldh_ObjidToName(utlctx->ldhses, *p_ObjDId, ldh_eName_Hierarchy, hier_name, sizeof(hier_name),
+                            &size);
       if (EVEN(sts))
         strcat(text, "-");
-      else {
+      else
+      {
         if (list_desc->Segments != 0)
           utl_cut_segments(hier_name, hier_name, list_desc->Segments);
 
@@ -7792,17 +8393,18 @@ static int utl_list_get_parvalue(
     }
     break;
   }
-  case pwr_eType_AttrRef: {
+  case pwr_eType_AttrRef:
+  {
     pwr_tAName hier_name;
     char* hier_name_p;
 
     /* Get the object name from ldh */
     p_AttrRef = (pwr_sAttrRef*)object_element;
-    sts = ldh_AttrRefToName(
-        utlctx->ldhses, p_AttrRef, ldh_eName_Aref, &hier_name_p, &size);
+    sts = ldh_AttrRefToName(utlctx->ldhses, p_AttrRef, ldh_eName_Aref, &hier_name_p, &size);
     if (EVEN(sts))
       strcat(text, "-");
-    else {
+    else
+    {
       strcpy(hier_name, hier_name_p);
       if (list_desc->Segments != 0)
         utl_cut_segments(hier_name, hier_name, list_desc->Segments);
@@ -7811,11 +8413,11 @@ static int utl_list_get_parvalue(
     }
     break;
   }
-  case pwr_eType_Time: {
+  case pwr_eType_Time:
+  {
     /* Convert time to ascii */
 
-    sts = time_AtoAscii((pwr_tTime*)object_element, time_eFormat_DateAndTime,
-        timbuf, sizeof(timbuf));
+    sts = time_AtoAscii((pwr_tTime*)object_element, time_eFormat_DateAndTime, timbuf, sizeof(timbuf));
     timbuf[20] = 0;
     strcat(text, timbuf);
     break;
@@ -7828,22 +8430,21 @@ static int utl_list_get_parvalue(
 }
 
 /*************************************************************************
-*
-* Name:		utl_list_print_columnheader()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* unsigned long	utlctx		I	output specification.
-* pwr_tObjid  objdid		I	objdid for the object.
-*
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		utl_list_print_columnheader()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * unsigned long	utlctx		I	output specification.
+ * pwr_tObjid  objdid		I	objdid for the object.
+ *
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-static int utl_list_print_columnheader(
-    utl_ctx utlctx, utl_t_listbody* listbody_ptr)
+static int utl_list_print_columnheader(utl_ctx utlctx, utl_t_listbody* listbody_ptr)
 {
   char text[160];
   int found;
@@ -7854,9 +8455,11 @@ static int utl_list_print_columnheader(
     return FOE__SUCCESS;
 
   found = 0;
-  for (j = 0; j < UTL_PARDESCRIPTION; j++) {
-    if ((listbody_ptr->ParDescription[j].ColumnHeader[0] != 0)
-        && (listbody_ptr->ParDescription[j].SizeTabs != 0)) {
+  for (j = 0; j < UTL_PARDESCRIPTION; j++)
+  {
+    if ((listbody_ptr->ParDescription[j].ColumnHeader[0] != 0) &&
+        (listbody_ptr->ParDescription[j].SizeTabs != 0))
+    {
       found = 1;
       break;
     }
@@ -7867,12 +8470,13 @@ static int utl_list_print_columnheader(
 
   /* Print column header */
   new_row = 1;
-  for (j = 0; j < UTL_PARDESCRIPTION; j++) {
+  for (j = 0; j < UTL_PARDESCRIPTION; j++)
+  {
     text[0] = 0;
-    if (new_row) {
+    if (new_row)
+    {
       u_pagebreak(utlctx);
-      for (i = 0; i < (int)strlen(listbody_ptr->ParDescription[j].MarginString);
-           i++)
+      for (i = 0; i < (int)strlen(listbody_ptr->ParDescription[j].MarginString); i++)
         strcat(text, " ");
     }
     strcat(text, listbody_ptr->ParDescription[j].ColumnHeader);
@@ -7887,18 +8491,19 @@ static int utl_list_print_columnheader(
   }
 
   /* Print underscore */
-  if (listbody_ptr->ColHead_____) {
+  if (listbody_ptr->ColHead_____)
+  {
     new_row = 1;
-    for (j = 0; j < UTL_PARDESCRIPTION; j++) {
+    for (j = 0; j < UTL_PARDESCRIPTION; j++)
+    {
       text[0] = 0;
-      if (new_row) {
+      if (new_row)
+      {
         u_pagebreak(utlctx);
-        for (i = 0;
-             i < (int)strlen(listbody_ptr->ParDescription[j].MarginString); i++)
+        for (i = 0; i < (int)strlen(listbody_ptr->ParDescription[j].MarginString); i++)
           strcat(text, " ");
       }
-      for (i = 0; i < (int)strlen(listbody_ptr->ParDescription[j].ColumnHeader);
-           i++)
+      for (i = 0; i < (int)strlen(listbody_ptr->ParDescription[j].ColumnHeader); i++)
         strcat(text, "-");
       u_print(utlctx, "%s", text);
       if (listbody_ptr->ParDescription[j].SizeTabs == -1)
@@ -7916,32 +8521,35 @@ static int utl_list_print_columnheader(
 }
 
 /*************************************************************************
-*
-* Name:		utl_cut_segments()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		utl_cut_segments()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
 
 int utl_cut_segments(char* outname, char* name, int segments)
 {
   char* s[20];
   int i, j, last_i = 0;
 
-  for (i = 0; i < segments; i++) {
+  for (i = 0; i < segments; i++)
+  {
     s[i] = strrchr(name, '-');
-    if (s[i] == 0) {
+    if (s[i] == 0)
+    {
       last_i = i;
       break;
     }
     *s[i] = '+';
     last_i = i;
   }
-  for (j = 0; j <= last_i; j++) {
+  for (j = 0; j <= last_i; j++)
+  {
     if (s[j] != 0)
       *s[j] = '-';
   }
@@ -7954,24 +8562,23 @@ int utl_cut_segments(char* outname, char* name, int segments)
 }
 
 /*************************************************************************
-*
-* Name:		utl_configure_card()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* char *	hiername	I	Name of a object in the hierarchy.
-* char *	class		I	Name of the class.
-*
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		utl_configure_card()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * char *	hiername	I	Name of a object in the hierarchy.
+ * char *	class		I	Name of the class.
+ *
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-int utl_configure_card(ldh_tSesContext ldhses, char* rackname, char* cardname,
-    char* cardclassname, char* channame, char* chanidentity,
-    char* chandescription, char* table)
+int utl_configure_card(ldh_tSesContext ldhses, char* rackname, char* cardname, char* cardclassname,
+                       char* channame, char* chanidentity, char* chandescription, char* table)
 {
   int sts, size, i;
   pwr_tObjid rackobjdid;
@@ -7990,13 +8597,15 @@ int utl_configure_card(ldh_tSesContext ldhses, char* rackname, char* cardname,
 
   /* Get rack objdid */
   sts = ldh_NameToObjid(ldhses, &rackobjdid, rackname);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     return FOE__OBJNAME;
   }
 
   /* Get card class */
   sts = ldh_ClassNameToId(ldhses, &cardclass, cardclassname);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     return FOE__CLASSNAME;
   }
 
@@ -8005,36 +8614,43 @@ int utl_configure_card(ldh_tSesContext ldhses, char* rackname, char* cardname,
     return FOE__QUALSYNT;
 
   /* Create the card */
-  sts = ldh_CreateObject(
-      ldhses, &cardobjdid, cardname, cardclass, rackobjdid, ldh_eDest_IntoLast);
+  sts = ldh_CreateObject(ldhses, &cardobjdid, cardname, cardclass, rackobjdid, ldh_eDest_IntoLast);
   if (EVEN(sts))
     return sts;
 
   /* Get number of channels in the card */
-  sts = ldh_GetObjectPar(ldhses, cardobjdid, "RtBody", "MaxNoOfChannels",
-      (char**)&channels, &size);
-  if (EVEN(sts)) {
+  sts = ldh_GetObjectPar(ldhses, cardobjdid, "RtBody", "MaxNoOfChannels", (char**)&channels, &size);
+  if (EVEN(sts))
+  {
     /* This is probably a co card */
-    sts = ldh_GetObjectPar(ldhses, cardobjdid, "RtBody", "MaxNoOfCounters",
-        (char**)&channels, &size);
+    sts = ldh_GetObjectPar(ldhses, cardobjdid, "RtBody", "MaxNoOfCounters", (char**)&channels, &size);
     if (EVEN(sts))
       return sts;
   }
 
   /* Get the class of the channels */
-  if (strstr(cardclassname, "DI") != NULL) {
+  if (strstr(cardclassname, "DI") != NULL)
+  {
     strcpy(chanclassname, "ChanDi");
     strcpy(chantclassname, "ChanDi");
-  } else if (strstr(cardclassname, "DO") != NULL) {
+  }
+  else if (strstr(cardclassname, "DO") != NULL)
+  {
     strcpy(chanclassname, "ChanDo");
     strcpy(chantclassname, "ChanDo");
-  } else if (strstr(cardclassname, "AI") != NULL) {
+  }
+  else if (strstr(cardclassname, "AI") != NULL)
+  {
     strcpy(chanclassname, "ChanAi");
     strcpy(chantclassname, "ChanAit");
-  } else if (strstr(cardclassname, "AO") != NULL) {
+  }
+  else if (strstr(cardclassname, "AO") != NULL)
+  {
     strcpy(chanclassname, "ChanAo");
     strcpy(chantclassname, "ChanAo");
-  } else if (strstr(cardclassname, "CO") != NULL) {
+  }
+  else if (strstr(cardclassname, "CO") != NULL)
+  {
     strcpy(chanclassname, "ChanCo");
     strcpy(chantclassname, "ChanCot");
   }
@@ -8051,19 +8667,21 @@ int utl_configure_card(ldh_tSesContext ldhses, char* rackname, char* cardname,
     utl_parse_indexstring(table, tablearray, sizeof(tablearray));
 
   /* Create the channels */
-  for (i = 0; i < *channels; i++) {
+  for (i = 0; i < *channels; i++)
+  {
     /* Get the channel name */
     utl_config_replace(channame, objectname, i + 1);
 
     /* Create the chan object */
-    if (tablearray[i + 1]) {
-      sts = ldh_CreateObject(ldhses, &objdid, objectname, chantclass,
-          cardobjdid, ldh_eDest_IntoLast);
+    if (tablearray[i + 1])
+    {
+      sts = ldh_CreateObject(ldhses, &objdid, objectname, chantclass, cardobjdid, ldh_eDest_IntoLast);
       if (EVEN(sts))
         return sts;
-    } else {
-      sts = ldh_CreateObject(ldhses, &objdid, objectname, chanclass, cardobjdid,
-          ldh_eDest_IntoLast);
+    }
+    else
+    {
+      sts = ldh_CreateObject(ldhses, &objdid, objectname, chanclass, cardobjdid, ldh_eDest_IntoLast);
       if (EVEN(sts))
         return sts;
     }
@@ -8074,19 +8692,19 @@ int utl_configure_card(ldh_tSesContext ldhses, char* rackname, char* cardname,
       return sts;
 
     /* Set the identity */
-    if (chanidentity != 0) {
+    if (chanidentity != 0)
+    {
       utl_config_replace(chanidentity, replaced_str, i + 1);
-      sts = ldh_SetObjectPar(
-          ldhses, objdid, "RtBody", "Identity", replaced_str, size);
+      sts = ldh_SetObjectPar(ldhses, objdid, "RtBody", "Identity", replaced_str, size);
       if (EVEN(sts))
         return sts;
     }
 
     /* Set the description */
-    if (chandescription != 0) {
+    if (chandescription != 0)
+    {
       utl_config_replace(chandescription, replaced_str, i + 1);
-      sts = ldh_SetObjectPar(
-          ldhses, objdid, "RtBody", "Description", replaced_str, size);
+      sts = ldh_SetObjectPar(ldhses, objdid, "RtBody", "Description", replaced_str, size);
       if (EVEN(sts))
         return sts;
     }
@@ -8097,16 +8715,16 @@ int utl_configure_card(ldh_tSesContext ldhses, char* rackname, char* cardname,
 }
 
 /*************************************************************************
-*
-* Name:		utl_config_replace()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description: 	Replaces a '#' with an index.
-*
-**************************************************************************/
+ *
+ * Name:		utl_config_replace()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description: 	Replaces a '#' with an index.
+ *
+ **************************************************************************/
 
 static int utl_config_replace(char* instr, char* outstr, int index)
 {
@@ -8118,16 +8736,18 @@ static int utl_config_replace(char* instr, char* outstr, int index)
   if (indexstr[0] == ' ')
     indexstr[0] = '0';
 
-  nr = utl_parse(instr, "#", "", (char*)par_str,
-      sizeof(par_str) / sizeof(par_str[0]), sizeof(par_str[0]));
+  nr = utl_parse(instr, "#", "", (char*)par_str, sizeof(par_str) / sizeof(par_str[0]), sizeof(par_str[0]));
 
-  if (*instr == '#') {
+  if (*instr == '#')
+  {
     strcpy(outstr, indexstr);
     strcat(outstr, (char*)par_str[0]);
-  } else
+  }
+  else
     strcpy(outstr, (char*)par_str[0]);
 
-  for (i = 1; i < MIN(5, nr); i++) {
+  for (i = 1; i < MIN(5, nr); i++)
+  {
     strcat(outstr, indexstr);
     strcat(outstr, (char*)par_str[i]);
   }
@@ -8140,16 +8760,16 @@ static int utl_config_replace(char* instr, char* outstr, int index)
 }
 
 /*************************************************************************
-*
-* Name:		utl_get_filename()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description: 	returns a utic filename.
-*
-**************************************************************************/
+ *
+ * Name:		utl_get_filename()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description: 	returns a utic filename.
+ *
+ **************************************************************************/
 
 int utl_get_filename(char* filename)
 {
@@ -8164,19 +8784,19 @@ int utl_get_filename(char* filename)
 }
 
 /*************************************************************************
-*
-* Name:		utl_get_projectname()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Get the project name.
-*	Under VMS project and systemname are equal.
-*	Under Linux project name i defined in env.
-*
-**************************************************************************/
+ *
+ * Name:		utl_get_projectname()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Get the project name.
+ *	Under VMS project and systemname are equal.
+ *	Under Linux project name i defined in env.
+ *
+ **************************************************************************/
 
 int utl_get_projectname(char* projectname)
 {
@@ -8191,17 +8811,17 @@ int utl_get_projectname(char* projectname)
 }
 
 /*************************************************************************
-*
-* Name:		utl_get_systemname()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Get the system name from the system object file.
-*
-**************************************************************************/
+ *
+ * Name:		utl_get_systemname()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Get the system name from the system object file.
+ *
+ **************************************************************************/
 
 int utl_get_systemname(char* systemname, char* systemgroup)
 {
@@ -8211,7 +8831,8 @@ int utl_get_systemname(char* systemname, char* systemgroup)
   int sts;
 
   *systemname = '\0';
-  if (!name_is_stored) {
+  if (!name_is_stored)
+  {
     sts = lfu_ReadSysObjectFile(systemname, systemgroup);
     if (EVEN(sts))
       return sts;
@@ -8219,7 +8840,9 @@ int utl_get_systemname(char* systemname, char* systemgroup)
     strcpy(stored_name, systemname);
     strcpy(stored_group, systemgroup);
     name_is_stored = 1;
-  } else {
+  }
+  else
+  {
     strcpy(systemname, stored_name);
     strcpy(systemgroup, stored_group);
   }
@@ -8227,22 +8850,22 @@ int utl_get_systemname(char* systemname, char* systemgroup)
 }
 
 /*************************************************************************
-*
-* Name:		utl_get_systemobject()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses	I	ldh session.
-* pwr_tObjid *   system_objid	O	system objdid.
-*
-* Description:
-*	Get the system object objid and the systemname attribute.
-*
-**************************************************************************/
+ *
+ * Name:		utl_get_systemobject()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses	I	ldh session.
+ * pwr_tObjid *   system_objid	O	system objdid.
+ *
+ * Description:
+ *	Get the system object objid and the systemname attribute.
+ *
+ **************************************************************************/
 
-int utl_get_systemobject(ldh_tSesContext ldhses, pwr_tObjid* system_objid,
-    char* systemname, char* systemgroup)
+int utl_get_systemobject(ldh_tSesContext ldhses, pwr_tObjid* system_objid, char* systemname,
+                         char* systemgroup)
 {
   int sts, size, found;
   pwr_tClassId cid;
@@ -8252,12 +8875,14 @@ int utl_get_systemobject(ldh_tSesContext ldhses, pwr_tObjid* system_objid,
 
   sts = ldh_GetRootList(ldhses, &objid);
   found = 0;
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = ldh_GetObjectClass(ldhses, objid, &cid);
     if (EVEN(sts))
       return sts;
 
-    if (cid == pwr_eClass_System) {
+    if (cid == pwr_eClass_System)
+    {
       found = 1;
       break;
     }
@@ -8267,16 +8892,14 @@ int utl_get_systemobject(ldh_tSesContext ldhses, pwr_tObjid* system_objid,
   if (!found)
     return FOE__OBJECT;
 
-  sts = ldh_GetObjectPar(
-      ldhses, objid, "SysBody", "SystemName", (char**)&sysname_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, objid, "SysBody", "SystemName", (char**)&sysname_ptr, &size);
   if (EVEN(sts))
     return sts;
 
   strcpy(systemname, sysname_ptr);
   free((char*)sysname_ptr);
 
-  sts = ldh_GetObjectPar(
-      ldhses, objid, "SysBody", "SystemGroup", (char**)&sysgroup_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, objid, "SysBody", "SystemGroup", (char**)&sysgroup_ptr, &size);
   if (EVEN(sts))
     return sts;
 
@@ -8288,20 +8911,19 @@ int utl_get_systemobject(ldh_tSesContext ldhses, pwr_tObjid* system_objid,
 }
 
 /*************************************************************************
-*
-* Name:		utl_get_listconfig_object()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Get info in the ListConfig object.
-*
-**************************************************************************/
+ *
+ * Name:		utl_get_listconfig_object()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Get info in the ListConfig object.
+ *
+ **************************************************************************/
 
-static int utl_get_listconfig_object(
-    ldh_tSesContext ldhses, int* landscape_rows, int* portrait_rows)
+static int utl_get_listconfig_object(ldh_tSesContext ldhses, int* landscape_rows, int* portrait_rows)
 {
   int sts, size, found;
   pwr_tUInt32* landscape_rows_p;
@@ -8313,31 +8935,38 @@ static int utl_get_listconfig_object(
   found = 0;
   /* Try to find the configobject in the local hierarchy */
   sts = ldh_NameToObjid(ldhses, &objid, "wb:Local-Lists");
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sts = ldh_GetChild(ldhses, objid, &child);
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       sts = ldh_GetObjectClass(ldhses, child, &cid);
       if (EVEN(sts))
         return sts;
 
-      if (cid == vldh_eclass(ldhses, "ListConfig")) {
+      if (cid == vldh_eclass(ldhses, "ListConfig"))
+      {
         found = 1;
         break;
       }
       sts = ldh_GetNextSibling(ldhses, child, &child);
     }
   }
-  if (!found) {
+  if (!found)
+  {
     /* Try to find the configobject in the layout hierarchy */
     sts = ldh_NameToObjid(ldhses, &objid, "wb:layout-Lists");
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       sts = ldh_GetChild(ldhses, objid, &child);
-      while (ODD(sts)) {
+      while (ODD(sts))
+      {
         sts = ldh_GetObjectClass(ldhses, child, &cid);
         if (EVEN(sts))
           return sts;
 
-        if (cid == vldh_eclass(ldhses, "ListConfig")) {
+        if (cid == vldh_eclass(ldhses, "ListConfig"))
+        {
           found = 1;
           break;
         }
@@ -8345,19 +8974,18 @@ static int utl_get_listconfig_object(
       }
     }
   }
-  if (!found) {
+  if (!found)
+  {
     /* Use default values */
     *landscape_rows = UTL_PAGE_BREAK_LANDS;
     *portrait_rows = UTL_PAGE_BREAK_PORTR;
     return FOE__SUCCESS;
   }
 
-  sts = ldh_GetObjectPar(ldhses, child, "DevBody", "LandscapePageRows",
-      (char**)&landscape_rows_p, &size);
+  sts = ldh_GetObjectPar(ldhses, child, "DevBody", "LandscapePageRows", (char**)&landscape_rows_p, &size);
   if (EVEN(sts))
     return sts;
-  sts = ldh_GetObjectPar(ldhses, child, "DevBody", "PortraitPageRows",
-      (char**)&portrait_rows_p, &size);
+  sts = ldh_GetObjectPar(ldhses, child, "DevBody", "PortraitPageRows", (char**)&portrait_rows_p, &size);
   if (EVEN(sts))
     return sts;
 
@@ -8370,36 +8998,32 @@ static int utl_get_listconfig_object(
 }
 
 /*************************************************************************
-*
-* Name:		utl_get_module_time()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Get the insert time of a library module.
-*
-**************************************************************************/
+ *
+ * Name:		utl_get_module_time()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Get the insert time of a library module.
+ *
+ **************************************************************************/
 
-pwr_tStatus utl_get_module_time(
-    char* libr_name, char* module_name, pwr_tTime* time)
-{
-  return 0;
-}
+pwr_tStatus utl_get_module_time(char* libr_name, char* module_name, pwr_tTime* time) { return 0; }
 
 /*************************************************************************
-*
-* Name:		utl_sortchildren()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		utl_sortchildren()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ *
+ * Description:
+ *
+ **************************************************************************/
 
 int utl_sortchildren(ldh_tSesContext ldhses, char* parent_name, int classort)
 {
@@ -8412,7 +9036,8 @@ int utl_sortchildren(ldh_tSesContext ldhses, char* parent_name, int classort)
   int child_count;
 
   sts = ldh_NameToObjid(ldhses, &parent_objdid, parent_name);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     return FOE__OBJECT;
   }
 
@@ -8421,8 +9046,8 @@ int utl_sortchildren(ldh_tSesContext ldhses, char* parent_name, int classort)
 
   /* Get all children */
   child_count = 0;
-  sts = trv_get_children_class_name(utlctx->ldhses, parent_objdid, 0, 0,
-      (trv_tBcFunc)utl_ctxlist_insert, &child_list, &child_count, 0, 0, 0);
+  sts = trv_get_children_class_name(utlctx->ldhses, parent_objdid, 0, 0, (trv_tBcFunc)utl_ctxlist_insert,
+                                    &child_list, &child_count, 0, 0, 0);
   if (EVEN(sts))
     return sts;
 
@@ -8432,16 +9057,17 @@ int utl_sortchildren(ldh_tSesContext ldhses, char* parent_name, int classort)
 
   /* Move the children */
   child_listptr = child_list;
-  while (child_listptr) {
-    sts = ldh_MoveObject(
-        ldhses, child_listptr->o.Objid, parent_objdid, ldh_eDest_IntoLast);
+  while (child_listptr)
+  {
+    sts = ldh_MoveObject(ldhses, child_listptr->o.Objid, parent_objdid, ldh_eDest_IntoLast);
     if (EVEN(sts))
       return sts;
     child_listptr = child_listptr->next;
   }
 
   child_listptr = child_list;
-  while (child_listptr) {
+  while (child_listptr)
+  {
     next = child_listptr->next;
     free((char*)child_listptr);
     child_listptr = next;
@@ -8453,28 +9079,27 @@ int utl_sortchildren(ldh_tSesContext ldhses, char* parent_name, int classort)
 }
 
 /*************************************************************************
-*
-* Name:		utl_create_object()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* char *	object_name	I	Name object.
-* char *	class_name	I	class of the object.
-* char *	destination_name I	Name of created destination object.
-* int		first		I	Position relativ destination.
-* int		last		I	Position relativ destination.
-* int		after		I	Position relativ destination.
-* int		before		I	Position relativ destination.
-*
-* Description: 	Create an object.
-*
-**************************************************************************/
+ *
+ * Name:		utl_create_object()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * char *	object_name	I	Name object.
+ * char *	class_name	I	class of the object.
+ * char *	destination_name I	Name of created destination object.
+ * int		first		I	Position relativ destination.
+ * int		last		I	Position relativ destination.
+ * int		after		I	Position relativ destination.
+ * int		before		I	Position relativ destination.
+ *
+ * Description: 	Create an object.
+ *
+ **************************************************************************/
 
-int utl_create_object(ldh_tSesContext ldhses, char* object_name,
-    char* class_name, char* destination_name, int first, int last, int after,
-    int before)
+int utl_create_object(ldh_tSesContext ldhses, char* object_name, char* class_name, char* destination_name,
+                      int first, int last, int after, int before)
 {
   int sts;
   pwr_tObjid destination;
@@ -8495,22 +9120,26 @@ int utl_create_object(ldh_tSesContext ldhses, char* object_name,
 
   /* Get class */
   sts = ldh_ClassNameToId(ldhses, &cid, class_name);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     return FOE__CLASSNAME;
   }
 
   /* Check destination name */
-  if (streq(destination_name, "")) {
+  if (streq(destination_name, ""))
+  {
     /* A root object, no destination */
     destination = pwr_cNObjid;
-  } else {
+  }
+  else
+  {
     sts = ldh_NameToObjid(ldhses, &destination, destination_name);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       return FOE__OBJNAME;
     }
   }
-  sts = ldh_CreateObject(
-      ldhses, &objdid, object_name, cid, destination, (ldh_eDest)code);
+  sts = ldh_CreateObject(ldhses, &objdid, object_name, cid, destination, (ldh_eDest)code);
   if (EVEN(sts))
     return sts;
 
@@ -8518,28 +9147,27 @@ int utl_create_object(ldh_tSesContext ldhses, char* object_name,
 }
 
 /*************************************************************************
-*
-* Name:		utl_move_object()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* char *	object_name	I	Name object.
-* char *	class_name	I	class of the object.
-* char *	destination_name I	Name of created destination object.
-* int		first		I	Position relativ destination.
-* int		last		I	Position relativ destination.
-* int		after		I	Position relativ destination.
-* int		before		I	Position relativ destination.
-*
-* Description: 	Create an object.
-*
-**************************************************************************/
+ *
+ * Name:		utl_move_object()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * char *	object_name	I	Name object.
+ * char *	class_name	I	class of the object.
+ * char *	destination_name I	Name of created destination object.
+ * int		first		I	Position relativ destination.
+ * int		last		I	Position relativ destination.
+ * int		after		I	Position relativ destination.
+ * int		before		I	Position relativ destination.
+ *
+ * Description: 	Create an object.
+ *
+ **************************************************************************/
 
-int utl_move_object(ldh_tSesContext ldhses, char* source_name,
-    char* destination_name, char* name, int first, int last, int after,
-    int before)
+int utl_move_object(ldh_tSesContext ldhses, char* source_name, char* destination_name, char* name, int first,
+                    int last, int after, int before)
 {
   int sts;
   pwr_tObjid destination;
@@ -8559,14 +9187,17 @@ int utl_move_object(ldh_tSesContext ldhses, char* source_name,
 
   /* Check source name */
   sts = ldh_NameToObjid(ldhses, &source, source_name);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     return FOE__OBJNAME;
   }
 
-  if (destination_name != NULL) {
+  if (destination_name != NULL)
+  {
     /* Check destination name */
     sts = ldh_NameToObjid(ldhses, &destination, destination_name);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       return FOE__OBJNAME;
     }
 
@@ -8576,7 +9207,8 @@ int utl_move_object(ldh_tSesContext ldhses, char* source_name,
   }
 
   /* Rename the object if name is present */
-  if (name != NULL) {
+  if (name != NULL)
+  {
     sts = ldh_ChangeObjectName(ldhses, source, name);
     if (EVEN(sts))
       return sts;
@@ -8586,49 +9218,47 @@ int utl_move_object(ldh_tSesContext ldhses, char* source_name,
 }
 
 /*************************************************************************
-*
-* Name:		utl_copy_objects()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* char *	object_name	I	Name object.
-* char *	class_name	I	class of the object.
-* char *	destination_name I	Name of created destination object.
-* int		first		I	Position relativ destination.
-* int		last		I	Position relativ destination.
-* int		after		I	Position relativ destination.
-* int		before		I	Position relativ destination.
-*
-* Description: 	Copy an object.
-*
-**************************************************************************/
+ *
+ * Name:		utl_copy_objects()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * char *	object_name	I	Name object.
+ * char *	class_name	I	class of the object.
+ * char *	destination_name I	Name of created destination object.
+ * int		first		I	Position relativ destination.
+ * int		last		I	Position relativ destination.
+ * int		after		I	Position relativ destination.
+ * int		before		I	Position relativ destination.
+ *
+ * Description: 	Copy an object.
+ *
+ **************************************************************************/
 
-int utl_copy_objects(ldh_tSesContext ldhses, char* source_name,
-    char* destination_name, char* name, int hier, int first, int last,
-    int after, int before)
+int utl_copy_objects(ldh_tSesContext ldhses, char* source_name, char* destination_name, char* name, int hier,
+                     int first, int last, int after, int before)
 {
   return FOE__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		utl_move_window()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* char *	source_name	I	Name of source object.
-* char *	destination_name I	Name of destination object.
-*
-* Description: 	Moves all the object in one window to another window.
-*
-**************************************************************************/
+ *
+ * Name:		utl_move_window()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * char *	source_name	I	Name of source object.
+ * char *	destination_name I	Name of destination object.
+ *
+ * Description: 	Moves all the object in one window to another window.
+ *
+ **************************************************************************/
 
-int utl_move_window(
-    ldh_tSesContext ldhses, char* source_name, char* destination_name)
+int utl_move_window(ldh_tSesContext ldhses, char* source_name, char* destination_name)
 {
   int sts, size, get_sts;
   int i;
@@ -8649,13 +9279,15 @@ int utl_move_window(
 
   /* Check source name */
   sts = ldh_NameToObjid(ldhses, &source, source_name);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     return FOE__OBJNAME;
   }
 
   /* Check source name */
   sts = ldh_NameToObjid(ldhses, &destination, destination_name);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     return FOE__OBJNAME;
   }
 
@@ -8683,37 +9315,37 @@ int utl_move_window(
       return FOE__PLCLOADED;
 
     /* Get the plc buffer */
-    sts = ldh_GetObjectBuffer(ldhses, source_plcobjdid, "DevBody", "PlcProgram",
-        &eclass, (char**)&source_plcbuffer, &size);
+    sts = ldh_GetObjectBuffer(ldhses, source_plcobjdid, "DevBody", "PlcProgram", &eclass,
+                              (char**)&source_plcbuffer, &size);
     if (EVEN(sts))
       return sts;
 
-    sts = ldh_GetObjectBuffer(ldhses, dest_plcobjdid, "DevBody", "PlcProgram",
-        &eclass, (char**)&dest_plcbuffer, &size);
+    sts = ldh_GetObjectBuffer(ldhses, dest_plcobjdid, "DevBody", "PlcProgram", &eclass,
+                              (char**)&dest_plcbuffer, &size);
     if (EVEN(sts))
       return sts;
 
     /* Copy the default max values */
-    for (i = 0; i < PWR_OBJTYPES_MAX; i++) {
-      source_plcbuffer->defnamecount[i] = MAX(
-          source_plcbuffer->defnamecount[i], dest_plcbuffer->defnamecount[i]);
+    for (i = 0; i < PWR_OBJTYPES_MAX; i++)
+    {
+      source_plcbuffer->defnamecount[i] =
+          MAX(source_plcbuffer->defnamecount[i], dest_plcbuffer->defnamecount[i]);
       dest_plcbuffer->defnamecount[i] = source_plcbuffer->defnamecount[i];
     }
 
-    sts = ldh_SetObjectBuffer(ldhses, source_plcobjdid, "DevBody", "PlcProgram",
-        (char*)source_plcbuffer);
+    sts = ldh_SetObjectBuffer(ldhses, source_plcobjdid, "DevBody", "PlcProgram", (char*)source_plcbuffer);
     if (EVEN(sts))
       return sts;
     free((char*)source_plcbuffer);
 
-    sts = ldh_SetObjectBuffer(
-        ldhses, dest_plcobjdid, "DevBody", "PlcProgram", (char*)dest_plcbuffer);
+    sts = ldh_SetObjectBuffer(ldhses, dest_plcobjdid, "DevBody", "PlcProgram", (char*)dest_plcbuffer);
     if (EVEN(sts))
       return sts;
     free((char*)dest_plcbuffer);
 
     get_sts = ldh_GetChild(ldhses, source, &next_child);
-    while (ODD(get_sts)) {
+    while (ODD(get_sts))
+    {
       /* Get next sibling before the move */
       child = next_child;
       get_sts = ldh_GetNextSibling(ldhses, child, &next_child);
@@ -8724,27 +9356,27 @@ int utl_move_window(
         return sts;
 
       /* Change values in the node and connection buffer */
-      sts = ldh_GetObjectBuffer(ldhses, child, "DevBody", "PlcNode", &eclass,
-          (char**)&nodebuffer, &size);
-      if (ODD(sts)) {
+      sts = ldh_GetObjectBuffer(ldhses, child, "DevBody", "PlcNode", &eclass, (char**)&nodebuffer, &size);
+      if (ODD(sts))
+      {
         nodebuffer->woid = source;
 
-        sts = ldh_SetObjectBuffer(
-            ldhses, child, "DevBody", "PlcNode", (char*)nodebuffer);
+        sts = ldh_SetObjectBuffer(ldhses, child, "DevBody", "PlcNode", (char*)nodebuffer);
         if (EVEN(sts))
           return sts;
         free((char*)nodebuffer);
-      } else {
+      }
+      else
+      {
         /* This is a connection */
-        sts = ldh_GetObjectBuffer(ldhses, child, "DevBody", "PlcConnection",
-            &eclass, (char**)&conbuffer, &size);
+        sts = ldh_GetObjectBuffer(ldhses, child, "DevBody", "PlcConnection", &eclass, (char**)&conbuffer,
+                                  &size);
         if (EVEN(sts))
           return sts;
 
         conbuffer->woid = source;
 
-        sts = ldh_SetObjectBuffer(
-            ldhses, child, "DevBody", "PlcConnection", (char*)conbuffer);
+        sts = ldh_SetObjectBuffer(ldhses, child, "DevBody", "PlcConnection", (char*)conbuffer);
         if (EVEN(sts))
           return sts;
         free((char*)conbuffer);
@@ -8755,20 +9387,19 @@ int utl_move_window(
 }
 
 /*************************************************************************
-*
-* Name:		utl_connect()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-*
-* Description: 	Connect to objects.
-*
-**************************************************************************/
+ *
+ * Name:		utl_connect()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ *
+ * Description: 	Connect to objects.
+ *
+ **************************************************************************/
 
-int utl_connect(ldh_tSesContext ldhses, char* object_name, char* connect_name,
-    int reconnect)
+int utl_connect(ldh_tSesContext ldhses, char* object_name, char* connect_name, int reconnect)
 {
   printf("%%FOE-E-CONNECT, Connect is obsolete\n");
 
@@ -8776,17 +9407,17 @@ int utl_connect(ldh_tSesContext ldhses, char* object_name, char* connect_name,
 }
 
 /*************************************************************************
-*
-* Name:		utl_disconnect()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-*
-* Description: 	Disconnect an object.
-*
-**************************************************************************/
+ *
+ * Name:		utl_disconnect()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ *
+ * Description: 	Disconnect an object.
+ *
+ **************************************************************************/
 
 int utl_disconnect(ldh_tSesContext ldhses, char* object_name)
 {
@@ -8795,33 +9426,33 @@ int utl_disconnect(ldh_tSesContext ldhses, char* object_name)
 }
 
 /*************************************************************************
-*
-* Name:		utl_object_delete()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* pwr_tObjid  objdid		I	objdid for the object.
-* ldh_tSesContext ldhses		I	ldh session.
-* unsigned long	utlctx		I	output specification.
-*
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		utl_object_delete()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * pwr_tObjid  objdid		I	objdid for the object.
+ * ldh_tSesContext ldhses		I	ldh session.
+ * unsigned long	utlctx		I	output specification.
+ *
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-static int utl_object_delete(pwr_tObjid Objdid, ldh_tSesContext ldhses,
-    utl_ctx utlctx, unsigned long dum1, unsigned long dum2, unsigned long dum3)
+static int utl_object_delete(pwr_tObjid Objdid, ldh_tSesContext ldhses, utl_ctx utlctx, unsigned long dum1,
+                             unsigned long dum2, unsigned long dum3)
 {
   pwr_tOName hier_name;
   int sts, size;
 
-  sts = ldh_ObjidToName(
-      ldhses, Objdid, ldh_eName_Hierarchy, hier_name, sizeof(hier_name), &size);
+  sts = ldh_ObjidToName(ldhses, Objdid, ldh_eName_Hierarchy, hier_name, sizeof(hier_name), &size);
   if (EVEN(sts))
     return sts;
 
-  if (utlctx->confirm) {
+  if (utlctx->confirm)
+  {
     printf("Delete object %s ", hier_name);
     // TODO
     printf("[Y/n/q/a]: ");
@@ -8837,10 +9468,12 @@ static int utl_object_delete(pwr_tObjid Objdid, ldh_tSesContext ldhses,
 
   /* Delete the object */
   sts = ldh_DeleteObject(ldhses, Objdid);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     if (utlctx->log)
       printf("Object deleted %s\n", hier_name);
-  } else if (sts == LDH__HAS_CHILD)
+  }
+  else if (sts == LDH__HAS_CHILD)
     printf("%%FOE-E-UNABLE_TO_DELETE object %s, object has child\n", hier_name);
   else if (EVEN(sts))
     return sts;
@@ -8849,33 +9482,33 @@ static int utl_object_delete(pwr_tObjid Objdid, ldh_tSesContext ldhses,
 }
 
 /*************************************************************************
-*
-* Name:		utl_tree_delete()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* pwr_tObjid  objdid		I	objdid for the object.
-* ldh_tSesContext ldhses		I	ldh session.
-* unsigned long	utlctx		I	output specification.
-*
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		utl_tree_delete()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * pwr_tObjid  objdid		I	objdid for the object.
+ * ldh_tSesContext ldhses		I	ldh session.
+ * unsigned long	utlctx		I	output specification.
+ *
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-static int utl_tree_delete(pwr_tObjid Objdid, ldh_tSesContext ldhses,
-    utl_ctx utlctx, unsigned long dum1, unsigned long dum2, unsigned long dum3)
+static int utl_tree_delete(pwr_tObjid Objdid, ldh_tSesContext ldhses, utl_ctx utlctx, unsigned long dum1,
+                           unsigned long dum2, unsigned long dum3)
 {
   pwr_tOName hier_name;
   int sts, size;
 
-  sts = ldh_ObjidToName(
-      ldhses, Objdid, ldh_eName_Hierarchy, hier_name, sizeof(hier_name), &size);
+  sts = ldh_ObjidToName(ldhses, Objdid, ldh_eName_Hierarchy, hier_name, sizeof(hier_name), &size);
   if (EVEN(sts))
     return sts;
 
-  if (utlctx->confirm) {
+  if (utlctx->confirm)
+  {
     printf("Delete tree %s ", hier_name);
     // TODO
     printf("[Y/n]: ");
@@ -8887,34 +9520,36 @@ static int utl_tree_delete(pwr_tObjid Objdid, ldh_tSesContext ldhses,
 
   /* Delete the object tree */
   sts = ldh_DeleteObjectTree(ldhses, Objdid, 0);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     if (utlctx->log)
       printf("Object tree deleted %s\n", hier_name);
-  } else if (EVEN(sts))
+  }
+  else if (EVEN(sts))
     return sts;
 
   return FOE__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		utl_delete_objects()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* char *	hiername	I	Name of a object in the hierarchy.
-* char *	class		I	Name of the class.
-*
-*
-* Description: 	Delete all objects of a specified class that is found
-*		below a specific object in the hierarchy.
-*
-**************************************************************************/
+ *
+ * Name:		utl_delete_objects()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * char *	hiername	I	Name of a object in the hierarchy.
+ * char *	class		I	Name of the class.
+ *
+ *
+ * Description: 	Delete all objects of a specified class that is found
+ *		below a specific object in the hierarchy.
+ *
+ **************************************************************************/
 
-int utl_delete_objects(ldh_tSesContext ldhses, char* hiername, char* classname,
-    char* name, int confirm, int log)
+int utl_delete_objects(ldh_tSesContext ldhses, char* hiername, char* classname, char* name, int confirm,
+                       int log)
 {
   utl_ctx utlctx;
   int sts, i;
@@ -8930,42 +9565,52 @@ int utl_delete_objects(ldh_tSesContext ldhses, char* hiername, char* classname,
   int object_count;
 
   /* Check if class */
-  if (classname != NULL) {
-    nr = utl_parse(classname, ", ", "", (char*)class_str,
-        sizeof(class_str) / sizeof(class_str[0]), sizeof(class_str[0]));
+  if (classname != NULL)
+  {
+    nr = utl_parse(classname, ", ", "", (char*)class_str, sizeof(class_str) / sizeof(class_str[0]),
+                   sizeof(class_str[0]));
     if ((nr == 0) || (nr > UTL_INPUTLIST_MAX))
       return FOE__CLASSYNT;
 
-    for (i = 0; i < nr; i++) {
+    for (i = 0; i < nr; i++)
+    {
       sts = ldh_ClassNameToId(ldhses, &class_vect[i], class_str[i]);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         return FOE__CLASSNAME;
       }
     }
     class_vect[nr] = 0;
     classp = class_vect;
-  } else
+  }
+  else
     classp = 0;
 
   /* Check if hierarchy */
-  if (hiername != NULL) {
+  if (hiername != NULL)
+  {
     /* Get objdid for the hierarchy object */
     sts = ldh_NameToObjid(ldhses, &hierobjdid, hiername);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       return FOE__HIERNAME;
     }
-  } else
+  }
+  else
     hierobjdid = pwr_cNObjid;
 
   /* Check if name */
-  if (name != NULL) {
+  if (name != NULL)
+  {
     /* Check that name includes a wildcard */
     s = strchr(name, '*');
-    if (s == 0) {
+    if (s == 0)
+    {
       /* Print this object */
       /* Get objdid for the object */
       sts = ldh_NameToObjid(ldhses, &objdid, name);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         return FOE__OBJECT;
       }
 
@@ -8991,8 +9636,8 @@ int utl_delete_objects(ldh_tSesContext ldhses, char* hiername, char* classname,
   /* Search for objects */
   object_count = 0;
   object_list = 0;
-  sts = trv_get_objects_hier_class_name(ldhses, hierobjdid, classp, name,
-      &utl_objidlist_insert, &object_list, &object_count, 0, 0, 0);
+  sts = trv_get_objects_hier_class_name(ldhses, hierobjdid, classp, name, &utl_objidlist_insert, &object_list,
+                                        &object_count, 0, 0, 0);
   if (EVEN(sts))
     return sts;
 
@@ -9000,7 +9645,8 @@ int utl_delete_objects(ldh_tSesContext ldhses, char* hiername, char* classname,
     printf("Number of objects found: %d\n", object_count);
 
   object_ptr = object_list;
-  while (object_ptr) {
+  while (object_ptr)
+  {
     sts = utl_object_delete(object_ptr->objid, ldhses, utlctx, 0, 0, 0);
     if (sts == FOE__ABORTSEARCH)
       break;
@@ -9017,21 +9663,21 @@ int utl_delete_objects(ldh_tSesContext ldhses, char* hiername, char* classname,
 }
 
 /*************************************************************************
-*
-* Name:		utl_delete_objects()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* char *	hiername	I	Name of a object in the hierarchy.
-* char *	class		I	Name of the class.
-*
-*
-* Description: 	Delete all objects of a specified class that is found
-*		below a specific object in the hierarchy.
-*
-**************************************************************************/
+ *
+ * Name:		utl_delete_objects()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * char *	hiername	I	Name of a object in the hierarchy.
+ * char *	class		I	Name of the class.
+ *
+ *
+ * Description: 	Delete all objects of a specified class that is found
+ *		below a specific object in the hierarchy.
+ *
+ **************************************************************************/
 
 int utl_delete_tree(ldh_tSesContext ldhses, char* name, int confirm, int log)
 {
@@ -9043,10 +9689,12 @@ int utl_delete_tree(ldh_tSesContext ldhses, char* name, int confirm, int log)
   classp = 0;
 
   /* Check if hierarchy */
-  if (name != NULL) {
+  if (name != NULL)
+  {
     /* Get objdid for the hierarchy object */
     sts = ldh_NameToObjid(ldhses, &objdid, name);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       return FOE__OBJECT;
     }
   }
@@ -9065,17 +9713,17 @@ int utl_delete_tree(ldh_tSesContext ldhses, char* name, int confirm, int log)
 }
 
 /*************************************************************************
-*
-* Name:		utl_delete_volume()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-*
-* Description: 	Delete a volume.
-*
-**************************************************************************/
+ *
+ * Name:		utl_delete_volume()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ *
+ * Description: 	Delete a volume.
+ *
+ **************************************************************************/
 
 int utl_delete_volume(ldh_tWBContext ldhwb, char* name, int confirm, int log)
 {
@@ -9092,7 +9740,8 @@ int utl_delete_volume(ldh_tWBContext ldhwb, char* name, int confirm, int log)
   utlctx->confirm = confirm;
   utlctx->log = log;
 
-  if (utlctx->confirm) {
+  if (utlctx->confirm)
+  {
     printf("Delete volume %s ", name);
     // TODO
     printf("[Y/n]: ");
@@ -9104,10 +9753,12 @@ int utl_delete_volume(ldh_tWBContext ldhwb, char* name, int confirm, int log)
 
   /* Delete the volume */
   sts = ldh_DeleteVolume(ldhwb, volid);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     if (utlctx->log)
       printf("Volume deleted %s\n", name);
-  } else if (EVEN(sts))
+  }
+  else if (EVEN(sts))
     return sts;
 
   utl_ctx_delete(utlctx);
@@ -9115,20 +9766,20 @@ int utl_delete_volume(ldh_tWBContext ldhwb, char* name, int confirm, int log)
 }
 
 /*************************************************************************
-*
-* Name:		utl_export_object()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-*
-* Description: 	Export an object. Print the object name in a file.
-*
-**************************************************************************/
+ *
+ * Name:		utl_export_object()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ *
+ * Description: 	Export an object. Print the object name in a file.
+ *
+ **************************************************************************/
 
-int utl_export_object(ldh_tSesContext ldhses, char* name, char* prefix,
-    int debugparameter, int gms, char* filename, int append)
+int utl_export_object(ldh_tSesContext ldhses, char* name, char* prefix, int debugparameter, int gms,
+                      char* filename, int append)
 {
   int sts, size, j;
   pwr_tClassId cid;
@@ -9146,27 +9797,32 @@ int utl_export_object(ldh_tSesContext ldhses, char* name, char* prefix,
   pwr_tFileName fname;
 
   /* Check if prefix */
-  if (prefix != NULL) {
+  if (prefix != NULL)
+  {
     /* Add the prefix to the object name */
     strcpy(str, prefix);
-  } else
+  }
+  else
     strcpy(str, "");
 
-  if (name != NULL) {
+  if (name != NULL)
+  {
     /* Get objdid for the hierarchy object */
     sts = ldh_NameToObjid(ldhses, &objdid, name);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       return FOE__OBJECT;
     }
-    sts = ldh_ObjidToName(
-        ldhses, objdid, ldh_eName_Hierarchy, hiername, sizeof(hiername), &size);
+    sts = ldh_ObjidToName(ldhses, objdid, ldh_eName_Hierarchy, hiername, sizeof(hiername), &size);
     if (EVEN(sts))
       return sts;
 
-    if (gms) {
+    if (gms)
+    {
       /* Convert the name to prooper syntax */
       s = hiername;
-      while (*s != 0) {
+      while (*s != 0)
+      {
         if (*s == '-')
           *s = '$';
         s++;
@@ -9176,7 +9832,8 @@ int utl_export_object(ldh_tSesContext ldhses, char* name, char* prefix,
   }
 
   /* Check if debugparameter */
-  if (debugparameter) {
+  if (debugparameter)
+  {
     /* Add the debugparameter to the name */
 
     /* Get the debugparameter */
@@ -9184,14 +9841,16 @@ int utl_export_object(ldh_tSesContext ldhses, char* name, char* prefix,
     if (EVEN(sts))
       return sts;
 
-    sts = ldh_GetClassBody(
-        ldhses, cid, "GraphPlcNode", &bodyclass, (char**)&graphbody, &size);
-    if (ODD(sts)) {
+    sts = ldh_GetClassBody(ldhses, cid, "GraphPlcNode", &bodyclass, (char**)&graphbody, &size);
+    if (ODD(sts))
+    {
       if (graphbody->debugpar[0] != 0)
         strcpy(debugpar, graphbody->debugpar);
       else
         strcpy(debugpar, "ActVal");
-    } else {
+    }
+    else
+    {
       /* Assume that there is an actualvalue in the object */
       strcpy(debugpar, "ActualValue");
     }
@@ -9201,23 +9860,28 @@ int utl_export_object(ldh_tSesContext ldhses, char* name, char* prefix,
       return sts;
 
     found = 0;
-    for (j = 0; j < rows; j++) {
-      if (streq(debugpar, bodydef[j].ParName)) {
+    for (j = 0; j < rows; j++)
+    {
+      if (streq(debugpar, bodydef[j].ParName))
+      {
         found = 1;
         break;
       }
     }
 
-    if (found) {
+    if (found)
+    {
       if (gms)
         strcat(str, "$_");
       else
         strcat(str, ".");
       strcat(str, debugpar);
-      if (gms) {
+      if (gms)
+      {
         /* Add the parameter type with hashmarks */
 
-        switch (bodydef[j].Par->Output.Info.Type) {
+        switch (bodydef[j].Par->Output.Info.Type)
+        {
         case pwr_eType_Boolean:
           strcat(str, "##Boolean");
           break;
@@ -9267,7 +9931,8 @@ int utl_export_object(ldh_tSesContext ldhses, char* name, char* prefix,
     }
   }
 
-  if (filename != NULL) {
+  if (filename != NULL)
+  {
     /* Open file */
     dcli_translate_filename(fname, filename);
     if (append)
@@ -9275,12 +9940,14 @@ int utl_export_object(ldh_tSesContext ldhses, char* name, char* prefix,
     else
       output_file = fopen(filename, "w");
 
-    if (output_file == 0) {
+    if (output_file == 0)
+    {
       return FOE__NOFILE;
     }
     fprintf(output_file, "%s\n", str);
     fclose(output_file);
-  } else
+  }
+  else
     /* Print on terminal */
     printf("%s\n", str);
 
@@ -9288,15 +9955,15 @@ int utl_export_object(ldh_tSesContext ldhses, char* name, char* prefix,
 }
 
 /*************************************************************************
-*
-* Name:		utl_realloc_s()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		utl_realloc_s()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * Description:
+ *
+ **************************************************************************/
 
 int utl_realloc_s(char** list_ptr, int count, int size, int* alloc)
 {
@@ -9304,12 +9971,15 @@ int utl_realloc_s(char** list_ptr, int count, int size, int* alloc)
 
   char* new_list;
 
-  if (count == 0) {
+  if (count == 0)
+  {
     *list_ptr = (char*)calloc(UTL_ALLOC, size);
     if (*list_ptr == 0)
       return FOE__NOMEMORY;
     *alloc = UTL_ALLOC;
-  } else if (*alloc <= count) {
+  }
+  else if (*alloc <= count)
+  {
     new_list = (char*)calloc(*alloc + UTL_ALLOC, size);
     if (new_list == 0)
       return FOE__NOMEMORY;
@@ -9322,15 +9992,15 @@ int utl_realloc_s(char** list_ptr, int count, int size, int* alloc)
 }
 
 /*************************************************************************
-*
-* Name:		utl_realloc()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		utl_realloc()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * Description:
+ *
+ **************************************************************************/
 
 int utl_realloc(char** list_ptr, int old_size, int new_size)
 {
@@ -9339,11 +10009,14 @@ int utl_realloc(char** list_ptr, int old_size, int new_size)
   if (old_size >= new_size)
     return FOE__SUCCESS;
 
-  if (old_size == 0) {
+  if (old_size == 0)
+  {
     *list_ptr = (char*)calloc(1, new_size);
     if (*list_ptr == 0)
       return FOE__NOMEMORY;
-  } else {
+  }
+  else
+  {
     new_list = (char*)calloc(1, new_size);
     if (new_list == 0)
       return FOE__NOMEMORY;
@@ -9355,17 +10028,17 @@ int utl_realloc(char** list_ptr, int old_size, int new_size)
 }
 
 /*************************************************************************
-*
-* Name:		utl_create_loadfiles()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-*
-* Description: 	Create loadfiles.
-*
-**************************************************************************/
+ *
+ * Name:		utl_create_loadfiles()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ *
+ * Description: 	Create loadfiles.
+ *
+ **************************************************************************/
 
 int utl_create_loadfiles(ldh_tSesContext ldhses, char* volumes, int allvolumes)
 {
@@ -9395,40 +10068,45 @@ int utl_create_loadfiles(ldh_tSesContext ldhses, char* volumes, int allvolumes)
     return sts;
   current_volid = volinfo.Volume;
 
-  if (volumes != NULL) {
+  if (volumes != NULL)
+  {
     /* Parse the volumestr */
-    nr = utl_parse(volumes, ", ", "", (char*)vol_str,
-        sizeof(vol_str) / sizeof(vol_str[0]), sizeof(vol_str[0]));
-    if ((nr == 0) || (nr > UTL_INPUTLIST_MAX)) {
+    nr = utl_parse(volumes, ", ", "", (char*)vol_str, sizeof(vol_str) / sizeof(vol_str[0]),
+                   sizeof(vol_str[0]));
+    if ((nr == 0) || (nr > UTL_INPUTLIST_MAX))
+    {
       status = FOE__PARSYNT;
       goto error_return;
     }
 
-    for (i = 0; i < nr; i++) {
-      sts = ldh_VolumeNameToId(
-          ldh_SessionToWB(ldhses), vol_str[i], &volume_vect[i]);
-      if (EVEN(sts)) {
+    for (i = 0; i < nr; i++)
+    {
+      sts = ldh_VolumeNameToId(ldh_SessionToWB(ldhses), vol_str[i], &volume_vect[i]);
+      if (EVEN(sts))
+      {
         status = sts;
         goto error_return;
       }
     }
     volume_vect[nr] = 0;
-  } else
+  }
+  else
     volume_vect[0] = 0;
 
-  if (allvolumes) {
+  if (allvolumes)
+  {
     // Get all volumes that is not class, directory and wb volumes
     i = 0;
     sts = ldh_GetVolumeList(ldh_SessionToWB(ldhses), &vol_id);
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       sts = ldh_GetVolumeClass(ldh_SessionToWB(ldhses), vol_id, &vol_class);
       if (EVEN(sts))
         return sts;
 
-      if (vol_class == pwr_eClass_WorkBenchVolume
-          || vol_class == pwr_eClass_ClassVolume
-          || vol_class == pwr_eClass_DetachedClassVolume
-          || vol_class == pwr_eClass_DirectoryVolume) {
+      if (vol_class == pwr_eClass_WorkBenchVolume || vol_class == pwr_eClass_ClassVolume ||
+          vol_class == pwr_eClass_DetachedClassVolume || vol_class == pwr_eClass_DirectoryVolume)
+      {
         sts = ldh_GetNextVolume(ldh_SessionToWB(ldhses), vol_id, &vol_id);
         continue;
       }
@@ -9443,15 +10121,18 @@ int utl_create_loadfiles(ldh_tSesContext ldhses, char* volumes, int allvolumes)
     volume_vect[i] = 0;
   }
 
-  if (volumes == NULL && !allvolumes) {
+  if (volumes == NULL && !allvolumes)
+  {
     // Take the current volume
     volume_vect[0] = current_volid;
     volume_vect[1] = 0;
   }
 
-  for (i = 0; volume_vect[i] != 0; i++) {
+  for (i = 0; volume_vect[i] != 0; i++)
+  {
     other_volume_attached = 0;
-    if (current_volid != volume_vect[i]) {
+    if (current_volid != volume_vect[i])
+    {
       /* Attach this volume */
       sts = ldh_AttachVolume(ldh_SessionToWB(ldhses), volume_vect[i], &volctx);
       if (EVEN(sts))
@@ -9459,11 +10140,12 @@ int utl_create_loadfiles(ldh_tSesContext ldhses, char* volumes, int allvolumes)
       other_volume_attached = 1;
 
       /* Open a read session */
-      sts = ldh_OpenSession(
-          &l_ldhses, volctx, ldh_eAccess_ReadOnly, ldh_eUtility_Pwr);
+      sts = ldh_OpenSession(&l_ldhses, volctx, ldh_eAccess_ReadOnly, ldh_eUtility_Pwr);
       if (EVEN(sts))
         return sts;
-    } else {
+    }
+    else
+    {
       l_ldhses = ldhses;
       /* Set session to ReadOnly */
       sts = ldh_SetSession(ldhses, ldh_eAccess_ReadOnly);
@@ -9475,10 +10157,13 @@ int utl_create_loadfiles(ldh_tSesContext ldhses, char* volumes, int allvolumes)
     if (ODD(sts))
       status = ldh_CreateLoadFile(l_ldhses);
 
-    if (other_volume_attached) {
+    if (other_volume_attached)
+    {
       ldh_CloseSession(l_ldhses);
       ldh_DetachVolume(ldh_SessionToWB(ldhses), volctx);
-    } else {
+    }
+    else
+    {
       /* Return to session access ReadWrite */
       sts = ldh_SetSession(ldhses, ldh_eAccess_ReadWrite);
       if (EVEN(sts))
@@ -9487,8 +10172,7 @@ int utl_create_loadfiles(ldh_tSesContext ldhses, char* volumes, int allvolumes)
     if (EVEN(status))
       return status;
 
-    wb_log::log(
-        (wb_session*)ldhses, wlog_eCategory_VolumeBuild, volume_vect[i]);
+    wb_log::log((wb_session*)ldhses, wlog_eCategory_VolumeBuild, volume_vect[i]);
   }
   return FOE__SUCCESS;
 
@@ -9501,34 +10185,34 @@ error_return:
 }
 
 /*************************************************************************
-*
-* Cross document list functions.
-*
-**************************************************************************/
+ *
+ * Cross document list functions.
+ *
+ **************************************************************************/
 
 static int cross_doclist_loaded = 0;
 static crossdoc_t_list* cross_doclist = 0;
 static int cross_doclist_count = 0;
 
 /*************************************************************************
-*
-* Name:		cross_doclist_add()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description: 	Add an item to the document list.
-*
-**************************************************************************/
+ *
+ * Name:		cross_doclist_add()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description: 	Add an item to the document list.
+ *
+ **************************************************************************/
 
-static int cross_doclist_add(crossdoc_t_list** doclist, int* doclist_count,
-    pwr_tObjid objid, pwr_tObjid parent, float ll_x, float ll_y, float ur_x,
-    float ur_y, char* page)
+static int cross_doclist_add(crossdoc_t_list** doclist, int* doclist_count, pwr_tObjid objid,
+                             pwr_tObjid parent, float ll_x, float ll_y, float ur_x, float ur_y, char* page)
 {
   crossdoc_t_list* doclist_ptr;
 
-  if (*doclist) {
+  if (*doclist)
+  {
     doclist_ptr = *doclist;
     while (doclist_ptr->next)
       doclist_ptr = doclist_ptr->next;
@@ -9537,7 +10221,9 @@ static int cross_doclist_add(crossdoc_t_list** doclist, int* doclist_count,
     if (doclist_ptr->next == 0)
       return FOE__NOMEMORY;
     doclist_ptr = doclist_ptr->next;
-  } else {
+  }
+  else
+  {
     doclist_ptr = (crossdoc_t_list*)calloc(1, sizeof(crossdoc_t_list));
     if (doclist_ptr == 0)
       return FOE__NOMEMORY;
@@ -9555,19 +10241,19 @@ static int cross_doclist_add(crossdoc_t_list** doclist, int* doclist_count,
 }
 
 /*************************************************************************
-*
-* Name:		cross_doclist_object_insert()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description: 	Insert an object in the doclist.
-*
-**************************************************************************/
+ *
+ * Name:		cross_doclist_object_insert()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description: 	Insert an object in the doclist.
+ *
+ **************************************************************************/
 
-static int cross_doclist_object_insert(pwr_sAttrRef* arp,
-    ldh_tSesContext ldhses, int dum1, int dum2, int dum3, int dum4)
+static int cross_doclist_object_insert(pwr_sAttrRef* arp, ldh_tSesContext ldhses, int dum1, int dum2,
+                                       int dum3, int dum4)
 {
   int sts, size;
   pwr_tClassId cid;
@@ -9581,8 +10267,7 @@ static int cross_doclist_object_insert(pwr_sAttrRef* arp,
   sts = ldh_GetObjectClass(ldhses, arp->Objid, &cid);
 
   /* If graphmethod == 6 this is a document object */
-  sts = ldh_GetClassBody(
-      ldhses, cid, "GraphPlcNode", &bufclass, (char**)&graphbody, &size);
+  sts = ldh_GetClassBody(ldhses, cid, "GraphPlcNode", &bufclass, (char**)&graphbody, &size);
   if (EVEN(sts))
     return FOE__SUCCESS;
 
@@ -9590,20 +10275,17 @@ static int cross_doclist_object_insert(pwr_sAttrRef* arp,
     return FOE__SUCCESS;
 
   /* Store parent, koordinates and page */
-  sts = ldh_GetObjectPar(
-      ldhses, arp->Objid, "DevBody", "Page", (char**)&page, &size);
+  sts = ldh_GetObjectPar(ldhses, arp->Objid, "DevBody", "Page", (char**)&page, &size);
   if (EVEN(sts))
     return FOE__SUCCESS;
 
-  sts = ldh_GetObjectBuffer(ldhses, arp->Objid, "DevBody", "PlcNode", &eclass,
-      (char**)&nodebuffer, &size);
+  sts = ldh_GetObjectBuffer(ldhses, arp->Objid, "DevBody", "PlcNode", &eclass, (char**)&nodebuffer, &size);
   if (EVEN(sts))
     return sts;
 
-  sts = cross_doclist_add(&cross_doclist, &cross_doclist_count, arp->Objid,
-      nodebuffer->woid, nodebuffer->x, nodebuffer->y,
-      nodebuffer->x + nodebuffer->width, nodebuffer->y + nodebuffer->height,
-      page);
+  sts = cross_doclist_add(&cross_doclist, &cross_doclist_count, arp->Objid, nodebuffer->woid, nodebuffer->x,
+                          nodebuffer->y, nodebuffer->x + nodebuffer->width,
+                          nodebuffer->y + nodebuffer->height, page);
   if (EVEN(sts))
     return sts;
   free((char*)nodebuffer);
@@ -9613,16 +10295,16 @@ static int cross_doclist_object_insert(pwr_sAttrRef* arp,
 }
 
 /*************************************************************************
-*
-* Name:		cross_doclist_load()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description: 	Load the doc reference list.
-*
-**************************************************************************/
+ *
+ * Name:		cross_doclist_load()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description: 	Load the doc reference list.
+ *
+ **************************************************************************/
 static int cross_doclist_load(ldh_tSesContext ldhses)
 {
   pwr_tStatus sts;
@@ -9632,7 +10314,7 @@ static int cross_doclist_load(ldh_tSesContext ldhses)
     return FOE__SUCCESS;
 
   sts = trv_get_objects_hier_class_name(ldhses, pwr_cNObjid, 0, NULL,
-      (trv_tBcFunc)cross_doclist_object_insert, ldhses, 0, 0, 0, 0);
+                                        (trv_tBcFunc)cross_doclist_object_insert, ldhses, 0, 0, 0, 0);
   if (EVEN(sts))
     return sts;
 
@@ -9641,16 +10323,16 @@ static int cross_doclist_load(ldh_tSesContext ldhses)
 }
 
 /*************************************************************************
-*
-* Name:		cross_doclist_unload()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description: 	Unload the doc reference list.
-*
-**************************************************************************/
+ *
+ * Name:		cross_doclist_unload()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description: 	Unload the doc reference list.
+ *
+ **************************************************************************/
 
 static int cross_doclist_unload()
 {
@@ -9658,7 +10340,8 @@ static int cross_doclist_unload()
   crossdoc_t_list* next;
 
   doclist_ptr = cross_doclist;
-  while (doclist_ptr) {
+  while (doclist_ptr)
+  {
     next = doclist_ptr->next;
     free((char*)doclist_ptr);
     doclist_ptr = next;
@@ -9671,21 +10354,20 @@ static int cross_doclist_unload()
 }
 
 /*************************************************************************
-*
-* Name:		cross_get_object_page()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* pwr_tObjid  objdid of the object
-*
-* Description: 	Returns the document page of a plc object.
-*
-**************************************************************************/
+ *
+ * Name:		cross_get_object_page()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * pwr_tObjid  objdid of the object
+ *
+ * Description: 	Returns the document page of a plc object.
+ *
+ **************************************************************************/
 
-static int cross_get_object_page(
-    ldh_tSesContext ldhses, pwr_tObjid objid, char* page)
+static int cross_get_object_page(ldh_tSesContext ldhses, pwr_tObjid objid, char* page)
 {
   pwr_tStatus sts;
   pwr_tObjid parent;
@@ -9699,22 +10381,24 @@ static int cross_get_object_page(
   if (EVEN(sts))
     return sts;
 
-  if (cross_doclist == 0) {
+  if (cross_doclist == 0)
+  {
     /* No document objects found */
     *page = 0;
     return FOE__SUCCESS;
   }
 
   sts = ldh_GetParent(ldhses, objid, &parent);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     *page = 0;
     return FOE__SUCCESS;
   }
 
   /* Get the koordinates of the object */
-  sts = ldh_GetObjectBuffer(ldhses, objid, "DevBody", "PlcNode", &bufclass,
-      (char**)&nodebuffer, &size);
-  if (EVEN(sts)) {
+  sts = ldh_GetObjectBuffer(ldhses, objid, "DevBody", "PlcNode", &bufclass, (char**)&nodebuffer, &size);
+  if (EVEN(sts))
+  {
     *page = 0;
     return FOE__SUCCESS;
   }
@@ -9723,10 +10407,13 @@ static int cross_get_object_page(
   y = nodebuffer->y + nodebuffer->height / 2;
 
   doclist_ptr = cross_doclist;
-  while (doclist_ptr) {
-    if (cdh_ObjidIsEqual(parent, doclist_ptr->parent)) {
-      if (x >= doclist_ptr->ll_x && x <= doclist_ptr->ur_x
-          && y >= doclist_ptr->ll_y && y <= doclist_ptr->ur_y) {
+  while (doclist_ptr)
+  {
+    if (cdh_ObjidIsEqual(parent, doclist_ptr->parent))
+    {
+      if (x >= doclist_ptr->ll_x && x <= doclist_ptr->ur_x && y >= doclist_ptr->ll_y &&
+          y <= doclist_ptr->ur_y)
+      {
         strcpy(page, doclist_ptr->page);
         return FOE__SUCCESS;
       }
@@ -9739,10 +10426,10 @@ static int cross_get_object_page(
 }
 
 /*************************************************************************
-*
-* Cross reference list functions.
-*
-**************************************************************************/
+ *
+ * Cross reference list functions.
+ *
+ **************************************************************************/
 
 #define CROSSLIST_DI 0
 #define CROSSLIST_DO 1
@@ -9758,16 +10445,15 @@ static int cross_get_object_page(
 #define CROSSLIST_SIZE 11
 
 static int cross_crosslist_loaded = 0;
-static cross_t_list* cross_crosslist[CROSSLIST_SIZE]
-    = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-static int cross_crosslist_count[CROSSLIST_SIZE]
-    = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+static cross_t_list* cross_crosslist[CROSSLIST_SIZE] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+static int cross_crosslist_count[CROSSLIST_SIZE] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-pwr_tStatus wb_utl::utl_replace_symbol(
-    ldh_tSesContext ldhses, pwr_tObjid oid, pwr_sAttrRef* arp)
+pwr_tStatus wb_utl::utl_replace_symbol(ldh_tSesContext ldhses, pwr_tObjid oid, pwr_sAttrRef* arp)
 {
-  switch (arp->Objid.vid) {
-  case ldh_cPlcFoVolume: {
+  switch (arp->Objid.vid)
+  {
+  case ldh_cPlcFoVolume:
+  {
     pwr_tStatus sts;
     pwr_tOid host;
     pwr_tCid cid;
@@ -9783,13 +10469,13 @@ pwr_tStatus wb_utl::utl_replace_symbol(
     if (EVEN(sts))
       return sts;
 
-    if (cid == pwr_cClass_plc) {
+    if (cid == pwr_cClass_plc)
+    {
       // PlcFo reference in embedded template plc
       pwr_tAttrRef* host_arp;
       int size;
 
-      sts = ldh_GetObjectPar(
-          ldhses, host, "RtBody", "HostObject", (char**)&host_arp, &size);
+      sts = ldh_GetObjectPar(ldhses, host, "RtBody", "HostObject", (char**)&host_arp, &size);
       if (EVEN(sts))
         return sts;
 
@@ -9797,12 +10483,14 @@ pwr_tStatus wb_utl::utl_replace_symbol(
       arp->Offset += host_arp->Offset;
 
       free((char*)host_arp);
-    } else
+    }
+    else
       arp->Objid = host;
 
     break;
   }
-  case ldh_cPlcMainVolume: {
+  case ldh_cPlcMainVolume:
+  {
     pwr_tStatus sts;
     pwr_tOid host;
     pwr_sAttrRef* con_arp;
@@ -9815,8 +10503,7 @@ pwr_tStatus wb_utl::utl_replace_symbol(
     if (EVEN(sts))
       return sts;
 
-    sts = ldh_GetObjectPar(
-        ldhses, host, "RtBody", "PlcConnect", (char**)&con_arp, &size);
+    sts = ldh_GetObjectPar(ldhses, host, "RtBody", "PlcConnect", (char**)&con_arp, &size);
     if (EVEN(sts))
       return sts;
 
@@ -9837,24 +10524,24 @@ pwr_tStatus wb_utl::utl_replace_symbol(
 }
 
 /*************************************************************************
-*
-* Name:		cross_crosslist_add()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description: 	Add an item to the crosslist.
-*
-**************************************************************************/
+ *
+ * Name:		cross_crosslist_add()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description: 	Add an item to the crosslist.
+ *
+ **************************************************************************/
 
-static int cross_crosslist_add(cross_t_list** crosslist, int* crosslist_count,
-    int dum, pwr_sAttrRef* arp, pwr_sAttrRef* refarp,
-    unsigned long specification)
+static int cross_crosslist_add(cross_t_list** crosslist, int* crosslist_count, int dum, pwr_sAttrRef* arp,
+                               pwr_sAttrRef* refarp, unsigned long specification)
 {
   cross_t_list* crosslist_ptr;
 
-  if (*crosslist) {
+  if (*crosslist)
+  {
     crosslist_ptr = *crosslist;
     while (crosslist_ptr->next)
       crosslist_ptr = crosslist_ptr->next;
@@ -9863,7 +10550,9 @@ static int cross_crosslist_add(cross_t_list** crosslist, int* crosslist_count,
     if (crosslist_ptr->next == 0)
       return FOE__NOMEMORY;
     crosslist_ptr = crosslist_ptr->next;
-  } else {
+  }
+  else
+  {
     crosslist_ptr = (cross_t_list*)calloc(1, sizeof(cross_t_list));
     if (crosslist_ptr == 0)
       return FOE__NOMEMORY;
@@ -9877,76 +10566,74 @@ static int cross_crosslist_add(cross_t_list** crosslist, int* crosslist_count,
 }
 
 /*************************************************************************
-*
-* Name:		cross_crosslist_object_insert()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description: 	Insert an object in the crosslist.
-*
-**************************************************************************/
+ *
+ * Name:		cross_crosslist_object_insert()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description: 	Insert an object in the crosslist.
+ *
+ **************************************************************************/
 
-static int cross_crosslist_object_insert(pwr_sAttrRef* arp,
-    ldh_tSesContext ldhses, int dum1, int dum2, int dum3, int dum4)
+static int cross_crosslist_object_insert(pwr_sAttrRef* arp, ldh_tSesContext ldhses, int dum1, int dum2,
+                                         int dum3, int dum4)
 {
   static crr_t_searchlist searchlist[] = {
-    { pwr_cClass_plc, "DevBody", "ResetObject", CRR_READ, CROSSLIST_DV },
-    { pwr_cClass_resdv, "DevBody", "DvObject", CRR_WRITE, CROSSLIST_DV },
-    { pwr_cClass_setdv, "DevBody", "DvObject", CRR_WRITE, CROSSLIST_DV },
-    { pwr_cClass_stodv, "DevBody", "DvObject", CRR_WRITE, CROSSLIST_DV },
-    { pwr_cClass_GetDv, "DevBody", "DvObject", CRR_READ, CROSSLIST_DV },
-    { pwr_cClass_GetDo, "DevBody", "DoObject", CRR_READ, CROSSLIST_DO },
-    { pwr_cClass_resdo, "DevBody", "DoObject", CRR_WRITE, CROSSLIST_DO },
-    { pwr_cClass_setdo, "DevBody", "DoObject", CRR_WRITE, CROSSLIST_DO },
-    { pwr_cClass_stodo, "DevBody", "DoObject", CRR_WRITE, CROSSLIST_DO },
-    { pwr_cClass_GetDi, "DevBody", "DiObject", CRR_READ, CROSSLIST_DI },
-    { pwr_cClass_cstoav, "DevBody", "AvObject", CRR_WRITE, CROSSLIST_AV },
-    { pwr_cClass_GetAv, "DevBody", "AvObject", CRR_READ, CROSSLIST_AV },
-    { pwr_cClass_stoav, "DevBody", "AvObject", CRR_WRITE, CROSSLIST_AV },
-    { pwr_cClass_cstoao, "DevBody", "AoObject", CRR_WRITE, CROSSLIST_AO },
-    { pwr_cClass_GetAo, "DevBody", "AoObject", CRR_READ, CROSSLIST_AO },
-    { pwr_cClass_stoao, "DevBody", "AoObject", CRR_WRITE, CROSSLIST_AO },
-    { pwr_cClass_GetAi, "DevBody", "AiObject", CRR_READ, CROSSLIST_AI },
-    { pwr_cClass_pos3p, "DevBody", "DoOpen", CRR_WRITE, CROSSLIST_DO },
-    { pwr_cClass_pos3p, "DevBody", "DoClose", CRR_WRITE, CROSSLIST_DO },
-    { pwr_cClass_inc3p, "DevBody", "DoOpen", CRR_WRITE, CROSSLIST_DI },
-    { pwr_cClass_inc3p, "DevBody", "DoClose", CRR_WRITE, CROSSLIST_DO },
-    { pwr_cClass_stodp, "DevBody", "Object", CRR_WRITE, CROSSLIST_OBJ },
-    { pwr_cClass_setdp, "DevBody", "Object", CRR_WRITE, CROSSLIST_OBJ },
-    { pwr_cClass_resdp, "DevBody", "Object", CRR_WRITE, CROSSLIST_OBJ },
-    { pwr_cClass_GetDp, "DevBody", "DpObject", CRR_READ, CROSSLIST_OBJ },
-    { pwr_cClass_cstoap, "DevBody", "Object", CRR_WRITE, CROSSLIST_OBJ },
-    { pwr_cClass_GetAp, "DevBody", "ApObject", CRR_READ, CROSSLIST_OBJ },
-    { pwr_cClass_stoap, "DevBody", "Object", CRR_WRITE, CROSSLIST_OBJ },
-    { pwr_cClass_CStoIp, "DevBody", "Object", CRR_WRITE, CROSSLIST_OBJ },
-    { pwr_cClass_GetIp, "DevBody", "IpObject", CRR_READ, CROSSLIST_OBJ },
-    { pwr_cClass_StoIp, "DevBody", "Object", CRR_WRITE, CROSSLIST_OBJ },
-    { pwr_cClass_stoii, "DevBody", "IiObject", CRR_WRITE, CROSSLIST_II },
-    { pwr_cClass_stoio, "DevBody", "IoObject", CRR_WRITE, CROSSLIST_IO },
-    { pwr_cClass_stoiv, "DevBody", "IvObject", CRR_WRITE, CROSSLIST_IV },
-    { pwr_cClass_cstoii, "DevBody", "IiObject", CRR_WRITE, CROSSLIST_II },
-    { pwr_cClass_cstoio, "DevBody", "IoObject", CRR_WRITE, CROSSLIST_IO },
-    { pwr_cClass_cstoiv, "DevBody", "IvObject", CRR_WRITE, CROSSLIST_IV },
-    { pwr_cClass_GetIi, "DevBody", "IiObject", CRR_READ, CROSSLIST_II },
-    { pwr_cClass_GetIo, "DevBody", "IoObject", CRR_READ, CROSSLIST_IO },
-    { pwr_cClass_GetIv, "DevBody", "IvObject", CRR_READ, CROSSLIST_IV },
-    { pwr_cClass_GetPi, "DevBody", "CoObject", CRR_READ, CROSSLIST_CO },
-    { pwr_cClass_ExternRef, "DevBody", "Object", CRR_GETFROMOBJECT,
-        CROSSLIST_OBJ },
-    { pwr_cClass_reset_so, "DevBody", "OrderObject", CRR_READ, CROSSLIST_OBJ },
-    { pwr_cClass_GetData, "DevBody", "DataObject", CRR_REF, CROSSLIST_OBJ },
-    { pwr_cClass_Di, "RtBody", "SigChanCon", CRR_REF, CROSSLIST_OBJ },
-    { pwr_cClass_Do, "RtBody", "SigChanCon", CRR_REF, CROSSLIST_OBJ },
-    { pwr_cClass_Ai, "RtBody", "SigChanCon", CRR_REF, CROSSLIST_OBJ },
-    { pwr_cClass_Ao, "RtBody", "SigChanCon", CRR_REF, CROSSLIST_OBJ },
-    { pwr_cClass_Ii, "RtBody", "SigChanCon", CRR_REF, CROSSLIST_OBJ },
-    { pwr_cClass_Io, "RtBody", "SigChanCon", CRR_REF, CROSSLIST_OBJ },
-    { pwr_cClass_Co, "RtBody", "SigChanCon", CRR_REF, CROSSLIST_OBJ },
-    { pwr_cClass_Po, "RtBody", "SigChanCon", CRR_REF, CROSSLIST_OBJ },
-    { 0, "", "", 0, 0 }
-  };
+      {pwr_cClass_plc, "DevBody", "ResetObject", CRR_READ, CROSSLIST_DV},
+      {pwr_cClass_resdv, "DevBody", "DvObject", CRR_WRITE, CROSSLIST_DV},
+      {pwr_cClass_setdv, "DevBody", "DvObject", CRR_WRITE, CROSSLIST_DV},
+      {pwr_cClass_stodv, "DevBody", "DvObject", CRR_WRITE, CROSSLIST_DV},
+      {pwr_cClass_GetDv, "DevBody", "DvObject", CRR_READ, CROSSLIST_DV},
+      {pwr_cClass_GetDo, "DevBody", "DoObject", CRR_READ, CROSSLIST_DO},
+      {pwr_cClass_resdo, "DevBody", "DoObject", CRR_WRITE, CROSSLIST_DO},
+      {pwr_cClass_setdo, "DevBody", "DoObject", CRR_WRITE, CROSSLIST_DO},
+      {pwr_cClass_stodo, "DevBody", "DoObject", CRR_WRITE, CROSSLIST_DO},
+      {pwr_cClass_GetDi, "DevBody", "DiObject", CRR_READ, CROSSLIST_DI},
+      {pwr_cClass_cstoav, "DevBody", "AvObject", CRR_WRITE, CROSSLIST_AV},
+      {pwr_cClass_GetAv, "DevBody", "AvObject", CRR_READ, CROSSLIST_AV},
+      {pwr_cClass_stoav, "DevBody", "AvObject", CRR_WRITE, CROSSLIST_AV},
+      {pwr_cClass_cstoao, "DevBody", "AoObject", CRR_WRITE, CROSSLIST_AO},
+      {pwr_cClass_GetAo, "DevBody", "AoObject", CRR_READ, CROSSLIST_AO},
+      {pwr_cClass_stoao, "DevBody", "AoObject", CRR_WRITE, CROSSLIST_AO},
+      {pwr_cClass_GetAi, "DevBody", "AiObject", CRR_READ, CROSSLIST_AI},
+      {pwr_cClass_pos3p, "DevBody", "DoOpen", CRR_WRITE, CROSSLIST_DO},
+      {pwr_cClass_pos3p, "DevBody", "DoClose", CRR_WRITE, CROSSLIST_DO},
+      {pwr_cClass_inc3p, "DevBody", "DoOpen", CRR_WRITE, CROSSLIST_DI},
+      {pwr_cClass_inc3p, "DevBody", "DoClose", CRR_WRITE, CROSSLIST_DO},
+      {pwr_cClass_stodp, "DevBody", "Object", CRR_WRITE, CROSSLIST_OBJ},
+      {pwr_cClass_setdp, "DevBody", "Object", CRR_WRITE, CROSSLIST_OBJ},
+      {pwr_cClass_resdp, "DevBody", "Object", CRR_WRITE, CROSSLIST_OBJ},
+      {pwr_cClass_GetDp, "DevBody", "DpObject", CRR_READ, CROSSLIST_OBJ},
+      {pwr_cClass_cstoap, "DevBody", "Object", CRR_WRITE, CROSSLIST_OBJ},
+      {pwr_cClass_GetAp, "DevBody", "ApObject", CRR_READ, CROSSLIST_OBJ},
+      {pwr_cClass_stoap, "DevBody", "Object", CRR_WRITE, CROSSLIST_OBJ},
+      {pwr_cClass_CStoIp, "DevBody", "Object", CRR_WRITE, CROSSLIST_OBJ},
+      {pwr_cClass_GetIp, "DevBody", "IpObject", CRR_READ, CROSSLIST_OBJ},
+      {pwr_cClass_StoIp, "DevBody", "Object", CRR_WRITE, CROSSLIST_OBJ},
+      {pwr_cClass_stoii, "DevBody", "IiObject", CRR_WRITE, CROSSLIST_II},
+      {pwr_cClass_stoio, "DevBody", "IoObject", CRR_WRITE, CROSSLIST_IO},
+      {pwr_cClass_stoiv, "DevBody", "IvObject", CRR_WRITE, CROSSLIST_IV},
+      {pwr_cClass_cstoii, "DevBody", "IiObject", CRR_WRITE, CROSSLIST_II},
+      {pwr_cClass_cstoio, "DevBody", "IoObject", CRR_WRITE, CROSSLIST_IO},
+      {pwr_cClass_cstoiv, "DevBody", "IvObject", CRR_WRITE, CROSSLIST_IV},
+      {pwr_cClass_GetIi, "DevBody", "IiObject", CRR_READ, CROSSLIST_II},
+      {pwr_cClass_GetIo, "DevBody", "IoObject", CRR_READ, CROSSLIST_IO},
+      {pwr_cClass_GetIv, "DevBody", "IvObject", CRR_READ, CROSSLIST_IV},
+      {pwr_cClass_GetPi, "DevBody", "CoObject", CRR_READ, CROSSLIST_CO},
+      {pwr_cClass_ExternRef, "DevBody", "Object", CRR_GETFROMOBJECT, CROSSLIST_OBJ},
+      {pwr_cClass_reset_so, "DevBody", "OrderObject", CRR_READ, CROSSLIST_OBJ},
+      {pwr_cClass_GetData, "DevBody", "DataObject", CRR_REF, CROSSLIST_OBJ},
+      {pwr_cClass_Di, "RtBody", "SigChanCon", CRR_REF, CROSSLIST_OBJ},
+      {pwr_cClass_Do, "RtBody", "SigChanCon", CRR_REF, CROSSLIST_OBJ},
+      {pwr_cClass_Ai, "RtBody", "SigChanCon", CRR_REF, CROSSLIST_OBJ},
+      {pwr_cClass_Ao, "RtBody", "SigChanCon", CRR_REF, CROSSLIST_OBJ},
+      {pwr_cClass_Ii, "RtBody", "SigChanCon", CRR_REF, CROSSLIST_OBJ},
+      {pwr_cClass_Io, "RtBody", "SigChanCon", CRR_REF, CROSSLIST_OBJ},
+      {pwr_cClass_Co, "RtBody", "SigChanCon", CRR_REF, CROSSLIST_OBJ},
+      {pwr_cClass_Po, "RtBody", "SigChanCon", CRR_REF, CROSSLIST_OBJ},
+      {0, "", "", 0, 0}};
 
   int sts, size;
   pwr_tClassId cid;
@@ -9961,11 +10648,13 @@ static int cross_crosslist_object_insert(pwr_sAttrRef* arp,
   sts = ldh_GetObjectClass(ldhses, arp->Objid, &cid);
 
   searchlist_ptr = searchlist;
-  while (searchlist_ptr->cid != 0) {
-    if (cid == searchlist_ptr->cid) {
+  while (searchlist_ptr->cid != 0)
+  {
+    if (cid == searchlist_ptr->cid)
+    {
       /* Check if the objdid in the parameter is correct */
-      sts = ldh_GetObjectPar(ldhses, arp->Objid, searchlist_ptr->body,
-          searchlist_ptr->attr, (char**)&aref_ptr, &size);
+      sts = ldh_GetObjectPar(ldhses, arp->Objid, searchlist_ptr->body, searchlist_ptr->attr,
+                             (char**)&aref_ptr, &size);
       if (EVEN(sts))
         return sts;
 
@@ -9974,17 +10663,19 @@ static int cross_crosslist_object_insert(pwr_sAttrRef* arp,
 
       wb_utl::utl_replace_symbol(ldhses, arp->Objid, &aref);
 
-      if (cdh_ObjidIsNotNull(aref.Objid)) {
+      if (cdh_ObjidIsNotNull(aref.Objid))
+      {
         /* Check if object exists */
         sts = ldh_GetAttrRefTid(ldhses, &aref, &refobjid_class);
-        if (ODD(sts)) {
+        if (ODD(sts))
+        {
           /* If attribute, get object or attrobject */
-          if (!cdh_tidIsCid(refobjid_class)) {
+          if (!cdh_tidIsCid(refobjid_class))
+          {
             char *np, *s;
             int nsize;
 
-            sts = ldh_AttrRefToName(
-                ldhses, &aref, ldh_eName_Hierarchy, &np, &nsize);
+            sts = ldh_AttrRefToName(ldhses, &aref, ldh_eName_Hierarchy, &np, &nsize);
             if (EVEN(sts))
               return FOE__SUCCESS;
             if ((s = strrchr(np, '.')))
@@ -9993,9 +10684,9 @@ static int cross_crosslist_object_insert(pwr_sAttrRef* arp,
             if (EVEN(sts))
               return FOE__SUCCESS;
           }
-          if (searchlist_ptr->write == CRR_GETFROMOBJECT) {
-            sts = ldh_GetObjectPar(ldhses, arp->Objid, "DevBody", "Write",
-                (char**)&write_ptr, &size);
+          if (searchlist_ptr->write == CRR_GETFROMOBJECT)
+          {
+            sts = ldh_GetObjectPar(ldhses, arp->Objid, "DevBody", "Write", (char**)&write_ptr, &size);
             if (EVEN(sts))
               return sts;
             if (*write_ptr)
@@ -10003,13 +10694,13 @@ static int cross_crosslist_object_insert(pwr_sAttrRef* arp,
             else
               write = 0;
             free((char*)write_ptr);
-          } else
+          }
+          else
             write = searchlist_ptr->write;
 
           /* Store in crosslist */
           sts = cross_crosslist_add(&cross_crosslist[searchlist_ptr->list],
-              &cross_crosslist_count[searchlist_ptr->list], 0, &aref, arp,
-              write);
+                                    &cross_crosslist_count[searchlist_ptr->list], 0, &aref, arp, write);
           if (EVEN(sts))
             return sts;
         }
@@ -10022,16 +10713,16 @@ static int cross_crosslist_object_insert(pwr_sAttrRef* arp,
 }
 
 /*************************************************************************
-*
-* Name:		cross_crosslist_load()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description: 	Load thes cross reference list.
-*
-**************************************************************************/
+ *
+ * Name:		cross_crosslist_load()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description: 	Load thes cross reference list.
+ *
+ **************************************************************************/
 static int cross_crosslist_load(ldh_tSesContext ldhses)
 {
   pwr_tStatus sts;
@@ -10047,17 +10738,19 @@ static int cross_crosslist_load(ldh_tSesContext ldhses)
     /* Already loaded */
     return FOE__SUCCESS;
 
-  if (allvolumes) {
+  if (allvolumes)
+  {
     /* Get all volumes that is not class and wb volumes */
     i = 0;
     sts = ldh_GetVolumeList(ldh_SessionToWB(ldhses), &vol_id);
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       sts = ldh_GetVolumeClass(ldh_SessionToWB(ldhses), vol_id, &vol_class);
       if (EVEN(sts))
         return sts;
 
-      if (!(cdh_isClassVolumeClass(vol_class)
-              || vol_class == pwr_eClass_WorkBenchVolume)) {
+      if (!(cdh_isClassVolumeClass(vol_class) || vol_class == pwr_eClass_WorkBenchVolume))
+      {
         volume_vect[i] = vol_id;
         i++;
         if (i > UTL_INPUTLIST_MAX)
@@ -10067,15 +10760,15 @@ static int cross_crosslist_load(ldh_tSesContext ldhses)
     }
     volume_vect[i] = 0;
     volume_p = volume_vect;
-  } else
+  }
+  else
     volume_p = NULL;
 
   sts = trv_create_ctx(&trvctx, ldhses, pwr_cNObjid, 0, NULL, volume_p);
   if (EVEN(sts))
     return sts;
 
-  sts = trv_aobject_search(
-      trvctx, (trv_tBcFunc)cross_crosslist_object_insert, ldhses, 0, 0, 0, 0);
+  sts = trv_aobject_search(trvctx, (trv_tBcFunc)cross_crosslist_object_insert, ldhses, 0, 0, 0, 0);
   if (EVEN(sts))
     return sts;
 
@@ -10086,16 +10779,16 @@ static int cross_crosslist_load(ldh_tSesContext ldhses)
 }
 
 /*************************************************************************
-*
-* Name:		cross_crosslist_unload()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description: 	Unload thes cross reference list.
-*
-**************************************************************************/
+ *
+ * Name:		cross_crosslist_unload()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description: 	Unload thes cross reference list.
+ *
+ **************************************************************************/
 
 static int cross_crosslist_unload()
 {
@@ -10103,9 +10796,11 @@ static int cross_crosslist_unload()
   cross_t_list* crosslist_ptr;
   cross_t_list* next;
 
-  for (i = 0; i < CROSSLIST_SIZE; i++) {
+  for (i = 0; i < CROSSLIST_SIZE; i++)
+  {
     crosslist_ptr = cross_crosslist[i];
-    while (crosslist_ptr) {
+    while (crosslist_ptr)
+    {
       next = crosslist_ptr->next;
       free((char*)crosslist_ptr);
       crosslist_ptr = next;
@@ -10118,19 +10813,18 @@ static int cross_crosslist_unload()
 }
 
 /*************************************************************************
-*
-* Name:		crr_refobject()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		crr_refobject()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-static int crr_refobject(
-    utl_ctx utlctx, pwr_tObjid Objdid, utl_t_list** crrlist, int* crrcount)
+static int crr_refobject(utl_ctx utlctx, pwr_tObjid Objdid, utl_t_list** crrlist, int* crrcount)
 {
   pwr_tStatus sts;
   cross_t_list* crosslist_ptr;
@@ -10152,12 +10846,15 @@ static int crr_refobject(
   cr_index = CROSSLIST_OBJ;
 
   crosslist_ptr = cross_crosslist[cr_index];
-  while (crosslist_ptr) {
+  while (crosslist_ptr)
+  {
     /* Check that object is not already found */
     cr_ptr = cross_crosslist[cr_index];
     found = 0;
-    while (cr_ptr) {
-      if (cdh_ArefIsEqual(&cr_ptr->o, &crosslist_ptr->o)) {
+    while (cr_ptr)
+    {
+      if (cdh_ArefIsEqual(&cr_ptr->o, &crosslist_ptr->o))
+      {
         if (cr_ptr != crosslist_ptr)
           found = 1;
         break;
@@ -10166,8 +10863,7 @@ static int crr_refobject(
     }
 
     if (!found)
-      utl_list_insert(crrlist, crrcount, &crosslist_ptr->o,
-          crosslist_ptr->specification, 0, 0);
+      utl_list_insert(crrlist, crrcount, &crosslist_ptr->o, crosslist_ptr->specification, 0, 0);
 
     crosslist_ptr = crosslist_ptr->next;
   }
@@ -10175,23 +10871,23 @@ static int crr_refobject(
 }
 
 /*************************************************************************
-*
-* Name:		crr_crossref_children()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* pwr_tObjid  objdid		I	objdid of the object
-* utl_t_list	** crrlist	IO	list of found crossreferenses.
-* int *		crrcount	IO	count of references in the list.
-*
-* Description: 	Crossreference the children of a window object.
-*
-**************************************************************************/
+ *
+ * Name:		crr_crossref_children()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * pwr_tObjid  objdid		I	objdid of the object
+ * utl_t_list	** crrlist	IO	list of found crossreferenses.
+ * int *		crrcount	IO	count of references in the list.
+ *
+ * Description: 	Crossreference the children of a window object.
+ *
+ **************************************************************************/
 
-static int crr_crossref_children(ldh_tSesContext ldhses, pwr_tObjid objid,
-    utl_t_list** crrlist, int* crrcount)
+static int crr_crossref_children(ldh_tSesContext ldhses, pwr_tObjid objid, utl_t_list** crrlist,
+                                 int* crrcount)
 {
   pwr_tStatus sts;
   cross_t_list* crosslist_ptr;
@@ -10214,18 +10910,20 @@ static int crr_crossref_children(ldh_tSesContext ldhses, pwr_tObjid objid,
   cr_index = CROSSLIST_OBJ;
 
   crosslist_ptr = cross_crosslist[cr_index];
-  while (crosslist_ptr) {
-    if (cdh_ObjidIsNotNull(crosslist_ptr->parent)) {
-      sts = ldh_GetParent(
-          ldhses, crosslist_ptr->o.Objid, &crosslist_ptr->parent);
-      if (EVEN(sts)) {
+  while (crosslist_ptr)
+  {
+    if (cdh_ObjidIsNotNull(crosslist_ptr->parent))
+    {
+      sts = ldh_GetParent(ldhses, crosslist_ptr->o.Objid, &crosslist_ptr->parent);
+      if (EVEN(sts))
+      {
         crosslist_ptr = crosslist_ptr->next;
         continue;
       }
     }
-    if (cdh_ObjidIsEqual(crosslist_ptr->parent, objid)) {
-      utl_list_insert(crrlist, crrcount, &crosslist_ptr->refo,
-          crosslist_ptr->specification, 0, 0);
+    if (cdh_ObjidIsEqual(crosslist_ptr->parent, objid))
+    {
+      utl_list_insert(crrlist, crrcount, &crosslist_ptr->refo, crosslist_ptr->specification, 0, 0);
       /* Set the current object as refobj */
       crrlist_ptr = *crrlist;
       while (crrlist_ptr->next)
@@ -10238,23 +10936,22 @@ static int crr_crossref_children(ldh_tSesContext ldhses, pwr_tObjid objid,
 }
 
 /*************************************************************************
-*
-* Name:		crr_crossref()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* pwr_tObjid  objdid		I	objdid of the object
-* utl_t_list	** crrlist	IO	list of found crossreferenses.
-* int *		crrcount	IO	count of references in the list.
-*
-* Description: 	Crossreference method for a common object.
-*
-**************************************************************************/
+ *
+ * Name:		crr_crossref()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * pwr_tObjid  objdid		I	objdid of the object
+ * utl_t_list	** crrlist	IO	list of found crossreferenses.
+ * int *		crrcount	IO	count of references in the list.
+ *
+ * Description: 	Crossreference method for a common object.
+ *
+ **************************************************************************/
 
-static int crr_crossref(ldh_tSesContext ldhses, pwr_sAttrRef* arp,
-    utl_t_list** crrlist, int* crrcount)
+static int crr_crossref(ldh_tSesContext ldhses, pwr_sAttrRef* arp, utl_t_list** crrlist, int* crrcount)
 {
   pwr_tStatus sts;
   cross_t_list* crosslist_ptr;
@@ -10298,10 +10995,11 @@ static int crr_crossref(ldh_tSesContext ldhses, pwr_sAttrRef* arp,
     cr_index = CROSSLIST_OBJ;
 
   crosslist_ptr = cross_crosslist[cr_index];
-  while (crosslist_ptr) {
-    if (cdh_ArefIsEqual(&crosslist_ptr->o, arp)) {
-      sts = utl_list_insert(crrlist, crrcount, &crosslist_ptr->refo,
-          crosslist_ptr->specification, 0, 0);
+  while (crosslist_ptr)
+  {
+    if (cdh_ArefIsEqual(&crosslist_ptr->o, arp))
+    {
+      sts = utl_list_insert(crrlist, crrcount, &crosslist_ptr->refo, crosslist_ptr->specification, 0, 0);
       if (EVEN(sts))
         return sts;
       /* Set the current object as refobj */
@@ -10316,65 +11014,64 @@ static int crr_crossref(ldh_tSesContext ldhses, pwr_sAttrRef* arp,
 }
 
 /*************************************************************************
-*
-* Name:		utl_set_template()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* pwr_tObjid  objdid		I	objdid for the object.
-* ldh_tSesContext ldhses		I	ldh session.
-* unsigned long	utlctx		I	output specification.
-*
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		utl_set_template()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * pwr_tObjid  objdid		I	objdid for the object.
+ * ldh_tSesContext ldhses		I	ldh session.
+ * unsigned long	utlctx		I	output specification.
+ *
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-int utl_set_template(ldh_tSesContext ldhses, int signalobjectsegments,
-    int showsigchancon, int sigchanconsegments, int showdetecttext)
+int utl_set_template(ldh_tSesContext ldhses, int signalobjectsegments, int showsigchancon,
+                     int sigchanconsegments, int showdetecttext)
 {
-#define UTL_MODIFY_OBJECTSEGMENTS(klass, attribute)                            \
-  sts = ldh_NameToObjid(ldhses, &objid, "pwrb:Class-" #klass "-Template");     \
-  if (EVEN(sts))                                                               \
-    return sts;                                                                \
-  sts = ldh_SetObjectPar(ldhses, objid, "DevBody", attribute,                  \
-      (char*)&signalobjectsegments, sizeof(signalobjectsegments));             \
-  if (EVEN(sts))                                                               \
+#define UTL_MODIFY_OBJECTSEGMENTS(klass, attribute)                                                          \
+  sts = ldh_NameToObjid(ldhses, &objid, "pwrb:Class-" #klass "-Template");                                   \
+  if (EVEN(sts))                                                                                             \
+    return sts;                                                                                              \
+  sts = ldh_SetObjectPar(ldhses, objid, "DevBody", attribute, (char*)&signalobjectsegments,                  \
+                         sizeof(signalobjectsegments));                                                      \
+  if (EVEN(sts))                                                                                             \
     return sts;
 
-#define UTL_MODIFY_SIGCHANCONSEGMENTS(klass)                                   \
-  sts = ldh_NameToObjid(ldhses, &objid, "pwrb:Class-" #klass "-Template");     \
-  if (EVEN(sts))                                                               \
-    return sts;                                                                \
-  sts = ldh_SetObjectPar(ldhses, objid, "DevBody", "SigChanConSegments",       \
-      (char*)&sigchanconsegments, sizeof(sigchanconsegments));                 \
-  if (EVEN(sts))                                                               \
+#define UTL_MODIFY_SIGCHANCONSEGMENTS(klass)                                                                 \
+  sts = ldh_NameToObjid(ldhses, &objid, "pwrb:Class-" #klass "-Template");                                   \
+  if (EVEN(sts))                                                                                             \
+    return sts;                                                                                              \
+  sts = ldh_SetObjectPar(ldhses, objid, "DevBody", "SigChanConSegments", (char*)&sigchanconsegments,         \
+                         sizeof(sigchanconsegments));                                                        \
+  if (EVEN(sts))                                                                                             \
     return sts;
 
-#define UTL_MODIFY_SHOWSIGCHANCON(klass)                                       \
-  sts = ldh_NameToObjid(ldhses, &objid, "pwrb:Class-" #klass "-Template");     \
-  if (EVEN(sts))                                                               \
-    return sts;                                                                \
-  sts = ldh_SetObjectPar(ldhses, objid, "DevBody", "ShowSigChanCon",           \
-      (char*)&value, sizeof(value));                                           \
-  if (EVEN(sts))                                                               \
+#define UTL_MODIFY_SHOWSIGCHANCON(klass)                                                                     \
+  sts = ldh_NameToObjid(ldhses, &objid, "pwrb:Class-" #klass "-Template");                                   \
+  if (EVEN(sts))                                                                                             \
+    return sts;                                                                                              \
+  sts = ldh_SetObjectPar(ldhses, objid, "DevBody", "ShowSigChanCon", (char*)&value, sizeof(value));          \
+  if (EVEN(sts))                                                                                             \
     return sts;
 
-#define UTL_MODIFY_SHOWDETECTTEXT(klass)                                       \
-  sts = ldh_NameToObjid(ldhses, &objid, "pwrb:Class-" #klass "-Template");     \
-  if (EVEN(sts))                                                               \
-    return sts;                                                                \
-  sts = ldh_SetObjectPar(ldhses, objid, "DevBody", "ShowDetectText",           \
-      (char*)&value, sizeof(value));                                           \
-  if (EVEN(sts))                                                               \
+#define UTL_MODIFY_SHOWDETECTTEXT(klass)                                                                     \
+  sts = ldh_NameToObjid(ldhses, &objid, "pwrb:Class-" #klass "-Template");                                   \
+  if (EVEN(sts))                                                                                             \
+    return sts;                                                                                              \
+  sts = ldh_SetObjectPar(ldhses, objid, "DevBody", "ShowDetectText", (char*)&value, sizeof(value));          \
+  if (EVEN(sts))                                                                                             \
     return sts;
 
   pwr_tObjid objid;
   int sts;
   pwr_tBoolean value;
 
-  if (signalobjectsegments != 0) {
+  if (signalobjectsegments != 0)
+  {
     UTL_MODIFY_OBJECTSEGMENTS(GetDi, "DiObjectSegments");
     UTL_MODIFY_OBJECTSEGMENTS(GetDo, "DoObjectSegments");
     UTL_MODIFY_OBJECTSEGMENTS(GetDv, "DvObjectSegments");
@@ -10410,7 +11107,8 @@ int utl_set_template(ldh_tSesContext ldhses, int signalobjectsegments,
     UTL_MODIFY_OBJECTSEGMENTS(CStoIp, "ObjectSegments");
   }
 
-  if (sigchanconsegments != 0) {
+  if (sigchanconsegments != 0)
+  {
     UTL_MODIFY_SIGCHANCONSEGMENTS(GetDi);
     UTL_MODIFY_SIGCHANCONSEGMENTS(GetDo);
     UTL_MODIFY_SIGCHANCONSEGMENTS(GetAi);
@@ -10429,7 +11127,8 @@ int utl_set_template(ldh_tSesContext ldhses, int signalobjectsegments,
     UTL_MODIFY_SIGCHANCONSEGMENTS(CStoAo);
   }
 
-  if (showsigchancon) {
+  if (showsigchancon)
+  {
     value = showsigchancon - 1;
     UTL_MODIFY_SHOWSIGCHANCON(GetDi);
     UTL_MODIFY_SHOWSIGCHANCON(GetDo);
@@ -10448,7 +11147,8 @@ int utl_set_template(ldh_tSesContext ldhses, int signalobjectsegments,
     UTL_MODIFY_SHOWSIGCHANCON(CStoAi);
     UTL_MODIFY_SHOWSIGCHANCON(CStoAo);
   }
-  if (showdetecttext) {
+  if (showdetecttext)
+  {
     value = showdetecttext - 1;
     UTL_MODIFY_SHOWDETECTTEXT(DSup);
     UTL_MODIFY_SHOWDETECTTEXT(ASup);
@@ -10463,35 +11163,38 @@ void utl_objidstr_to_filestr(char* instr, char* outstr)
 
   strcpy(outstr, instr + 2);
   t = str;
-  for (t = outstr; *t != 0; t++) {
+  for (t = outstr; *t != 0; t++)
+  {
     if (!isdigit(*t))
       *t = '_';
   }
 }
 
 /*************************************************************************
-*
-* Name:		utl_read_line()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Read a line for a file.
-*
-**************************************************************************/
+ *
+ * Name:		utl_read_line()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Read a line for a file.
+ *
+ **************************************************************************/
 
 pwr_tStatus utl_read_line(char* line, int maxsize, FILE* file, int* line_count)
 {
   char* s;
 
-  for (;;) {
+  for (;;)
+  {
     if (fgets(line, maxsize, file) == NULL)
       return 0;
     if (line_count)
       (*line_count)++;
-    if (line[0] != '!') {
+    if (line[0] != '!')
+    {
       s = strchr(line, 10);
       if (s != 0)
         *s = 0;
@@ -10507,8 +11210,8 @@ static int utl_in_libhier(ldh_tSesContext ldhses, pwr_tOid oid)
   pwr_tOid parent;
   pwr_tCid cid;
 
-  for (sts = ldh_GetParent(ldhses, oid, &parent); ODD(sts);
-       sts = ldh_GetParent(ldhses, parent, &parent)) {
+  for (sts = ldh_GetParent(ldhses, oid, &parent); ODD(sts); sts = ldh_GetParent(ldhses, parent, &parent))
+  {
     sts = ldh_GetObjectClass(ldhses, parent, &cid);
     if (EVEN(sts))
       return 0;

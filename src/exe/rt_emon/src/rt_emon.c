@@ -876,7 +876,7 @@ static void applGetMsgInfo(mh_sHead* hp, sAppl* ap, mh_uApplReply* Reply)
 {
   pwr_tUInt32* TargetIdxP = (pwr_tUInt32*)(hp + 1);
   sActive* cp;
-  sApplActive* aap;
+  sApplActive* aap = NULL;
   struct LstHead* al;
 
   switch (ap->state)
@@ -2123,7 +2123,7 @@ static void fromMessageUnit(qcom_sGet* get)
 
 static void fromOutunit(qcom_sGet* get)
 {
-  sOutunit* op;
+  sOutunit* op = NULL;
   mh_sHead* hp = (mh_sHead*)get->data;
   qcom_sAid* aid = &get->sender;
 

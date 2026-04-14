@@ -40,15 +40,15 @@
 #include "glow_grownode.h"
 #include "glow_draw.h"
 
-GrowScrollBar::GrowScrollBar(GrowCtx* glow_ctx, const char* name, double x,
-    double y, double w, double h, glow_eDir dir, glow_eDrawType border_d_type,
-    int line_w, glow_mDisplayLevel display_lev, glow_eDrawType fill_d_type,
-    glow_eDrawType bar_d_type, int nodraw)
-    : GrowRect(glow_ctx, name, x, y, w, h, border_d_type, line_w, 0,
-          display_lev, 1, 0, 0, fill_d_type, nodraw),
-      max_value(100), min_value(0), bar_value(35), bar_length(10), user_data(0),
-      direction(dir), movement_active(0), start_pos(0), start_value(0),
-      callback_userdata(0), value_changed_cb(0), bar_color(bar_d_type)
+GrowScrollBar::GrowScrollBar(GrowCtx* glow_ctx, const char* name, double x, double y, double w, double h,
+                             glow_eDir dir, glow_eDrawType border_d_type, int line_w,
+                             glow_mDisplayLevel display_lev, glow_eDrawType fill_d_type,
+                             glow_eDrawType bar_d_type, int nodraw)
+    : GrowRect(glow_ctx, name, x, y, w, h, border_d_type, line_w, 0, display_lev, 1, 0, 0, fill_d_type,
+               nodraw),
+      max_value(100), min_value(0), bar_value(35), bar_length(10), user_data(0), direction(dir),
+      movement_active(0), start_pos(0), start_value(0), callback_userdata(0), value_changed_cb(0),
+      bar_color(bar_d_type)
 {
   if (!nodraw)
     draw();
@@ -61,13 +61,9 @@ GrowScrollBar::~GrowScrollBar()
   draw();
 }
 
-void GrowScrollBar::save(std::ofstream& fp, glow_eSaveMode mode)
-{
-}
+void GrowScrollBar::save(std::ofstream& fp, glow_eSaveMode mode) {}
 
-void GrowScrollBar::open(std::ifstream& fp)
-{
-}
+void GrowScrollBar::open(std::ifstream& fp) {}
 
 void GrowScrollBar::set_highlight(int on)
 {
@@ -77,24 +73,23 @@ void GrowScrollBar::set_highlight(int on)
 
 void GrowScrollBar::draw()
 {
-  ctx->draw(&ctx->mw,
-      x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
-      y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
-      x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
-      y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
-  ctx->draw(&ctx->navw,
-      x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
-      y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
-      x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
-      y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
+  ctx->draw(&ctx->mw, x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
+            y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
+            x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
+            y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
+  ctx->draw(&ctx->navw, x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
+            y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
+            x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
+            y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
 }
 
-void GrowScrollBar::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
-    void* node, void* colornode, void *transpnode)
+void GrowScrollBar::draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node, void* colornode,
+                         void* transpnode)
 {
   if (!(display_level & ctx->display_level))
     return;
-  if (w == &ctx->navw) {
+  if (w == &ctx->navw)
+  {
     if (ctx->no_nav)
       return;
     hot = 0;
@@ -107,14 +102,17 @@ void GrowScrollBar::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   idx = MAX(0, idx);
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
   int x1, y1, x2, y2, ll_x, ll_y, ur_x, ur_y;
-  int x0, y0, width, height;
+  int x0 = 0, y0 = 0, width = 0, height = 0;
 
-  if (!t) {
+  if (!t)
+  {
     x1 = int(trf.x(ll.x, ll.y) * w->zoom_factor_x) - w->offset_x;
     y1 = int(trf.y(ll.x, ll.y) * w->zoom_factor_y) - w->offset_y;
     x2 = int(trf.x(ur.x, ur.y) * w->zoom_factor_x) - w->offset_x;
     y2 = int(trf.y(ur.x, ur.y) * w->zoom_factor_y) - w->offset_y;
-  } else {
+  }
+  else
+  {
     x1 = int(trf.x(t, ll.x, ll.y) * w->zoom_factor_x) - w->offset_x;
     y1 = int(trf.y(t, ll.x, ll.y) * w->zoom_factor_y) - w->offset_y;
     x2 = int(trf.x(t, ur.x, ur.y) * w->zoom_factor_x) - w->offset_x;
@@ -126,65 +124,54 @@ void GrowScrollBar::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   ll_y = MIN(y1, y2);
   ur_y = MAX(y1, y2);
 
-  glow_eDrawType fdrawtype
-      = ((GrowCtx*)ctx)
-            ->get_drawtype(fill_drawtype, glow_eDrawType_FillHighlight,
-                highlight, (GrowNode*)colornode, 1);
-  glow_eDrawType bdrawtype
-      = ((GrowCtx*)ctx)
-            ->get_drawtype(draw_type, glow_eDrawType_LineHighlight, highlight,
-                (GrowNode*)colornode, 0);
+  glow_eDrawType fdrawtype =
+      ((GrowCtx*)ctx)
+          ->get_drawtype(fill_drawtype, glow_eDrawType_FillHighlight, highlight, (GrowNode*)colornode, 1);
+  glow_eDrawType bdrawtype =
+      ((GrowCtx*)ctx)
+          ->get_drawtype(draw_type, glow_eDrawType_LineHighlight, highlight, (GrowNode*)colornode, 0);
   glow_eDrawType shift_drawtype;
 
   ctx->gdraw->fill_rect(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, fdrawtype);
-  if (shadow) {
-    shift_drawtype
-        = ((GrowCtx*)ctx)->shift_drawtype(fill_drawtype, 2, 0); // Dark
-    ctx->gdraw->line(
-        w, ll_x + 1, ll_y + 1, ll_x + 1, ur_y - 1, shift_drawtype, 0, 0);
-    ctx->gdraw->line(
-        w, ll_x + 1, ll_y + 1, ur_x - 1, ll_y + 1, shift_drawtype, 0, 0);
-    shift_drawtype
-        = ((GrowCtx*)ctx)->shift_drawtype(fill_drawtype, -2, 0); // Light
-    ctx->gdraw->line(
-        w, ll_x + 1, ur_y - 1, ur_x - 1, ur_y - 1, shift_drawtype, 0, 0);
-    ctx->gdraw->line(
-        w, ur_x - 1, ll_y + 1, ur_x - 1, ur_y - 1, shift_drawtype, 0, 0);
+  if (shadow)
+  {
+    shift_drawtype = ((GrowCtx*)ctx)->shift_drawtype(fill_drawtype, 2, 0); // Dark
+    ctx->gdraw->line(w, ll_x + 1, ll_y + 1, ll_x + 1, ur_y - 1, shift_drawtype, 0, 0);
+    ctx->gdraw->line(w, ll_x + 1, ll_y + 1, ur_x - 1, ll_y + 1, shift_drawtype, 0, 0);
+    shift_drawtype = ((GrowCtx*)ctx)->shift_drawtype(fill_drawtype, -2, 0); // Light
+    ctx->gdraw->line(w, ll_x + 1, ur_y - 1, ur_x - 1, ur_y - 1, shift_drawtype, 0, 0);
+    ctx->gdraw->line(w, ur_x - 1, ll_y + 1, ur_x - 1, ur_y - 1, shift_drawtype, 0, 0);
   }
 
-  if (!feq(max_value, min_value)) {
-    switch (direction) {
+  if (!feq(max_value, min_value))
+  {
+    switch (direction)
+    {
     case glow_eDir_Vertical:
       height = int(bar_length / (max_value - min_value) * (ur_y - ll_y));
       height = MAX(0, MIN(height, ur_y - ll_y));
       width = ur_x - ll_x;
       x0 = ll_x;
-      y0 = ll_y + int((bar_value - min_value) / (max_value - min_value)
-                      * (ur_y - ll_y));
+      y0 = ll_y + int((bar_value - min_value) / (max_value - min_value) * (ur_y - ll_y));
       break;
     case glow_eDir_Horizontal:
       width = int(bar_length / (max_value - min_value) * (ur_x - ll_x));
       width = MAX(0, MIN(width, ur_x - ll_x));
       height = ur_y - ll_y;
-      x0 = ll_x + int((bar_value - min_value) / (max_value - min_value)
-                      * (ur_x - ll_x));
+      x0 = ll_x + int((bar_value - min_value) / (max_value - min_value) * (ur_x - ll_x));
       y0 = ll_y;
       break;
     }
 
     ctx->gdraw->fill_rect(w, x0, y0, width, height, bar_color);
-    if (shadow) {
-      shift_drawtype
-          = ((GrowCtx*)ctx)->shift_drawtype(bar_color, -2, 0); // Light
-      ctx->gdraw->line(
-          w, x0 + 1, y0 + 1, x0 + 1, y0 + height - 1, shift_drawtype, 0, 0);
-      ctx->gdraw->line(
-          w, x0 + 1, y0 + 1, x0 + width - 1, y0 + 1, shift_drawtype, 0, 0);
+    if (shadow)
+    {
+      shift_drawtype = ((GrowCtx*)ctx)->shift_drawtype(bar_color, -2, 0); // Light
+      ctx->gdraw->line(w, x0 + 1, y0 + 1, x0 + 1, y0 + height - 1, shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, x0 + 1, y0 + 1, x0 + width - 1, y0 + 1, shift_drawtype, 0, 0);
       shift_drawtype = ((GrowCtx*)ctx)->shift_drawtype(bar_color, 2, 0); // Dark
-      ctx->gdraw->line(w, x0 + 1, y0 + height - 1, x0 + width - 1,
-          y0 + height - 1, shift_drawtype, 0, 0);
-      ctx->gdraw->line(w, x0 + width - 1, y0 + 1, x0 + width - 1,
-          y0 + height - 1, shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, x0 + 1, y0 + height - 1, x0 + width - 1, y0 + height - 1, shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, x0 + width - 1, y0 + 1, x0 + width - 1, y0 + height - 1, shift_drawtype, 0, 0);
     }
     ctx->gdraw->rect(w, x0, y0, width, height, bdrawtype, idx, 0);
   }
@@ -214,23 +201,23 @@ void GrowScrollBar::set_range(double min, double max)
   draw();
 }
 
-void GrowScrollBar::export_javabean(GlowTransform* t, void* node,
-    glow_eExportPass pass, int* shape_cnt, int node_cnt, int in_nc,
-    std::ofstream& fp)
+void GrowScrollBar::export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt,
+                                    int node_cnt, int in_nc, std::ofstream& fp)
 {
 }
 
 void GrowScrollBar::convert(glow_eConvert version)
 {
-  switch (version) {
-  case glow_eConvert_V34: {
+  switch (version)
+  {
+  case glow_eConvert_V34:
+  {
     break;
   }
   }
 }
 
-int GrowScrollBar::event_handler(
-    GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy)
+int GrowScrollBar::event_handler(GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy)
 {
   double ll_x, ur_x, ll_y, ur_y;
 
@@ -239,8 +226,7 @@ int GrowScrollBar::event_handler(
   ll_y = MIN(ll.y, ur.y);
   ur_y = MAX(ll.y, ur.y);
 
-  if (!movement_active
-      && !(ll_x <= fx && fx <= ur_x && ll_y <= fy && fy <= ur_y))
+  if (!movement_active && !(ll_x <= fx && fx <= ur_x && ll_y <= fy && fy <= ur_y))
     return 0;
 
   if (event == glow_eEvent_ButtonMotion && !movement_active)
@@ -249,17 +235,15 @@ int GrowScrollBar::event_handler(
   if (feq(min_value, max_value))
     return 1;
 
-  switch (event) {
+  switch (event)
+  {
   case glow_eEvent_MB1Down:
-    switch (direction) {
+    switch (direction)
+    {
     case glow_eDir_Vertical:
-      if (ll_y
-                  + (bar_value - min_value) / (max_value - min_value)
-                      * (ur_y - ll_y)
-              <= fy
-          && fy <= ll_y
-                  + (bar_value - min_value + bar_length)
-                      / (max_value - min_value) * (ur_y - ll_y)) {
+      if (ll_y + (bar_value - min_value) / (max_value - min_value) * (ur_y - ll_y) <= fy &&
+          fy <= ll_y + (bar_value - min_value + bar_length) / (max_value - min_value) * (ur_y - ll_y))
+      {
         start_pos = fy;
         start_value = bar_value;
         movement_active = 1;
@@ -267,13 +251,9 @@ int GrowScrollBar::event_handler(
       }
       break;
     case glow_eDir_Horizontal:
-      if (ll_x
-                  + (bar_value - min_value) / (max_value - min_value)
-                      * (ur_x - ll_x)
-              <= fx
-          && fx <= ll_x
-                  + (bar_value - min_value + bar_length)
-                      / (max_value - min_value) * (ur_x - ll_x)) {
+      if (ll_x + (bar_value - min_value) / (max_value - min_value) * (ur_x - ll_x) <= fx &&
+          fx <= ll_x + (bar_value - min_value + bar_length) / (max_value - min_value) * (ur_x - ll_x))
+      {
         start_pos = fx;
         start_value = bar_value;
         movement_active = 1;
@@ -286,17 +266,17 @@ int GrowScrollBar::event_handler(
     movement_active = 0;
     break;
   case glow_eEvent_ButtonMotion:
-    if (movement_active) {
+    if (movement_active)
+    {
       if (bar_length >= max_value - min_value)
         break;
-      switch (direction) {
+      switch (direction)
+      {
       case glow_eDir_Vertical:
-        bar_value = start_value
-            + (fy - start_pos) / (ur_y - ll_y) * (max_value - min_value);
+        bar_value = start_value + (fy - start_pos) / (ur_y - ll_y) * (max_value - min_value);
         break;
       case glow_eDir_Horizontal:
-        bar_value = start_value
-            + (fx - start_pos) / (ur_x - ll_x) * (max_value - min_value);
+        bar_value = start_value + (fx - start_pos) / (ur_x - ll_x) * (max_value - min_value);
         break;
       }
       if (bar_value < min_value)

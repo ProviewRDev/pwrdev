@@ -513,10 +513,10 @@ unsigned int rmq_receive()
 
 unsigned int rmq_send(remnode_item* remnode, pwr_sClass_RemTrans* remtrans, char* buf, int buf_size)
 {
-  int sts;
+  int sts = 0;
   amqp_basic_properties_t prop;
   amqp_bytes_t msg;
-  char* tmpbuf;
+  char* tmpbuf = NULL;
   unsigned int tmpbuf_size;
 
   if (rn_rmq->DisableHeader)
