@@ -404,6 +404,8 @@ bytes will be written to add_tab.
 The function will also set up the required fields in op so that Proview
 may perform IO operations using the IoAgentRead() and IoAgentWrite() functions
 in this module.  */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
 static void dpm_set_add_tab(pwr_sClass_Pb_DP_Slave* op, io_sAgent* ap,
                             io_sRack* rp, DPM_SL_PRM_ADD_TAB* add_tab,
                             int add_tab_len)
@@ -506,6 +508,7 @@ static void dpm_set_add_tab(pwr_sClass_Pb_DP_Slave* op, io_sAgent* ap,
       sizeof(add_tab->bOutput_Count) + 2 * add_tab->bInput_Count +
       2 * add_tab->bOutput_Count;
 }
+#pragma GCC diagnostic pop
 
 /* Writes instructions for reflashing the board to the error log.  */
 static void flashing_disabled_warning(io_sAgent* ap)
@@ -738,6 +741,8 @@ static short dpm_download_master_prm(io_sAgentLocalHilscher* local,
 is passed in local.  op holds the slave to configure, the corresponding
 agent pointer and rack pointer must be passed in ap and rp respectively.
 DRV_NO_ERROR will be returned upon success.  */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
 static short dpm_download_slave_prm(io_sAgentLocalHilscher* local,
                                     pwr_sClass_Pb_DP_Slave* op, io_sAgent* ap,
                                     io_sRack* rp)
@@ -829,6 +834,7 @@ static short dpm_download_slave_prm(io_sAgentLocalHilscher* local,
 
   return dpm_ddlm_download(local, op->SlaveAddress, bufcnt, buf, ap);
 }
+#pragma GCC diagnostic pop
 
 /* Requests diagnostics from the slave address, attached to the
 board referred to by local.  The function will return DRV_NO_ERROR if
