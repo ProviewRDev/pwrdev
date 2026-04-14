@@ -6,8 +6,6 @@ ProviewR is an open-source industrial process control system with a modular arch
 
 ## Core Architecture
 
-You understand the build system in src/doc/man/man_pwre.fodt
-
 ### Module Structure
 The codebase is organized into specialized modules, each with a consistent directory layout:
 - `lib/` - Core libraries and shared functionality  
@@ -28,9 +26,21 @@ The codebase is organized into specialized modules, each with a consistent direc
 
 ### Build System Architecture
 
-ProviewR uses a sophisticated Perl-based build system (`pwre.pl`) that manages module dependencies and cross-compilation:
+ProviewR uses a Perl-based build system (`pwre.pl`) that manages module dependencies and cross-compilation. See `src/doc/man/man_pwre.fodt` for full reference.
 
+**Quick reference:**
+```bash
+pwre init latest                  # Initialize build environment
+pwre module <name>                # Switch to module (rt, xtt, wb, profibus, …)
+pwre build module                 # Build current module
+pwre method_build <module> gtk    # Build GUI-dependent programs
+pwre build_all_modules gtk        # Full project build
+pwre configure                    # Check installed dependencies
+```
 
+**Build variables** are defined in `src/tools/bld/src/variables.mk`. Key variables: `pwre_btype` (dbg/rls), `pwre_os`, `pwre_hw`, `pwre_conf_gtk`/`pwre_conf_qt`.
+
+**Generic makefiles** in `src/tools/bld/src/` provide reusable rules: `exe_generic.mk`, `lib_generic.mk`, `wbl_generic.mk`, `jpwr_generic.mk`, `jsw_generic.mk`, `msg_generic.mk`.
 
 ### Component Integration Patterns
 
@@ -132,66 +142,19 @@ The system uses `/usr/local/adm` or local `adm/` directories for configuration. 
 The system supports both GTK and Qt through compile-time selection. When working on UI components, maintain separation between framework-specific code and business logic.
 
 ### Graphics Framework
-ProviewR has a layered graphics framework in `xtt/lib/`:
+Layered graphics in `xtt/lib/`: Glow (primitives) → Grow (HMI objects) → specialized contexts. Flow handles PLC flow charts, Ge is the graphics editor, Cow provides common dialogs. Each graphics area has a GTK widget (`*_gtk.cpp`) wrapping a platform-agnostic context.
 
-| Component | Location | Purpose |
-|-----------|----------|---------|
-| **Glow** | `glow/src/glow_*.cpp` | Base graphics library - primitives, contexts, events |
-| **Grow** | `glow/src/glow_grow*.cpp` | Rich HMI objects (bars, trends, sliders, images) |
-| **Flow** | `flow/src/flow_*.cpp` | Flow chart editor for PLC programming |
-| **Brow** | `glow/src/glow_browctx.cpp` | Browser/tree view navigation |
-| **Ge** | `ge/src/ge_*.cpp` | Graphics Editor application |
-| **Cow** | `cow/src/cow_*.cpp` | Common UI components and dialogs |
-
-**Key abbreviations:**
-- **Glow** = Graphics Library for Objects in Windows
-- **Grow** = Graphics with Rich Objects (extends Glow)
-- **Xtt** = eXecution Tool and Trends
-- **Wb** = Workbench
-- **Nav** = Navigator (tree-based navigation)
-
-**Context hierarchy:** `GlowCtx` → `GrowCtx` → specialized contexts (CurveCtx, ColPalCtx, KeyboardCtx)
-
-**Widget pattern:** Each graphics area has a GTK widget (`*_gtk.cpp`) wrapping a platform-agnostic context.
-
-See [GRAPHICS_FRAMEWORK.md](.github/GRAPHICS_FRAMEWORK.md) for comprehensive documentation.
+See [GRAPHICS_FRAMEWORK.md](.github/GRAPHICS_FRAMEWORK.md) for component details, context hierarchy, and widget patterns.
 
 ### Database Architecture
 
-ProviewR uses a multi-layered database architecture separating configuration-time from runtime data:
-
-| Component | Purpose |
-|-----------|---------|
-| **WBL files** | Text-based `.wb_load` object definitions in `*/wbl/` directories |
-| **BerkeleyDB** | Persistent storage for workbench editing sessions |
-| **DBS files** | ProviewR binary snapshot format (`.dbs`) for runtime loading |
-| **GDB** | In-memory runtime database with hash tables for fast lookups |
-| **GDH** | Public API for runtime data access (`gdh_*` functions) |
-| **LDH** | Workbench API for configuration (`ldh_*` functions) |
-| **RTDB** | Shared memory segment at `/tmp/pwr_rtdb_<node_id>` |
-| **Volumes** | Logical containers (RootVolume, ClassVolume, SharedVolume) |
-
 **Data flow:** WBL → LDH → BerkeleyDB → (build/export) → DBS → GDB → GDH → RTDB
 
-See [DATABASE_ARCHITECTURE.md](.github/DATABASE_ARCHITECTURE.md) for comprehensive documentation.
+Key APIs: `gdh_*` for runtime data access, `ldh_*` for workbench configuration. See [DATABASE_ARCHITECTURE.md](.github/DATABASE_ARCHITECTURE.md) for full component reference.
 
 ### QCom (Queue Communication)
 
-QCom is the core inter-process and inter-node message-passing system:
-
-| Component | Purpose |
-|-----------|---------|
-| **qcom_*** | Queue API: `qcom_Init()`, `qcom_CreateQ()`, `qcom_Put()`, `qcom_Get()` |
-| **rt_qmon** | QCom Monitor daemon - handles UDP transport between nodes |
-| **rt_neth** | Network handler - higher-level protocol (subscriptions, volumes) |
-| **QDB** | Internal shared memory database for queues and links |
-
-**Key concepts:**
-- Queue types: private, forward, broadcast, event
-- Network: UDP on port 55000 + bus number, message segmentation
-- Patterns: Request/Reply via `qcom_Request()`/`qcom_Reply()`
-
-See [QCOM.md](.github/QCOM.md) for comprehensive documentation.
+Core IPC system using shared-memory queues. API: `qcom_Init()`, `qcom_CreateQ()`, `qcom_Put()`, `qcom_Get()`. UDP transport between nodes via `rt_qmon`. See [QCOM.md](.github/QCOM.md) for queue types, network protocol, and patterns.
 
 ### Module Dependencies
 Understand the build dependency chain when making changes:
@@ -201,6 +164,16 @@ Understand the build dependency chain when making changes:
 ### Real-time Considerations
 This is a real-time industrial control system. Changes to rt module components, data handling, or timing-sensitive code require careful consideration of system performance and deterministic behavior.
 
+### Mixed-Version Runtime
+When modifying class definitions or network protocol structs, see [mixed-version-runtime-compatibility.md](.github/mixed-version-runtime-compatibility.md) for rules on safe class changes and when to increment `netver`.
+
+### Code Formatting
+- **C/C++**: `.clang-format` at project root (LLVM-based, Allman braces, 110-column limit). Use `clang-format` to format.
+- **JavaScript/HTML/CSS**: Prettier via `pnpm format` (targets `java/jsw/**/*.{css,html,js,jsi}`).
+
+### Testing
+Tests are standalone C executables in `src/tst/`, `src/lib/rt/tst/`, and `src/lib/co/tst/`. They are built as part of the normal module build — no separate test runner or framework. Run them directly after building.
+
 ## Getting Started
 1. Examine existing module structure in `src/` for patterns
 2. Use `pwre.pl` commands to understand build dependencies  
@@ -208,5 +181,6 @@ This is a real-time industrial control system. Changes to rt module components, 
 4. Review [DATABASE_ARCHITECTURE.md](.github/DATABASE_ARCHITECTURE.md) for data layer understanding
 5. Review [QCOM.md](.github/QCOM.md) for inter-process communication
 6. Review [UPGRADE.md](.github/UPGRADE.md) for the project upgrade infrastructure
+7. Review [mixed-version-runtime-compatibility.md](.github/mixed-version-runtime-compatibility.md) for class change safety rules
 
 The modular architecture allows focused development while maintaining system integrity through well-defined interfaces and consistent build patterns.
