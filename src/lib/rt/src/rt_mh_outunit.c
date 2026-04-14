@@ -596,8 +596,9 @@ static void blockListDestroy(sHandler* hp)
 {
   sBlock* bp;
   struct LstHead * bl;
+  struct LstHead * bl_next;
 
-  LstForEach(bl, &hp->block_l) {
+  LstForEachSafe(bl, bl_next, &hp->block_l) {
     bp = LstEntry(bl, sBlock, block_l);
     LstRemove(bl);
     LstNull(bl);

@@ -132,4 +132,11 @@ static inline int LstEmpty(struct LstHead *h)
 #define LstForEach(pos, head) \
     for (pos = (head)->next; pos != (head); pos = pos->next)
 
+/*
+ * LstForEachSafe(pos, n, listHead) is a safe variant that allows
+ * removing or freeing the current element during iteration.
+ */
+#define LstForEachSafe(pos, n, head) \
+    for (pos = (head)->next, n = pos->next; pos != (head); pos = n, n = pos->next)
+
 #endif
