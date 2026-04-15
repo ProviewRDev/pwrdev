@@ -152,7 +152,7 @@ mkdir		:= mkdir
 #   Set to /buildversion for frozen dbs versions
 wblflags	:=
 
-warnings := -Wall -Wextra -Wno-unused-parameter -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-sign-compare -Wno-missing-field-initializers -Wno-cast-function-type -Wno-implicit-fallthrough -Wno-narrowing -Wno-format-overflow -Wno-format-truncation
+warnings := -Wall -Wextra -Wno-unused-parameter -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-sign-compare -Wno-missing-field-initializers -Wno-cast-function-type -Wno-narrowing  -Wno-format-truncation
 # strncpy(dst, src, sizeof(dst)) is the standard idiom for fixed-size struct
 # fields throughout ProviewR. GCC warns because it may skip null-termination,
 # but these fields are copied by size, not as C strings. Audited 2026-04.
