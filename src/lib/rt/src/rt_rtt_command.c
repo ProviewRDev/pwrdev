@@ -2536,10 +2536,10 @@ static int rtt_set_func(menu_ctx ctx, int* flag)
       rtt_mode_address = 0;
       return RTT__NOPICTURE;
     } else if (str_NoCaseStrcmp(arg2_str, "ACCVIO") == 0) {
-      char* s = 0;
+      volatile char* s = 0;
 
       /* Test of exception handler... */
-      strcpy(s, "The end is close");
+      *(char*)s = 'X';
     } else if (str_NoCaseStrncmp(arg2_str, "DUMP", strlen(arg2_str)) == 0) {
       /* Check authorization */
       if (!(rtt_priv & RTT_PRIV_SYS)) {
