@@ -2993,7 +2993,8 @@ extern "C"
   */
   void grow_RegisterUserDataCallbacks(grow_tCtx ctx, void (*save)(void*, void*, glow_eUserdataCbType),
                                       void (*open)(void*, void*, glow_eUserdataCbType),
-                                      void (*copy)(void*, void*, void**, glow_eUserdataCbType));
+                                      void (*copy)(void*, void*, void**, glow_eUserdataCbType),
+                                      void (*close)(void*, void*, glow_eUserdataCbType) = 0);
 
   void grow_RegisterEventLogCallback(grow_tCtx ctx, void (*log_cb)(void*, void*, unsigned int));
 

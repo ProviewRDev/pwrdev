@@ -79,6 +79,9 @@ GrowNode::~GrowNode()
   if (!nc)
     return;
 
+  if (user_data && ctx->userdata_close_callback)
+    ctx->userdata_close_callback(this, user_data, glow_eUserdataCbType_Node);
+
   if (!ctx->nodraw)
     ctx->set_defered_redraw();
   ctx->delete_node_cons(this);

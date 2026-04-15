@@ -77,6 +77,9 @@ GlowNodeClass::GlowNodeClass(const GlowNodeClass& nc) : GlowArrayElem(nc)
 
 GlowNodeClass::~GlowNodeClass()
 {
+  if (user_data && ctx->userdata_close_callback)
+    ctx->userdata_close_callback(this, user_data, glow_eUserdataCbType_NodeClass);
+
   int i;
   GlowArrayElem* element;
 

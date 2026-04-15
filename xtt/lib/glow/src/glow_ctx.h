@@ -106,6 +106,7 @@ typedef struct
 typedef void (*glow_tUserDataSaveCb)(std::ofstream*, void*, glow_eUserdataCbType);
 typedef void (*glow_tUserDataOpenCb)(std::ifstream*, void*, glow_eUserdataCbType);
 typedef void (*glow_tUserDataCopyCb)(void*, void*, void**, glow_eUserdataCbType);
+typedef void (*glow_tUserDataCloseCb)(void*, void*, glow_eUserdataCbType);
 typedef void (*glow_tEventLogCb)(void*, void*, unsigned int);
 typedef void (*glow_tScriptExecCb)(void*, char*);
 
@@ -900,6 +901,8 @@ public:
   //! when userdata is opened.
   glow_tUserDataCopyCb userdata_copy_callback; //!< Callback function called
   //! when userdata is copied.
+  glow_tUserDataCloseCb userdata_close_callback; //!< Callback function called
+  //! when userdata is freed.
   int version;                      //!< Current glow version.
   GlowTipText* tiptext;             //!< Tip text object.
   GlowArrayElem* inputfocus_object; //!< Object that has input focus.
@@ -974,11 +977,13 @@ public:
     is copied.
   */
   void register_userdata_callbacks(glow_tUserDataSaveCb save_callback, glow_tUserDataOpenCb open_callback,
-                                   glow_tUserDataCopyCb copy_callback)
+                                   glow_tUserDataCopyCb copy_callback,
+                                   glow_tUserDataCloseCb close_callback = 0)
   {
     userdata_save_callback = save_callback;
     userdata_open_callback = open_callback;
     userdata_copy_callback = copy_callback;
+    userdata_close_callback = close_callback;
   }
 
   //! Register callback functions for event logging.

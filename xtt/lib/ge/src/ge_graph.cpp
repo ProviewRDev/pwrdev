@@ -4056,6 +4056,24 @@ void graph_userdata_copy_cb(void* object, void* old_data, void** new_data, glow_
   }
 }
 
+static void graph_userdata_close_cb(void* object, void* data, glow_eUserdataCbType utype)
+{
+  switch (utype)
+  {
+  case glow_eUserdataCbType_NodeClass:
+  case glow_eUserdataCbType_Node:
+  {
+    if (grow_GetObjectType(object) == glow_eObjectType_GrowDashCell)
+      delete (GeDash*)data;
+    else
+      delete (GeDyn*)data;
+    break;
+  }
+  case glow_eUserdataCbType_Ctx:
+    break;
+  }
+}
+
 GraphGbl::GraphGbl() { strcpy(version, graph_cVersion); }
 
 int GraphGbl::load_config(void* graph) { return 1; }
@@ -4154,7 +4172,8 @@ void GraphGrow::grow_setup()
   grow_EnableEvent(ctx, glow_eEvent_AnteRegionSelect, glow_eEventType_CallBack, graph_grow_cb);
   grow_EnableEvent(ctx, glow_eEvent_AnteRegionAddSelect, glow_eEventType_CallBack, graph_grow_cb);
 
-  grow_RegisterUserDataCallbacks(ctx, graph_userdata_save_cb, graph_userdata_open_cb, graph_userdata_copy_cb);
+  grow_RegisterUserDataCallbacks(ctx, graph_userdata_save_cb, graph_userdata_open_cb, graph_userdata_copy_cb,
+                                 graph_userdata_close_cb);
   grow_RegisterScriptExecCallback(ctx, graph_scriptexec_cb);
 }
 
