@@ -1754,6 +1754,7 @@ static int gdh_StringToAttr(char* str_value, char* buffer_p, int buffer_size, pw
       return GDH__BADARG;
     d = f;
     memcpy(buffer_p, (char*)&d, sizeof(d));
+    break;
   }
   case pwr_eType_Char:
     if (sscanf(str_value, "%c", buffer_p) != 1)
