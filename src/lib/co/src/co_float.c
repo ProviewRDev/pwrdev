@@ -168,6 +168,7 @@ union i3e_s_be
 #define IBYTE2(i) ((i << 0x08) & 0x00ff0000)
 #define IBYTE3(i) ((i << 0x18) & 0xff000000)
 
+#undef ENDIAN_SWAP_INT
 #define ENDIAN_SWAP_INT(t, s)                                                                                \
   {                                                                                                          \
     int i = *(int*)s;                                                                                        \

@@ -168,6 +168,7 @@ union i3e_s_be
 #define IBYTE2(i) ((i << 0x08) & 0x00ff0000)
 #define IBYTE3(i) ((i << 0x18) & 0xff000000)
 
+#undef ENDIAN_SWAP_INT
 #define ENDIAN_SWAP_INT(t, s)                                                                                \
   {                                                                                                          \
     int i = *(int*)s;                                                                                        \
@@ -177,12 +178,14 @@ union i3e_s_be
 #define SBYTE0(s) ((s >> 0x08) & 0x00ff)
 #define SBYTE1(s) ((s << 0x08) & 0xff00)
 
+#undef ENDIAN_SWAP_SHORT
 #define ENDIAN_SWAP_SHORT(t, s)                                                                              \
   {                                                                                                          \
     short int i = *(short*)s;                                                                                \
     *(short*)t = (SBYTE0(i) | SBYTE1(i));                                                                    \
   }
 
+#undef ENDIAN_SWAP_BOOL
 #define ENDIAN_SWAP_BOOL(t, s) ENDIAN_SWAP_INT(t, s)
 
 #define touchObject(op)                                                                                      \
