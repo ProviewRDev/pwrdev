@@ -889,7 +889,10 @@ int wb_vrepwbl::getAttrInfoRec(wb_attrname* attr, pwr_eBix bix, pwr_tCid cid, si
         *flags = 0;
       }
     }
-    else IF_ATTR(DvVersion, pwr_eType_UInt32, 1, level) return 1;
+    // clang-format off
+    else IF_ATTR(DvVersion, pwr_eType_UInt32, 1, level)
+    return 1;
+    // clang-format on
   }
   case pwr_eClass_ClassHier:
   case pwr_eClass_TypeHier:
@@ -970,7 +973,10 @@ int wb_vrepwbl::getAttrInfoRec(wb_attrname* attr, pwr_eBix bix, pwr_tCid cid, si
     }
     else
       IF_ATTR(Filler, pwr_eType_Int32, 1, level)
-    else IF_ATTR(TypeRef, pwr_eType_TypeId, 1, level) return 1;
+    // clang-format off
+    else IF_ATTR(TypeRef, pwr_eType_TypeId, 1, level)
+    return 1;
+    // clang-format on
   }
   default:
   {
