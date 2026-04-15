@@ -153,6 +153,10 @@ mkdir		:= mkdir
 wblflags	:=
 
 warnings := -Wall -Wextra -Wno-unused-parameter -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-sign-compare -Wno-missing-field-initializers -Wno-cast-function-type -Wno-implicit-fallthrough -Wno-narrowing -Wno-format-overflow -Wno-format-truncation
+# strncpy(dst, src, sizeof(dst)) is the standard idiom for fixed-size struct
+# fields throughout ProviewR. GCC warns because it may skip null-termination,
+# but these fields are copied by size, not as C strings. Audited 2026-04.
+warnings += -Wno-stringop-truncation
 
 ifeq ($(pwre_btype),rls)
   cflags	:= $(cross_compile) -c -O3 -D_GNU_SOURCE -DPWR_NDEBUG -D_REENTRANT -fPIC $(warnings)
