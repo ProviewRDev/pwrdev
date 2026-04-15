@@ -5968,6 +5968,7 @@ int GeValue::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
       annot_size = 80;
     else
       annot_size = 4;
+    break;
   case graph_eDatabase_User:
     annot_typeid = attr_type;
     if (attr_type == pwr_eType_String)
@@ -6120,6 +6121,7 @@ int GeValue::scan(grow_tObject object)
           *(pwr_tNetStatus*)p = PWR__NETTIMEOUT;
       }
     // No break
+    /* fall through */
     case pwr_eType_Status:
     {
       pwr_tStatus val = *(pwr_tStatus*)p;
@@ -11308,6 +11310,7 @@ int GeBar::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
   case graph_eDatabase_Local:
     p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(parsed_name, attr_type);
     bar_typeid = attr_type;
+    break;
   case graph_eDatabase_User:
     bar_typeid = attr_type;
     break;
@@ -11741,6 +11744,7 @@ int GeTrend::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
     case graph_eDatabase_Local:
       p1 = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(parsed_name, attr_type);
       trend_typeid1 = attr_type;
+      break;
     case graph_eDatabase_User:
       trend_typeid1 = attr_type;
       break;
@@ -11765,6 +11769,7 @@ int GeTrend::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
     case graph_eDatabase_Local:
       p2 = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(parsed_name, attr_type);
       trend_typeid2 = attr_type;
+      break;
     case graph_eDatabase_User:
       trend_typeid2 = attr_type;
       break;
@@ -15896,8 +15901,10 @@ int GeAxis::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
       case graph_eDatabase_Gdh:
         sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&max_value_p, &max_value_subid,
                                           attr_size, object, now);
+        break;
       case graph_eDatabase_Local:
         max_value_p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(parsed_name, attr_type_max);
+        break;
       default:;
       }
       max_found = 1;
@@ -27157,11 +27164,11 @@ int GePulldownMenu::action(grow_tObject object, glow_tEvent event)
       }
     }
     break;
-
   case glow_eEvent_InputFocusGained:
     if (menu_object)
       break;
     time_GetTime(&focus_gained_time);
+  /* fall through */
   case glow_eEvent_MB1Click:
     if (event->event == glow_eEvent_MB1Click)
     {
@@ -27467,6 +27474,9 @@ int GePulldownMenu::action(grow_tObject object, glow_tEvent event)
 int GePulldownMenu::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   char pref[200];
+
+  if (!prefix)
+    prefix = (char*)"";
 
   if (button_mask != 0)
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "PulldownMenu.ItemMask\"," << button_mask
@@ -27981,12 +27991,14 @@ int GeOptionMenu::connect(grow_tObject object, glow_sTraceData* trace_data, bool
   case graph_eDatabase_Local:
     p = dyn->graph->localdb_ref_or_create(parsed_name, attr_type);
     type_id = attr_type;
+    break;
   case graph_eDatabase_User:
     type_id = attr_type;
     break;
   case graph_eDatabase_Ccm:
     sts = dyn->graph->ccm_ref_variable(parsed_name, attr_type, &p);
     type_id = attr_type;
+    break;
   default:;
   }
 
@@ -29449,11 +29461,11 @@ int GeMethodPulldownMenu::action(grow_tObject object, glow_tEvent event)
       return GE__NO_PROPAGATE;
     }
     break;
-
   case glow_eEvent_InputFocusGained:
     if (menu_object)
       break;
     time_GetTime(&focus_gained_time);
+  /* fall through */
   case glow_eEvent_MB1Click:
     if (event->event == glow_eEvent_MB1Click)
     {
