@@ -56,8 +56,9 @@ extern "C" {
 
 #define ENDIAN_SWAP_INT(t, s)                                                  \
   {                                                                            \
-    int i = *(int*)s;                                                          \
-    *(int*)t = (IBYTE0(i) | IBYTE1(i) | IBYTE2(i) | IBYTE3(i));                \
+    unsigned char *_esit = (unsigned char*)(t), *_esis = (unsigned char*)(s);   \
+    _esit[0] = _esis[3]; _esit[1] = _esis[2];                                 \
+    _esit[2] = _esis[1]; _esit[3] = _esis[0];                                 \
   }
 
 #define SBYTE0(s) ((s >> 0x08) & 0x00ff)
@@ -65,8 +66,8 @@ extern "C" {
 
 #define ENDIAN_SWAP_SHORT(t, s)                                                \
   {                                                                            \
-    short int i = *(short*)s;                                                  \
-    *(short*)t = (SBYTE0(i) | SBYTE1(i));                                      \
+    unsigned char *_esit = (unsigned char*)(t), *_esis = (unsigned char*)(s);   \
+    _esit[0] = _esis[1]; _esit[1] = _esis[0];                                 \
   }
 
 #define IBYTEP0(s) (((*(int*)s) >> 0x18) & 0x000000ff)
@@ -75,14 +76,27 @@ extern "C" {
 #define IBYTEP3(s) (((*(int*)s) << 0x18) & 0xff000000)
 
 #define ENDIAN_SWAP_INTP(s)                                                    \
-  (*(int*)s = (IBYTEP0(s) | IBYTEP1(s) | IBYTEP2(s) | IBYTEP3(s)))
+  {                                                                            \
+    unsigned char *_p = (unsigned char*)(s), _t0 = _p[0], _t1 = _p[1];        \
+    _p[0] = _p[3]; _p[1] = _p[2]; _p[2] = _t1; _p[3] = _t0;                 \
+  }
 
 #define SBYTEP0(s) (((*(short*)s) >> 0x08) & 0x00ff)
 #define SBYTEP1(s) (((*(short*)s) << 0x08) & 0xff00)
 
-#define ENDIAN_SWAP_SHORTP(s) (*(short*)s = (SBYTEP0(s) | SBYTEP1(s)))
+#define ENDIAN_SWAP_SHORTP(s)                                                  \
+  {                                                                            \
+    unsigned char *_p = (unsigned char*)(s), _t = _p[0];                       \
+    _p[0] = _p[1]; _p[1] = _t;                                                \
+  }
 
-#define ENDIAN_SWAP_BOOLP(s) (*(int*)s = (0 != *(int*)s))
+#define ENDIAN_SWAP_BOOLP(s)                                                   \
+  {                                                                            \
+    int _v;                                                                    \
+    memcpy(&_v, (s), sizeof(_v));                                              \
+    _v = (0 != _v);                                                            \
+    memcpy((s), &_v, sizeof(_v));                                              \
+  }
 
 /** OS type
  * @note Do not change the order. Must be backward compatible
