@@ -1266,9 +1266,10 @@ char* opc_provider::longname(pwr_tOix oix)
   if (m_list[oix]->po.fthoix == 0)
     strcpy(m_list[oix]->po.lname, m_list[oix]->po.name);
   else {
-    strcpy(m_list[oix]->po.lname, longname(m_list[oix]->po.fthoix));
-    strcat(m_list[oix]->po.lname, "-");
-    strcat(m_list[oix]->po.lname, m_list[oix]->po.name);
+    char tmp[sizeof(m_list[oix]->po.lname)];
+    snprintf(tmp, sizeof(tmp), "%s-%s", longname(m_list[oix]->po.fthoix),
+        m_list[oix]->po.name);
+    strcpy(m_list[oix]->po.lname, tmp);
   }
   return m_list[oix]->po.lname;
 }

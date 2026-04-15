@@ -482,12 +482,12 @@ static int rtt_toupper(char* str_upper, char* str)
     */
     if (convert) {
       *t = (char)toupper(namechar);
-      if (*t == 'ö')
-        *t = (char)'Ö';
-      else if (*t == 'ä')
-        *t = (char)'Ä';
-      else if (*t == 'å')
-        *t = (char)'Å';
+      if (*t == 'ï¿½')
+        *t = (char)'ï¿½';
+      else if (*t == 'ï¿½')
+        *t = (char)'ï¿½';
+      else if (*t == 'ï¿½')
+        *t = (char)'ï¿½';
     } else
       *t = namechar;
     prev_char = (unsigned char)*t;
@@ -916,9 +916,9 @@ static void init_ctable(void)
   ctable['X'] = K_ACTION_VAR;
   ctable['Y'] = K_ACTION_VAR;
   ctable['Z'] = K_ACTION_VAR;
-  ctable[(unsigned char)'Å'] = K_ACTION_VAR;
-  ctable[(unsigned char)'Ä'] = K_ACTION_VAR;
-  ctable[(unsigned char)'Ö'] = K_ACTION_VAR;
+  ctable[(unsigned char)'ï¿½'] = K_ACTION_VAR;
+  ctable[(unsigned char)'ï¿½'] = K_ACTION_VAR;
+  ctable[(unsigned char)'ï¿½'] = K_ACTION_VAR;
   ctable['a'] = K_ACTION_VAR;
   ctable['b'] = K_ACTION_VAR;
   ctable['c'] = K_ACTION_VAR;
@@ -945,9 +945,9 @@ static void init_ctable(void)
   ctable['x'] = K_ACTION_VAR;
   ctable['y'] = K_ACTION_VAR;
   ctable['z'] = K_ACTION_VAR;
-  ctable[(unsigned char)'å'] = K_ACTION_VAR;
-  ctable[(unsigned char)'ä'] = K_ACTION_VAR;
-  ctable[(unsigned char)'ö'] = K_ACTION_VAR;
+  ctable[(unsigned char)'ï¿½'] = K_ACTION_VAR;
+  ctable[(unsigned char)'ï¿½'] = K_ACTION_VAR;
+  ctable[(unsigned char)'ï¿½'] = K_ACTION_VAR;
   ctable[(unsigned char)'['] = K_ACTION_VAR;
   ctable[(unsigned char)']'] = K_ACTION_VAR;
   ctable['0'] = K_ACTION_NUM;

@@ -312,7 +312,7 @@ int rmq_connect(int msg_order)
 
 unsigned int rmq_receive()
 {
-  pwr_tStatus sts;
+  pwr_tStatus sts = 1;
   int search_remtrans = 0;
   remtrans_item* remtrans;
   amqp_rpc_reply_t ret;
