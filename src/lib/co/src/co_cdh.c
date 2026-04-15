@@ -2655,9 +2655,9 @@ pwr_tStatus cdh_NextObjectName(char *t, const char *s) {
   sscanf(&s[i + 1], "%d", &num);
   num++;
   if (s[i + 1] == '0')
-    sprintf(&name[i + 1], "%0*d", len - i - 1, num);
+    snprintf(&name[i + 1], sizeof(name) - (i + 1), "%0*d", len - i - 1, num);
   else
-    sprintf(&name[i + 1], "%d", num);
+    snprintf(&name[i + 1], sizeof(name) - (i + 1), "%d", num);
 
   if (strlen(name) > sizeof(pwr_tObjName) - 1)
     return CDH__NAMELEN;

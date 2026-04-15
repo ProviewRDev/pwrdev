@@ -247,7 +247,7 @@ int CnvReadWbl::read_wbl(char* filename)
         if (nr > 3)
           strcpy(class_id, line_part[3]);
         if (nr > 5)
-          sprintf(class_version, "%s %s", line_part[4], line_part[5]);
+          snprintf(class_version, sizeof(class_version), "%s %s", line_part[4], line_part[5]);
         else
         {
           pwr_tTime t;

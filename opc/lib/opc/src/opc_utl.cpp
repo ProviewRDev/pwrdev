@@ -268,7 +268,7 @@ pwr_tStatus time_AtoOPCAscii(pwr_tTime* tp, char* buf, int bufsize)
 #endif
   strftime(buf, bufsize, "%Y-%m-%dT%H:%M:%S", tmpTm);
 
-  sprintf(tmpStr, ".%07d%s%02d:00", (int)(tp->tv_nsec / 100), tzone >= 0 ? "+" : "-", abs(tzone));
+  snprintf(tmpStr, sizeof(tmpStr), ".%07d%s%02d:00", (int)(tp->tv_nsec / 100), tzone >= 0 ? "+" : "-", abs(tzone));
   buflen = strlen(buf);
   if (strlen(tmpStr) + buflen < (unsigned int)bufsize)
     strcpy(&buf[buflen], tmpStr);

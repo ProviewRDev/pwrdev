@@ -8734,7 +8734,7 @@ static int utl_config_replace(char* instr, char* outstr, int index)
   char par_str[5][80];
   int i, nr;
 
-  sprintf(indexstr, "%2d", index);
+  snprintf(indexstr, sizeof(indexstr), "%2d", index);
   if (indexstr[0] == ' ')
     indexstr[0] = '0';
 

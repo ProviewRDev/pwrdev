@@ -84,7 +84,7 @@ static pwr_tStatus EditClassVolume(ldh_sMenuCall* ip)
 
     str_ToLower(name, name);
     dcli_translate_filename(filename, "$pwr_exe/wb_open_db.sh");
-    sprintf(cmd, "%s \"%s\" \"%s\" \"%s\" \"%s\" &", filename, CoLogin::username(), CoLogin::ucpassword(),
+    snprintf(cmd, sizeof(cmd), "%s \"%s\" \"%s\" \"%s\" \"%s\" &", filename, CoLogin::username(), CoLogin::ucpassword(),
             name, name);
 
     sts = system(cmd);

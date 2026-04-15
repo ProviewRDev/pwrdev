@@ -72,7 +72,7 @@ wb_dbs::wb_dbs(wb_vrep* v)
   //@todo strcpy(m_volume.className, m_ohp->chp->db.name.data);
   m_volume.dvVersion = getDvVersion(m_v);
 
-  sprintf(m_fileName, dbs_cNameVolume, dbs_cDirectory, cdh_Low(m_v->name()));
+  snprintf(m_fileName, sizeof(m_fileName), dbs_cNameVolume, dbs_cDirectory, cdh_Low(m_v->name()));
   dcli_translate_filename(m_fileName, m_fileName);
 
   m_oid_th = tree_CreateTable(&sts, sizeof(pwr_tOid), offsetof(sOentry, o.oid), sizeof(sOentry), 1000,

@@ -1722,7 +1722,7 @@ static int wnav_show_func(void* client_data, void* client_flag)
     else
     {
       user_DevPrivToString(CoLogin::privilege(), priv_str, sizeof(priv_str));
-      sprintf(msg, "User %s (%s)", CoLogin::username(), priv_str);
+      snprintf(msg, sizeof(msg), "User %s (%s)", CoLogin::username(), priv_str);
       wnav->message('I', msg);
     }
   }
@@ -2968,7 +2968,7 @@ static int wnav_list_func(void* client_data, void* client_flag)
     if (EVEN(sts))
       return sts;
 
-    sprintf(file, "pwrp_load:rtt_crr_%s.dat", wnav_VolumeIdToStr(info.Volume));
+    snprintf(file, sizeof(file), "pwrp_load:rtt_crr_%s.dat", wnav_VolumeIdToStr(info.Volume));
 
     strcpy(descriptor_str, "localWb:Lists-RttSignalList");
     sts = ldh_NameToObjid(wnav->ldhses, &objid, descriptor_str);
@@ -3000,7 +3000,7 @@ static int wnav_list_func(void* client_data, void* client_flag)
     if (EVEN(sts))
       return sts;
 
-    sprintf(file, "pwrp_load:rtt_crro_%s.dat", wnav_VolumeIdToStr(info.Volume));
+    snprintf(file, sizeof(file), "pwrp_load:rtt_crro_%s.dat", wnav_VolumeIdToStr(info.Volume));
 
     strcpy(descriptor_str, "localWb:Lists-RttObjectList");
     sts = ldh_NameToObjid(wnav->ldhses, &objid, descriptor_str);
@@ -3032,7 +3032,7 @@ static int wnav_list_func(void* client_data, void* client_flag)
     if (EVEN(sts))
       return sts;
 
-    sprintf(file, "pwrp_load:rtt_crrc_%s.dat", wnav_VolumeIdToStr(info.Volume));
+    snprintf(file, sizeof(file), "pwrp_load:rtt_crrc_%s.dat", wnav_VolumeIdToStr(info.Volume));
 
     strcpy(descriptor_str, "localWb:Lists-RttCodeList");
     sts = ldh_NameToObjid(wnav->ldhses, &objid, descriptor_str);
@@ -3058,7 +3058,7 @@ static int wnav_list_func(void* client_data, void* client_flag)
     }
 
     // Create the plc list
-    sprintf(file, "pwrp_load:rtt_plc_%s.dat", wnav_VolumeIdToStr(info.Volume));
+    snprintf(file, sizeof(file), "pwrp_load:rtt_plc_%s.dat", wnav_VolumeIdToStr(info.Volume));
 
     // Search for local descriptor
     strcpy(descriptor_str, "localWb:Lists-RttPlcList");
@@ -3645,7 +3645,7 @@ static int wnav_open_func(void* client_data, void* client_flag)
     }
 
     dcli_translate_filename(filename, "$pwr_exe/wb_open_db.sh");
-    sprintf(cmd, "%s \"%s\" \"%s\" \"%s\" \"%s\" &", filename, CoLogin::username(), CoLogin::ucpassword(),
+    snprintf(cmd, sizeof(cmd), "%s \"%s\" \"%s\" \"%s\" \"%s\" &", filename, CoLogin::username(), CoLogin::ucpassword(),
             volumestr, volumestr);
 
     sts = system(cmd);

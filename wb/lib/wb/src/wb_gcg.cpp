@@ -5427,7 +5427,7 @@ int gcg_comp_m0(vldh_t_plc plc, unsigned long codetype, unsigned long* errorcoun
     for (i = 0; i < GCGM0_MAXFILES; i++)
     {
       sprintf(filenames[i], "%s%s", gcgm0_filenames[i], vldh_IdToStr(0, plc->lp.oid));
-      sprintf(fullfilename, "%s%s%s", gcdir, filenames[i], GCEXT);
+      snprintf(fullfilename, sizeof(fullfilename), "%s%s%s", gcdir, filenames[i], GCEXT);
       dcli_translate_filename(fullfilename, fullfilename);
       if ((files[i] = fopen(fullfilename, "w")) == NULL)
       {

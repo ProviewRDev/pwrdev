@@ -60,7 +60,7 @@ static pwr_tStatus OpenDb(ldh_sMenuCall* ip)
     return sts;
 
   dcli_translate_filename(filename, "$pwr_exe/wb_open_db.sh");
-  sprintf(cmd, "%s \"%s\" \"%s\" \"%s\" \"%s\" &", filename, CoLogin::username(), CoLogin::ucpassword(),
+  snprintf(cmd, sizeof(cmd), "%s \"%s\" \"%s\" \"%s\" \"%s\" &", filename, CoLogin::username(), CoLogin::ucpassword(),
           volume_name, volume_name);
 
   sts = system(cmd);

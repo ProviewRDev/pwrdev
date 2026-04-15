@@ -216,7 +216,7 @@ void wb_merep::copyFiles(const char* dirName, wb_merep* merep)
       char buff[256];
       char e_timbuf[32];
       time_AtoAscii(&e_dp->dbsenv()->vp->time, time_eFormat_NumDateAndTime, e_timbuf, sizeof(e_timbuf));
-      sprintf(buff, "Global class volume \"%s\" [%s](%s), was copied to data base \"%s\"",
+      snprintf(buff, sizeof(buff), "Global class volume \"%s\" [%s](%s), was copied to data base \"%s\"",
               e_dp->dbsenv()->vp->name, e_timbuf, e_dp->fileName(), dirName);
       MsgWindow::message('I', buff);
 
@@ -266,7 +266,7 @@ bool wb_merep::compareMeta(const char* dbName, wb_merep* merep)
     if (e_it == merep->m_mvrepdbs.end())
     {
       time_AtoAscii(&i_dp->dbsenv()->vp->time, time_eFormat_NumDateAndTime, i_timbuf, sizeof(i_timbuf));
-      sprintf(buff,
+      snprintf(buff, sizeof(buff),
               "Local class volume \"%s\" [%s] (%s), in data base \"%s\", "
               "does not exist in global scope",
               i_dp->dbsenv()->vp->name, i_timbuf, i_dp->fileName(), dbName);
@@ -282,7 +282,7 @@ bool wb_merep::compareMeta(const char* dbName, wb_merep* merep)
     time_AtoAscii(&i_dp->dbsenv()->vp->time, time_eFormat_NumDateAndTime, i_timbuf, sizeof(i_timbuf));
     time_AtoAscii(&e_dp->dbsenv()->vp->time, time_eFormat_NumDateAndTime, e_timbuf, sizeof(e_timbuf));
 
-    sprintf(buff,
+    snprintf(buff, sizeof(buff),
             "Local class volume \"%s\" [%s] (%s), in data base \"%s\", "
             "can be updated [%s]",
             i_dp->dbsenv()->vp->name, i_timbuf, i_dp->fileName(), dbName, e_timbuf);

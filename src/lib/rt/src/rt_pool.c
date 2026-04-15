@@ -356,7 +356,7 @@ static pool_sSegment* newSegment(pwr_tStatus* sts, pool_sHead* php,
 
 static char* segName(char workstr[16], char* name, pwr_tUInt32 generation)
 {
-  sprintf(workstr, "%.11s%4.4x", name, generation);
+  snprintf(workstr, 16, "%.11s%4.4x", name, generation);
   return workstr;
 }
 

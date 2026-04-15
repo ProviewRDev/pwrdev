@@ -1405,7 +1405,7 @@ void Wtt::activate_utilities()
     }
 
     utl_get_systemname(systemname, systemgroup);
-    sprintf(title, "PwR Utilites Volume %s, %s on %s", volname, CoLogin::username(), systemname);
+    snprintf(title, sizeof(title), "PwR Utilites Volume %s, %s on %s", volname, CoLogin::username(), systemname);
     set_clock_cursor();
     ute_new(title);
     reset_cursor();
@@ -2046,7 +2046,7 @@ void Wtt::activate_openclasseditor()
 
       str_ToLower(name, name);
       dcli_translate_filename(filename, "$pwr_exe/wb_open_db.sh");
-      sprintf(cmd, "%s \"%s\" \"%s\" \"%s\" \"%s\" &", filename, CoLogin::username(), CoLogin::ucpassword(),
+      snprintf(cmd, sizeof(cmd), "%s \"%s\" \"%s\" \"%s\" \"%s\" &", filename, CoLogin::username(), CoLogin::ucpassword(),
               name, name);
 
       set_clock_cursor();

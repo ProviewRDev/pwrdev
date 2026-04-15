@@ -558,7 +558,7 @@ static void nmpstrans_request_timeout(trans_ctx transctx, char* key, int userdat
   if (req_ptr->req->AlarmText[0][0] != 0)
   {
     char alarm_text[sizeof(req_ptr->req->AlarmText[0]) + 1 + sizeof(key) + 1];
-    sprintf(alarm_text, "%s %s", req_ptr->req->AlarmText[0], key);
+    snprintf(alarm_text, sizeof(alarm_text), "%s %s", req_ptr->req->AlarmText[0], key);
     sts = nmpstrans_alarm_send(alarm_text, "NMpsTrans", 'B');
   }
 
@@ -590,7 +590,7 @@ static void nmpstrans_datasend_timeout(trans_ctx transctx, char* key, int userda
   if (snd_ptr->snd->AlarmText[0][0] != 0)
   {
     char alarm_text[sizeof(snd_ptr->snd->AlarmText[0]) + 1 + sizeof(key) + 1];
-    sprintf(alarm_text, "%s %s", snd_ptr->snd->AlarmText[0], key);
+    snprintf(alarm_text, sizeof(alarm_text), "%s %s", snd_ptr->snd->AlarmText[0], key);
     sts = nmpstrans_alarm_send(alarm_text, "NMpsTrans", 'B');
   }
 

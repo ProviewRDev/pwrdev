@@ -1212,7 +1212,7 @@ static void serverConnect(qcom_sGet* get)
         {
           np = gdb_AddNode(&sts, mp->hdr.nid, gdb_mAdd__);
 
-          sprintf(np->name, "%s_s%d", node.name, gdb_SnidToSid(mp->hdr.nid));
+          snprintf(np->name, sizeof(np->name), "%s_s%d", node.name, gdb_SnidToSid(mp->hdr.nid));
           np->os = node.os;
           np->hw = node.hw;
           co_SetFormat(&np->fm, node.bo, node.ft);

@@ -720,19 +720,19 @@ ini_sContext* ini_CheckContext(pwr_tStatus* status, ini_sContext* cp)
   cp->nodefile.logOpenFail = errh_LogInfo;
 
   if (!cp->flags.b.applfile)
-    sprintf(cp->applfile.name, dbs_cNameAppl, cp->dir, cdh_Low(cp->origname), cp->busid);
+    snprintf(cp->applfile.name, sizeof(cp->applfile.name), dbs_cNameAppl, cp->dir, cdh_Low(cp->origname), cp->busid);
   // str_ToLower(cp->applfile.name, cp->applfile.name);
   cp->applfile.errcount = NULL;
   cp->applfile.logOpenFail = errh_LogInfo;
 
   if (!cp->flags.b.bootfile)
-    sprintf(cp->bootfile.name, dbs_cNameBoot, cp->dir, cdh_Low(cp->origname), cp->busid);
+    snprintf(cp->bootfile.name, sizeof(cp->bootfile.name), dbs_cNameBoot, cp->dir, cdh_Low(cp->origname), cp->busid);
   // str_ToLower(cp->bootfile.name, cp->bootfile.name);
   cp->bootfile.errcount = &cp->fatals;
   cp->bootfile.logOpenFail = errh_LogFatal;
 
   if (!cp->flags.b.nodefile)
-    sprintf(cp->nodefile.name, dbs_cNameNode, cp->dir, cdh_Low(cp->origname), cp->busid);
+    snprintf(cp->nodefile.name, sizeof(cp->nodefile.name), dbs_cNameNode, cp->dir, cdh_Low(cp->origname), cp->busid);
   // str_ToLower(cp->nodefile.name, cp->nodefile.name);
   cp->nodefile.errcount = &cp->fatals;
   cp->nodefile.logOpenFail = errh_LogFatal;
@@ -836,7 +836,7 @@ char* ini_LoadDirectory(pwr_tStatus* status, ini_sContext* cp)
     }
   }
   if (!cp->flags.b.aliasfile)
-    sprintf(cp->aliasfile.name, dbs_cNameAlias, cp->dir);
+    snprintf(cp->aliasfile.name, sizeof(cp->aliasfile.name), dbs_cNameAlias, cp->dir);
 
   *sts = ini_LoadAlias(cp->aliasfile.name);
   if (ODD(*sts))
@@ -1074,13 +1074,13 @@ pwr_tBoolean ini_IterVolumes(pwr_tStatus* sts, ini_sContext* cp,
 
   for (vp = lst_Succ(NULL, &cp->vol_lh, &vl); vp != NULL; vp = lst_Succ(NULL, vl, &vl))
   {
-    sprintf(vp->filename, dbs_cNameVolume, cp->bdir, cdh_Low(vp->name));
+    snprintf(vp->filename, sizeof(vp->filename), dbs_cNameVolume, cp->bdir, cdh_Low(vp->name));
     // str_ToLower(vp->filename, vp->filename);
 
     dbs_Open(sts, &cp->dbs, vp->filename);
     if (*sts == ERRNO__NOENT)
     { /* Give pwrp a chance */
-      sprintf(vp->filename, dbs_cNameVolume, cp->dir, cdh_Low(vp->name));
+      snprintf(vp->filename, sizeof(vp->filename), dbs_cNameVolume, cp->dir, cdh_Low(vp->name));
       //  str_ToLower(vp->filename, vp->filename);
       dbs_Open(sts, &cp->dbs, vp->filename);
     }

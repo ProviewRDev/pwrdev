@@ -264,7 +264,7 @@ static gdb_sNode* addNode(qcom_sNode* node)
     if (np == NULL)
       break;
 
-    sprintf(np->name, "%s_s%d", node->name, pvd_procom->m_sid);
+    snprintf(np->name, sizeof(np->name), "%s_s%d", node->name, pvd_procom->m_sid);
     np->os = node->os;
     np->hw = node->hw;
     np->upcnt++;

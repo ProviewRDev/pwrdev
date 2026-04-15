@@ -353,7 +353,7 @@ void rt_pvd_file::copyObject(co_procom* pcom, pwr_tOix oix, pwr_tOix destoix, in
   item.oix = next_oix++;
 
   if (streq(name, ""))
-    sprintf(item.name, "O%d_%s", next_oix, m_list[oix].name);
+    snprintf(item.name, sizeof(item.name), "O%d_%s", next_oix, m_list[oix].name);
   else
     strcpy(item.name, name);
 

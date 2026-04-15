@@ -631,7 +631,7 @@ int XttTbl::read_bootfile(char* systemname, char* systemgroup)
 
   busid = atoi(s);
 
-  sprintf(fname, dbs_cNameBoot, "$pwrp_load/", nodename, busid);
+  snprintf(fname, sizeof(fname), dbs_cNameBoot, "$pwrp_load/", nodename, busid);
   dcli_translate_filename(fname, fname);
 
   fp = fopen(fname, "r");

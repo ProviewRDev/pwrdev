@@ -837,7 +837,7 @@ void wb_build::rootvolume(pwr_tVid vid)
     if (evenSts())
       return;
 
-    sprintf(msg, "Build:    Volume   Loadfiles created volume %s", m_session.name());
+    snprintf(msg, sizeof(msg), "Build:    Volume   Loadfiles created volume %s", m_session.name());
     MsgWindow::message('I', msg, msgw_ePop_No);
 
     wb_log::log(&m_session, wlog_eCategory_VolumeBuild, m_session.vid());
@@ -864,7 +864,7 @@ void wb_build::rootvolume(pwr_tVid vid)
     if (ODD(sumsts))
       sumsts = PWRB__SUCCESS;
 
-    sprintf(msg, "Build:    Volume   Crossreference file generated volume %s", m_session.name());
+    snprintf(msg, sizeof(msg), "Build:    Volume   Crossreference file generated volume %s", m_session.name());
     MsgWindow::message('I', msg, msgw_ePop_No);
   }
 

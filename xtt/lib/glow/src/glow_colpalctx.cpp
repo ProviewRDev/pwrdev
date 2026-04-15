@@ -1200,7 +1200,7 @@ char* ColPalCtx::customcolor_idx_to_text(int idx)
 {
   static char str[20];
 
-  sprintf(str, "CustomColor%d", (idx - glow_eDrawType_CustomColor1) / 4 + 1);
+  snprintf(str, sizeof(str), "CustomColor%d", (idx - glow_eDrawType_CustomColor1) / 4 + 1);
   return str;
 }
 

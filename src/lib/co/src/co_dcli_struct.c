@@ -1306,7 +1306,7 @@ static int find_struct(t_ctx ctx, char* filename, char* struct_name, dcli_sStruc
             for (j = 0; j < count; j++)
             {
               strcpy(tmp, element_p->name);
-              sprintf(element_p->name, "%s[%d].%s", e_ptr->name, i, tmp);
+              snprintf(element_p->name, sizeof(element_p->name), "%s[%d].%s", e_ptr->name, i, tmp);
               element_p = element_p->next;
             }
           }
@@ -1343,7 +1343,7 @@ static int find_struct(t_ctx ctx, char* filename, char* struct_name, dcli_sStruc
               for (j = 0; j < count; j++)
               {
                 strcpy(tmp, element_p->name);
-                sprintf(element_p->name, "%s[%d][%d].%s", e_ptr->name, i, k, tmp);
+                snprintf(element_p->name, sizeof(element_p->name), "%s[%d][%d].%s", e_ptr->name, i, k, tmp);
                 element_p = element_p->next;
               }
             }

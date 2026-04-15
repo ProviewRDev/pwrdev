@@ -320,7 +320,7 @@ int GeMethods::get_xm_mask(pwr_tAttrRef* arp, char* name, pwr_sClass_XttMethodsM
       if (streq(op_name[i], ""))
         continue;
 
-      sprintf(command, "check method/filter=\"%s\"/object=%s", op_filter[i], aname);
+      snprintf(command, sizeof(command), "check method/filter=\"%s\"/object=%s", op_filter[i], aname);
 
       sts = (command_cb)(command, udata);
       if (ODD(sts))
@@ -333,7 +333,7 @@ int GeMethods::get_xm_mask(pwr_tAttrRef* arp, char* name, pwr_sClass_XttMethodsM
       if (streq(mnt_name[i], ""))
         continue;
 
-      sprintf(command, "check method/filter=\"%s\"/object=%s", mnt_filter[i], aname);
+      snprintf(command, sizeof(command), "check method/filter=\"%s\"/object=%s", mnt_filter[i], aname);
 
       sts = (command_cb)(command, udata);
       if (ODD(sts))
