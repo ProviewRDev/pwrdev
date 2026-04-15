@@ -2597,6 +2597,7 @@ int XNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
           break;
 
       // if even sts continue
+      /* fall through */
       case xnav_eItemType_Local:
         if (xnav->is_local_enum(((ItemLocal*)item)->type_id))
         {
@@ -2732,6 +2733,7 @@ int XNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
         {
         case xnav_eItemType_HelpHeader:
           item->close(xnav->brow, event->object.x, event->object.y);
+          break;
         default:
           item->open_children(xnav->brow, event->object.x, event->object.y);
         }
