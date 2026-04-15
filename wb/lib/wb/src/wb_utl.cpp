@@ -1676,13 +1676,15 @@ static int utl_list_classsort(utl_t_list** list, int size, ldh_tSesContext ldhse
       {
         /* Order first in classes and then in alpabeth order */
         strcpy(dummytxt, name1);
-        strcpy(name1, "00000000000000000000");
-        strncpy(name1, classname1, strlen(classname1));
+        memset(name1, '0', 20);
+        name1[20] = '\0';
+        memcpy(name1, classname1, MIN(strlen(classname1), 20));
         strcat(name1, dummytxt);
 
         strcpy(dummytxt, name2);
-        strcpy(name2, "00000000000000000000");
-        strncpy(name2, classname2, strlen(classname2));
+        memset(name2, '0', 20);
+        name2[20] = '\0';
+        memcpy(name2, classname2, MIN(strlen(classname2), 20));
         strcat(name2, dummytxt);
       }
 
