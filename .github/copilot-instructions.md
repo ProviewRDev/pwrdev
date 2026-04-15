@@ -67,7 +67,42 @@ pwre configure                    # Check installed dependencies
 
 **Build variables** are defined in `src/tools/bld/src/variables.mk`. Key variables: `pwre_btype` (dbg/rls), `pwre_os`, `pwre_hw`, `pwre_conf_gtk`/`pwre_conf_qt`.
 
-**Generic makefiles** in `src/tools/bld/src/` provide reusable rules: `exe_generic.mk`, `lib_generic.mk`, `wbl_generic.mk`, `jpwr_generic.mk`, `jsw_generic.mk`, `msg_generic.mk`.
+**Generic makefiles** in `src/tools/bld/src/` provide reusable build rules:
+
+| Makefile | Purpose |
+|----------|---------|
+| `variables.mk` | Common variables, compiler/linker flags, warning flags, paths |
+| `exe_generic.mk` | Executable programs (C/C++ compile + link rules) |
+| `lib_generic.mk` | Static libraries (compile to `.o`, archive to `.a`) |
+| `link_rule_generic.mk` | Default link rule for executables |
+| `wbl_generic.mk` | Workbench Load files (WBL → C → object compilation) |
+| `msg_generic.mk` | Message files (`.msg` → C source generation) |
+| `mmi_generic.mk` | MMI/HMI resource files (copy/install PWG, XTT help, etc.) |
+| `jpwr_generic.mk` | Java (jpwr) compilation and JAR packaging |
+| `jsw_generic.mk` | JavaScript web components (copy/bundle JS/HTML/CSS) |
+| `aapp_generic.mk` | Android app build rules |
+
+All generic makefiles include `variables.mk`. Module-level makefiles (e.g. `xtt/lib/ge/src/os_linux/hw_x86_64/makefile`) set `type_name`, `comp_name`, list sources, then include the appropriate generic makefile.
+
+### Compiler Warning Policy
+
+Warnings are configured in the `warnings` variable in `variables.mk`. The project uses `-Wall -Wextra` as baseline, with these suppressions:
+
+| Suppressed warning | Reason |
+|--------------------|--------|
+| `-Wno-unused-parameter` | Callback-heavy codebase with fixed function signatures |
+| `-Wno-unused-but-set-parameter` | Same — required by callback/interface contracts |
+| `-Wno-unused-but-set-variable` | Conditional compilation, debug variables |
+| `-Wno-sign-compare` | Pervasive `int` vs `size_t` mixing in C code |
+| `-Wno-missing-field-initializers` | `= {0}` partial struct init is idiomatic |
+| `-Wno-cast-function-type` | Required by GTK `G_CALLBACK()` / `g_signal_connect()` API |
+| `-Wno-narrowing` | C++ brace-init pedantry in C-style code |
+| `-Wno-format-truncation` | `snprintf` is designed to truncate — warning is informational |
+| `-Wno-stringop-truncation` | `strncpy(dst, src, sizeof(dst))` is standard idiom for fixed-size struct fields; audited 2026-04 |
+
+**Currently under evaluation** (commented out, being tested for re-enablement):
+- `-Wno-format-overflow` — catches provably-too-small `sprintf` buffers; real bugs
+- `-Wno-implicit-fallthrough` — catches missing `break` in `switch`; real bugs. GCC respects `/* fall through */` comments for intentional cases
 
 ### Component Integration Patterns
 
