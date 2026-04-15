@@ -667,6 +667,7 @@ int GlowArray::brow_insert(GlowArrayElem* element, GlowArrayElem* destination, g
     a[idx] = element;
     ((GlowNode*)element)->set_level(destination_level);
     a_size++;
+    break;
   case glow_eDest_Before:
     if (idx > 0)
       idx--;
