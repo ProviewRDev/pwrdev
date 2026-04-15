@@ -205,7 +205,7 @@ int obscure_syntax = 0;
 
 /* Macros for re_compile_pattern, which is found below these definitions.  */
 
-#define CHAR_CLASS_MAX_LENGTH 6
+#define CHAR_CLASS_MAX_LENGTH 7
 
 /* Fetch the next character in the uncompiled pattern, translating it if
    necessary.  */
