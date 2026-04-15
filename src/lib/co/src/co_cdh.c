@@ -123,6 +123,9 @@ int cdh_ObjidIsNotNull(pwr_tObjid Objid)
   return (Objid.vid != pwr_cNObjid.vid) || (Objid.oix != pwr_cNObjid.oix);
 }
 
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
 int cdh_RefIdCompare(pwr_tRefId Reference_1, pwr_tRefId Reference_2)
 {
   return cdh_ObjidCompare(
@@ -206,6 +209,8 @@ int cdh_DlidIsNotNull(pwr_tDlid DirectLink)
 {
   return cdh_ObjidIsNotNull(*(pwr_tObjid*)&DirectLink);
 }
+
+#pragma GCC diagnostic pop
 
 int cdh_ArefIsEqual(pwr_sAttrRef* arp1, pwr_sAttrRef* arp2)
 {
@@ -1510,7 +1515,7 @@ cdh_sParseName* cdh_ParseName(pwr_tStatus* sts, cdh_sParseName* pn,
   char* segp;
   char* segcp;
   pwr_tInt32 state;
-  cdh_sParseName ParseName;
+  static cdh_sParseName ParseName;
   char origName[256];
   char normName[256];
 

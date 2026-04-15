@@ -804,9 +804,13 @@ int pb_gsd::read(char* filename)
           line_part[1][0] == '(')
       {
         // Space befor index part, concatenate part 0 and 1
-        strcat(line_part[0], line_part[1]);
+        {
+          char tmp[sizeof(line_part[0])];
+          snprintf(tmp, sizeof(tmp), "%s%s", line_part[0], line_part[1]);
+          strcpy(line_part[0], tmp);
+        }
         for (int i = 1; i < part_cnt - 1; i++)
-          strcpy(line_part[i], line_part[i + 1]);
+          memmove(line_part[i], line_part[i + 1], sizeof(line_part[0]));
         part_cnt--;
       }
 

@@ -1722,7 +1722,7 @@ static void utl_ctx_new(utl_ctx* utlctx, ldh_tSesContext ldhses, const char* pag
 {
   int sts;
   int landscape_rows = 0;
-  int portrait_rows;
+  int portrait_rows = 0;
 
   /* Create the context */
   *utlctx = (utl_ctx)calloc(1, sizeof(**utlctx));

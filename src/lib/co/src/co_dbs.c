@@ -178,7 +178,7 @@ dbs_sEnv* dbs_Open(pwr_tStatus* sts, dbs_sEnv* ep, const char* filename)
   return ep;
 }
 
-static pwr_tBoolean checkQ(const dbs_sVenv* vep, dbs_sQlink* item)
+static pwr_tBoolean __attribute__((unused)) checkQ(const dbs_sVenv* vep, dbs_sQlink* item)
 {
   dbs_sQlink* link;
 

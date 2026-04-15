@@ -4126,7 +4126,7 @@ static int ccm_read_buffer(
 
     if (strlen(str) > K_LINE_SIZE - 1) {
       filectx->error_row = row;
-      strcpy(filectx->error_line, str);
+      snprintf(filectx->error_line, sizeof(filectx->error_line), "%s", str);
       return CCM__LONGLINE;
     }
     if (str_StartsWith(str, "#include")) {
@@ -5615,7 +5615,7 @@ static int ccm_func_sort(void* filectx, ccm_sArg* arg_list, int arg_count,
 	      s1 = arg_valp[k] + K_STRING_SIZE * j;
 	      s2 = arg_valp[k] + K_STRING_SIZE * (j + 1);
 	      strcpy(tmp, s2);
-	      strcpy(s2, s1);
+	      memmove(s2, s1, strlen(s1) + 1);
 	      strcpy(s1, tmp);
 	      break;
 	    }
@@ -5667,7 +5667,7 @@ static int ccm_func_sort(void* filectx, ccm_sArg* arg_list, int arg_count,
 	      s1 = arg_valp[k] + K_STRING_SIZE * j;
 	      s2 = arg_valp[k] + K_STRING_SIZE * (j + 1);
 	      strcpy(tmp, s2);
-	      strcpy(s2, s1);
+	      memmove(s2, s1, strlen(s1) + 1);
 	      strcpy(s1, tmp);
 	      break;
 	    }
@@ -6390,12 +6390,12 @@ static int ccm_function_exec(ccm_tFileCtx filectx, char* name, ccm_tFunc* func,
       if (nr < 3) {
         /* The parser doesn't count the null-strings */
         if (expr[0] == ';') {
-          strcpy(elm_str[2], elm_str[1]);
-          strcpy(elm_str[1], elm_str[0]);
+          memmove(elm_str[2], elm_str[1], sizeof(elm_str[0]));
+          memmove(elm_str[1], elm_str[0], sizeof(elm_str[0]));
           strcpy(elm_str[0], "");
           if (expr[1] == ';') {
-            strcpy(elm_str[2], elm_str[1]);
-            strcpy(elm_str[1], elm_str[0]);
+            memmove(elm_str[2], elm_str[1], sizeof(elm_str[0]));
+            memmove(elm_str[1], elm_str[0], sizeof(elm_str[0]));
             strcpy(elm_str[0], "");
           }
         }

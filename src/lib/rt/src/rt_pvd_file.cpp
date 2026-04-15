@@ -501,9 +501,9 @@ char* rt_pvd_file::longname(pwr_tOix oix)
   if (m_list[oix].fthoix == 0)
     strcpy(m_list[oix].lname, m_list[oix].name);
   else {
-    strcpy(m_list[oix].lname, longname(m_list[oix].fthoix));
-    strcat(m_list[oix].lname, "-");
-    strcat(m_list[oix].lname, m_list[oix].name);
+    char tmp[sizeof(m_list[oix].lname)];
+    snprintf(tmp, sizeof(tmp), "%s-%s", longname(m_list[oix].fthoix), m_list[oix].name);
+    strcpy(m_list[oix].lname, tmp);
   }
   return m_list[oix].lname;
 }

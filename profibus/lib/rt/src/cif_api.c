@@ -2088,7 +2088,7 @@ short RunFirmwareDownload(unsigned short usDevNumber, FILEDATA* ptFile,
         tSendMsg.e = RCS_CONT_MSK;
 
         // Set byte 0 to 63 to byte 1 to 65 of the 1st message
-        memcpy(&tSendMsg.data[0], &tSendMsg.data[1], 64);
+        memmove(&tSendMsg.data[0], &tSendMsg.data[1], 64);
 
         // Insert byte 64 to 239 from the abData[64]
         memcpy(&tSendMsg.data[64], &pabData[64],

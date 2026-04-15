@@ -1387,7 +1387,7 @@ time_tClock time_DtoClock(pwr_tStatus* status, pwr_tDeltaTime* tp)
 pwr_tDeltaTime* time_ClockToD(
     pwr_tStatus* status, pwr_tDeltaTime* tp, time_tClock clock)
 {
-  pwr_tDeltaTime time;
+  static pwr_tDeltaTime time;
   pwr_dStatus(sts, status, TIME__SUCCESS);
 
   if (tp == NULL)

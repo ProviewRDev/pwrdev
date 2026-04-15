@@ -3007,14 +3007,14 @@ static int gccm_read_file(
       str[strlen(str) - 1] = 0;
       if (strlen(str) + strlen(str2) > K_LINE_SIZE - 1) {
         filectx->error_row = row;
-        strcpy(filectx->error_line, str2);
+        snprintf(filectx->error_line, sizeof(filectx->error_line), "%s", str2);
         return CCM__LONGLINE;
       }
       strcat(str, str2);
     }
     if (strlen(str) > K_LINE_SIZE - 1) {
       filectx->error_row = row;
-      strcpy(filectx->error_line, str);
+      snprintf(filectx->error_line, sizeof(filectx->error_line), "%s", str);
       return CCM__LONGLINE;
     }
     if (str_StartsWith(str, "#include")) {
@@ -3093,14 +3093,14 @@ static int gccm_read_buff(
       str[strlen(str) - 1] = 0;
       if (strlen(str) + strlen(str2) > K_LINE_SIZE - 1) {
         filectx->error_row = row;
-        strcpy(filectx->error_line, str2);
+        snprintf(filectx->error_line, sizeof(filectx->error_line), "%s", str2);
         return CCM__LONGLINE;
       }
       strcat(str, str2);
     }
     if (strlen(str) > K_LINE_SIZE - 1) {
       filectx->error_row = row;
-      strcpy(filectx->error_line, str);
+      snprintf(filectx->error_line, sizeof(filectx->error_line), "%s", str);
       return CCM__LONGLINE;
     }
     if (str_StartsWith(str, "#include")) {
@@ -4559,12 +4559,12 @@ static int gccm_function_exec(gccm_t_file_ctx filectx, char* name,
       if (nr < 3) {
         /* The parser doesn't count the null-strings */
         if (expr[0] == ';') {
-          strcpy(elm_str[2], elm_str[1]);
-          strcpy(elm_str[1], elm_str[0]);
+          memmove(elm_str[2], elm_str[1], sizeof(elm_str[0]));
+          memmove(elm_str[1], elm_str[0], sizeof(elm_str[0]));
           strcpy(elm_str[0], "");
           if (expr[1] == ';') {
-            strcpy(elm_str[2], elm_str[1]);
-            strcpy(elm_str[1], elm_str[0]);
+            memmove(elm_str[2], elm_str[1], sizeof(elm_str[0]));
+            memmove(elm_str[1], elm_str[0], sizeof(elm_str[0]));
             strcpy(elm_str[0], "");
           }
         }

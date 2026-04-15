@@ -53,7 +53,7 @@
 pwr_tDeltaTime* time_Uptime(
     pwr_tStatus* status, pwr_tDeltaTime* tp, pwr_tDeltaTime* ap)
 {
-  pwr_tDeltaTime time;
+  static pwr_tDeltaTime time;
   unsigned long tics;
   static pwr_tUInt64 tics_64;
   struct tms buff;
@@ -160,7 +160,7 @@ pwr_tStatus time_SetTime(pwr_tTime* pt)
 
 time_tOs* time_AtoOs(pwr_tStatus* status, time_tOs* tp, pwr_tTime* ap)
 {
-  time_tOs os_time;
+  static time_tOs os_time;
   pwr_dStatus(sts, status, TIME__SUCCESS);
 
   if (tp == NULL)
@@ -176,7 +176,7 @@ time_tOs* time_AtoOs(pwr_tStatus* status, time_tOs* tp, pwr_tTime* ap)
 
 time_tOs* time_DtoOs(pwr_tStatus* status, time_tOs* tp, pwr_tDeltaTime* dp)
 {
-  time_tOs os_time;
+  static time_tOs os_time;
   pwr_dStatus(sts, status, TIME__SUCCESS);
 
   if (tp == NULL)

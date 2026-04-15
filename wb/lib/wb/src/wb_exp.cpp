@@ -2066,7 +2066,8 @@ static pwr_tStatus gen_filename(
       *s = '_';
 
   if (strlen(hiername) >= MAX_FILENAME_LEN)
-    strcpy(hiername, &hiername[strlen(hiername) - MAX_FILENAME_LEN + 1]);
+    memmove(hiername, &hiername[strlen(hiername) - MAX_FILENAME_LEN + 1],
+        MAX_FILENAME_LEN);
 
   strcpy(filename, "pwrp_lis:");
   strcat(filename, hiername);

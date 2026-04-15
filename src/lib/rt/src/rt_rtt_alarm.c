@@ -1299,9 +1299,12 @@ static int rtt_event_item_text(rtt_t_menu_alarm* menu_ptr, int index)
 
   strcat(menu_ptr->text, "  ");
   if ((menu_ptr->type == RTT_ALARMTYPE_INFO)
-      || (menu_ptr->type == RTT_ALARMTYPE_ALARM))
-    strncat(menu_ptr->text, menu_ptr->eventtext,
+      || (menu_ptr->type == RTT_ALARMTYPE_ALARM)) {
+    char evtxt[sizeof(menu_ptr->eventtext)];
+    memcpy(evtxt, menu_ptr->eventtext, sizeof(evtxt));
+    strncat(menu_ptr->text, evtxt,
         sizeof(menu_ptr->text) - strlen(menu_ptr->text));
+  }
 
   menu_ptr->text[79] = 0;
 
@@ -1367,8 +1370,12 @@ int rtt_alarm_item_text(rtt_t_menu_alarm* menu_ptr, int index)
   strcat(menu_ptr->text, timestr);
 
   strcat(menu_ptr->text, "  ");
-  strncat(menu_ptr->text, menu_ptr->eventtext,
-      sizeof(menu_ptr->text) - strlen(menu_ptr->text));
+  {
+    char evtxt[sizeof(menu_ptr->eventtext)];
+    memcpy(evtxt, menu_ptr->eventtext, sizeof(evtxt));
+    strncat(menu_ptr->text, evtxt,
+        sizeof(menu_ptr->text) - strlen(menu_ptr->text));
+  }
 
   menu_ptr->text[79] = 0;
 

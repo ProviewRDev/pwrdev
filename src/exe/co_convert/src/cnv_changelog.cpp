@@ -138,7 +138,7 @@ int CnvChangeLog::read(const char* module)
 
         i = 0;
         for (; *s && *s != 32 && *s != 9; s++) {
-          if (i >= (int)sizeof(p.component))
+          if (i >= (int)sizeof(p.component) - 1)
             break;
           p.component[i++] = *s;
         }
