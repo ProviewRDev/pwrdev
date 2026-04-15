@@ -318,6 +318,7 @@ void opc_provider::insert_object(pwr_tOix fth, pwr_tOix bws, s0__BrowseElement* 
       o->po.body = calloc(1, o->po.body_size);
       o->type = pwr_eType_String;
       o->size = sizeof(pwr_tString80);
+      break;
     default:
       o->po.cid = pwr_cClass_Opc_Hier;
       o->po.body_size = sizeof(pwr_sClass_Opc_Hier);
