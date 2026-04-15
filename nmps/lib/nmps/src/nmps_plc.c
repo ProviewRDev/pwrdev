@@ -225,6 +225,7 @@ void NMpsCell_exec(plc_sThread* tp, pwr_sClass_NMpsCell* object)
     {
     case NMPS_OPTYPE_EXTINSERT:
       object->ExternIndex = 1;
+    /* fall through */
     case NMPS_OPTYPE_EXTINSERT_IDX:
       /* Direct link to extern objid */
       if (object->ExternIndex <= 0 || object->ExternIndex > object->MaxSize)
@@ -307,9 +308,11 @@ void NMpsCell_exec(plc_sThread* tp, pwr_sClass_NMpsCell* object)
         object->ExternFlag = 0;
         break;
       }
+    /* fall through */
     case NMPS_OPTYPE_EXTDELETE:
       if (object->ExternOpType == NMPS_OPTYPE_EXTDELETE)
         object->ExternIndex = 1;
+    /* fall through */
     case NMPS_OPTYPE_EXTDELETE_IDX:
       if (object->ExternIndex > object->LastIndex)
       {
@@ -838,6 +841,7 @@ void NMpsStoreCell_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell* object)
     case NMPS_OPTYPE_EXTINSERT:
     case NMPS_OPTYPE_EXTINSERTSELECT:
       object->ExternIndex = 1;
+    /* fall through */
     case NMPS_OPTYPE_EXTINSERT_IDX:
       /* Direct link to extern objid */
       if (object->ExternIndex <= 0 || object->ExternIndex > object->MaxSize)
@@ -983,9 +987,11 @@ void NMpsStoreCell_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell* object)
         object->ExternFlag = 0;
         break;
       }
+    /* fall through */
     case NMPS_OPTYPE_EXTDELETE:
       if (object->ExternOpType == NMPS_OPTYPE_EXTDELETE)
         object->ExternIndex = 1;
+    /* fall through */
     case NMPS_OPTYPE_EXTDELETE_IDX:
       if (object->ExternIndex > object->LastIndex)
       {

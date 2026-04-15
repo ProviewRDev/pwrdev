@@ -369,6 +369,7 @@ void WNavGtk::sel_convert_cb(GtkWidget* w, GtkSelectionData* selection_data, gui
         free(node_list);
         return;
       }
+    /* fall through */
     default:
       brow_GetAnnotation(node_list[0], 0, name, sizeof(name));
       gtk_selection_data_set(selection_data, GDK_SELECTION_TYPE_STRING, 8, (const guchar*)name, strlen(name));

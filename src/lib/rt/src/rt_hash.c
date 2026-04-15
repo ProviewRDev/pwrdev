@@ -194,6 +194,7 @@ static pool_sQlink* findEntry(pwr_tStatus* sts, pool_sQlink** bp, /* Return poin
       pwr_tUInt16* ykey = (pwr_tUInt16*)keyp;
       found = *xkey == *ykey;
     }
+    /* fall through */
     case hash_eKey_user:
       if (htp->comp_f != NULL)
         found = htp->comp_f(keyp, ip);

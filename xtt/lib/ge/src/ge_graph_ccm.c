@@ -1927,6 +1927,7 @@ int gccm_operate_exec(t_func_ctx funcctx, s_operand *op, s_operand *next) {
           strcpy(next->result_string, next_string);
         break;
       }
+    /* fall through */
     case K_ACTION_MUL:
       if (op->result_decl == K_DECL_INT && next_decl == K_DECL_INT) {
         next->result_int = op->result_int * next_int;

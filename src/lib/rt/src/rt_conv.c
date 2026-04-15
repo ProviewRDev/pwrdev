@@ -269,7 +269,7 @@ conv_eIdx conv_GetIdx(pwr_eType src, pwr_eType trg)
     default:
       break;
     }
-
+  /* fall through */
   case pwr_eType_Float32:
     switch (trg)
     {
@@ -290,7 +290,7 @@ conv_eIdx conv_GetIdx(pwr_eType src, pwr_eType trg)
     default:
       break;
     }
-
+  /* fall through */
   case pwr_eType_Float64:
     switch (trg)
     {
@@ -311,7 +311,7 @@ conv_eIdx conv_GetIdx(pwr_eType src, pwr_eType trg)
     default:
       break;
     }
-
+  /* fall through */
   case pwr_eType_Int8:
   case pwr_eType_Char:
     switch (trg)
@@ -338,7 +338,7 @@ conv_eIdx conv_GetIdx(pwr_eType src, pwr_eType trg)
     default:
       break;
     }
-
+  /* fall through */
   case pwr_eType_Int16:
     switch (trg)
     {
@@ -362,7 +362,7 @@ conv_eIdx conv_GetIdx(pwr_eType src, pwr_eType trg)
     default:
       break;
     }
-
+  /* fall through */
   case pwr_eType_Int32:
     switch (trg)
     {
@@ -388,7 +388,7 @@ conv_eIdx conv_GetIdx(pwr_eType src, pwr_eType trg)
     default:
       break;
     }
-
+  /* fall through */
   case pwr_eType_UInt8:
     switch (trg)
     {
@@ -412,7 +412,7 @@ conv_eIdx conv_GetIdx(pwr_eType src, pwr_eType trg)
     default:
       break;
     }
-
+  /* fall through */
   case pwr_eType_UInt16:
     switch (trg)
     {
@@ -436,7 +436,7 @@ conv_eIdx conv_GetIdx(pwr_eType src, pwr_eType trg)
     default:
       break;
     }
-
+  /* fall through */
   case pwr_eType_UInt32:
     switch (trg)
     {
@@ -462,7 +462,7 @@ conv_eIdx conv_GetIdx(pwr_eType src, pwr_eType trg)
     default:
       break;
     }
-
+  /* fall through */
   case pwr_eType_Enum:
   case pwr_eType_Mask:
     switch (trg)
@@ -475,7 +475,7 @@ conv_eIdx conv_GetIdx(pwr_eType src, pwr_eType trg)
     default:
       break;
     }
-
+  /* fall through */
   case pwr_eType_Objid:
     switch (trg)
     {
@@ -484,7 +484,7 @@ conv_eIdx conv_GetIdx(pwr_eType src, pwr_eType trg)
     default:
       break;
     }
-
+  /* fall through */
   case pwr_eType_AttrRef:
     switch (trg)
     {
@@ -493,7 +493,7 @@ conv_eIdx conv_GetIdx(pwr_eType src, pwr_eType trg)
     default:
       break;
     }
-
+  /* fall through */
   default:
     break;
   }

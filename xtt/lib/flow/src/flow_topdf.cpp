@@ -362,6 +362,7 @@ void CnvToPdf::cnv_text(char* to, char* from)
     case '\\':
       *t++ = '\\';
       *t++ = '\\';
+    /* fall through */
     default:
       *t++ = *s;
     }

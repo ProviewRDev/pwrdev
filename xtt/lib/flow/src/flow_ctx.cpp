@@ -1108,6 +1108,7 @@ int FlowCtx::event_handler(flow_eEvent event, int x, int y, int w, int h)
       }
       return 1;
     }
+  /* fall through */
   case flow_eEvent_MB1DoubleClick:
   case flow_eEvent_MB1ClickShift:
   case flow_eEvent_MB1DoubleClickShift:

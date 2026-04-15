@@ -271,6 +271,7 @@ static int json_match(pwr_tCid chan_cid, const char* id, const pwr_eDataRepEnum 
       }
     }
   }
+  /* fall through */
   case pwr_cClass_ChanIi:
   case pwr_cClass_ChanAi:
   {

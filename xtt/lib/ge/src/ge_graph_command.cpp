@@ -1387,6 +1387,7 @@ static int graph_set_func(void* client_data, void* client_flag)
       break;
     case glow_eType_TraceColor:
       grow_info_p->type = glow_eType_Color;
+    /* fall through */
     case glow_eType_Direction:
     case glow_eType_Color:
     case glow_eType_Tone:
@@ -3107,6 +3108,7 @@ static int graph_replace_func(void* client_data, void* client_flag)
       case glow_eObjectType_GrowGroup:
         graph_group_replace_attr(sel_list[i], from_str, to_str, &replace_cnt, strict);
       // Do this for groups also (no break)
+      /* fall through */
       case glow_eObjectType_GrowNode:
       case glow_eObjectType_GrowSlider:
       case glow_eObjectType_GrowTrend:
@@ -3169,6 +3171,7 @@ static void graph_group_replace_attr(grow_tObject group, char* from_str, char* t
     case glow_eObjectType_GrowGroup:
       graph_group_replace_attr(objectlist[i], from_str, to_str, replace_cnt, strict);
     // Do this for groups also (no break)
+    /* fall through */
     case glow_eObjectType_GrowNode:
     case glow_eObjectType_GrowSlider:
     case glow_eObjectType_GrowTrend:

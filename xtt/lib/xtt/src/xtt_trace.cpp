@@ -349,6 +349,7 @@ int RtTrace::scan_bc(flow_tObject object, void* trace_p)
       break;
     case flow_eTraceType_DataRef:
       trace_p = (char*)trace_p + pwr_cAlignLW;
+    /* fall through */
     case flow_eTraceType_AttrRef:
       if (((pwr_tAttrRef*)trace_p)->Objid.vid == 0)
         strcpy(txt, "");

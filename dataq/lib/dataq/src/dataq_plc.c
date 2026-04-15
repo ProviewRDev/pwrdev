@@ -266,6 +266,7 @@ void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
     {
     case pwr_eDataQCtlEnum_Insert:
       co->Super.Control.Index = 1;
+    /* fall through */
     case pwr_eDataQCtlEnum_InsertIndex:
       /* Direct link to extern objid */
       if (co->Super.Control.Index <= 0 || co->Super.Control.Index > co->Super.Config.MaxSize)
@@ -353,9 +354,11 @@ void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
         co->Super.Control.Commit = 0;
         break;
       }
+    /* fall through */
     case pwr_eDataQCtlEnum_Delete:
       if (co->Super.Control.Operation == pwr_eDataQCtlEnum_Delete)
         co->Super.Control.Index = 1;
+    /* fall through */
     case pwr_eDataQCtlEnum_DeleteIndex:
       if (co->Super.Control.Index > co->DataSize || co->Super.Control.Index <= 0)
       {
@@ -928,6 +931,7 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
     case pwr_eDataQCtlEnum_Insert:
     case pwr_eDataQCtlEnum_InsertSelect:
       co->Super.Control.Index = 1;
+    /* fall through */
     case pwr_eDataQCtlEnum_InsertIndex:
       /* Direct link to extern objid */
       if (co->Super.Control.Index <= 0 || co->Super.Control.Index > co->Super.Config.MaxSize)
@@ -1077,9 +1081,11 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
         co->Super.Control.Commit = 0;
         break;
       }
+    /* fall through */
     case pwr_eDataQCtlEnum_Delete:
       if (co->Super.Control.Operation == pwr_eDataQCtlEnum_Delete)
         co->Super.Control.Index = 1;
+    /* fall through */
     case pwr_eDataQCtlEnum_DeleteIndex:
       if (co->Super.Control.Index > co->DataSize)
       {

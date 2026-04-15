@@ -656,6 +656,7 @@ int rtt_view(menu_ctx parent_ctx, char* filename, char* inbuff, char* intitle, i
           return sts;
         break;
       }
+    /* fall through */
     case RTT_K_CTRLZ:
       if (type == RTT_VIEWTYPE_FILE)
         fclose(ctx->infile);

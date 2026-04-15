@@ -1180,6 +1180,7 @@ int GlowCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
       }
       return 1;
     }
+  /* fall through */
   case glow_eEvent_MB1DoubleClick:
   case glow_eEvent_MB1ClickShift:
   case glow_eEvent_MB1DoubleClickShift:

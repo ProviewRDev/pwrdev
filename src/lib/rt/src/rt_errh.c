@@ -1000,6 +1000,7 @@ static int msg_vsprintf(char* buf, const char* fmt, aa_list ap, va_list vap)
 
     case 'X':
       flags |= LARGE;
+    /* fall through */
     case 'x':
       base = 16;
       break;

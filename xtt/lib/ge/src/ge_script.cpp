@@ -1610,6 +1610,7 @@ static int graph_setgraphattribute_func(void* filectx, ccm_sArg* arg_list, int a
     break;
   case glow_eType_TraceColor:
     grow_info_p->type = glow_eType_Color;
+  /* fall through */
   case glow_eType_Direction:
   case glow_eType_Color:
   case glow_eType_Tone:
@@ -1786,6 +1787,7 @@ static int graph_getgraphattribute_func(void* filectx, ccm_sArg* arg_list, int a
     break;
   case glow_eType_TraceColor:
     grow_info_p->type = glow_eType_Color;
+  /* fall through */
   case glow_eType_Direction:
   case glow_eType_Color:
   case glow_eType_Tone:

@@ -545,6 +545,7 @@ int re_compile_pattern(char* pattern, int size, struct regex* bufp)
     case '?':
       if ((obscure_syntax & RE_BK_PLUS_QM) || (obscure_syntax & RE_LIMITED_OPS))
         goto normal_char;
+    /* fall through */
     handle_plus:
     case '*':
       /* If there is no previous pattern, char not special. */
@@ -1265,6 +1266,7 @@ void re_compile_fastmap(struct regex* bufp)
     case duplicate:
       bufp->can_be_null = 1;
       fastmap['\n'] = 1;
+    /* fall through */
     case anychar:
       for (j = 0; j < (1 << BYTEWIDTH); j++)
         if (j != '\n')
@@ -1755,6 +1757,7 @@ int re_match_2(struct regex* pbufp, char* string1_arg, int size1, char* string2_
         {
         case jump_n:
           is_a_jump_n = 1;
+        /* fall through */
         case finalize_jump:
         case maybe_finalize_jump:
         case jump:
@@ -1943,7 +1946,7 @@ int re_match_2(struct regex* pbufp, char* string1_arg, int size1, char* string2_
         p[-1] = (unsigned char)jump;
         goto nofinalize;
       }
-    /* Note fall through.  */
+    /* Note: fall through.  */
 
     /* The end of a stupid repeat has a finalize_jump back to the
        start, where another failure point will be made which will
@@ -1952,9 +1955,10 @@ int re_match_2(struct regex* pbufp, char* string1_arg, int size1, char* string2_
     /* Take off failure points put on by matching on_failure_jump
        because didn't fail.  Also remove the register information
        put on by the on_failure_jump.  */
+    /* fall through */
     case finalize_jump:
       POP_FAILURE_POINT();
-    /* Note fall through.  */
+    /* fall through */
 
     /* Jump without taking off any failure points.  */
     case jump:

@@ -1391,6 +1391,7 @@ int XttMultiViewGtk::set_subwindow_source(const char* name, char* source, char* 
 
             mv.Action[i * rows + j].Object[0] = object_aref;
           }
+          /* fall through */
           case pwr_eMultiViewContentEnum_Camera:
           {
             pwr_sClass_XttCamera xttcamera;

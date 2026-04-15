@@ -879,6 +879,7 @@ SOAP_FMAC5 int SOAP_FMAC6 __s0__Subscribe(struct soap* soap, _s0__Subscribe* s0_
             }
             // Else continue and use PresMaxLimit and PresMinLimit
           }
+          /* fall through */
           case pwr_cClass_Av:
           case pwr_cClass_Iv:
           {

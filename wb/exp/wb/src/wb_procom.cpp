@@ -61,6 +61,7 @@ void wb_procom::put(vext_sAMsg* msg, int size, pwr_tStatus* sts)
       *sts = LDH__MSGSND;
       return;
     }
+  /* fall through */
   case procom_eType_Local:
     memcpy(&m_msg, msg, sizeof(m_msg));
     break;

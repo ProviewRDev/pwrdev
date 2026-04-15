@@ -242,6 +242,7 @@ int GrowCtx::subw_event_handler(glow_eEvent event, int x, int y, int w, int h)
         {
           return sts;
         }
+      /* fall through */
       case glow_eEvent_MB1Click:
       case glow_eEvent_MB2Click:
       case glow_eEvent_MB3Click:
@@ -268,6 +269,7 @@ int GrowCtx::subw_event_handler(glow_eEvent event, int x, int y, int w, int h)
           }
           return sts;
         }
+      /* fall through */
       default:
         sts = layer->a[i]->event_handler(&mw, event, x, y, fx, fy);
         if (sts)
@@ -712,6 +714,7 @@ int GrowCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
       }
       return 1;
     }
+  /* fall through */
   case glow_eEvent_MB1DoubleClick:
   case glow_eEvent_MB1ClickShift:
   case glow_eEvent_MB1DoubleClickShift:

@@ -434,6 +434,7 @@ int WbExpWNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     default:;
     }
   }
+  /* fall through */
   case flow_eEvent_Radiobutton:
   {
     switch (event->object.object_type)

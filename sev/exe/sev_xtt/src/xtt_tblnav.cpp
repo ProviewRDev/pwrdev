@@ -332,6 +332,7 @@ static int tblnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
     default:;
     }
   }
+  /* fall through */
   case flow_eEvent_MB1DoubleClick:
     switch (event->object.object_type)
     {

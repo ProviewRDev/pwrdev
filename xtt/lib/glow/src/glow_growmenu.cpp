@@ -493,6 +493,7 @@ int GrowMenu::event_handler(GlowWind* w, glow_eEvent event, int x, int y, double
       }
     }
   }
+  /* fall through */
   default:
     sts = local_event_handler(w, event, rx, ry);
   }
