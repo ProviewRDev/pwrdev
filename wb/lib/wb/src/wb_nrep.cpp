@@ -312,6 +312,7 @@ void wb_nrep::parse() {
         case ']':
           num_attr++;
           state = 6;
+        break;
         case '0':
         case '1':
         case '2':
