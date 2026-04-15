@@ -1014,6 +1014,7 @@ int rtt_menu_alarm_new(menu_ctx parent_ctx, menu_ctx ctx)
           return sts;
         break;
       }
+    /* fall through */
     case RTT_K_CTRLZ:
       rtt_menu_delete(ctx);
       return RTT__FASTBACK;
@@ -1800,7 +1801,7 @@ static int rtt_alarm_last_message()
   {
     strncpy(rtt_AlarmLastMessage, &last_menu_ptr->text[2], sizeof(rtt_AlarmLastMessage) - 2);
     rtt_AlarmLastMessage[79] = 0;
-    sprintf(alarm_count_str, "%3d:%3d", not_returned_alarms, rtt_alarmlist_index);
+    snprintf(alarm_count_str, sizeof(alarm_count_str), "%3d:%3d", not_returned_alarms, rtt_alarmlist_index);
     if (strlen(rtt_AlarmLastMessage) < 72)
     {
       for (i = 0; i < 73; i++)
@@ -1812,7 +1813,7 @@ static int rtt_alarm_last_message()
   {
     strcpy(rtt_AlarmLastMessage, "                                             "
                                  "                         ");
-    sprintf(alarm_count_str, "%3d:%3d", rtt_alarmlist_index - not_returned_alarms, rtt_alarmlist_index);
+    snprintf(alarm_count_str, sizeof(alarm_count_str), "%3d:%3d", rtt_alarmlist_index - not_returned_alarms, rtt_alarmlist_index);
     strcpy(&rtt_AlarmLastMessage[72], alarm_count_str);
   }
   rtt_message('S', "");

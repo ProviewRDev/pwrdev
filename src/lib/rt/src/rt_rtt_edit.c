@@ -2974,7 +2974,7 @@ static int modify_func(edit_ctx ctx, int flag)
       }
 
       item_ptr->number = number;
-      sprintf(menu_ptr->text, "Number:        %d", number);
+      snprintf(menu_ptr->text, sizeof(menu_ptr->text), "Number:        %d", number);
       return RTT__SUCCESS;
     }
     else if (m_ctx->current_item == 1)
@@ -2993,7 +2993,7 @@ static int modify_func(edit_ctx ctx, int flag)
         if (*s == '#')
           *s = ' ';
       strcpy(item_ptr->text, arg1_str);
-      sprintf(menu_ptr->text, "Text:          %s", arg1_str);
+      snprintf(menu_ptr->text, sizeof(menu_ptr->text), "Text:          %s", arg1_str);
       return RTT__SUCCESS;
     }
     else if (m_ctx->current_item == 2)
@@ -3018,7 +3018,7 @@ static int modify_func(edit_ctx ctx, int flag)
           (str_NoCaseStrcmp(arg1_str, "COMMAND") == 0))
       {
         strcpy(item_ptr->type, arg1_str);
-        sprintf(menu_ptr->text, "Type:          %s", arg1_str);
+        snprintf(menu_ptr->text, sizeof(menu_ptr->text), "Type:          %s", arg1_str);
         return RTT__SUCCESS;
       }
       else
@@ -3039,7 +3039,7 @@ static int modify_func(edit_ctx ctx, int flag)
         }
       }
       strcpy(item_ptr->parameter, arg1_str);
-      sprintf(menu_ptr->text, "Parameter      %s", arg1_str);
+      snprintf(menu_ptr->text, sizeof(menu_ptr->text), "Parameter      %s", arg1_str);
       return RTT__SUCCESS;
     }
     else if (m_ctx->current_item == 4)
@@ -3054,7 +3054,7 @@ static int modify_func(edit_ctx ctx, int flag)
         }
       }
       strcpy(item_ptr->dualparameter, arg1_str);
-      sprintf(menu_ptr->text, "Dualparameter: %s", arg1_str);
+      snprintf(menu_ptr->text, sizeof(menu_ptr->text), "Dualparameter: %s", arg1_str);
       return RTT__SUCCESS;
     }
     else if (m_ctx->current_item == 5)
@@ -3073,7 +3073,7 @@ static int modify_func(edit_ctx ctx, int flag)
           (str_NoCaseStrcmp(arg1_str, "SYS") == 0) || (str_NoCaseStrcmp(arg1_str, "NOOP") == 0))
       {
         strcpy(item_ptr->priv, arg1_str);
-        sprintf(menu_ptr->text, "Privileges:    %s", arg1_str);
+        snprintf(menu_ptr->text, sizeof(menu_ptr->text), "Privileges:    %s", arg1_str);
         return RTT__SUCCESS;
       }
       else
@@ -3100,7 +3100,7 @@ static int modify_func(edit_ctx ctx, int flag)
           (str_NoCaseStrcmp(arg1_str, "FLASH") == 0) || (str_NoCaseStrcmp(arg1_str, "OPENCLOSED") == 0))
       {
         strcpy(item_ptr->outflags, arg1_str);
-        sprintf(menu_ptr->text, "Outputflags:   %s", arg1_str);
+        snprintf(menu_ptr->text, sizeof(menu_ptr->text), "Outputflags:   %s", arg1_str);
         return RTT__SUCCESS;
       }
       else
@@ -3129,7 +3129,7 @@ static int modify_func(edit_ctx ctx, int flag)
       }
 
       item_ptr->characters = number;
-      sprintf(menu_ptr->text, "Characters:    %d", number);
+      snprintf(menu_ptr->text, sizeof(menu_ptr->text), "Characters:    %d", number);
       return RTT__SUCCESS;
     }
     if (m_ctx->current_item == 8)
@@ -3152,7 +3152,7 @@ static int modify_func(edit_ctx ctx, int flag)
       }
 
       item_ptr->decimals = number;
-      sprintf(menu_ptr->text, "Decimals:      %d", number);
+      snprintf(menu_ptr->text, sizeof(menu_ptr->text), "Decimals:      %d", number);
       return RTT__SUCCESS;
     }
     if (m_ctx->current_item == 9)
@@ -3175,7 +3175,7 @@ static int modify_func(edit_ctx ctx, int flag)
       }
 
       item_ptr->maxlimit = some_float;
-      sprintf(menu_ptr->text, "Maxlimit:      %f", some_float);
+      snprintf(menu_ptr->text, sizeof(menu_ptr->text), "Maxlimit:      %f", some_float);
       return RTT__SUCCESS;
     }
     if (m_ctx->current_item == 10)
@@ -3198,7 +3198,7 @@ static int modify_func(edit_ctx ctx, int flag)
       }
 
       item_ptr->minlimit = some_float;
-      sprintf(menu_ptr->text, "Minlimit:      %f", some_float);
+      snprintf(menu_ptr->text, sizeof(menu_ptr->text), "Minlimit:      %f", some_float);
       return RTT__SUCCESS;
     }
     else if (m_ctx->current_item == 11)
@@ -3216,7 +3216,7 @@ static int modify_func(edit_ctx ctx, int flag)
           (str_NoCaseStrcmp(arg1_str, "RTTSYS") == 0) || (str_NoCaseStrcmp(arg1_str, "USER") == 0))
       {
         strcpy(item_ptr->database, arg1_str);
-        sprintf(menu_ptr->text, "Database:      %s", arg1_str);
+        snprintf(menu_ptr->text, sizeof(menu_ptr->text), "Database:      %s", arg1_str);
         return RTT__SUCCESS;
       }
       else
@@ -3245,7 +3245,7 @@ static int modify_func(edit_ctx ctx, int flag)
           (str_NoCaseStrcmp(arg1_str, "CHAR") == 0))
       {
         strcpy(item_ptr->declaration, arg1_str);
-        sprintf(menu_ptr->text, "Declaration:   %s", arg1_str);
+        snprintf(menu_ptr->text, sizeof(menu_ptr->text), "Declaration:   %s", arg1_str);
         return RTT__SUCCESS;
       }
       else
@@ -4863,7 +4863,7 @@ static int dtt_edit_read_v27(edit_ctx ctx, char* name, int userspec_name)
     }
   }
   else
-    sprintf(filename, "%s%s.dtt", dtt_source_dir, name);
+    snprintf(filename, sizeof(filename), "%s%s.dtt", dtt_source_dir, name);
 
   /* Open and read */
   fin = fopen(filename, "r");
@@ -6526,7 +6526,7 @@ static int dtt_edit_read_menues(char* filename)
   char fname[270];
   char line[80];
 
-  sprintf(fname, "%s%s.dtt_m", dtt_source_dir, filename);
+  snprintf(fname, sizeof(fname), "%s%s.dtt_m", dtt_source_dir, filename);
 
   /* Open and read */
   fin = fopen(fname, "r");
@@ -6945,6 +6945,8 @@ int dtt_start(char* programname)
  *
  **************************************************************************/
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-overflow"
 static int dtt_get_picturefilename(int index, char* filename)
 {
   sprintf(filename, "dtt_appl_%s_p%d", dtt_programname, index);
@@ -6969,6 +6971,7 @@ static int dtt_get_menufilename(char* filename)
   sprintf(filename, "dtt_appl_%s_m", dtt_programname);
   return RTT__SUCCESS;
 }
+#pragma GCC diagnostic pop
 
 /*************************************************************************
  *

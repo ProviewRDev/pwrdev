@@ -2978,6 +2978,7 @@ int rtt_menu_new(menu_ctx parent_ctx, pwr_tObjid argoi, rtt_t_menu** menu_p, cha
           return sts;
         break;
       }
+    /* fall through */
     case RTT_K_CTRLZ:
       if (ctx->parent_ctx != 0)
       {
@@ -3419,6 +3420,7 @@ int rtt_menu_upd_new(menu_ctx parent_ctx, pwr_tObjid argoi, rtt_t_menu_upd** men
           return sts;
         break;
       }
+    /* fall through */
     case RTT_K_CTRLZ:
       if (ctx->parent_ctx != 0)
       {
@@ -3904,6 +3906,7 @@ int rtt_menu_edit_new(menu_ctx parent_ctx, pwr_tObjid argoi, rtt_t_menu_upd** me
           return sts;
         break;
       }
+    /* fall through */
     case RTT_K_CTRLZ:
       if (ctx->parent_ctx != 0)
       {
@@ -4410,6 +4413,7 @@ int rtt_menu_sysedit_new(menu_ctx parent_ctx, pwr_tObjid argoi, rtt_t_menu_upd**
           return sts;
         break;
       }
+    /* fall through */
     case RTT_K_CTRLZ:
       if (ctx->parent_ctx != 0)
       {
@@ -5696,6 +5700,7 @@ static int rtt_edit_print_value(rtt_t_menu_upd* menu_ptr, unsigned long init)
       if (EVEN(sts))
         break;
     }
+    /* fall through */
     case pwr_eType_TypeId:
     {
       pwr_tOName hiername;
@@ -5964,7 +5969,7 @@ static int rtt_attribute_elements(menu_ctx parent_ctx, pwr_tObjid objid, void* a
   {
     if (rtt_mode_address)
     {
-      sprintf(parnameindex, "%8lu    ", (unsigned long)(parameter_ptr + rtt_rtdb_offset));
+      snprintf(parnameindex, sizeof(parnameindex), "%8lu    ", (unsigned long)(parameter_ptr + rtt_rtdb_offset));
       strcat(parnameindex, parname);
     }
     else
@@ -5976,7 +5981,7 @@ static int rtt_attribute_elements(menu_ctx parent_ctx, pwr_tObjid objid, void* a
       if (parameter_ptr != 0)
         if (j != 0)
           parameter_ptr += asize / elements;
-      sprintf(nr, "[%d]", j);
+      snprintf(nr, sizeof(nr), "[%d]", j);
       strcat(parnameindex, nr);
       strcat(parameter_name, nr);
     }
@@ -6340,7 +6345,7 @@ int rtt_object_parameters(menu_ctx parent_ctx, pwr_tObjid objid, void* arg1, voi
     {
       if (rtt_mode_address)
       {
-        sprintf(parnameindex, "%8lu    ", (unsigned long)(parameter_ptr + rtt_rtdb_offset));
+        snprintf(parnameindex, sizeof(parnameindex), "%8lu    ", (unsigned long)(parameter_ptr + rtt_rtdb_offset));
         strcat(parnameindex, bd[i].attrName);
       }
       else
@@ -6365,7 +6370,7 @@ int rtt_object_parameters(menu_ctx parent_ctx, pwr_tObjid objid, void* arg1, voi
       if (bd[i].attrClass == pwr_eClass_Input && rtt_mode_address)
       {
         /* Add the content of the pointer */
-        sprintf(parnameindex, "%8lu    ", (unsigned long)(parameter_ptr - 4 + rtt_rtdb_offset));
+        snprintf(parnameindex, sizeof(parnameindex), "%8lu    ", (unsigned long)(parameter_ptr - 4 + rtt_rtdb_offset));
         strcat(parnameindex, bd[i].attrName);
         strcat(parnameindex, "P");
 
