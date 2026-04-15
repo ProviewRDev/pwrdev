@@ -318,6 +318,7 @@ static int lognav_brow_cb(FlowCtx* ctx, flow_tEvent event)
     default:;
     }
   }
+  /* fall through */
   case flow_eEvent_MB1DoubleClick:
     switch (event->object.object_type)
     {
@@ -327,6 +328,7 @@ static int lognav_brow_cb(FlowCtx* ctx, flow_tEvent event)
       {
       case lognav_eItemType_Hier:
         ((ItemHier*)item)->open_children(lognav, event->object.x, event->object.y);
+        break;
       case lognav_eItemType_Entry:
         ((ItemEntry*)item)->open_children(lognav, event->object.x, event->object.y);
         break;
