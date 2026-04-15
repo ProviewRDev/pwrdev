@@ -41,6 +41,7 @@
    This module contains the meta cache handling routines.  */
 
 #include "rt_gdb.h"
+#include "rt_mvol.h"
 
 #define cmvolc_AssumeLocked(ccp) pwr_Assert(ccp->flags.b.cacheLock)
 
