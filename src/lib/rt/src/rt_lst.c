@@ -38,7 +38,7 @@
 #include "rt_sect.h"
 #include "rt_lst.h"
 
-static pwr_tBoolean check(lst_sEntry* link)
+static pwr_tBoolean __attribute__((unused)) check(lst_sEntry* link)
 {
   if (link == NULL || link->blink == NULL || link->flink == NULL)
     return NO;

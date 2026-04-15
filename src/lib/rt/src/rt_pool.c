@@ -79,7 +79,7 @@ static pool_sSegment* newSegment(pwr_tStatus* sts, pool_sHead* php,
     size_t size /* Requested size in pool_sEntry units */
     );
 
-static pwr_tBoolean checkQ(pool_sHead* php, pool_sQlink* item);
+static pwr_tBoolean __attribute__((unused)) checkQ(pool_sHead* php, pool_sQlink* item);
 
 static pwr_tBoolean checkInitQ(pool_sHead* php, pool_sQlink* item);
 
@@ -105,7 +105,7 @@ static void* allocLookaside(pwr_tStatus* sts, pool_sHead* php, pool_sList* lp)
   return (void*)entryPAdd(ep, sizeof(pool_sEntry));
 }
 
-static pwr_tBoolean checkQ(pool_sHead* php, pool_sQlink* item)
+static pwr_tBoolean __attribute__((unused)) checkQ(pool_sHead* php, pool_sQlink* item)
 {
   pool_sQlink* link;
 
