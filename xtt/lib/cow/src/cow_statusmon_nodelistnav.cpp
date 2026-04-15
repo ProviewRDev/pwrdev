@@ -728,6 +728,7 @@ void NodelistNav::message(pwr_tStatus sts, const char* node, int idx, const char
   {
   case 3:
     severity = 'S';
+    break;
   case 1:
     severity = 'I';
     break;
