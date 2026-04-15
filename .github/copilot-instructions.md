@@ -201,6 +201,38 @@ When modifying class definitions or network protocol structs, see [mixed-version
 ### Testing
 Tests are standalone C executables in `src/tst/`, `src/lib/rt/tst/`, and `src/lib/co/tst/`. They are built as part of the normal module build — no separate test runner or framework. Run them directly after building.
 
+### File Encoding — ISO 8859-1 Gotcha
+
+**~60 source files are encoded in ISO 8859-1** (Latin-1), not UTF-8. They contain Swedish characters (å ä ö Å Ä Ö) in comments and string literals. **Any tool that silently re-encodes to UTF-8 will corrupt these files and break the build** (GCC rejects the byte sequences).
+
+**Rules:**
+- **Never use VS Code `replace_string_in_file` / `multi_replace_string_in_file`** on these files — they convert to UTF-8 on save.
+- Use `LANG=C LC_ALL=C sed -i` for edits to preserve byte-level encoding.
+- If a file gets corrupted: `git checkout HEAD -- <file>`, then re-apply changes with `sed`.
+- Verify encoding after edits: `file <path>` should report `ISO-8859 text`, not `UTF-8`.
+- When the project is eventually migrated to UTF-8, all of these files must be batch-converted (e.g. `iconv -f ISO-8859-1 -t UTF-8`) and the build verified.
+
+**ISO 8859-1 source files (by module):**
+
+| Module | Files |
+|--------|-------|
+| `src/lib/co/` | `co_ccm.c`, `co_cdh.c`, `co_dcli.c`, `co_dcli_input.c` |
+| `src/lib/rt/` | `rt_rtt_command.c`, `rt_rtt_dir.c`, `rt_rtt_global.h`, `rt_rtt_helptext.h`, `rt_plc_io.c`, `rt_io_base.h`, `rt_subc.c` |
+| `src/exe/` | `wb_rtt.c`, `twolist.c`, `cnv_classdep.cpp`, `rt_epri.c`, `rt_qmon.c` |
+| `xtt/lib/` | `ge_graph_ccm.c`, `glow_keyboardctx.cpp`, `xtt_hist.cpp`, `xtt_sevhist.cpp` |
+| `wb/lib/` | `wb_nrep.cpp`, `wb_trv.cpp`, `wb_foe_dataarithm.c`, `wb_wblindex.c` |
+| `dataq/` | `dataq_backup.c`, `dataq_backup_dump.c`, `dataq_appl.c` |
+| `nmps/` | `rs_nmps_bck.c`, `rs_nmps_bck_dump.c`, `nmps_appl.c` |
+| `remote/` | `rs_remote_3964r.c`, `rs_remote_3964r_vnet.c`, `rs_remote_alcm.c`, `rs_remote_dmq.c`, `rs_remote_pams.c`, `rs_remote_rk512.c`, `rs_remote_serial.c`, `remote_remio_utils.c`, `remote_utils.c` |
+| `ssabox/` | `rt_io_m_ssab_pidup.c`, `ssabox_as_ode_solvers.h`, `ssabox_as_phasor_methods.h`, `ssabox_plc_antisway.c/.h`, `ssabox_plc_servoreg.c/.h`, `ssabox_ssabutil.c`, `ssabox_ssabutil_matrix.c` |
+| `otherio/` | `rt_io_m_mb_rtu_master.c`, `rt_io_m_mb_rtu_server.c`, `libusbio.h`, `usbio_dummy_functions.c` |
+| `java/` | `jpwr_rt_mh.c`, `jpwr_rt_hist.cpp` |
+| `tlog/` | `rs_tlog.c` |
+| `project/` | `ra_cdhtest.cpp`, `ra_gdhtest.cpp`, `ra_nethtest.cpp`, `wa_ldhtest.cpp` |
+| `src/tools/` | `docker/pwrtest02/wa_ldhtest.cpp` |
+
+To regenerate this list: `find . -name '*.c' -o -name '*.cpp' -o -name '*.h' | xargs file 2>/dev/null | grep -i iso-8859`
+
 ## Getting Started
 1. Examine existing module structure in `src/` for patterns
 2. Use `pwre.pl` commands to understand build dependencies  
