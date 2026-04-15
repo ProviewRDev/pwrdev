@@ -1,3 +1,6 @@
+#ifndef rt_io_m_ssab_locals_h
+#define rt_io_m_ssab_locals_h
+
 #define BFB_SERVICE_READ 1
 #define BFB_SERVICE_WRITE 2
 
@@ -32,3 +35,5 @@ typedef struct
   int next_write_req_item;     /* Index for next position in write request area */
   int comm_error_count;        /* Consecutive scans without any UDP response */
 } io_sRackLocal;
+
+#endif
